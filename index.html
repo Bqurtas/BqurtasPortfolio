@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barakat Qurtas | Portfolio</title>
+  <style>
+    :root {
+      --bg: #090c14;
+      --surface: rgba(18, 24, 38, 0.74);
+      --surface-2: rgba(29, 35, 50, 0.75);
+      --text: #eef4ff;
+      --muted: #a4b3d7;
+      --primary: #8fa9ff;
+      --primary-2: #4f7bff;
+      --border: rgba(255, 255, 255, 0.13);
+      --ok: #66df9f;
+      --shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+      --radius-xl: 28px;
+      --radius-lg: 18px;
+      --radius-sm: 12px;
+      --font: "Inter", "Segoe UI", Arial, sans-serif;
+    }
+
+    [data-theme="light"] {
+      --bg: #f4f6fb;
+      --surface: rgba(255, 255, 255, 0.9);
+      --surface-2: rgba(242, 246, 255, 0.88);
+      --text: #121826;
+      --muted: #5d6780;
+      --primary: #496dff;
+      --primary-2: #3256dd;
+      --border: rgba(18, 24, 38, 0.12);
+      --ok: #169961;
+      --shadow: 0 20px 38px rgba(29, 44, 84, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; font-family: var(--font); background: radial-gradient(circle at 10% 10%, #16213f 0%, var(--bg) 46%); color: var(--text); scroll-behavior: smooth; }
+    body { min-height: 100vh; }
+
+    .layout { display: flex; }
+
+    .sidebar-wrap { position: fixed; inset-inline-start: 18px; top: 18px; bottom: 18px; width: 92px; z-index: 30; }
+    .scroll-line-track { position: absolute; inset-inline-end: -17px; top: 0; width: 2px; height: 100%; background: rgba(255,255,255,.14); border-radius: 999px; }
+    .scroll-line { width: 100%; height: 0; background: linear-gradient(180deg, #9dc4ff, #4f7bff); border-radius: 999px; transition: height .2s linear; }
+
+    .sidebar { height: 100%; width: 92px; background: var(--surface); border: 1px solid var(--border); border-radius: 34px; backdrop-filter: blur(16px); box-shadow: var(--shadow); overflow: hidden; transition: width .35s ease; padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+    .sidebar:hover { width: 290px; }
+    .profile-chip { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 18px; background: var(--surface-2); border: 1px solid var(--border); }
+    .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,.35); }
+    .profile-text { opacity: 0; width: 0; overflow: hidden; white-space: nowrap; transition: .25s ease; }
+    .sidebar:hover .profile-text { opacity: 1; width: 180px; }
+    .profile-text strong { display: block; font-size: 14px; }
+    .profile-text small { color: var(--muted); }
+
+    .menu-links, .social-links { display: grid; gap: 8px; }
+    .menu-item, .social-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; color: var(--text); text-decoration: none; border: 1px solid transparent; transition: .2s ease; }
+    .menu-item:hover, .social-item:hover { border-color: var(--border); background: rgba(151, 177, 255, .11); transform: translateX(2px); }
+    .icon-dot { min-width: 30px; min-height: 30px; border-radius: 50%; display: grid; place-items: center; background: rgba(139,166,255,.2); border: 1px solid var(--border); font-size: 14px; }
+    .menu-label, .social-label { opacity: 0; width: 0; overflow: hidden; white-space: nowrap; transition: .25s ease; color: var(--muted); }
+    .sidebar:hover .menu-label, .sidebar:hover .social-label { opacity: 1; width: 160px; }
+
+    main { margin-inline-start: 130px; width: calc(100% - 130px); scroll-snap-type: y mandatory; }
+    section { min-height: 100vh; scroll-snap-align: start; padding: 42px 40px; display: flex; align-items: center; }
+    .panel { width: 100%; border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 30px; background: var(--surface); backdrop-filter: blur(12px); box-shadow: var(--shadow); }
+
+    .top-controls { position: fixed; top: 20px; inset-inline-end: 20px; display: flex; gap: 10px; z-index: 40; }
+    .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); padding: 9px 12px; border-radius: 12px; cursor: pointer; }
+
+    .hero-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 24px; align-items: center; }
+    h1 { font-size: clamp(2rem, 4vw, 3.5rem); margin: 0 0 14px; }
+    .badge { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; border: 1px solid var(--border); padding: 8px 12px; color: var(--ok); margin-bottom: 12px; }
+    .tickers { display: flex; overflow: hidden; border-top: 1px solid var(--border); margin-top: 18px; padding-top: 16px; }
+    .ticker-track { white-space: nowrap; animation: move 24s linear infinite; color: var(--muted); }
+    @keyframes move { from { transform: translateX(0); } to { transform: translateX(-50%);} }
+
+    .hero-photo { border-radius: 24px; overflow: hidden; border: 1px solid var(--border); }
+    .hero-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .title-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+    .tab-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .tab-btn { border: 1px solid var(--border); background: var(--surface-2); color: var(--text); border-radius: 12px; padding: 10px 8px; cursor: pointer; display: flex; gap: 6px; justify-content: center; align-items: center; }
+    .tab-btn.active { border-color: var(--primary); background: rgba(95,129,255,.22); }
+    .works-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+    .work-card { aspect-ratio: 1/1; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); cursor: pointer; position: relative; }
+    .work-card img, .work-card video { width: 100%; height: 100%; object-fit: cover; }
+    .status-box { margin-top: 16px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; border:1px solid var(--border); border-radius: 16px; padding: 14px; }
+
+    .logos { display: grid; grid-template-columns: repeat(8,1fr); gap: 12px; }
+    .logo-box { height: 66px; display:grid; place-items:center; border:1px solid var(--border); border-radius: 12px; background: var(--surface-2); }
+    .logo-box img { max-height: 36px; max-width: 80%; object-fit: contain; }
+
+    .about-grid { display:grid; grid-template-columns: 1fr 1fr; gap:18px; }
+    .stats { display:grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+    .stat { padding: 14px; border:1px solid var(--border); border-radius: 14px; background: var(--surface-2); }
+
+    .logo-marquee { overflow: hidden; border:1px solid var(--border); border-radius: 16px; padding: 12px; }
+    .logo-marquee-track { display:flex; gap: 20px; width: max-content; animation: move 18s linear infinite; }
+
+    .footer-icons { display:flex; gap:10px; flex-wrap: wrap; }
+    .round { width: 42px; height: 42px; border-radius: 50%; border:1px solid var(--border); display:grid; place-items:center; background: var(--surface-2); }
+
+    .blog-grid { display:grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+    .blog-card { border:1px solid var(--border); border-radius: 14px; padding: 12px; background: var(--surface-2); cursor: pointer; }
+    .pager { margin-top: 12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    input, select, textarea { background: var(--surface-2); border:1px solid var(--border); color: var(--text); border-radius: 10px; padding: 8px; width: 100%; }
+    textarea { min-height: 120px; }
+
+    .modal { position: fixed; inset:0; display:none; background: rgba(0,0,0,.65); place-items:center; z-index: 50; }
+    .modal.open { display:grid; }
+    .modal-box { width:min(900px,92vw); max-height: 90vh; overflow:auto; background: var(--surface); border:1px solid var(--border); border-radius: 20px; padding: 14px; }
+    .floating { position: fixed; inset-inline-end: 20px; bottom: 20px; display:flex; flex-direction:column; gap:10px; z-index: 40; }
+
+    @media (max-width: 1100px) {
+      .tab-grid { grid-template-columns: repeat(4,1fr); }
+      .works-grid { grid-template-columns: repeat(4,1fr); }
+      .logos { grid-template-columns: repeat(4,1fr); }
+      .hero-grid, .about-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .sidebar-wrap { inset-inline-start: 8px; top: 8px; bottom: 8px; }
+      .sidebar { width: 74px; }
+      main { margin-inline-start: 92px; width: calc(100% - 92px); }
+      section { padding: 26px 14px; }
+      .panel { padding: 16px; }
+      .tab-grid { grid-template-columns: repeat(6,1fr); }
+      .tab-btn span:last-child { display:none; }
+      .works-grid { grid-template-columns: repeat(3,1fr); }
+      .blog-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <div class="top-controls">
+    <button class="btn" id="themeBtn">🌙 Dark</button>
+    <select id="langSwitch" class="btn" style="padding-right:28px;">
+      <option value="en">EN</option>
+      <option value="ku">KU</option>
+      <option value="ar">AR</option>
+    </select>
+  </div>
+
+  <aside class="sidebar-wrap">
+    <div class="sidebar" id="sidebar">
+      <div class="profile-chip">
+        <img src="WebsitePortfolio/Bqurtas1.webp" alt="Barakat" class="avatar" />
+        <div class="profile-text"><strong data-i18n="name">Barakat Qurtas</strong><small>Graphic Designer</small></div>
+      </div>
+      <nav class="menu-links">
+        <a class="menu-item" href="#home"><span class="icon-dot">⌂</span><span class="menu-label" data-i18n="home">Home</span></a>
+        <a class="menu-item" href="#journal"><span class="icon-dot">✎</span><span class="menu-label" data-i18n="journal">Journal</span></a>
+        <a class="menu-item" href="#bio"><span class="icon-dot">☰</span><span class="menu-label" data-i18n="biography">Biography</span></a>
+        <a class="menu-item" href="#contact"><span class="icon-dot">✉</span><span class="menu-label" data-i18n="contact">Contact</span></a>
+      </nav>
+      <div class="social-links">
+        <a class="social-item" href="https://instagram.com/Bqurtas" target="_blank"><span class="icon-dot">◎</span><span class="social-label">Instagram</span></a>
+        <a class="social-item" href="https://facebook.com/Bqurtas" target="_blank"><span class="icon-dot">f</span><span class="social-label">Facebook</span></a>
+        <a class="social-item" href="https://linkedin.com/in/bqurtas" target="_blank"><span class="icon-dot">in</span><span class="social-label">LinkedIn</span></a>
+        <a class="social-item" href="https://youtube.com/@Bqurtas" target="_blank"><span class="icon-dot">▶</span><span class="social-label">YouTube</span></a>
+      </div>
+    </div>
+    <div class="scroll-line-track"><div class="scroll-line" id="scrollLine"></div></div>
+  </aside>
+
+  <main>
+    <section id="home">
+      <div class="panel">
+        <div class="hero-grid">
+          <div>
+            <div class="badge">● <span data-i18n="available">Available to work</span></div>
+            <h1><span data-i18n="name">Barakat Qurtas</span><br><span style="color:var(--primary)" data-i18n="role">Graphic Designer</span></h1>
+            <p data-i18n="heroText">Luxury visual systems, editorial design, social campaigns, and identity experiences.</p>
+            <div class="tickers"><div class="ticker-track">Graphic Design · Printing · Website Design · Social Media · Video Montage · Videography · Photography · AI · Book · Logo · Graphic Design · Printing · Website Design · Social Media · Video Montage · Videography · Photography · AI · Book · Logo ·</div></div>
+          </div>
+          <div class="hero-photo"><img src="WebsitePortfolio/CoverWeb.webp" alt="cover"></div>
+        </div>
+
+        <hr style="border-color:var(--border); margin:24px 0">
+
+        <div class="title-row"><h2 style="margin:0" data-i18n="portfolio">Portfolio</h2><small id="portfolioCount">General Design · 85 Masterpieces</small></div>
+        <div class="tab-grid" id="tabs"></div>
+        <div class="works-grid" id="works"></div>
+        <div class="status-box">
+          <div><small>COLLECTION STATUS</small><div>ARCHIVE UNIFIED & COMPLETE</div></div>
+          <div id="statusValue">29% · 25 / 85</div>
+          <button class="btn" id="loadMore">UNVEIL NEXT BATCH</button>
+        </div>
+
+        <h3 style="margin-top:24px">Institutions Portfolio — Work with</h3>
+        <p>Places I am always proud to work with and our ongoing collaboration.</p>
+        <div class="logos" id="workLogos"></div>
+
+        <div class="about-grid" style="margin-top:18px;">
+          <div class="panel" style="padding:18px;">
+            <small>Graphic Design</small>
+            <h3 style="margin:8px 0">Personal Biography</h3>
+            <p>12+ Years · Explore Biography</p>
+            <p>"The primary goal of my work is consistently delivering excellence and ensuring complete satisfaction."</p>
+          </div>
+          <div class="stats">
+            <div class="stat"><strong>+1000</strong><div>Designs</div></div>
+            <div class="stat"><strong>25+</strong><div>Clients</div></div>
+            <div class="stat"><strong>20+</strong><div>Logos</div></div>
+            <div class="stat"><strong>100+</strong><div>Campaigns</div></div>
+          </div>
+        </div>
+
+        <h3>Logo Motion</h3>
+        <div class="logo-marquee"><div class="logo-marquee-track" id="tickerLogos"></div></div>
+
+        <footer style="margin-top:20px; border-top:1px solid var(--border); padding-top:14px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+          <div>© <span data-i18n="name">Barakat Qurtas</span> · <span data-i18n="role">Graphic Designer</span></div>
+          <div class="footer-icons"><span class="round">Ps</span><span class="round">Ai</span><span class="round">Ae</span><span class="round">Id</span><span class="round">Lr</span><span class="round">AI</span></div>
+        </footer>
+      </div>
+    </section>
+
+    <section id="journal">
+      <div class="panel">
+        <h2 data-i18n="journal">Journal</h2>
+        <div class="blog-grid" id="blogGrid"></div>
+        <div class="pager">
+          <span>123</span><span>Page</span>
+          <input id="pageInput" type="number" min="1" style="width:80px;" />
+          <button class="btn" id="goPage">Go</button>
+          <span id="pageInfo">Page 1 of 3</span>
+        </div>
+        <h3>Subscribe</h3>
+        <input placeholder="Email address" />
+      </div>
+    </section>
+
+    <section id="bio">
+      <div class="panel">
+        <h2 data-i18n="biography">Biography</h2>
+        <h4>Discover the story behind the designer</h4>
+        <p><strong>WORK PHILOSOPHY</strong><br>"It doesn't matter where I work now or where I work in the future, but it is always important to be satisfied with others."</p>
+        <p>I’m Barakat Qurtas, born in Soran and currently based in Erbil, a city that transformed the way I see the world. I grew up between the stillness of the mountains and the rhythm of city life—two contrasts that continue to define my design language.</p>
+        <p>I work with Adobe Creative Suite and hold several masterclass certificates. I’ve collaborated with the Presidency of the Kurdistan Region and the KRG Protocol. My aim is to expand my creative impact and establish a leading advertising and publishing company.</p>
+        <div class="about-grid">
+          <div><h4>Experience</h4><p>Directorate of Media Affairs (Dec 2021 - Present) · Protocol Media · Freelance Graphic Designer.</p></div>
+          <div><h4>Education</h4><p>Salahaddin University-Erbil · Diploma of Law (2020 – 2022).</p></div>
+          <div><h4>Honors & Awards</h4><p>Shield of Honor and Certificate of Appreciation (Sep 2025), Office of the President (Apr 2024), Soran University (Oct 2023).</p></div>
+          <div><h4>Languages & Organizations</h4><p>Arabic, English, Kurdish and more · Nuche Net, KDYU, CNO, justice NGO.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="panel">
+        <h2 data-i18n="contact">Contact</h2>
+        <h3>Get in Touch · Let's Collaborate</h3>
+        <p><strong>Digital Landscape:</strong> Erbil - Kurdistan Region, Iraq</p>
+        <p><strong>Inquiry:</strong> <a href="mailto:info@bqurtas.com">info@bqurtas.com</a> · <strong>Call:</strong> <a href="tel:009647517884985">00964 751 788 49 85</a></p>
+        <div class="about-grid">
+          <form class="panel" style="padding:16px;">
+            <h4>Project Brief</h4>
+            <input placeholder="Full name" />
+            <input placeholder="Email" />
+            <select>
+              <option>Graphic Design</option><option>Logo Design</option><option>Social Media</option><option>Website Design</option><option>Video</option>
+            </select>
+            <textarea placeholder="Tell me about your project..."></textarea>
+            <button class="btn" type="button">Send Inquiry</button>
+          </form>
+          <div class="panel" style="padding:16px;">
+            <h4>AI Chat Assistant (Coming soon)</h4>
+            <p>Before direct contact, users can ask quick questions and get instant answers from your assistant.</p>
+            <button class="btn" type="button">Open Chatbot</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="floating">
+    <a href="#home" class="btn">↑</a>
+    <button class="btn">🤖</button>
+  </div>
+
+  <div class="modal" id="workModal"><div class="modal-box"><button class="btn" id="closeModal">Close</button><div id="modalBody"></div></div></div>
+
+  <script>
+    const i18n = {
+      en: {name:'Barakat Qurtas', home:'Home', journal:'Journal', biography:'Biography', contact:'Contact', role:'Graphic Designer', available:'Available to work', heroText:'Luxury visual systems, editorial design, social campaigns, and identity experiences.', portfolio:'Portfolio'},
+      ar: {name:'بركات قزطاس', home:'الرئيسية', journal:'المدونة', biography:'السيرة', contact:'تواصل', role:'مصمم جرافيك', available:'متاح للعمل', heroText:'أنظمة بصرية راقية وهوية احترافية وحملات رقمية.', portfolio:'الأعمال'},
+      ku: {name:'بەرەکات قورتاس', home:'سەرەکی', journal:'بلۆگ', biography:'ژیاننامە', contact:'پەیوەندی', role:'گرافیک دیزاینەر', available:'بەردەست بۆ کار', heroText:'سیستەمی دیزاینی راقی، ناسنامەی براند و کەمپەینی دیجیتاڵ.', portfolio:'پرتفۆلیۆ'}
+    };
+
+    const tabs = [
+      ['General','📦','GeneralDesign','GDesign',85,'webp'], ['Official','🏛','Official','Official',168,'webp'], ['Posters','🪧','Poster','Poster',18,'webp'],
+      ['Social','📱','SocialMedia','SMedia',19,'webp'], ['Logo','⬢','LogoDesign','Logo',28,'webp'], ['Book','📚','Book','BookCover',99,'webp'],
+      ['Events','🎟','EventandCon','Event',16,'webp'], ['Business','💼','Businesscard','Bcard',11,'webp'], ['Invoices','🧾','Invoice','Invoice',12,'webp'],
+      ['Image','🖼','Photos','Photo',147,'webp'], ['Video','🎬','Videos','Videos',30,'mp4'], ['Other','✨','Other','Other',45,'webp']
+    ];
+
+    let activeTab = 0, visible = 25;
+    const tabsEl = document.getElementById('tabs');
+    const worksEl = document.getElementById('works');
+    const countEl = document.getElementById('portfolioCount');
+    const statusEl = document.getElementById('statusValue');
+
+    tabs.forEach((t,i)=>{
+      const b = document.createElement('button'); b.className='tab-btn'+(i===0?' active':'');
+      b.innerHTML = `<span>${t[1]}</span><span>${t[0]}</span>`;
+      b.onclick = ()=>{ activeTab=i; visible=25; document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderWorks();};
+      tabsEl.appendChild(b);
+    });
+
+    function renderWorks(){
+      worksEl.innerHTML='';
+      const [name,,folder,prefix,total,ext] = tabs[activeTab];
+      countEl.textContent = `${name} Design · ${total} MASTERPIECES`;
+      const max = Math.min(total, visible);
+      for(let i=1;i<=max;i++){
+        const card=document.createElement('div'); card.className='work-card';
+        card.innerHTML = ext==='mp4' ? `<video src="${folder}/${prefix}${i}.${ext}" muted playsinline></video>` : `<img loading="lazy" src="${folder}/${prefix}${i}.${ext}" alt="${name} ${i}">`;
+        card.onclick=()=>openModal(i,total,name,folder,prefix,ext);
+        worksEl.appendChild(card);
+      }
+      statusEl.textContent = `${Math.round((max/total)*100)}% · ${max} / ${total}`;
+    }
+
+    function openModal(i,total,name,folder,prefix,ext){
+      const modal=document.getElementById('workModal');
+      const body=document.getElementById('modalBody');
+      body.innerHTML=`<h3>${name} · ${i} / ${total}</h3>${ext==='mp4'?`<video controls autoplay src="${folder}/${prefix}${i}.${ext}" style="width:100%;border-radius:12px"></video>`:`<img src="${folder}/${prefix}${i}.${ext}" style="width:100%;border-radius:12px">`}`;
+      modal.classList.add('open');
+    }
+
+    document.getElementById('closeModal').onclick=()=>document.getElementById('workModal').classList.remove('open');
+    document.getElementById('loadMore').onclick=()=>{ visible += 25; renderWorks(); };
+
+    const logosEl=document.getElementById('workLogos');
+    for(let i=1;i<=16;i++){
+      const d=document.createElement('div'); d.className='logo-box';
+      d.innerHTML=`<img src="WorkWith/WorkLogo${i}.webp" alt="work ${i}">`;
+      logosEl.appendChild(d);
+    }
+    const tlogos=document.getElementById('tickerLogos');
+    for(let r=0;r<2;r++) for(let i=1;i<=13;i++) { const img=document.createElement('img'); img.src=`TickerLogo/TickerLogo${i}.webp`; img.style.height='54px'; img.style.borderRadius='12px'; tlogos.appendChild(img); }
+
+    const blogs = Array.from({length: 10}, (_,i)=>({
+      title:`Design Journal #${i+1}`,
+      date:`2026-0${(i%8)+1}-0${(i%9)+1}`,
+      author:'Barakat Qurtas',
+      excerpt:'A modern note about visual storytelling, print discipline, and digital identity systems.'
+    }));
+    let blogPage=1, perPage=4;
+    function renderBlogs(){
+      const s=(blogPage-1)*perPage, e=s+perPage, part=blogs.slice(s,e), totalPages=Math.ceil(blogs.length/perPage);
+      const grid=document.getElementById('blogGrid'); grid.innerHTML='';
+      part.forEach((b,idx)=>{ const c=document.createElement('article'); c.className='blog-card'; c.innerHTML=`<h4>${b.title}</h4><small>${b.author} · ${b.date}</small><p>${b.excerpt}</p><button class='btn'>Read</button>`; c.onclick=()=>alert(`${b.title}\n\n${b.excerpt}\n\n(Return button ready in full CMS phase)`); grid.appendChild(c); });
+      document.getElementById('pageInfo').textContent = `Page ${blogPage} of ${totalPages}`;
+    }
+    document.getElementById('goPage').onclick=()=>{ const n=+document.getElementById('pageInput').value||1; const total=Math.ceil(blogs.length/perPage); blogPage=Math.min(total,Math.max(1,n)); renderBlogs(); };
+
+    document.getElementById('themeBtn').onclick=()=>{
+      const b=document.body;
+      const light=b.getAttribute('data-theme')==='light';
+      b.setAttribute('data-theme', light?'dark':'light');
+      document.getElementById('themeBtn').textContent = light ? '🌙 Dark' : '☀ Light';
+    };
+
+    document.getElementById('langSwitch').onchange=(e)=>{
+      const lang=e.target.value, pack=i18n[lang];
+      document.documentElement.lang=lang;
+      document.documentElement.dir=(lang==='ar')?'rtl':'ltr';
+      document.querySelectorAll('[data-i18n]').forEach(el=>{ const k=el.getAttribute('data-i18n'); if(pack[k]) el.textContent=pack[k]; });
+    };
+
+    window.addEventListener('scroll', ()=>{
+      const win=window.scrollY, h=document.documentElement.scrollHeight - window.innerHeight;
+      document.getElementById('scrollLine').style.height = `${Math.max(0,(win/h)*100)}%`;
+    });
+
+    renderWorks(); renderBlogs();
+  </script>
+</body>
+</html>
