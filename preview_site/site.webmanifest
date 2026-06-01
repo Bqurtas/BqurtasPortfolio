@@ -1,0 +1,12 @@
+{
+  "name": "Barakat Qurtas — Graphic Designer",
+  "short_name": "Bq.",
+  "description": "Independent graphic designer in Erbil, Kurdistan — brand identity, editorial, books, logos, posters & video.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#efe6d2",
+  "theme_color": "#14100b",
+  "icons": [
+    { "src": "/assets/logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any maskable" }
+  ]
+}
