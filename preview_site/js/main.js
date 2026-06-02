@@ -73,11 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('mobileMenu')?.classList.toggle('is-open');
   });
 
-  // Initial language: a /lang prefix in the URL wins, then the saved choice
-  let savedLang = null;
-  try { savedLang = localStorage.getItem('bq_lang'); } catch(e){}
+  // Initial language: ALWAYS English by default — only a /lang prefix in the
+  // URL (a shared localized link) switches it. Switching in-session updates
+  // the URL, so a reload keeps the chosen language without defaulting to it.
   const urlLang0 = location.pathname.replace(/^\/+/, '').split('/')[0];
-  window.applyLang(URL_LANGS.includes(urlLang0) ? urlLang0 : (savedLang || 'en'));
+  window.applyLang(URL_LANGS.includes(urlLang0) ? urlLang0 : 'en');
 
   /* ---------- ROUTER (room switcher + deep-links) ---------- */
   const rooms = document.querySelectorAll('.room');
@@ -159,6 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileMenu = document.getElementById('mobileMenu');
   const setMenu = (open) => {
     mobileMenu?.classList.toggle('is-open', open);
+    document.body.classList.toggle('menu-open', open);
     document.body.style.overflow = open ? 'hidden' : '';
   };
   menuBtn?.addEventListener('click', () => setMenu(!mobileMenu?.classList.contains('is-open')));
