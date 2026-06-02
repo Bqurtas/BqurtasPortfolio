@@ -599,69 +599,72 @@ em { font-style: italic; color: var(--ember); }
 }
 .mobilebar-pop--social a:active { color: var(--gold); border-color: var(--gold); }
 
-/* Full-screen overlay menu */
+/* Mobile menu — a dimmed backdrop with a compact bottom sheet (not full-screen) */
 .mobile-menu {
   display: none;
   position: fixed; inset: 0;
-  background: var(--bg);
+  background: rgba(20,12,6,0.5);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
   z-index: 200;
-  padding: 72px 24px max(40px, env(safe-area-inset-bottom));
-  flex-direction: column; align-items: center; justify-content: center;
-  overflow-y: auto; -webkit-overflow-scrolling: touch;
   opacity: 0; pointer-events: none;
-  transform: translateY(-100%);                 /* slides down from the top */
-  transition: opacity 0.3s var(--ease), transform 0.5s var(--ease-out);
+  transition: opacity 0.32s var(--ease);
 }
-.mobile-menu.is-open { opacity: 1; pointer-events: auto; transform: translateY(0); }
-/* the scroll-to-top control hides while the menu sheet is down */
+.mobile-menu.is-open { opacity: 1; pointer-events: auto; }
+/* the scroll-to-top control hides while the menu is open */
 body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform: scale(0.8); }
-  position: absolute; top: 16px; right: 20px;
-  width: 46px; height: 46px; border-radius: 50%;
+
+.mobile-sheet {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: var(--bg);
+  border-radius: 28px 28px 0 0;
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -24px 60px -20px rgba(0,0,0,0.5);
+  padding: 14px 22px max(26px, env(safe-area-inset-bottom));
+  max-height: 86vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  transform: translateY(100%);
+  transition: transform 0.42s var(--ease-out);
+}
+.mobile-menu.is-open .mobile-sheet { transform: translateY(0); }
+.mobile-sheet::before {
+  content: ''; display: block; width: 46px; height: 5px; border-radius: 999px;
+  background: var(--line); margin: 2px auto 2px;
+}
+.mobile-menu-close {
+  position: absolute; top: 14px; right: 18px;
+  width: 52px; height: 52px; border-radius: 50%;
   border: 1px solid var(--line); background: var(--surface);
   color: var(--ink); display: flex; align-items: center; justify-content: center;
-  font-size: 18px; z-index: 2;
+  font-size: 24px; z-index: 3;
 }
-[dir="rtl"] .mobile-menu-close { right: auto; left: 20px; }
+[dir="rtl"] .mobile-menu-close { right: auto; left: 18px; }
 .mobile-menu-close:hover, .mobile-menu-close:active { color: var(--gold); border-color: var(--gold); }
 
-/* Languages + socials sit separately at the top of the sheet */
-.mobile-menu-top {
-  width: 100%; max-width: 440px;
-  display: flex; flex-direction: column; gap: 16px;
-  margin-bottom: 4px; flex-shrink: 0;
-}
-
-/* Profile block — name · photo · logo (the Bq card, made permanent) */
+/* Profile block — photo · name (no Bq logo) */
 .mobile-menu-profile {
   display: flex; flex-direction: column; align-items: center;
-  text-align: center; gap: 7px;
-  margin: 26px 0 18px; flex-shrink: 0;
+  text-align: center; gap: 6px;
+  margin: 6px 0 14px;
 }
-.mobile-menu-logo {
-  font-family: 'Fraunces', serif; font-style: italic; font-weight: 600;
-  font-size: 30px; color: var(--ink); line-height: 1;
-}
-.mobile-menu-logo::after { content: '.'; color: var(--gold); }
 .mobile-menu-photo {
-  width: 96px; height: 96px; border-radius: 50%; overflow: hidden;
-  border: 2px solid var(--gold); margin-top: 4px;
+  width: 84px; height: 84px; border-radius: 50%; overflow: hidden;
+  border: 2px solid var(--gold);
 }
 .mobile-menu-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 /* Only the NAME is set in the Liana logo font */
-.mobile-menu-name { font-family: 'Liana', 'Fraunces', serif; font-weight: 400; font-size: 34px; margin: 8px 0 0; }
+.mobile-menu-name { font-family: 'Liana', 'Fraunces', serif; font-weight: 400; font-size: 32px; margin: 6px 0 0; }
 .mobile-menu-role { color: var(--ink-soft); }
 
 /* Centered room titles — the normal serif heading face */
 .mobile-nav {
   width: 100%; max-width: 440px;
   display: flex; flex-direction: column; align-items: stretch; gap: 6px;
-  margin: 10px 0;
+  margin: 6px auto 0;
 }
 .mobile-link {
   display: flex; align-items: center; justify-content: center; gap: 14px;
-  padding: 18px; border-radius: 14px;
+  padding: 15px; border-radius: 14px;
   color: var(--ink);
-  font-family: 'Fraunces', serif; font-size: 28px; font-weight: 500;
+  font-family: 'Fraunces', serif; font-size: 26px; font-weight: 500;
   text-align: center;
 }
 .mobile-link i { color: var(--gold); font-size: 18px; }
@@ -786,6 +789,21 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .hero-marquee-track i { margin-right: 6px; color: var(--gold); }
 .hero-marquee-track span:nth-child(even) { color: var(--gold); }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* hero services tagline (Design • Printing • Advertising · AI) */
+.hero-services {
+  margin-top: 22px;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 16px;
+  opacity: 0; animation: fadeIn 1s ease 2s forwards;
+}
+.hero-services-main { color: var(--ink-soft); font-size: 12px; letter-spacing: 0.16em; }
+.hero-services-ai {
+  display: inline-flex; align-items: center; gap: 7px;
+  color: var(--gold); font-size: 12px; letter-spacing: 0.14em;
+  padding: 6px 13px; border: 1px solid rgba(201,162,83,0.45); border-radius: 999px;
+}
+.hero-services-ai i { font-size: 11px; }
+@media (max-width: 560px) { .hero-services { flex-direction: column; gap: 10px; margin-top: 18px; } }
 
 /* =========================================================
    ROOM HERO — a classy intro at the top of each room
@@ -1587,7 +1605,8 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
     border: 1px solid var(--line);
     border-radius: 18px;
     box-shadow: 0 -8px 30px -22px rgba(26,15,8,0.5), 0 26px 50px -34px rgba(0,0,0,0.5);
-    height: min(76svh, 620px);
+    /* a fixed (viewport-stable) height avoids the resize jump while scrolling */
+    height: min(72vh, 560px);
     overflow: hidden;
   }
   :root[data-theme="dark"] .bio-stack > .bio-block { background: var(--bg-2); }
@@ -2897,13 +2916,14 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 /* Mobile: the assistant takes the whole screen, with a close button on top */
 @media (max-width: 820px) {
   .chat {
-    inset: 0; left: 0; right: 0;
-    width: 100%; max-width: none; height: 100dvh; border-radius: 0; border: 0;
+    top: auto; bottom: 0; left: 0; right: 0;
+    width: 100%; max-width: none; height: 80vh; max-height: 80dvh;
+    border-radius: 24px 24px 0 0; border: 1px solid var(--line); border-bottom: 0;
     transform: translateY(100%); transform-origin: bottom center;
   }
   [dir="rtl"] .chat { left: 0; right: 0; }
   .chat.is-open { transform: none; }
-  .chat-head { padding: max(16px, env(safe-area-inset-top)) 18px 16px; }
+  .chat-head { padding: 18px; border-radius: 24px 24px 0 0; }
   .chat-min { width: 42px; height: 42px; font-size: 19px; background: rgba(255,255,255,0.08); }
   .chat-body { padding: 20px; gap: 14px; }
   .chat-msg { max-width: 88%; font-size: 15px; }
@@ -3203,7 +3223,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   .rail-card { display: none; }
   .to-top { bottom: 94px; right: 16px; width: 44px; height: 44px; }
   .to-top-ring { width: 44px; height: 44px; }
-  .chat { inset: 0; top: 0; bottom: 0; left: 0; right: 0; width: 100%; height: 100dvh; border-radius: 0; border: 0; transform-origin: bottom center; }
+  .chat { top: auto; bottom: 0; left: 0; right: 0; width: 100%; height: 80vh; max-height: 80dvh; border-radius: 24px 24px 0 0; transform-origin: bottom center; }
   [dir="rtl"] .chat { right: 0; left: 0; }
   .dash-main { flex-direction: column; }
   .dash-tabs { width: 100%; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--line); }

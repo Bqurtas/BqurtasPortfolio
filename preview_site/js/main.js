@@ -164,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   menuBtn?.addEventListener('click', () => setMenu(!mobileMenu?.classList.contains('is-open')));
   document.getElementById('mobileMenuClose')?.addEventListener('click', () => setMenu(false));
+  mobileMenu?.addEventListener('click', (e) => { if (e.target === mobileMenu) setMenu(false); });
 
   /* ---------- MOBILE BOTTOM-BAR POPUPS (language · socials) ---------- */
   const langPop = document.getElementById('langPop');

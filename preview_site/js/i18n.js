@@ -50,7 +50,7 @@ window.I18N = {
     'contact.pitch.lede': 'Tell me about you, your project, your timeline, and your budget. I reply to every serious enquiry within 48 hours.',
     'contact.submit': 'Send the pitch',
 
-        'meta.title.design': 'Barakat Qurtas — Kurdish Graphic & Motion Designer',
+        'meta.title.design': 'Barakat Qurtas | Design • Printing • Advertising',
     'meta.title.blog': 'The Journal — Barakat Qurtas', 'meta.title.bio': 'Biography — Barakat Qurtas', 'meta.title.contact': 'Contact — Barakat Qurtas',
     'hero.portfolio': 'Portfolio · 2026', 'hero.issue': 'Vol. 04 / Issue 01', 'hero.scroll': 'Scroll', 'krg': 'Hewlêr · KRG',
     'f.cta.eye': 'Have a project in mind?', 'f.cta.title': "Let's make something <em>quietly</em> good together.", 'f.cta.btn': 'Start a conversation',
@@ -117,7 +117,7 @@ window.I18N = {
     'contact.pitch.lede': 'باسی خۆت و پڕۆژەکەت و کاتەکەت و بودجەکەت بۆ بکە. لە ماوەی ٤٨ کاتژمێردا وەڵامی هەموو نامەیەکی جددی دەدەمەوە.',
     'contact.submit': 'نامەکە بنێرە',
 
-        'meta.title.design': 'بەرەکات قورتاس — دیزاینەری گرافیک و مۆشن',
+        'meta.title.design': 'بەرەکات قورتاس | دیزاین • چاپ • بانگەشە',
     'meta.title.blog': 'گۆڤار — بەرەکات قورتاس', 'meta.title.bio': 'بایۆگرافی — بەرەکات قورتاس', 'meta.title.contact': 'پەیوەندی — بەرەکات قورتاس',
     'hero.portfolio': 'پۆرتفۆلیۆ · ٢٠٢٦', 'hero.issue': 'بەرگی ٠٤ / ژمارە ٠١', 'hero.scroll': 'بۆ خوارەوە', 'krg': 'هەولێر · هەرێمی کوردستان',
     'f.cta.eye': 'پڕۆژەیەکت لە مێشکدایە؟', 'f.cta.title': 'با بە <em>هێمنی</em> شتێکی جوان دروست بکەین.', 'f.cta.btn': 'دەستپێبکە بە گفتوگۆ',
@@ -184,7 +184,7 @@ window.I18N = {
     'contact.pitch.lede': 'Li ser xwe, projeya xwe, dema xwe û budceya xwe binivîse. Ez di 48 saetan de bersiva her daxwazek cidî didim.',
     'contact.submit': 'Pêşniyarê bişîne',
 
-        'meta.title.design': 'Barakat Qurtas — Sêwirmendê Grafîk û Motion',
+        'meta.title.design': 'Barakat Qurtas | Sêwiran • Çap • Reklam',
     'meta.title.blog': 'Kovar — Barakat Qurtas', 'meta.title.bio': 'Jînenîgarî — Barakat Qurtas', 'meta.title.contact': 'Têkilî — Barakat Qurtas',
     'hero.portfolio': 'Portfolyo · 2026', 'hero.issue': 'Cild 04 / Hejmar 01', 'hero.scroll': 'Berjêr', 'krg': 'Hewlêr · Kurdistan',
     'f.cta.eye': 'Projeyek di hişê te de heye?', 'f.cta.title': 'Werin em tiştekî <em>bêdeng</em> xweş çêkin.', 'f.cta.btn': 'Danûstandinê dest pê bike',
@@ -251,7 +251,7 @@ window.I18N = {
     'contact.pitch.lede': 'أخبرني عنك، عن مشروعك، عن جدولك الزمني، وميزانيتك. أرد على كل استفسار جدي خلال 48 ساعة.',
     'contact.submit': 'أرسل الاقتراح',
 
-        'meta.title.design': 'بركات قرطاس — مصمم جرافيك وموشن كردي',
+        'meta.title.design': 'بركات قرطاس | تصميم • طباعة • إعلان',
     'meta.title.blog': 'المدونة — بركات قرطاس', 'meta.title.bio': 'السيرة — بركات قرطاس', 'meta.title.contact': 'التواصل — بركات قرطاس',
     'hero.portfolio': 'بورتفوليو · ٢٠٢٦', 'hero.issue': 'المجلد ٠٤ / العدد ٠١', 'hero.scroll': 'مرّر للأسفل', 'krg': 'أربيل · إقليم كردستان',
     'f.cta.eye': 'لديك مشروع في بالك؟', 'f.cta.title': 'لنصنع شيئًا <em>جميلًا</em> بهدوء معًا.', 'f.cta.btn': 'ابدأ محادثة',
@@ -318,7 +318,7 @@ window.I18N = {
     'contact.pitch.lede': 'Parlez-moi de vous, de votre projet, du calendrier et du budget. Je réponds à chaque demande sérieuse sous 48 h.',
     'contact.submit': 'Envoyer la proposition',
 
-        'meta.title.design': 'Barakat Qurtas — Designer Graphique & Motion Kurde',
+        'meta.title.design': 'Barakat Qurtas | Design • Impression • Publicité',
     'meta.title.blog': 'Le Journal — Barakat Qurtas', 'meta.title.bio': 'Biographie — Barakat Qurtas', 'meta.title.contact': 'Contact — Barakat Qurtas',
     'hero.portfolio': 'Portfolio · 2026', 'hero.issue': 'Vol. 04 / Numéro 01', 'hero.scroll': 'Défiler', 'krg': 'Hewlêr · Kurdistan',
     'f.cta.eye': 'Un projet en tête ?', 'f.cta.title': 'Créons ensemble quelque chose de <em>discrètement</em> beau.', 'f.cta.btn': 'Démarrer une conversation',
@@ -1224,3 +1224,7 @@ window.ROOMCARD_I18N = {"ku": {"design": {"tag": "پۆرتفۆلیۆ", "count": 
 /* ===== chat header strings ===== */
 window.I18N_EXTRA_CH = {"en": {"chat.title": "Studio Assistant", "chat.status": "Online · replies instantly", "chat.ph": "Ask about services, pricing, timeline…"}, "ku": {"chat.title": "یاریدەدەری ستۆدیۆ", "chat.status": "ئۆنلاین · خێرا وەڵام دەداتەوە", "chat.ph": "پرسیار بکە دەربارەی خزمەت، نرخ، کات…"}, "kmr": {"chat.title": "Alîkarê Studyo", "chat.status": "Online · tavilê bersiv dide", "chat.ph": "Li ser karûbar, biha, dem bipirse…"}, "ar": {"chat.title": "مساعد الاستوديو", "chat.status": "متصل · يرد فورًا", "chat.ph": "اسأل عن الخدمات، الأسعار، الوقت…"}, "fr": {"chat.title": "Assistant du studio", "chat.status": "En ligne · répond aussitôt", "chat.ph": "Posez une question : services, tarifs, délais…"}};
 Object.keys(window.I18N_EXTRA_CH).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_CH[l]); });
+
+/* ===== hero services tagline ===== */
+window.I18N_EXTRA_HS = {"en": {"hero.services": "Design • Printing • Advertising", "hero.ai": "Artificial Intelligence • AI"}, "ku": {"hero.services": "دیزاین • چاپ • بانگەشە", "hero.ai": "زیرەکیی دەستکرد • AI"}, "kmr": {"hero.services": "Sêwiran • Çap • Reklam", "hero.ai": "Aqilmendiya Çêkirî • AI"}, "ar": {"hero.services": "تصميم • طباعة • إعلان", "hero.ai": "الذكاء الاصطناعي • AI"}, "fr": {"hero.services": "Design • Impression • Publicité", "hero.ai": "Intelligence Artificielle • IA"}};
+Object.keys(window.I18N_EXTRA_HS).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_HS[l]); });
