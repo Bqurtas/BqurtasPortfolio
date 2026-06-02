@@ -3,8 +3,8 @@
   <url><loc>https://www.bqurtas.com/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>
   <url><loc>https://www.bqurtas.com/design</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://www.bqurtas.com/blog</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.bqurtas.com/bio</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.bqurtas.com/contact</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.bqurtas.com/bio</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.bqurtas.com/contact</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.bqurtas.com/design/official</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.bqurtas.com/design/book</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.bqurtas.com/design/image</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
@@ -16,4 +16,68 @@
   <url><loc>https://www.bqurtas.com/design/invoices</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.bqurtas.com/design/video</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.bqurtas.com/design/other</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bqurtas.com/ku</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.bqurtas.com/ku/design</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.bqurtas.com/ku/blog</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bqurtas.com/ku/bio</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bqurtas.com/ku/contact</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bqurtas.com/ku/design/official</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ku/design/book</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ku/design/image</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ku/design/logo</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ku/design/posters</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ku/design/social</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ku/design/events</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ku/design/business</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ku/design/invoices</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ku/design/video</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ku/design/other</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr/design</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr/blog</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr/bio</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr/contact</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr/design/official</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr/design/book</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr/design/image</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr/design/logo</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr/design/posters</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr/design/social</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr/design/events</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr/design/business</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr/design/invoices</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr/design/video</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/kmr/design/other</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ar</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.bqurtas.com/ar/design</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.bqurtas.com/ar/blog</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bqurtas.com/ar/bio</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bqurtas.com/ar/contact</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bqurtas.com/ar/design/official</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ar/design/book</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ar/design/image</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ar/design/logo</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ar/design/posters</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ar/design/social</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ar/design/events</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ar/design/business</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ar/design/invoices</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ar/design/video</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/ar/design/other</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/fr</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.bqurtas.com/fr/design</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.bqurtas.com/fr/blog</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bqurtas.com/fr/bio</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bqurtas.com/fr/contact</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.bqurtas.com/fr/design/official</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/fr/design/book</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/fr/design/image</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/fr/design/logo</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/fr/design/posters</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/fr/design/social</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/fr/design/events</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/fr/design/business</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/fr/design/invoices</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/fr/design/video</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.bqurtas.com/fr/design/other</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
 </urlset>

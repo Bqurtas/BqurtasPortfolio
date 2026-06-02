@@ -39,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Pick up the wrapped applyLang and extend it
   let currentLang = 'en';
+  let routerReady = false;                       // URL syncing only once the router is live
+  const URL_LANGS = ['ku', 'kmr', 'ar', 'fr'];   // en has no prefix
   const setDocTitle = () => {
     const d = window.BQ_DICT || {};
     const room = document.body.dataset.room || 'design';
@@ -51,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentLang = lang;
     setLangBadge(lang);
     setDocTitle();
+    if (routerReady) syncURL(false);             // keep the /lang prefix in the address bar
     if (window.__bqRerenderChrome) window.__bqRerenderChrome();
     if (window.__bqRenderActiveHonor) window.__bqRenderActiveHonor();
   };
@@ -70,10 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('mobileMenu')?.classList.toggle('is-open');
   });
 
-  // Restore saved language
+  // Initial language: a /lang prefix in the URL wins, then the saved choice
   let savedLang = null;
   try { savedLang = localStorage.getItem('bq_lang'); } catch(e){}
-  window.applyLang(savedLang || 'en');
+  const urlLang0 = location.pathname.replace(/^\/+/, '').split('/')[0];
+  window.applyLang(URL_LANGS.includes(urlLang0) ? urlLang0 : (savedLang || 'en'));
 
   /* ---------- ROUTER (room switcher + deep-links) ---------- */
   const rooms = document.querySelectorAll('.room');
@@ -83,22 +87,25 @@ document.addEventListener('DOMContentLoaded', () => {
   let triggerReveals = () => {};
   let moveUnderline  = () => {};
 
-  // Each room — and each Design tab — is its own shareable URL (real path):
-  //   /design · /design/logo · /blog · /bio · /contact
+  // Each room — and each Design tab — is its own shareable URL (real path),
+  // optionally language-prefixed so a shared link carries its own cover:
+  //   /design · /design/logo · /blog · /ku/blog · /ar/design/logo · /fr/bio
   // Legacy hash links (#blog) are still understood on first load.
   const parseRoute = () => {
     let raw = location.pathname.replace(/^\/+|\/+$/g, '');
     if (!raw && location.hash) raw = location.hash.replace(/^#/, '');
-    const [room, tab] = raw.split('/');
-    return { room, tab };
+    let seg = raw.split('/');
+    if (URL_LANGS.includes(seg[0])) seg = seg.slice(1);
+    return { room: seg[0], tab: seg[1] };
   };
   const syncURL = (push) => {
     const room = document.body.dataset.room || 'design';
+    const prefix = (currentLang && currentLang !== 'en') ? '/' + currentLang : '';
     let path;
     if (room === 'design') {
-      path = (currentFilter && currentFilter !== 'all') ? '/design/' + currentFilter : '/';
+      path = (currentFilter && currentFilter !== 'all') ? prefix + '/design/' + currentFilter : (prefix || '/');
     } else {
-      path = '/' + room;
+      path = prefix + '/' + room;
     }
     if ((location.pathname.replace(/\/+$/, '') || '/') === path) return;
     try {
@@ -212,7 +219,31 @@ document.addEventListener('DOMContentLoaded', () => {
     if (info) info.textContent = infoT.replace('{shown}', currentShown).replace('{total}', total).replace('{rem}', remaining);
     if (btn)  btn.style.display = remaining > 0 ? 'inline-flex' : 'none';
     if (btnT) btnT.textContent  = loadT.replace('{n}', Math.min(remaining, PAGE_SIZE));
+    // Show-less / collapse appear once the viewer has loaded past the first batch
+    const less = document.getElementById('loadLessBtn');
+    const coll = document.getElementById('loadCollapseBtn');
+    const canCollapse = currentShown > PAGE_SIZE;
+    if (less) less.style.display = canCollapse ? 'inline-flex' : 'none';
+    if (coll) coll.style.display = canCollapse ? 'inline-flex' : 'none';
   };
+
+  /* Re-render the grid showing exactly `n` cards (used by show-less/collapse). */
+  const renderUpTo = (n) => {
+    if (!gridEl) return;
+    buildColumns(colCountForWidth());
+    const matching = matchingCards();
+    const target = Math.max(0, Math.min(n, matching.length));
+    matching.slice(0, target).forEach(e => placeCard(e.el));
+    currentShown = target;
+    updateTabHeader(currentFilter, matching.length);
+    updateLoadMore(matching.length);
+  };
+  const scrollToGridTop = () => {
+    const head = document.getElementById('tabHeader') || gridEl;
+    head?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  window.__bqShowFewer  = () => { renderUpTo(Math.max(PAGE_SIZE, currentShown - PAGE_SIZE)); scrollToGridTop(); };
+  window.__bqCollapseAll = () => { renderUpTo(PAGE_SIZE); scrollToGridTop(); };
 
   /* ===== JS MASONRY =====
      Cards are placed into column containers; each new card goes to the
@@ -324,6 +355,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('loadMoreBtn')?.addEventListener('click', () => {
     window.__bqRenderGallery(false);
   });
+  /* Show fewer (one batch) / collapse all the way back to the first batch */
+  document.getElementById('loadLessBtn')?.addEventListener('click', () => window.__bqShowFewer());
+  document.getElementById('loadCollapseBtn')?.addEventListener('click', () => window.__bqCollapseAll());
 
   tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab, true)));
 
@@ -380,6 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const t0 = document.querySelector(`.tab[data-filter="${startTab}"]`);
     if (t0) activateTab(t0);
   }
+  routerReady = true;   // from here on, language switches update the URL prefix
   triggerReveals();
 
   /* ---------- Expose helpers for gallery.js ---------- */

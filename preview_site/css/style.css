@@ -88,15 +88,26 @@ input, select, textarea { font-family: inherit; color: inherit; }
   font-family: 'Noto Naskh Arabic', 'Manrope', sans-serif;
 }
 :root[lang="ar"] h1, :root[lang="ar"] h2, :root[lang="ar"] h3, :root[lang="ar"] h4,
-:root[lang="ku"] h1, :root[lang="ku"] h2, :root[lang="ku"] h3, :root[lang="ku"] h4 {
-  font-family: 'Noto Kufi Arabic', 'Fraunces', serif;
+:root[lang="ku"] h1, :root[lang="ku"] h2, :root[lang="ku"] h3, :root[lang="ku"] h4,
+:root[lang="kmr"] h1, :root[lang="kmr"] h2, :root[lang="kmr"] h3, :root[lang="kmr"] h4 {
   letter-spacing: 0;
 }
+:root[lang="ar"] h1, :root[lang="ar"] h2, :root[lang="ar"] h3, :root[lang="ar"] h4,
+:root[lang="ku"] h1, :root[lang="ku"] h2, :root[lang="ku"] h3, :root[lang="ku"] h4 {
+  font-family: 'Noto Kufi Arabic', 'Fraunces', serif;
+}
+/* The brand name is always Latin — keep its logo/serif type in every language */
+:root[lang] .profile-card-name,
+:root[lang] .splash-name,
+:root[lang] .bio-phil-sign { font-family: 'Liana', 'Fraunces', serif !important; }
+:root[lang] .hero-name,
+:root[lang] .footer-bq,
+:root[lang] .pencemor-hero-name { font-family: 'Fraunces', serif !important; }
 
 /* ---------- Type ---------- */
 .mono {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--ink-soft);
 }
 h1, h2, h3, h4 { font-family: 'Fraunces', serif; font-weight: 500; color: var(--ink); }
@@ -404,6 +415,55 @@ em { font-style: italic; color: var(--ember); }
 }
 .social-opt small { font-size: 13px; }
 
+/* ---------- Rail tool tooltips (a small label above each tool) ---------- */
+.rail-chat, .theme-btn { position: relative; }
+.tool-tip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%; transform: translateX(-50%) translateY(6px);
+  padding: 7px 14px;
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+  white-space: nowrap;
+  font-family: 'Fraunces', serif; font-size: 14px; font-weight: 500;
+  color: var(--ink);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s var(--ease), transform 0.3s var(--ease);
+  z-index: 260;
+}
+.tool-tip::after {
+  content: ''; position: absolute;
+  top: 100%; left: 50%; transform: translateX(-50%) rotate(45deg);
+  width: 9px; height: 9px; margin-top: -5px;
+  background: var(--bg-3);
+  border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+}
+.rail-chat:hover .tool-tip,
+.lang-hover:hover .tool-tip,
+.social-hover:hover .tool-tip,
+.theme-btn:hover .tool-tip { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- Circular tool button (theme, last in the rail) ---------- */
+.rail-tool {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid var(--line); background: var(--surface);
+  color: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s var(--ease); cursor: none;
+}
+.rail-tool:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+.theme-btn i { font-size: 16px; color: var(--gold); }
+.theme-btn .theme-icon-moon { display: none; }
+:root[data-theme="dark"] .theme-btn .theme-icon-sun  { display: none; }
+:root[data-theme="dark"] .theme-btn .theme-icon-moon { display: inline; }
+
+/* Language button: a small globe + the current code, stacked */
+.lang-current { flex-direction: column; gap: 1px; }
+.lang-current-icon { font-size: 13px; color: var(--gold); line-height: 1; }
+.lang-current #langCurrentCode { font-size: 9.5px; line-height: 1; }
+
 .rail-status { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .rail-dot {
   width: 8px; height: 8px;
@@ -612,12 +672,14 @@ em { font-style: italic; color: var(--ember); }
 .hero-marquee-track {
   display: flex; gap: 0; white-space: nowrap;
   width: max-content;
+  direction: ltr;                 /* keep the seamless loop identical in RTL */
   animation: marquee 38s linear infinite;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  font-size: 12.5px; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--ink-soft);
   will-change: transform;
 }
+.hero-disc { unicode-bidi: isolate; }
 .hero-marquee-track i { margin-right: 6px; color: var(--gold); }
 .hero-marquee-track span:nth-child(even) { color: var(--gold); }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
@@ -968,6 +1030,20 @@ em { font-style: italic; color: var(--ember); }
 }
 .load-more-btn i { font-size: 12px; color: var(--gold); transition: transform 0.35s var(--ease); }
 .load-more-btn:hover i { transform: translateY(3px); }
+/* show-more + show-less side by side */
+.load-more-actions { display: inline-flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.load-less-btn:hover i { transform: translateY(-3px); }
+.load-collapse-btn {
+  margin-top: 4px;
+  padding: 8px 18px;
+  border: 0; background: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-soft); cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: color 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+.load-collapse-btn:hover { color: var(--gold); border-bottom-color: var(--gold); }
 
 /* =========================================================
    GRID + CARDS
@@ -1052,14 +1128,14 @@ em { font-style: italic; color: var(--ember); }
 .card--photo:hover .card-meta--ov { opacity: 1; transform: none; }
 
 .card-meta--ov .card-tag {
-  color: rgba(201,162,83,0.88) !important;
-  font-size: 8.5px; letter-spacing: 0.15em;
+  color: rgba(201,162,83,0.92) !important;
+  font-size: 10.5px; letter-spacing: 0.14em;
   display: inline-flex; align-items: center; gap: 5px;
 }
 .card-meta--ov .card-title {
   font-family: 'Fraunces', serif;
-  font-size: 12px; font-weight: 500; line-height: 1.2;
-  color: rgba(240,230,210,0.95) !important; margin: 0;
+  font-size: 15px; font-weight: 500; line-height: 1.2;
+  color: rgba(240,230,210,0.96) !important; margin: 0;
 }
 .card-zoom-icon {
   position: absolute; top: 8px; right: 8px;
@@ -1667,7 +1743,7 @@ em { font-style: italic; color: var(--ember); }
 .cert-item:hover .cert-zoom { opacity: 1; }
 .cert-item:hover .cert-img-wrap { border-color: var(--gold); }
 .cert-label {
-  font-size: 8px; letter-spacing: 0.1em;
+  font-size: 11px; letter-spacing: 0.08em;
   color: var(--ink-muted); text-align: center;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
@@ -1898,6 +1974,7 @@ em { font-style: italic; color: var(--ember); }
   align-items: center;
   gap: 56px;
   white-space: nowrap;
+  direction: ltr;                 /* seamless loop stays consistent in RTL */
   animation: logosMarquee 50s linear infinite;
   width: max-content;
 }
@@ -2549,10 +2626,10 @@ em { font-style: italic; color: var(--ember); }
   font-size: 60px; color: var(--ink); opacity: 0.06; line-height: 1;
 }
 [dir="rtl"] .tab-card-n { right: auto; left: 8px; }
-.tab-card-tag { color: var(--gold) !important; font-size: 9px; }
-.tab-card-title { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 500; margin: 6px 0 8px; }
-.tab-card-desc { font-size: 12.5px; color: var(--ink-soft); line-height: 1.55; margin-bottom: 12px; }
-.tab-card-count { color: var(--ink-muted) !important; font-size: 9px; display: inline-flex; align-items: center; gap: 6px; }
+.tab-card-tag { color: var(--gold) !important; font-size: 11px; }
+.tab-card-title { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 500; margin: 7px 0 9px; }
+.tab-card-desc { font-size: 14px; color: var(--ink-soft); line-height: 1.6; margin-bottom: 12px; }
+.tab-card-count { color: var(--ink-muted) !important; font-size: 11px; display: inline-flex; align-items: center; gap: 6px; }
 .tab-card-count i { color: var(--gold); }
 @media (max-width: 820px) { .tab-card { display: none; } }
 

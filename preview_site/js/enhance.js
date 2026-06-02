@@ -363,18 +363,22 @@
       <span class="mono tab-card-count" id="tcCount"></span>`;
     document.body.appendChild(card);
 
+    const tcLang = () => document.documentElement.dataset.lang || 'en';
+    const infoFor = (f) => (window.TABCARD_I18N && window.TABCARD_I18N[tcLang()] && window.TABCARD_I18N[tcLang()][f]) || INFO[f];
+
     let hideT;
     const show = (tab) => {
       const f = tab.dataset.filter;
-      const info = INFO[f]; if (!info) return;
+      const info = infoFor(f); if (!info) return;
       clearTimeout(hideT);
       const name = (tab.querySelector('.tab-label')?.textContent || f).trim();
       const count = countFor(f);
+      const worksT = (window.BQ_DICT && window.BQ_DICT['tab.works']) || '{n} works · click to filter';
       $('#tcTag', card).textContent = info.tag;
       $('#tcTitle', card).textContent = name;
       $('#tcDesc', card).textContent = info.desc;
       $('#tcN', card).textContent = count || '';
-      $('#tcCount', card).innerHTML = `<i class="fa-solid fa-layer-group"></i> ${count} works · click to filter`;
+      $('#tcCount', card).innerHTML = `<i class="fa-solid fa-layer-group"></i> ${worksT.replace('{n}', count)}`;
 
       /* position below the tab, clamped to the viewport, flip up if needed */
       card.style.visibility = 'hidden'; card.classList.add('is-shown');
