@@ -126,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     syncURL(push);
     setDocTitle();
     document.getElementById('mobileMenu')?.classList.remove('is-open');
+    document.body.style.overflow = '';
   };
   window.__bqShowRoom = showRoom;
 
@@ -153,10 +154,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  /* ---------- MOBILE MENU ---------- */
+  /* ---------- MOBILE MENU (full-screen overlay) ---------- */
   const menuBtn = document.getElementById('menuToggle');
   const mobileMenu = document.getElementById('mobileMenu');
-  menuBtn?.addEventListener('click', () => mobileMenu?.classList.toggle('is-open'));
+  const setMenu = (open) => {
+    mobileMenu?.classList.toggle('is-open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  };
+  menuBtn?.addEventListener('click', () => setMenu(!mobileMenu?.classList.contains('is-open')));
+  document.getElementById('mobileMenuClose')?.addEventListener('click', () => setMenu(false));
 
   /* ---------- TABS + PAGINATION + SECTION HEADER ---------- */
   const tabs = document.querySelectorAll('.tab');

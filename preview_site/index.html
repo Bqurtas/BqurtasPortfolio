@@ -73,7 +73,7 @@
   <!-- Font Awesome icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
 
-  <link rel="stylesheet" href="css/style.css?v=51" />
+  <link rel="stylesheet" href="css/style.css?v=54" />
 </head>
 <body>
 
@@ -213,53 +213,60 @@
 
   <!-- ===== MOBILE TOP BAR ===== -->
   <header class="topbar">
-    <a href="#" class="topbar-logo" data-route="design"><span>Bq</span></a>
+    <a href="/design" class="topbar-logo" data-route="design"><span>Bq</span></a>
     <div class="topbar-tools">
-      <button class="theme-switch theme-switch--sm" id="themeToggleM" role="switch" aria-checked="false" aria-label="Toggle dark mode">
-        <span class="theme-switch-track">
-          <i class="fa-solid fa-sun theme-switch-sun"></i>
-          <i class="fa-solid fa-moon theme-switch-moon"></i>
-          <span class="theme-switch-knob"></span>
-        </span>
+      <button class="topbar-btn theme-btn" id="themeToggleM" role="switch" aria-checked="false" aria-label="Toggle dark mode">
+        <i class="fa-solid fa-sun theme-icon-sun" aria-hidden="true"></i>
+        <i class="fa-solid fa-moon theme-icon-moon" aria-hidden="true"></i>
       </button>
-      <button class="topbar-lang" id="langToggleM" aria-label="Language"><span id="langCurrentCodeM">EN</span></button>
       <button class="topbar-btn" id="railChatM" aria-label="Chat with assistant"><i class="fa-solid fa-comment-dots"></i></button>
-      <button class="topbar-btn" id="menuToggle" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+      <button class="topbar-btn topbar-menu-btn" id="menuToggle" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
     </div>
   </header>
 
-  <!-- Mobile menu -->
+  <!-- Mobile menu — full-screen overlay -->
   <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile navigation">
-    <a href="/design" class="mobile-link" data-route="design">
-      <i class="fa-solid fa-compass-drafting"></i>
-      <span data-i18n="nav.design">Design</span>
-    </a>
-    <a href="/blog" class="mobile-link" data-route="blog">
-      <i class="fa-solid fa-feather-pointed"></i>
-      <span data-i18n="nav.blog">Blog</span>
-    </a>
-    <a href="/bio" class="mobile-link" data-route="bio">
-      <i class="fa-solid fa-user-pen"></i>
-      <span data-i18n="nav.bio">Biography</span>
-    </a>
-    <a href="/contact" class="mobile-link" data-route="contact">
-      <i class="fa-solid fa-paper-plane"></i>
-      <span data-i18n="nav.contact">Contact</span>
-    </a>
+    <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+
+    <div class="mobile-menu-profile">
+      <span class="mobile-menu-logo">Bq</span>
+      <span class="mobile-menu-photo"><img src="assets/avatar.webp" alt="Barakat Qurtas" /></span>
+      <h3 class="mobile-menu-name" data-i18n="name.full">Barakat Qurtas</h3>
+      <span class="mono mobile-menu-role" data-i18n="profile.eye">Independent Designer · Hewlêr</span>
+    </div>
+
+    <div class="mobile-nav">
+      <a href="/design" class="mobile-link" data-route="design">
+        <i class="fa-solid fa-compass-drafting"></i>
+        <span data-i18n="nav.design">Design</span>
+      </a>
+      <a href="/blog" class="mobile-link" data-route="blog">
+        <i class="fa-solid fa-feather-pointed"></i>
+        <span data-i18n="nav.blog">Blog</span>
+      </a>
+      <a href="/bio" class="mobile-link" data-route="bio">
+        <i class="fa-solid fa-user-pen"></i>
+        <span data-i18n="nav.bio">Biography</span>
+      </a>
+      <a href="/contact" class="mobile-link" data-route="contact">
+        <i class="fa-solid fa-paper-plane"></i>
+        <span data-i18n="nav.contact">Contact</span>
+      </a>
+    </div>
 
     <div class="mobile-langs">
-      <span class="mono">Languages</span>
+      <span class="mono" data-i18n="bio.languages">Languages</span>
       <div class="mobile-langs-row">
         <button class="mobile-lang" data-lang="en">EN</button>
-        <button class="mobile-lang" data-lang="ku">کو</button>
-        <button class="mobile-lang" data-lang="kmr">KU</button>
-        <button class="mobile-lang" data-lang="ar">عر</button>
-        <button class="mobile-lang" data-lang="fr">FR</button>
+        <button class="mobile-lang" data-lang="ku">کوردی</button>
+        <button class="mobile-lang" data-lang="kmr">Kurmancî</button>
+        <button class="mobile-lang" data-lang="ar">عربی</button>
+        <button class="mobile-lang" data-lang="fr">Français</button>
       </div>
     </div>
 
     <div class="mobile-socials">
-      <span class="mono">Connect</span>
+      <span class="mono" data-i18n="f.connect">Connect</span>
       <div class="mobile-socials-row">
         <a href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
         <a href="https://instagram.com/bqurtas" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
@@ -1156,8 +1163,8 @@
       <div class="chat-head-id">
         <span class="chat-ava"><img src="assets/avatar.webp" alt="" /></span>
         <div>
-          <strong>Studio Assistant</strong>
-          <span class="chat-status"><i class="fa-solid fa-circle"></i> Online · replies instantly</span>
+          <strong data-i18n="chat.title">Studio Assistant</strong>
+          <span class="chat-status"><i class="fa-solid fa-circle"></i> <span data-i18n="chat.status">Online · replies instantly</span></span>
         </div>
       </div>
       <button class="chat-min" id="chatMin" aria-label="Close chat"><i class="fa-solid fa-chevron-down"></i></button>
@@ -1165,7 +1172,7 @@
     <div class="chat-body" id="chatBody"></div>
     <div class="chat-quick" id="chatQuick"></div>
     <form class="chat-input" id="chatForm">
-      <input type="text" id="chatText" placeholder="Ask about services, pricing, timeline…" autocomplete="off" />
+      <input type="text" id="chatText" placeholder="Ask about services, pricing, timeline…" data-i18n-ph="chat.ph" autocomplete="off" />
       <button type="submit" aria-label="Send"><i class="fa-solid fa-paper-plane"></i></button>
     </form>
   </section>
@@ -1252,9 +1259,9 @@
     </article>
   </div>
 
-  <script src="js/i18n.js?v=51"></script>
-  <script src="js/main.js?v=51"></script>
-  <script src="js/gallery.js?v=51"></script>
-  <script src="js/enhance.js?v=51"></script>
+  <script src="js/i18n.js?v=54"></script>
+  <script src="js/main.js?v=54"></script>
+  <script src="js/gallery.js?v=54"></script>
+  <script src="js/enhance.js?v=54"></script>
 </body>
 </html>

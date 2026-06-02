@@ -453,16 +453,32 @@
       return best ? best.a : getFallback();
     };
 
-    const add = (who, html) => {
+    /* conversation is archived on the device (and follows the user to desktop) */
+    const HKEY = 'bq_chat_history';
+    const persist = () => {
+      try {
+        const msgs = Array.from(body.querySelectorAll('.chat-msg:not(.is-typing)'))
+          .map(el => ({ who: el.classList.contains('chat-msg--me') ? 'me' : 'bot', html: el.innerHTML }));
+        localStorage.setItem(HKEY, JSON.stringify(msgs.slice(-100)));
+      } catch (e) {}
+    };
+    const add = (who, html, noPersist) => {
       const el = document.createElement('div');
       el.className = `chat-msg chat-msg--${who}`;
       el.innerHTML = html;
       body.appendChild(el);
       body.scrollTop = body.scrollHeight;
+      if (!noPersist) persist();
       return el;
     };
+    const restore = () => {
+      let msgs = [];
+      try { msgs = JSON.parse(localStorage.getItem(HKEY) || '[]'); } catch (e) {}
+      msgs.forEach(m => add(m.who, m.html, true));
+      return msgs.length > 0;
+    };
     const typing = () => {
-      const el = add('bot', '<span class="chat-typing"><i></i><i></i><i></i></span>');
+      const el = add('bot', '<span class="chat-typing"><i></i><i></i><i></i></span>', true);
       el.classList.add('is-typing');
       return el;
     };
@@ -472,6 +488,7 @@
         t.classList.remove('is-typing');
         t.innerHTML = reply(msg);
         body.scrollTop = body.scrollHeight;
+        persist();
       }, 550 + Math.random() * 400);
     };
 
@@ -502,7 +519,8 @@
       panel.setAttribute('aria-hidden', 'false');
       if (!greeted) {
         greeted = true;
-        setTimeout(() => add('bot', getGreet()), 250);
+        const hadHistory = restore();
+        if (!hadHistory) setTimeout(() => add('bot', getGreet()), 250);
         buildQuick();
       }
       setTimeout(() => input.focus(), 300);

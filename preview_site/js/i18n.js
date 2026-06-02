@@ -8,7 +8,7 @@ window.I18N = {
     dir: 'ltr',
     'hero.hello': "Hello, I'm",
     'pj.eyebrow': 'Design Studio',
-    'pj.tag': 'While our fingerprint stays on top, let your <em>every worry stop</em>.',
+    'pj.tag': 'While our fingerprint sits atop your work, let your <em>every worry stop</em>.',
     'pj.desc': 'A studio for brand identity, editorial, and print — where every piece carries a real mark of care. Your project, signed by hand.',
     'pj.contact': 'Get in touch', 'pj.work': 'View the work',
     'pj.tl': '№ 02 — The Studio', 'pj.tr': 'Hewlêr · Est. 2014',
@@ -75,7 +75,7 @@ window.I18N = {
     dir: 'rtl',
     'hero.hello': 'سڵاو، من',
     'pj.eyebrow': 'ستۆدیۆی دیزاین',
-    'pj.tag': 'تا پەنجەمۆری ئێمە لەسەرەوە بێت، <em>خەمت نەبێت</em>.',
+    'pj.tag': 'تا پەنجەمۆری ئێمە بەسەر کارەکانتەوە بێت، <em>تۆ خەمت نەبێت</em>.',
     'pj.desc': 'ستۆدیۆیەک بۆ ناسنامەی بران، ئەدیتۆریاڵ و چاپ — لەوێ هەر بەرهەمێک مۆری ڕاستەقینەی خۆشەویستی هەڵدەگرێت. پڕۆژەکەت، بە دەست واژووکراو.',
     'pj.contact': 'پەیوەندیمان پێوە بکە', 'pj.work': 'بینینی کارەکان',
     'pj.tl': '№ ٠٢ — ستۆدیۆ', 'pj.tr': 'هەولێر · لە ٢٠١٤ـەوە',
@@ -142,7 +142,7 @@ window.I18N = {
     dir: 'ltr',
     'hero.hello': 'Silav, ez',
     'pj.eyebrow': 'Studyoya Sêwirandinê',
-    'pj.tag': 'Heta destnîşana me li jor be, <em>xema xwe nexwe</em>.',
+    'pj.tag': 'Heta şopa me li ser karê te be, <em>tu xema xwe neke</em>.',
     'pj.desc': 'Studyoyek ji bo nasnameya brandê, edîtoriyal û çapê — li wir her parçeyek nîşaneke rastîn a baldariyê hildigire. Projeya te, bi destan îmzekirî.',
     'pj.contact': 'Têkilî daîne', 'pj.work': 'Karan bibîne',
     'pj.tl': '№ 02 — Studyo', 'pj.tr': 'Hewlêr · Ji 2014',
@@ -209,7 +209,7 @@ window.I18N = {
     dir: 'rtl',
     'hero.hello': 'مرحبًا، أنا',
     'pj.eyebrow': 'استوديو تصميم',
-    'pj.tag': 'ما دامت بصمتنا في الأعلى، <em>فلا تقلق أبدًا</em>.',
+    'pj.tag': 'ما دامت بصمتنا فوق عملك، <em>فلا تقلق أبدًا</em>.',
     'pj.desc': 'استوديو للهوية البصرية والتصميم التحريري والطباعة — حيث يحمل كل عمل بصمة عناية حقيقية. مشروعك، موقّع باليد.',
     'pj.contact': 'تواصل معنا', 'pj.work': 'شاهد الأعمال',
     'pj.tl': '№ ٠٢ — الاستوديو', 'pj.tr': 'أربيل · منذ ٢٠١٤',
@@ -276,7 +276,7 @@ window.I18N = {
     dir: 'ltr',
     'hero.hello': 'Bonjour, je suis',
     'pj.eyebrow': 'Studio de Design',
-    'pj.tag': 'Tant que notre empreinte reste au sommet, <em>ne vous inquiétez de rien</em>.',
+    'pj.tag': 'Tant que notre empreinte coiffe votre travail, <em>ne vous inquiétez de rien</em>.',
     'pj.desc': "Un studio d'identité de marque, d'édition et d'impression — où chaque pièce porte une véritable marque de soin. Votre projet, signé à la main.",
     'pj.contact': 'Prendre contact', 'pj.work': 'Voir les travaux',
     'pj.tl': '№ 02 — Le Studio', 'pj.tr': 'Hewlêr · Depuis 2014',
@@ -1220,3 +1220,7 @@ Object.keys(window.I18N_EXTRA_L).forEach(function(l){ if(window.I18N[l]) Object.
 window.I18N_EXTRA_N = {"en": {"name.first": "Barakat", "name.last": "Qurtas", "name.full": "Barakat Qurtas", "pj.name": "Panjamor", "tip.share": "Socials"}, "ku": {"name.first": "بەرەکات", "name.last": "قورتاس", "name.full": "بەرەکات قورتاس", "pj.name": "پەنجەمۆر", "tip.share": "تۆڕەکان"}, "kmr": {"name.first": "Barakat", "name.last": "Qurtas", "name.full": "Barakat Qurtas", "pj.name": "Panjamor", "tip.share": "Tor"}, "ar": {"name.first": "بركات", "name.last": "قرطاس", "name.full": "بركات قرطاس", "pj.name": "بنجمور", "tip.share": "الشبكات"}, "fr": {"name.first": "Barakat", "name.last": "Qurtas", "name.full": "Barakat Qurtas", "pj.name": "Panjamor", "tip.share": "Réseaux"}};
 Object.keys(window.I18N_EXTRA_N).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_N[l]); });
 window.ROOMCARD_I18N = {"ku": {"design": {"tag": "پۆرتفۆلیۆ", "count": "٧٠٠+ کار", "desc": "کاتالۆگێکی زیندوو — ئەدیتۆریاڵی فەرمی، کتێب، لۆگۆ، پۆستەر، وێنە و ڤیدیۆ."}, "blog": {"tag": "گۆڤار", "count": "٦ وتار", "desc": "تێبینی کورت لە مێزی کارەوە لەسەر تایپۆگرافی، شوێن، و پیشەی نەرمی دیزاین."}, "bio": {"tag": "دەربارە", "count": "٢٠١٤ — ئێستا", "desc": "دەیەیەک پراکتیک لە هەولێر — ئەزموون، خوێندن، خەڵات و زمانەکان."}, "contact": {"tag": "داواکارییەکان", "count": "وەڵام لە ٤٨ کاتژمێر", "desc": "پڕۆژەیەک پێشکەش بکە بە نامەیەکی وردبینانە. ئامادە بۆ پڕۆژەی هەڵبژێردراو."}}, "kmr": {"design": {"tag": "Portfolyo", "count": "700+ kar", "desc": "Katalogeke zindî — edîtoriyala fermî, pirtûk, logo, poster, wêne û vîdyo."}, "blog": {"tag": "Kovar", "count": "6 gotar", "desc": "Notên kurt ji maseyê li ser tîpografî, cî û pîşeya hêdî ya sêwirandinê."}, "bio": {"tag": "Derbarê", "count": "2014 — niha", "desc": "Deh sal pratîk li Hewlêr — ezmûn, perwerde, xelat û ziman."}, "contact": {"tag": "Daxwaz", "count": "Bersiv di 48 saetan", "desc": "Projeyek bi nameyeke baldarane pêşkêş bike. Ji bo karên bijartî amade."}}, "ar": {"design": {"tag": "بورتفوليو", "count": "٧٠٠+ عمل", "desc": "كتالوج حي — تحرير رسمي وكتب وشعارات وملصقات وصور وفيديو."}, "blog": {"tag": "مجلة", "count": "٦ مقالات", "desc": "ملاحظات قصيرة من المكتب عن الطباعة والمكان وحرفة التصميم البطيئة."}, "bio": {"tag": "نبذة", "count": "٢٠١٤ — الآن", "desc": "عقد من الممارسة في أربيل — الخبرة والتعليم والجوائز واللغات."}, "contact": {"tag": "الاستفسارات", "count": "الرد خلال ٤٨ ساعة", "desc": "قدّم مشروعك في رسالة واحدة دقيقة. متاح لمشاريع مختارة."}}, "fr": {"design": {"tag": "Portfolio", "count": "700+ travaux", "desc": "Un catalogue vivant — éditorial officiel, livres, logos, affiches, photo & vidéo."}, "blog": {"tag": "Journal", "count": "6 essais", "desc": "De brèves notes du bureau sur la typographie, le lieu et l’artisanat lent du design."}, "bio": {"tag": "À propos", "count": "2014 — auj.", "desc": "Une décennie de pratique à Hewlêr — expérience, formation, prix et langues."}, "contact": {"tag": "Demandes", "count": "Réponse sous 48 h", "desc": "Présentez un projet en une lettre soignée. Disponible pour des commandes choisies."}}};
+
+/* ===== chat header strings ===== */
+window.I18N_EXTRA_CH = {"en": {"chat.title": "Studio Assistant", "chat.status": "Online · replies instantly", "chat.ph": "Ask about services, pricing, timeline…"}, "ku": {"chat.title": "یاریدەدەری ستۆدیۆ", "chat.status": "ئۆنلاین · خێرا وەڵام دەداتەوە", "chat.ph": "پرسیار بکە دەربارەی خزمەت، نرخ، کات…"}, "kmr": {"chat.title": "Alîkarê Studyo", "chat.status": "Online · tavilê bersiv dide", "chat.ph": "Li ser karûbar, biha, dem bipirse…"}, "ar": {"chat.title": "مساعد الاستوديو", "chat.status": "متصل · يرد فورًا", "chat.ph": "اسأل عن الخدمات، الأسعار، الوقت…"}, "fr": {"chat.title": "Assistant du studio", "chat.status": "En ligne · répond aussitôt", "chat.ph": "Posez une question : services, tarifs, délais…"}};
+Object.keys(window.I18N_EXTRA_CH).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_CH[l]); });
