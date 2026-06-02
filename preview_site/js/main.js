@@ -165,6 +165,22 @@ document.addEventListener('DOMContentLoaded', () => {
   menuBtn?.addEventListener('click', () => setMenu(!mobileMenu?.classList.contains('is-open')));
   document.getElementById('mobileMenuClose')?.addEventListener('click', () => setMenu(false));
 
+  /* ---------- MOBILE BOTTOM-BAR POPUPS (language · socials) ---------- */
+  const langPop = document.getElementById('langPop');
+  const socialPop = document.getElementById('socialPop');
+  const closePops = (except) => {
+    if (langPop && except !== 'lang') langPop.classList.remove('is-open');
+    if (socialPop && except !== 'social') socialPop.classList.remove('is-open');
+  };
+  document.getElementById('langPopBtn')?.addEventListener('click', (e) => {
+    e.stopPropagation(); closePops('lang'); langPop?.classList.toggle('is-open');
+  });
+  document.getElementById('socialPopBtn')?.addEventListener('click', (e) => {
+    e.stopPropagation(); closePops('social'); socialPop?.classList.toggle('is-open');
+  });
+  langPop?.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => langPop.classList.remove('is-open')));
+  document.addEventListener('click', (e) => { if (!e.target.closest('.mobilebar-pop-wrap')) closePops(); });
+
   /* ---------- TABS + PAGINATION + SECTION HEADER ---------- */
   const tabs = document.querySelectorAll('.tab');
   const PAGE_SIZE = 35;
