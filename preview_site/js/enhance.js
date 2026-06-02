@@ -10,6 +10,13 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const CDN = (window.BQ_GALLERY && window.BQ_GALLERY.CDN_BASE) || '';
 
+  /* Language-change dispatcher — modules push callbacks to re-render
+     their JS-generated content (marquee, blog, chatbot) on language switch. */
+  window.__bqLangCb = window.__bqLangCb || [];
+  window.__bqOnLang = function (lang, dict) {
+    window.__bqLangCb.forEach(function (fn) { try { fn(lang, dict); } catch (e) {} });
+  };
+
   /* =======================================================
      1 · SPLASH
      ======================================================= */
@@ -208,10 +215,12 @@
     const wrap  = $('.hero-marquee');
     const DISC_ORDER = ['Brand Identity', 'Editorial', 'Posters', 'Book Design', 'Video'];
     const ICONS = { 'Brand Identity': 'fa-pen-nib', 'Editorial': 'fa-newspaper', 'Posters': 'fa-image', 'Book Design': 'fa-book', 'Video': 'fa-video' };
+    const DISC_KEY = { 'Brand Identity':'disc.brand','Editorial':'disc.editorial','Posters':'disc.posters','Book Design':'disc.book','Video':'disc.video' };
+    const discLabel = (d) => (window.BQ_DICT && window.BQ_DICT[DISC_KEY[d]]) || d;
     const buildMarquee = () => {
       if (!track || !wrap) return;
       const unit = DISC_ORDER.map(d =>
-        `<span class="hero-disc" data-disc="${d}"><i class="fa-solid ${ICONS[d]}"></i> ${d}</span><span class="hero-sep">✦</span>`
+        `<span class="hero-disc" data-disc="${d}"><i class="fa-solid ${ICONS[d]}"></i> ${discLabel(d)}</span><span class="hero-sep">✦</span>`
       ).join('');
       track.innerHTML = unit;                              // measure one set
       const setW = track.scrollWidth || 900;
@@ -223,6 +232,7 @@
       track.style.animationDuration = Math.max(18, halfW / 55).toFixed(1) + 's';
     };
     buildMarquee();
+    window.__bqLangCb.push(() => buildMarquee());
     let rb; window.addEventListener('resize', () => { clearTimeout(rb); rb = setTimeout(buildMarquee, 250); });
 
     /* delegated discipline hover (survives marquee rebuild) */
@@ -232,8 +242,9 @@
       if (!info) return;
       curDisc = item;
       info.imgs.forEach((src, i) => { if (album[i]) album[i].src = src; });
-      hfTitle.textContent = item.dataset.disc;
-      hfSub.textContent = `${info.count} works · click to open`;
+      hfTitle.textContent = discLabel(item.dataset.disc);
+      const albumT = (window.BQ_DICT && window.BQ_DICT['float.album']) || '{n} works · click to open';
+      hfSub.textContent = albumT.replace('{n}', info.count);
       float.classList.remove('is-portrait');
       float.classList.add('is-shown', 'is-album');
     };
@@ -259,7 +270,7 @@
       name.addEventListener('mouseenter', () => {
         portraitImg.src = 'assets/portrait.webp';
         hfTitle.textContent = 'Barakat Qurtas';
-        hfSub.textContent = 'Designer · Hewlêr';
+        hfSub.textContent = (window.BQ_DICT && window.BQ_DICT['float.designer']) || 'Designer · Hewlêr';
         float.classList.remove('is-album');
         float.classList.add('is-shown', 'is-portrait');
       });
@@ -418,14 +429,19 @@
     ];
     const FALLBACK = "I'm not sure about that one — but Barakat can help directly. Try the <b>Contact</b> room, or ask me about <i>services, pricing, timelines, or languages</i>.";
 
+    /* language-aware knowledge base */
+    const chatTr = () => (window.CHAT_I18N && window.CHAT_I18N[document.documentElement.dataset.lang || 'en']) || null;
+    const getKB = () => { const t = chatTr(); return (t && t.kb) || KB; };
+    const getFallback = () => { const t = chatTr(); return (t && t.fallback) || FALLBACK; };
+    const getGreet = () => { const t = chatTr(); return (t && t.greet) || "Hi! 👋 I'm the studio assistant. How can I help — <b>services</b>, <b>pricing</b>, or starting a <b>project</b>?"; };
     const reply = (msg) => {
       const m = msg.toLowerCase();
       let best = null, score = 0;
-      KB.forEach(item => {
+      getKB().forEach(item => {
         const s = item.k.reduce((acc, kw) => acc + (m.includes(kw) ? kw.length : 0), 0);
         if (s > score) { score = s; best = item; }
       });
-      return best ? best.a : FALLBACK;
+      return best ? best.a : getFallback();
     };
 
     const add = (who, html) => {
@@ -450,19 +466,23 @@
       }, 550 + Math.random() * 400);
     };
 
-    const QUICK = ['Services', 'Pricing', 'Timeline', 'Contact'];
+    const QUICK = [
+      { label: 'Services', q: 'services' }, { label: 'Pricing', q: 'pricing' },
+      { label: 'Timeline', q: 'timeline' }, { label: 'Contact', q: 'contact' }
+    ];
+    const getQuick = () => { const t = chatTr(); return (t && t.quick) || QUICK; };
     const buildQuick = () => {
       quick.innerHTML = '';
-      QUICK.forEach(q => {
+      getQuick().forEach(item => {
         const b = document.createElement('button');
-        b.className = 'chat-chip'; b.textContent = q;
-        b.addEventListener('click', () => send(q));
+        b.className = 'chat-chip'; b.textContent = item.label;
+        b.addEventListener('click', () => send(item.q || item.label, item.label));
         quick.appendChild(b);
       });
     };
 
-    const send = (text) => {
-      add('me', text.replace(/</g, '&lt;'));
+    const send = (text, display) => {
+      add('me', (display || text).replace(/</g, '&lt;'));
       botReply(text);
     };
 
@@ -473,7 +493,7 @@
       panel.setAttribute('aria-hidden', 'false');
       if (!greeted) {
         greeted = true;
-        setTimeout(() => add('bot', "Hi! 👋 I'm the studio assistant. How can I help — <b>services</b>, <b>pricing</b>, or starting a <b>project</b>?"), 250);
+        setTimeout(() => add('bot', getGreet()), 250);
         buildQuick();
       }
       setTimeout(() => input.focus(), 300);
@@ -485,6 +505,8 @@
     };
     triggers.forEach(t => t.addEventListener('click', () => panel.classList.contains('is-open') ? close() : open()));
     min && min.addEventListener('click', close);
+    /* rebuild quick chips in the new language (once) */
+    window.__bqLangCb.push(() => { if (greeted) buildQuick(); });
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const v = input.value.trim();
@@ -671,19 +693,30 @@
       sub: $('#bcSub'), meta: $('#bcMeta'), read: $('#bcRead'),
     };
     let curPost = null;
+    /* translate a post into the active language (falls back to English) */
+    const blogLang = () => (document.documentElement.dataset.lang || 'en');
+    const L = (p) => {
+      const t = window.BLOG_I18N && window.BLOG_I18N[blogLang()] && window.BLOG_I18N[blogLang()][p.num];
+      if (!t) return p;
+      return { num: p.num, accent: p.accent, img: p.img, read: p.read,
+               tag: t.tag || p.tag, title: t.title || p.title, sub: t.sub || p.sub,
+               date: t.date || p.date, body: t.body || p.body };
+    };
+    const dT = (k, fb) => (window.BQ_DICT && window.BQ_DICT[k]) || fb;
     const preview = (p) => {
       if (!p) return;
       curPost = p;
+      const q = L(p);
       els.card.classList.add('swapping');
       if (els.ghost) els.ghost.textContent = p.num;
       if (p.accent) els.card.style.background = p.accent;
       setTimeout(() => {
-        if (els.img)  els.img.src = p.img;
-        if (els.tag)  els.tag.textContent = p.tag;
-        if (els.title) els.title.innerHTML = hl(p.title);
-        if (els.sub)  els.sub.textContent = p.sub;
-        if (els.meta) els.meta.textContent = `${p.tag.toUpperCase()} · ${p.date.toUpperCase()}`;
-        if (els.read) els.read.textContent = `${p.read} MIN`;
+        if (els.img)  els.img.src = q.img;
+        if (els.tag)  els.tag.textContent = q.tag;
+        if (els.title) els.title.innerHTML = hl(q.title);
+        if (els.sub)  els.sub.textContent = q.sub;
+        if (els.meta) els.meta.textContent = `${q.tag.toUpperCase()} · ${q.date.toUpperCase()}`;
+        if (els.read) els.read.textContent = dT('blog.min', '{n} MIN').replace('{n}', p.read);
         els.card.classList.remove('swapping');
       }, 160);
     };
@@ -694,12 +727,13 @@
       const start = (page - 1) * PAGE_SIZE;
       const slice = POSTS.slice(start, start + PAGE_SIZE);
       slice.forEach((p, i) => {
+        const q = L(p);
         const a = document.createElement('a');
         a.href = '#'; a.className = 'index-row' + (i === 0 ? ' is-active' : '');
         a.innerHTML =
           `<span class="mono index-row-num">${p.num} / ${String(POSTS.length).padStart(2,'0')}</span>
-           <span class="index-row-title">${p.title}</span>
-           <span class="mono index-row-tag">${p.tag}</span>`;
+           <span class="index-row-title">${q.title}</span>
+           <span class="mono index-row-tag">${q.tag}</span>`;
         a.addEventListener('mouseenter', () => { setActive(a); preview(p); });
         a.addEventListener('click', (e) => { e.preventDefault(); openReader(p); });
         list.appendChild(a);
@@ -743,6 +777,7 @@
       cForm: $('#rdCommentForm'), cName: $('#rdCommentName'), cText: $('#rdCommentText'),
     };
     let curNum = null;
+    let curPostObj = null;
     const lkKey = (n) => `bq_blog_like_${n}`;
     const cmKey = (n) => `bq_blog_cmts_${n}`;
     const baseLikes = (n) => 11 + (parseInt(n, 10) * 7) % 30;
@@ -756,19 +791,23 @@
     };
     const renderComments = () => {
       const l = getComments(curNum);
-      rd.commentCount.textContent = `${l.length} comment${l.length === 1 ? '' : 's'}`;
+      const cTpl = (window.BQ_DICT && window.BQ_DICT['blog.comments']) || '{n} comments';
+      rd.commentCount.textContent = cTpl.replace('{n}', l.length);
+      const empty = (window.BQ_DICT && window.BQ_DICT['blog.noComments']) || 'No comments yet — be the first to write one.';
       rd.comments.innerHTML = l.length ? l.slice().reverse().map(c =>
         `<div class="reader-comment"><div class="reader-comment-head"><strong>${esc(c.name)}</strong><span class="mono">${new Date(c.at).toLocaleDateString()}</span></div><p>${esc(c.text)}</p></div>`).join('')
-        : `<p class="reader-comment-empty">No comments yet — be the first to write one.</p>`;
+        : `<p class="reader-comment-empty">${empty}</p>`;
     };
     const openReader = (p) => {
       curNum = p.num;
-      if (rd.img) { rd.img.src = p.img; rd.img.alt = p.title; }
-      if (rd.tag) rd.tag.textContent = p.tag;
-      if (rd.title) rd.title.innerHTML = p.title;
-      if (rd.date) rd.date.textContent = (p.date || '').toUpperCase();
-      if (rd.read) rd.read.textContent = `${p.read} MIN READ`;
-      if (rd.text) rd.text.innerHTML = p.body.map(x => `<p>${x}</p>`).join('');
+      curPostObj = p;
+      const q = L(p);
+      if (rd.img) { rd.img.src = q.img; rd.img.alt = q.title; }
+      if (rd.tag) rd.tag.textContent = q.tag;
+      if (rd.title) rd.title.innerHTML = q.title;
+      if (rd.date) rd.date.textContent = (q.date || '').toUpperCase();
+      if (rd.read) rd.read.textContent = dT('blog.minRead', '{n} MIN READ').replace('{n}', p.read);
+      if (rd.text) rd.text.innerHTML = q.body.map(x => `<p>${x}</p>`).join('');
       renderLike(); renderComments();
       reader.classList.add('is-open'); reader.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden'; reader.scrollTop = 0;
@@ -784,7 +823,7 @@
     });
     rd.cForm?.addEventListener('submit', (e) => {
       e.preventDefault();
-      const name = (rd.cName.value || '').trim() || 'Anonymous';
+      const name = (rd.cName.value || '').trim() || dT('blog.anon', 'Anonymous');
       const text = (rd.cText.value || '').trim();
       if (!text) { rd.cText.focus(); return; }
       const l = getComments(curNum); l.push({ name, text, at: Date.now() });
@@ -793,6 +832,19 @@
     });
 
     renderPage();
+    window.__bqLangCb.push(() => {
+      renderPage();
+      if (reader && reader.classList.contains('is-open') && curPostObj) {
+        const q = L(curPostObj);
+        if (rd.tag) rd.tag.textContent = q.tag;
+        if (rd.title) rd.title.innerHTML = q.title;
+        if (rd.date) rd.date.textContent = (q.date || '').toUpperCase();
+        if (rd.read) rd.read.textContent = dT('blog.minRead', '{n} MIN READ').replace('{n}', curPostObj.read);
+        if (rd.text) rd.text.innerHTML = q.body.map(x => `<p>${x}</p>`).join('');
+        if (rd.img) rd.img.alt = q.title;
+        renderComments();
+      }
+    });
   })();
 
   /* =======================================================

@@ -42,6 +42,7 @@ window.BQ_GALLERY = {
       out.push({ coll, cat, index: i, type,
         url:   this.url(coll, i),
         title: `${c.title} ${String(i).padStart(2, '0')}`,
+        titlePrefix: c.title,
         tag: c.tag, icon: c.icon,
       });
     }
@@ -66,18 +67,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const loader = document.getElementById('galleryLoading');
   if (loader) loader.remove();
 
+  /* ---- language-aware card labels (tag + title) ---- */
+  const galLang = () => (document.documentElement.dataset.lang || 'en');
+  const galDigits = (s) => (galLang() === 'ku' || galLang() === 'ar')
+    ? String(s).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : String(s);
+  const galTag = (coll, fb) => {
+    const t = window.GAL_I18N && window.GAL_I18N[galLang()] && window.GAL_I18N[galLang()][coll];
+    if (t && t.tag) return t.tag;
+    const c = window.BQ_GALLERY.COLLECTIONS[coll];
+    return (c && c.tag) || fb || '';
+  };
+  const galTitle = (coll, i, fb) => {
+    const t = window.GAL_I18N && window.GAL_I18N[galLang()] && window.GAL_I18N[galLang()][coll];
+    const c = window.BQ_GALLERY.COLLECTIONS[coll];
+    const pfx = (t && t.title) || (c && c.title) || fb || '';
+    return `${pfx} ${galDigits(String(i).padStart(2, '0'))}`;
+  };
+
   const buildCard = (item) => {
     const article = document.createElement('article');
     article.className = 'card card--photo';
+    const dispTag   = galTag(item.coll, item.tag);
+    const dispTitle = galTitle(item.coll, item.index, item.titlePrefix || item.tag);
     article.dataset.cat   = item.cat;
+    article.dataset.coll  = item.coll;
     article.dataset.idx   = item.index;
     article.dataset.full  = item.url;
-    article.dataset.title = item.title;
+    article.dataset.title = dispTitle;
     article.dataset.type  = item.type;
 
     const mediaHtml = item.type === 'video'
-      ? `<video muted loop playsinline preload="none" src="${item.url}" title="${item.title}"></video>`
-      : `<img loading="lazy" src="${item.url}" alt="${item.title}" />`;
+      ? `<video muted loop playsinline preload="none" src="${item.url}" title="${dispTitle}"></video>`
+      : `<img loading="lazy" src="${item.url}" alt="${dispTitle}" />`;
 
     const playIcon = item.type === 'video' ? 'fa-play' : 'fa-magnifying-glass-plus';
 
@@ -85,8 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="card-art card-art--photo">
         ${mediaHtml}
         <div class="card-meta card-meta--ov">
-          <span class="mono card-tag"><i class="fa-solid ${item.icon}"></i> ${item.tag}</span>
-          <h3 class="card-title">${item.title}</h3>
+          <span class="mono card-tag"><i class="fa-solid ${item.icon}"></i> ${dispTag}</span>
+          <h3 class="card-title">${dispTitle}</h3>
           <span class="card-zoom-icon"><i class="fa-solid ${playIcon}"></i></span>
         </div>
       </div>`;
@@ -119,16 +140,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('certLoading')?.remove();
     window.BQ_GALLERY.items('certificate').forEach(item => {
       const div = document.createElement('div');
+      const dispTitle = galTitle('certificate', item.index, item.titlePrefix);
       div.className = 'cert-item';
+      div.dataset.coll  = 'certificate';
+      div.dataset.idx   = item.index;
       div.dataset.full  = item.url;
-      div.dataset.title = item.title;
+      div.dataset.title = dispTitle;
       div.dataset.type  = 'image';
       div.innerHTML = `
         <div class="cert-img-wrap">
-          <img loading="lazy" src="${item.url}" alt="${item.title}" />
+          <img loading="lazy" src="${item.url}" alt="${dispTitle}" />
           <div class="cert-zoom"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
         </div>
-        <span class="mono cert-label">${item.title}</span>`;
+        <span class="mono cert-label">${dispTitle}</span>`;
       div.addEventListener('error', () => div.remove(), { once: true });
       certGrid.appendChild(div);
     });
@@ -175,6 +199,29 @@ document.addEventListener('DOMContentLoaded', () => {
   /* Lightbox, then render the gallery via the masonry engine in main.js */
   if (window.__bqInitLightbox)  window.__bqInitLightbox();
   if (window.__bqRenderGallery) window.__bqRenderGallery(true);
+
+  /* ---- relocalize every card + certificate label on language switch ---- */
+  window.__bqRelocalizeGallery = () => {
+    (window.BQ_ALL_CARDS || []).forEach(entry => {
+      const card = entry.el; if (!card) return;
+      const coll = card.dataset.coll; if (!coll) return;
+      const title = galTitle(coll, card.dataset.idx, '');
+      card.dataset.title = title;
+      const tg = card.querySelector('.card-tag');
+      if (tg) { const ic = tg.querySelector('i'); const cls = ic ? ic.className : ''; tg.innerHTML = `<i class="${cls}"></i> ${galTag(coll, '')}`; }
+      const tt = card.querySelector('.card-title'); if (tt) tt.textContent = title;
+      const media = card.querySelector('img, video');
+      if (media) { if (media.tagName === 'IMG') media.alt = title; else media.title = title; }
+    });
+    document.querySelectorAll('#certGrid .cert-item').forEach(div => {
+      const title = galTitle('certificate', div.dataset.idx, 'Certificate');
+      div.dataset.title = title;
+      const lbl = div.querySelector('.cert-label'); if (lbl) lbl.textContent = title;
+      const img = div.querySelector('img'); if (img) img.alt = title;
+    });
+  };
+  window.__bqLangCb = window.__bqLangCb || [];
+  window.__bqLangCb.push(() => window.__bqRelocalizeGallery());
 
   /* ── WorkWith: real images in marquee ── */
   const marqueeTrack = document.querySelector('.logo-marquee-track');

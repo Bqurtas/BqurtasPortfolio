@@ -2,6 +2,7 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
+  <base href="/" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#14100b" />
 
@@ -27,8 +28,9 @@
   <meta property="og:title" content="Barakat Qurtas — Kurdish Graphic &amp; Motion Designer" />
   <meta property="og:description" content="1000+ works across brand identity, editorial, book covers, logos, posters & video — from Hewlêr, Kurdistan. Available for select commissions." />
   <meta property="og:image" content="https://www.bqurtas.com/assets/cover.webp" />
-  <meta property="og:image:width" content="600" />
-  <meta property="og:image:height" content="315" />
+  <meta property="og:image:type" content="image/webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="Barakat Qurtas — Kurdish Graphic & Motion Designer" />
   <meta property="og:url" content="https://www.bqurtas.com/" />
   <meta property="og:locale" content="en_US" />
@@ -71,7 +73,7 @@
   <!-- Font Awesome icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
 
-  <link rel="stylesheet" href="css/style.css?v=38" />
+  <link rel="stylesheet" href="css/style.css?v=45" />
 </head>
 <body>
 
@@ -110,28 +112,28 @@
     </a>
 
     <nav class="rail-nav" aria-label="Rooms">
-      <a href="#design" class="rail-link is-active" data-route="design" aria-label="Design">
+      <a href="/design" class="rail-link is-active" data-route="design" aria-label="Design">
         <i class="fa-solid fa-compass-drafting rail-icon"></i>
         <span class="rail-tip">
           <span class="rail-tip-num">01</span>
           <span class="rail-tip-text" data-i18n="nav.design">Design</span>
         </span>
       </a>
-      <a href="#blog" class="rail-link" data-route="blog" aria-label="Blog">
+      <a href="/blog" class="rail-link" data-route="blog" aria-label="Blog">
         <i class="fa-solid fa-feather-pointed rail-icon"></i>
         <span class="rail-tip">
           <span class="rail-tip-num">02</span>
           <span class="rail-tip-text" data-i18n="nav.blog">Blog</span>
         </span>
       </a>
-      <a href="#bio" class="rail-link" data-route="bio" aria-label="Biography">
+      <a href="/bio" class="rail-link" data-route="bio" aria-label="Biography">
         <i class="fa-solid fa-user-pen rail-icon"></i>
         <span class="rail-tip">
           <span class="rail-tip-num">03</span>
           <span class="rail-tip-text" data-i18n="nav.bio">Biography</span>
         </span>
       </a>
-      <a href="#contact" class="rail-link" data-route="contact" aria-label="Contact">
+      <a href="/contact" class="rail-link" data-route="contact" aria-label="Contact">
         <i class="fa-solid fa-paper-plane rail-icon"></i>
         <span class="rail-tip">
           <span class="rail-tip-num">04</span>
@@ -199,10 +201,10 @@
   <div class="profile-card" id="profileCard" aria-hidden="true">
     <div class="profile-card-photo"><span class="profile-card-ring" aria-hidden="true"></span><img src="assets/avatar.webp" alt="Barakat Qurtas" /></div>
     <div class="profile-card-body">
-      <span class="mono profile-card-eyebrow"><span class="profile-card-dot"></span> Independent Designer · Hewlêr</span>
+      <span class="mono profile-card-eyebrow"><span class="profile-card-dot"></span> <span data-i18n="profile.eye">Independent Designer · Hewlêr</span></span>
       <h4 class="profile-card-name">Barakat Qurtas</h4>
-      <p class="profile-card-bio">Designer of printed matter since 2014 — brand identity, editorial, books, and the quiet things in between.</p>
-      <a href="#bio" class="profile-card-btn" data-route="bio">View biography <i class="fa-solid fa-arrow-right"></i></a>
+      <p class="profile-card-bio" data-i18n="profile.bio">Designer of printed matter since 2014 — brand identity, editorial, books, and the quiet things in between.</p>
+      <a href="/bio" class="profile-card-btn" data-route="bio"><span data-i18n="profile.btn">View biography</span> <i class="fa-solid fa-arrow-right"></i></a>
     </div>
   </div>
 
@@ -227,19 +229,19 @@
 
   <!-- Mobile menu -->
   <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile navigation">
-    <a href="#design" class="mobile-link" data-route="design">
+    <a href="/design" class="mobile-link" data-route="design">
       <i class="fa-solid fa-compass-drafting"></i>
       <span data-i18n="nav.design">Design</span>
     </a>
-    <a href="#blog" class="mobile-link" data-route="blog">
+    <a href="/blog" class="mobile-link" data-route="blog">
       <i class="fa-solid fa-feather-pointed"></i>
       <span data-i18n="nav.blog">Blog</span>
     </a>
-    <a href="#bio" class="mobile-link" data-route="bio">
+    <a href="/bio" class="mobile-link" data-route="bio">
       <i class="fa-solid fa-user-pen"></i>
       <span data-i18n="nav.bio">Biography</span>
     </a>
-    <a href="#contact" class="mobile-link" data-route="contact">
+    <a href="/contact" class="mobile-link" data-route="contact">
       <i class="fa-solid fa-paper-plane"></i>
       <span data-i18n="nav.contact">Contact</span>
     </a>
@@ -351,7 +353,7 @@
           </div>
 
           <div class="pencemor-hero-actions">
-            <a href="#contact" data-route="contact" class="pencemor-hero-btn pencemor-hero-btn--primary" data-i18n="pj.contact">Get in touch</a>
+            <a href="/contact" data-route="contact" class="pencemor-hero-btn pencemor-hero-btn--primary" data-i18n="pj.contact">Get in touch</a>
             <button type="button" class="pencemor-hero-btn pencemor-hero-btn--ghost" id="pencemorViewWork" data-i18n="pj.work">View the work</button>
           </div>
         </div>
@@ -426,11 +428,11 @@
       <div class="section bio-teaser">
         <div class="bio-teaser-grid">
           <div class="bio-teaser-text">
-            <span class="section-num mono"><i class="fa-solid fa-user-pen"></i> &nbsp; A short note</span>
-            <h2 class="bio-teaser-title">Designer of <em>printed matter</em>, working from Hewlêr since 2014.</h2>
-            <p>Independent graphic designer based in Erbil, Kurdistan Region. Currently with the Directorate of Media Affairs at the Office of the President. Earlier — Protocol Media at the KRG Prime Minister's office, and a long freelance practice at a printing shop in the old city.</p>
-            <a href="#bio" class="bio-teaser-link" data-route="bio">
-              <span>Read the full biography</span>
+            <span class="section-num mono"><i class="fa-solid fa-user-pen"></i> &nbsp; <span data-i18n="d.note">A short note</span></span>
+            <h2 class="bio-teaser-title" data-i18n="d.teaser.title">Designer of <em>printed matter</em>, working from Hewlêr since 2014.</h2>
+            <p data-i18n="d.teaser.body">Independent graphic designer based in Erbil, Kurdistan Region. Currently with the Directorate of Media Affairs at the Office of the President. Earlier — Protocol Media at the KRG Prime Minister's office, and a long freelance practice at a printing shop in the old city.</p>
+            <a href="/bio" class="bio-teaser-link" data-route="bio">
+              <span data-i18n="d.teaser.link">Read the full biography</span>
               <i class="fa-solid fa-arrow-right"></i>
             </a>
           </div>
@@ -438,19 +440,19 @@
           <ul class="stats">
             <li class="stat">
               <span class="stat-num" data-count="1000" data-suffix="+">0</span>
-              <span class="stat-label"><i class="fa-solid fa-palette"></i> Designs</span>
+              <span class="stat-label"><i class="fa-solid fa-palette"></i> <span data-i18n="st.designs">Designs</span></span>
             </li>
             <li class="stat">
               <span class="stat-num" data-count="25" data-suffix="+">0</span>
-              <span class="stat-label"><i class="fa-solid fa-handshake"></i> Clients</span>
+              <span class="stat-label"><i class="fa-solid fa-handshake"></i> <span data-i18n="st.clients">Clients</span></span>
             </li>
             <li class="stat">
               <span class="stat-num" data-count="20" data-suffix="+">0</span>
-              <span class="stat-label"><i class="fa-solid fa-pen-nib"></i> Logos</span>
+              <span class="stat-label"><i class="fa-solid fa-pen-nib"></i> <span data-i18n="st.logos">Logos</span></span>
             </li>
             <li class="stat">
               <span class="stat-num" data-count="100" data-suffix="+">0</span>
-              <span class="stat-label"><i class="fa-solid fa-book"></i> Books</span>
+              <span class="stat-label"><i class="fa-solid fa-book"></i> <span data-i18n="st.books">Books</span></span>
             </li>
           </ul>
         </div>
@@ -459,41 +461,41 @@
       <!-- ===== CLIENT LOGOS — places worked with ===== -->
       <div class="section logos-section">
         <header class="logos-head">
-          <span class="section-num mono"><i class="fa-solid fa-handshake"></i> &nbsp; Worked with</span>
-          <h3 class="logos-title">Places &amp; people I've worked alongside.</h3>
+          <span class="section-num mono"><i class="fa-solid fa-handshake"></i> &nbsp; <span data-i18n="d.worked.eye">Worked with</span></span>
+          <h3 class="logos-title" data-i18n="d.worked.title">Places &amp; people I've worked alongside.</h3>
         </header>
         <div class="logo-marquee">
           <div class="logo-marquee-track">
-            <div class="logo-chip"><i class="fa-solid fa-landmark"></i><span>Presidency of Kurdistan Region</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-building-columns"></i><span>KRG Prime Minister's Office</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-newspaper"></i><span>Directorate of Media Affairs</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-graduation-cap"></i><span>Salahaddin University</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-school"></i><span>Soran University</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-network-wired"></i><span>Nuche Net Agency</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-people-group"></i><span>Kurdistan Democratic Youth Union</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-hands-holding-circle"></i><span>CNO Organizations</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-scale-balanced"></i><span>Justice NGO — Lagan</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-city"></i><span>Governor of Erbil</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-print"></i><span>Independent Printing Shops</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-landmark"></i><span data-i18n="org.presidency">Presidency of Kurdistan Region</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-building-columns"></i><span data-i18n="org.pmoffice">KRG Prime Minister's Office</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-newspaper"></i><span data-i18n="org.dma">Directorate of Media Affairs</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-graduation-cap"></i><span data-i18n="org.salahaddin">Salahaddin University</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-school"></i><span data-i18n="org.soran">Soran University</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-network-wired"></i><span data-i18n="org.nuche">Nuche Net Agency</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-people-group"></i><span data-i18n="org.kdyu">Kurdistan Democratic Youth Union</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-hands-holding-circle"></i><span data-i18n="org.cno">CNO Organizations</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-scale-balanced"></i><span data-i18n="org.justice">Justice NGO — Lagan</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-city"></i><span data-i18n="org.governor">Governor of Erbil</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-print"></i><span data-i18n="org.printshops">Independent Printing Shops</span></div>
             <!-- duplicate for seamless scroll -->
-            <div class="logo-chip"><i class="fa-solid fa-landmark"></i><span>Presidency of Kurdistan Region</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-building-columns"></i><span>KRG Prime Minister's Office</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-newspaper"></i><span>Directorate of Media Affairs</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-graduation-cap"></i><span>Salahaddin University</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-school"></i><span>Soran University</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-network-wired"></i><span>Nuche Net Agency</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-people-group"></i><span>Kurdistan Democratic Youth Union</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-hands-holding-circle"></i><span>CNO Organizations</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-scale-balanced"></i><span>Justice NGO — Lagan</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-city"></i><span>Governor of Erbil</span></div>
-            <div class="logo-chip"><i class="fa-solid fa-print"></i><span>Independent Printing Shops</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-landmark"></i><span data-i18n="org.presidency">Presidency of Kurdistan Region</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-building-columns"></i><span data-i18n="org.pmoffice">KRG Prime Minister's Office</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-newspaper"></i><span data-i18n="org.dma">Directorate of Media Affairs</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-graduation-cap"></i><span data-i18n="org.salahaddin">Salahaddin University</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-school"></i><span data-i18n="org.soran">Soran University</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-network-wired"></i><span data-i18n="org.nuche">Nuche Net Agency</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-people-group"></i><span data-i18n="org.kdyu">Kurdistan Democratic Youth Union</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-hands-holding-circle"></i><span data-i18n="org.cno">CNO Organizations</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-scale-balanced"></i><span data-i18n="org.justice">Justice NGO — Lagan</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-city"></i><span data-i18n="org.governor">Governor of Erbil</span></div>
+            <div class="logo-chip"><i class="fa-solid fa-print"></i><span data-i18n="org.printshops">Independent Printing Shops</span></div>
           </div>
         </div>
 
         <!-- LOGOS DESIGNED -->
         <header class="logos-head">
-          <span class="section-num mono"><i class="fa-solid fa-pen-nib"></i> &nbsp; Designed by hand</span>
-          <h3 class="logos-title">Selected logos I've drawn.</h3>
+          <span class="section-num mono"><i class="fa-solid fa-pen-nib"></i> &nbsp; <span data-i18n="d.drawn.eye">Designed by hand</span></span>
+          <h3 class="logos-title" data-i18n="d.drawn.title">Selected logos I've drawn.</h3>
         </header>
         <div class="logos-grid">
           <div class="logo-mark"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="40" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="60" cy="60" r="12" fill="currentColor"/></svg><span>Atlas Studio</span></div>
@@ -514,28 +516,28 @@
       <!-- ===== LATEST FROM THE BLOG (in Design room) ===== -->
       <div class="section latest-blog">
         <header class="latest-blog-head">
-          <span class="section-num mono"><i class="fa-solid fa-feather-pointed"></i> &nbsp; Latest from the blog</span>
-          <h3 class="latest-blog-title">Recent notes from the desk.</h3>
-          <a href="#blog" class="latest-blog-all" data-route="blog">All posts <i class="fa-solid fa-arrow-right"></i></a>
+          <span class="section-num mono"><i class="fa-solid fa-feather-pointed"></i> &nbsp; <span data-i18n="d.latest.eye">Latest from the blog</span></span>
+          <h3 class="latest-blog-title" data-i18n="d.latest.title">Recent notes from the desk.</h3>
+          <a href="/blog" class="latest-blog-all" data-route="blog"><span data-i18n="d.latest.all">All posts</span> <i class="fa-solid fa-arrow-right"></i></a>
         </header>
         <div class="latest-blog-grid">
           <article class="blog-card">
-            <span class="mono blog-meta"><i class="fa-solid fa-calendar"></i> May 2026 · <i class="fa-solid fa-clock"></i> 6 min</span>
-            <h3>On the architecture of meaning</h3>
-            <p>Typography is not decoration. It is the floorplan of the page — the place where readers pause, breathe, and find their footing.</p>
-            <a href="#blog" class="blog-more" data-route="blog">Read the essay <i class="fa-solid fa-arrow-right"></i></a>
+            <span class="mono blog-meta"><i class="fa-solid fa-calendar"></i> <span data-i18n="bt1.date">May 2026</span> · <i class="fa-solid fa-clock"></i> <span data-i18n="bt1.min">6 min</span></span>
+            <h3 data-i18n="bt1.title">On the architecture of meaning</h3>
+            <p data-i18n="bt1.body">Typography is not decoration. It is the floorplan of the page — the place where readers pause, breathe, and find their footing.</p>
+            <a href="/blog" class="blog-more" data-route="blog"><span data-i18n="blog.more">Read the essay</span> <i class="fa-solid fa-arrow-right"></i></a>
           </article>
           <article class="blog-card">
-            <span class="mono blog-meta"><i class="fa-solid fa-calendar"></i> Apr 2026 · <i class="fa-solid fa-clock"></i> 4 min</span>
-            <h3>A printer's room in Hewlêr</h3>
-            <p>The old quarter, third floor, north-facing light. A notebook, a small press, and a slow habit of asking why.</p>
-            <a href="#blog" class="blog-more" data-route="blog">Read the essay <i class="fa-solid fa-arrow-right"></i></a>
+            <span class="mono blog-meta"><i class="fa-solid fa-calendar"></i> <span data-i18n="bt2.date">Apr 2026</span> · <i class="fa-solid fa-clock"></i> <span data-i18n="bt2.min">4 min</span></span>
+            <h3 data-i18n="bt2.title">A printer's room in Hewlêr</h3>
+            <p data-i18n="bt2.body">The old quarter, third floor, north-facing light. A notebook, a small press, and a slow habit of asking why.</p>
+            <a href="/blog" class="blog-more" data-route="blog"><span data-i18n="blog.more">Read the essay</span> <i class="fa-solid fa-arrow-right"></i></a>
           </article>
           <article class="blog-card">
-            <span class="mono blog-meta"><i class="fa-solid fa-calendar"></i> Mar 2026 · <i class="fa-solid fa-clock"></i> 8 min</span>
-            <h3>Two scripts, one wordmark</h3>
-            <p>Designing for Kurdish and Latin in the same logo is not translation — it is duet. Notes from the Khanasin mark.</p>
-            <a href="#blog" class="blog-more" data-route="blog">Read the essay <i class="fa-solid fa-arrow-right"></i></a>
+            <span class="mono blog-meta"><i class="fa-solid fa-calendar"></i> <span data-i18n="bt3.date">Mar 2026</span> · <i class="fa-solid fa-clock"></i> <span data-i18n="bt3.min">8 min</span></span>
+            <h3 data-i18n="bt3.title">Two scripts, one wordmark</h3>
+            <p data-i18n="bt3.body">Designing for Kurdish and Latin in the same logo is not translation — it is duet. Notes from the Khanasin mark.</p>
+            <a href="/blog" class="blog-more" data-route="blog"><span data-i18n="blog.more">Read the essay</span> <i class="fa-solid fa-arrow-right"></i></a>
           </article>
         </div>
       </div>
@@ -547,7 +549,7 @@
     <section class="room is-hidden" id="blog" data-room="blog">
       <!-- Room hero -->
       <div class="room-hero">
-        <a class="room-hero-return" href="#design" data-route="design" aria-label="Return to start"><i class="fa-solid fa-arrow-left-long"></i> <span data-i18n="rh.return">Return to start</span></a>
+        <a class="room-hero-return" href="/design" data-route="design" aria-label="Return to start"><i class="fa-solid fa-arrow-left-long"></i> <span data-i18n="rh.return">Return to start</span></a>
         <span class="room-hero-corner room-hero-corner--tr mono"><i class="fa-solid fa-location-dot"></i> <span data-i18n="krg">Hewlêr · KRG</span></span>
         <span class="room-hero-corner room-hero-corner--bl mono">36.19° N · 44.01° E</span>
         <div class="room-hero-inner">
@@ -592,7 +594,7 @@
                   </span>
                   <span class="mono blog-card-read" id="bcRead">6 MIN</span>
                 </div>
-                <span class="blog-card-cta mono"><i class="fa-solid fa-arrow-right"></i> Click to read the full note</span>
+                <span class="blog-card-cta mono"><i class="fa-solid fa-arrow-right"></i> <span data-i18n="blog.cta">Click to read the full note</span></span>
               </div>
             </article>
           </div>
@@ -604,9 +606,9 @@
           <div class="blog-pager-pages" id="blogPages"></div>
           <button class="blog-pager-arrow" id="blogNext" aria-label="Next page"><i class="fa-solid fa-arrow-right-long"></i></button>
           <form class="blog-pager-go" id="blogGoForm">
-            <label class="mono" for="blogGoInput">Go to</label>
+            <label class="mono" for="blogGoInput" data-i18n="blog.goto">Go to</label>
             <input type="number" id="blogGoInput" min="1" inputmode="numeric" placeholder="#" />
-            <button type="submit" aria-label="Go to page">Go</button>
+            <button type="submit" aria-label="Go to page" data-i18n="blog.go">Go</button>
           </form>
         </nav>
 
@@ -635,7 +637,7 @@
     <section class="room is-hidden" id="bio" data-room="bio">
       <!-- Room hero -->
       <div class="room-hero">
-        <a class="room-hero-return" href="#design" data-route="design" aria-label="Return to start"><i class="fa-solid fa-arrow-left-long"></i> <span data-i18n="rh.return">Return to start</span></a>
+        <a class="room-hero-return" href="/design" data-route="design" aria-label="Return to start"><i class="fa-solid fa-arrow-left-long"></i> <span data-i18n="rh.return">Return to start</span></a>
         <span class="room-hero-corner room-hero-corner--tr mono"><i class="fa-solid fa-location-dot"></i> <span data-i18n="krg">Hewlêr · KRG</span></span>
         <span class="room-hero-corner room-hero-corner--bl mono">36.19° N · 44.01° E</span>
         <div class="room-hero-inner">
@@ -654,19 +656,19 @@
         <header class="section-head">
           <span class="section-num mono"><i class="fa-solid fa-user-pen"></i> &nbsp; 03 — <span data-i18n="bio.label">Biography Room</span></span>
           <h2 class="section-title" data-i18n="bio.title">A short, <em>honest</em> biography.</h2>
-          <p class="section-lede"><span class="dropcap">B</span>arakat Qurtas Babakr — independent graphic designer, working between state protocol, editorial design, and quiet personal projects. Based in Erbil, Kurdistan Region of Iraq.</p>
+          <p class="section-lede" data-i18n="bio.lede"><span class="dropcap">B</span>arakat Qurtas Babakr — independent graphic designer, working between state protocol, editorial design, and quiet personal projects. Based in Erbil, Kurdistan Region of Iraq.</p>
         </header>
 
         <div class="bio-stack">
         <!-- WORK PHILOSOPHY -->
         <div class="bio-block bio-philosophy" data-wm="&#xf14e;">
-          <span class="mono bio-phil-eyebrow"><i class="fa-solid fa-compass"></i> Discover the story behind the designer</span>
-          <h3 class="bio-phil-label">Work <em>Philosophy</em></h3>
-          <blockquote class="bio-phil-quote">"It doesn't matter where I work now or where I work in the future, but it is always important to be satisfied with others."</blockquote>
+          <span class="mono bio-phil-eyebrow"><i class="fa-solid fa-compass"></i> <span data-i18n="bp.eye">Discover the story behind the designer</span></span>
+          <h3 class="bio-phil-label" data-i18n="bp.label">Work <em>Philosophy</em></h3>
+          <blockquote class="bio-phil-quote" data-i18n="bp.quote">"It doesn't matter where I work now or where I work in the future, but it is always important to be satisfied with others."</blockquote>
           <div class="bio-phil-text">
-            <p>I'm Barakat Qurtas, born in Soran and currently based in Erbil — a city that transformed the way I see the world. I grew up between the stillness of the mountains and the rhythm of city life — two contrasts that continue to define my design language. Erbil now offers glowing nights and endless inspiration.</p>
-            <p>My passion for design began early. At the age of 12, I started experimenting, and by 17 I was fully immersed in graphic design as a profession. Since then I've continued to develop my skills through practice and real-world experience — letting my work speak for itself.</p>
-            <p>I work with Adobe Creative Suite and hold several masterclass certificates. I've collaborated with the Presidency of the Kurdistan Region and the KRG Protocol. My aim is to expand my creative impact and establish a leading advertising and publishing company.</p>
+            <p data-i18n="bp.p1">I'm Barakat Qurtas, born in Soran and currently based in Erbil — a city that transformed the way I see the world. I grew up between the stillness of the mountains and the rhythm of city life — two contrasts that continue to define my design language. Erbil now offers glowing nights and endless inspiration.</p>
+            <p data-i18n="bp.p2">My passion for design began early. At the age of 12, I started experimenting, and by 17 I was fully immersed in graphic design as a profession. Since then I've continued to develop my skills through practice and real-world experience — letting my work speak for itself.</p>
+            <p data-i18n="bp.p3">I work with Adobe Creative Suite and hold several masterclass certificates. I've collaborated with the Presidency of the Kurdistan Region and the KRG Protocol. My aim is to expand my creative impact and establish a leading advertising and publishing company.</p>
           </div>
           <span class="bio-phil-sign">Barakat Qurtas</span>
         </div>
@@ -679,13 +681,13 @@
               <span class="tl-dot"></span>
               <div class="tl-card">
                 <div class="tl-head">
-                  <h4>Works at Directorate of Media Affairs</h4>
-                  <span class="mono tl-date">Dec 2021 — Present · 4 yrs 6 mos</span>
+                  <h4 data-i18n="ex1.title">Works at Directorate of Media Affairs</h4>
+                  <span class="mono tl-date" data-i18n="ex1.date">Dec 2021 — Present · 4 yrs 6 mos</span>
                 </div>
-                <p class="tl-org"><i class="fa-solid fa-landmark"></i> Kurdistan Region Presidency · Part-time</p>
-                <p class="tl-loc"><i class="fa-solid fa-location-dot"></i> Erbil Plains District, Erbil Governorate, Iraq</p>
-                <p class="tl-desc">Office of the President of the Kurdistan Region. Author at Presidency of the Kurdistan Region of Iraq — <a href="https://presidency.gov.krd/en/home" target="_blank" rel="noopener">presidency.gov.krd</a></p>
-                <div class="tl-skills"><i class="fa-solid fa-palette"></i> Graphic Design, Adobe Lightroom <span>+16 skills</span></div>
+                <p class="tl-org"><i class="fa-solid fa-landmark"></i> <span data-i18n="ex1.org">Kurdistan Region Presidency · Part-time</span></p>
+                <p class="tl-loc"><i class="fa-solid fa-location-dot"></i> <span data-i18n="ex1.loc">Erbil Plains District, Erbil Governorate, Iraq</span></p>
+                <p class="tl-desc"><span data-i18n="ex1.desc">Office of the President of the Kurdistan Region. Author at Presidency of the Kurdistan Region of Iraq —</span> <a href="https://presidency.gov.krd/en/home" target="_blank" rel="noopener">presidency.gov.krd</a></p>
+                <div class="tl-skills"><i class="fa-solid fa-palette"></i> <span data-i18n="ex1.skills">Graphic Design, Adobe Lightroom</span> <span data-i18n="ex1.more">+16 skills</span></div>
               </div>
             </li>
 
@@ -693,13 +695,13 @@
               <span class="tl-dot"></span>
               <div class="tl-card">
                 <div class="tl-head">
-                  <h4>Former Works at Protocol Media</h4>
-                  <span class="mono tl-date">Feb 2019 — Dec 2019 · 11 mos</span>
+                  <h4 data-i18n="ex2.title">Former Works at Protocol Media</h4>
+                  <span class="mono tl-date" data-i18n="ex2.date">Feb 2019 — Dec 2019 · 11 mos</span>
                 </div>
-                <p class="tl-org"><i class="fa-solid fa-landmark"></i> Kurdistan Regional Government · Part-time</p>
-                <p class="tl-loc"><i class="fa-solid fa-location-dot"></i> Erbil, Erbil Governorate, Iraq</p>
-                <p class="tl-desc">Office of the Prime Minister of the Kurdistan Regional Government.</p>
-                <div class="tl-skills"><i class="fa-solid fa-video"></i> Protocol Officer, Video Camera <span>+2 skills</span></div>
+                <p class="tl-org"><i class="fa-solid fa-landmark"></i> <span data-i18n="ex2.org">Kurdistan Regional Government · Part-time</span></p>
+                <p class="tl-loc"><i class="fa-solid fa-location-dot"></i> <span data-i18n="ex2.loc">Erbil, Erbil Governorate, Iraq</span></p>
+                <p class="tl-desc" data-i18n="ex2.desc">Office of the Prime Minister of the Kurdistan Regional Government.</p>
+                <div class="tl-skills"><i class="fa-solid fa-video"></i> <span data-i18n="ex2.skills">Protocol Officer, Video Camera</span> <span data-i18n="ex2.more">+2 skills</span></div>
               </div>
             </li>
 
@@ -707,12 +709,12 @@
               <span class="tl-dot"></span>
               <div class="tl-card">
                 <div class="tl-head">
-                  <h4>Graphic Designer</h4>
-                  <span class="mono tl-date">Jan 2014 — Jan 2019 · 5 yrs 1 mo</span>
+                  <h4 data-i18n="ex3.title">Graphic Designer</h4>
+                  <span class="mono tl-date" data-i18n="ex3.date">Jan 2014 — Jan 2019 · 5 yrs 1 mo</span>
                 </div>
-                <p class="tl-org"><i class="fa-solid fa-print"></i> Printing Shop · Part-time &amp; Freelance Graphic Designer</p>
-                <p class="tl-loc"><i class="fa-solid fa-location-dot"></i> Erbil, Erbil Governorate, Iraq</p>
-                <div class="tl-skills"><i class="fa-solid fa-palette"></i> Graphic Design, Adobe Lightroom <span>+25 skills</span></div>
+                <p class="tl-org"><i class="fa-solid fa-print"></i> <span data-i18n="ex3.org">Printing Shop · Part-time &amp; Freelance Graphic Designer</span></p>
+                <p class="tl-loc"><i class="fa-solid fa-location-dot"></i> <span data-i18n="ex2.loc">Erbil, Erbil Governorate, Iraq</span></p>
+                <div class="tl-skills"><i class="fa-solid fa-palette"></i> <span data-i18n="ex3.skills">Graphic Design, Adobe Lightroom</span> <span data-i18n="ex3.more">+25 skills</span></div>
               </div>
             </li>
           </ol>
@@ -722,11 +724,11 @@
         <div class="bio-block" data-wm="&#xf19d;">
           <h3 class="bio-block-title"><i class="fa-solid fa-graduation-cap"></i> <span data-i18n="bio.education">Education</span></h3>
           <div class="bio-card">
-            <h4>Salahaddin University — Erbil</h4>
-            <p class="bio-sub">Diploma of Law · 2020 — 2022</p>
-            <p>Grade: Graduate</p>
-            <p><span class="mono">— Activities:</span> Law for a safe community</p>
-            <div class="tl-skills"><i class="fa-solid fa-scale-balanced"></i> Law and International Law</div>
+            <h4 data-i18n="ed.title">Salahaddin University — Erbil</h4>
+            <p class="bio-sub" data-i18n="ed.sub">Diploma of Law · 2020 — 2022</p>
+            <p data-i18n="ed.grade">Grade: Graduate</p>
+            <p><span class="mono" data-i18n="ed.act">— Activities:</span> <span data-i18n="ed.actv">Law for a safe community</span></p>
+            <div class="tl-skills"><i class="fa-solid fa-scale-balanced"></i> <span data-i18n="ed.skills">Law and International Law</span></div>
           </div>
         </div>
 
@@ -744,7 +746,7 @@
                  data-sub="For the cooperation and coordination of organizing the book launch ceremony."
                  data-accent="#5a1a1a">
                 <span class="mono index-row-num">01 / 05</span>
-                <span class="index-row-title">Shield of Honor &amp; Certificate</span>
+                <span class="index-row-title" data-i18n="h1.t">Shield of Honor &amp; Certificate</span>
                 <span class="mono index-row-tag">2025</span>
               </a>
 
@@ -754,7 +756,7 @@
                  data-sub="For his continued work in journalism and newspaper design — Kurdistan Region Presidency."
                  data-accent="#1a2740">
                 <span class="mono index-row-num">02 / 05</span>
-                <span class="index-row-title">Honorary Gift — Presidency</span>
+                <span class="index-row-title" data-i18n="h2.t">Honorary Gift — Presidency</span>
                 <span class="mono index-row-tag">2024</span>
               </a>
 
@@ -764,7 +766,7 @@
                  data-sub="For organizing the conference of the Department of History at Soran University."
                  data-accent="#2a1a0e">
                 <span class="mono index-row-num">03 / 05</span>
-                <span class="index-row-title">Shield of Honor — Soran</span>
+                <span class="index-row-title" data-i18n="h3.t">Shield of Honor — Soran</span>
                 <span class="mono index-row-tag">2023</span>
               </a>
 
@@ -774,7 +776,7 @@
                  data-sub="For continuous volunteer work with the Coordination Network of Organizations of Erbil Province."
                  data-accent="#0e1a26">
                 <span class="mono index-row-num">04 / 05</span>
-                <span class="index-row-title">World Volunteer Day</span>
+                <span class="index-row-title" data-i18n="h4.t">World Volunteer Day</span>
                 <span class="mono index-row-tag">2020</span>
               </a>
 
@@ -784,7 +786,7 @@
                  data-sub="For organizing the World Youth Day Conference — Coordination Network of Organizations."
                  data-accent="#3a2616">
                 <span class="mono index-row-num">05 / 05</span>
-                <span class="index-row-title">Respect &amp; Appreciation</span>
+                <span class="index-row-title" data-i18n="h5.t">Respect &amp; Appreciation</span>
                 <span class="mono index-row-tag">2020</span>
               </a>
             </div>
@@ -815,25 +817,25 @@
         <a class="bio-block bio-social bio-social--linkedin" href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener">
           <span class="bio-social-mark"><i class="fa-brands fa-linkedin-in"></i></span>
           <div class="bio-social-text">
-            <span class="mono bio-social-eyebrow">Connect · Professional Network</span>
-            <h3 class="bio-social-title">Barakat on <em>LinkedIn</em></h3>
-            <p class="bio-social-desc">Experience, recommendations, and the professional record — kept current and open for collaboration.</p>
+            <span class="mono bio-social-eyebrow" data-i18n="li.eye">Connect · Professional Network</span>
+            <h3 class="bio-social-title" data-i18n="li.title">Barakat on <em>LinkedIn</em></h3>
+            <p class="bio-social-desc" data-i18n="li.desc">Experience, recommendations, and the professional record — kept current and open for collaboration.</p>
             <span class="bio-social-handle mono">linkedin.com/in/bqurtas</span>
           </div>
-          <span class="bio-social-go mono">Open <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+          <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
         </a>
 
         <!-- LANGUAGES -->
         <div class="bio-block" data-wm="&#xf1ab;">
           <h3 class="bio-block-title"><i class="fa-solid fa-language"></i> <span data-i18n="bio.languages">Languages</span></h3>
           <div class="langs-grid">
-            <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4>Arabic</h4><p>Full professional proficiency</p><div class="lang-bar"><span style="width:95%"></span></div></div></div>
-            <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4>English</h4><p>Elementary proficiency · Duolingo Score 10 (May 2026)</p><div class="lang-bar"><span style="width:45%"></span></div></div></div>
-            <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4>French</h4><p>Elementary proficiency</p><div class="lang-bar"><span style="width:35%"></span></div></div></div>
-            <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4>Iranian languages</h4><p>Elementary proficiency</p><div class="lang-bar"><span style="width:40%"></span></div></div></div>
-            <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4>Kurdish (Soranî)</h4><p>Professional working proficiency</p><div class="lang-bar"><span style="width:100%"></span></div></div></div>
-            <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4>Kurdish — Kurmancî</h4><p>Professional working proficiency</p><div class="lang-bar"><span style="width:90%"></span></div></div></div>
-            <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4>Turkish</h4><p>Elementary proficiency</p><div class="lang-bar"><span style="width:30%"></span></div></div></div>
+            <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4 data-i18n="lng.ar">Arabic</h4><p data-i18n="lp.full">Full professional proficiency</p><div class="lang-bar"><span style="width:95%"></span></div></div></div>
+            <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4 data-i18n="lng.en">English</h4><p data-i18n="lp.enNote">Elementary proficiency · Duolingo Score 10 (May 2026)</p><div class="lang-bar"><span style="width:45%"></span></div></div></div>
+            <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4 data-i18n="lng.fr">French</h4><p data-i18n="lp.elem">Elementary proficiency</p><div class="lang-bar"><span style="width:35%"></span></div></div></div>
+            <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4 data-i18n="lng.ir">Iranian languages</h4><p data-i18n="lp.elem">Elementary proficiency</p><div class="lang-bar"><span style="width:40%"></span></div></div></div>
+            <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4 data-i18n="lng.ckb">Kurdish (Soranî)</h4><p data-i18n="lp.prof">Professional working proficiency</p><div class="lang-bar"><span style="width:100%"></span></div></div></div>
+            <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4 data-i18n="lng.kmr">Kurdish — Kurmancî</h4><p data-i18n="lp.prof">Professional working proficiency</p><div class="lang-bar"><span style="width:90%"></span></div></div></div>
+            <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4 data-i18n="lng.tr">Turkish</h4><p data-i18n="lp.elem">Elementary proficiency</p><div class="lang-bar"><span style="width:30%"></span></div></div></div>
           </div>
         </div>
 
@@ -841,10 +843,10 @@
         <div class="bio-block" data-wm="&#xf500;">
           <h3 class="bio-block-title"><i class="fa-solid fa-people-group"></i> <span data-i18n="bio.orgs">Organizations</span></h3>
           <ul class="orgs">
-            <li><i class="fa-solid fa-building"></i><div><h4>Nuche Net</h4><p>Graphic Designer and Printmaker · Oct 2024 — Aug 2025</p></div></li>
-            <li><i class="fa-solid fa-building"></i><div><h4>Kurdistan Democratic Youth Union</h4><p>Graphic Designer and social media management · Dec 2022 — Sep 2024</p></div></li>
-            <li><i class="fa-solid fa-building"></i><div><h4>CNO Organizations</h4><p>Graphic Designer and Volunteer · Apr 2019 — Jan 2020</p></div></li>
-            <li><i class="fa-solid fa-building"></i><div><h4>Justice NGO for Lagan Issues</h4><p>Graphic Designer and website developer · Feb 2014 — Feb 2017</p></div></li>
+            <li><i class="fa-solid fa-building"></i><div><h4>Nuche Net</h4><p data-i18n="bo1.role">Graphic Designer and Printmaker · Oct 2024 — Aug 2025</p></div></li>
+            <li><i class="fa-solid fa-building"></i><div><h4 data-i18n="bo2.name">Kurdistan Democratic Youth Union</h4><p data-i18n="bo2.role">Graphic Designer and social media management · Dec 2022 — Sep 2024</p></div></li>
+            <li><i class="fa-solid fa-building"></i><div><h4 data-i18n="bo3.name">CNO Organizations</h4><p data-i18n="bo3.role">Graphic Designer and Volunteer · Apr 2019 — Jan 2020</p></div></li>
+            <li><i class="fa-solid fa-building"></i><div><h4 data-i18n="bo4.name">Justice NGO for Lagan Issues</h4><p data-i18n="bo4.role">Graphic Designer and website developer · Feb 2014 — Feb 2017</p></div></li>
           </ul>
         </div>
 
@@ -852,16 +854,16 @@
         <div class="bio-block" data-wm="&#xf552;">
           <h3 class="bio-block-title"><i class="fa-solid fa-toolbox"></i> <span data-i18n="bio.services">Services Provided</span></h3>
           <div class="services-grid">
-            <div class="service"><i class="fa-solid fa-palette"></i><span>Graphic Design</span></div>
-            <div class="service"><i class="fa-solid fa-file-lines"></i><span>Resume Writing</span></div>
-            <div class="service"><i class="fa-solid fa-bullhorn"></i><span>Advertising</span></div>
-            <div class="service"><i class="fa-solid fa-list-check"></i><span>Project Management</span></div>
-            <div class="service"><i class="fa-solid fa-box-open"></i><span>Packaging Design</span></div>
-            <div class="service"><i class="fa-solid fa-film"></i><span>Video Editing</span></div>
-            <div class="service"><i class="fa-solid fa-pen-nib"></i><span>Logo Design</span></div>
-            <div class="service"><i class="fa-solid fa-print"></i><span>Print Design</span></div>
-            <div class="service"><i class="fa-solid fa-calendar-day"></i><span>Event Production</span></div>
-            <div class="service"><i class="fa-solid fa-hashtag"></i><span>Social Media Marketing</span></div>
+            <div class="service"><i class="fa-solid fa-palette"></i><span data-i18n="opt.gd">Graphic Design</span></div>
+            <div class="service"><i class="fa-solid fa-file-lines"></i><span data-i18n="opt.cv">Resume Writing</span></div>
+            <div class="service"><i class="fa-solid fa-bullhorn"></i><span data-i18n="opt.adv">Advertising</span></div>
+            <div class="service"><i class="fa-solid fa-list-check"></i><span data-i18n="opt.pm">Project Management</span></div>
+            <div class="service"><i class="fa-solid fa-box-open"></i><span data-i18n="opt.pkg">Packaging Design</span></div>
+            <div class="service"><i class="fa-solid fa-film"></i><span data-i18n="opt.vid">Video Editing</span></div>
+            <div class="service"><i class="fa-solid fa-pen-nib"></i><span data-i18n="opt.ld">Logo Design</span></div>
+            <div class="service"><i class="fa-solid fa-print"></i><span data-i18n="opt.prd">Print Design</span></div>
+            <div class="service"><i class="fa-solid fa-calendar-day"></i><span data-i18n="opt.evt">Event Production</span></div>
+            <div class="service"><i class="fa-solid fa-hashtag"></i><span data-i18n="opt.smm">Social Media Marketing</span></div>
           </div>
         </div>
 
@@ -871,7 +873,7 @@
           <div class="cert-grid" id="certGrid">
             <div class="gallery-loading" id="certLoading">
               <i class="fa-solid fa-circle-notch fa-spin"></i>
-              <span class="mono">Loading…</span>
+              <span class="mono" data-i18n="cert.loading">Loading…</span>
             </div>
           </div>
         </div>
@@ -880,12 +882,12 @@
         <a class="bio-block bio-social bio-social--behance" href="https://www.behance.net/bqurtas" target="_blank" rel="noopener">
           <span class="bio-social-mark"><i class="fa-brands fa-behance"></i></span>
           <div class="bio-social-text">
-            <span class="mono bio-social-eyebrow">Portfolio · Creative Network</span>
-            <h3 class="bio-social-title">Barakat on <em>Behance</em></h3>
-            <p class="bio-social-desc">The full creative portfolio — projects, case studies, and work in progress, curated in one place.</p>
+            <span class="mono bio-social-eyebrow" data-i18n="be.eye">Portfolio · Creative Network</span>
+            <h3 class="bio-social-title" data-i18n="be.title">Barakat on <em>Behance</em></h3>
+            <p class="bio-social-desc" data-i18n="be.desc">The full creative portfolio — projects, case studies, and work in progress, curated in one place.</p>
             <span class="bio-social-handle mono">behance.net/bqurtas</span>
           </div>
-          <span class="bio-social-go mono">Open <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+          <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
         </a>
         </div><!-- /.bio-stack -->
 
@@ -898,7 +900,7 @@
     <section class="room is-hidden" id="contact" data-room="contact">
       <!-- Room hero -->
       <div class="room-hero">
-        <a class="room-hero-return" href="#design" data-route="design" aria-label="Return to start"><i class="fa-solid fa-arrow-left-long"></i> <span data-i18n="rh.return">Return to start</span></a>
+        <a class="room-hero-return" href="/design" data-route="design" aria-label="Return to start"><i class="fa-solid fa-arrow-left-long"></i> <span data-i18n="rh.return">Return to start</span></a>
         <span class="room-hero-corner room-hero-corner--tr mono"><i class="fa-solid fa-location-dot"></i> <span data-i18n="krg">Hewlêr · KRG</span></span>
         <span class="room-hero-corner room-hero-corner--bl mono">36.19° N · 44.01° E</span>
         <div class="room-hero-inner">
@@ -916,7 +918,7 @@
       <div class="section">
         <header class="section-head">
           <span class="section-num mono"><i class="fa-solid fa-paper-plane"></i> &nbsp; 04 — <span data-i18n="contact.label">Contact Room</span></span>
-          <p class="contact-eyebrow mono">— Get in Touch · Let's Collaborate · Digital Landscape</p>
+          <p class="contact-eyebrow mono" data-i18n="c.eyebrow">— Get in Touch · Let's Collaborate · Digital Landscape</p>
           <h2 class="section-title" data-i18n="contact.title">Start a <em>conversation</em>.</h2>
         </header>
 
@@ -988,29 +990,29 @@
                 <label for="pType"><i class="fa-solid fa-compass-drafting"></i> <span data-i18n="cf.type">Project type</span></label>
                 <select id="pType" name="type" required>
                   <option value="" data-i18n-opt="cf.choose">Choose one…</option>
-                  <option>Graphic Design</option>
-                  <option>Logo Design</option>
-                  <option>Print Design</option>
-                  <option>Packaging Design</option>
-                  <option>Advertising</option>
-                  <option>Social Media Marketing</option>
-                  <option>Event Production</option>
-                  <option>Video Editing</option>
-                  <option>Resume Writing</option>
-                  <option>Project Management</option>
-                  <option>Other</option>
+                  <option data-i18n-opt="opt.gd">Graphic Design</option>
+                  <option data-i18n-opt="opt.ld">Logo Design</option>
+                  <option data-i18n-opt="opt.prd">Print Design</option>
+                  <option data-i18n-opt="opt.pkg">Packaging Design</option>
+                  <option data-i18n-opt="opt.adv">Advertising</option>
+                  <option data-i18n-opt="opt.smm">Social Media Marketing</option>
+                  <option data-i18n-opt="opt.evt">Event Production</option>
+                  <option data-i18n-opt="opt.vid">Video Editing</option>
+                  <option data-i18n-opt="opt.cv">Resume Writing</option>
+                  <option data-i18n-opt="opt.pm">Project Management</option>
+                  <option data-i18n-opt="opt.other">Other</option>
                 </select>
               </div>
               <div class="field">
                 <label for="pBudget"><i class="fa-solid fa-sack-dollar"></i> <span data-i18n="cf.budget">Budget range (USD)</span></label>
                 <select id="pBudget" name="budget">
                   <option value="" data-i18n-opt="cf.choose">Choose one…</option>
-                  <option>Under $500</option>
+                  <option data-i18n-opt="opt.u500">Under $500</option>
                   <option>$500 — $1,500</option>
                   <option>$1,500 — $5,000</option>
                   <option>$5,000 — $15,000</option>
                   <option>$15,000+</option>
-                  <option>Let's discuss</option>
+                  <option data-i18n-opt="opt.discuss">Let's discuss</option>
                 </select>
               </div>
             </div>
@@ -1020,11 +1022,11 @@
                 <label for="pTimeline"><i class="fa-solid fa-hourglass-half"></i> <span data-i18n="cf.timeline">Timeline</span></label>
                 <select id="pTimeline" name="timeline">
                   <option value="" data-i18n-opt="cf.choose">Choose one…</option>
-                  <option>ASAP</option>
-                  <option>2 — 4 weeks</option>
-                  <option>1 — 3 months</option>
-                  <option>3 — 6 months</option>
-                  <option>Flexible</option>
+                  <option data-i18n-opt="opt.asap">ASAP</option>
+                  <option data-i18n-opt="opt.24w">2 — 4 weeks</option>
+                  <option data-i18n-opt="opt.13m">1 — 3 months</option>
+                  <option data-i18n-opt="opt.36m">3 — 6 months</option>
+                  <option data-i18n-opt="opt.flex">Flexible</option>
                 </select>
               </div>
               <div class="field">
@@ -1033,10 +1035,10 @@
                   <option value="" data-i18n-opt="cf.choose">Choose one…</option>
                   <option>Instagram</option>
                   <option>LinkedIn</option>
-                  <option>A friend</option>
-                  <option>Google search</option>
-                  <option>Direct</option>
-                  <option>Other</option>
+                  <option data-i18n-opt="opt.friend">A friend</option>
+                  <option data-i18n-opt="opt.gsearch">Google search</option>
+                  <option data-i18n-opt="opt.direct">Direct</option>
+                  <option data-i18n-opt="opt.other">Other</option>
                 </select>
               </div>
             </div>
@@ -1072,7 +1074,7 @@
           <span class="mono"><i class="fa-solid fa-handshake-angle"></i> <span data-i18n="f.cta.eye">Have a project in mind?</span></span>
           <h3 class="footer-cta-title" data-i18n="f.cta.title">Let's make something <em>quietly</em> good together.</h3>
         </div>
-        <a href="#contact" class="footer-cta-btn" data-route="contact">
+        <a href="/contact" class="footer-cta-btn" data-route="contact">
           <i class="fa-solid fa-paper-plane"></i>
           <span data-i18n="f.cta.btn">Start a conversation</span>
           <i class="fa-solid fa-arrow-right"></i>
@@ -1084,7 +1086,7 @@
         <div class="footer-lead">
           <span class="footer-bq">Bq</span>
           <p class="footer-lead-text" data-i18n="f.lead">Independent graphic designer crafting brand identity, editorial, and books from the old quarter of Hewlêr — Kurdistan, since 2014.</p>
-          <a href="#contact" class="footer-avail" data-route="contact">
+          <a href="/contact" class="footer-avail" data-route="contact">
             <span class="footer-avail-dot" aria-hidden="true"></span>
             <span data-i18n="f.avail">Available for select commissions</span>
           </a>
@@ -1094,10 +1096,10 @@
           <div class="footer-col2">
             <span class="footer-col2-title mono" data-i18n="f.explore">Explore</span>
             <nav class="footer-nav" aria-label="Footer">
-              <a href="#design" data-route="design" data-i18n="nav.design">Design</a>
-              <a href="#blog" data-route="blog" data-i18n="nav.blog">Blog</a>
-              <a href="#bio" data-route="bio" data-i18n="nav.bio">Biography</a>
-              <a href="#contact" data-route="contact" data-i18n="nav.contact">Contact</a>
+              <a href="/design" data-route="design" data-i18n="nav.design">Design</a>
+              <a href="/blog" data-route="blog" data-i18n="nav.blog">Blog</a>
+              <a href="/bio" data-route="bio" data-i18n="nav.bio">Biography</a>
+              <a href="/contact" data-route="contact" data-i18n="nav.contact">Contact</a>
             </nav>
           </div>
 
@@ -1212,7 +1214,7 @@
         <div class="reader-meta">
           <span class="reader-author">
             <img src="assets/avatar.webp" alt="" />
-            <span><strong id="rdAuthor">Barakat Qurtas</strong><small class="mono">Designer · Hewlêr</small></span>
+            <span><strong id="rdAuthor">Barakat Qurtas</strong><small class="mono" data-i18n="float.designer">Designer · Hewlêr</small></span>
           </span>
           <span class="reader-meta-dot" aria-hidden="true">·</span>
           <span class="mono reader-date" id="rdDate"></span>
@@ -1224,7 +1226,7 @@
         <!-- Like + comments -->
         <div class="reader-engage">
           <button class="reader-like" id="rdLike" aria-pressed="false">
-            <i class="fa-solid fa-heart"></i> <span id="rdLikeCount">0</span> <small>likes</small>
+            <i class="fa-solid fa-heart"></i> <span id="rdLikeCount">0</span> <small data-i18n="rd.likes">likes</small>
           </button>
           <span class="reader-engage-count mono" id="rdCommentCount">0 comments</span>
         </div>
@@ -1233,18 +1235,18 @@
 
         <form class="reader-comment-form" id="rdCommentForm">
           <div class="reader-comment-row">
-            <input type="text" id="rdCommentName" placeholder="Your name" autocomplete="name" />
-            <button type="submit" aria-label="Post comment">Post <i class="fa-solid fa-paper-plane"></i></button>
+            <input type="text" id="rdCommentName" placeholder="Your name" data-i18n-ph="cf.name.ph" autocomplete="name" />
+            <button type="submit" aria-label="Post comment"><span data-i18n="rd.post">Post</span> <i class="fa-solid fa-paper-plane"></i></button>
           </div>
-          <textarea id="rdCommentText" placeholder="Share a thought…" rows="2"></textarea>
+          <textarea id="rdCommentText" placeholder="Share a thought…" data-i18n-ph="rd.cmt" rows="2"></textarea>
         </form>
       </div>
     </article>
   </div>
 
-  <script src="js/i18n.js?v=38"></script>
-  <script src="js/main.js?v=38"></script>
-  <script src="js/gallery.js?v=38"></script>
-  <script src="js/enhance.js?v=38"></script>
+  <script src="js/i18n.js?v=45"></script>
+  <script src="js/main.js?v=45"></script>
+  <script src="js/gallery.js?v=45"></script>
+  <script src="js/enhance.js?v=45"></script>
 </body>
 </html>

@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setLangBadge(lang);
     setDocTitle();
     if (window.__bqRerenderChrome) window.__bqRerenderChrome();
+    if (window.__bqRenderActiveHonor) window.__bqRenderActiveHonor();
   };
 
   // Bind all language option buttons (rail flyout, mobile, footer)
@@ -82,21 +83,27 @@ document.addEventListener('DOMContentLoaded', () => {
   let triggerReveals = () => {};
   let moveUnderline  = () => {};
 
-  // Each room — and each Design tab — is its own shareable URL:
-  //   #design · #design/logo · #blog · #bio · #contact
-  const parseHash = () => {
-    const raw = (location.hash || '').replace(/^#/, '');
+  // Each room — and each Design tab — is its own shareable URL (real path):
+  //   /design · /design/logo · /blog · /bio · /contact
+  // Legacy hash links (#blog) are still understood on first load.
+  const parseRoute = () => {
+    let raw = location.pathname.replace(/^\/+|\/+$/g, '');
+    if (!raw && location.hash) raw = location.hash.replace(/^#/, '');
     const [room, tab] = raw.split('/');
     return { room, tab };
   };
-  const syncHash = (push) => {
+  const syncURL = (push) => {
     const room = document.body.dataset.room || 'design';
-    let h = '#' + room;
-    if (room === 'design' && currentFilter && currentFilter !== 'all') h += '/' + currentFilter;
-    if (('#' + (location.hash || '').replace(/^#/, '')) === h) return;
+    let path;
+    if (room === 'design') {
+      path = (currentFilter && currentFilter !== 'all') ? '/design/' + currentFilter : '/';
+    } else {
+      path = '/' + room;
+    }
+    if ((location.pathname.replace(/\/+$/, '') || '/') === path) return;
     try {
-      if (push) history.pushState(null, '', h);
-      else      history.replaceState(null, '', h);
+      if (push) history.pushState(null, '', path);
+      else      history.replaceState(null, '', path);
     } catch(e){}
   };
 
@@ -109,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.dataset.room = id;
     document.querySelectorAll('.reveal').forEach(el => el.classList.remove('is-in'));
     requestAnimationFrame(() => triggerReveals());
-    syncHash(push);
+    syncURL(push);
     setDocTitle();
     document.getElementById('mobileMenu')?.classList.remove('is-open');
   };
@@ -127,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Browser back/forward + pasted deep-links
   window.addEventListener('popstate', () => {
-    const { room, tab } = parseHash();
+    const { room, tab } = parseRoute();
     const r = validRooms.includes(room) ? room : 'design';
     if (document.body.dataset.room !== r) showRoom(r, false);
     if (r === 'design') {
@@ -295,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tab.setAttribute('aria-selected', 'true');
     currentFilter = tab.dataset.filter;
     window.__bqRenderGallery(true);
-    if (push !== false) syncHash(!!push);
+    if (push !== false) syncURL(!!push);
   };
 
   /* re-layout on width change (column count change) */
@@ -365,12 +372,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.reveal:not(.is-in)').forEach(el => io.observe(el));
   };
 
-  // initial route — restore room AND the Design tab from the URL hash
-  const { room: hashRoom, tab: hashTab } = parseHash();
-  const startRoom = validRooms.includes(hashRoom) ? hashRoom : 'design';
+  // initial route — restore room AND the Design tab from the URL path/hash
+  const { room: startRoomRaw, tab: startTab } = parseRoute();
+  const startRoom = validRooms.includes(startRoomRaw) ? startRoomRaw : 'design';
   showRoom(startRoom);
-  if (startRoom === 'design' && hashTab) {
-    const t0 = document.querySelector(`.tab[data-filter="${hashTab}"]`);
+  if (startRoom === 'design' && startTab) {
+    const t0 = document.querySelector(`.tab[data-filter="${startTab}"]`);
     if (t0) activateTab(t0);
   }
   triggerReveals();
@@ -538,17 +545,32 @@ document.addEventListener('DOMContentLoaded', () => {
   /* Blog index is rendered & paginated by enhance.js (window.__bqHighlightTitle reused there) */
   window.__bqHighlightTitle = highlightTitle;
 
-  /* Honors index */
-  initIndex('honorsIndex', 'honorGhost', (d) => {
+  /* Honors index — language-aware preview card */
+  const honorRender = (d) => {
+    const dict = window.BQ_DICT || {};
+    const tr = (window.HONORS_I18N && window.HONORS_I18N[currentLang] && window.HONORS_I18N[currentLang][d.num]) || null;
+    const title = (tr && tr.title) || d.title;
+    const sub   = (tr && tr.sub)   || d.sub;
+    const tag   = (tr && tr.tag)   || d.tag;
+    const loc   = (s) => (currentLang === 'ku' || currentLang === 'ar') ? String(s).replace(/[0-9]/g, x => '٠١٢٣٤٥٦٧٨٩'[x]) : String(s);
+    const year  = d.date.split(' ').pop();
     const set = (id, v, html) => { const el = document.getElementById(id); if (el) { if (html) el.innerHTML = v; else el.textContent = v; } };
-    set('hcVol',  `AWARD №${d.num} · ${d.date.split(' ').pop()}`);
-    set('hcTitle', highlightTitle(d.title), true);
-    set('hcSub',  d.sub);
-    set('hcMeta', `ISSUED BY ${d.tag.toUpperCase()}`);
-    set('hcBig',  `№ ${d.num}`);
+    set('hcVol',  (dict['hon.vol'] || 'AWARD №{num} · {year}').replace('{num}', loc(d.num)).replace('{year}', loc(year)));
+    set('hcTitle', highlightTitle(title), true);
+    set('hcSub',  sub);
+    set('hcMeta', (dict['hon.issued'] || 'ISSUED BY {tag}').replace('{tag}', tag.toUpperCase()));
+    set('hcBig',  `№ ${loc(d.num)}`);
     const ic = document.getElementById('hcIcon');
     if (ic && d.icon) ic.className = `fa-solid ${d.icon} index-card-icon`;
-  });
+  };
+  initIndex('honorsIndex', 'honorGhost', honorRender);
+  const honorsRoot = document.getElementById('honorsIndex');
+  window.__bqRenderActiveHonor = () => {
+    if (!honorsRoot) return;
+    const act = honorsRoot.querySelector('.index-row.is-active') || honorsRoot.querySelector('.index-row');
+    if (act) honorRender(act.dataset);
+  };
+  window.__bqRenderActiveHonor();
 
   /* ---------- Pitch form ---------- */
   const form = document.getElementById('pitchForm');
