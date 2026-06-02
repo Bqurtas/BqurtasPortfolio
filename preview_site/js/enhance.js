@@ -105,16 +105,21 @@
       <i class="fa-solid rail-card-icon" id="rcIcon" aria-hidden="true"></i>`;
     document.body.appendChild(card);
 
+    const rcLang = () => document.documentElement.dataset.lang || 'en';
+    const trFor  = (route) => (window.ROOMCARD_I18N && window.ROOMCARD_I18N[rcLang()] && window.ROOMCARD_I18N[rcLang()][route]) || null;
     let hideT;
     const show = (link) => {
-      const r = ROOMS[link.dataset.route];
+      const route = link.dataset.route;
+      const r = ROOMS[route];
       if (!r) return;
       clearTimeout(hideT);
+      const tr = trFor(route);
+      const nm = (window.BQ_DICT && window.BQ_DICT['nav.' + route]) || r.name;
       $('#rcN', card).textContent = r.n;
-      $('#rcTag', card).textContent = r.tag;
-      $('#rcTitle', card).textContent = r.name;
-      $('#rcDesc', card).textContent = r.desc;
-      $('#rcCount', card).textContent = r.count;
+      $('#rcTag', card).textContent = (tr && tr.tag) || r.tag;
+      $('#rcTitle', card).textContent = nm;
+      $('#rcDesc', card).textContent = (tr && tr.desc) || r.desc;
+      $('#rcCount', card).textContent = (tr && tr.count) || r.count;
       $('#rcIcon', card).className = `fa-solid ${r.icon} rail-card-icon`;
       const b = link.getBoundingClientRect();
       card.style.top = Math.max(16, Math.min(b.top + b.height / 2, window.innerHeight - 120)) + 'px';

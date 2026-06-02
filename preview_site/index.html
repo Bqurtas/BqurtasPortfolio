@@ -73,7 +73,7 @@
   <!-- Font Awesome icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
 
-  <link rel="stylesheet" href="css/style.css?v=48" />
+  <link rel="stylesheet" href="css/style.css?v=50" />
 </head>
 <body>
 
@@ -85,7 +85,7 @@
       </div>
       <div class="splash-line"><span class="splash-line-fill" id="splashFill"></span></div>
       <div class="splash-row mono">
-        <span class="splash-name">Barakat Qurtas</span>
+        <span class="splash-name" data-i18n="name.full">Barakat Qurtas</span>
         <span class="splash-pct" id="splashPct">00</span>
       </div>
       <span class="splash-tag mono">Independent Designer · Hewlêr, Kurdistan</span>
@@ -153,7 +153,6 @@
       <!-- Language hover-menu -->
       <div class="lang-hover" id="langHover">
         <button class="lang-current" id="langCurrentBtn" aria-haspopup="true" aria-expanded="false" aria-label="Language">
-          <i class="fa-solid fa-language lang-current-icon" aria-hidden="true"></i>
           <span id="langCurrentCode">EN</span>
         </button>
         <span class="tool-tip" data-i18n="tip.lang">Language</span>
@@ -204,7 +203,7 @@
     <div class="profile-card-photo"><span class="profile-card-ring" aria-hidden="true"></span><img src="assets/avatar.webp" alt="Barakat Qurtas" /></div>
     <div class="profile-card-body">
       <span class="mono profile-card-eyebrow"><span class="profile-card-dot"></span> <span data-i18n="profile.eye">Independent Designer · Hewlêr</span></span>
-      <h4 class="profile-card-name">Barakat Qurtas</h4>
+      <h4 class="profile-card-name" data-i18n="name.full">Barakat Qurtas</h4>
       <p class="profile-card-bio" data-i18n="profile.bio">Designer of printed matter since 2014 — brand identity, editorial, books, and the quiet things in between.</p>
       <a href="/bio" class="profile-card-btn" data-route="bio"><span data-i18n="profile.btn">View biography</span> <i class="fa-solid fa-arrow-right"></i></a>
     </div>
@@ -303,8 +302,8 @@
 
           <p class="hero-hello" data-i18n="hero.hello">Hello, I'm</p>
           <h1 class="hero-title">
-            <span class="hero-line hero-line--1"><span class="hero-name">Barakat</span></span>
-            <span class="hero-line hero-line--2"><span class="hero-name">Qurtas</span></span>
+            <span class="hero-line hero-line--1"><span class="hero-name" data-i18n="name.first">Barakat</span></span>
+            <span class="hero-line hero-line--2"><span class="hero-name" data-i18n="name.last">Qurtas</span></span>
           </h1>
 
           <div class="hero-marquee">
@@ -341,7 +340,7 @@
         <div class="pencemor-hero-inner">
           <img class="pencemor-hero-mark" src="assets/pencemor.webp" alt="Panjamor" />
           <span class="mono pencemor-hero-eyebrow" data-i18n="pj.eyebrow">Design Studio</span>
-          <h2 class="pencemor-hero-name">Panjamor</h2>
+          <h2 class="pencemor-hero-name" data-i18n="pj.name">Panjamor</h2>
           <span class="pencemor-hero-rule" aria-hidden="true"></span>
           <p class="pencemor-hero-tag" data-i18n="pj.tag">While our fingerprint stays on top, let your <em>every worry stop</em>.</p>
           <p class="pencemor-hero-desc" data-i18n="pj.desc">A studio for brand identity, editorial, and print — where every piece carries a real mark of care. Your project, signed by hand.</p>
@@ -599,7 +598,7 @@
                 <div class="blog-card-foot">
                   <span class="blog-card-author">
                     <img src="assets/avatar.webp" alt="" />
-                    <span><strong>Barakat Qurtas</strong><small class="mono" id="bcMeta">MAY 2026</small></span>
+                    <span><strong data-i18n="name.full">Barakat Qurtas</strong><small class="mono" id="bcMeta">MAY 2026</small></span>
                   </span>
                   <span class="mono blog-card-read" id="bcRead">6 MIN</span>
                 </div>
@@ -679,7 +678,7 @@
             <p data-i18n="bp.p2">My passion for design began early. At the age of 12, I started experimenting, and by 17 I was fully immersed in graphic design as a profession. Since then I've continued to develop my skills through practice and real-world experience — letting my work speak for itself.</p>
             <p data-i18n="bp.p3">I work with Adobe Creative Suite and hold several masterclass certificates. I've collaborated with the Presidency of the Kurdistan Region and the KRG Protocol. My aim is to expand my creative impact and establish a leading advertising and publishing company.</p>
           </div>
-          <span class="bio-phil-sign">Barakat Qurtas</span>
+          <span class="bio-phil-sign" data-i18n="name.full">Barakat Qurtas</span>
         </div>
 
         <!-- EXPERIENCE -->
@@ -958,7 +957,7 @@
             <i class="fa-solid fa-user-tie"></i>
             <div>
               <span class="mono">— <span data-i18n="qc.designer">Designer</span></span>
-              <p>Barakat Qurtas</p>
+              <p data-i18n="name.full">Barakat Qurtas</p>
             </div>
           </a>
         </div>
@@ -1134,7 +1133,7 @@
       </div>
 
       <div class="footer-bottom mono">
-        <span>© 2026 Barakat Qurtas</span>
+        <span>© 2026 <span data-i18n="name.full">Barakat Qurtas</span></span>
         <span class="footer-coords-min"><i class="fa-solid fa-location-crosshairs"></i> 36.19° N · 44.01° E</span>
         <span data-i18n="f.set">Set in Fraunces &amp; Manrope</span>
       </div>
@@ -1223,7 +1222,7 @@
         <div class="reader-meta">
           <span class="reader-author">
             <img src="assets/avatar.webp" alt="" />
-            <span><strong id="rdAuthor">Barakat Qurtas</strong><small class="mono" data-i18n="float.designer">Designer · Hewlêr</small></span>
+            <span><strong id="rdAuthor" data-i18n="name.full">Barakat Qurtas</strong><small class="mono" data-i18n="float.designer">Designer · Hewlêr</small></span>
           </span>
           <span class="reader-meta-dot" aria-hidden="true">·</span>
           <span class="mono reader-date" id="rdDate"></span>
@@ -1253,9 +1252,9 @@
     </article>
   </div>
 
-  <script src="js/i18n.js?v=48"></script>
-  <script src="js/main.js?v=48"></script>
-  <script src="js/gallery.js?v=48"></script>
-  <script src="js/enhance.js?v=48"></script>
+  <script src="js/i18n.js?v=50"></script>
+  <script src="js/main.js?v=50"></script>
+  <script src="js/gallery.js?v=50"></script>
+  <script src="js/enhance.js?v=50"></script>
 </body>
 </html>
