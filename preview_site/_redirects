@@ -1,2 +1,7 @@
 # Send the apex (bqurtas.com) to the canonical www host
 https://bqurtas.com/*  https://www.bqurtas.com/:splat  301!
+
+# SPA fallback — serve the app shell for client-side routes so deep-links
+# (/design, /design/logo, /blog, /bio, /contact) load even if the Pages
+# Function isn't active. Static files and Functions take precedence over this.
+/*  /index.html  200
