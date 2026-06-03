@@ -2543,7 +2543,8 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 
   /* Mobile tabs — icon only */
   .tabs-row { grid-template-columns: repeat(6, 1fr); }
-  .tab-label { display: none; }
+  /* Visually hidden but still read by screen readers (keeps the i18n label as the button's accessible name) */
+  .tab-label { position: absolute; width: 1px; height: 1px; padding: 0; margin: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .tab { padding: 13px 4px 17px; gap: 0; }
   .tab-header-inner { flex-direction: column; align-items: flex-start; gap: 8px; }
   .tab-header-right { display: none; }
