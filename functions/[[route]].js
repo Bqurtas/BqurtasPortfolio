@@ -12,7 +12,7 @@
      /ku/blog         /ar/design/logo         /fr/bio
    ========================================================= */
 
-const SITE = 'https://www.bqurtas.com';
+const SITE = 'https://bqurtas.com';
 const LANGS = ['ku', 'kmr', 'ar', 'fr'];                 // en = no prefix
 const ROOMS = ['blog', 'bio', 'contact'];
 const TABS  = ['official','book','image','logo','posters','social','events','business','invoices','video','other'];

@@ -1,5 +1,5 @@
-# Send the apex (bqurtas.com) to the canonical www host
-https://bqurtas.com/*  https://www.bqurtas.com/:splat  301!
+# Send www to the canonical apex host (bqurtas.com)
+https://www.bqurtas.com/*  https://bqurtas.com/:splat  301!
 
 # SPA fallback — serve the app shell for client-side routes so deep-links
 # (/design, /design/logo, /blog, /bio, /contact) load even if the Pages
