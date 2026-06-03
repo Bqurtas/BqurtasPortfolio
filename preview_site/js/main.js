@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
       title.textContent = meta.title;
       if (desc)  desc.textContent  = meta.desc;
       if (note)  note.textContent  = meta.note;
-      if (ghost) ghost.textContent = total;
+      if (ghost) ghost.dataset.ghost = total;
       title.classList.remove('anim-out');
       title.classList.add('anim-in');
     }, 160);

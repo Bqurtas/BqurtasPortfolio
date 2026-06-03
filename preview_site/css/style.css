@@ -1101,6 +1101,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 }
 .tab-header-note { color: var(--gold-ink) !important; }
 .tab-header-right { flex-shrink: 0; text-align: right; }
+.tab-header-ghost::after { content: attr(data-ghost); }
 .tab-header-ghost {
   font-family: 'Fraunces', serif;
   font-size: clamp(80px, 10vw, 140px);
@@ -3273,6 +3274,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
    light mode. Re-point --gold to its vibrant value inside them so gold text
    stays readable on the dark background (the deep --gold is only for light bg). */
 .footer,
-.dash {
+.dash,
+.hero-meta {
   --gold: var(--gold-bright);
 }
