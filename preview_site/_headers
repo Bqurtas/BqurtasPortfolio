@@ -1,4 +1,6 @@
 # Security + caching headers for Cloudflare Pages
+# NOTE: the HTML pages themselves are served fresh (no long cache) so site
+# updates always show immediately. Only static files get a short cache.
 
 /*
   X-Frame-Options: SAMEORIGIN
@@ -7,12 +9,13 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
 
-# Long-cache the static assets (they are versioned / immutable)
+# Images & fonts rarely change — cache for a week (not a year)
 /assets/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=604800
 
+# CSS/JS are ?v-versioned, so a short cache is plenty and edits show fast
 /css/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=3600
 
 /js/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=3600
