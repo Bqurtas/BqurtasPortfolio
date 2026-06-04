@@ -48,20 +48,39 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Barakat Qurtas",
-    "jobTitle": "Graphic Designer",
-    "url": "https://bqurtas.com/",
-    "image": "https://bqurtas.com/assets/portrait.webp",
-    "email": "info@bqurtas.com",
-    "telephone": "+9647517884985",
-    "address": { "@type": "PostalAddress", "addressLocality": "Erbil", "addressRegion": "Kurdistan Region", "addressCountry": "IQ" },
-    "sameAs": [
-      "https://www.linkedin.com/in/bqurtas/",
-      "https://instagram.com/bqurtas",
-      "https://www.behance.net/bqurtas"
-    ],
-    "knowsAbout": ["Brand Identity","Editorial Design","Logo Design","Book Cover Design","Poster Design","Video Editing"]
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://bqurtas.com/#website",
+        "name": "Barakat Qurtas",
+        "alternateName": "Bqurtas — Design Studio",
+        "url": "https://bqurtas.com/",
+        "inLanguage": ["en", "ckb", "kmr", "ar", "fr"],
+        "publisher": { "@id": "https://bqurtas.com/#person" }
+      },
+      {
+        "@type": "Person",
+        "@id": "https://bqurtas.com/#person",
+        "name": "Barakat Qurtas",
+        "alternateName": "بەرەکات قورتاس",
+        "jobTitle": "Graphic & Motion Designer",
+        "url": "https://bqurtas.com/",
+        "image": "https://bqurtas.com/assets/portrait.webp",
+        "email": "info@bqurtas.com",
+        "telephone": "+9647517884985",
+        "address": { "@type": "PostalAddress", "addressLocality": "Erbil", "addressRegion": "Kurdistan Region", "addressCountry": "IQ" },
+        "sameAs": [
+          "https://www.linkedin.com/in/bqurtas/",
+          "https://instagram.com/bqurtas",
+          "https://www.behance.net/bqurtas"
+        ],
+        "knowsAbout": ["Brand Identity", "Editorial Design", "Logo Design", "Book Cover Design", "Poster Design", "Video Editing", "Motion Graphics"]
+      },
+      { "@type": "SiteNavigationElement", "position": 1, "name": "Design", "url": "https://bqurtas.com/design" },
+      { "@type": "SiteNavigationElement", "position": 2, "name": "Blog", "url": "https://bqurtas.com/blog" },
+      { "@type": "SiteNavigationElement", "position": 3, "name": "Biography", "url": "https://bqurtas.com/bio" },
+      { "@type": "SiteNavigationElement", "position": 4, "name": "Contact", "url": "https://bqurtas.com/contact" }
+    ]
   }
   </script>
 
