@@ -48,7 +48,7 @@ export async function onRequest(context) {
   if (!env || !env.ASSETS) return next();
 
   const meta = (OG[r.lang] && OG[r.lang][r.key]) || OG.en[r.key] || OG.en.home;
-  const img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg';
+  const img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=2';
 
   try {
     const shell = await env.ASSETS.fetch(new URL('/index.html', url.origin));
