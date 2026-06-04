@@ -446,10 +446,16 @@
     const reply = (msg) => {
       const m = msg.toLowerCase();
       let best = null, score = 0;
-      getKB().forEach(item => {
-        const s = item.k.reduce((acc, kw) => acc + (m.includes(kw) ? kw.length : 0), 0);
+      // Search EVERY language's KB (current UI language first) so a question
+      // asked in any language is answered, whatever language the site is in.
+      const C = window.CHAT_I18N || {};
+      const cur = document.documentElement.dataset.lang || 'en';
+      const langs = [cur].concat(Object.keys(C).filter(l => l !== cur));
+      const kbs = langs.map(l => C[l] && C[l].kb).filter(Boolean);
+      (kbs.length ? kbs : [getKB()]).forEach(kb => kb.forEach(item => {
+        const s = item.k.reduce((acc, kw) => acc + (m.includes(kw.toLowerCase()) ? kw.length : 0), 0);
         if (s > score) { score = s; best = item; }
-      });
+      }));
       return best ? best.a : getFallback();
     };
 

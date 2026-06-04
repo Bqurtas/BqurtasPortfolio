@@ -93,6 +93,9 @@ input, select, textarea { font-family: inherit; color: inherit; }
 :root[lang="ku"] body {
   font-family: 'Noto Naskh Arabic', 'Manrope', sans-serif;
 }
+/* Arabic-script text is cursive — any letter-spacing breaks the joins between
+   letters. Zero it everywhere for ku/ar (mono labels, status, buttons, chat…). */
+:root[lang="ar"] *, :root[lang="ku"] * { letter-spacing: 0 !important; }
 :root[lang="ar"] h1, :root[lang="ar"] h2, :root[lang="ar"] h3, :root[lang="ar"] h4,
 :root[lang="ku"] h1, :root[lang="ku"] h2, :root[lang="ku"] h3, :root[lang="ku"] h4,
 :root[lang="kmr"] h1, :root[lang="kmr"] h2, :root[lang="kmr"] h3, :root[lang="kmr"] h4 {
