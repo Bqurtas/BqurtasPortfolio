@@ -3278,3 +3278,25 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .hero-meta {
   --gold: var(--gold-bright);
 }
+
+/* ---- Studio dashboard · Visitors (analytics) ---- */
+.dash-h { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin: 22px 0 10px; }
+.dash-dim { color: var(--ink-muted); font-size: 12px; }
+.dash-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 28px; }
+.dash-grid2 .dash-bar-row { margin-bottom: 8px; }
+.viz-wrap { margin-top: 18px; }
+.viz-chart { display: flex; align-items: flex-end; gap: 4px; height: 70px; margin-top: 8px; }
+.viz-day { flex: 1; height: 100%; display: flex; align-items: flex-end; }
+.viz-day-fill { display: block; width: 100%; min-height: 4px; border-radius: 3px 3px 0 0; background: linear-gradient(180deg, var(--gold-bright), var(--gold-deep)); transition: height 0.4s var(--ease); }
+.dash-recent { display: flex; flex-direction: column; gap: 2px; }
+.dash-recent-row { display: grid; grid-template-columns: 24px 1fr auto auto; align-items: center; gap: 12px; padding: 7px 10px; border-radius: 8px; font-size: 12px; }
+.dash-recent-row:nth-child(odd) { background: var(--line-soft); }
+.dash-recent-flag { font-size: 14px; }
+.dash-recent-path { color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dash-gate-inline { text-align: center; padding: 40px 0; }
+.dash-gate-inline h3 { margin: 14px 0 6px; }
+@media (max-width: 560px) {
+  .dash-grid2 { grid-template-columns: 1fr; gap: 2px 0; }
+  .dash-recent-row { grid-template-columns: 22px 1fr auto; }
+  .dash-recent-row > .dash-dim:last-child { display: none; }
+}

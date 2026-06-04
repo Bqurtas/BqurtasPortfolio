@@ -545,6 +545,25 @@
   /* =======================================================
      7 · SECRET STUDIO DASHBOARD
      ======================================================= */
+  /* ---- First-party analytics beacon → /api/hit (cookieless) ---- */
+  (function analytics() {
+    let first = true;
+    function hit() {
+      try {
+        const data = JSON.stringify({ p: location.pathname, r: first ? document.referrer : '', l: document.documentElement.lang || 'en' });
+        first = false;
+        if (navigator.sendBeacon) navigator.sendBeacon('/api/hit', data);
+        else fetch('/api/hit', { method: 'POST', body: data, keepalive: true }).catch(() => {});
+      } catch (e) {}
+    }
+    hit();
+    try {
+      const _push = history.pushState;
+      history.pushState = function () { const r = _push.apply(this, arguments); setTimeout(hit, 80); return r; };
+      window.addEventListener('popstate', () => setTimeout(hit, 80));
+    } catch (e) {}
+  })();
+
   (function dashboard() {
     const dash = $('#dash');
     if (!dash) return;
@@ -647,7 +666,73 @@
     };
     const esc = (s) => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
 
-    const VIEWS = { overview: renderOverview, works: renderWorks, leads: renderLeads, settings: renderSettings };
+    const flag = (cc) => (cc && cc.length === 2)
+      ? cc.toUpperCase().replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0))) : '🌐';
+    const ago = (ts) => { const s = (Date.now() - ts) / 1000;
+      if (s < 60) return 'just now';
+      if (s < 3600) return Math.floor(s / 60) + 'm ago';
+      if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+      return Math.floor(s / 86400) + 'd ago'; };
+    const bars = (rows, fmt) => {
+      if (!rows || !rows.length) return `<p class="dash-dim mono">No data yet</p>`;
+      const max = Math.max(...rows.map(x => x.c), 1);
+      return rows.map(r => `<div class="dash-bar-row"><span class="dash-bar-label">${fmt(r)}</span><span class="dash-bar"><span class="dash-bar-fill" style="width:${(r.c / max * 100).toFixed(0)}%"></span></span><span class="dash-bar-n mono">${r.c}</span></div>`).join('');
+    };
+
+    const renderVisitors = async () => {
+      let token = '';
+      try { token = localStorage.getItem('bq_stats_token') || ''; } catch (e) {}
+      if (!token) {
+        view.innerHTML = `<div class="dash-gate-inline">
+          <i class="fa-solid fa-chart-line dash-gate-icon"></i>
+          <h3>Connect your analytics</h3>
+          <p class="mono">Enter the <b>STATS_TOKEN</b> you set in Cloudflare.</p>
+          <form id="stTokForm" class="dash-login"><input type="password" id="stTok" placeholder="Stats token" autocomplete="off"><button type="submit">Connect <i class="fa-solid fa-arrow-right"></i></button></form></div>`;
+        $('#stTokForm').addEventListener('submit', (e) => { e.preventDefault();
+          const v = $('#stTok').value.trim(); if (!v) return;
+          try { localStorage.setItem('bq_stats_token', v); } catch (x) {} renderVisitors(); });
+        return;
+      }
+      view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i><br>Loading visitor data…</p>`;
+      let d;
+      try { d = await (await fetch('/api/stats?token=' + encodeURIComponent(token))).json(); }
+      catch (e) { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>Can't reach analytics — this works on the live site only, not local preview.</p>`; return; }
+
+      if (!d.ok) {
+        if (d.error === 'unauthorized') { try { localStorage.removeItem('bq_stats_token'); } catch (x) {}
+          view.innerHTML = `<p class="dash-empty mono">Wrong token.</p><button class="dash-btn" id="stRetry">Try again</button>`;
+          $('#stRetry').addEventListener('click', renderVisitors); return; }
+        if (d.error === 'no-db') { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-database"></i><br>Analytics database not connected yet.<br><small>Create a Cloudflare D1 database and bind it as <b>DB</b>.</small></p>`; return; }
+        view.innerHTML = `<p class="dash-empty mono">Analytics error: ${esc(d.error || '')}</p>`; return;
+      }
+
+      const sMax = Math.max(...(d.series || []).map(s => s.c), 1);
+      const chart = (d.series || []).map(s =>
+        `<span class="viz-day" title="${s.d} · ${s.c} views"><span class="viz-day-fill" style="height:${Math.max(8, (s.c / sMax * 100)).toFixed(0)}%"></span></span>`).join('');
+
+      view.innerHTML = `
+        <div class="dash-cards">
+          <div class="dash-card"><span class="dash-card-n">${d.views}</span><span class="mono">Page views</span></div>
+          <div class="dash-card"><span class="dash-card-n">${d.visitors}</span><span class="mono">Visitors</span></div>
+          <div class="dash-card"><span class="dash-card-n">${d.viewsToday}</span><span class="mono">Views today</span></div>
+          <div class="dash-card"><span class="dash-card-n">${d.visitorsToday}</span><span class="mono">Visitors today</span></div>
+        </div>
+        ${chart ? `<div class="viz-wrap"><span class="dash-dim mono">Last 14 days</span><div class="viz-chart">${chart}</div></div>` : ''}
+        <div class="dash-grid2">
+          <div><h4 class="dash-h mono">Top pages</h4>${bars(d.paths, r => esc(r.path))}</div>
+          <div><h4 class="dash-h mono">Countries</h4>${bars(d.countries, r => flag(r.country) + ' ' + esc(r.country || '—'))}</div>
+          <div><h4 class="dash-h mono">Referrers</h4>${bars(d.referrers, r => esc(r.ref))}</div>
+          <div><h4 class="dash-h mono">Devices</h4>${bars(d.devices, r => esc(r.device || '—'))}</div>
+        </div>
+        <h4 class="dash-h mono">Recent visits</h4>
+        <div class="dash-recent">${(d.recent || []).length ? d.recent.map(r =>
+          `<div class="dash-recent-row mono"><span class="dash-recent-flag">${flag(r.country)}</span><span class="dash-recent-path">${esc(r.path)}</span><span class="dash-dim">${esc(r.device)}</span><span class="dash-dim">${ago(r.ts)}</span></div>`).join('')
+          : '<p class="dash-dim mono">No visits yet</p>'}</div>
+        <button class="dash-btn" id="stRefresh"><i class="fa-solid fa-rotate"></i> Refresh</button>`;
+      $('#stRefresh')?.addEventListener('click', renderVisitors);
+    };
+
+    const VIEWS = { overview: renderOverview, visitors: renderVisitors, works: renderWorks, leads: renderLeads, settings: renderSettings };
     const showConsole = () => {
       gate.hidden = true; main.hidden = false;
       renderOverview();
