@@ -578,9 +578,60 @@
     const hint = $('#dashHint');
     let unlocked = sessionStorage.getItem('bq_dash_ok') === '1';
 
+    /* ---- Dashboard translations (follows the site language) ---- */
+    const DASH_I18N = {
+      en: { overview:'Overview', visitors:'Visitors', works:'Works', leads:'Leads', profile:'Profile', settings:'Settings',
+        gateTitle:'Enter access code', gatePrivate:'This console is private.', gatePh:'Access code', unlock:'Unlock', wrong:'✗ Wrong access code.',
+        oTotal:'Total works', oColl:'Collections', oLeads:'Leads stored', oLangs:'Languages', oWelcome:'Welcome back — your studio console is private to you; data lives in this browser.',
+        lEmpty:'No leads yet. Pitches from the Contact form appear here.', lClear:'Clear all leads', lConfirm:'Delete all stored leads?',
+        pName:'Name', pTitle:'Title / role', pAvatar:'Avatar URL', pSave:'Save profile', pSaved:'✓ Saved', pNote:'Adding more admins needs a backend login system — that arrives with the content manager. For now this profile is yours, kept privately in this browser.',
+        sSplash:'Show intro splash on load', sTheme:'Theme', sLight:'Light', sDark:'Dark', sReset:'Reset saved preferences', sResetConfirm:'Reset saved preferences?', sDone:'Done.', sNote:'Open anytime with ⌘ / Ctrl + B, or 5× click the Bq logo.',
+        vConnect:'Connect your analytics', vEnter:'Enter the STATS_TOKEN you set in Cloudflare.', vTokenPh:'Stats token', vConnectBtn:'Connect', vLoading:'Loading visitor data…' },
+      ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن',
+        gateTitle:'کۆدی چوونەژوورەوە بنووسە', gatePrivate:'ئەم کۆنسۆڵە تایبەتە.', gatePh:'کۆدی چوونەژوورەوە', unlock:'کردنەوە', wrong:'✗ کۆدەکە هەڵەیە.',
+        oTotal:'کۆی کارەکان', oColl:'کۆکراوەکان', oLeads:'داواکاری هەڵگیراو', oLangs:'زمانەکان', oWelcome:'بەخێربێیتەوە — کۆنسۆڵی ستۆدیۆ تەنها بۆ تۆیە؛ زانیارییەکان لەم وێبگەڕەدا دەمێننەوە.',
+        lEmpty:'هێشتا داواکاری نییە. پرۆژەکانی فۆڕمی پەیوەندی لێرە دەردەکەون.', lClear:'سڕینەوەی هەموو داواکارییەکان', lConfirm:'هەموو داواکارییە هەڵگیراوەکان بسڕێتەوە؟',
+        pName:'ناو', pTitle:'پلە / ڕۆڵ', pAvatar:'بەستەری وێنە', pSave:'پاشەکەوتکردنی پرۆفایل', pSaved:'✓ پاشەکەوتکرا', pNote:'زیادکردنی ئەدمینی زیاتر پێویستی بە سیستەمی چوونەژوورەوەی سێرڤەر هەیە — لەگەڵ بەڕێوەبەری ناوەڕۆکدا دێت. ئێستا ئەم پرۆفایلە هی تۆیە، بە تایبەتی لەم وێبگەڕەدا پارێزراوە.',
+        sSplash:'پیشاندانی سپلاشی دەستپێک', sTheme:'ڕووکار', sLight:'ڕووناک', sDark:'تاریک', sReset:'ڕێکخستنە پاشەکەوتکراوەکان بسڕەوە', sResetConfirm:'ڕێکخستنە پاشەکەوتکراوەکان بسڕێتەوە؟', sDone:'تەواوبوو.', sNote:'هەر کاتێک بە ⌘ / Ctrl + B بیکەرەوە، یان ٥ جار کلیک لە لۆگۆی Bq بکە.',
+        vConnect:'ئامارەکانت ببەستەوە', vEnter:'ئەو STATS_TOKENـەی لە Cloudflare دانراوە بنووسە.', vTokenPh:'تۆکنی ئامار', vConnectBtn:'بەستنەوە', vLoading:'بارکردنی زانیاری سەردانکەران…' },
+      ar: { overview:'نظرة عامة', visitors:'الزوار', works:'الأعمال', leads:'الطلبات', profile:'الملف', settings:'الإعدادات',
+        gateTitle:'أدخل رمز الدخول', gatePrivate:'هذه اللوحة خاصة.', gatePh:'رمز الدخول', unlock:'فتح', wrong:'✗ رمز خاطئ.',
+        oTotal:'إجمالي الأعمال', oColl:'المجموعات', oLeads:'الطلبات المحفوظة', oLangs:'اللغات', oWelcome:'أهلاً بعودتك — لوحة الاستوديو خاصة بك؛ البيانات تبقى في هذا المتصفح.',
+        lEmpty:'لا طلبات بعد. تظهر هنا مشاريع نموذج التواصل.', lClear:'مسح كل الطلبات', lConfirm:'حذف كل الطلبات المحفوظة؟',
+        pName:'الاسم', pTitle:'اللقب / الدور', pAvatar:'رابط الصورة', pSave:'حفظ الملف', pSaved:'✓ تم الحفظ', pNote:'إضافة مزيد من المشرفين تتطلب نظام تسجيل دخول خلفي — يأتي مع مدير المحتوى. حالياً هذا الملف خاص بك، محفوظ في هذا المتصفح.',
+        sSplash:'إظهار شاشة البداية', sTheme:'المظهر', sLight:'فاتح', sDark:'داكن', sReset:'إعادة تعيين التفضيلات', sResetConfirm:'إعادة تعيين التفضيلات المحفوظة؟', sDone:'تم.', sNote:'افتحها في أي وقت بـ ⌘ / Ctrl + B، أو انقر شعار Bq خمس مرات.',
+        vConnect:'اربط تحليلاتك', vEnter:'أدخل STATS_TOKEN الذي ضبطته في Cloudflare.', vTokenPh:'رمز الإحصاءات', vConnectBtn:'اتصال', vLoading:'تحميل بيانات الزوار…' },
+      kmr: { overview:'Giştî', visitors:'Mêvan', works:'Kar', leads:'Daxwaz', profile:'Profîl', settings:'Mîheng',
+        gateTitle:'Koda gihiştinê binivîse', gatePrivate:'Ev konsol taybet e.', gatePh:'Koda gihiştinê', unlock:'Veke', wrong:'✗ Koda çewt.',
+        oTotal:'Tevahiya karan', oColl:'Berhevok', oLeads:'Daxwazên tomarkirî', oLangs:'Ziman', oWelcome:'Bi xêr hatî — konsola studyoyê taybet e ji te re; dane di vê gerokê de dimînin.',
+        lEmpty:'Hêj daxwaz tune. Pêşniyarên forma têkiliyê li vir xuya dibin.', lClear:'Hemû daxwazan paqij bike', lConfirm:'Hemû daxwazên tomarkirî werin jêbirin?',
+        pName:'Nav', pTitle:'Sernav / rol', pAvatar:'Girêdana wêneyê', pSave:'Profîlê tomar bike', pSaved:'✓ Tomar bû', pNote:'Zêdekirina admînên din pêdivî bi sîstema têketinê ya backend heye — ew bi rêveberê naverokê re tê. Niha ev profîl ya te ye, bi taybetî di vê gerokê de tê parastin.',
+        sSplash:'Dîmena destpêkê nîşan bide', sTheme:'Tema', sLight:'Ronî', sDark:'Tarî', sReset:'Vebijarkên tomarkirî jê bibe', sResetConfirm:'Vebijarkên tomarkirî werin jêbirin?', sDone:'Qediya.', sNote:'Her dem bi ⌘ / Ctrl + B veke, an 5 caran li logoya Bq bitikîne.',
+        vConnect:'Analîtîkên xwe girêde', vEnter:'STATS_TOKEN ya ku te di Cloudflare de danî binivîse.', vTokenPh:'Tokena statîstîkê', vConnectBtn:'Girêde', vLoading:'Daneyên mêvanan tê barkirin…' },
+      fr: { overview:'Aperçu', visitors:'Visiteurs', works:'Travaux', leads:'Demandes', profile:'Profil', settings:'Réglages',
+        gateTitle:"Entrez le code d'accès", gatePrivate:'Cette console est privée.', gatePh:"Code d'accès", unlock:'Déverrouiller', wrong:'✗ Code incorrect.',
+        oTotal:'Total des travaux', oColl:'Collections', oLeads:'Demandes enregistrées', oLangs:'Langues', oWelcome:'Bon retour — votre console studio est privée ; les données restent dans ce navigateur.',
+        lEmpty:'Aucune demande pour l’instant. Les projets du formulaire de contact apparaissent ici.', lClear:'Effacer toutes les demandes', lConfirm:'Supprimer toutes les demandes enregistrées ?',
+        pName:'Nom', pTitle:'Titre / rôle', pAvatar:"URL de l'avatar", pSave:'Enregistrer le profil', pSaved:'✓ Enregistré', pNote:'Ajouter d’autres admins nécessite un système de connexion backend — il arrive avec le gestionnaire de contenu. Pour l’instant ce profil est le vôtre, gardé dans ce navigateur.',
+        sSplash:"Afficher l'intro au chargement", sTheme:'Thème', sLight:'Clair', sDark:'Sombre', sReset:'Réinitialiser les préférences', sResetConfirm:'Réinitialiser les préférences enregistrées ?', sDone:'Terminé.', sNote:'Ouvrez à tout moment avec ⌘ / Ctrl + B, ou cliquez 5× sur le logo Bq.',
+        vConnect:'Connectez vos analyses', vEnter:'Saisissez le STATS_TOKEN défini dans Cloudflare.', vTokenPh:'Jeton de stats', vConnectBtn:'Connecter', vLoading:'Chargement des données visiteurs…' }
+    };
+    const curLang = () => { const l = document.documentElement.getAttribute('lang') || document.documentElement.dataset.lang || 'en'; return DASH_I18N[l] ? l : 'en'; };
+    const DT = (k) => (DASH_I18N[curLang()][k] ?? DASH_I18N.en[k] ?? k);
+    const localizeChrome = () => {
+      $$('.dash-tab').forEach(t => { const ic = t.querySelector('i'); t.innerHTML = (ic ? ic.outerHTML + ' ' : '') + DT(t.dataset.dash); });
+      const g = $('#dashGate'); if (g) {
+        const h = g.querySelector('h3'); if (h) h.textContent = DT('gateTitle');
+        const p = g.querySelector('p.mono'); if (p) p.textContent = DT('gatePrivate');
+        const k = $('#dashKey'); if (k) k.placeholder = DT('gatePh');
+        const b = g.querySelector('button[type="submit"]'); if (b) b.innerHTML = DT('unlock') + ' <i class="fa-solid fa-arrow-right"></i>';
+      }
+    };
+
     const openDash = () => {
       dash.classList.add('is-open');
       dash.setAttribute('aria-hidden', 'false');
+      localizeChrome();
       if (unlocked) showConsole(); else { dash.classList.remove('is-full'); gate.hidden = false; main.hidden = true; setTimeout(() => $('#dashKey')?.focus(), 200); }
     };
     const closeDash = () => { dash.classList.remove('is-open'); dash.setAttribute('aria-hidden', 'true'); };
@@ -608,7 +659,7 @@
         unlocked = true; sessionStorage.setItem('bq_dash_ok', '1');
         showConsole();
       } else {
-        hint.textContent = '✗ Wrong access code.';
+        hint.textContent = DT('wrong');
         $('#dashKey').value = '';
       }
     });
@@ -623,12 +674,12 @@
       const cats = Object.keys(colls).length;
       view.innerHTML = `
         <div class="dash-cards">
-          <div class="dash-card"><span class="dash-card-n">${total}</span><span class="mono">Total works</span></div>
-          <div class="dash-card"><span class="dash-card-n">${cats}</span><span class="mono">Collections</span></div>
-          <div class="dash-card"><span class="dash-card-n">${leads.length}</span><span class="mono">Leads stored</span></div>
-          <div class="dash-card"><span class="dash-card-n">5</span><span class="mono">Languages</span></div>
+          <div class="dash-card"><span class="dash-card-n">${total}</span><span class="mono">${DT('oTotal')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${cats}</span><span class="mono">${DT('oColl')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${leads.length}</span><span class="mono">${DT('oLeads')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">5</span><span class="mono">${DT('oLangs')}</span></div>
         </div>
-        <p class="dash-note mono">Welcome back, Barakat. Studio console is private to you — data lives in this browser.</p>`;
+        <p class="dash-note mono">${DT('oWelcome')}</p>`;
     };
     const renderWorks = () => {
       const colls = collections();
@@ -642,7 +693,7 @@
     };
     const renderLeads = () => {
       const leads = getLeads();
-      if (!leads.length) { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-inbox"></i><br>No leads yet. Pitches from the Contact form appear here.</p>`; return; }
+      if (!leads.length) { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-inbox"></i><br>${DT('lEmpty')}</p>`; return; }
       view.innerHTML = `<div class="dash-leads">` + leads.slice().reverse().map(l =>
         `<div class="dash-lead">
            <div class="dash-lead-top"><strong>${esc(l.name)}</strong><span class="mono">${l.type || ''}</span></div>
@@ -650,25 +701,25 @@
            <p>${esc(l.message || '')}</p>
            <span class="mono dash-lead-meta">${l.budget || '—'} · ${l.timeline || '—'} · ${new Date(l.at).toLocaleDateString()}</span>
          </div>`).join('') + `</div>
-         <button class="dash-btn dash-btn--danger" id="dashClearLeads"><i class="fa-solid fa-trash"></i> Clear all leads</button>`;
+         <button class="dash-btn dash-btn--danger" id="dashClearLeads"><i class="fa-solid fa-trash"></i> ${DT('lClear')}</button>`;
       $('#dashClearLeads')?.addEventListener('click', () => {
-        if (confirm('Delete all stored leads?')) { localStorage.removeItem('bq_pitches'); renderLeads(); }
+        if (confirm(DT('lConfirm'))) { localStorage.removeItem('bq_pitches'); renderLeads(); }
       });
     };
     const renderSettings = () => {
       view.innerHTML = `
         <div class="dash-set">
-          <label class="dash-row"><span>Show intro splash on load</span>
+          <label class="dash-row"><span>${DT('sSplash')}</span>
             <input type="checkbox" id="setSplash" ${localStorage.getItem('bq_splash') === 'off' ? '' : 'checked'}></label>
-          <label class="dash-row"><span>Theme</span>
-            <select id="setTheme"><option value="light">Light</option><option value="dark">Dark</option></select></label>
-          <button class="dash-btn" id="setReset"><i class="fa-solid fa-rotate"></i> Reset saved preferences</button>
+          <label class="dash-row"><span>${DT('sTheme')}</span>
+            <select id="setTheme"><option value="light">${DT('sLight')}</option><option value="dark">${DT('sDark')}</option></select></label>
+          <button class="dash-btn" id="setReset"><i class="fa-solid fa-rotate"></i> ${DT('sReset')}</button>
         </div>
-        <p class="dash-note mono">Open anytime with <b>⌘ / Ctrl + B</b>, or 5× click the Bq logo.</p>`;
+        <p class="dash-note mono">${DT('sNote')}</p>`;
       $('#setSplash').addEventListener('change', (e) => localStorage.setItem('bq_splash', e.target.checked ? 'on' : 'off'));
       const themeSel = $('#setTheme'); themeSel.value = document.documentElement.dataset.theme || 'light';
       themeSel.addEventListener('change', (e) => { document.documentElement.dataset.theme = e.target.value; try { localStorage.setItem('bq_theme', e.target.value); } catch (x) {} });
-      $('#setReset').addEventListener('click', () => { if (confirm('Reset saved preferences?')) { ['bq_theme','bq_lang','bq_splash'].forEach(k => localStorage.removeItem(k)); alert('Done.'); } });
+      $('#setReset').addEventListener('click', () => { if (confirm(DT('sResetConfirm'))) { ['bq_theme','bq_lang','bq_splash'].forEach(k => localStorage.removeItem(k)); alert(DT('sDone')); } });
     };
     const esc = (s) => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
 
@@ -692,13 +743,13 @@
           <div><strong>${esc(p.name)}</strong><span class="mono">${esc(p.title)}</span></div>
         </div>
         <div class="dash-set">
-          <label class="dash-field"><span class="mono">Name</span><input id="prfName" type="text" value="${esc(p.name)}"></label>
-          <label class="dash-field"><span class="mono">Title / role</span><input id="prfTitle" type="text" value="${esc(p.title)}"></label>
-          <label class="dash-field"><span class="mono">Avatar URL</span><input id="prfAvatar" type="text" value="${esc(p.avatar)}"></label>
-          <button class="dash-btn" id="prfSave"><i class="fa-solid fa-floppy-disk"></i> Save profile</button>
-          <span class="mono dash-prof-saved" id="prfSaved" hidden>✓ Saved</span>
+          <label class="dash-field"><span class="mono">${DT('pName')}</span><input id="prfName" type="text" value="${esc(p.name)}"></label>
+          <label class="dash-field"><span class="mono">${DT('pTitle')}</span><input id="prfTitle" type="text" value="${esc(p.title)}"></label>
+          <label class="dash-field"><span class="mono">${DT('pAvatar')}</span><input id="prfAvatar" type="text" value="${esc(p.avatar)}"></label>
+          <button class="dash-btn" id="prfSave"><i class="fa-solid fa-floppy-disk"></i> ${DT('pSave')}</button>
+          <span class="mono dash-prof-saved" id="prfSaved" hidden>${DT('pSaved')}</span>
         </div>
-        <p class="dash-note mono">Adding more admins needs a backend login system — that arrives with the content manager. For now this profile is yours, kept privately in this browser.</p>`;
+        <p class="dash-note mono">${DT('pNote')}</p>`;
       $('#prfSave')?.addEventListener('click', () => {
         const np = { name: $('#prfName').value.trim() || PROFILE_DEFAULT.name, title: $('#prfTitle').value.trim(), avatar: $('#prfAvatar').value.trim() };
         try { localStorage.setItem('bq_profile', JSON.stringify(np)); } catch (e) {}
@@ -727,15 +778,15 @@
       if (!token) {
         view.innerHTML = `<div class="dash-gate-inline">
           <i class="fa-solid fa-chart-line dash-gate-icon"></i>
-          <h3>Connect your analytics</h3>
-          <p class="mono">Enter the <b>STATS_TOKEN</b> you set in Cloudflare.</p>
-          <form id="stTokForm" class="dash-login"><input type="password" id="stTok" placeholder="Stats token" autocomplete="off"><button type="submit">Connect <i class="fa-solid fa-arrow-right"></i></button></form></div>`;
+          <h3>${DT('vConnect')}</h3>
+          <p class="mono">${DT('vEnter')}</p>
+          <form id="stTokForm" class="dash-login"><input type="password" id="stTok" placeholder="${DT('vTokenPh')}" autocomplete="off"><button type="submit">${DT('vConnectBtn')} <i class="fa-solid fa-arrow-right"></i></button></form></div>`;
         $('#stTokForm').addEventListener('submit', (e) => { e.preventDefault();
           const v = $('#stTok').value.trim(); if (!v) return;
           try { localStorage.setItem('bq_stats_token', v); } catch (x) {} renderVisitors(); });
         return;
       }
-      view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i><br>Loading visitor data…</p>`;
+      view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i><br>${DT('vLoading')}</p>`;
       let d;
       try { d = await (await fetch('/api/stats?token=' + encodeURIComponent(token))).json(); }
       catch (e) { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>Can't reach analytics — this works on the live site only, not local preview.</p>`; return; }
