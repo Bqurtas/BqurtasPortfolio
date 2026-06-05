@@ -580,35 +580,35 @@
 
     /* ---- Dashboard translations (follows the site language) ---- */
     const DASH_I18N = {
-      en: { overview:'Overview', visitors:'Visitors', works:'Works', leads:'Leads', profile:'Profile', settings:'Settings', content:'Content',
+      en: { overview:'Overview', visitors:'Visitors', works:'Works', leads:'Leads', profile:'Profile', settings:'Settings', content:'Content', assistant:'Assistant',
         gateTitle:'Enter access code', gatePrivate:'This console is private.', gatePh:'Access code', unlock:'Unlock', wrong:'✗ Wrong access code.',
         oTotal:'Total works', oColl:'Collections', oLeads:'Leads stored', oLangs:'Languages', oWelcome:'Welcome back — your studio console is private to you; data lives in this browser.',
         lEmpty:'No leads yet. Pitches from the Contact form appear here.', lClear:'Clear all leads', lConfirm:'Delete all stored leads?',
         pName:'Name', pTitle:'Title / role', pAvatar:'Avatar URL', pSave:'Save profile', pSaved:'✓ Saved', pNote:'Adding more admins needs a backend login system — that arrives with the content manager. For now this profile is yours, kept privately in this browser.',
         sSplash:'Show intro splash on load', sTheme:'Theme', sLight:'Light', sDark:'Dark', sReset:'Reset saved preferences', sResetConfirm:'Reset saved preferences?', sDone:'Done.', sNote:'Open anytime with ⌘ / Ctrl + B, or 5× click the Bq logo.',
         vConnect:'Connect your analytics', vEnter:'Enter the STATS_TOKEN you set in Cloudflare.', vTokenPh:'Stats token', vConnectBtn:'Connect', vLoading:'Loading visitor data…' },
-      ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن', content:'ناوەڕۆک',
+      ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن', content:'ناوەڕۆک', assistant:'یاریدەدەر',
         gateTitle:'کۆدی چوونەژوورەوە بنووسە', gatePrivate:'ئەم کۆنسۆڵە تایبەتە.', gatePh:'کۆدی چوونەژوورەوە', unlock:'کردنەوە', wrong:'✗ کۆدەکە هەڵەیە.',
         oTotal:'کۆی کارەکان', oColl:'کۆکراوەکان', oLeads:'داواکاری هەڵگیراو', oLangs:'زمانەکان', oWelcome:'بەخێربێیتەوە — کۆنسۆڵی ستۆدیۆ تەنها بۆ تۆیە؛ زانیارییەکان لەم وێبگەڕەدا دەمێننەوە.',
         lEmpty:'هێشتا داواکاری نییە. پرۆژەکانی فۆڕمی پەیوەندی لێرە دەردەکەون.', lClear:'سڕینەوەی هەموو داواکارییەکان', lConfirm:'هەموو داواکارییە هەڵگیراوەکان بسڕێتەوە؟',
         pName:'ناو', pTitle:'پلە / ڕۆڵ', pAvatar:'بەستەری وێنە', pSave:'پاشەکەوتکردنی پرۆفایل', pSaved:'✓ پاشەکەوتکرا', pNote:'زیادکردنی ئەدمینی زیاتر پێویستی بە سیستەمی چوونەژوورەوەی سێرڤەر هەیە — لەگەڵ بەڕێوەبەری ناوەڕۆکدا دێت. ئێستا ئەم پرۆفایلە هی تۆیە، بە تایبەتی لەم وێبگەڕەدا پارێزراوە.',
         sSplash:'پیشاندانی سپلاشی دەستپێک', sTheme:'ڕووکار', sLight:'ڕووناک', sDark:'تاریک', sReset:'ڕێکخستنە پاشەکەوتکراوەکان بسڕەوە', sResetConfirm:'ڕێکخستنە پاشەکەوتکراوەکان بسڕێتەوە؟', sDone:'تەواوبوو.', sNote:'هەر کاتێک بە ⌘ / Ctrl + B بیکەرەوە، یان ٥ جار کلیک لە لۆگۆی Bq بکە.',
         vConnect:'ئامارەکانت ببەستەوە', vEnter:'ئەو STATS_TOKENـەی لە Cloudflare دانراوە بنووسە.', vTokenPh:'تۆکنی ئامار', vConnectBtn:'بەستنەوە', vLoading:'بارکردنی زانیاری سەردانکەران…' },
-      ar: { overview:'نظرة عامة', visitors:'الزوار', works:'الأعمال', leads:'الطلبات', profile:'الملف', settings:'الإعدادات', content:'المحتوى',
+      ar: { overview:'نظرة عامة', visitors:'الزوار', works:'الأعمال', leads:'الطلبات', profile:'الملف', settings:'الإعدادات', content:'المحتوى', assistant:'المساعد',
         gateTitle:'أدخل رمز الدخول', gatePrivate:'هذه اللوحة خاصة.', gatePh:'رمز الدخول', unlock:'فتح', wrong:'✗ رمز خاطئ.',
         oTotal:'إجمالي الأعمال', oColl:'المجموعات', oLeads:'الطلبات المحفوظة', oLangs:'اللغات', oWelcome:'أهلاً بعودتك — لوحة الاستوديو خاصة بك؛ البيانات تبقى في هذا المتصفح.',
         lEmpty:'لا طلبات بعد. تظهر هنا مشاريع نموذج التواصل.', lClear:'مسح كل الطلبات', lConfirm:'حذف كل الطلبات المحفوظة؟',
         pName:'الاسم', pTitle:'اللقب / الدور', pAvatar:'رابط الصورة', pSave:'حفظ الملف', pSaved:'✓ تم الحفظ', pNote:'إضافة مزيد من المشرفين تتطلب نظام تسجيل دخول خلفي — يأتي مع مدير المحتوى. حالياً هذا الملف خاص بك، محفوظ في هذا المتصفح.',
         sSplash:'إظهار شاشة البداية', sTheme:'المظهر', sLight:'فاتح', sDark:'داكن', sReset:'إعادة تعيين التفضيلات', sResetConfirm:'إعادة تعيين التفضيلات المحفوظة؟', sDone:'تم.', sNote:'افتحها في أي وقت بـ ⌘ / Ctrl + B، أو انقر شعار Bq خمس مرات.',
         vConnect:'اربط تحليلاتك', vEnter:'أدخل STATS_TOKEN الذي ضبطته في Cloudflare.', vTokenPh:'رمز الإحصاءات', vConnectBtn:'اتصال', vLoading:'تحميل بيانات الزوار…' },
-      kmr: { overview:'Giştî', visitors:'Mêvan', works:'Kar', leads:'Daxwaz', profile:'Profîl', settings:'Mîheng', content:'Naverok',
+      kmr: { overview:'Giştî', visitors:'Mêvan', works:'Kar', leads:'Daxwaz', profile:'Profîl', settings:'Mîheng', content:'Naverok', assistant:'Alîkar',
         gateTitle:'Koda gihiştinê binivîse', gatePrivate:'Ev konsol taybet e.', gatePh:'Koda gihiştinê', unlock:'Veke', wrong:'✗ Koda çewt.',
         oTotal:'Tevahiya karan', oColl:'Berhevok', oLeads:'Daxwazên tomarkirî', oLangs:'Ziman', oWelcome:'Bi xêr hatî — konsola studyoyê taybet e ji te re; dane di vê gerokê de dimînin.',
         lEmpty:'Hêj daxwaz tune. Pêşniyarên forma têkiliyê li vir xuya dibin.', lClear:'Hemû daxwazan paqij bike', lConfirm:'Hemû daxwazên tomarkirî werin jêbirin?',
         pName:'Nav', pTitle:'Sernav / rol', pAvatar:'Girêdana wêneyê', pSave:'Profîlê tomar bike', pSaved:'✓ Tomar bû', pNote:'Zêdekirina admînên din pêdivî bi sîstema têketinê ya backend heye — ew bi rêveberê naverokê re tê. Niha ev profîl ya te ye, bi taybetî di vê gerokê de tê parastin.',
         sSplash:'Dîmena destpêkê nîşan bide', sTheme:'Tema', sLight:'Ronî', sDark:'Tarî', sReset:'Vebijarkên tomarkirî jê bibe', sResetConfirm:'Vebijarkên tomarkirî werin jêbirin?', sDone:'Qediya.', sNote:'Her dem bi ⌘ / Ctrl + B veke, an 5 caran li logoya Bq bitikîne.',
         vConnect:'Analîtîkên xwe girêde', vEnter:'STATS_TOKEN ya ku te di Cloudflare de danî binivîse.', vTokenPh:'Tokena statîstîkê', vConnectBtn:'Girêde', vLoading:'Daneyên mêvanan tê barkirin…' },
-      fr: { overview:'Aperçu', visitors:'Visiteurs', works:'Travaux', leads:'Demandes', profile:'Profil', settings:'Réglages', content:'Contenu',
+      fr: { overview:'Aperçu', visitors:'Visiteurs', works:'Travaux', leads:'Demandes', profile:'Profil', settings:'Réglages', content:'Contenu', assistant:'Assistant',
         gateTitle:"Entrez le code d'accès", gatePrivate:'Cette console est privée.', gatePh:"Code d'accès", unlock:'Déverrouiller', wrong:'✗ Code incorrect.',
         oTotal:'Total des travaux', oColl:'Collections', oLeads:'Demandes enregistrées', oLangs:'Langues', oWelcome:'Bon retour — votre console studio est privée ; les données restent dans ce navigateur.',
         lEmpty:'Aucune demande pour l’instant. Les projets du formulaire de contact apparaissent ici.', lClear:'Effacer toutes les demandes', lConfirm:'Supprimer toutes les demandes enregistrées ?',
@@ -842,6 +842,56 @@
       }).catch(() => { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${t.err}</p>`; });
     };
 
+    /* ---- AI assistant (private; proxied via /api/assistant) ---- */
+    const AT_I18N = {
+      en: { gate:'Connect the assistant', note:'Enter your EDIT_TOKEN (same as the content editor).', tokPh:'Edit token', conn:'Connect', ph:'Ask about clients, pricing, briefs, ideas…', send:'Send', intro:'Hello Barakat — I can help with client replies, quotes, briefs, ideas, captions and translation. Ask in any language.', clear:'Clear', thinking:'Thinking…', errKey:'Set ANTHROPIC_API_KEY in Cloudflare to enable the assistant.', err:'Assistant works on the live site only.' },
+      ku: { gate:'بەستنەوەی یاریدەدەر', note:'EDIT_TOKENـەکەت بنووسە (هەمان تۆکنی ناوەڕۆک).', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', ph:'دەربارەی کڕیار، نرخ، پلان، بیرۆکە بپرسە…', send:'ناردن', intro:'سڵاو بەرەکات — دەتوانم یارمەتیت بدەم لە وەڵامی کڕیار، نرخ، پلانی پڕۆژە، بیرۆکە، کاپشن و وەرگێڕان. بە هەر زمانێک بپرسە.', clear:'پاککردنەوە', thinking:'بیردەکاتەوە…', errKey:'بۆ چالاککردن، ANTHROPIC_API_KEY لە Cloudflare دابنێ.', err:'یاریدەدەر تەنها لەسەر سایتە زیندووەکە کاردەکات.' },
+      ar: { gate:'ربط المساعد', note:'أدخل EDIT_TOKEN (نفس رمز محرر المحتوى).', tokPh:'رمز التحرير', conn:'اتصال', ph:'اسأل عن العملاء، التسعير، الخطط، الأفكار…', send:'إرسال', intro:'مرحباً بركات — أساعدك في ردود العملاء، عروض الأسعار، الخطط، الأفكار، التعليقات والترجمة. اسأل بأي لغة.', clear:'مسح', thinking:'يفكر…', errKey:'اضبط ANTHROPIC_API_KEY في Cloudflare لتفعيل المساعد.', err:'المساعد يعمل على الموقع المباشر فقط.' },
+      kmr: { gate:'Alîkar girêde', note:'EDIT_TOKEN ya xwe binivîse (heman tokena edîtorê).', tokPh:'Tokena guhertinê', conn:'Girêde', ph:'Li ser kirîar, biha, plan, fikiran bipirse…', send:'Bişîne', intro:'Slav Barakat — ez dikarim di bersivên kirîaran, bihayan, planan, fikiran, sernivîs û wergerê de alîkar bim. Bi her zimanî bipirse.', clear:'Paqij bike', thinking:'Difikire…', errKey:'Ji bo çalakkirinê ANTHROPIC_API_KEY li Cloudflare deyne.', err:'Alîkar tenê li ser malpera zindî dixebite.' },
+      fr: { gate:"Connecter l'assistant", note:'Saisissez votre EDIT_TOKEN (le même que l’éditeur).', tokPh:"Jeton d'édition", conn:'Connecter', ph:'Clients, tarifs, briefs, idées…', send:'Envoyer', intro:'Bonjour Barakat — je peux aider pour les réponses clients, devis, briefs, idées, légendes et traduction. Demandez dans n’importe quelle langue.', clear:'Effacer', thinking:'Réflexion…', errKey:'Définissez ANTHROPIC_API_KEY dans Cloudflare pour activer l’assistant.', err:"L'assistant fonctionne sur le site en ligne uniquement." }
+    };
+    const renderAssistant = () => {
+      const t = AT_I18N[curLang()] || AT_I18N.en;
+      const token = editToken();
+      if (!token) {
+        view.innerHTML = `<div class="dash-gate-inline">
+          <i class="fa-solid fa-robot dash-gate-icon"></i>
+          <h3>${t.gate}</h3><p class="mono">${t.note}</p>
+          <form id="asTokForm" class="dash-login"><input type="password" id="asTok" placeholder="${t.tokPh}" autocomplete="off"><button type="submit">${t.conn} <i class="fa-solid fa-arrow-right"></i></button></form></div>`;
+        $('#asTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#asTok').value.trim(); if (!v) return; try { localStorage.setItem('bq_edit_token', v); } catch (x) {} renderAssistant(); });
+        return;
+      }
+      let hist = []; try { hist = JSON.parse(localStorage.getItem('bq_assist') || '[]'); } catch (e) {}
+      const save = () => { try { localStorage.setItem('bq_assist', JSON.stringify(hist.slice(-40))); } catch (e) {} };
+      view.innerHTML = `
+        <div class="asst">
+          <div class="asst-bar"><button class="dash-btn" id="asstClear"><i class="fa-solid fa-eraser"></i> ${t.clear}</button></div>
+          <div class="asst-msgs" id="asstMsgs"></div>
+          <form class="asst-form" id="asstForm"><input id="asstInput" type="text" placeholder="${t.ph}" autocomplete="off"><button type="submit" aria-label="${t.send}"><i class="fa-solid fa-paper-plane"></i></button></form>
+        </div>`;
+      const msgs = $('#asstMsgs');
+      const paint = () => {
+        msgs.innerHTML = `<div class="asst-msg asst-bot">${esc(t.intro)}</div>` +
+          hist.map(m => `<div class="asst-msg asst-${m.role === 'user' ? 'me' : 'bot'}">${esc(m.content).replace(/\n/g, '<br>')}</div>`).join('');
+        msgs.scrollTop = msgs.scrollHeight;
+      };
+      paint();
+      $('#asstClear').addEventListener('click', () => { hist = []; save(); paint(); });
+      $('#asstForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const v = $('#asstInput').value.trim(); if (!v) return;
+        hist.push({ role: 'user', content: v }); save(); $('#asstInput').value = ''; paint();
+        const typing = document.createElement('div'); typing.className = 'asst-msg asst-bot asst-typing'; typing.textContent = t.thinking;
+        msgs.appendChild(typing); msgs.scrollTop = msgs.scrollHeight;
+        fetch('/api/assistant', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-edit-token': token }, body: JSON.stringify({ messages: hist.map(m => ({ role: m.role, content: m.content })) }) })
+          .then(r => r.json()).then(d => {
+            if (d.ok) { hist.push({ role: 'assistant', content: d.text }); save(); paint(); }
+            else if (d.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderAssistant(); }
+            else { typing.classList.remove('asst-typing'); typing.textContent = d.error === 'no-key' ? t.errKey : ('✗ ' + (d.error || '')); }
+          }).catch(() => { typing.classList.remove('asst-typing'); typing.textContent = t.err; });
+      });
+    };
+
     const flag = (cc) => (cc && cc.length === 2)
       ? cc.toUpperCase().replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0))) : '🌐';
     const ago = (ts) => { const s = (Date.now() - ts) / 1000;
@@ -908,7 +958,7 @@
       $('#stRefresh')?.addEventListener('click', renderVisitors);
     };
 
-    const VIEWS = { overview: renderOverview, visitors: renderVisitors, works: renderWorks, content: renderContent, leads: renderLeads, profile: renderProfile, settings: renderSettings };
+    const VIEWS = { overview: renderOverview, visitors: renderVisitors, works: renderWorks, content: renderContent, assistant: renderAssistant, leads: renderLeads, profile: renderProfile, settings: renderSettings };
     const showConsole = () => {
       gate.hidden = true; main.hidden = false;
       dash.classList.add('is-full');           // console takes the full screen
