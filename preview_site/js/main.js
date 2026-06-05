@@ -690,7 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Reliable delivery: paste a free Web3Forms access key (web3forms.com, tied
       // to info@bqurtas.com) below and every pitch is auto-emailed to you. Until
       // then it falls back to opening a prefilled mail in the visitor's mail app.
-      const WEB3FORMS_KEY = ''; // ← paste your Web3Forms access key here
+      const WEB3FORMS_KEY = '6396c177-b988-43d0-ac42-5c398151cde9'; // delivers each pitch to info@bqurtas.com
       const fields = {
         company:      form.querySelector('#pCompany').value,
         phone:        form.querySelector('#pPhone').value,
