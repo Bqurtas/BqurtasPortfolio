@@ -1624,9 +1624,10 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
     border: 1px solid var(--line);
     border-radius: 18px;
     box-shadow: 0 -8px 30px -22px rgba(26,15,8,0.5), 0 26px 50px -34px rgba(0,0,0,0.5);
-    /* a fixed (viewport-stable) height avoids the resize jump while scrolling */
-    height: min(72vh, 560px);
-    overflow: hidden;
+    /* size to the content so EVERY card shows all of its information; the cards
+       still pile up on scroll (sticky), they're just each as tall as they need. */
+    height: auto;
+    overflow: hidden;   /* clips only the decorative quote mark, not real content */
   }
   :root[data-theme="dark"] .bio-stack > .bio-block { background: var(--bg-2); }
   .bio-stack > .bio-social { align-items: center; text-align: center; }
