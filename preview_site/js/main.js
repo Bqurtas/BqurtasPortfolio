@@ -660,15 +660,47 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       try { localStorage.setItem('bq_pitches', JSON.stringify(submissions)); } catch(e){}
 
-      const subject = encodeURIComponent(`Pitch — ${type} — ${name}`);
-      const body = encodeURIComponent(
-        `Name: ${name}\nEmail: ${email}\nCompany: ${form.querySelector('#pCompany').value}\nPhone: ${form.querySelector('#pPhone').value}\nProject type: ${type}\nBudget: ${form.querySelector('#pBudget').value}\nTimeline: ${form.querySelector('#pTimeline').value}\nHeard about: ${form.querySelector('#pHear').value}\nNDA: ${form.querySelector('#pNDA').checked ? 'Yes' : 'No'}\n\n---\n${message}`
-      );
-      window.location.href = `mailto:info@bqurtas.com?subject=${subject}&body=${body}`;
+      // Reliable delivery: paste a free Web3Forms access key (web3forms.com, tied
+      // to info@bqurtas.com) below and every pitch is auto-emailed to you. Until
+      // then it falls back to opening a prefilled mail in the visitor's mail app.
+      const WEB3FORMS_KEY = ''; // ← paste your Web3Forms access key here
+      const fields = {
+        company:      form.querySelector('#pCompany').value,
+        phone:        form.querySelector('#pPhone').value,
+        project_type: type,
+        budget:       form.querySelector('#pBudget').value,
+        timeline:     form.querySelector('#pTimeline').value,
+        heard_about:  form.querySelector('#pHear').value,
+        nda:          form.querySelector('#pNDA').checked ? 'Yes' : 'No'
+      };
 
-      status.style.color = 'var(--gold)';
-      status.innerHTML = '<i class="fa-solid fa-circle-check"></i> Pitch prepared. Your mail client will open — or write directly to info@bqurtas.com.';
-      form.reset();
+      if (WEB3FORMS_KEY) {
+        status.style.color = 'var(--gold)';
+        status.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
+        fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: `New pitch — ${type} — ${name}`, name, email, message, ...fields })
+        }).then(r => r.json()).then(d => {
+          status.style.color = d.success ? 'var(--gold)' : 'var(--ember)';
+          status.innerHTML = d.success
+            ? '<i class="fa-solid fa-circle-check"></i> Thank you — your pitch has been sent. I reply within 48 hours.'
+            : '<i class="fa-solid fa-circle-exclamation"></i> Could not send — please write directly to info@bqurtas.com.';
+          if (d.success) form.reset();
+        }).catch(() => {
+          status.style.color = 'var(--ember)';
+          status.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Could not send — please write directly to info@bqurtas.com.';
+        });
+      } else {
+        const subject = encodeURIComponent(`Pitch — ${type} — ${name}`);
+        const body = encodeURIComponent(
+          `Name: ${name}\nEmail: ${email}\nCompany: ${fields.company}\nPhone: ${fields.phone}\nProject type: ${type}\nBudget: ${fields.budget}\nTimeline: ${fields.timeline}\nHeard about: ${fields.heard_about}\nNDA: ${fields.nda}\n\n---\n${message}`
+        );
+        window.location.href = `mailto:info@bqurtas.com?subject=${subject}&body=${body}`;
+        status.style.color = 'var(--gold)';
+        status.innerHTML = '<i class="fa-solid fa-circle-check"></i> Pitch prepared. Your mail client will open — or write directly to info@bqurtas.com.';
+        form.reset();
+      }
     });
   }
 

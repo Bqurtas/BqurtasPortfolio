@@ -2991,10 +2991,24 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .dash-head { display: flex; align-items: center; justify-content: space-between; padding: 20px 26px; border-bottom: 1px solid var(--line); background: var(--ink); color: var(--bg-2); }
 .dash-head-id { display: flex; align-items: center; gap: 14px; }
 .dash-logo { font-family: 'Fraunces', serif; font-style: italic; font-weight: 600; font-size: 30px; color: var(--gold); }
+.dash-logo.has-av { width: 40px; height: 40px; border-radius: 50%; background-size: cover; background-position: center; border: 1px solid rgba(201,162,83,0.5); }
 .dash-head-id strong { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500; display: block; }
 .dash-head-id .mono { font-size: 9px; letter-spacing: 0.16em; color: rgba(232,223,205,0.5); }
+.dash-head-actions { display: flex; align-items: center; gap: 8px; }
+.dash-theme { width: 36px; height: 36px; border-radius: 50%; color: var(--bg-2); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.3s; }
+.dash-theme:hover { background: rgba(255,255,255,0.12); }
 .dash-close { width: 36px; height: 36px; border-radius: 50%; color: var(--bg-2); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.3s; }
 .dash-close:hover { background: rgba(255,255,255,0.12); }
+/* Profile tab */
+.dash-prof-card { display: flex; align-items: center; gap: 18px; padding: 22px; border: 1px solid var(--line); border-radius: 14px; margin-bottom: 22px; background: var(--bg-2); }
+.dash-prof-av { width: 64px; height: 64px; border-radius: 50%; background-size: cover; background-position: center; border: 1px solid var(--line); flex-shrink: 0; }
+.dash-prof-card strong { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 500; display: block; }
+.dash-prof-card .mono { font-size: 11px; color: var(--gold); }
+.dash-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.dash-field .mono { font-size: 10px; letter-spacing: 0.14em; color: var(--ink-muted); text-transform: uppercase; }
+.dash-field input { padding: 11px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg-1); color: var(--ink); font-size: 14px; }
+.dash-field input:focus { outline: none; border-color: var(--gold); }
+.dash-prof-saved { color: var(--gold); margin-left: 12px; }
 
 .dash-gate { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; padding: 30px; }
 .dash-gate-icon { font-size: 30px; color: var(--gold); }

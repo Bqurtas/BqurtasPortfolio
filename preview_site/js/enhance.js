@@ -672,6 +672,42 @@
     };
     const esc = (s) => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
 
+    /* ---- Owner profile (stored privately in this browser) ---- */
+    const PROFILE_DEFAULT = { name: 'Barakat Qurtas', title: 'Founder · Studio Pencemor', avatar: '/assets/avatar.webp' };
+    const profile = () => { try { return Object.assign({}, PROFILE_DEFAULT, JSON.parse(localStorage.getItem('bq_profile') || '{}')); } catch (e) { return Object.assign({}, PROFILE_DEFAULT); } };
+    const syncHeaderProfile = () => {
+      const p = profile();
+      const sub = $('#dashHeadSub'); if (sub) sub.textContent = 'Private · ' + p.name;
+      const logo = $('.dash-logo');
+      if (logo) {
+        if (p.avatar) { logo.style.backgroundImage = `url("${p.avatar}")`; logo.classList.add('has-av'); logo.textContent = ''; }
+        else { logo.style.backgroundImage = ''; logo.classList.remove('has-av'); logo.textContent = 'Bq'; }
+      }
+    };
+    const renderProfile = () => {
+      const p = profile();
+      view.innerHTML = `
+        <div class="dash-prof-card">
+          <span class="dash-prof-av" style="background-image:url('${esc(p.avatar)}')"></span>
+          <div><strong>${esc(p.name)}</strong><span class="mono">${esc(p.title)}</span></div>
+        </div>
+        <div class="dash-set">
+          <label class="dash-field"><span class="mono">Name</span><input id="prfName" type="text" value="${esc(p.name)}"></label>
+          <label class="dash-field"><span class="mono">Title / role</span><input id="prfTitle" type="text" value="${esc(p.title)}"></label>
+          <label class="dash-field"><span class="mono">Avatar URL</span><input id="prfAvatar" type="text" value="${esc(p.avatar)}"></label>
+          <button class="dash-btn" id="prfSave"><i class="fa-solid fa-floppy-disk"></i> Save profile</button>
+          <span class="mono dash-prof-saved" id="prfSaved" hidden>✓ Saved</span>
+        </div>
+        <p class="dash-note mono">Adding more admins needs a backend login system — that arrives with the content manager. For now this profile is yours, kept privately in this browser.</p>`;
+      $('#prfSave')?.addEventListener('click', () => {
+        const np = { name: $('#prfName').value.trim() || PROFILE_DEFAULT.name, title: $('#prfTitle').value.trim(), avatar: $('#prfAvatar').value.trim() };
+        try { localStorage.setItem('bq_profile', JSON.stringify(np)); } catch (e) {}
+        syncHeaderProfile();
+        const s = $('#prfSaved'); if (s) { s.hidden = false; setTimeout(() => { s.hidden = true; }, 1800); }
+        renderProfile();
+      });
+    };
+
     const flag = (cc) => (cc && cc.length === 2)
       ? cc.toUpperCase().replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0))) : '🌐';
     const ago = (ts) => { const s = (Date.now() - ts) / 1000;
@@ -738,12 +774,19 @@
       $('#stRefresh')?.addEventListener('click', renderVisitors);
     };
 
-    const VIEWS = { overview: renderOverview, visitors: renderVisitors, works: renderWorks, leads: renderLeads, settings: renderSettings };
+    const VIEWS = { overview: renderOverview, visitors: renderVisitors, works: renderWorks, leads: renderLeads, profile: renderProfile, settings: renderSettings };
     const showConsole = () => {
       gate.hidden = true; main.hidden = false;
       dash.classList.add('is-full');           // console takes the full screen
+      syncHeaderProfile();
       renderOverview();
     };
+    // header dark / light toggle
+    $('#dashTheme')?.addEventListener('click', () => {
+      const next = (document.documentElement.dataset.theme === 'dark') ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem('bq_theme', next); } catch (e) {}
+    });
     $$('.dash-tab').forEach(t => t.addEventListener('click', () => {
       $$('.dash-tab').forEach(x => x.classList.remove('is-active'));
       t.classList.add('is-active');

@@ -96,7 +96,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"></noscript>
 
-  <link rel="stylesheet" href="css/style.css?v=72" />
+  <link rel="stylesheet" href="css/style.css?v=73" />
 </head>
 <body>
 
@@ -1221,10 +1221,13 @@
           <span class="dash-logo">Bq</span>
           <div>
             <strong>Studio Console</strong>
-            <span class="mono">Private · Barakat Qurtas</span>
+            <span class="mono" id="dashHeadSub">Private · Barakat Qurtas</span>
           </div>
         </div>
-        <button class="dash-close" id="dashClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+        <div class="dash-head-actions">
+          <button class="dash-theme" id="dashTheme" aria-label="Toggle dark / light"><i class="fa-solid fa-circle-half-stroke"></i></button>
+          <button class="dash-close" id="dashClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+        </div>
       </header>
 
       <!-- Login gate -->
@@ -1246,6 +1249,7 @@
           <button class="dash-tab" data-dash="visitors"><i class="fa-solid fa-chart-line"></i> Visitors</button>
           <button class="dash-tab" data-dash="works"><i class="fa-solid fa-layer-group"></i> Works</button>
           <button class="dash-tab" data-dash="leads"><i class="fa-solid fa-inbox"></i> Leads</button>
+          <button class="dash-tab" data-dash="profile"><i class="fa-solid fa-id-badge"></i> Profile</button>
           <button class="dash-tab" data-dash="settings"><i class="fa-solid fa-sliders"></i> Settings</button>
         </nav>
         <div class="dash-view" id="dashView"></div>
@@ -1296,10 +1300,10 @@
     </article>
   </div>
 
-  <script src="js/i18n.js?v=72"></script>
-  <script src="js/chat-kb.js?v=72"></script>
-  <script src="js/main.js?v=72"></script>
-  <script src="js/gallery.js?v=72"></script>
-  <script src="js/enhance.js?v=72"></script>
+  <script src="js/i18n.js?v=73"></script>
+  <script src="js/chat-kb.js?v=73"></script>
+  <script src="js/main.js?v=73"></script>
+  <script src="js/gallery.js?v=73"></script>
+  <script src="js/enhance.js?v=73"></script>
 </body>
 </html>
