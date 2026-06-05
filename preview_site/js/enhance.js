@@ -580,35 +580,35 @@
 
     /* ---- Dashboard translations (follows the site language) ---- */
     const DASH_I18N = {
-      en: { overview:'Overview', visitors:'Visitors', works:'Works', leads:'Leads', profile:'Profile', settings:'Settings',
+      en: { overview:'Overview', visitors:'Visitors', works:'Works', leads:'Leads', profile:'Profile', settings:'Settings', content:'Content',
         gateTitle:'Enter access code', gatePrivate:'This console is private.', gatePh:'Access code', unlock:'Unlock', wrong:'✗ Wrong access code.',
         oTotal:'Total works', oColl:'Collections', oLeads:'Leads stored', oLangs:'Languages', oWelcome:'Welcome back — your studio console is private to you; data lives in this browser.',
         lEmpty:'No leads yet. Pitches from the Contact form appear here.', lClear:'Clear all leads', lConfirm:'Delete all stored leads?',
         pName:'Name', pTitle:'Title / role', pAvatar:'Avatar URL', pSave:'Save profile', pSaved:'✓ Saved', pNote:'Adding more admins needs a backend login system — that arrives with the content manager. For now this profile is yours, kept privately in this browser.',
         sSplash:'Show intro splash on load', sTheme:'Theme', sLight:'Light', sDark:'Dark', sReset:'Reset saved preferences', sResetConfirm:'Reset saved preferences?', sDone:'Done.', sNote:'Open anytime with ⌘ / Ctrl + B, or 5× click the Bq logo.',
         vConnect:'Connect your analytics', vEnter:'Enter the STATS_TOKEN you set in Cloudflare.', vTokenPh:'Stats token', vConnectBtn:'Connect', vLoading:'Loading visitor data…' },
-      ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن',
+      ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن', content:'ناوەڕۆک',
         gateTitle:'کۆدی چوونەژوورەوە بنووسە', gatePrivate:'ئەم کۆنسۆڵە تایبەتە.', gatePh:'کۆدی چوونەژوورەوە', unlock:'کردنەوە', wrong:'✗ کۆدەکە هەڵەیە.',
         oTotal:'کۆی کارەکان', oColl:'کۆکراوەکان', oLeads:'داواکاری هەڵگیراو', oLangs:'زمانەکان', oWelcome:'بەخێربێیتەوە — کۆنسۆڵی ستۆدیۆ تەنها بۆ تۆیە؛ زانیارییەکان لەم وێبگەڕەدا دەمێننەوە.',
         lEmpty:'هێشتا داواکاری نییە. پرۆژەکانی فۆڕمی پەیوەندی لێرە دەردەکەون.', lClear:'سڕینەوەی هەموو داواکارییەکان', lConfirm:'هەموو داواکارییە هەڵگیراوەکان بسڕێتەوە؟',
         pName:'ناو', pTitle:'پلە / ڕۆڵ', pAvatar:'بەستەری وێنە', pSave:'پاشەکەوتکردنی پرۆفایل', pSaved:'✓ پاشەکەوتکرا', pNote:'زیادکردنی ئەدمینی زیاتر پێویستی بە سیستەمی چوونەژوورەوەی سێرڤەر هەیە — لەگەڵ بەڕێوەبەری ناوەڕۆکدا دێت. ئێستا ئەم پرۆفایلە هی تۆیە، بە تایبەتی لەم وێبگەڕەدا پارێزراوە.',
         sSplash:'پیشاندانی سپلاشی دەستپێک', sTheme:'ڕووکار', sLight:'ڕووناک', sDark:'تاریک', sReset:'ڕێکخستنە پاشەکەوتکراوەکان بسڕەوە', sResetConfirm:'ڕێکخستنە پاشەکەوتکراوەکان بسڕێتەوە؟', sDone:'تەواوبوو.', sNote:'هەر کاتێک بە ⌘ / Ctrl + B بیکەرەوە، یان ٥ جار کلیک لە لۆگۆی Bq بکە.',
         vConnect:'ئامارەکانت ببەستەوە', vEnter:'ئەو STATS_TOKENـەی لە Cloudflare دانراوە بنووسە.', vTokenPh:'تۆکنی ئامار', vConnectBtn:'بەستنەوە', vLoading:'بارکردنی زانیاری سەردانکەران…' },
-      ar: { overview:'نظرة عامة', visitors:'الزوار', works:'الأعمال', leads:'الطلبات', profile:'الملف', settings:'الإعدادات',
+      ar: { overview:'نظرة عامة', visitors:'الزوار', works:'الأعمال', leads:'الطلبات', profile:'الملف', settings:'الإعدادات', content:'المحتوى',
         gateTitle:'أدخل رمز الدخول', gatePrivate:'هذه اللوحة خاصة.', gatePh:'رمز الدخول', unlock:'فتح', wrong:'✗ رمز خاطئ.',
         oTotal:'إجمالي الأعمال', oColl:'المجموعات', oLeads:'الطلبات المحفوظة', oLangs:'اللغات', oWelcome:'أهلاً بعودتك — لوحة الاستوديو خاصة بك؛ البيانات تبقى في هذا المتصفح.',
         lEmpty:'لا طلبات بعد. تظهر هنا مشاريع نموذج التواصل.', lClear:'مسح كل الطلبات', lConfirm:'حذف كل الطلبات المحفوظة؟',
         pName:'الاسم', pTitle:'اللقب / الدور', pAvatar:'رابط الصورة', pSave:'حفظ الملف', pSaved:'✓ تم الحفظ', pNote:'إضافة مزيد من المشرفين تتطلب نظام تسجيل دخول خلفي — يأتي مع مدير المحتوى. حالياً هذا الملف خاص بك، محفوظ في هذا المتصفح.',
         sSplash:'إظهار شاشة البداية', sTheme:'المظهر', sLight:'فاتح', sDark:'داكن', sReset:'إعادة تعيين التفضيلات', sResetConfirm:'إعادة تعيين التفضيلات المحفوظة؟', sDone:'تم.', sNote:'افتحها في أي وقت بـ ⌘ / Ctrl + B، أو انقر شعار Bq خمس مرات.',
         vConnect:'اربط تحليلاتك', vEnter:'أدخل STATS_TOKEN الذي ضبطته في Cloudflare.', vTokenPh:'رمز الإحصاءات', vConnectBtn:'اتصال', vLoading:'تحميل بيانات الزوار…' },
-      kmr: { overview:'Giştî', visitors:'Mêvan', works:'Kar', leads:'Daxwaz', profile:'Profîl', settings:'Mîheng',
+      kmr: { overview:'Giştî', visitors:'Mêvan', works:'Kar', leads:'Daxwaz', profile:'Profîl', settings:'Mîheng', content:'Naverok',
         gateTitle:'Koda gihiştinê binivîse', gatePrivate:'Ev konsol taybet e.', gatePh:'Koda gihiştinê', unlock:'Veke', wrong:'✗ Koda çewt.',
         oTotal:'Tevahiya karan', oColl:'Berhevok', oLeads:'Daxwazên tomarkirî', oLangs:'Ziman', oWelcome:'Bi xêr hatî — konsola studyoyê taybet e ji te re; dane di vê gerokê de dimînin.',
         lEmpty:'Hêj daxwaz tune. Pêşniyarên forma têkiliyê li vir xuya dibin.', lClear:'Hemû daxwazan paqij bike', lConfirm:'Hemû daxwazên tomarkirî werin jêbirin?',
         pName:'Nav', pTitle:'Sernav / rol', pAvatar:'Girêdana wêneyê', pSave:'Profîlê tomar bike', pSaved:'✓ Tomar bû', pNote:'Zêdekirina admînên din pêdivî bi sîstema têketinê ya backend heye — ew bi rêveberê naverokê re tê. Niha ev profîl ya te ye, bi taybetî di vê gerokê de tê parastin.',
         sSplash:'Dîmena destpêkê nîşan bide', sTheme:'Tema', sLight:'Ronî', sDark:'Tarî', sReset:'Vebijarkên tomarkirî jê bibe', sResetConfirm:'Vebijarkên tomarkirî werin jêbirin?', sDone:'Qediya.', sNote:'Her dem bi ⌘ / Ctrl + B veke, an 5 caran li logoya Bq bitikîne.',
         vConnect:'Analîtîkên xwe girêde', vEnter:'STATS_TOKEN ya ku te di Cloudflare de danî binivîse.', vTokenPh:'Tokena statîstîkê', vConnectBtn:'Girêde', vLoading:'Daneyên mêvanan tê barkirin…' },
-      fr: { overview:'Aperçu', visitors:'Visiteurs', works:'Travaux', leads:'Demandes', profile:'Profil', settings:'Réglages',
+      fr: { overview:'Aperçu', visitors:'Visiteurs', works:'Travaux', leads:'Demandes', profile:'Profil', settings:'Réglages', content:'Contenu',
         gateTitle:"Entrez le code d'accès", gatePrivate:'Cette console est privée.', gatePh:"Code d'accès", unlock:'Déverrouiller', wrong:'✗ Code incorrect.',
         oTotal:'Total des travaux', oColl:'Collections', oLeads:'Demandes enregistrées', oLangs:'Langues', oWelcome:'Bon retour — votre console studio est privée ; les données restent dans ce navigateur.',
         lEmpty:'Aucune demande pour l’instant. Les projets du formulaire de contact apparaissent ici.', lClear:'Effacer toutes les demandes', lConfirm:'Supprimer toutes les demandes enregistrées ?',
@@ -759,6 +759,89 @@
       });
     };
 
+    /* ---- Content manager (blog posts → D1 via /api/content) ---- */
+    const CT_I18N = {
+      en: { connect:'Connect the editor', note:'Enter your EDIT_TOKEN (Cloudflare → Settings → Variables).', tokPh:'Edit token', conn:'Connect', neu:'New post', title:'Title', sub:'Subtitle', tag:'Category', date:'Date', num:'No.', read:'Min read', accent:'Accent', img:'Image URL', body:'Body — one paragraph per line', save:'Publish', cancel:'Cancel', empty:'No studio posts yet — add your first note.', saved:'✓ Published', confirm:'Delete this post?', loading:'Loading…', err:'Content API works on the live site only.' },
+      ku: { connect:'بەستنەوەی دەستکاریکەر', note:'EDIT_TOKENـەکەت بنووسە (Cloudflare → ڕێکخستن → Variables).', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', neu:'بابەتی نوێ', title:'سەردێڕ', sub:'ژێر-سەردێڕ', tag:'پۆل', date:'بەروار', num:'ژمارە', read:'خوێندنەوە (خولەک)', accent:'ڕەنگ', img:'بەستەری وێنە', body:'دەق — هەر پەرەگرافێک لە دێڕێک', save:'بڵاوکردنەوە', cancel:'هەڵوەشاندنەوە', empty:'هێشتا بابەت نییە — یەکەمیان زیاد بکە.', saved:'✓ بڵاوکرایەوە', confirm:'ئەم بابەتە بسڕێتەوە؟', loading:'بارکردن…', err:'API تەنها لەسەر سایتە زیندووەکە کاردەکات.' },
+      ar: { connect:'ربط المحرر', note:'أدخل EDIT_TOKEN (Cloudflare → الإعدادات → المتغيرات).', tokPh:'رمز التحرير', conn:'اتصال', neu:'مقال جديد', title:'العنوان', sub:'العنوان الفرعي', tag:'التصنيف', date:'التاريخ', num:'رقم', read:'دقائق القراءة', accent:'اللون', img:'رابط الصورة', body:'النص — فقرة في كل سطر', save:'نشر', cancel:'إلغاء', empty:'لا مقالات بعد — أضف أول واحدة.', saved:'✓ تم النشر', confirm:'حذف هذا المقال؟', loading:'جار التحميل…', err:'واجهة المحتوى تعمل على الموقع المباشر فقط.' },
+      kmr: { connect:'Edîtorê girêde', note:'EDIT_TOKEN ya xwe binivîse (Cloudflare → Mîheng → Variables).', tokPh:'Tokena guhertinê', conn:'Girêde', neu:'Nivîsa nû', title:'Sernav', sub:'Bin-sernav', tag:'Kategorî', date:'Dîrok', num:'Hejmar', read:'Xwendin (deq)', accent:'Reng', img:'Girêdana wêneyê', body:'Nivîs — her paragraf di rêzekê de', save:'Biweşîne', cancel:'Betal', empty:'Hêj nivîs tune — ya yekem zêde bike.', saved:'✓ Hat weşandin', confirm:'Ev nivîs were jêbirin?', loading:'Tê barkirin…', err:'API tenê li ser malpera zindî dixebite.' },
+      fr: { connect:"Connecter l'éditeur", note:'Saisissez votre EDIT_TOKEN (Cloudflare → Réglages → Variables).', tokPh:"Jeton d'édition", conn:'Connecter', neu:'Nouvel article', title:'Titre', sub:'Sous-titre', tag:'Catégorie', date:'Date', num:'N°', read:'Lecture (min)', accent:'Accent', img:"URL de l'image", body:'Texte — un paragraphe par ligne', save:'Publier', cancel:'Annuler', empty:'Aucun article — ajoutez le premier.', saved:'✓ Publié', confirm:'Supprimer cet article ?', loading:'Chargement…', err:"L'API de contenu fonctionne sur le site en ligne uniquement." }
+    };
+    const editToken = () => { try { return localStorage.getItem('bq_edit_token') || ''; } catch (e) { return ''; } };
+    const renderContent = () => {
+      const t = CT_I18N[curLang()] || CT_I18N.en;
+      const token = editToken();
+      if (!token) {
+        view.innerHTML = `<div class="dash-gate-inline">
+          <i class="fa-solid fa-feather-pointed dash-gate-icon"></i>
+          <h3>${t.connect}</h3><p class="mono">${t.note}</p>
+          <form id="ctTokForm" class="dash-login"><input type="password" id="ctTok" placeholder="${t.tokPh}" autocomplete="off"><button type="submit">${t.conn} <i class="fa-solid fa-arrow-right"></i></button></form></div>`;
+        $('#ctTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#ctTok').value.trim(); if (!v) return; try { localStorage.setItem('bq_edit_token', v); } catch (x) {} renderContent(); });
+        return;
+      }
+      view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i><br>${t.loading}</p>`;
+      fetch('/api/content').then(r => r.json()).then(d => {
+        const posts = (d && d.posts) || [];
+        const rows = posts.length ? posts.map(p => `
+          <div class="cms-row">
+            <span class="cms-row-t"><strong>${esc(p.title)}</strong><span class="mono">${esc(p.tag)} · ${esc(p.date)}</span></span>
+            <span class="cms-row-act"><button class="cms-edit" data-id="${esc(p.id)}" aria-label="Edit"><i class="fa-solid fa-pen"></i></button><button class="cms-del" data-id="${esc(p.id)}" aria-label="Delete"><i class="fa-solid fa-trash"></i></button></span>
+          </div>`).join('') : `<p class="dash-dim mono">${t.empty}</p>`;
+        view.innerHTML = `
+          <div class="cms-head"><button class="dash-btn" id="cmsNew"><i class="fa-solid fa-plus"></i> ${t.neu}</button><span class="mono cms-status" id="cmsStatus"></span></div>
+          <div class="cms-list">${rows}</div>
+          <form class="cms-form" id="cmsForm" hidden>
+            <input type="hidden" id="fId">
+            <div class="dash-field"><span class="mono">${t.title}</span><input id="fTitle" type="text"></div>
+            <div class="dash-field"><span class="mono">${t.sub}</span><input id="fSub" type="text"></div>
+            <div class="cms-grid">
+              <div class="dash-field"><span class="mono">${t.tag}</span><input id="fTag" type="text"></div>
+              <div class="dash-field"><span class="mono">${t.date}</span><input id="fDate" type="text" placeholder="Jun 2026"></div>
+              <div class="dash-field"><span class="mono">${t.num}</span><input id="fNum" type="text"></div>
+              <div class="dash-field"><span class="mono">${t.read}</span><input id="fRead" type="number" value="4"></div>
+              <div class="dash-field"><span class="mono">${t.accent}</span><input id="fAccent" type="text" value="#1a2740"></div>
+            </div>
+            <div class="dash-field"><span class="mono">${t.img}</span><input id="fImg" type="text" placeholder="https://…"></div>
+            <div class="dash-field"><span class="mono">${t.body}</span><textarea id="fBody" rows="6"></textarea></div>
+            <div class="cms-form-act">
+              <button type="submit" class="dash-btn"><i class="fa-solid fa-cloud-arrow-up"></i> ${t.save}</button>
+              <button type="button" class="dash-btn" id="cmsCancel">${t.cancel}</button>
+            </div>
+          </form>`;
+        const form = $('#cmsForm');
+        const fill = (p) => {
+          $('#fId').value = p ? p.id : ''; $('#fTitle').value = p ? p.title : ''; $('#fSub').value = p ? p.sub : '';
+          $('#fTag').value = p ? p.tag : ''; $('#fDate').value = p ? p.date : ''; $('#fNum').value = p ? p.num : '';
+          $('#fRead').value = p ? p.read : 4; $('#fAccent').value = p ? (p.accent || '#1a2740') : '#1a2740';
+          $('#fImg').value = p ? p.img : ''; $('#fBody').value = p ? (p.body || []).join('\n') : '';
+          form.hidden = false; form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        };
+        $('#cmsNew').addEventListener('click', () => fill(null));
+        $('#cmsCancel').addEventListener('click', () => { form.hidden = true; });
+        $$('.cms-edit').forEach(b => b.addEventListener('click', () => fill(posts.find(x => x.id === b.dataset.id))));
+        $$('.cms-del').forEach(b => b.addEventListener('click', () => {
+          if (!confirm(t.confirm)) return;
+          fetch('/api/content?id=' + encodeURIComponent(b.dataset.id), { method: 'DELETE', headers: { 'x-edit-token': token } })
+            .then(r => r.json()).then(() => renderContent());
+        }));
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const payload = { id: $('#fId').value.trim(), title: $('#fTitle').value.trim(), sub: $('#fSub').value.trim(),
+            tag: $('#fTag').value.trim(), date: $('#fDate').value.trim(), num: $('#fNum').value.trim(),
+            read: parseInt($('#fRead').value, 10) || 4, accent: $('#fAccent').value.trim(), img: $('#fImg').value.trim(),
+            body: $('#fBody').value.split('\n').map(s => s.trim()).filter(Boolean) };
+          if (!payload.title) return;
+          const st = $('#cmsStatus'); st.textContent = '…';
+          fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-edit-token': token }, body: JSON.stringify(payload) })
+            .then(r => r.json()).then(d2 => {
+              if (d2.ok) { st.textContent = t.saved; renderContent(); }
+              else if (d2.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); }
+              else { st.textContent = '✗ ' + (d2.error || ''); }
+            });
+        });
+      }).catch(() => { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${t.err}</p>`; });
+    };
+
     const flag = (cc) => (cc && cc.length === 2)
       ? cc.toUpperCase().replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0))) : '🌐';
     const ago = (ts) => { const s = (Date.now() - ts) / 1000;
@@ -825,7 +908,7 @@
       $('#stRefresh')?.addEventListener('click', renderVisitors);
     };
 
-    const VIEWS = { overview: renderOverview, visitors: renderVisitors, works: renderWorks, leads: renderLeads, profile: renderProfile, settings: renderSettings };
+    const VIEWS = { overview: renderOverview, visitors: renderVisitors, works: renderWorks, content: renderContent, leads: renderLeads, profile: renderProfile, settings: renderSettings };
     const showConsole = () => {
       gate.hidden = true; main.hidden = false;
       dash.classList.add('is-full');           // console takes the full screen
@@ -860,7 +943,7 @@
     /* every note. Add more here and pagination grows automatically. */
     const P = (num, tag, date, read, accent, img, title, sub, body) =>
       ({ num, tag, date, read, accent, img: IMG(img), title, sub, body });
-    const POSTS = [
+    let POSTS = [
       P('01','Editorial','May 2026',6,'#1a2740','Official/Official7.webp','On the architecture of meaning','Typography is not decoration — it is the floorplan of the page.',
         ["Typography is not decoration. It is the floorplan of the page — the place where a reader pauses, breathes, and finds their footing.","When I set a page I am choosing a pace, not just a typeface. A wide margin is a held breath; a tight column an urgent whisper.","Get the architecture right and the content feels inevitable — as if it could not have been arranged any other way."]),
       P('02','Place','Apr 2026',4,'#5a1a1a','GeneralDesign/GDesign1.webp',"A printer's room in Hewlêr","The old quarter, third floor, north-facing light. A notebook, a small press.",
@@ -896,7 +979,7 @@
     ];
 
     const PAGE_SIZE = 4;
-    const pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
+    let pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
     let page = 1;
 
     /* ----- rich preview ----- */
@@ -1045,6 +1128,19 @@
     });
 
     renderPage();
+    /* merge studio-managed posts from the CMS (D1) ahead of the built-in notes;
+       fails silently to the built-ins so the live blog can never break. */
+    fetch('/api/content').then(r => r.json()).then(d => {
+      if (!d || !d.ok || !Array.isArray(d.posts) || !d.posts.length) return;
+      const cms = d.posts.map(p => ({
+        num: String(p.num || p.id || ''), tag: p.tag || '', date: p.date || '',
+        read: p.read || 4, accent: p.accent || '#1a2740', img: p.img || '',
+        title: p.title || '', sub: p.sub || '', body: Array.isArray(p.body) ? p.body : []
+      }));
+      POSTS = cms.concat(POSTS);
+      pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
+      page = 1; renderPage();
+    }).catch(() => {});
     window.__bqLangCb.push(() => {
       renderPage();
       if (reader && reader.classList.contains('is-open') && curPostObj) {

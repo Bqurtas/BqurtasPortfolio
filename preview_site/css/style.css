@@ -3009,6 +3009,24 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .dash-field input { padding: 11px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg-1); color: var(--ink); font-size: 14px; }
 .dash-field input:focus { outline: none; border-color: var(--gold); }
 .dash-prof-saved { color: var(--gold); margin-left: 12px; }
+/* Content manager (CMS) */
+.dash-field textarea { padding: 11px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg-1); color: var(--ink); font-size: 14px; line-height: 1.6; resize: vertical; font-family: inherit; }
+.dash-field textarea:focus { outline: none; border-color: var(--gold); }
+.cms-head { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+.cms-status { color: var(--gold); font-size: 12px; }
+.cms-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.cms-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-2); }
+.cms-row-t { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.cms-row-t strong { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; }
+.cms-row-t .mono { font-size: 10px; color: var(--gold); }
+.cms-row-act { display: flex; gap: 8px; flex-shrink: 0; }
+.cms-edit, .cms-del { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--line); color: var(--ink-soft); cursor: pointer; transition: all 0.25s var(--ease); }
+.cms-edit:hover { border-color: var(--gold); color: var(--gold); }
+.cms-del:hover { border-color: var(--ember); color: var(--ember); }
+.cms-form { border-top: 1px solid var(--line); padding-top: 22px; }
+.cms-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 16px; }
+.cms-form-act { display: flex; gap: 10px; margin-top: 8px; }
+@media (max-width: 640px) { .cms-grid { grid-template-columns: 1fr; } }
 
 .dash-gate { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; padding: 30px; }
 .dash-gate-icon { font-size: 30px; color: var(--gold); }
