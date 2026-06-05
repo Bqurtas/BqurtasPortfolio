@@ -134,7 +134,7 @@ img, .work-media, .lightbox-img { -webkit-user-drag: none; -khtml-user-drag: non
 
 /* ---------- Type ---------- */
 .mono {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--ink-soft);
 }
@@ -277,7 +277,7 @@ em { font-style: italic; color: var(--ember); }
   border-top: 1px solid var(--line);
 }
 .rail-tip-num {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 10px; color: var(--gold); letter-spacing: 0.12em;
 }
 .rail-tip-text {
@@ -346,7 +346,7 @@ em { font-style: italic; color: var(--ember); }
   width: 44px; height: 44px;
   border-radius: 50%;
   border: 1px solid var(--line);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
   color: var(--ink); background: var(--surface);
   display: flex; align-items: center; justify-content: center;
@@ -384,7 +384,7 @@ em { font-style: italic; color: var(--ember); }
 }
 .lang-opt:hover { background: var(--surface); color: var(--gold); }
 .lang-opt span {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
   color: var(--gold); text-transform: uppercase;
   min-width: 28px;
@@ -505,7 +505,7 @@ em { font-style: italic; color: var(--ember); }
   50% { opacity: 0.5; transform: scale(0.85); }
 }
 .rail-status-text {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--ink-soft);
   writing-mode: vertical-rl; transform: rotate(180deg);
@@ -516,7 +516,7 @@ em { font-style: italic; color: var(--ember); }
   width: 38px; height: 38px;
   border-radius: 50%;
   border: 1px solid var(--line);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 11px; font-weight: 600;
   color: var(--ink); background: var(--surface);
 }
@@ -577,7 +577,7 @@ em { font-style: italic; color: var(--ember); }
 }
 .mobilebar-btn:active, .mobilebar-btn.is-active { border-color: var(--gold); }
 /* every dock icon shares the gold accent */
-.mobilebar-btn #langCurrentCodeM { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600; color: var(--gold-ink); }
+.mobilebar-btn #langCurrentCodeM { font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace; font-size: 14px; font-weight: 600; color: var(--gold-ink); }
 :root[lang="ar"] .mobilebar-btn #langCurrentCodeM { font-size: 18px; }
 .theme-btn.mobilebar-btn i { color: var(--gold-ink); }
 .menu-icon { width: 22px; height: 22px; display: block; }
@@ -796,7 +796,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   width: max-content;
   direction: ltr;                 /* keep the seamless loop identical in RTL */
   animation: marquee 38s linear infinite;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 12.5px; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--ink-soft);
   will-change: transform;
@@ -866,7 +866,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .room-hero-return {
   position: absolute; top: 28px; left: var(--pad-x);
   display: inline-flex; align-items: center; gap: 10px;
-  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--ink-soft); padding: 10px 16px; border: 1px solid var(--line); border-radius: 999px;
   transition: all 0.3s var(--ease);
 }
@@ -982,7 +982,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .pencemor-hero-btn {
   display: inline-flex; align-items: center; gap: 10px;
   padding: 15px 30px; border-radius: 999px; cursor: pointer;
-  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
   transition: all 0.3s var(--ease);
 }
 .pencemor-hero-btn--primary { background: var(--ink); color: var(--bg); border: 1px solid var(--ink); }
@@ -1156,7 +1156,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   display: inline-flex; align-items: center; gap: 14px;
   padding: 17px 40px;
   border: 1px solid var(--line);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--ink-soft);
   border-radius: 2px; cursor: pointer;
@@ -1175,7 +1175,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   margin-top: 4px;
   padding: 8px 18px;
   border: 0; background: none;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--ink-soft); cursor: pointer;
   border-bottom: 1px solid transparent;
@@ -1333,7 +1333,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .lb-caption {
   position: absolute; bottom: -38px; left: 0; right: 0;
   text-align: center;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
   color: rgba(201,162,83,0.75);
 }
@@ -1369,7 +1369,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .blog-more {
   margin-top: auto;
   display: inline-flex; align-items: center; gap: 8px;
-  color: var(--ink); font-family: 'JetBrains Mono', monospace;
+  color: var(--ink); font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
   border-bottom: 1px solid var(--gold-soft);
   padding-bottom: 4px; align-self: flex-start;
@@ -1795,7 +1795,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   font-size: 13px; color: var(--ink-soft);
 }
 .tl-skills i { color: var(--gold); margin-right: 6px; }
-.tl-skills span { color: var(--gold); font-family: 'JetBrains Mono', monospace; font-size: 11px; margin-left: 6px; }
+.tl-skills span { color: var(--gold); font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace; font-size: 11px; margin-left: 6px; }
 
 /* Bio card (education) */
 .bio-card {
@@ -1805,7 +1805,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   border-radius: 4px;
 }
 .bio-card h4 { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 500; margin-bottom: 6px; }
-.bio-sub { color: var(--gold); font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 12px; }
+.bio-sub { color: var(--gold); font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 12px; }
 .bio-card p { color: var(--ink-soft); font-size: 15px; line-height: 1.6; margin-bottom: 4px; }
 .bio-card .tl-skills { margin-top: 16px; }
 
@@ -1997,7 +1997,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   border-bottom: 1px solid var(--line); padding-bottom: 12px;
 }
 .field label {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--gold);
   display: inline-flex; align-items: center; gap: 8px;
@@ -2028,7 +2028,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   display: inline-flex; align-items: center; gap: 14px;
   padding: 18px 32px;
   background: var(--ink); color: var(--bg);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
   margin-top: 16px;
   border-radius: 2px;
@@ -2038,7 +2038,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 :root[data-theme="dark"] .pitch-submit { background: var(--gold-bright); color: #14100b; }
 :root[data-theme="dark"] .pitch-submit:hover { background: var(--gold-deep); }
 .contact-status {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 12px; letter-spacing: 0.1em;
   color: var(--gold); margin-top: 8px; min-height: 16px;
   display: inline-flex; align-items: center; gap: 8px;
@@ -2073,7 +2073,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   padding: 14px 24px;
   border: 1px solid var(--ink);
   color: var(--ink);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
   border-radius: 2px;
   transition: all 0.3s var(--ease);
@@ -2115,7 +2115,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   letter-spacing: -0.03em;
 }
 .stat-label {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--gold);
   display: inline-flex; align-items: center; gap: 8px;
@@ -2217,7 +2217,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 }
 .logo-mark svg { width: 56%; height: auto; }
 .logo-mark span {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--ink-soft); text-align: center;
 }
@@ -2267,7 +2267,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   position: absolute;
   right: 0; top: 0;
   display: inline-flex; align-items: center; gap: 10px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
   color: var(--gold);
   padding: 12px 18px;
@@ -2322,7 +2322,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   display: inline-flex; align-items: center; gap: 14px;
   padding: 20px 32px;
   background: var(--gold-bright); color: #14100b;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
   border-radius: 2px;
   transition: all 0.3s var(--ease);
@@ -2436,7 +2436,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .footer-lead-text { color: rgba(232, 223, 205, 0.7); font-size: 15px; line-height: 1.7; max-width: 380px; }
 .footer-avail {
   display: inline-flex; align-items: center; gap: 10px;
-  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace; font-size: 11px; letter-spacing: 0.12em;
   text-transform: uppercase; color: rgba(232, 223, 205, 0.85);
   transition: color 0.3s var(--ease); align-self: flex-start;
 }
@@ -2757,7 +2757,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .profile-card-btn {
   display: inline-flex; align-items: center; gap: 10px;
   padding: 11px 18px; border: 1px solid var(--ink); border-radius: 999px;
-  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
   color: var(--ink); transition: all 0.3s var(--ease);
 }
 .profile-card-btn:hover { background: var(--ink); color: var(--bg); gap: 14px; }
@@ -2955,7 +2955,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .chat-ava { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(201,162,83,0.4); flex-shrink: 0; }
 .chat-ava img { width: 100%; height: 100%; object-fit: cover; }
 .chat-head-id strong { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 500; display: block; }
-.chat-status { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.12em; color: rgba(232,223,205,0.6); display: inline-flex; align-items: center; gap: 6px; }
+.chat-status { font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace; font-size: 9px; letter-spacing: 0.12em; color: rgba(232,223,205,0.6); display: inline-flex; align-items: center; gap: 6px; }
 .chat-status i { color: #6bbf59; font-size: 7px; }
 .chat-min { width: 30px; height: 30px; border-radius: 50%; color: var(--bg-2); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.3s; }
 .chat-min:hover { background: rgba(255,255,255,0.1); }
@@ -3017,7 +3017,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .dash-login { display: flex; gap: 10px; margin-top: 10px; }
 .dash-login input { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 12px 20px; font-size: 14px; color: var(--ink); outline: none; min-width: 200px; }
 .dash-login input:focus { border-color: var(--gold); }
-.dash-login button { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; background: var(--gold-bright); color: #14100b; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; }
+.dash-login button { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; background: var(--gold-bright); color: #14100b; border-radius: 999px; font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; }
 .dash-hint { color: var(--ember) !important; font-size: 11px; min-height: 14px; }
 
 .dash-main { flex: 1; display: flex; min-height: 0; }
@@ -3086,7 +3086,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   display: inline-flex; align-items: center; justify-content: center; gap: 12px;
   padding: 15px 24px; background: var(--ink); color: var(--bg);
   border-radius: 999px; cursor: pointer;
-  font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
   transition: all 0.3s var(--ease);
 }
 :root[data-theme="dark"] .subscribe-form button { background: var(--gold-bright); color: #14100b; }
@@ -3179,7 +3179,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .reader-comment-form button {
   display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0;
   padding: 0 20px; background: var(--ink); color: var(--bg); border-radius: 10px; cursor: pointer;
-  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
   transition: all 0.3s var(--ease);
 }
 :root[data-theme="dark"] .reader-comment-form button { background: var(--gold-bright); color: #14100b; }
@@ -3227,7 +3227,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .blog-page {
   min-width: 42px; height: 42px; padding: 0 8px;
   border: 1px solid var(--line); border-radius: 10px;
-  font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft);
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace; font-size: 12px; color: var(--ink-soft);
   cursor: pointer; transition: all 0.25s var(--ease);
 }
 .blog-page:hover { border-color: var(--gold); color: var(--ink); }
@@ -3239,14 +3239,14 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .blog-pager-go input {
   width: 58px; height: 42px; text-align: center;
   border: 1px solid var(--line); border-radius: 10px; background: var(--surface);
-  font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink); outline: none;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace; font-size: 13px; color: var(--ink); outline: none;
   -moz-appearance: textfield;
 }
 .blog-pager-go input::-webkit-outer-spin-button, .blog-pager-go input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .blog-pager-go input:focus { border-color: var(--gold); }
 .blog-pager-go button {
   height: 42px; padding: 0 20px; background: var(--ink); color: var(--bg); border-radius: 10px; cursor: pointer;
-  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
   transition: all 0.3s var(--ease);
 }
 :root[data-theme="dark"] .blog-pager-go button { background: var(--gold-bright); color: #14100b; }
