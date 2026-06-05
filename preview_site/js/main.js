@@ -705,3 +705,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+/* =========================================================
+   Light content protection — deters casual right-click, image
+   drag/save, and the common "inspect" shortcuts. This is a
+   deterrent only: client-side code can never fully stop a
+   determined visitor (browser menu, devtools, view-source via
+   URL, network tab all remain). It just raises the bar.
+   ========================================================= */
+(function protect() {
+  // Block right-click context menu (the "Save image as…" entry).
+  document.addEventListener('contextmenu', (e) => e.preventDefault());
+  // Block dragging images out to the desktop.
+  document.addEventListener('dragstart', (e) => {
+    if (e.target && e.target.tagName === 'IMG') e.preventDefault();
+  });
+  // Block the usual devtools / view-source / save shortcuts.
+  document.addEventListener('keydown', (e) => {
+    const k = (e.key || '').toLowerCase();
+    if (k === 'f12') { e.preventDefault(); return; }
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (k === 'i' || k === 'j' || k === 'c')) { e.preventDefault(); return; }
+    if ((e.ctrlKey || e.metaKey) && (k === 'u' || k === 's')) { e.preventDefault(); return; }
+  });
+})();

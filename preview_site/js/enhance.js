@@ -573,7 +573,7 @@
   (function dashboard() {
     const dash = $('#dash');
     if (!dash) return;
-    const KEY = 'bqurtas-studio';           // access key
+    const KEY = '107502';                   // access code
     const gate = $('#dashGate'), main = $('#dashMain'), view = $('#dashView');
     const hint = $('#dashHint');
     let unlocked = sessionStorage.getItem('bq_dash_ok') === '1';
@@ -581,7 +581,7 @@
     const openDash = () => {
       dash.classList.add('is-open');
       dash.setAttribute('aria-hidden', 'false');
-      if (unlocked) showConsole(); else { gate.hidden = false; main.hidden = true; setTimeout(() => $('#dashKey')?.focus(), 200); }
+      if (unlocked) showConsole(); else { dash.classList.remove('is-full'); gate.hidden = false; main.hidden = true; setTimeout(() => $('#dashKey')?.focus(), 200); }
     };
     const closeDash = () => { dash.classList.remove('is-open'); dash.setAttribute('aria-hidden', 'true'); };
 
@@ -589,7 +589,7 @@
     if (location.hash === '#studio') openDash();
     window.addEventListener('hashchange', () => { if (location.hash === '#studio') openDash(); });
     document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'b') { e.preventDefault(); openDash(); }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') { e.preventDefault(); openDash(); }   // ⌘ / Ctrl + B
       if (e.key === 'Escape') closeDash();
     });
     let clicks = 0, clickT;
@@ -608,7 +608,7 @@
         unlocked = true; sessionStorage.setItem('bq_dash_ok', '1');
         showConsole();
       } else {
-        hint.textContent = '✗ Wrong key. (hint: bqurtas-studio)';
+        hint.textContent = '✗ Wrong access code.';
         $('#dashKey').value = '';
       }
     });
@@ -664,7 +664,7 @@
             <select id="setTheme"><option value="light">Light</option><option value="dark">Dark</option></select></label>
           <button class="dash-btn" id="setReset"><i class="fa-solid fa-rotate"></i> Reset saved preferences</button>
         </div>
-        <p class="dash-note mono">Access key: <b>${KEY}</b> · Open anytime with Ctrl/⌘ + Shift + B, or 5× click the Bq logo.</p>`;
+        <p class="dash-note mono">Open anytime with <b>⌘ / Ctrl + B</b>, or 5× click the Bq logo.</p>`;
       $('#setSplash').addEventListener('change', (e) => localStorage.setItem('bq_splash', e.target.checked ? 'on' : 'off'));
       const themeSel = $('#setTheme'); themeSel.value = document.documentElement.dataset.theme || 'light';
       themeSel.addEventListener('change', (e) => { document.documentElement.dataset.theme = e.target.value; try { localStorage.setItem('bq_theme', e.target.value); } catch (x) {} });
@@ -741,6 +741,7 @@
     const VIEWS = { overview: renderOverview, visitors: renderVisitors, works: renderWorks, leads: renderLeads, settings: renderSettings };
     const showConsole = () => {
       gate.hidden = true; main.hidden = false;
+      dash.classList.add('is-full');           // console takes the full screen
       renderOverview();
     };
     $$('.dash-tab').forEach(t => t.addEventListener('click', () => {
