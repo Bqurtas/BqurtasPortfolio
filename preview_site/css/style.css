@@ -127,7 +127,10 @@ img, .work-media, .lightbox-img { -webkit-user-drag: none; -khtml-user-drag: non
 /* Arabic script connects — tight/negative tracking, clipping and italics
    "break" the name, so relax those for the hero title in ku/ar. */
 :root[lang="ku"] .hero-title, :root[lang="ar"] .hero-title {
-  letter-spacing: 0; line-height: 1.18;
+  /* Noto Kufi glyphs run much larger than Fraunces — scale the name down so it
+     sits centred on the page like the Latin/Kurmancî/French heroes. */
+  font-size: clamp(44px, 10vw, 132px);
+  letter-spacing: 0; line-height: 1.2;
 }
 :root[lang="ku"] .hero-line, :root[lang="ar"] .hero-line { overflow: visible; }
 :root[lang="ku"] .hero-line--2, :root[lang="ar"] .hero-line--2 { font-style: normal; }
