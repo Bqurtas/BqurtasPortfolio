@@ -61,7 +61,7 @@
       const p = Math.min(Math.max(h.scrollTop / max, 0), 1);
       if (railFill) railFill.style.height = (p * 100) + '%';
       if (ring) ring.style.strokeDashoffset = C * (1 - p);
-      if (toTop) toTop.classList.toggle('is-shown', h.scrollTop > 350);
+      if (toTop) toTop.classList.add('is-shown');   // always visible in every room; the ring still fills with scroll progress
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
