@@ -642,9 +642,11 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 }
 .mobile-menu.is-open .mobile-sheet { transform: translateY(0); }
 .mobile-sheet::before {
-  content: ''; display: block; width: 46px; height: 5px; border-radius: 999px;
-  background: var(--line); margin: 2px auto 2px;
+  content: ''; display: block; width: 44px; height: 5px; border-radius: 999px;
+  background: var(--ink-muted); opacity: 0.55; margin: 4px auto 18px;
+  cursor: grab;
 }
+.mobile-sheet { touch-action: pan-y; }
 .mobile-menu-close {
   position: absolute; top: 14px; right: 18px;
   width: 52px; height: 52px; border-radius: 50%;
@@ -1749,6 +1751,28 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   border-bottom: 1px solid var(--line);
 }
 .bio-block-title i { color: var(--gold); font-size: 0.85em; }
+.bio-block-lede { color: var(--ink-soft); font-size: 15px; line-height: 1.7; margin: -18px 0 8px; max-width: 540px; }
+
+/* Tools & software card */
+.tools-group { margin-top: 26px; }
+.tools-cat { display: block; color: var(--gold) !important; font-size: 10px; letter-spacing: 0.2em; margin-bottom: 14px; }
+.tools-grid { display: flex; flex-wrap: wrap; gap: 18px 16px; }
+.tool { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 64px; }
+.tool-mark {
+  width: 50px; height: 50px; border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif; font-weight: 600; font-size: 17px; line-height: 1; letter-spacing: 0 !important;
+  background: var(--b, #1a1b1e); color: var(--c, var(--gold));
+  border: 1px solid color-mix(in srgb, var(--c, #c9a253) 38%, transparent);
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+.tool:hover .tool-mark { transform: translateY(-4px); box-shadow: 0 10px 22px -10px color-mix(in srgb, var(--c, #c9a253) 60%, transparent); }
+.tool-name { font-size: 10.5px; color: var(--ink-muted); text-align: center; line-height: 1.25; }
+.tools-typing {
+  margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line);
+  display: flex; align-items: center; gap: 12px; color: var(--ink-soft); font-size: 14.5px;
+}
+.tools-typing i { color: var(--gold); font-size: 18px; }
 
 /* Timeline */
 .timeline { position: relative; padding-left: 30px; }
@@ -2417,7 +2441,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 }
 
 .footer-bottom {
-  padding: 28px var(--pad-x) 32px;
+  padding: 28px var(--pad-x) 22px;
   display: flex; justify-content: space-between; gap: 16px;
   flex-wrap: wrap; color: rgba(232, 223, 205, 0.62) !important;
 }
@@ -2469,7 +2493,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   transition: color 0.3s var(--ease);
 }
 .footer-list a:hover { color: var(--gold); }
-.footer-social-min { display: flex; gap: 10px; flex-wrap: wrap; }
+.footer-social-min { display: flex; gap: 10px; flex-wrap: nowrap; }
 .footer-social-min a {
   width: 40px; height: 40px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
@@ -2485,6 +2509,8 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 }
 @media (max-width: 560px) {
   .footer-cols { grid-template-columns: 1fr 1fr; gap: 28px; }
+  /* Connect column spans full width so the social icons stay on one row */
+  .footer-cols > :last-child { grid-column: 1 / -1; }
 }
 
 /* ---------- Logo section hover (Worked-with grows, Designed enlarge) ---------- */
@@ -3321,12 +3347,16 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 /* Mobile: strong-feeling snapping — every screen AND every section is a snap
    point (proximity, so the page always scrolls freely and nothing is trapped). */
 @media (max-width: 820px) {
-  html { scroll-snap-type: y proximity; scroll-padding-top: 0; }
+  html { scroll-snap-type: y mandatory; scroll-padding-top: 0; }
   .hero { height: auto; min-height: calc(100svh - var(--dock-h)); scroll-snap-align: start; }
   .room-hero,
   .pencemor-hero { min-height: calc(100svh - var(--dock-h)); scroll-snap-align: start; }
   .room > .section { scroll-snap-align: start; }
-  .footer { scroll-snap-align: start; padding-bottom: calc(var(--dock-h) + 8px); }
+  /* The gallery/cert grids are far taller than the screen — let them scroll
+     freely so mandatory snap never traps you mid-grid. */
+  .room > .section:has(#grid),
+  .room > .section:has(#certGrid) { scroll-snap-align: none; }
+  .footer { scroll-snap-align: start; padding-bottom: calc(var(--dock-h) + 3px); }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-snap-type: none; }

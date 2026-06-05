@@ -166,6 +166,33 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('mobileMenuClose')?.addEventListener('click', () => setMenu(false));
   mobileMenu?.addEventListener('click', (e) => { if (e.target === mobileMenu) setMenu(false); });
 
+  /* Drag the sheet (grab the handle / top) downward to dismiss it. */
+  const sheet = mobileMenu?.querySelector('.mobile-sheet');
+  if (sheet) {
+    let startY = null, dy = 0, dragging = false;
+    const onDown = (y) => { if (sheet.scrollTop > 4) return; startY = y; dy = 0; dragging = true; sheet.style.transition = 'none'; };
+    const onMove = (y) => {
+      if (!dragging || startY === null) return;
+      dy = y - startY;
+      if (dy < 0) dy = 0;                       // only downward
+      sheet.style.transform = `translateY(${dy}px)`;
+    };
+    const onUp = () => {
+      if (!dragging) return;
+      dragging = false; startY = null;
+      sheet.style.transition = '';
+      sheet.style.transform = '';
+      if (dy > 90) setMenu(false);              // far enough → close
+    };
+    sheet.addEventListener('touchstart', (e) => onDown(e.touches[0].clientY), { passive: true });
+    sheet.addEventListener('touchmove',  (e) => { onMove(e.touches[0].clientY); }, { passive: true });
+    sheet.addEventListener('touchend', onUp);
+    // pointer (trackpad / mouse) drag too
+    sheet.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'touch') onDown(e.clientY); });
+    window.addEventListener('pointermove', (e) => { if (dragging && e.pointerType !== 'touch') onMove(e.clientY); });
+    window.addEventListener('pointerup', () => { if (dragging) onUp(); });
+  }
+
   /* ---------- MOBILE BOTTOM-BAR POPUPS (language · socials) ---------- */
   const langPop = document.getElementById('langPop');
   const socialPop = document.getElementById('socialPop');
