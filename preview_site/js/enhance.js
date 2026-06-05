@@ -581,35 +581,35 @@
     /* ---- Dashboard translations (follows the site language) ---- */
     const DASH_I18N = {
       en: { overview:'Overview', visitors:'Visitors', works:'Works', leads:'Leads', profile:'Profile', settings:'Settings', content:'Content', assistant:'Assistant',
-        gateTitle:'Enter access code', gatePrivate:'This console is private.', gatePh:'Access code', unlock:'Unlock', wrong:'✗ Wrong access code.', twoTitle:'Enter the SMS code', twoNote:'We texted a 6-digit code to your phone.', twoPh:'6-digit code', twoWrong:'✗ Wrong or expired code.', twoSending:'Sending code…',
+        gateTitle:'Enter access code', gatePrivate:'This console is private.', gatePh:'Access code', unlock:'Unlock', wrong:'✗ Wrong access code.', twoTitle:'Enter the SMS code', twoNote:'We texted a 6-digit code to your phone.', twoPh:'6-digit code', twoWrong:'✗ Wrong or expired code.', twoSending:'Sending code…', twoSetupBtn:'Set up 2FA (authenticator)', twoSetup1:'1) In Cloudflare set TOTP_SECRET to this (then Retry deployment):', twoSetup2:'2) Add the same key to Google Authenticator (manual entry: "Pencemor Studio"). Tap the key to copy.', twoSetupLink:'open in app',
         oTotal:'Total works', oColl:'Collections', oLeads:'Leads stored', oLangs:'Languages', oWelcome:'Welcome back — your studio console is private to you; data lives in this browser.',
         lEmpty:'No leads yet. Pitches from the Contact form appear here.', lClear:'Clear all leads', lConfirm:'Delete all stored leads?',
         pName:'Name', pTitle:'Title / role', pAvatar:'Avatar URL', pSave:'Save profile', pSaved:'✓ Saved', pNote:'Adding more admins needs a backend login system — that arrives with the content manager. For now this profile is yours, kept privately in this browser.',
         sSplash:'Show intro splash on load', sTheme:'Theme', sLight:'Light', sDark:'Dark', sReset:'Reset saved preferences', sResetConfirm:'Reset saved preferences?', sDone:'Done.', sNote:'Open anytime with ⌘ / Ctrl + B, or 5× click the Bq logo.',
         vConnect:'Connect your analytics', vEnter:'Enter the STATS_TOKEN you set in Cloudflare.', vTokenPh:'Stats token', vConnectBtn:'Connect', vLoading:'Loading visitor data…' },
       ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن', content:'ناوەڕۆک', assistant:'یاریدەدەر',
-        gateTitle:'کۆدی چوونەژوورەوە بنووسە', gatePrivate:'ئەم کۆنسۆڵە تایبەتە.', gatePh:'کۆدی چوونەژوورەوە', unlock:'کردنەوە', wrong:'✗ کۆدەکە هەڵەیە.', twoTitle:'کۆدی SMS بنووسە', twoNote:'کۆدێکی ٦ ژمارەیی نێردرا بۆ مۆبایلەکەت.', twoPh:'کۆدی ٦ ژمارەیی', twoWrong:'✗ کۆد هەڵەیە یان بەسەرچووە.', twoSending:'ناردنی کۆد…',
+        gateTitle:'کۆدی چوونەژوورەوە بنووسە', gatePrivate:'ئەم کۆنسۆڵە تایبەتە.', gatePh:'کۆدی چوونەژوورەوە', unlock:'کردنەوە', wrong:'✗ کۆدەکە هەڵەیە.', twoTitle:'کۆدی SMS بنووسە', twoNote:'کۆدێکی ٦ ژمارەیی نێردرا بۆ مۆبایلەکەت.', twoPh:'کۆدی ٦ ژمارەیی', twoWrong:'✗ کۆد هەڵەیە یان بەسەرچووە.', twoSending:'ناردنی کۆد…', twoSetupBtn:'ڕێکخستنی 2FA (ئەپی ئۆتێنتیکەیتەر)', twoSetup1:'١) لە Cloudflare، TOTP_SECRET بکە بەمە (پاشان Retry deployment):', twoSetup2:'٢) هەمان کلیل بخە ناو Google Authenticator (داخڵکردنی دەستی: «Pencemor Studio»). کلیک لە کلیلەکە بکە بۆ کۆپی.', twoSetupLink:'لە ئەپ بیکەرەوە',
         oTotal:'کۆی کارەکان', oColl:'کۆکراوەکان', oLeads:'داواکاری هەڵگیراو', oLangs:'زمانەکان', oWelcome:'بەخێربێیتەوە — کۆنسۆڵی ستۆدیۆ تەنها بۆ تۆیە؛ زانیارییەکان لەم وێبگەڕەدا دەمێننەوە.',
         lEmpty:'هێشتا داواکاری نییە. پرۆژەکانی فۆڕمی پەیوەندی لێرە دەردەکەون.', lClear:'سڕینەوەی هەموو داواکارییەکان', lConfirm:'هەموو داواکارییە هەڵگیراوەکان بسڕێتەوە؟',
         pName:'ناو', pTitle:'پلە / ڕۆڵ', pAvatar:'بەستەری وێنە', pSave:'پاشەکەوتکردنی پرۆفایل', pSaved:'✓ پاشەکەوتکرا', pNote:'زیادکردنی ئەدمینی زیاتر پێویستی بە سیستەمی چوونەژوورەوەی سێرڤەر هەیە — لەگەڵ بەڕێوەبەری ناوەڕۆکدا دێت. ئێستا ئەم پرۆفایلە هی تۆیە، بە تایبەتی لەم وێبگەڕەدا پارێزراوە.',
         sSplash:'پیشاندانی سپلاشی دەستپێک', sTheme:'ڕووکار', sLight:'ڕووناک', sDark:'تاریک', sReset:'ڕێکخستنە پاشەکەوتکراوەکان بسڕەوە', sResetConfirm:'ڕێکخستنە پاشەکەوتکراوەکان بسڕێتەوە؟', sDone:'تەواوبوو.', sNote:'هەر کاتێک بە ⌘ / Ctrl + B بیکەرەوە، یان ٥ جار کلیک لە لۆگۆی Bq بکە.',
         vConnect:'ئامارەکانت ببەستەوە', vEnter:'ئەو STATS_TOKENـەی لە Cloudflare دانراوە بنووسە.', vTokenPh:'تۆکنی ئامار', vConnectBtn:'بەستنەوە', vLoading:'بارکردنی زانیاری سەردانکەران…' },
       ar: { overview:'نظرة عامة', visitors:'الزوار', works:'الأعمال', leads:'الطلبات', profile:'الملف', settings:'الإعدادات', content:'المحتوى', assistant:'المساعد',
-        gateTitle:'أدخل رمز الدخول', gatePrivate:'هذه اللوحة خاصة.', gatePh:'رمز الدخول', unlock:'فتح', wrong:'✗ رمز خاطئ.', twoTitle:'أدخل رمز الرسالة', twoNote:'أرسلنا رمزاً من ٦ أرقام إلى هاتفك.', twoPh:'رمز من ٦ أرقام', twoWrong:'✗ رمز خاطئ أو منتهٍ.', twoSending:'جار إرسال الرمز…',
+        gateTitle:'أدخل رمز الدخول', gatePrivate:'هذه اللوحة خاصة.', gatePh:'رمز الدخول', unlock:'فتح', wrong:'✗ رمز خاطئ.', twoTitle:'أدخل رمز الرسالة', twoNote:'أرسلنا رمزاً من ٦ أرقام إلى هاتفك.', twoPh:'رمز من ٦ أرقام', twoWrong:'✗ رمز خاطئ أو منتهٍ.', twoSending:'جار إرسال الرمز…', twoSetupBtn:'إعداد 2FA (تطبيق المصادقة)', twoSetup1:'١) في Cloudflare اضبط TOTP_SECRET على هذا (ثم Retry deployment):', twoSetup2:'٢) أضف نفس المفتاح إلى Google Authenticator (إدخال يدوي: «Pencemor Studio»). انقر المفتاح للنسخ.', twoSetupLink:'افتح في التطبيق',
         oTotal:'إجمالي الأعمال', oColl:'المجموعات', oLeads:'الطلبات المحفوظة', oLangs:'اللغات', oWelcome:'أهلاً بعودتك — لوحة الاستوديو خاصة بك؛ البيانات تبقى في هذا المتصفح.',
         lEmpty:'لا طلبات بعد. تظهر هنا مشاريع نموذج التواصل.', lClear:'مسح كل الطلبات', lConfirm:'حذف كل الطلبات المحفوظة؟',
         pName:'الاسم', pTitle:'اللقب / الدور', pAvatar:'رابط الصورة', pSave:'حفظ الملف', pSaved:'✓ تم الحفظ', pNote:'إضافة مزيد من المشرفين تتطلب نظام تسجيل دخول خلفي — يأتي مع مدير المحتوى. حالياً هذا الملف خاص بك، محفوظ في هذا المتصفح.',
         sSplash:'إظهار شاشة البداية', sTheme:'المظهر', sLight:'فاتح', sDark:'داكن', sReset:'إعادة تعيين التفضيلات', sResetConfirm:'إعادة تعيين التفضيلات المحفوظة؟', sDone:'تم.', sNote:'افتحها في أي وقت بـ ⌘ / Ctrl + B، أو انقر شعار Bq خمس مرات.',
         vConnect:'اربط تحليلاتك', vEnter:'أدخل STATS_TOKEN الذي ضبطته في Cloudflare.', vTokenPh:'رمز الإحصاءات', vConnectBtn:'اتصال', vLoading:'تحميل بيانات الزوار…' },
       kmr: { overview:'Giştî', visitors:'Mêvan', works:'Kar', leads:'Daxwaz', profile:'Profîl', settings:'Mîheng', content:'Naverok', assistant:'Alîkar',
-        gateTitle:'Koda gihiştinê binivîse', gatePrivate:'Ev konsol taybet e.', gatePh:'Koda gihiştinê', unlock:'Veke', wrong:'✗ Koda çewt.', twoTitle:'Koda SMSê binivîse', twoNote:'Me koda 6-hejmarî şand telefona te.', twoPh:'Koda 6-hejmarî', twoWrong:'✗ Koda çewt an qediyayî.', twoSending:'Kod tê şandin…',
+        gateTitle:'Koda gihiştinê binivîse', gatePrivate:'Ev konsol taybet e.', gatePh:'Koda gihiştinê', unlock:'Veke', wrong:'✗ Koda çewt.', twoTitle:'Koda SMSê binivîse', twoNote:'Me koda 6-hejmarî şand telefona te.', twoPh:'Koda 6-hejmarî', twoWrong:'✗ Koda çewt an qediyayî.', twoSending:'Kod tê şandin…', twoSetupBtn:'Sazkirina 2FA (sepana erêkirinê)', twoSetup1:'1) Li Cloudflare TOTP_SECRET wiha saz bike (paşê Retry deployment):', twoSetup2:'2) Heman mifte têxe Google Authenticator (têketina destî: "Pencemor Studio"). Li mifte bitikîne ji bo kopî.', twoSetupLink:'di sepanê de veke',
         oTotal:'Tevahiya karan', oColl:'Berhevok', oLeads:'Daxwazên tomarkirî', oLangs:'Ziman', oWelcome:'Bi xêr hatî — konsola studyoyê taybet e ji te re; dane di vê gerokê de dimînin.',
         lEmpty:'Hêj daxwaz tune. Pêşniyarên forma têkiliyê li vir xuya dibin.', lClear:'Hemû daxwazan paqij bike', lConfirm:'Hemû daxwazên tomarkirî werin jêbirin?',
         pName:'Nav', pTitle:'Sernav / rol', pAvatar:'Girêdana wêneyê', pSave:'Profîlê tomar bike', pSaved:'✓ Tomar bû', pNote:'Zêdekirina admînên din pêdivî bi sîstema têketinê ya backend heye — ew bi rêveberê naverokê re tê. Niha ev profîl ya te ye, bi taybetî di vê gerokê de tê parastin.',
         sSplash:'Dîmena destpêkê nîşan bide', sTheme:'Tema', sLight:'Ronî', sDark:'Tarî', sReset:'Vebijarkên tomarkirî jê bibe', sResetConfirm:'Vebijarkên tomarkirî werin jêbirin?', sDone:'Qediya.', sNote:'Her dem bi ⌘ / Ctrl + B veke, an 5 caran li logoya Bq bitikîne.',
         vConnect:'Analîtîkên xwe girêde', vEnter:'STATS_TOKEN ya ku te di Cloudflare de danî binivîse.', vTokenPh:'Tokena statîstîkê', vConnectBtn:'Girêde', vLoading:'Daneyên mêvanan tê barkirin…' },
       fr: { overview:'Aperçu', visitors:'Visiteurs', works:'Travaux', leads:'Demandes', profile:'Profil', settings:'Réglages', content:'Contenu', assistant:'Assistant',
-        gateTitle:"Entrez le code d'accès", gatePrivate:'Cette console est privée.', gatePh:"Code d'accès", unlock:'Déverrouiller', wrong:'✗ Code incorrect.', twoTitle:'Entrez le code SMS', twoNote:'Un code à 6 chiffres a été envoyé à votre téléphone.', twoPh:'Code à 6 chiffres', twoWrong:'✗ Code incorrect ou expiré.', twoSending:'Envoi du code…',
+        gateTitle:"Entrez le code d'accès", gatePrivate:'Cette console est privée.', gatePh:"Code d'accès", unlock:'Déverrouiller', wrong:'✗ Code incorrect.', twoTitle:'Entrez le code SMS', twoNote:'Un code à 6 chiffres a été envoyé à votre téléphone.', twoPh:'Code à 6 chiffres', twoWrong:'✗ Code incorrect ou expiré.', twoSending:'Envoi du code…', twoSetupBtn:'Configurer la 2FA (authentification)', twoSetup1:'1) Dans Cloudflare, définissez TOTP_SECRET sur ceci (puis Retry deployment) :', twoSetup2:'2) Ajoutez la même clé à Google Authenticator (saisie manuelle : « Pencemor Studio »). Cliquez la clé pour copier.', twoSetupLink:'ouvrir dans l’app',
         oTotal:'Total des travaux', oColl:'Collections', oLeads:'Demandes enregistrées', oLangs:'Langues', oWelcome:'Bon retour — votre console studio est privée ; les données restent dans ce navigateur.',
         lEmpty:'Aucune demande pour l’instant. Les projets du formulaire de contact apparaissent ici.', lClear:'Effacer toutes les demandes', lConfirm:'Supprimer toutes les demandes enregistrées ?',
         pName:'Nom', pTitle:'Titre / rôle', pAvatar:"URL de l'avatar", pSave:'Enregistrer le profil', pSaved:'✓ Enregistré', pNote:'Ajouter d’autres admins nécessite un système de connexion backend — il arrive avec le gestionnaire de contenu. Pour l’instant ce profil est le vôtre, gardé dans ce navigateur.',
@@ -734,11 +734,25 @@
             <select id="setTheme"><option value="light">${DT('sLight')}</option><option value="dark">${DT('sDark')}</option></select></label>
           <button class="dash-btn" id="setReset"><i class="fa-solid fa-rotate"></i> ${DT('sReset')}</button>
         </div>
-        <p class="dash-note mono">${DT('sNote')}</p>`;
+        <p class="dash-note mono">${DT('sNote')}</p>
+        <div class="dash-2fa">
+          <button class="dash-btn" id="gen2fa"><i class="fa-solid fa-shield-halved"></i> ${DT('twoSetupBtn')}</button>
+          <div id="twofaOut" hidden></div>
+        </div>`;
       $('#setSplash').addEventListener('change', (e) => localStorage.setItem('bq_splash', e.target.checked ? 'on' : 'off'));
       const themeSel = $('#setTheme'); themeSel.value = document.documentElement.dataset.theme || 'light';
       themeSel.addEventListener('change', (e) => { document.documentElement.dataset.theme = e.target.value; try { localStorage.setItem('bq_theme', e.target.value); } catch (x) {} });
       $('#setReset').addEventListener('click', () => { if (confirm(DT('sResetConfirm'))) { ['bq_theme','bq_lang','bq_splash'].forEach(k => localStorage.removeItem(k)); alert(DT('sDone')); } });
+      $('#gen2fa').addEventListener('click', () => {
+        const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        const r = crypto.getRandomValues(new Uint8Array(32));
+        let sec = ''; for (const b of r) sec += A[b % 32];
+        const uri = `otpauth://totp/Pencemor%20Studio?secret=${sec}&issuer=Pencemor`;
+        const out = $('#twofaOut'); out.hidden = false;
+        out.innerHTML = `<p class="dash-note mono">${DT('twoSetup1')}</p><code class="dash-secret" id="twoSec">${sec}</code>
+          <p class="dash-note mono">${DT('twoSetup2')}</p><a class="dash-note mono" href="${uri}">otpauth://… (${DT('twoSetupLink')})</a>`;
+        const c = $('#twoSec'); c.addEventListener('click', () => { try { navigator.clipboard.writeText(sec); c.classList.add('copied'); } catch (e) {} });
+      });
     };
     const esc = (s) => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
 
@@ -863,11 +877,11 @@
 
     /* ---- AI assistant (private; proxied via /api/assistant) ---- */
     const AT_I18N = {
-      en: { gate:'Connect the assistant', note:'Enter your EDIT_TOKEN (same as the content editor).', tokPh:'Edit token', conn:'Connect', ph:'Ask about clients, pricing, briefs, ideas…', send:'Send', intro:'Hello Barakat — I can help with client replies, quotes, briefs, ideas, captions and translation. Ask in any language.', clear:'Clear', thinking:'Thinking…', errKey:'Set ANTHROPIC_API_KEY in Cloudflare to enable the assistant.', err:'Assistant works on the live site only.' },
-      ku: { gate:'بەستنەوەی یاریدەدەر', note:'EDIT_TOKENـەکەت بنووسە (هەمان تۆکنی ناوەڕۆک).', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', ph:'دەربارەی کڕیار، نرخ، پلان، بیرۆکە بپرسە…', send:'ناردن', intro:'سڵاو بەرەکات — دەتوانم یارمەتیت بدەم لە وەڵامی کڕیار، نرخ، پلانی پڕۆژە، بیرۆکە، کاپشن و وەرگێڕان. بە هەر زمانێک بپرسە.', clear:'پاککردنەوە', thinking:'بیردەکاتەوە…', errKey:'بۆ چالاککردن، ANTHROPIC_API_KEY لە Cloudflare دابنێ.', err:'یاریدەدەر تەنها لەسەر سایتە زیندووەکە کاردەکات.' },
-      ar: { gate:'ربط المساعد', note:'أدخل EDIT_TOKEN (نفس رمز محرر المحتوى).', tokPh:'رمز التحرير', conn:'اتصال', ph:'اسأل عن العملاء، التسعير، الخطط، الأفكار…', send:'إرسال', intro:'مرحباً بركات — أساعدك في ردود العملاء، عروض الأسعار، الخطط، الأفكار، التعليقات والترجمة. اسأل بأي لغة.', clear:'مسح', thinking:'يفكر…', errKey:'اضبط ANTHROPIC_API_KEY في Cloudflare لتفعيل المساعد.', err:'المساعد يعمل على الموقع المباشر فقط.' },
-      kmr: { gate:'Alîkar girêde', note:'EDIT_TOKEN ya xwe binivîse (heman tokena edîtorê).', tokPh:'Tokena guhertinê', conn:'Girêde', ph:'Li ser kirîar, biha, plan, fikiran bipirse…', send:'Bişîne', intro:'Slav Barakat — ez dikarim di bersivên kirîaran, bihayan, planan, fikiran, sernivîs û wergerê de alîkar bim. Bi her zimanî bipirse.', clear:'Paqij bike', thinking:'Difikire…', errKey:'Ji bo çalakkirinê ANTHROPIC_API_KEY li Cloudflare deyne.', err:'Alîkar tenê li ser malpera zindî dixebite.' },
-      fr: { gate:"Connecter l'assistant", note:'Saisissez votre EDIT_TOKEN (le même que l’éditeur).', tokPh:"Jeton d'édition", conn:'Connecter', ph:'Clients, tarifs, briefs, idées…', send:'Envoyer', intro:'Bonjour Barakat — je peux aider pour les réponses clients, devis, briefs, idées, légendes et traduction. Demandez dans n’importe quelle langue.', clear:'Effacer', thinking:'Réflexion…', errKey:'Définissez ANTHROPIC_API_KEY dans Cloudflare pour activer l’assistant.', err:"L'assistant fonctionne sur le site en ligne uniquement." }
+      en: { gate:'Connect the assistant', note:'Enter your EDIT_TOKEN (same as the content editor).', tokPh:'Edit token', conn:'Connect', ph:'Ask about clients, pricing, briefs, ideas…', send:'Send', intro:'Hello Barakat — I can help with client replies, quotes, briefs, ideas, captions and translation. Ask in any language.', clear:'Clear', thinking:'Thinking…', errKey:'Enable Workers AI in Cloudflare (free) to turn this on.', err:'Assistant works on the live site only.' },
+      ku: { gate:'بەستنەوەی یاریدەدەر', note:'EDIT_TOKENـەکەت بنووسە (هەمان تۆکنی ناوەڕۆک).', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', ph:'دەربارەی کڕیار، نرخ، پلان، بیرۆکە بپرسە…', send:'ناردن', intro:'سڵاو بەرەکات — دەتوانم یارمەتیت بدەم لە وەڵامی کڕیار، نرخ، پلانی پڕۆژە، بیرۆکە، کاپشن و وەرگێڕان. بە هەر زمانێک بپرسە.', clear:'پاککردنەوە', thinking:'بیردەکاتەوە…', errKey:'Workers AI لە Cloudflare چالاک بکە (بەخۆڕایی) بۆ کارکردنی.', err:'یاریدەدەر تەنها لەسەر سایتە زیندووەکە کاردەکات.' },
+      ar: { gate:'ربط المساعد', note:'أدخل EDIT_TOKEN (نفس رمز محرر المحتوى).', tokPh:'رمز التحرير', conn:'اتصال', ph:'اسأل عن العملاء، التسعير، الخطط، الأفكار…', send:'إرسال', intro:'مرحباً بركات — أساعدك في ردود العملاء، عروض الأسعار، الخطط، الأفكار، التعليقات والترجمة. اسأل بأي لغة.', clear:'مسح', thinking:'يفكر…', errKey:'فعّل Workers AI في Cloudflare (مجاناً) لتشغيله.', err:'المساعد يعمل على الموقع المباشر فقط.' },
+      kmr: { gate:'Alîkar girêde', note:'EDIT_TOKEN ya xwe binivîse (heman tokena edîtorê).', tokPh:'Tokena guhertinê', conn:'Girêde', ph:'Li ser kirîar, biha, plan, fikiran bipirse…', send:'Bişîne', intro:'Slav Barakat — ez dikarim di bersivên kirîaran, bihayan, planan, fikiran, sernivîs û wergerê de alîkar bim. Bi her zimanî bipirse.', clear:'Paqij bike', thinking:'Difikire…', errKey:'Workers AI li Cloudflare çalak bike (belaş) ji bo vê.', err:'Alîkar tenê li ser malpera zindî dixebite.' },
+      fr: { gate:"Connecter l'assistant", note:'Saisissez votre EDIT_TOKEN (le même que l’éditeur).', tokPh:"Jeton d'édition", conn:'Connecter', ph:'Clients, tarifs, briefs, idées…', send:'Envoyer', intro:'Bonjour Barakat — je peux aider pour les réponses clients, devis, briefs, idées, légendes et traduction. Demandez dans n’importe quelle langue.', clear:'Effacer', thinking:'Réflexion…', errKey:'Activez Workers AI dans Cloudflare (gratuit) pour l’activer.', err:"L'assistant fonctionne sur le site en ligne uniquement." }
     };
     const renderAssistant = () => {
       const t = AT_I18N[curLang()] || AT_I18N.en;
@@ -906,7 +920,7 @@
           .then(r => r.json()).then(d => {
             if (d.ok) { hist.push({ role: 'assistant', content: d.text }); save(); paint(); }
             else if (d.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderAssistant(); }
-            else { typing.classList.remove('asst-typing'); typing.textContent = d.error === 'no-key' ? t.errKey : ('✗ ' + (d.error || '')); }
+            else { typing.classList.remove('asst-typing'); typing.textContent = (d.error === 'no-key' || d.error === 'no-ai') ? t.errKey : ('✗ ' + (d.error || '')); }
           }).catch(() => { typing.classList.remove('asst-typing'); typing.textContent = t.err; });
       });
     };
