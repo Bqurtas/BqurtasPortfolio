@@ -1624,9 +1624,10 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
     border: 1px solid var(--line);
     border-radius: 18px;
     box-shadow: 0 -8px 30px -22px rgba(26,15,8,0.5), 0 26px 50px -34px rgba(0,0,0,0.5);
-    /* size to the content so EVERY card shows all of its information; the cards
-       still pile up on scroll (sticky), they're just each as tall as they need. */
-    height: auto;
+    /* a shared minimum height so short cards (e.g. the social card) match the
+       others and the pile looks even — but taller cards (Tools, Experience)
+       grow past it so every detail still shows. */
+    min-height: min(72vh, 540px);
     overflow: hidden;   /* clips only the decorative quote mark, not real content */
   }
   :root[data-theme="dark"] .bio-stack > .bio-block { background: var(--bg-2); }
@@ -2925,7 +2926,8 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 }
 [dir="rtl"] .to-top { right: auto; left: 28px; }
 .to-top.is-shown { opacity: 1; transform: none; pointer-events: auto; }
-.to-top:hover { background: var(--gold-bright); color: #14100b; }
+/* keep its own colour on hover — only a touch more shadow, no colour change */
+.to-top:hover { box-shadow: 0 18px 42px -12px rgba(0,0,0,0.5); }
 .to-top i { font-size: 14px; position: relative; z-index: 2; transition: transform 0.3s var(--ease); }
 .to-top:hover i { transform: translateY(-2px); }
 .to-top-ring { position: absolute; inset: 0; width: 50px; height: 50px; transform: rotate(-90deg); }

@@ -61,26 +61,13 @@
       const p = Math.min(Math.max(h.scrollTop / max, 0), 1);
       if (railFill) railFill.style.height = (p * 100) + '%';
       if (ring) ring.style.strokeDashoffset = C * (1 - p);
+      /* hidden at the very top of the page; shown once you've scrolled down
+         (and it STAYS shown until you go back up) — in every room. */
+      if (toTop) toTop.classList.toggle('is-shown', h.scrollTop > 200);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
     onScroll();
-
-    /* the go-to-top button shows ONLY while you're scrolling, then fades out
-       when you stop (and never near the very top, where it'd be pointless). */
-    let idleT;
-    if (toTop) {
-      window.addEventListener('scroll', () => {
-        if (document.documentElement.scrollTop > 200) {
-          toTop.classList.add('is-shown');
-          clearTimeout(idleT);
-          idleT = setTimeout(() => toTop.classList.remove('is-shown'), 1100);
-        } else {
-          clearTimeout(idleT);
-          toTop.classList.remove('is-shown');
-        }
-      }, { passive: true });
-    }
 
     toTop && toTop.addEventListener('click', () =>
       window.scrollTo({ top: 0, behavior: 'smooth' }));
