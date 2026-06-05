@@ -2964,8 +2964,22 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 }
 [dir="rtl"] .chat { left: auto; right: calc(var(--rail-w) + 20px); transform-origin: bottom right; }
 .chat.is-open { opacity: 1; pointer-events: auto; transform: none; }
+/* backdrop only shows on mobile (the chat is a bottom sheet there) */
+.chat-backdrop { display: none; }
 /* Mobile: the assistant is a bottom sheet ABOVE the dock (the dock stays visible) */
 @media (max-width: 820px) {
+  .chat-backdrop {
+    display: block; position: fixed; inset: 0; z-index: 799;
+    background: rgba(20,12,6,0.5); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+    opacity: 0; pointer-events: none; transition: opacity 0.32s var(--ease);
+  }
+  .chat-backdrop.is-open { opacity: 1; pointer-events: auto; }
+  .chat-head { position: relative; }
+  /* grab handle — drag the header down to dismiss */
+  .chat-head::before {
+    content: ''; position: absolute; top: 7px; left: 50%; transform: translateX(-50%);
+    width: 40px; height: 4px; border-radius: 999px; background: rgba(255,255,255,0.34);
+  }
   .chat {
     top: auto; bottom: var(--dock-h); left: 0; right: 0;
     width: 100%; max-width: none; height: 62vh; max-height: 62vh;

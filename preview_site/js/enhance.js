@@ -519,8 +519,10 @@
     };
 
     let greeted = false;
+    const backdrop = $('#chatBackdrop');
     const open = () => {
       panel.classList.add('is-open');
+      backdrop && backdrop.classList.add('is-open');
       triggers.forEach(t => t.classList.add('is-active'));
       panel.setAttribute('aria-hidden', 'false');
       if (!greeted) {
@@ -533,11 +535,29 @@
     };
     const close = () => {
       panel.classList.remove('is-open');
+      backdrop && backdrop.classList.remove('is-open');
       triggers.forEach(t => t.classList.remove('is-active'));
       panel.setAttribute('aria-hidden', 'true');
     };
     triggers.forEach(t => t.addEventListener('click', () => panel.classList.contains('is-open') ? close() : open()));
     min && min.addEventListener('click', close);
+    backdrop && backdrop.addEventListener('click', close);
+
+    /* mobile: drag the header downward to dismiss the sheet */
+    const cHead = panel.querySelector('.chat-head');
+    if (cHead) {
+      const isMobile = () => window.matchMedia('(max-width: 820px)').matches;
+      let sy = null, dy = 0, drag = false;
+      const down = (y) => { if (!isMobile()) return; sy = y; dy = 0; drag = true; panel.style.transition = 'none'; };
+      const move = (y) => { if (!drag) return; dy = y - sy; if (dy < 0) dy = 0; panel.style.transform = `translateY(${dy}px)`; };
+      const up = () => { if (!drag) return; drag = false; sy = null; panel.style.transition = ''; panel.style.transform = ''; if (dy > 80) close(); };
+      cHead.addEventListener('touchstart', (e) => down(e.touches[0].clientY), { passive: true });
+      cHead.addEventListener('touchmove', (e) => move(e.touches[0].clientY), { passive: true });
+      cHead.addEventListener('touchend', up);
+      cHead.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'touch') down(e.clientY); });
+      window.addEventListener('pointermove', (e) => { if (drag && e.pointerType !== 'touch') move(e.clientY); });
+      window.addEventListener('pointerup', () => { if (drag) up(); });
+    }
     /* rebuild quick chips in the new language (once) */
     window.__bqLangCb.push(() => { if (greeted) buildQuick(); });
     form.addEventListener('submit', (e) => {
