@@ -814,87 +814,32 @@
       });
     };
 
-    /* ---- Content manager (blog posts → D1 via /api/content) ---- */
+    /* ---- Blog manager — posts live in Supabase (free; edit in its studio) ---- */
+    const SB_STUDIO = 'https://supabase.com/dashboard/project/dcnkhzrishphpismmxuu/editor';
     const CT_I18N = {
-      en: { connect:'Connect the editor', note:'Enter your EDIT_TOKEN (Cloudflare → Settings → Variables).', tokPh:'Edit token', conn:'Connect', neu:'New post', title:'Title', sub:'Subtitle', tag:'Category', date:'Date', num:'No.', read:'Min read', accent:'Accent', img:'Image URL', body:'Body — one paragraph per line', save:'Publish', cancel:'Cancel', empty:'No studio posts yet — add your first note.', saved:'✓ Published', confirm:'Delete this post?', loading:'Loading…', err:'Content API works on the live site only.' },
-      ku: { connect:'بەستنەوەی دەستکاریکەر', note:'EDIT_TOKENـەکەت بنووسە (Cloudflare → ڕێکخستن → Variables).', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', neu:'بابەتی نوێ', title:'سەردێڕ', sub:'ژێر-سەردێڕ', tag:'پۆل', date:'بەروار', num:'ژمارە', read:'خوێندنەوە (خولەک)', accent:'ڕەنگ', img:'بەستەری وێنە', body:'دەق — هەر پەرەگرافێک لە دێڕێک', save:'بڵاوکردنەوە', cancel:'هەڵوەشاندنەوە', empty:'هێشتا بابەت نییە — یەکەمیان زیاد بکە.', saved:'✓ بڵاوکرایەوە', confirm:'ئەم بابەتە بسڕێتەوە؟', loading:'بارکردن…', err:'API تەنها لەسەر سایتە زیندووەکە کاردەکات.' },
-      ar: { connect:'ربط المحرر', note:'أدخل EDIT_TOKEN (Cloudflare → الإعدادات → المتغيرات).', tokPh:'رمز التحرير', conn:'اتصال', neu:'مقال جديد', title:'العنوان', sub:'العنوان الفرعي', tag:'التصنيف', date:'التاريخ', num:'رقم', read:'دقائق القراءة', accent:'اللون', img:'رابط الصورة', body:'النص — فقرة في كل سطر', save:'نشر', cancel:'إلغاء', empty:'لا مقالات بعد — أضف أول واحدة.', saved:'✓ تم النشر', confirm:'حذف هذا المقال؟', loading:'جار التحميل…', err:'واجهة المحتوى تعمل على الموقع المباشر فقط.' },
-      kmr: { connect:'Edîtorê girêde', note:'EDIT_TOKEN ya xwe binivîse (Cloudflare → Mîheng → Variables).', tokPh:'Tokena guhertinê', conn:'Girêde', neu:'Nivîsa nû', title:'Sernav', sub:'Bin-sernav', tag:'Kategorî', date:'Dîrok', num:'Hejmar', read:'Xwendin (deq)', accent:'Reng', img:'Girêdana wêneyê', body:'Nivîs — her paragraf di rêzekê de', save:'Biweşîne', cancel:'Betal', empty:'Hêj nivîs tune — ya yekem zêde bike.', saved:'✓ Hat weşandin', confirm:'Ev nivîs were jêbirin?', loading:'Tê barkirin…', err:'API tenê li ser malpera zindî dixebite.' },
-      fr: { connect:"Connecter l'éditeur", note:'Saisissez votre EDIT_TOKEN (Cloudflare → Réglages → Variables).', tokPh:"Jeton d'édition", conn:'Connecter', neu:'Nouvel article', title:'Titre', sub:'Sous-titre', tag:'Catégorie', date:'Date', num:'N°', read:'Lecture (min)', accent:'Accent', img:"URL de l'image", body:'Texte — un paragraphe par ligne', save:'Publier', cancel:'Annuler', empty:'Aucun article — ajoutez le premier.', saved:'✓ Publié', confirm:'Supprimer cet article ?', loading:'Chargement…', err:"L'API de contenu fonctionne sur le site en ligne uniquement." }
+      en: { open:'Open blog editor', posts:'posts', draft:'draft', loading:'Loading your posts…', empty:'No posts yet — open the editor and write your first.', how:'Add or edit posts in the editor: a title, a subtitle, the body (leave one empty line between paragraphs), and an image URL. Saved posts appear on your blog within moments.', err:'Could not reach the blog (it works on the live site).' },
+      ku: { open:'کردنەوەی دەستکاریکەری بلۆگ', posts:'بابەت', draft:'ڕەشنووس', loading:'بارکردنی بابەتەکانت…', empty:'هێشتا بابەت نییە — دەستکاریکەرەکە بکەرەوە و یەکەمیان بنووسە.', how:'لە دەستکاریکەرەکە بابەت زیاد بکە یان دەستکاری بکە: سەردێڕ، ژێر-سەردێڕ، دەق (دێڕێکی بەتاڵ لە نێوان پەرەگرافەکان)، و بەستەری وێنە. بابەتە پاشەکەوتکراوەکان لە چەند چرکەدا لە بلۆگەکەتدا دەردەکەون.', err:'نەگەیشتە بلۆگ (لەسەر سایتە زیندووەکە کاردەکات).' },
+      ar: { open:'فتح محرر المدونة', posts:'مقالات', draft:'مسودة', loading:'جار تحميل مقالاتك…', empty:'لا مقالات بعد — افتح المحرر واكتب أول واحدة.', how:'أضف أو حرّر المقالات في المحرر: عنوان، عنوان فرعي، النص (اترك سطراً فارغاً بين الفقرات)، ورابط صورة. تظهر المقالات المحفوظة في مدونتك خلال لحظات.', err:'تعذّر الوصول إلى المدونة (تعمل على الموقع المباشر).' },
+      kmr: { open:'Edîtorê blogê veke', posts:'nivîs', draft:'reşnivîs', loading:'Nivîsên te tên barkirin…', empty:'Hêj nivîs tune — edîtorê veke û ya yekem binivîse.', how:'Di edîtorê de nivîsan zêde bike an biguherîne: sernav, bin-sernav, nivîs (rêzeke vala di navbera paragrafan), û girêdana wêneyê. Nivîsên tomarkirî di çend kêliyan de li blogê xuya dibin.', err:'Negihîşt blogê (li ser malpera zindî dixebite).' },
+      fr: { open:"Ouvrir l'éditeur du blog", posts:'articles', draft:'brouillon', loading:'Chargement de vos articles…', empty:"Aucun article — ouvrez l'éditeur et écrivez le premier.", how:"Ajoutez ou modifiez les articles dans l'éditeur : titre, sous-titre, texte (laissez une ligne vide entre les paragraphes), et URL d'image. Les articles enregistrés apparaissent sur votre blog en quelques instants.", err:'Blog inaccessible (fonctionne sur le site en ligne).' }
     };
     const editToken = () => { try { return localStorage.getItem('bq_edit_token') || ''; } catch (e) { return ''; } };
     const renderContent = () => {
       const t = CT_I18N[curLang()] || CT_I18N.en;
-      const token = editToken();
-      if (!token) {
-        view.innerHTML = `<div class="dash-gate-inline">
-          <i class="fa-solid fa-feather-pointed dash-gate-icon"></i>
-          <h3>${t.connect}</h3><p class="mono">${t.note}</p>
-          <form id="ctTokForm" class="dash-login"><input type="password" id="ctTok" placeholder="${t.tokPh}" autocomplete="off"><button type="submit">${t.conn} <i class="fa-solid fa-arrow-right"></i></button></form></div>`;
-        $('#ctTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#ctTok').value.trim(); if (!v) return; try { localStorage.setItem('bq_edit_token', v); } catch (x) {} renderContent(); });
-        return;
-      }
+      const SB = window.BQ_SUPA || {};
       view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i><br>${t.loading}</p>`;
-      fetch('/api/content').then(r => r.json()).then(d => {
-        const posts = (d && d.posts) || [];
-        const rows = posts.length ? posts.map(p => `
-          <div class="cms-row">
-            <span class="cms-row-t"><strong>${esc(p.title)}</strong><span class="mono">${esc(p.tag)} · ${esc(p.date)}</span></span>
-            <span class="cms-row-act"><button class="cms-edit" data-id="${esc(p.id)}" aria-label="Edit"><i class="fa-solid fa-pen"></i></button><button class="cms-del" data-id="${esc(p.id)}" aria-label="Delete"><i class="fa-solid fa-trash"></i></button></span>
-          </div>`).join('') : `<p class="dash-dim mono">${t.empty}</p>`;
-        view.innerHTML = `
-          <div class="cms-head"><button class="dash-btn" id="cmsNew"><i class="fa-solid fa-plus"></i> ${t.neu}</button><span class="mono cms-status" id="cmsStatus"></span></div>
-          <div class="cms-list">${rows}</div>
-          <form class="cms-form" id="cmsForm" hidden>
-            <input type="hidden" id="fId">
-            <div class="dash-field"><span class="mono">${t.title}</span><input id="fTitle" type="text"></div>
-            <div class="dash-field"><span class="mono">${t.sub}</span><input id="fSub" type="text"></div>
-            <div class="cms-grid">
-              <div class="dash-field"><span class="mono">${t.tag}</span><input id="fTag" type="text"></div>
-              <div class="dash-field"><span class="mono">${t.date}</span><input id="fDate" type="text" placeholder="Jun 2026"></div>
-              <div class="dash-field"><span class="mono">${t.num}</span><input id="fNum" type="text"></div>
-              <div class="dash-field"><span class="mono">${t.read}</span><input id="fRead" type="number" value="4"></div>
-              <div class="dash-field"><span class="mono">${t.accent}</span><input id="fAccent" type="text" value="#1a2740"></div>
-            </div>
-            <div class="dash-field"><span class="mono">${t.img}</span><input id="fImg" type="text" placeholder="https://…"></div>
-            <div class="dash-field"><span class="mono">${t.body}</span><textarea id="fBody" rows="6"></textarea></div>
-            <div class="cms-form-act">
-              <button type="submit" class="dash-btn"><i class="fa-solid fa-cloud-arrow-up"></i> ${t.save}</button>
-              <button type="button" class="dash-btn" id="cmsCancel">${t.cancel}</button>
-            </div>
-          </form>`;
-        const form = $('#cmsForm');
-        const fill = (p) => {
-          $('#fId').value = p ? p.id : ''; $('#fTitle').value = p ? p.title : ''; $('#fSub').value = p ? p.sub : '';
-          $('#fTag').value = p ? p.tag : ''; $('#fDate').value = p ? p.date : ''; $('#fNum').value = p ? p.num : '';
-          $('#fRead').value = p ? p.read : 4; $('#fAccent').value = p ? (p.accent || '#1a2740') : '#1a2740';
-          $('#fImg').value = p ? p.img : ''; $('#fBody').value = p ? (p.body || []).join('\n') : '';
-          form.hidden = false; form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        };
-        $('#cmsNew').addEventListener('click', () => fill(null));
-        $('#cmsCancel').addEventListener('click', () => { form.hidden = true; });
-        $$('.cms-edit').forEach(b => b.addEventListener('click', () => fill(posts.find(x => x.id === b.dataset.id))));
-        $$('.cms-del').forEach(b => b.addEventListener('click', () => {
-          if (!confirm(t.confirm)) return;
-          fetch('/api/content?id=' + encodeURIComponent(b.dataset.id), { method: 'DELETE', headers: { 'x-edit-token': token } })
-            .then(r => r.json()).then(() => renderContent());
-        }));
-        form.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const payload = { id: $('#fId').value.trim(), title: $('#fTitle').value.trim(), sub: $('#fSub').value.trim(),
-            tag: $('#fTag').value.trim(), date: $('#fDate').value.trim(), num: $('#fNum').value.trim(),
-            read: parseInt($('#fRead').value, 10) || 4, accent: $('#fAccent').value.trim(), img: $('#fImg').value.trim(),
-            body: $('#fBody').value.split('\n').map(s => s.trim()).filter(Boolean) };
-          if (!payload.title) return;
-          const st = $('#cmsStatus'); st.textContent = '…';
-          fetch('/api/content', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-edit-token': token }, body: JSON.stringify(payload) })
-            .then(r => r.json()).then(d2 => {
-              if (d2.ok) { st.textContent = t.saved; renderContent(); }
-              else if (d2.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); }
-              else { st.textContent = '✗ ' + (d2.error || ''); }
-            });
-        });
-      }).catch(() => { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${t.err}</p>`; });
+      fetch(SB.url + '/rest/v1/posts?select=id,title,tag,date,created_at,published&order=created_at.desc', { headers: { apikey: SB.key } })
+        .then(r => r.json()).then(rows => {
+          const list = Array.isArray(rows) ? rows : [];
+          const rowsHtml = list.length ? list.map(p => {
+            const d = p.date || (p.created_at ? new Date(p.created_at).toLocaleDateString('en', { month: 'short', year: 'numeric' }) : '');
+            return `<div class="cms-row"><span class="cms-row-t"><strong>${esc(p.title)}</strong><span class="mono">${esc(p.tag || 'Note')} · ${esc(d)}${p.published === false ? ' · ' + t.draft : ''}</span></span></div>`;
+          }).join('') : `<p class="dash-dim mono">${t.empty}</p>`;
+          view.innerHTML = `
+            <div class="cms-head"><a class="dash-btn" href="${SB_STUDIO}" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square"></i> ${t.open}</a><span class="mono cms-status">${list.length} ${t.posts}</span></div>
+            <p class="dash-note mono">${t.how}</p>
+            <div class="cms-list">${rowsHtml}</div>`;
+        }).catch(() => { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${t.err}</p>`; });
     };
 
     /* ---- AI assistant (private; proxied via /api/assistant) ---- */
@@ -1233,19 +1178,31 @@
     });
 
     renderPage();
-    /* merge studio-managed posts from the CMS (D1) ahead of the built-in notes;
-       fails silently to the built-ins so the live blog can never break. */
-    fetch('/api/content').then(r => r.json()).then(d => {
-      if (!d || !d.ok || !Array.isArray(d.posts) || !d.posts.length) return;
-      const cms = d.posts.map(p => ({
-        num: String(p.num || p.id || ''), tag: p.tag || '', date: p.date || '',
-        read: p.read || 4, accent: p.accent || '#1a2740', img: p.img || '',
-        title: p.title || '', sub: p.sub || '', body: Array.isArray(p.body) ? p.body : []
-      }));
-      POSTS = cms.concat(POSTS);
-      pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
-      page = 1; renderPage();
-    }).catch(() => {});
+    /* merge studio-managed posts from Supabase ahead of the built-in notes;
+       fails silently to the built-ins so the live blog can never break.
+       (SB_KEY is a public "publishable" key — safe in the client; the database
+       is protected by row-level security so visitors can only READ posts.) */
+    const SB = window.BQ_SUPA || {};
+    if (SB.url && SB.key) {
+      fetch(SB.url + '/rest/v1/posts?select=*&published=eq.true&order=created_at.desc', { headers: { apikey: SB.key } })
+        .then(r => r.json()).then(rows => {
+          if (!Array.isArray(rows) || !rows.length) return;
+          const cms = rows.map(p => ({
+            num: String(p.num || p.id || ''),
+            tag: p.tag || 'Note',
+            date: p.date || (p.created_at ? new Date(p.created_at).toLocaleDateString('en', { month: 'short', year: 'numeric' }) : ''),
+            read: p.read_minutes || 4,
+            accent: p.accent || '#1a2740',
+            img: p.cover || '',
+            title: p.title || '',
+            sub: p.subtitle || '',
+            body: String(p.body || '').split(/\n\s*\n/).map(s => s.trim()).filter(Boolean)
+          }));
+          POSTS = cms.concat(POSTS);
+          pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
+          page = 1; renderPage();
+        }).catch(() => {});
+    }
     window.__bqLangCb.push(() => {
       renderPage();
       if (reader && reader.classList.contains('is-open') && curPostObj) {
