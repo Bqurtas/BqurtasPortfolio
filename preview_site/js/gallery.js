@@ -6,6 +6,11 @@
 window.BQ_GALLERY = {
 
   CDN_BASE: 'https://cdn.jsdelivr.net/gh/Bqurtas/BqurtasPortfolio@main',
+  RAW_BASE: 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main',
+  REPO:     'Bqurtas/BqurtasPortfolio',
+  BRANCH:   'main',
+  _loaded:  false,
+  _ok:      false,
 
   /* Each collection: folder, file prefix, extension, count,
      cat = data-cat used for tab filtering (defaults to key),
@@ -28,25 +33,96 @@ window.BQ_GALLERY = {
     video:       { folder: 'Videos',        prefix: 'Videos',      ext: 'mp4',  count: 30,  cat: 'video',       tag: 'Video',         icon: 'fa-video',          title: 'Video' },
   },
 
+  /* Direct CDN url for a collection + 1-based index. If a live folder
+     manifest was loaded it maps the index to the real filename; otherwise
+     it falls back to the static prefix+number scheme. */
   url(coll, i) {
     const c = this.COLLECTIONS[coll];
+    if (c.files && c.files[i - 1] != null)
+      return `${this.CDN_BASE}/${c.folder}/${encodeURIComponent(c.files[i - 1])}`;
     return `${this.CDN_BASE}/${c.folder}/${c.prefix}${i}.${c.ext}`;
+  },
+
+  /* raw.githubusercontent fallback for the same item — used when jsDelivr
+     hasn't cached a brand-new file yet, so freshly dropped work still shows. */
+  rawUrl(coll, i) {
+    const c = this.COLLECTIONS[coll];
+    if (c.files && c.files[i - 1] != null)
+      return `${this.RAW_BASE}/${c.folder}/${encodeURIComponent(c.files[i - 1])}`;
+    return `${this.RAW_BASE}/${c.folder}/${c.prefix}${i}.${c.ext}`;
   },
 
   items(coll) {
     const c   = this.COLLECTIONS[coll];
     const cat = c.cat || coll;
-    const type = c.ext === 'mp4' ? 'video' : 'image';
+    const n   = (c.files && c.files.length) ? c.files.length : c.count;
     const out = [];
-    for (let i = 1; i <= c.count; i++) {
+    for (let i = 1; i <= n; i++) {
+      const fname = c.files ? c.files[i - 1] : null;
+      const type  = fname ? (/\.(mp4|webm|mov)$/i.test(fname) ? 'video' : 'image')
+                          : (c.ext === 'mp4' ? 'video' : 'image');
       out.push({ coll, cat, index: i, type,
-        url:   this.url(coll, i),
-        title: `${c.title} ${String(i).padStart(2, '0')}`,
+        url:    this.url(coll, i),
+        rawUrl: this.rawUrl(coll, i),
+        title:  `${c.title} ${String(i).padStart(2, '0')}`,
         titlePrefix: c.title,
         tag: c.tag, icon: c.icon,
       });
     }
     return out;
+  },
+
+  /* ── Auto-discover real folder contents from GitHub ───────────────────
+     ONE call to the Git Trees API lists the whole repo, so dropping any
+     image/video into a folder makes it appear on the site with NO code
+     change and NO required filename pattern. Result is cached briefly per
+     session; on any failure (offline / API rate-limit) it silently keeps
+     the static counts above, so the gallery can never break. */
+  async loadManifest() {
+    if (this._loaded) return this._ok;
+    this._loaded = true;
+    const KEY = 'bq_gallery_tree_v1', TTL = 5 * 60 * 1000;   // 5-min freshness
+    let paths = null;
+    try {
+      const hit = JSON.parse(sessionStorage.getItem(KEY) || 'null');
+      if (hit && Array.isArray(hit.paths) && (Date.now() - hit.t) < TTL) paths = hit.paths;
+    } catch (e) {}
+    if (!paths) {
+      try {
+        const ctrl  = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 6000);
+        const r = await fetch(
+          `https://api.github.com/repos/${this.REPO}/git/trees/${this.BRANCH}?recursive=1`,
+          { signal: ctrl.signal, headers: { Accept: 'application/vnd.github+json' } });
+        clearTimeout(timer);
+        if (r.ok) {
+          const j = await r.json();
+          if (j && Array.isArray(j.tree))
+            paths = j.tree.filter(n => n.type === 'blob').map(n => n.path);
+          if (paths) { try { sessionStorage.setItem(KEY, JSON.stringify({ t: Date.now(), paths })); } catch (e) {} }
+        }
+      } catch (e) {}
+    }
+    if (!paths) return (this._ok = false);
+
+    const IMG = /\.(webp|jpe?g|png|gif|avif|svg)$/i;
+    const VID = /\.(mp4|webm|mov)$/i;
+    const byFolder = {};
+    for (const p of paths) {
+      const slash = p.indexOf('/');
+      if (slash < 0) continue;
+      const folder = p.slice(0, slash);
+      const file   = p.slice(slash + 1);
+      if (file.indexOf('/') >= 0) continue;            // direct children only
+      if (!IMG.test(file) && !VID.test(file)) continue;
+      (byFolder[folder] || (byFolder[folder] = [])).push(file);
+    }
+    const nat = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+    for (const k of Object.keys(this.COLLECTIONS)) {
+      const c = this.COLLECTIONS[k], list = byFolder[c.folder];
+      if (list && list.length) { c.files = list.sort(nat); c.count = c.files.length; }
+    }
+    return (this._ok = true);
   },
 
   all() {
@@ -59,9 +135,13 @@ window.BQ_GALLERY = {
 /* =========================================================
    Build cards inside #grid
    ========================================================= */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const grid = document.getElementById('grid');
   if (!grid) return;
+
+  /* Auto-discover real folder contents from GitHub (silent fallback to the
+     static counts if it fails) BEFORE building, so new work shows itself. */
+  await window.BQ_GALLERY.loadManifest();
 
   /* Remove loading spinner */
   const loader = document.getElementById('galleryLoading');
@@ -112,9 +192,13 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </div>`;
 
-    /* drop the card if its file is missing (folders have sparse numbering) */
+    /* On error try raw.githubusercontent once (covers brand-new files that
+       jsDelivr hasn't cached yet); only then drop the card. */
     const media = article.querySelector('img, video');
-    media.addEventListener('error', () => article.remove(), { once: true });
+    media.addEventListener('error', () => {
+      if (item.rawUrl && !media.dataset.fb) { media.dataset.fb = '1'; media.src = item.rawUrl; return; }
+      article.remove();
+    });
     return article;
   };
 
@@ -149,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
       div.dataset.type  = 'image';
       div.innerHTML = `
         <div class="cert-img-wrap">
-          <img loading="lazy" src="${item.url}" alt="${dispTitle}" />
+          <img loading="lazy" src="${item.url}" data-raw="${item.rawUrl}" alt="${dispTitle}" />
           <div class="cert-zoom"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
         </div>
         <span class="mono cert-label">${dispTitle}</span>`;
@@ -157,9 +241,13 @@ document.addEventListener('DOMContentLoaded', () => {
       certGrid.appendChild(div);
     });
 
-    /* error fallback for cert images */
+    /* error fallback for cert images: raw.githubusercontent once, then drop */
     certGrid.querySelectorAll('img').forEach(img => {
-      img.addEventListener('error', () => img.closest('.cert-item')?.remove());
+      img.addEventListener('error', () => {
+        const raw = img.dataset.raw;
+        if (raw && !img.dataset.fb) { img.dataset.fb = '1'; img.src = raw; return; }
+        img.closest('.cert-item')?.remove();
+      });
     });
 
     /* open lightbox on cert click */

@@ -816,30 +816,125 @@
 
     /* ---- Blog manager — posts live in Supabase (free; edit in its studio) ---- */
     const SB_STUDIO = 'https://supabase.com/dashboard/project/dcnkhzrishphpismmxuu/editor';
-    const CT_I18N = {
-      en: { open:'Open blog editor', posts:'posts', draft:'draft', loading:'Loading your posts…', empty:'No posts yet — open the editor and write your first.', how:'Add or edit posts in the editor: a title, a subtitle, the body (leave one empty line between paragraphs), and an image URL. Saved posts appear on your blog within moments.', err:'Could not reach the blog (it works on the live site).' },
-      ku: { open:'کردنەوەی دەستکاریکەری بلۆگ', posts:'بابەت', draft:'ڕەشنووس', loading:'بارکردنی بابەتەکانت…', empty:'هێشتا بابەت نییە — دەستکاریکەرەکە بکەرەوە و یەکەمیان بنووسە.', how:'لە دەستکاریکەرەکە بابەت زیاد بکە یان دەستکاری بکە: سەردێڕ، ژێر-سەردێڕ، دەق (دێڕێکی بەتاڵ لە نێوان پەرەگرافەکان)، و بەستەری وێنە. بابەتە پاشەکەوتکراوەکان لە چەند چرکەدا لە بلۆگەکەتدا دەردەکەون.', err:'نەگەیشتە بلۆگ (لەسەر سایتە زیندووەکە کاردەکات).' },
-      ar: { open:'فتح محرر المدونة', posts:'مقالات', draft:'مسودة', loading:'جار تحميل مقالاتك…', empty:'لا مقالات بعد — افتح المحرر واكتب أول واحدة.', how:'أضف أو حرّر المقالات في المحرر: عنوان، عنوان فرعي، النص (اترك سطراً فارغاً بين الفقرات)، ورابط صورة. تظهر المقالات المحفوظة في مدونتك خلال لحظات.', err:'تعذّر الوصول إلى المدونة (تعمل على الموقع المباشر).' },
-      kmr: { open:'Edîtorê blogê veke', posts:'nivîs', draft:'reşnivîs', loading:'Nivîsên te tên barkirin…', empty:'Hêj nivîs tune — edîtorê veke û ya yekem binivîse.', how:'Di edîtorê de nivîsan zêde bike an biguherîne: sernav, bin-sernav, nivîs (rêzeke vala di navbera paragrafan), û girêdana wêneyê. Nivîsên tomarkirî di çend kêliyan de li blogê xuya dibin.', err:'Negihîşt blogê (li ser malpera zindî dixebite).' },
-      fr: { open:"Ouvrir l'éditeur du blog", posts:'articles', draft:'brouillon', loading:'Chargement de vos articles…', empty:"Aucun article — ouvrez l'éditeur et écrivez le premier.", how:"Ajoutez ou modifiez les articles dans l'éditeur : titre, sous-titre, texte (laissez une ligne vide entre les paragraphes), et URL d'image. Les articles enregistrés apparaissent sur votre blog en quelques instants.", err:'Blog inaccessible (fonctionne sur le site en ligne).' }
+        const CT_I18N = {
+      en: { gate:'Publish to your blog', note:'Enter your edit token to write, edit and publish posts.', tokPh:'Edit token', conn:'Connect', newBtn:'Write new post', editBtn:'Edit', delBtn:'Delete', delAsk:'Delete this post permanently?', fTitle:'Title', fSub:'Subtitle', fTag:'Label', fCover:'Cover image link', fCoverPh:'https://…  paste any image link', fAccent:'Accent', fMin:'Read (min)', fBody:'Body', fBodyPh:'Write your post here…  Leave one empty line between paragraphs.', fPub:'Published — visible on the site', save:'Publish', saving:'Publishing…', savedMsg:"Saved — it's on your blog now.", cancel:'Cancel', back:'All posts', loading:'Loading your posts…', empty:'No posts yet — write your first one.', err:'Could not reach the blog service (works on the live site).', needTitle:'Please add a title.', posts:'posts', draft:'draft', studio:'Advanced (raw database)' },
+      ku: { gate:'بڵاوکردنەوە بۆ بلۆگەکەت', note:'تۆکنی دەستکاریت بنووسە بۆ نووسین، دەستکاری و بڵاوکردنەوەی بابەت.', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', newBtn:'نووسینی بابەتی نوێ', editBtn:'دەستکاری', delBtn:'سڕینەوە', delAsk:'ئەم بابەتە بە تەواوی بسڕێتەوە؟', fTitle:'سەردێڕ', fSub:'ژێر-سەردێڕ', fTag:'لەیبڵ', fCover:'بەستەری وێنەی سەرەکی', fCoverPh:'https://…  هەر بەستەرێکی وێنە', fAccent:'ڕەنگ', fMin:'خوێندنەوە (خ)', fBody:'دەق', fBodyPh:'لێرە بابەتەکەت بنووسە…  دێڕێکی بەتاڵ لە نێوان پەرەگرافەکان بهێڵە.', fPub:'بڵاوکراوە — لەسەر سایت دیارە', save:'بڵاوکردنەوە', saving:'بڵاودەکرێتەوە…', savedMsg:'پاشەکەوتکرا — ئێستا لەسەر بلۆگەکەتە.', cancel:'هەڵوەشاندنەوە', back:'هەموو بابەتەکان', loading:'بارکردنی بابەتەکانت…', empty:'هێشتا بابەت نییە — یەکەمیان بنووسە.', err:'نەگەیشتە خزمەتگوزاری بلۆگ (لەسەر سایتە زیندووەکە کاردەکات).', needTitle:'تکایە سەردێڕێک زیاد بکە.', posts:'بابەت', draft:'ڕەشنووس', studio:'پێشکەوتوو (داتابەیس)' },
+      ar: { gate:'انشر في مدونتك', note:'أدخل رمز التحرير للكتابة والتعديل والنشر.', tokPh:'رمز التحرير', conn:'اتصال', newBtn:'كتابة مقال جديد', editBtn:'تعديل', delBtn:'حذف', delAsk:'حذف هذا المقال نهائياً؟', fTitle:'العنوان', fSub:'العنوان الفرعي', fTag:'التصنيف', fCover:'رابط صورة الغلاف', fCoverPh:'https://…  ألصق أي رابط صورة', fAccent:'اللون', fMin:'القراءة (د)', fBody:'النص', fBodyPh:'اكتب مقالك هنا…  اترك سطراً فارغاً بين الفقرات.', fPub:'منشور — ظاهر على الموقع', save:'نشر', saving:'جارٍ النشر…', savedMsg:'تم الحفظ — إنه الآن على مدونتك.', cancel:'إلغاء', back:'كل المقالات', loading:'جارٍ تحميل مقالاتك…', empty:'لا مقالات بعد — اكتب أول واحد.', err:'تعذّر الوصول إلى خدمة المدونة (تعمل على الموقع المباشر).', needTitle:'الرجاء إضافة عنوان.', posts:'مقالات', draft:'مسودة', studio:'متقدم (قاعدة البيانات)' },
+      kmr: { gate:'Li blogê biweşîne', note:'Ji bo nivîsîn, guhertin û weşandinê tokena xwe binivîse.', tokPh:'Tokena guhertinê', conn:'Girêde', newBtn:'Nivîsa nû binivîse', editBtn:'Biguhere', delBtn:'Jê bibe', delAsk:'Ev nivîs bi temamî were jêbirin?', fTitle:'Sernav', fSub:'Bin-sernav', fTag:'Etîket', fCover:'Girêdana wêneyê', fCoverPh:'https://…  her girêdana wêneyê', fAccent:'Reng', fMin:'Xwendin (deq)', fBody:'Nivîs', fBodyPh:'Nivîsa xwe li vir binivîse…  Rêzeke vala di navbera paragrafan de bihêle.', fPub:'Weşandî — li ser malperê xuya ye', save:'Biweşîne', saving:'Tê weşandin…', savedMsg:'Hat tomarkirin — niha li ser blogê ye.', cancel:'Betal', back:'Hemû nivîs', loading:'Nivîsên te tên barkirin…', empty:'Hêj nivîs tune — ya yekem binivîse.', err:'Negihîşt xizmeta blogê (li ser malpera zindî dixebite).', needTitle:'Ji kerema xwe sernavekê zêde bike.', posts:'nivîs', draft:'reşnivîs', studio:'Pêşketî (database)' },
+      fr: { gate:'Publier sur votre blog', note:"Saisissez votre jeton d'édition pour écrire, modifier et publier.", tokPh:"Jeton d'édition", conn:'Connecter', newBtn:'Écrire un article', editBtn:'Modifier', delBtn:'Supprimer', delAsk:'Supprimer définitivement cet article ?', fTitle:'Titre', fSub:'Sous-titre', fTag:'Étiquette', fCover:"Lien de l'image", fCoverPh:"https://…  collez un lien d'image", fAccent:'Couleur', fMin:'Lecture (min)', fBody:'Texte', fBodyPh:'Écrivez votre article ici…  Laissez une ligne vide entre les paragraphes.', fPub:'Publié — visible sur le site', save:'Publier', saving:'Publication…', savedMsg:"Enregistré — c'est sur votre blog.", cancel:'Annuler', back:'Tous les articles', loading:'Chargement de vos articles…', empty:'Aucun article — écrivez le premier.', err:'Service du blog inaccessible (fonctionne sur le site en ligne).', needTitle:'Veuillez ajouter un titre.', posts:'articles', draft:'brouillon', studio:'Avancé (base de données)' }
     };
     const editToken = () => { try { return localStorage.getItem('bq_edit_token') || ''; } catch (e) { return ''; } };
-    const renderContent = () => {
-      const t = CT_I18N[curLang()] || CT_I18N.en;
+        const cmsApi = (payload) => {
       const SB = window.BQ_SUPA || {};
+      return fetch(SB.url + '/functions/v1/blog-admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: SB.key, Authorization: 'Bearer ' + SB.key, 'x-edit-token': editToken() },
+        body: JSON.stringify(payload)
+      }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
+    };
+    let CMS_POSTS = [];
+    const cmsGate = () => {
+      const t = CT_I18N[curLang()] || CT_I18N.en;
+      view.innerHTML = `<div class="dash-gate-inline">
+        <i class="fa-solid fa-feather-pointed dash-gate-icon"></i>
+        <h3>${t.gate}</h3><p class="mono">${t.note}</p>
+        <form id="ctTokForm" class="dash-login"><input type="password" id="ctTok" placeholder="${t.tokPh}" autocomplete="off"><button type="submit">${t.conn} <i class="fa-solid fa-arrow-right"></i></button></form></div>`;
+      $('#ctTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#ctTok').value.trim(); if (!v) return; try { localStorage.setItem('bq_edit_token', v); } catch (x) {} renderContent(); });
+    };
+    const cmsList = () => {
+      const t = CT_I18N[curLang()] || CT_I18N.en;
       view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i><br>${t.loading}</p>`;
-      fetch(SB.url + '/rest/v1/posts?select=id,title,tag,date,created_at,published&order=created_at.desc', { headers: { apikey: SB.key } })
-        .then(r => r.json()).then(rows => {
-          const list = Array.isArray(rows) ? rows : [];
-          const rowsHtml = list.length ? list.map(p => {
-            const d = p.date || (p.created_at ? new Date(p.created_at).toLocaleDateString('en', { month: 'short', year: 'numeric' }) : '');
-            return `<div class="cms-row"><span class="cms-row-t"><strong>${esc(p.title)}</strong><span class="mono">${esc(p.tag || 'Note')} · ${esc(d)}${p.published === false ? ' · ' + t.draft : ''}</span></span></div>`;
-          }).join('') : `<p class="dash-dim mono">${t.empty}</p>`;
-          view.innerHTML = `
-            <div class="cms-head"><a class="dash-btn" href="${SB_STUDIO}" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square"></i> ${t.open}</a><span class="mono cms-status">${list.length} ${t.posts}</span></div>
-            <p class="dash-note mono">${t.how}</p>
-            <div class="cms-list">${rowsHtml}</div>`;
-        }).catch(() => { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${t.err}</p>`; });
+      cmsApi({ action: 'list' }).then(d => {
+        if (d && d.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
+        if (!d || !d.ok) { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${t.err}</p><button class="dash-btn" id="ctRetry"><i class="fa-solid fa-rotate"></i> ${t.conn}</button>`; const rb = $('#ctRetry'); if (rb) rb.addEventListener('click', cmsList); return; }
+        CMS_POSTS = Array.isArray(d.posts) ? d.posts : [];
+        const rows = CMS_POSTS.length ? CMS_POSTS.map((p) => {
+          const dd = p.date || (p.created_at ? new Date(p.created_at).toLocaleDateString('en', { month: 'short', year: 'numeric' }) : '');
+          return `<div class="cms-row" data-id="${p.id}">
+            <span class="cms-row-t"><strong>${esc(p.title || '')}</strong><span class="mono">${esc(p.tag || 'Note')} · ${esc(dd)}${p.published === false ? ' · ' + t.draft : ''}</span></span>
+            <span class="cms-row-act">
+              <button class="cms-mini" data-act="edit" data-id="${p.id}" title="${t.editBtn}"><i class="fa-solid fa-pen"></i></button>
+              <button class="cms-mini cms-mini--del" data-act="del" data-id="${p.id}" title="${t.delBtn}"><i class="fa-solid fa-trash-can"></i></button>
+            </span></div>`;
+        }).join('') : `<p class="dash-dim mono">${t.empty}</p>`;
+        view.innerHTML = `
+          <div class="cms-head">
+            <button class="dash-btn dash-btn--go" id="ctNew"><i class="fa-solid fa-feather-pointed"></i> ${t.newBtn}</button>
+            <span class="mono cms-status">${CMS_POSTS.length} ${t.posts}</span>
+          </div>
+          <div class="cms-list">${rows}</div>
+          <a class="cms-studio mono" href="${SB_STUDIO}" target="_blank" rel="noopener"><i class="fa-solid fa-database"></i> ${t.studio}</a>`;
+        $('#ctNew').addEventListener('click', () => cmsEdit(null));
+        view.querySelectorAll('.cms-mini').forEach((b) => b.addEventListener('click', () => {
+          const id = b.getAttribute('data-id'), act = b.getAttribute('data-act');
+          if (act === 'edit') cmsEdit(CMS_POSTS.find((p) => String(p.id) === String(id)));
+          else cmsDel(id);
+        }));
+      }).catch(() => { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${t.err}</p>`; });
+    };
+    const cmsDel = (id) => {
+      const t = CT_I18N[curLang()] || CT_I18N.en;
+      if (!window.confirm(t.delAsk)) return;
+      cmsApi({ action: 'delete', id: Number(id) }).then((d) => {
+        if (d && d.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
+        try { if (window.__bqReloadBlog) window.__bqReloadBlog(); } catch (x) {}
+        cmsList();
+      });
+    };
+    const cmsEdit = (post) => {
+      const t = CT_I18N[curLang()] || CT_I18N.en;
+      const p = post || {};
+      const accent = p.accent || '#1a2740';
+      view.innerHTML = `
+        <div class="cms-head"><button class="dash-btn" id="ctBack"><i class="fa-solid fa-arrow-left"></i> ${t.back}</button>
+          <span class="mono cms-status">${p.id ? t.editBtn : t.newBtn}</span></div>
+        <form id="ctForm" class="cms-form">
+          <label class="cms-field"><span>${t.fTitle}</span><input id="cf_title" type="text" value="${esc(p.title || '')}" required></label>
+          <label class="cms-field"><span>${t.fSub}</span><input id="cf_sub" type="text" value="${esc(p.subtitle || '')}"></label>
+          <div class="cms-row3">
+            <label class="cms-field"><span>${t.fTag}</span><input id="cf_tag" type="text" value="${esc(p.tag || 'Note')}"></label>
+            <label class="cms-field"><span>${t.fMin}</span><input id="cf_min" type="number" min="1" max="60" value="${esc(String(p.read_minutes || 4))}"></label>
+            <label class="cms-field cms-field--color"><span>${t.fAccent}</span><input id="cf_accent" type="color" value="${esc(accent)}"></label>
+          </div>
+          <label class="cms-field"><span>${t.fCover}</span><input id="cf_cover" type="url" value="${esc(p.cover || '')}" placeholder="${esc(t.fCoverPh)}"></label>
+          <div class="cms-cover-prev" id="cf_prev"${p.cover ? '' : ' hidden'}><img src="${esc(p.cover || '')}" alt=""></div>
+          <label class="cms-field"><span>${t.fBody}</span><textarea id="cf_body" rows="12" placeholder="${esc(t.fBodyPh)}">${esc(p.body || '')}</textarea></label>
+          <label class="cms-check"><input type="checkbox" id="cf_pub" ${p.published === false ? '' : 'checked'}> <span>${t.fPub}</span></label>
+          <div class="cms-actions">
+            <button type="submit" class="dash-btn dash-btn--go" id="ctSave"><i class="fa-solid fa-paper-plane"></i> ${t.save}</button>
+            <button type="button" class="dash-btn" id="ctCancel">${t.cancel}</button>
+            <span class="mono cms-savemsg" id="ctMsg"></span>
+          </div>
+        </form>`;
+      $('#ctBack').addEventListener('click', cmsList);
+      $('#ctCancel').addEventListener('click', cmsList);
+      const cover = $('#cf_cover'), prev = $('#cf_prev');
+      cover.addEventListener('input', () => { const v = cover.value.trim(); if (v) { prev.hidden = false; prev.querySelector('img').src = v; } else { prev.hidden = true; } });
+      $('#ctForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = $('#cf_title').value.trim();
+        const msg = $('#ctMsg');
+        if (!title) { msg.textContent = t.needTitle; return; }
+        const payload = { action: 'upsert', post: {
+          id: p.id || undefined, title,
+          subtitle: $('#cf_sub').value, tag: $('#cf_tag').value.trim() || 'Note',
+          read_minutes: Number($('#cf_min').value) || 4, accent: $('#cf_accent').value,
+          cover: $('#cf_cover').value.trim(), body: $('#cf_body').value, published: $('#cf_pub').checked
+        } };
+        const btn = $('#ctSave'); btn.disabled = true; msg.textContent = t.saving;
+        cmsApi(payload).then((d) => {
+          btn.disabled = false;
+          if (d && d.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
+          if (!d || !d.ok) { msg.textContent = '✗ ' + ((d && d.error) || ''); return; }
+          msg.textContent = t.savedMsg;
+          try { if (window.__bqReloadBlog) window.__bqReloadBlog(); } catch (x) {}
+          setTimeout(cmsList, 800);
+        }).catch(() => { btn.disabled = false; msg.textContent = t.err; });
+      });
+    };
+    const renderContent = () => {
+      if (!editToken()) { cmsGate(); return; }
+      cmsList();
     };
 
     /* ---- AI assistant (private; proxied via /api/assistant) ---- */
@@ -1178,16 +1273,18 @@
     });
 
     renderPage();
-    /* merge studio-managed posts from Supabase ahead of the built-in notes;
-       fails silently to the built-ins so the live blog can never break.
-       (SB_KEY is a public "publishable" key — safe in the client; the database
-       is protected by row-level security so visitors can only READ posts.) */
-    const SB = window.BQ_SUPA || {};
-    if (SB.url && SB.key) {
-      fetch(SB.url + '/rest/v1/posts?select=*&published=eq.true&order=created_at.desc', { headers: { apikey: SB.key } })
-        .then(r => r.json()).then(rows => {
-          if (!Array.isArray(rows) || !rows.length) return;
-          const cms = rows.map(p => ({
+        /* studio-managed posts from Supabase, merged ahead of the built-in notes.
+       Rebuilt from the built-ins on each call (idempotent), so publishing from
+       the dashboard can refresh the live blog instantly via window.__bqReloadBlog.
+       The publishable key is public/safe; row-level security keeps the table
+       read-only for visitors, while writes go through the secure Edge Function. */
+    const BUILTIN_POSTS = POSTS.slice();
+    const loadCmsPosts = () => {
+      const SB = window.BQ_SUPA || {};
+      if (!SB.url || !SB.key) return;
+      fetch(SB.url + '/rest/v1/posts?select=*&published=eq.true&order=created_at.desc', { headers: { apikey: SB.key }, cache: 'no-store' })
+        .then((r) => r.json()).then((rows) => {
+          const cms = (Array.isArray(rows) ? rows : []).map((p) => ({
             num: String(p.num || p.id || ''),
             tag: p.tag || 'Note',
             date: p.date || (p.created_at ? new Date(p.created_at).toLocaleDateString('en', { month: 'short', year: 'numeric' }) : ''),
@@ -1196,13 +1293,16 @@
             img: p.cover || '',
             title: p.title || '',
             sub: p.subtitle || '',
-            body: String(p.body || '').split(/\n\s*\n/).map(s => s.trim()).filter(Boolean)
+            body: String(p.body || '').split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean)
           }));
-          POSTS = cms.concat(POSTS);
+          POSTS = cms.concat(BUILTIN_POSTS);
           pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
-          page = 1; renderPage();
+          if (page > pageCount) page = 1;
+          renderPage();
         }).catch(() => {});
-    }
+    };
+    loadCmsPosts();
+    window.__bqReloadBlog = loadCmsPosts;
     window.__bqLangCb.push(() => {
       renderPage();
       if (reader && reader.classList.contains('is-open') && curPostObj) {
@@ -1248,4 +1348,43 @@
     });
   })();
 
+})();
+
+
+/* ---- CMS editor styles (injected here so no separate CSS file edit is needed) ---- */
+(function cmsStyles(){
+  if (document.getElementById('bq-cms-style')) return;
+  var el = document.createElement('style'); el.id = 'bq-cms-style';
+  el.textContent = `.cms-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.cms-status{opacity:.6;font-size:12px}
+.cms-list{display:flex;flex-direction:column}
+.cms-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px;border-bottom:1px solid rgba(128,128,128,.18)}
+.cms-row-t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cms-row-t strong{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cms-row-t .mono{opacity:.55;font-size:11px}
+.cms-row-act{display:flex;gap:6px;flex-shrink:0}
+.cms-mini{width:34px;height:34px;border-radius:9px;border:1px solid rgba(128,128,128,.25);background:transparent;color:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s,border-color .15s}
+.cms-mini:hover{background:rgba(128,128,128,.14)}
+.cms-mini--del:hover{background:rgba(200,60,50,.16);color:#e2554a;border-color:rgba(200,60,50,.4)}
+.cms-studio{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-size:11px;opacity:.5;text-decoration:none;color:inherit}
+.cms-studio:hover{opacity:.85}
+.cms-form{display:flex;flex-direction:column;gap:14px;max-width:680px}
+.cms-field{display:flex;flex-direction:column;gap:6px}
+.cms-field>span{font-size:11px;letter-spacing:.04em;text-transform:uppercase;opacity:.6}
+.cms-field input,.cms-field textarea{width:100%;padding:11px 13px;border-radius:10px;border:1px solid rgba(128,128,128,.28);background:rgba(128,128,128,.06);color:inherit;font:inherit;font-size:14px;outline:none;transition:border-color .15s,background .15s}
+.cms-field input:focus,.cms-field textarea:focus{border-color:currentColor;background:rgba(128,128,128,.1)}
+.cms-field textarea{resize:vertical;line-height:1.65;min-height:170px}
+.cms-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end}
+.cms-field--color input[type=color]{height:44px;padding:4px;cursor:pointer;border-radius:10px}
+.cms-check{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:14px;user-select:none}
+.cms-check input{width:18px;height:18px;cursor:pointer;accent-color:#bd9a4e}
+.cms-cover-prev{border-radius:10px;overflow:hidden;border:1px solid rgba(128,128,128,.22);max-height:210px}
+.cms-cover-prev img{display:block;width:100%;height:auto;max-height:210px;object-fit:cover}
+.cms-cover-prev[hidden]{display:none}
+.cms-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px}
+.cms-savemsg{opacity:.75;font-size:12px}
+.dash-btn--go{background:#bd9a4e;border-color:#bd9a4e;color:#17120a;font-weight:600}
+.dash-btn--go:hover{background:#ccab5f;border-color:#ccab5f}
+@media(max-width:560px){.cms-row3{grid-template-columns:1fr 1fr}.cms-form{max-width:none}}`;
+  document.head.appendChild(el);
 })();
