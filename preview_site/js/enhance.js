@@ -862,8 +862,7 @@
             <button class="dash-btn dash-btn--go" id="ctNew"><i class="fa-solid fa-feather-pointed"></i> ${t.newBtn}</button>
             <span class="mono cms-status">${CMS_POSTS.length} ${t.posts}</span>
           </div>
-          <div class="cms-list">${rows}</div>
-          <a class="cms-studio mono" href="${SB_STUDIO}" target="_blank" rel="noopener"><i class="fa-solid fa-database"></i> ${t.studio}</a>`;
+          <div class="cms-list">${rows}</div>`;
         $('#ctNew').addEventListener('click', () => cmsEdit(null));
         view.querySelectorAll('.cms-mini').forEach((b) => b.addEventListener('click', () => {
           const id = b.getAttribute('data-id'), act = b.getAttribute('data-act');
