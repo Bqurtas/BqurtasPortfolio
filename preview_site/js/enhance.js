@@ -910,8 +910,11 @@
         <form id="ctForm" class="cms-form">
           <label class="cms-field"><span>${t.fTitle}</span><input id="cf_title" type="text" value="${esc(p.title || '')}" required></label>
           <label class="cms-field"><span>${t.fSub}</span><input id="cf_sub" type="text" value="${esc(p.subtitle || '')}"></label>
-          <div class="cms-row3">
-            <label class="cms-field"><span>${t.fTag}</span><input id="cf_tag" type="text" list="cf_cats" value="${esc(p.tag || 'Design')}" autocomplete="off"><datalist id="cf_cats"><option value="Design"></option><option value="Logo"></option><option value="AI"></option><option value="Live"></option><option value="Branding"></option><option value="Print"></option><option value="Photography"></option><option value="Note"></option></datalist></label>
+          <div class="cms-field"><span>${t.fTag}</span>
+            <div class="cms-cats" id="cf_cats"></div>
+            <input id="cf_tag" type="hidden" value="${esc(p.tag || 'Design')}">
+          </div>
+          <div class="cms-row2">
             <label class="cms-field"><span>${t.fMin}</span><input id="cf_min" type="number" min="1" max="60" value="${esc(String(p.read_minutes || 4))}"></label>
             <label class="cms-field cms-field--color"><span>${t.fAccent}</span><input id="cf_accent" type="color" value="${esc(accent)}"></label>
           </div>
@@ -930,6 +933,17 @@
         </form>`;
       $('#ctBack').addEventListener('click', cmsList);
       $('#ctCancel').addEventListener('click', cmsList);
+      // category chips — click to pick (value kept in the hidden #cf_tag)
+      (() => {
+        const PRESETS = ['Design', 'Logo', 'AI', 'Live', 'Branding', 'Print', 'Photography', 'Note'];
+        const wrap = $('#cf_cats'), hid = $('#cf_tag');
+        const cur = (p.tag || 'Design');
+        const list2 = PRESETS.slice();
+        if (cur && !PRESETS.some(c => c.toLowerCase() === cur.toLowerCase())) list2.unshift(cur);
+        const draw = () => { wrap.innerHTML = list2.map(c => `<button type="button" class="cms-cat${c.toLowerCase() === (hid.value || '').toLowerCase() ? ' is-active' : ''}" data-cat="${esc(c)}">${esc(c)}</button>`).join(''); };
+        draw();
+        wrap.addEventListener('click', (e) => { const b = e.target.closest('.cms-cat'); if (!b) return; hid.value = b.getAttribute('data-cat'); draw(); });
+      })();
       const coverHidden = $('#cf_cover'), prev = $('#cf_prev'), upmsg = $('#cf_upmsg');
       $('#cf_coverfile').addEventListener('change', async (ev) => {
         const file = ev.target.files && ev.target.files[0]; if (!file) return;
@@ -1199,9 +1213,10 @@
     const catNorm = (s) => String(s || '').trim().toLowerCase();
     const viewPosts = () => curCat === 'all' ? POSTS : POSTS.filter(p => catNorm(L(p).tag) === curCat);
     const renderFilters = () => {
-      if (!list || !list.parentNode) return;
-      let bar = list.parentNode.querySelector('.blog-filters');
-      if (!bar) { bar = document.createElement('div'); bar.className = 'blog-filters'; list.parentNode.insertBefore(bar, list); }
+      const anchor = layout || list;
+      if (!anchor || !anchor.parentNode) return;
+      let bar = anchor.parentNode.querySelector('.blog-filters');
+      if (!bar) { bar = document.createElement('div'); bar.className = 'blog-filters'; anchor.parentNode.insertBefore(bar, anchor); }
       const cats = []; const seen = {};
       POSTS.forEach(p => { const c = (L(p).tag || '').trim(); const k = catNorm(c); if (c && !seen[k]) { seen[k] = 1; cats.push(c); } });
       const allLabel = (window.BQ_DICT && window.BQ_DICT['blog.all']) || 'All';
@@ -1381,23 +1396,28 @@
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const v = (email.value || '').trim();
+      const D = window.BQ_DICT || {};
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
-        status.style.color = 'var(--ember)';
-        status.textContent = '✗ Please enter a valid email.';
+        status.style.color = 'var(--ink-soft)';
+        status.textContent = D['sub.bad'] || '✗ Please enter a valid email.';
         return;
       }
-      let subs = [];
-      try { subs = JSON.parse(localStorage.getItem('bq_subscribers') || '[]'); } catch (x) {}
-      if (subs.includes(v)) {
-        status.style.color = 'var(--gold)';
-        status.textContent = '✓ You are already subscribed — thank you.';
-      } else {
-        subs.push(v);
-        try { localStorage.setItem('bq_subscribers', JSON.stringify(subs)); } catch (x) {}
-        status.style.color = 'var(--gold)';
-        status.textContent = '✓ Subscribed. Welcome to the journal.';
-      }
-      email.value = '';
+      const SB = window.BQ_SUPA || {};
+      const okMsg = D['sub.ok'] || '✓ Subscribed. Welcome to the journal.';
+      const dupMsg = D['sub.dup'] || '✓ You are already subscribed — thank you.';
+      const errMsg = D['sub.fail'] || '✗ Could not subscribe — please try again.';
+      status.style.color = 'var(--ink-muted)';
+      status.textContent = '…';
+      if (!SB.url || !SB.key) { status.style.color = 'var(--ink)'; status.textContent = okMsg; email.value = ''; return; }
+      fetch(SB.url + '/rest/v1/subscribers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: SB.key, Authorization: 'Bearer ' + SB.key, Prefer: 'return=minimal' },
+        body: JSON.stringify({ email: v, lang: (document.documentElement.dataset.lang || 'en') })
+      }).then(r => {
+        if (r.ok) { status.style.color = 'var(--ink)'; status.textContent = okMsg; email.value = ''; }
+        else if (r.status === 409) { status.style.color = 'var(--ink)'; status.textContent = dupMsg; email.value = ''; }
+        else { status.style.color = 'var(--ink-soft)'; status.textContent = errMsg; }
+      }).catch(() => { status.style.color = 'var(--ink-soft)'; status.textContent = errMsg; });
     });
   })();
 
@@ -1428,6 +1448,11 @@
 .cms-field input:focus,.cms-field textarea:focus{border-color:currentColor;background:rgba(128,128,128,.1)}
 .cms-field textarea{resize:vertical;line-height:1.65;min-height:170px}
 .cms-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end}
+.cms-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}
+.cms-cats{display:flex;flex-wrap:wrap;gap:7px}
+.cms-cat{font:inherit;font-size:12px;padding:7px 15px;border-radius:999px;border:1px solid rgba(128,128,128,.32);background:transparent;color:inherit;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.cms-cat:hover{border-color:currentColor}
+.cms-cat.is-active{background:#bd9a4e;border-color:#bd9a4e;color:#17120a;font-weight:600}
 .cms-field--color input[type=color]{height:44px;padding:4px;cursor:pointer;border-radius:10px}
 .cms-check{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:14px;user-select:none}
 .cms-check input{width:18px;height:18px;cursor:pointer;accent-color:#bd9a4e}
