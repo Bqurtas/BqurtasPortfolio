@@ -840,15 +840,48 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   padding: 6px 13px; border: 1px solid rgba(128,128,128,0.45); border-radius: 999px;
 }
 .hero-services-ai i { font-size: 11px; transition: transform 0.3s var(--ease); }
-/* On hover the AI pill gestures toward the future: a tagline slides in, the chip pulses, the pill glows. */
-.hero-services-ai { position: relative; transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease); }
+/* ===== The AI pill comes alive on hover: an energized rotating border, a sweeping
+   scan, orbiting nodes, a deep glow, the label decodes, and the future tagline slides in. ===== */
+@property --ai-ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.hero-services-ai { position: relative; isolation: isolate; overflow: visible;
+  transition: border-color 0.35s var(--ease), box-shadow 0.45s var(--ease), letter-spacing 0.4s var(--ease); }
+/* rotating gradient border (masked to a thin ring) */
+.hero-services-ai::after {
+  content: ''; position: absolute; inset: -1.5px; border-radius: inherit; padding: 1.5px; pointer-events: none; z-index: 2;
+  background: conic-gradient(from var(--ai-ang), transparent 0deg, currentColor 55deg, transparent 130deg, transparent 235deg, currentColor 310deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude;
+  opacity: 0; transition: opacity 0.4s ease;
+}
+.hero-services-ai:hover::after, .hero-services-ai:focus-visible::after { opacity: 1; animation: aiAng 1.5s linear infinite; }
+@keyframes aiAng { to { --ai-ang: 360deg; } }
+/* sweeping scan line inside the pill */
+.hero-services-ai::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 1; overflow: hidden;
+  background: linear-gradient(105deg, transparent 35%, currentColor 50%, transparent 65%);
+  opacity: 0; transform: translateX(-65%);
+}
+.hero-services-ai:hover::before, .hero-services-ai:focus-visible::before { opacity: 0.22; animation: aiScan 1.7s ease-in-out infinite; }
+@keyframes aiScan { 0% { transform: translateX(-65%); } 100% { transform: translateX(65%); } }
+.hero-services-ai:hover, .hero-services-ai:focus-visible { border-color: transparent; letter-spacing: 0.18em; outline: none;
+  box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 28%, transparent), 0 8px 34px -8px currentColor, 0 0 64px -12px currentColor; }
+/* orbiting nodes */
+.hero-ai-orbit { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: 0; transition: opacity 0.4s ease; }
+.hero-services-ai:hover .hero-ai-orbit, .hero-services-ai:focus-visible .hero-ai-orbit { opacity: 1; }
+.hero-ai-orbit i { position: absolute; top: 50%; left: 50%; width: 3px; height: 3px; margin: -1.5px; border-radius: 50%;
+  background: currentColor; box-shadow: 0 0 7px currentColor; }
+.hero-services-ai:hover .hero-ai-orbit i, .hero-services-ai:focus-visible .hero-ai-orbit i { animation: aiOrbit 2.6s linear infinite; }
+.hero-ai-orbit i:nth-child(2) { animation-delay: -0.87s; }
+.hero-ai-orbit i:nth-child(3) { animation-delay: -1.74s; }
+@keyframes aiOrbit { from { transform: rotate(0deg) translateX(120px) rotate(0deg); } to { transform: rotate(360deg) translateX(120px) rotate(-360deg); } }
+/* future tagline + label + chip */
 .hero-ai-future { display: inline-block; max-width: 0; overflow: hidden; white-space: nowrap; opacity: 0; transition: max-width 0.55s var(--ease), opacity 0.4s ease, margin-left 0.4s var(--ease); }
 .hero-ai-future::before { content: '\2192\00a0'; }
-.hero-services-ai:hover, .hero-services-ai:focus-visible { border-color: currentColor; box-shadow: 0 0 20px -5px currentColor; outline: none; }
-.hero-services-ai:hover .hero-ai-future, .hero-services-ai:focus-visible .hero-ai-future { max-width: 280px; opacity: 0.9; margin-left: 8px; }
-.hero-services-ai:hover .hero-ai-label, .hero-services-ai:focus-visible .hero-ai-label { text-shadow: 0 0 12px currentColor; }
-.hero-services-ai:hover i, .hero-services-ai:focus-visible i { animation: aiPulse 1.1s ease-in-out infinite; }
-@keyframes aiPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+.hero-services-ai:hover .hero-ai-future, .hero-services-ai:focus-visible .hero-ai-future { max-width: 300px; opacity: 0.92; margin-left: 10px; }
+.hero-services-ai:hover .hero-ai-label, .hero-services-ai:focus-visible .hero-ai-label { text-shadow: 0 0 14px currentColor; }
+.hero-ai-label .ai-glitch { opacity: 0.6; }
+.hero-services-ai:hover > i.fa-microchip, .hero-services-ai:focus-visible > i.fa-microchip { animation: aiPulse 0.95s ease-in-out infinite; }
+@keyframes aiPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.4); } }
 @media (max-width: 560px) { .hero-services { flex-direction: column; gap: 10px; margin-top: 18px; } }
 
 /* =========================================================
