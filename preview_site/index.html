@@ -99,7 +99,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"></noscript>
 
-  <link rel="stylesheet" href="css/style.css?v=104" />
+  <link rel="stylesheet" href="css/style.css?v=105" />
 </head>
 <body>
 
@@ -368,7 +368,7 @@
 
           <p class="hero-services mono">
             <span class="hero-services-main" data-i18n="hero.services">Design • Printing • Advertising</span>
-            <span class="hero-services-ai" tabindex="0"><i class="fa-solid fa-microchip"></i> <span class="hero-ai-label" data-i18n="hero.ai">Artificial Intelligence • AI</span><span class="hero-ai-future" data-i18n="hero.ai.future">Shaping the future</span><span class="hero-ai-orbit" aria-hidden="true"><i></i><i></i><i></i></span></span>
+            <span class="hero-services-ai" tabindex="0"><i class="fa-solid fa-microchip"></i> <span class="hero-ai-label" data-i18n="hero.ai">Artificial Intelligence • AI</span><span class="hero-ai-future" data-i18n="hero.ai.future">Shaping the future</span></span>
           </p>
         </div>
 
@@ -1276,22 +1276,9 @@
   <!-- ===== SECRET STUDIO DASHBOARD ===== -->
   <div class="dash" id="dash" aria-hidden="true">
     <div class="dash-panel" role="dialog" aria-label="Studio dashboard">
-      <header class="dash-head">
-        <div class="dash-head-id">
-          <span class="dash-logo">Bq</span>
-          <div>
-            <strong>Studio Console</strong>
-            <span class="mono" id="dashHeadSub">Private · Barakat Qurtas</span>
-          </div>
-        </div>
-        <div class="dash-head-actions">
-          <button class="dash-theme" id="dashTheme" aria-label="Toggle dark / light"><i class="fa-solid fa-circle-half-stroke"></i></button>
-          <button class="dash-close" id="dashClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-      </header>
-
       <!-- Login gate -->
       <div class="dash-gate" id="dashGate">
+        <button class="dash-gate-close" id="dashGateClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
         <i class="fa-solid fa-lock dash-gate-icon"></i>
         <h3>Enter access code</h3>
         <p class="mono">This console is private.</p>
@@ -1305,14 +1292,41 @@
       <!-- Console -->
       <div class="dash-main" id="dashMain" hidden>
         <nav class="dash-tabs">
-          <button class="dash-tab is-active" data-dash="overview"><i class="fa-solid fa-gauge-high"></i> Overview</button>
-          <button class="dash-tab" data-dash="visitors"><i class="fa-solid fa-chart-line"></i> Visitors</button>
-          <button class="dash-tab" data-dash="works"><i class="fa-solid fa-layer-group"></i> Works</button>
-          <button class="dash-tab" data-dash="content"><i class="fa-solid fa-feather-pointed"></i> Content</button>
-          <button class="dash-tab" data-dash="assistant"><i class="fa-solid fa-robot"></i> Assistant</button>
-          <button class="dash-tab" data-dash="leads"><i class="fa-solid fa-inbox"></i> Leads</button>
-          <button class="dash-tab" data-dash="profile"><i class="fa-solid fa-id-badge"></i> Profile</button>
-          <button class="dash-tab" data-dash="settings"><i class="fa-solid fa-sliders"></i> Settings</button>
+          <div class="dash-side-id">
+            <span class="dash-side-av" id="dashSideAv">Bq</span>
+            <div class="dash-side-meta">
+              <strong id="dashSideName">Barakat Qurtas</strong>
+              <span class="mono" id="dashHeadSub">Studio Console</span>
+            </div>
+          </div>
+          <div class="dash-side-nav">
+            <button class="dash-tab is-active" data-dash="overview"><i class="fa-solid fa-gauge-high"></i> Overview</button>
+            <button class="dash-tab" data-dash="visitors"><i class="fa-solid fa-chart-line"></i> Visitors</button>
+            <button class="dash-tab" data-dash="works"><i class="fa-solid fa-layer-group"></i> Works</button>
+            <button class="dash-tab" data-dash="content"><i class="fa-solid fa-feather-pointed"></i> Content</button>
+            <button class="dash-tab" data-dash="leads"><i class="fa-solid fa-inbox"></i> Leads</button>
+            <button class="dash-tab" data-dash="profile"><i class="fa-solid fa-id-badge"></i> Profile</button>
+            <button class="dash-tab" data-dash="settings"><i class="fa-solid fa-sliders"></i> Settings</button>
+          </div>
+          <div class="dash-side-tools">
+            <button class="dash-tool" id="dashAi" aria-label="AI"><i class="fa-solid fa-robot"></i> <span>AI</span></button>
+            <div class="dash-tool-langwrap">
+              <button class="dash-tool" id="dashLang" aria-haspopup="true" aria-label="Language"><i class="fa-solid fa-globe"></i> <span id="dashLangNow">English</span></button>
+              <div class="dash-lang-pop" id="dashLangPop" hidden>
+                <button data-lang="en">English</button>
+                <button data-lang="ku">کوردیی سۆرانی</button>
+                <button data-lang="kmr">Kurmancî</button>
+                <button data-lang="ar">العربية</button>
+                <button data-lang="fr">Français</button>
+                <button data-lang="tr">Türkçe</button>
+                <button data-lang="sv">Svenska</button>
+              </div>
+            </div>
+            <button class="dash-tool" id="dashTheme" aria-label="Toggle dark / light"><i class="fa-solid fa-circle-half-stroke"></i> <span>Theme</span></button>
+            <button class="dash-tool" id="dashAddAdmin" aria-label="Add admin"><i class="fa-solid fa-user-plus"></i> <span>Add admin</span></button>
+            <button class="dash-tool" id="dashLogout" aria-label="Log out"><i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Log out</span></button>
+            <button class="dash-tool" id="dashClose" aria-label="Close"><i class="fa-solid fa-xmark"></i> <span>Close</span></button>
+          </div>
         </nav>
         <div class="dash-view" id="dashView"></div>
       </div>
@@ -1365,10 +1379,10 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script src="js/i18n.js?v=104"></script>
-  <script src="js/chat-kb.js?v=104"></script>
-  <script src="js/main.js?v=104"></script>
-  <script src="js/gallery.js?v=104"></script>
-  <script src="js/enhance.js?v=104"></script>
+  <script src="js/i18n.js?v=105"></script>
+  <script src="js/chat-kb.js?v=105"></script>
+  <script src="js/main.js?v=105"></script>
+  <script src="js/gallery.js?v=105"></script>
+  <script src="js/enhance.js?v=105"></script>
 </body>
 </html>

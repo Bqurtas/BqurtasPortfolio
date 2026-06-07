@@ -608,38 +608,50 @@
         lEmpty:'No leads yet. Pitches from the Contact form appear here.', lClear:'Clear all leads', lConfirm:'Delete all stored leads?',
         pName:'Name', pTitle:'Title / role', pAvatar:'Avatar URL', pSave:'Save profile', pSaved:'✓ Saved', pNote:'Adding more admins needs a backend login system — that arrives with the content manager. For now this profile is yours, kept privately in this browser.',
         sSplash:'Show intro splash on load', sTheme:'Theme', sLight:'Light', sDark:'Dark', sReset:'Reset saved preferences', sResetConfirm:'Reset saved preferences?', sDone:'Done.', sNote:'Open anytime with ⌘ / Ctrl + B, or 5× click the Bq logo.',
-        vConnect:'Connect your analytics', vEnter:'Enter the STATS_TOKEN you set in Cloudflare.', vTokenPh:'Stats token', vConnectBtn:'Connect', vLoading:'Loading visitor data…' },
+        vConnect:'Connect your analytics', vEnter:'Enter the STATS_TOKEN you set in Cloudflare.', vTokenPh:'Stats token', vConnectBtn:'Connect', vLoading:'Loading visitor data…',
+        tAi:'AI', tLang:'Language', tTheme:'Theme', tAddAdmin:'Add admin', tLogout:'Log out', tClose:'Close',
+        admYou:'Owner', admName:'Name', admEmail:'Email', admRole:'Role', admAdd:'Add admin', admEmpty:'No additional admins yet.', admRemove:'Remove', admNote:'Shared login across devices needs the backend login system; for now these admins are saved privately in this browser.', logoutAsk:'Log out of the console?' },
       ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن', content:'ناوەڕۆک', assistant:'یاریدەدەر',
         gateTitle:'کۆدی چوونەژوورەوە بنووسە', gatePrivate:'ئەم کۆنسۆڵە تایبەتە.', gatePh:'کۆدی چوونەژوورەوە', unlock:'کردنەوە', wrong:'✗ کۆدەکە هەڵەیە.', twoTitle:'کۆدی SMS بنووسە', twoNote:'کۆدێکی ٦ ژمارەیی نێردرا بۆ مۆبایلەکەت.', twoPh:'کۆدی ٦ ژمارەیی', twoWrong:'✗ کۆد هەڵەیە یان بەسەرچووە.', twoSending:'ناردنی کۆد…', twoSetupBtn:'ڕێکخستنی 2FA (ئەپی ئۆتێنتیکەیتەر)', twoSetup1:'١) لە Cloudflare، TOTP_SECRET بکە بەمە (پاشان Retry deployment):', twoSetup2:'٢) هەمان کلیل بخە ناو Google Authenticator (داخڵکردنی دەستی: «Pencemor Studio»). کلیک لە کلیلەکە بکە بۆ کۆپی.', twoSetupLink:'لە ئەپ بیکەرەوە',
         oTotal:'کۆی کارەکان', oColl:'کۆکراوەکان', oLeads:'داواکاری هەڵگیراو', oLangs:'زمانەکان', oWelcome:'بەخێربێیتەوە — کۆنسۆڵی ستۆدیۆ تەنها بۆ تۆیە؛ زانیارییەکان لەم وێبگەڕەدا دەمێننەوە.',
         lEmpty:'هێشتا داواکاری نییە. پرۆژەکانی فۆڕمی پەیوەندی لێرە دەردەکەون.', lClear:'سڕینەوەی هەموو داواکارییەکان', lConfirm:'هەموو داواکارییە هەڵگیراوەکان بسڕێتەوە؟',
         pName:'ناو', pTitle:'پلە / ڕۆڵ', pAvatar:'بەستەری وێنە', pSave:'پاشەکەوتکردنی پرۆفایل', pSaved:'✓ پاشەکەوتکرا', pNote:'زیادکردنی ئەدمینی زیاتر پێویستی بە سیستەمی چوونەژوورەوەی سێرڤەر هەیە — لەگەڵ بەڕێوەبەری ناوەڕۆکدا دێت. ئێستا ئەم پرۆفایلە هی تۆیە، بە تایبەتی لەم وێبگەڕەدا پارێزراوە.',
         sSplash:'پیشاندانی سپلاشی دەستپێک', sTheme:'ڕووکار', sLight:'ڕووناک', sDark:'تاریک', sReset:'ڕێکخستنە پاشەکەوتکراوەکان بسڕەوە', sResetConfirm:'ڕێکخستنە پاشەکەوتکراوەکان بسڕێتەوە؟', sDone:'تەواوبوو.', sNote:'هەر کاتێک بە ⌘ / Ctrl + B بیکەرەوە، یان ٥ جار کلیک لە لۆگۆی Bq بکە.',
-        vConnect:'ئامارەکانت ببەستەوە', vEnter:'ئەو STATS_TOKENـەی لە Cloudflare دانراوە بنووسە.', vTokenPh:'تۆکنی ئامار', vConnectBtn:'بەستنەوە', vLoading:'بارکردنی زانیاری سەردانکەران…' },
+        vConnect:'ئامارەکانت ببەستەوە', vEnter:'ئەو STATS_TOKENـەی لە Cloudflare دانراوە بنووسە.', vTokenPh:'تۆکنی ئامار', vConnectBtn:'بەستنەوە', vLoading:'بارکردنی زانیاری سەردانکەران…',
+        tAi:'AI', tLang:'زمان', tTheme:'ڕووکار', tAddAdmin:'زیادکردنی ئەدمین', tLogout:'چوونەدەرەوە', tClose:'داخستن',
+        admYou:'خاوەن', admName:'ناو', admEmail:'ئیمەیل', admRole:'ڕۆڵ', admAdd:'زیادکردنی ئەدمین', admEmpty:'هێشتا ئەدمینی زیاتر نییە.', admRemove:'لابردن', admNote:'چوونەژوورەوەی هاوبەش لەنێوان ئامێرەکان پێویستی بە سیستەمی سێرڤەرە؛ ئێستا ئەم ئەدمینانە بە تایبەتی لەم وێبگەڕەدا هەڵگیراون.', logoutAsk:'لە کۆنسۆڵ بچیتە دەرەوە؟' },
       ar: { overview:'نظرة عامة', visitors:'الزوار', works:'الأعمال', leads:'الطلبات', profile:'الملف', settings:'الإعدادات', content:'المحتوى', assistant:'المساعد',
         gateTitle:'أدخل رمز الدخول', gatePrivate:'هذه اللوحة خاصة.', gatePh:'رمز الدخول', unlock:'فتح', wrong:'✗ رمز خاطئ.', twoTitle:'أدخل رمز الرسالة', twoNote:'أرسلنا رمزاً من ٦ أرقام إلى هاتفك.', twoPh:'رمز من ٦ أرقام', twoWrong:'✗ رمز خاطئ أو منتهٍ.', twoSending:'جار إرسال الرمز…', twoSetupBtn:'إعداد 2FA (تطبيق المصادقة)', twoSetup1:'١) في Cloudflare اضبط TOTP_SECRET على هذا (ثم Retry deployment):', twoSetup2:'٢) أضف نفس المفتاح إلى Google Authenticator (إدخال يدوي: «Pencemor Studio»). انقر المفتاح للنسخ.', twoSetupLink:'افتح في التطبيق',
         oTotal:'إجمالي الأعمال', oColl:'المجموعات', oLeads:'الطلبات المحفوظة', oLangs:'اللغات', oWelcome:'أهلاً بعودتك — لوحة الاستوديو خاصة بك؛ البيانات تبقى في هذا المتصفح.',
         lEmpty:'لا طلبات بعد. تظهر هنا مشاريع نموذج التواصل.', lClear:'مسح كل الطلبات', lConfirm:'حذف كل الطلبات المحفوظة؟',
         pName:'الاسم', pTitle:'اللقب / الدور', pAvatar:'رابط الصورة', pSave:'حفظ الملف', pSaved:'✓ تم الحفظ', pNote:'إضافة مزيد من المشرفين تتطلب نظام تسجيل دخول خلفي — يأتي مع مدير المحتوى. حالياً هذا الملف خاص بك، محفوظ في هذا المتصفح.',
         sSplash:'إظهار شاشة البداية', sTheme:'المظهر', sLight:'فاتح', sDark:'داكن', sReset:'إعادة تعيين التفضيلات', sResetConfirm:'إعادة تعيين التفضيلات المحفوظة؟', sDone:'تم.', sNote:'افتحها في أي وقت بـ ⌘ / Ctrl + B، أو انقر شعار Bq خمس مرات.',
-        vConnect:'اربط تحليلاتك', vEnter:'أدخل STATS_TOKEN الذي ضبطته في Cloudflare.', vTokenPh:'رمز الإحصاءات', vConnectBtn:'اتصال', vLoading:'تحميل بيانات الزوار…' },
+        vConnect:'اربط تحليلاتك', vEnter:'أدخل STATS_TOKEN الذي ضبطته في Cloudflare.', vTokenPh:'رمز الإحصاءات', vConnectBtn:'اتصال', vLoading:'تحميل بيانات الزوار…',
+        tAi:'AI', tLang:'اللغة', tTheme:'المظهر', tAddAdmin:'إضافة مشرف', tLogout:'تسجيل الخروج', tClose:'إغلاق',
+        admYou:'المالك', admName:'الاسم', admEmail:'البريد', admRole:'الدور', admAdd:'إضافة مشرف', admEmpty:'لا مشرفين إضافيين بعد.', admRemove:'إزالة', admNote:'تسجيل الدخول المشترك بين الأجهزة يحتاج نظام الخادم؛ حالياً هؤلاء المشرفون محفوظون في هذا المتصفح فقط.', logoutAsk:'تسجيل الخروج من اللوحة؟' },
       kmr: { overview:'Giştî', visitors:'Mêvan', works:'Kar', leads:'Daxwaz', profile:'Profîl', settings:'Mîheng', content:'Naverok', assistant:'Alîkar',
         gateTitle:'Koda gihiştinê binivîse', gatePrivate:'Ev konsol taybet e.', gatePh:'Koda gihiştinê', unlock:'Veke', wrong:'✗ Koda çewt.', twoTitle:'Koda SMSê binivîse', twoNote:'Me koda 6-hejmarî şand telefona te.', twoPh:'Koda 6-hejmarî', twoWrong:'✗ Koda çewt an qediyayî.', twoSending:'Kod tê şandin…', twoSetupBtn:'Sazkirina 2FA (sepana erêkirinê)', twoSetup1:'1) Li Cloudflare TOTP_SECRET wiha saz bike (paşê Retry deployment):', twoSetup2:'2) Heman mifte têxe Google Authenticator (têketina destî: "Pencemor Studio"). Li mifte bitikîne ji bo kopî.', twoSetupLink:'di sepanê de veke',
         oTotal:'Tevahiya karan', oColl:'Berhevok', oLeads:'Daxwazên tomarkirî', oLangs:'Ziman', oWelcome:'Bi xêr hatî — konsola studyoyê taybet e ji te re; dane di vê gerokê de dimînin.',
         lEmpty:'Hêj daxwaz tune. Pêşniyarên forma têkiliyê li vir xuya dibin.', lClear:'Hemû daxwazan paqij bike', lConfirm:'Hemû daxwazên tomarkirî werin jêbirin?',
         pName:'Nav', pTitle:'Sernav / rol', pAvatar:'Girêdana wêneyê', pSave:'Profîlê tomar bike', pSaved:'✓ Tomar bû', pNote:'Zêdekirina admînên din pêdivî bi sîstema têketinê ya backend heye — ew bi rêveberê naverokê re tê. Niha ev profîl ya te ye, bi taybetî di vê gerokê de tê parastin.',
         sSplash:'Dîmena destpêkê nîşan bide', sTheme:'Tema', sLight:'Ronî', sDark:'Tarî', sReset:'Vebijarkên tomarkirî jê bibe', sResetConfirm:'Vebijarkên tomarkirî werin jêbirin?', sDone:'Qediya.', sNote:'Her dem bi ⌘ / Ctrl + B veke, an 5 caran li logoya Bq bitikîne.',
-        vConnect:'Analîtîkên xwe girêde', vEnter:'STATS_TOKEN ya ku te di Cloudflare de danî binivîse.', vTokenPh:'Tokena statîstîkê', vConnectBtn:'Girêde', vLoading:'Daneyên mêvanan tê barkirin…' },
+        vConnect:'Analîtîkên xwe girêde', vEnter:'STATS_TOKEN ya ku te di Cloudflare de danî binivîse.', vTokenPh:'Tokena statîstîkê', vConnectBtn:'Girêde', vLoading:'Daneyên mêvanan tê barkirin…',
+        tAi:'AI', tLang:'Ziman', tTheme:'Tema', tAddAdmin:'Admîn zêde bike', tLogout:'Derkeve', tClose:'Bigire',
+        admYou:'Xwedî', admName:'Nav', admEmail:'E-name', admRole:'Rol', admAdd:'Admîn zêde bike', admEmpty:'Hêj admînên din tune.', admRemove:'Rake', admNote:'Têketina hevpar a di navbera amûran de pêdivî bi sîstema backend heye; niha ev admîn bi taybetî di vê gerokê de tên parastin.', logoutAsk:'Ji konsolê derkevî?' },
       fr: { overview:'Aperçu', visitors:'Visiteurs', works:'Travaux', leads:'Demandes', profile:'Profil', settings:'Réglages', content:'Contenu', assistant:'Assistant',
         gateTitle:"Entrez le code d'accès", gatePrivate:'Cette console est privée.', gatePh:"Code d'accès", unlock:'Déverrouiller', wrong:'✗ Code incorrect.', twoTitle:'Entrez le code SMS', twoNote:'Un code à 6 chiffres a été envoyé à votre téléphone.', twoPh:'Code à 6 chiffres', twoWrong:'✗ Code incorrect ou expiré.', twoSending:'Envoi du code…', twoSetupBtn:'Configurer la 2FA (authentification)', twoSetup1:'1) Dans Cloudflare, définissez TOTP_SECRET sur ceci (puis Retry deployment) :', twoSetup2:'2) Ajoutez la même clé à Google Authenticator (saisie manuelle : « Pencemor Studio »). Cliquez la clé pour copier.', twoSetupLink:'ouvrir dans l’app',
         oTotal:'Total des travaux', oColl:'Collections', oLeads:'Demandes enregistrées', oLangs:'Langues', oWelcome:'Bon retour — votre console studio est privée ; les données restent dans ce navigateur.',
         lEmpty:'Aucune demande pour l’instant. Les projets du formulaire de contact apparaissent ici.', lClear:'Effacer toutes les demandes', lConfirm:'Supprimer toutes les demandes enregistrées ?',
         pName:'Nom', pTitle:'Titre / rôle', pAvatar:"URL de l'avatar", pSave:'Enregistrer le profil', pSaved:'✓ Enregistré', pNote:'Ajouter d’autres admins nécessite un système de connexion backend — il arrive avec le gestionnaire de contenu. Pour l’instant ce profil est le vôtre, gardé dans ce navigateur.',
         sSplash:"Afficher l'intro au chargement", sTheme:'Thème', sLight:'Clair', sDark:'Sombre', sReset:'Réinitialiser les préférences', sResetConfirm:'Réinitialiser les préférences enregistrées ?', sDone:'Terminé.', sNote:'Ouvrez à tout moment avec ⌘ / Ctrl + B, ou cliquez 5× sur le logo Bq.',
-        vConnect:'Connectez vos analyses', vEnter:'Saisissez le STATS_TOKEN défini dans Cloudflare.', vTokenPh:'Jeton de stats', vConnectBtn:'Connecter', vLoading:'Chargement des données visiteurs…' }
+        vConnect:'Connectez vos analyses', vEnter:'Saisissez le STATS_TOKEN défini dans Cloudflare.', vTokenPh:'Jeton de stats', vConnectBtn:'Connecter', vLoading:'Chargement des données visiteurs…',
+        tAi:'IA', tLang:'Langue', tTheme:'Thème', tAddAdmin:'Ajouter admin', tLogout:'Déconnexion', tClose:'Fermer',
+        admYou:'Propriétaire', admName:'Nom', admEmail:'E-mail', admRole:'Rôle', admAdd:'Ajouter admin', admEmpty:'Aucun admin supplémentaire.', admRemove:'Retirer', admNote:'Une connexion partagée entre appareils nécessite le système backend ; pour l’instant ces admins sont enregistrés dans ce navigateur.', logoutAsk:'Se déconnecter de la console ?' }
     };
     const curLang = () => { const l = document.documentElement.getAttribute('lang') || document.documentElement.dataset.lang || 'en'; return DASH_I18N[l] ? l : 'en'; };
     const DT = (k) => (DASH_I18N[curLang()][k] ?? DASH_I18N.en[k] ?? k);
+    const LANG_LABELS = { en: 'English', ku: 'کوردیی سۆرانی', kmr: 'Kurmancî', ar: 'العربية', fr: 'Français', tr: 'Türkçe', sv: 'Svenska' };
+    const curSiteLang = () => document.documentElement.getAttribute('lang') || document.documentElement.dataset.lang || 'en';
     const localizeChrome = () => {
       $$('.dash-tab').forEach(t => { const ic = t.querySelector('i'); t.innerHTML = (ic ? ic.outerHTML + ' ' : '') + DT(t.dataset.dash); });
       const g = $('#dashGate'); if (g) {
@@ -648,6 +660,11 @@
         const k = $('#dashKey'); if (k) k.placeholder = DT('gatePh');
         const b = g.querySelector('button[type="submit"]'); if (b) b.innerHTML = DT('unlock') + ' <i class="fa-solid fa-arrow-right"></i>';
       }
+      // sidebar tool labels + language indicator
+      const tl = (id, k) => { const b = $(id); const s = b && b.querySelector('span'); if (s) s.textContent = DT(k); };
+      tl('#dashAi', 'tAi'); tl('#dashTheme', 'tTheme'); tl('#dashAddAdmin', 'tAddAdmin'); tl('#dashLogout', 'tLogout'); tl('#dashClose', 'tClose');
+      const ln = $('#dashLangNow'); if (ln) ln.textContent = LANG_LABELS[curSiteLang()] || 'English';
+      $$('#dashLangPop [data-lang]').forEach(b => b.classList.toggle('is-active', b.dataset.lang === curSiteLang()));
     };
 
     const openDash = () => {
@@ -659,7 +676,7 @@
     const closeDash = () => { dash.classList.remove('is-open'); dash.setAttribute('aria-hidden', 'true'); };
 
     /* triggers: URL hash #studio, or Ctrl/Cmd+Shift+B, or 5 quick clicks on rail logo */
-    if (location.hash === '#studio') openDash();
+    if (location.hash === '#studio') setTimeout(openDash, 0);   // defer: showConsole is defined later in this IIFE
     window.addEventListener('hashchange', () => { if (location.hash === '#studio') openDash(); });
     document.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') { e.preventDefault(); openDash(); }   // ⌘ / Ctrl + B
@@ -718,7 +735,7 @@
           <div class="dash-card"><span class="dash-card-n">${total}</span><span class="mono">${DT('oTotal')}</span></div>
           <div class="dash-card"><span class="dash-card-n">${cats}</span><span class="mono">${DT('oColl')}</span></div>
           <div class="dash-card"><span class="dash-card-n">${leads.length}</span><span class="mono">${DT('oLeads')}</span></div>
-          <div class="dash-card"><span class="dash-card-n">5</span><span class="mono">${DT('oLangs')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">7</span><span class="mono">${DT('oLangs')}</span></div>
         </div>
         <p class="dash-note mono">${DT('oWelcome')}</p>`;
     };
@@ -783,11 +800,12 @@
     const profile = () => { try { return Object.assign({}, PROFILE_DEFAULT, JSON.parse(localStorage.getItem('bq_profile') || '{}')); } catch (e) { return Object.assign({}, PROFILE_DEFAULT); } };
     const syncHeaderProfile = () => {
       const p = profile();
-      const sub = $('#dashHeadSub'); if (sub) sub.textContent = 'Private · ' + p.name;
-      const logo = $('.dash-logo');
-      if (logo) {
-        if (p.avatar) { logo.style.backgroundImage = `url("${p.avatar}")`; logo.classList.add('has-av'); logo.textContent = ''; }
-        else { logo.style.backgroundImage = ''; logo.classList.remove('has-av'); logo.textContent = 'Bq'; }
+      const nm = $('#dashSideName'); if (nm) nm.textContent = p.name;
+      const sub = $('#dashHeadSub'); if (sub) sub.textContent = p.title || 'Studio Console';
+      const av = $('#dashSideAv');
+      if (av) {
+        if (p.avatar) { av.style.backgroundImage = `url("${p.avatar}")`; av.classList.add('has-av'); av.textContent = ''; }
+        else { av.style.backgroundImage = ''; av.classList.remove('has-av'); av.textContent = 'Bq'; }
       }
     };
     const renderProfile = () => {
@@ -812,6 +830,34 @@
         const s = $('#prfSaved'); if (s) { s.hidden = false; setTimeout(() => { s.hidden = true; }, 1800); }
         renderProfile();
       });
+    };
+
+    /* ---- Team & admins (saved privately in this browser until the backend login lands) ---- */
+    const getAdmins = () => { try { return JSON.parse(localStorage.getItem('bq_admins') || '[]'); } catch (e) { return []; } };
+    const setAdmins = (a) => { try { localStorage.setItem('bq_admins', JSON.stringify(a)); } catch (e) {} };
+    const renderAdmins = () => {
+      const p = profile(); const admins = getAdmins();
+      view.innerHTML = `
+        <div class="dash-prof-card">
+          <span class="dash-prof-av" style="background-image:url('${esc(p.avatar)}')"></span>
+          <div><strong>${esc(p.name)}</strong><span class="mono">${DT('admYou')} · ${esc(p.title)}</span></div>
+        </div>
+        <div class="dash-admin-list" id="admList">${admins.length ? admins.map((a, i) => `
+          <div class="dash-admin-row"><div><strong>${esc(a.name)}</strong><span class="mono">${esc(a.role || '')}${a.email ? ' · ' + esc(a.email) : ''}</span></div><button class="dash-btn dash-btn--danger" data-rm="${i}"><i class="fa-solid fa-xmark"></i> ${DT('admRemove')}</button></div>`).join('') : `<p class="dash-note mono">${DT('admEmpty')}</p>`}</div>
+        <form class="dash-set" id="admForm">
+          <label class="dash-field"><span class="mono">${DT('admName')}</span><input id="admName" type="text"></label>
+          <label class="dash-field"><span class="mono">${DT('admEmail')}</span><input id="admEmail" type="email"></label>
+          <label class="dash-field"><span class="mono">${DT('admRole')}</span><input id="admRole" type="text"></label>
+          <button class="dash-btn" type="submit"><i class="fa-solid fa-user-plus"></i> ${DT('admAdd')}</button>
+        </form>
+        <p class="dash-note mono">${DT('admNote')}</p>`;
+      $('#admForm')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = $('#admName').value.trim(); if (!name) return;
+        const a = getAdmins(); a.push({ name: name, email: $('#admEmail').value.trim(), role: $('#admRole').value.trim() }); setAdmins(a);
+        renderAdmins();
+      });
+      $$('#admList [data-rm]').forEach(b => b.addEventListener('click', () => { const a = getAdmins(); a.splice(+b.dataset.rm, 1); setAdmins(a); renderAdmins(); }));
     };
 
     /* ---- Blog manager — posts live in Supabase (free; edit in its studio) ---- */
@@ -1099,19 +1145,48 @@
       $('#stRefresh')?.addEventListener('click', renderVisitors);
     };
 
-    const VIEWS = { overview: renderOverview, visitors: renderVisitors, works: renderWorks, content: renderContent, assistant: renderAssistant, leads: renderLeads, profile: renderProfile, settings: renderSettings };
+    const VIEWS = { overview: renderOverview, visitors: renderVisitors, works: renderWorks, content: renderContent, assistant: renderAssistant, admins: renderAdmins, leads: renderLeads, profile: renderProfile, settings: renderSettings };
     const showConsole = () => {
       gate.hidden = true; main.hidden = false;
       dash.classList.add('is-full');           // console takes the full screen
       syncHeaderProfile();
+      localizeChrome();
       renderOverview();
     };
-    // header dark / light toggle
+    /* open a non-tab view (AI, admins) from a sidebar tool — clear the nav highlight */
+    const openTool = (fn) => { $$('.dash-tab').forEach(x => x.classList.remove('is-active')); (fn || renderOverview)(); };
+
+    // dark / light toggle
     $('#dashTheme')?.addEventListener('click', () => {
       const next = (document.documentElement.dataset.theme === 'dark') ? 'light' : 'dark';
       document.documentElement.dataset.theme = next;
       try { localStorage.setItem('bq_theme', next); } catch (e) {}
     });
+    // AI + Add-admin sidebar tools
+    $('#dashAi')?.addEventListener('click', () => openTool(renderAssistant));
+    $('#dashAddAdmin')?.addEventListener('click', () => openTool(renderAdmins));
+    // Log out — lock the console again
+    $('#dashLogout')?.addEventListener('click', () => {
+      if (!confirm(DT('logoutAsk'))) return;
+      unlocked = false;
+      try { sessionStorage.removeItem('bq_dash_ok'); } catch (e) {}
+      dash.classList.remove('is-full'); main.hidden = true; gate.hidden = false;
+      closeDash();
+    });
+    // Language picker (popover above the button)
+    const langPop = $('#dashLangPop');
+    $('#dashLang')?.addEventListener('click', (e) => { e.stopPropagation(); if (langPop) langPop.hidden = !langPop.hidden; });
+    langPop?.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => {
+      if (window.applyLang) window.applyLang(b.dataset.lang);
+      if (langPop) langPop.hidden = true;
+      localizeChrome();
+      const active = $('.dash-tab.is-active');
+      ((active && VIEWS[active.dataset.dash]) || renderOverview)();
+    }));
+    document.addEventListener('click', () => { if (langPop && !langPop.hidden) langPop.hidden = true; });
+    // Gate close — the login screen no longer has a top bar
+    $('#dashGateClose')?.addEventListener('click', closeDash);
+
     $$('.dash-tab').forEach(t => t.addEventListener('click', () => {
       $$('.dash-tab').forEach(x => x.classList.remove('is-active'));
       t.classList.add('is-active');

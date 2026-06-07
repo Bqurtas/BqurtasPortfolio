@@ -4,45 +4,6 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* Native design-pen cursor — applied inline because the stylesheet `cursor` value
-     gets dropped in some engines; inline wins, stays native (instant, no lag) and,
-     since `cursor` inherits, covers the whole page. */
-  try {
-    const penCur = getComputedStyle(document.documentElement).getPropertyValue('--cur').trim();
-    if (penCur) document.documentElement.style.cursor = penCur;
-  } catch (e) {}
-
-  /* AI pill — the label "decodes" (character scramble) on hover, like a mind thinking */
-  (function aiScramble() {
-    const pill = document.querySelector('.hero-services-ai');
-    const el = document.querySelector('.hero-ai-label');
-    if (!pill || !el) return;
-    const chars = '!<>-_\\/[]{}=+*^?#________01';
-    let raf, frame = 0, queue = [];
-    const tick = () => {
-      let out = '', done = 0;
-      for (const q of queue) {
-        if (frame >= q.end) { done++; out += q.to; }
-        else if (frame >= q.start) { if (!q.ch || Math.random() < 0.3) q.ch = chars[Math.floor(Math.random() * chars.length)]; out += '<span class="ai-glitch">' + q.ch + '</span>'; }
-        else out += q.from;
-      }
-      el.innerHTML = out;
-      if (done === queue.length) return;
-      frame++; raf = requestAnimationFrame(tick);
-    };
-    let busy = false;
-    const trigger = () => {
-      if (busy) return; busy = true;
-      const text = el.textContent, old = text;
-      queue = [];
-      for (let i = 0; i < text.length; i++) { const s = Math.floor(Math.random() * 16); queue.push({ from: old[i] || '', to: text[i] || '', start: s, end: s + Math.floor(Math.random() * 16) + 8, ch: '' }); }
-      cancelAnimationFrame(raf); frame = 0; tick();
-      setTimeout(() => { busy = false; }, 750);
-    };
-    pill.addEventListener('mouseenter', trigger);
-    pill.addEventListener('focus', trigger);
-  })();
-
   /* ---------- THEME (dark / light) — toggle switch ---------- */
   const themeBtns = [document.getElementById('themeToggle'), document.getElementById('themeToggleM')].filter(Boolean);
   const applyTheme = (t) => {
@@ -789,7 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- Custom Cursor ---------- */
   const dot = document.getElementById('cursorDot');
   const ring = document.getElementById('cursorRing');
-  if (false && dot && ring) {   /* replaced by the native --cur design-pen cursor (instant, no lag) */
+  if (dot && ring && window.matchMedia('(pointer: fine)').matches) {
     let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
     document.addEventListener('mousemove', (e) => {
       mx = e.clientX; my = e.clientY;
