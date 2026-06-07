@@ -7,6 +7,7 @@ window.I18N = {
   en: {
     dir: 'ltr',
     'lang.select': 'Select your language',
+    'blog.all': 'All',
     'hero.hello': "Hello, I'm",
     'pj.eyebrow': 'Design Studio',
     'pj.tag': 'While our fingerprint sits your work atop, let your <em>every worry stop</em>.',
@@ -76,6 +77,7 @@ window.I18N = {
   tr: {
     dir: 'ltr',
     'lang.select': 'Dilinizi seçin',
+    'blog.all': 'Tümü',
     'hero.hello': "Merhaba, ben",
     'pj.eyebrow': 'Tasarım Stüdyosu',
     'pj.tag': 'Parmak izimiz işinizin üzerinde durdukça, <em>tüm kaygınız dinsin</em>.',
@@ -134,6 +136,7 @@ window.I18N = {
   sv: {
     dir: 'ltr',
     'lang.select': 'Välj ditt språk',
+    'blog.all': 'Alla',
     'hero.hello': "Hej, jag är",
     'pj.eyebrow': 'Designstudio',
     'pj.tag': 'Medan vårt fingeravtryck vilar över ditt verk, låt <em>all din oro upphöra</em>.',
@@ -192,6 +195,7 @@ window.I18N = {
   ku: {
     dir: 'rtl',
     'lang.select': 'زمانەکەت هەڵبژێرە',
+    'blog.all': 'هەموو',
     'hero.hello': 'سڵاو، من',
     'pj.eyebrow': 'ستۆدیۆی دیزاین',
     'pj.tag': 'تا پەنجەمۆرمان لەسەر کارەکانت بێت، <em>تۆ خەمت نەبێت</em>.',
@@ -261,6 +265,7 @@ window.I18N = {
   kmr: {
     dir: 'ltr',
     'lang.select': 'Zimanê xwe hilbijêre',
+    'blog.all': 'Hemû',
     'hero.hello': 'Silav, ez',
     'pj.eyebrow': 'Studyoya Sêwirandinê',
     'pj.tag': 'Heta mora me li ser karê te dimîne, êdî xem li dilê te <em>namîne</em>.',
@@ -330,6 +335,7 @@ window.I18N = {
   ar: {
     dir: 'rtl',
     'lang.select': 'اختر لغتك',
+    'blog.all': 'الكل',
     'hero.hello': 'مرحبًا، أنا',
     'pj.eyebrow': 'استوديو تصميم',
     'pj.tag': 'ما دامت بصمتنا فوق عملك، <em>فلا داعي لقلقك</em>.',
@@ -399,6 +405,7 @@ window.I18N = {
   fr: {
     dir: 'ltr',
     'lang.select': 'Choisissez votre langue',
+    'blog.all': 'Tout',
     'hero.hello': 'Bonjour, je suis',
     'pj.eyebrow': 'Studio de Design',
     'pj.tag': 'Tant que notre empreinte couvre votre ouvrage, nul souci ne reste sur <em>votre visage</em>.',

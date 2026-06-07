@@ -1195,23 +1195,43 @@
     };
 
     /* ----- render the current page of rows ----- */
+    let curCat = 'all';
+    const catNorm = (s) => String(s || '').trim().toLowerCase();
+    const viewPosts = () => curCat === 'all' ? POSTS : POSTS.filter(p => catNorm(L(p).tag) === curCat);
+    const renderFilters = () => {
+      if (!list || !list.parentNode) return;
+      let bar = list.parentNode.querySelector('.blog-filters');
+      if (!bar) { bar = document.createElement('div'); bar.className = 'blog-filters'; list.parentNode.insertBefore(bar, list); }
+      const cats = []; const seen = {};
+      POSTS.forEach(p => { const c = (L(p).tag || '').trim(); const k = catNorm(c); if (c && !seen[k]) { seen[k] = 1; cats.push(c); } });
+      const allLabel = (window.BQ_DICT && window.BQ_DICT['blog.all']) || 'All';
+      const chip = (label, val, active) => `<button class="blog-filter${active ? ' is-active' : ''}" data-cat="${catNorm(val)}">${label}</button>`;
+      bar.innerHTML = chip(allLabel, 'all', curCat === 'all') + cats.map(c => chip(c, c, catNorm(c) === curCat)).join('');
+      bar.querySelectorAll('.blog-filter').forEach(b => b.addEventListener('click', () => {
+        curCat = b.getAttribute('data-cat'); page = 1; renderPage();
+      }));
+    };
     const renderPage = () => {
+      renderFilters();
       list.querySelectorAll('.index-row').forEach(r => r.remove());
+      const FP = viewPosts();
+      pageCount = Math.max(1, Math.ceil(FP.length / PAGE_SIZE));
+      if (page > pageCount) page = 1;
       const start = (page - 1) * PAGE_SIZE;
-      const slice = POSTS.slice(start, start + PAGE_SIZE);
+      const slice = FP.slice(start, start + PAGE_SIZE);
       slice.forEach((p, i) => {
         const q = L(p);
         const a = document.createElement('a');
         a.href = '#'; a.className = 'index-row' + (i === 0 ? ' is-active' : '');
         a.innerHTML =
-          `<span class="mono index-row-num">${p.num} / ${String(POSTS.length).padStart(2,'0')}</span>
+          `<span class="mono index-row-num">${p.num} / ${String(FP.length).padStart(2,'0')}</span>
            <span class="index-row-title">${q.title}</span>
            <span class="mono index-row-tag">${q.tag}</span>`;
         a.addEventListener('mouseenter', () => { setActive(a); preview(p); });
         a.addEventListener('click', (e) => { e.preventDefault(); openReader(p); });
         list.appendChild(a);
       });
-      preview(slice[0]);
+      if (slice[0]) preview(slice[0]);
       renderPager();
     };
     const setActive = (row) => { list.querySelectorAll('.index-row').forEach(r => r.classList.remove('is-active')); row.classList.add('is-active'); };
@@ -1336,6 +1356,7 @@
     loadCmsPosts();
     window.__bqReloadBlog = loadCmsPosts;
     window.__bqLangCb.push(() => {
+      curCat = 'all';
       renderPage();
       if (reader && reader.classList.contains('is-open') && curPostObj) {
         const q = L(curPostObj);
