@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }));
 
   /* ---------- LANGUAGE — hover menu in rail + click on mobile ---------- */
-  const langCodeMap = { en: 'EN', ku: 'کو', kmr: 'Ku', ar: 'ع', fr: 'FR' };
-  const langLabelMap = { en: 'English', ku: 'کوردیی سۆرانی', kmr: 'Kurmancî', ar: 'العربية', fr: 'Français' };
+  const langCodeMap = { en: 'EN', ku: 'کو', kmr: 'Ku', ar: 'ع', fr: 'FR', tr: 'TR', sv: 'SV' };
+  const langLabelMap = { en: 'English', ku: 'کوردیی سۆرانی', kmr: 'Kurmancî', ar: 'العربية', fr: 'Français', tr: 'Türkçe', sv: 'Svenska' };
 
   const setLangBadge = (lang) => {
     const codeEl = document.getElementById('langCurrentCode');
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Pick up the wrapped applyLang and extend it
   let currentLang = 'en';
   let routerReady = false;                       // URL syncing only once the router is live
-  const URL_LANGS = ['ku', 'kmr', 'ar', 'fr'];   // en has no prefix
+  const URL_LANGS = ['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];   // en has no prefix
   const setDocTitle = () => {
     const d = window.BQ_DICT || {};
     const room = document.body.dataset.room || 'design';
