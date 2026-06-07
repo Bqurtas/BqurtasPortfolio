@@ -131,9 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
   window.__bqShowRoom = showRoom;
 
   /* Scroll-spy on the home / design page — the address bar reflects the section in view:
-       hero (top)       → base   ( / or /<lang> )
-       Pencemor studio  → /pencemor
-       the works / grid → /design
+       hero (top)            → base   ( / or /<lang> )
+       Panjamor studio       → /panjamor
+       "Design Room" + works → /design   ( /design/<tab> when a tab is active )
+       closing note → footer → base again (simple link)
      Each becomes a real shareable link (with its own cover). Other rooms keep their URL.
      Works for every language and section. */
   let __urlResetT;
@@ -145,14 +146,17 @@ document.addEventListener('DOMContentLoaded', () => {
       if (document.body.dataset.room !== 'design') return;
       const prefix = (currentLang && currentLang !== 'en') ? '/' + currentLang : '';
       const base = prefix || '/';
-      const pen  = document.getElementById('pencemorHero');
-      const work = document.getElementById('tabHeader');
-      const y = window.scrollY + window.innerHeight * 0.38;     // a touch below the fold
+      const pen  = document.getElementById('pencemorHero');       // Panjamor studio
+      const work = document.querySelector('.section.work');       // "01 — Design Room" + grid
+      const note = document.querySelector('.section.bio-teaser'); // "A short note" → back to simple
+      const y = window.scrollY + window.innerHeight * 0.38;       // a touch below the fold
       let path = base;
-      if (work && y >= __absTop(work)) {
+      if (note && y >= __absTop(note)) {
+        path = base;                                              // closing note → footer: plain link
+      } else if (work && y >= __absTop(work)) {
         path = (currentFilter && currentFilter !== 'all') ? prefix + '/design/' + currentFilter : prefix + '/design';
       } else if (pen && y >= __absTop(pen)) {
-        path = prefix + '/pencemor';
+        path = prefix + '/panjamor';
       }
       const cur  = (location.pathname.replace(/\/+$/, '') || '/');
       const want = (path.replace(/\/+$/, '') || '/');
@@ -182,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (t) activateTab(t, false);
       }
     }
-    if (room === 'pencemor') {
+    if (room === 'panjamor' || room === 'pencemor') {
       requestAnimationFrame(() => document.getElementById('pencemorHero')?.scrollIntoView({ behavior: 'auto', block: 'start' }));
     }
   });
@@ -498,8 +502,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const t0 = document.querySelector(`.tab[data-filter="${startTab}"]`);
     if (t0) activateTab(t0);
   }
-  if (startRoomRaw === 'pencemor') {
-    // a shared /pencemor link lands on the studio section
+  if (startRoomRaw === 'panjamor' || startRoomRaw === 'pencemor') {
+    // a shared /panjamor link lands on the studio section
     setTimeout(() => document.getElementById('pencemorHero')?.scrollIntoView({ behavior: 'auto', block: 'start' }), 60);
   }
   routerReady = true;   // from here on, language switches update the URL prefix
