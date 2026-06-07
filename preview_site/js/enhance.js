@@ -833,6 +833,26 @@
       }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
     };
     let CMS_POSTS = [];
+    const CT_X = {
+      en:  { fTag:'Category', fCover:'Cover image', uploading:'Uploading…', uploaded:'Uploaded ✓', fCoverHint:'Choose an image — it uploads automatically.' },
+      ku:  { fTag:'کەتەگۆری', fCover:'وێنەی سەرەکی', uploading:'بارکردن…', uploaded:'بارکرا ✓', fCoverHint:'وێنەیەک هەڵبژێرە — خۆکارانە بار دەبێت.' },
+      ar:  { fTag:'التصنيف', fCover:'صورة الغلاف', uploading:'جارٍ الرفع…', uploaded:'تم الرفع ✓', fCoverHint:'اختر صورة — تُرفع تلقائياً.' },
+      kmr: { fTag:'Kategorî', fCover:'Wêneyê bergê', uploading:'Tê barkirin…', uploaded:'Hat barkirin ✓', fCoverHint:'Wêneyek hilbijêre — bixweber tê barkirin.' },
+      fr:  { fTag:'Catégorie', fCover:'Image de couverture', uploading:'Téléversement…', uploaded:'Téléversé ✓', fCoverHint:'Choisissez une image — téléversée automatiquement.' }
+    };
+    const cmsResize = (file, maxW, q) => new Promise((resolve, reject) => {
+      const im = new Image();
+      im.onload = () => {
+        const scale = Math.min(1, maxW / (im.width || maxW));
+        const w = Math.max(1, Math.round(im.width * scale)), h = Math.max(1, Math.round(im.height * scale));
+        const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(im, 0, 0, w, h);
+        URL.revokeObjectURL(im.src);
+        try { resolve(cv.toDataURL('image/webp', q).split(',')[1]); } catch (e) { reject(e); }
+      };
+      im.onerror = () => reject('image_error');
+      im.src = URL.createObjectURL(file);
+    });
     const cmsGate = () => {
       const t = CT_I18N[curLang()] || CT_I18N.en;
       view.innerHTML = `<div class="dash-gate-inline">
@@ -881,7 +901,7 @@
       });
     };
     const cmsEdit = (post) => {
-      const t = CT_I18N[curLang()] || CT_I18N.en;
+      const t = Object.assign({}, CT_I18N.en, CT_I18N[curLang()] || {}, CT_X.en, CT_X[curLang()] || {});
       const p = post || {};
       const accent = p.accent || '#1a2740';
       view.innerHTML = `
@@ -891,11 +911,14 @@
           <label class="cms-field"><span>${t.fTitle}</span><input id="cf_title" type="text" value="${esc(p.title || '')}" required></label>
           <label class="cms-field"><span>${t.fSub}</span><input id="cf_sub" type="text" value="${esc(p.subtitle || '')}"></label>
           <div class="cms-row3">
-            <label class="cms-field"><span>${t.fTag}</span><input id="cf_tag" type="text" value="${esc(p.tag || 'Note')}"></label>
+            <label class="cms-field"><span>${t.fTag}</span><input id="cf_tag" type="text" list="cf_cats" value="${esc(p.tag || 'Design')}" autocomplete="off"><datalist id="cf_cats"><option value="Design"></option><option value="Logo"></option><option value="AI"></option><option value="Live"></option><option value="Branding"></option><option value="Print"></option><option value="Photography"></option><option value="Note"></option></datalist></label>
             <label class="cms-field"><span>${t.fMin}</span><input id="cf_min" type="number" min="1" max="60" value="${esc(String(p.read_minutes || 4))}"></label>
             <label class="cms-field cms-field--color"><span>${t.fAccent}</span><input id="cf_accent" type="color" value="${esc(accent)}"></label>
           </div>
-          <label class="cms-field"><span>${t.fCover}</span><input id="cf_cover" type="url" value="${esc(p.cover || '')}" placeholder="${esc(t.fCoverPh)}"></label>
+          <label class="cms-field"><span>${t.fCover}</span>
+            <input id="cf_coverfile" type="file" accept="image/*" class="cms-file">
+            <input id="cf_cover" type="hidden" value="${esc(p.cover || '')}">
+            <span class="cms-uphint" id="cf_upmsg">${p.cover ? '' : t.fCoverHint}</span></label>
           <div class="cms-cover-prev" id="cf_prev"${p.cover ? '' : ' hidden'}><img src="${esc(p.cover || '')}" alt=""></div>
           <label class="cms-field"><span>${t.fBody}</span><textarea id="cf_body" rows="12" placeholder="${esc(t.fBodyPh)}">${esc(p.body || '')}</textarea></label>
           <label class="cms-check"><input type="checkbox" id="cf_pub" ${p.published === false ? '' : 'checked'}> <span>${t.fPub}</span></label>
@@ -907,8 +930,18 @@
         </form>`;
       $('#ctBack').addEventListener('click', cmsList);
       $('#ctCancel').addEventListener('click', cmsList);
-      const cover = $('#cf_cover'), prev = $('#cf_prev');
-      cover.addEventListener('input', () => { const v = cover.value.trim(); if (v) { prev.hidden = false; prev.querySelector('img').src = v; } else { prev.hidden = true; } });
+      const coverHidden = $('#cf_cover'), prev = $('#cf_prev'), upmsg = $('#cf_upmsg');
+      $('#cf_coverfile').addEventListener('change', async (ev) => {
+        const file = ev.target.files && ev.target.files[0]; if (!file) return;
+        upmsg.textContent = t.uploading;
+        try {
+          const b64 = await cmsResize(file, 1600, 0.82);
+          const d = await cmsApi({ action: 'upload', filename: file.name, contentType: 'image/webp', dataB64: b64 });
+          if (d && d.ok && d.url) { coverHidden.value = d.url; prev.hidden = false; prev.querySelector('img').src = d.url; upmsg.textContent = t.uploaded; }
+          else if (d && d.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); }
+          else { upmsg.textContent = '✗ ' + ((d && d.error) || ''); }
+        } catch (err) { upmsg.textContent = '✗ ' + err; }
+      });
       $('#ctForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const title = $('#cf_title').value.trim();
@@ -916,7 +949,7 @@
         if (!title) { msg.textContent = t.needTitle; return; }
         const payload = { action: 'upsert', post: {
           id: p.id || undefined, title,
-          subtitle: $('#cf_sub').value, tag: $('#cf_tag').value.trim() || 'Note',
+          subtitle: $('#cf_sub').value, tag: $('#cf_tag').value.trim() || 'Design',
           read_minutes: Number($('#cf_min').value) || 4, accent: $('#cf_accent').value,
           cover: $('#cf_cover').value.trim(), body: $('#cf_body').value, published: $('#cf_pub').checked
         } };
@@ -1382,6 +1415,8 @@
 .cms-cover-prev[hidden]{display:none}
 .cms-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px}
 .cms-savemsg{opacity:.75;font-size:12px}
+.cms-file{font:inherit;font-size:13px;color:inherit;cursor:pointer;padding:8px 0}
+.cms-uphint{display:block;font-size:11px;opacity:.6;margin-top:4px}
 .dash-btn--go{background:#bd9a4e;border-color:#bd9a4e;color:#17120a;font-weight:600}
 .dash-btn--go:hover{background:#ccab5f;border-color:#ccab5f}
 @media(max-width:560px){.cms-row3{grid-template-columns:1fr 1fr}.cms-form{max-width:none}}`;
