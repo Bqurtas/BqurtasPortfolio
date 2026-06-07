@@ -130,19 +130,33 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   window.__bqShowRoom = showRoom;
 
-  /* While browsing the home / design room, the address bar settles back to the base URL
-     (or /<lang>) as you scroll — the deep /design/<filter> links never "stick" on scroll.
-     Other rooms keep their own URL. Works for every language and section. */
+  /* Scroll-spy on the home / design page — the address bar reflects the section in view:
+       hero (top)       → base   ( / or /<lang> )
+       Pencemor studio  → /pencemor
+       the works / grid → /design
+     Each becomes a real shareable link (with its own cover). Other rooms keep their URL.
+     Works for every language and section. */
   let __urlResetT;
+  const __absTop = (el) => el.getBoundingClientRect().top + window.scrollY;
   window.addEventListener('scroll', () => {
     if (document.body.dataset.room !== 'design') return;
     clearTimeout(__urlResetT);
     __urlResetT = setTimeout(() => {
       if (document.body.dataset.room !== 'design') return;
-      const base = (currentLang && currentLang !== 'en') ? '/' + currentLang : '/';
-      if ((location.pathname.replace(/\/+$/, '') || '/') !== base) {
-        try { history.replaceState(null, '', base); } catch (e) {}
+      const prefix = (currentLang && currentLang !== 'en') ? '/' + currentLang : '';
+      const base = prefix || '/';
+      const pen  = document.getElementById('pencemorHero');
+      const work = document.getElementById('tabHeader');
+      const y = window.scrollY + window.innerHeight * 0.38;     // a touch below the fold
+      let path = base;
+      if (work && y >= __absTop(work)) {
+        path = (currentFilter && currentFilter !== 'all') ? prefix + '/design/' + currentFilter : prefix + '/design';
+      } else if (pen && y >= __absTop(pen)) {
+        path = prefix + '/pencemor';
       }
+      const cur  = (location.pathname.replace(/\/+$/, '') || '/');
+      const want = (path.replace(/\/+$/, '') || '/');
+      if (cur !== want) { try { history.replaceState(null, '', path); } catch (e) {} }
     }, 180);
   }, { passive: true });
 
@@ -167,6 +181,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const t = document.querySelector(`.tab[data-filter="${want}"]`);
         if (t) activateTab(t, false);
       }
+    }
+    if (room === 'pencemor') {
+      requestAnimationFrame(() => document.getElementById('pencemorHero')?.scrollIntoView({ behavior: 'auto', block: 'start' }));
     }
   });
 
@@ -480,6 +497,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (startRoom === 'design' && startTab) {
     const t0 = document.querySelector(`.tab[data-filter="${startTab}"]`);
     if (t0) activateTab(t0);
+  }
+  if (startRoomRaw === 'pencemor') {
+    // a shared /pencemor link lands on the studio section
+    setTimeout(() => document.getElementById('pencemorHero')?.scrollIntoView({ behavior: 'auto', block: 'start' }), 60);
   }
   routerReady = true;   // from here on, language switches update the URL prefix
   triggerReveals();
