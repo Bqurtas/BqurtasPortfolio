@@ -1183,6 +1183,12 @@
     /* translate a post into the active language (falls back to English) */
     const blogLang = () => (document.documentElement.dataset.lang || 'en');
     const L = (p) => {
+      const cm = p._i18n && p._i18n[blogLang()];
+      if (cm && (cm.title || cm.body)) {
+        return { num: p.num, accent: p.accent, img: p.img, read: p.read, tag: p.tag, date: p.date,
+                 title: cm.title || p.title, sub: cm.subtitle || p.sub,
+                 body: cm.body ? String(cm.body).split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean) : p.body };
+      }
       const t = window.BLOG_I18N && window.BLOG_I18N[blogLang()] && window.BLOG_I18N[blogLang()][p.num];
       if (!t) return p;
       return { num: p.num, accent: p.accent, img: p.img, read: p.read,
@@ -1360,7 +1366,8 @@
             img: p.cover || '',
             title: p.title || '',
             sub: p.subtitle || '',
-            body: String(p.body || '').split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean)
+            body: String(p.body || '').split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean),
+            _i18n: p.i18n || null
           }));
           POSTS = cms.concat(BUILTIN_POSTS);
           pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
