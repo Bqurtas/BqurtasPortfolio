@@ -138,6 +138,22 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   window.__bqShowRoom = showRoom;
 
+  /* While browsing the home / design room, the address bar settles back to the base URL
+     (or /<lang>) as you scroll — the deep /design/<filter> links never "stick" on scroll.
+     Other rooms keep their own URL. Works for every language and section. */
+  let __urlResetT;
+  window.addEventListener('scroll', () => {
+    if (document.body.dataset.room !== 'design') return;
+    clearTimeout(__urlResetT);
+    __urlResetT = setTimeout(() => {
+      if (document.body.dataset.room !== 'design') return;
+      const base = (currentLang && currentLang !== 'en') ? '/' + currentLang : '/';
+      if ((location.pathname.replace(/\/+$/, '') || '/') !== base) {
+        try { history.replaceState(null, '', base); } catch (e) {}
+      }
+    }, 180);
+  }, { passive: true });
+
   routeLinks.forEach(a => {
     a.addEventListener('click', (e) => {
       const route = a.dataset.route;

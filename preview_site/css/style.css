@@ -24,7 +24,7 @@ body {
   font-size: 16px;
   line-height: 1.55;
   overflow-x: hidden;
-  cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAACN0lEQVR4AeyVQWsTQRzFXwVLDiYogXyFRPBqIZHS5GpRP4B6sSVqmoOiFGyVJh9A9JBGUET0VrxL62kjaqHtrQW95GavjRDv6/yGzpI22SRbGoXShbfz35md95u3mSFn9I+v/wdst1sVNOrAQcIxjU0ZLf1p//ZHCQ6AvvyqSzdKcACMxy94Drqxsanacl2jAAdA0hlohdbp+/q6LY8TfACIu28+7cTEZSUSCeWyWS3XX9m0jB0HuAvoUmbSaS0sPNVc6b7Gz44rc/HSATAbC7GQKOoCMtml/LW7qwcPH6lYnNX8/GPVavUATFoUFdoTuJ/SK8+VtLq6prv3Srp966YWF5+wni5wlKPUE4irS1kul9RofNHMbFE3rl9TZekZw1aHEw+TNhRoUnrG1aY0rTgqQAuFvF6+eK5YLEa3FWB3jAw0bztDbqFA3iclLSlpt7d3dGemqEwmrc9rn/Tta0OF/BRDdkEU/K60YeoLPJwSk2azqddv3iqVSimZTGp6+irdAdAssmE7Qm59gcwxBlVal5La8zy1Wi1KbW5t2Zaza4sBt4HAzpTOdG+vpWxuUrkrk1pZ+WgR7GhbSJ76XAOBzA1SmmPCsxNgatKzGN7bXyDdPTUUEBPMMMXcOfH84f07kY5x817FjYW1QwGZjJkvv4r5zx87QsCA0s847w3S0ECMMDXmBSM2En9n1AX6GR9GkYAYGnPPqHIufh4Qdd9NwpxORQZ2Tj5KfQo8ylfrO+fkf9K/AAAA//96DAOIAAAABklEQVQDAMUaA0i1asmdAAAAAElFTkSuQmCC") 3 3, auto;
+  cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAACd0lEQVR4AeyVzW8SQRjGH7hhw8maFChcpCamJtrEQpMq6cfNQ/FPsMaPg2JiejAaDUWNRpNeRI89VCBe4T8A/ApcejTRcOGAwZMJURIOxXlmGbo1u8u23U0vneTd2Z3dfX/P887MrhdH1PaAQ6HQUjgcTor+pNt6huBEIrGZXFkp3L51MxcITGwHg8EZN+ESLBwunZuevrKx8Xpibe2+//mzp+FoNHrXdbDX6/UHg4ExBZqcDGFuLn69+6ezrsac7qXjXq/3tVgq/a5Uqmg0GnifKyA2exHwIN392+lTAAMONglut9u/Wq2fyRcvX20+fpL+MnPhPMZPjSObfSeDAhhKhBN8CWaiVqu1Xa1WbxSLpfmryWQmHoshFp/Fm+xbTJ05qwnggw5VYQhmThW+Mf+6cFgmPJ/fwurqtT0CWAlxP804aBUMwRTg8/kXRWIJf/TwgYRznBVgmFWBz9gJU/Dg5Qz7ZrMJPZxjDL2AWr0OITTd7XYWYKNZgoXrMvrIRCIRmMHJoABZfl4Aaa2zPlqC+aqab8I/fvps6JzP1Wp1SNd9LNhxPRLMpMK5nO/Ll+ZRKHwwhQ9d72BkuW2BoTU539Gp0xD73RA+dC22nPaK+dE2WLguow+5v5eXF2FWduV6VLltg6ldzvcAzrJzwVEE76mg68G55SLbF5gJCfed8HvonguOH5kf37/hXmr3ZyZdj1hk+wYTztAL4HUqdQdKgFzdHLTYWgcGa3kBIwH53JZ228L1ocEa4T8BHpSx2wzn2jGw4sgK8DsvFiHXAXZQUff0veNglVwKEH859mpM37sG1kOMzo/BRlVxZey41K6U1SjpPwAAAP//WqnDWQAAAAZJREFUAwCdRgZMpG8JWAAAAABJRU5ErkJggg==") 4 4, auto;
   transition: background 0.5s var(--ease), color 0.5s var(--ease);
 }
 img, svg { display: block; max-width: 100%; }
@@ -42,7 +42,7 @@ input, select, textarea { font-family: inherit; color: inherit; }
   --ember: #0a0a0a;
 
   /* native design-pen cursor (dark nib + light outline → visible on light AND dark) */
-  --cur: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAACN0lEQVR4AeyVQWsTQRzFXwVLDiYogXyFRPBqIZHS5GpRP4B6sSVqmoOiFGyVJh9A9JBGUET0VrxL62kjaqHtrQW95GavjRDv6/yGzpI22SRbGoXShbfz35md95u3mSFn9I+v/wdst1sVNOrAQcIxjU0ZLf1p//ZHCQ6AvvyqSzdKcACMxy94Drqxsanacl2jAAdA0hlohdbp+/q6LY8TfACIu28+7cTEZSUSCeWyWS3XX9m0jB0HuAvoUmbSaS0sPNVc6b7Gz44rc/HSATAbC7GQKOoCMtml/LW7qwcPH6lYnNX8/GPVavUATFoUFdoTuJ/SK8+VtLq6prv3Srp966YWF5+wni5wlKPUE4irS1kul9RofNHMbFE3rl9TZekZw1aHEw+TNhRoUnrG1aY0rTgqQAuFvF6+eK5YLEa3FWB3jAw0bztDbqFA3iclLSlpt7d3dGemqEwmrc9rn/Tta0OF/BRDdkEU/K60YeoLPJwSk2azqddv3iqVSimZTGp6+irdAdAssmE7Qm59gcwxBlVal5La8zy1Wi1KbW5t2Zaza4sBt4HAzpTOdG+vpWxuUrkrk1pZ+WgR7GhbSJ76XAOBzA1SmmPCsxNgatKzGN7bXyDdPTUUEBPMMMXcOfH84f07kY5x817FjYW1QwGZjJkvv4r5zx87QsCA0s847w3S0ECMMDXmBSM2En9n1AX6GR9GkYAYGnPPqHIufh4Qdd9NwpxORQZ2Tj5KfQo8ylfrO+fkf9K/AAAA//96DAOIAAAABklEQVQDAMUaA0i1asmdAAAAAElFTkSuQmCC") 3 3, auto;
+  --cur: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAACd0lEQVR4AeyVzW8SQRjGH7hhw8maFChcpCamJtrEQpMq6cfNQ/FPsMaPg2JiejAaDUWNRpNeRI89VCBe4T8A/ApcejTRcOGAwZMJURIOxXlmGbo1u8u23U0vneTd2Z3dfX/P887MrhdH1PaAQ6HQUjgcTor+pNt6huBEIrGZXFkp3L51MxcITGwHg8EZN+ESLBwunZuevrKx8Xpibe2+//mzp+FoNHrXdbDX6/UHg4ExBZqcDGFuLn69+6ezrsac7qXjXq/3tVgq/a5Uqmg0GnifKyA2exHwIN392+lTAAMONglut9u/Wq2fyRcvX20+fpL+MnPhPMZPjSObfSeDAhhKhBN8CWaiVqu1Xa1WbxSLpfmryWQmHoshFp/Fm+xbTJ05qwnggw5VYQhmThW+Mf+6cFgmPJ/fwurqtT0CWAlxP804aBUMwRTg8/kXRWIJf/TwgYRznBVgmFWBz9gJU/Dg5Qz7ZrMJPZxjDL2AWr0OITTd7XYWYKNZgoXrMvrIRCIRmMHJoABZfl4Aaa2zPlqC+aqab8I/fvps6JzP1Wp1SNd9LNhxPRLMpMK5nO/Ll+ZRKHwwhQ9d72BkuW2BoTU539Gp0xD73RA+dC22nPaK+dE2WLguow+5v5eXF2FWduV6VLltg6ldzvcAzrJzwVEE76mg68G55SLbF5gJCfed8HvonguOH5kf37/hXmr3ZyZdj1hk+wYTztAL4HUqdQdKgFzdHLTYWgcGa3kBIwH53JZ228L1ocEa4T8BHpSx2wzn2jGw4sgK8DsvFiHXAXZQUff0veNglVwKEH859mpM37sG1kOMzo/BRlVxZey41K6U1SjpPwAAAP//WqnDWQAAAAZJREFUAwCdRgZMpG8JWAAAAABJRU5ErkJggg==") 4 4, auto;
 
   --rail-w: 96px;
   --dock-h: calc(64px + env(safe-area-inset-bottom));   /* mobile bottom dock height */
@@ -736,7 +736,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   height: 64px; background: var(--ink); z-index: 5;
   animation: letterboxOpen 1.6s var(--ease-out) 0.3s both;
 }
-:root[data-theme="dark"] .hero-letterbox { background: #111110; }
+/* strips invert with the theme: dark strips (light mode) / white strips (dark mode) via var(--ink) */
 .hero-letterbox--top { top: 0; transform-origin: top; }
 .hero-letterbox--bottom { bottom: 0; transform-origin: bottom; }
 @keyframes letterboxOpen {
@@ -756,7 +756,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 }
 
 .hero-meta { position: absolute; z-index: 6; opacity: 0; animation: fadeIn 1s ease 1.6s forwards; }
-.hero-meta .mono { color: var(--gold); display: block; }
+.hero-meta .mono { color: var(--bg); display: block; }   /* inverts: white text on dark strip (light mode), black text on white strip (dark mode) */
 .hero-meta i { margin-right: 6px; }
 .hero-meta--tl { top: 22px; left: 32px; }
 .hero-meta--tr { top: 22px; right: 32px; text-align: right; }
@@ -2383,22 +2383,22 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   font-family: 'Fraunces', serif;
   font-size: clamp(28px, 3.4vw, 44px);
   font-weight: 500; line-height: 1.15;
-  color: var(--bg-2);
+  color: #ececea;   /* footer is always dark → keep the headline light in both themes */
   letter-spacing: -0.02em;
   max-width: 640px;
 }
 .footer-cta-title em { color: var(--gold); font-style: italic; }
 .footer-cta-btn {
   display: inline-flex; align-items: center; gap: 14px;
-  padding: 20px 32px;
-  background: var(--gold-bright); color: var(--bg);
+  padding: 19px 32px;
+  background: transparent; color: #ececea; border: 1px solid #ececea;
   font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
   font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
   border-radius: 2px;
-  transition: all 0.3s var(--ease);
+  transition: background 0.35s var(--ease), color 0.35s var(--ease), gap 0.3s var(--ease);
   flex-shrink: 0;
 }
-.footer-cta-btn:hover { background: var(--bg-2); color: var(--ink); gap: 18px; }
+.footer-cta-btn:hover { background: #ececea; color: #1a1a18; gap: 18px; }
 
 /* Main grid */
 .footer-main {
