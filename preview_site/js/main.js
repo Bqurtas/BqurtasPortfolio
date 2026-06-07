@@ -4,6 +4,14 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  /* Native design-pen cursor — applied inline because the stylesheet `cursor` value
+     gets dropped in some engines; inline wins, stays native (instant, no lag) and,
+     since `cursor` inherits, covers the whole page. */
+  try {
+    const penCur = getComputedStyle(document.documentElement).getPropertyValue('--cur').trim();
+    if (penCur) document.documentElement.style.cursor = penCur;
+  } catch (e) {}
+
   /* ---------- THEME (dark / light) — toggle switch ---------- */
   const themeBtns = [document.getElementById('themeToggle'), document.getElementById('themeToggleM')].filter(Boolean);
   const applyTheme = (t) => {
@@ -734,7 +742,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- Custom Cursor ---------- */
   const dot = document.getElementById('cursorDot');
   const ring = document.getElementById('cursorRing');
-  if (dot && ring && window.matchMedia('(pointer: fine)').matches) {
+  if (false && dot && ring) {   /* replaced by the native --cur design-pen cursor (instant, no lag) */
     let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
     document.addEventListener('mousemove', (e) => {
       mx = e.clientX; my = e.clientY;
