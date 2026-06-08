@@ -3313,6 +3313,14 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .reader-like.is-liked i { color: var(--ember); transform: scale(1.15); }
 :root[data-theme="dark"] .reader-like.is-liked i { color: #e8607a; }
 .reader-engage-count { color: var(--ink-muted) !important; font-size: 10px; }
+.reader-share { display: inline-flex; align-items: center; gap: 9px; padding: 12px 20px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-soft); cursor: pointer; font-size: 13px; transition: all 0.25s var(--ease); }
+.reader-share i { color: var(--ink-muted); font-size: 13px; transition: color 0.25s; }
+.reader-share small { color: var(--ink-muted); font-size: 11px; }
+.reader-share:hover { border-color: var(--ink-soft); color: var(--ink); }
+.reader-share:hover i, .reader-share:hover small { color: var(--ink); }
+.reader-share.is-copied { border-color: var(--ink); background: var(--ink); color: var(--bg); }
+.reader-share.is-copied i, .reader-share.is-copied small { color: var(--bg); }
+.reader-share.is-copied small::after { content: ' ✓'; }
 
 .reader-comments { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
 .reader-comment { padding: 14px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }

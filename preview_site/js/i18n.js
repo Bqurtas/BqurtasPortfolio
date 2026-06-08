@@ -1702,3 +1702,7 @@ Object.keys(window.I18N_EXTRA_CH).forEach(function(l){ if(window.I18N[l]) Object
 /* ===== hero services tagline ===== */
 window.I18N_EXTRA_HS = {"en": {"hero.services": "Design • Printing • Advertising", "hero.ai": "Artificial Intelligence • AI"}, "ku": {"hero.services": "دیزاین • چاپ • بانگەشە", "hero.ai": "زیرەکیی دەستکرد • AI"}, "kmr": {"hero.services": "Sêwiran • Çap • Reklam", "hero.ai": "Aqilmendiya Çêkirî • AI"}, "ar": {"hero.services": "تصميم • طباعة • إعلان", "hero.ai": "الذكاء الاصطناعي • AI"}, "fr": {"hero.services": "Design • Impression • Publicité", "hero.ai": "Intelligence Artificielle • IA"}};
 Object.keys(window.I18N_EXTRA_HS).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_HS[l]); });
+
+/* ===== blog reader share button ===== */
+window.I18N_EXTRA_RDS = {"en":{"rd.share":"Share"},"ku":{"rd.share":"هاوبەشی"},"kmr":{"rd.share":"Parve bike"},"ar":{"rd.share":"مشاركة"},"fr":{"rd.share":"Partager"},"tr":{"rd.share":"Paylaş"},"sv":{"rd.share":"Dela"}};
+Object.keys(window.I18N_EXTRA_RDS).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_RDS[l]); });

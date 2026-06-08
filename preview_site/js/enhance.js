@@ -1245,6 +1245,8 @@
     ];
 
     const PAGE_SIZE = 4;
+    const slugify = (s) => String(s || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 60) || 'note';
+    POSTS.forEach((p) => { if (!p.slug) p.slug = slugify(p.title); });   // built-ins: slug from title
     let pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
     let page = 1;
 
@@ -1387,9 +1389,13 @@
         `<div class="reader-comment"><div class="reader-comment-head"><strong>${esc(c.name)}</strong><span class="mono">${new Date(c.at).toLocaleDateString()}</span></div><p>${esc(c.text)}</p></div>`).join('')
         : `<p class="reader-comment-empty">${empty}</p>`;
     };
-    const openReader = (p) => {
+    const blogBase = () => { const lang = document.documentElement.dataset.lang || 'en'; return (lang && lang !== 'en' ? '/' + lang : '') + '/blog'; };
+    let curSlug = null, pendingSlug = null;
+    const findPostBySlug = (slug) => { const id = parseInt(slug, 10); return POSTS.find((p) => p.slug === slug || (p.id != null && p.id === id) || String(p.num) === slug) || null; };
+    const openReader = (p, fromPop) => {
       curNum = p.num;
       curPostObj = p;
+      curSlug = p.slug || slugify(p.title);
       const q = L(p);
       if (rd.img) { rd.img.src = q.img; rd.img.alt = q.title; }
       if (rd.tag) rd.tag.textContent = q.tag;
@@ -1400,8 +1406,15 @@
       renderLike(); renderComments();
       reader.classList.add('is-open'); reader.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden'; reader.scrollTop = 0;
+      try { document.title = String(q.title || '').replace(/<[^>]+>/g, '') + ' — Barakat Qurtas'; } catch (e) {}
+      if (!fromPop) { try { history.pushState({ bqPost: curSlug }, '', blogBase() + '/' + curSlug); } catch (e) {} }
     };
-    const closeReader = () => { reader.classList.remove('is-open'); reader.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; };
+    const closeReaderDom = () => { reader.classList.remove('is-open'); reader.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; };
+    const closeReader = () => {
+      closeReaderDom();
+      if (history.state && history.state.bqPost) history.back();
+      else if (/\/blog\/[^/]+/.test(location.pathname)) { try { history.replaceState(null, '', blogBase()); } catch (e) {} }
+    };
     $('#readerClose')?.addEventListener('click', closeReader);
     reader?.addEventListener('click', (e) => { if (e.target === reader) closeReader(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && reader.classList.contains('is-open')) closeReader(); });
@@ -1419,6 +1432,24 @@
       try { localStorage.setItem(cmKey(curNum), JSON.stringify(l)); } catch (x) {}
       rd.cText.value = ''; renderComments();
     });
+    /* share — open the native share sheet or copy the link; the shared link
+       carries the post's own cover (rewritten by the Pages Function). */
+    $('#rdShare')?.addEventListener('click', async () => {
+      const url = location.origin + blogBase() + '/' + (curSlug || '');
+      const title = String((curPostObj && L(curPostObj).title) || 'Barakat Qurtas').replace(/<[^>]+>/g, '');
+      if (navigator.share) { try { await navigator.share({ title, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+      try { await navigator.clipboard.writeText(url); const b = $('#rdShare'); if (b) { b.classList.add('is-copied'); setTimeout(() => b.classList.remove('is-copied'), 1600); } } catch (e) {}
+    });
+    /* deep-link + back/forward: keep the reader in sync with /blog/<slug> */
+    window.__bqOpenPostSlug = (slug) => { if (!slug) return; const p = findPostBySlug(slug); if (p) openReader(p, true); else pendingSlug = slug; };
+    window.__bqCloseReader = () => { if (reader.classList.contains('is-open')) closeReaderDom(); };
+    window.addEventListener('popstate', () => {
+      const m = location.pathname.match(/\/blog\/([^\/?#]+)/);
+      if (m) { const slug = decodeURIComponent(m[1]); if (!(curSlug === slug && reader.classList.contains('is-open'))) window.__bqOpenPostSlug(slug); }
+      else if (reader.classList.contains('is-open')) closeReaderDom();
+    });
+    /* opened straight at /blog/<slug> (deep link / refresh) — built-ins open now, DB posts after they load */
+    (function () { const m = location.pathname.match(/\/blog\/([^\/?#]+)/); if (m) { const slug = decodeURIComponent(m[1]); const p = findPostBySlug(slug); if (p) openReader(p, true); else pendingSlug = slug; } })();
 
     renderPage();
         /* studio-managed posts from Supabase, merged ahead of the built-in notes.
@@ -1434,6 +1465,8 @@
         .then((r) => r.json()).then((rows) => {
           const cms = (Array.isArray(rows) ? rows : []).map((p) => ({
             num: String(p.num || p.id || ''),
+            id: p.id,
+            slug: (p.id ? p.id + '-' : '') + slugify(p.title || 'note'),
             tag: p.tag || 'Note',
             date: p.date || (p.created_at ? new Date(p.created_at).toLocaleDateString('en', { month: 'short', year: 'numeric' }) : ''),
             read: p.read_minutes || 4,
@@ -1448,6 +1481,7 @@
           pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
           if (page > pageCount) page = 1;
           renderPage();
+          if (pendingSlug) { const s = pendingSlug; pendingSlug = null; const p = findPostBySlug(s); if (p) openReader(p, true); }
         }).catch(() => {});
     };
     loadCmsPosts();

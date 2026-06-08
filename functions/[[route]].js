@@ -13,6 +13,8 @@
    ========================================================= */
 
 const SITE = 'https://bqurtas.com';
+const SUPA = 'https://dcnkhzrishphpismmxuu.supabase.co';             // blog posts live here
+const SUPA_KEY = 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3';   // publishable (read-only, safe in client)
 const LANGS = ['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];                 // en = no prefix
 const ROOMS = ['blog', 'bio', 'contact'];
 const TABS  = ['official','book','image','logo','posters','social','events','business','invoices','video','other'];
@@ -32,6 +34,7 @@ function resolve(pathname) {
     return { lang, key: 'home', canon: SITE + (prefix || '/') };
   }
   if (room === 'panjamor' || room === 'pencemor') return { lang, key: 'panjamor', canon: SITE + prefix + '/panjamor' };
+  if (room === 'blog' && seg[1]) return { lang, key: 'blogpost', slug: seg[1], canon: SITE + prefix + '/blog/' + seg[1] };
   if (ROOMS.includes(room)) return { lang, key: room, canon: SITE + prefix + '/' + room };
   return null;   // unknown → let Pages handle (404 / SPA fallback)
 }
@@ -48,8 +51,33 @@ export async function onRequest(context) {
   if (!r) return next();
   if (!env || !env.ASSETS) return next();
 
-  const meta = (OG[r.lang] && OG[r.lang][r.key]) || OG.en[r.key] || OG.en.home;
-  const img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=2';
+  let meta, img, imgType = 'image/jpeg';
+  if (r.key === 'blogpost') {
+    // a single blog post — fetch it from Supabase so the share shows ITS cover + title
+    const id = parseInt(r.slug, 10);
+    let post = null;
+    if (id) {
+      try {
+        const res = await fetch(SUPA + '/rest/v1/posts?id=eq.' + id + '&select=title,subtitle,cover,i18n&limit=1',
+          { headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY } });
+        if (res.ok) { const rows = await res.json(); post = Array.isArray(rows) ? rows[0] : null; }
+      } catch (e) {}
+    }
+    if (post) {
+      const tr = (post.i18n && post.i18n[r.lang]) || {};
+      const blogD = (OG[r.lang] && OG[r.lang].blog && OG[r.lang].blog.d) || OG.en.blog.d;
+      meta = { t: String(tr.title || post.title || 'Journal').trim() + ' — Barakat Qurtas',
+               d: String(tr.subtitle || post.subtitle || blogD).trim() };
+      img  = (post.cover && /^https?:\/\//.test(post.cover)) ? post.cover : (SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=2');
+      imgType = /\.png(\?|$)/i.test(img) ? 'image/png' : /\.webp(\?|$)/i.test(img) ? 'image/webp' : 'image/jpeg';
+    } else {
+      meta = (OG[r.lang] && OG[r.lang].blog) || OG.en.blog;
+      img  = SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=2';
+    }
+  } else {
+    meta = (OG[r.lang] && OG[r.lang][r.key]) || OG.en[r.key] || OG.en.home;
+    img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=2';
+  }
 
   try {
     const shell = await env.ASSETS.fetch(new URL('/index.html', url.origin));
@@ -60,7 +88,7 @@ export async function onRequest(context) {
       .on('meta[property="og:title"]',        setContent(meta.t))
       .on('meta[property="og:description"]',  setContent(meta.d))
       .on('meta[property="og:image"]',        setContent(img))
-      .on('meta[property="og:image:type"]',   setContent('image/jpeg'))
+      .on('meta[property="og:image:type"]',   setContent(imgType))
       .on('meta[property="og:image:alt"]',    setContent(meta.t))
       .on('meta[property="og:url"]',          setContent(r.canon))
       .on('meta[property="og:locale"]',       setContent(LOCALE[r.lang] || 'en_US'))

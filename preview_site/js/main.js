@@ -107,6 +107,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       path = prefix + '/' + room;
     }
+    // a deep blog-post URL (/blog/<slug>) is owned by the reader — leave it intact on passive syncs
+    if (room === 'blog' && !push && /\/blog\/[^/]+/.test(location.pathname)) return;
     if ((location.pathname.replace(/\/+$/, '') || '/') === path) return;
     try {
       if (push) history.pushState(null, '', path);
@@ -170,6 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!route) return;
       // allow language buttons to keep their own behavior — they don't have data-route
       e.preventDefault();
+      if (window.__bqCloseReader) window.__bqCloseReader();   // leaving via the rail closes an open post
       showRoom(route, true);
     });
   });
