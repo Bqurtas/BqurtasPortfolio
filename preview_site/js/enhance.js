@@ -1374,20 +1374,38 @@
     const baseLikes = (n) => 11 + (parseInt(n, 10) * 7) % 30;
     const getComments = (n) => { try { return JSON.parse(localStorage.getItem(cmKey(n)) || '[]'); } catch (e) { return []; } };
     const esc = (s) => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+    /* real, shared likes + comments on published posts (Supabase); built-in demo notes stay on localStorage */
+    const SBE = () => window.BQ_SUPA || {};
+    const sbHeaders = () => ({ apikey: SBE().key, Authorization: 'Bearer ' + SBE().key, 'Content-Type': 'application/json' });
+    const profile = () => { try { return JSON.parse(localStorage.getItem('bq_blog_profile') || '{}'); } catch (e) { return {}; } };
+    const saveProfile = (pp) => { try { localStorage.setItem('bq_blog_profile', JSON.stringify(pp)); } catch (e) {} };
+    const myToken = () => { const pp = profile(); if (!pp.token) { pp.token = 'bq' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36); saveProfile(pp); } return pp.token; };
+    let curLikes = 0, curLiked = false;
     const renderLike = () => {
-      const liked = localStorage.getItem(lkKey(curNum)) === '1';
-      if (rd.likeCount) rd.likeCount.textContent = baseLikes(curNum) + (liked ? 1 : 0);
-      rd.like.classList.toggle('is-liked', liked);
-      rd.like.setAttribute('aria-pressed', liked ? 'true' : 'false');
+      if (rd.likeCount) rd.likeCount.textContent = curLikes;
+      rd.like.classList.toggle('is-liked', curLiked);
+      rd.like.setAttribute('aria-pressed', curLiked ? 'true' : 'false');
     };
-    const renderComments = () => {
-      const l = getComments(curNum);
+    const renderCommentList = (l) => {
       const cTpl = (window.BQ_DICT && window.BQ_DICT['blog.comments']) || '{n} comments';
       rd.commentCount.textContent = cTpl.replace('{n}', l.length);
       const empty = (window.BQ_DICT && window.BQ_DICT['blog.noComments']) || 'No comments yet — be the first to write one.';
-      rd.comments.innerHTML = l.length ? l.slice().reverse().map(c =>
+      rd.comments.innerHTML = l.length ? l.map(c =>
         `<div class="reader-comment"><div class="reader-comment-head"><strong>${esc(c.name)}</strong><span class="mono">${new Date(c.at).toLocaleDateString()}</span></div><p>${esc(c.text)}</p></div>`).join('')
         : `<p class="reader-comment-empty">${empty}</p>`;
+    };
+    const loadEngagement = (p) => {
+      if (p && p.id != null && SBE().url) {
+        curLikes = 0; curLiked = false; renderLike(); renderCommentList([]);
+        fetch(SBE().url + '/rest/v1/post_likes?post_id=eq.' + p.id + '&select=token', { headers: sbHeaders(), cache: 'no-store' })
+          .then((r) => r.ok ? r.json() : []).then((rows) => { if (curPostObj !== p) return; const tok = myToken(); curLikes = rows.length; curLiked = rows.some((x) => x.token === tok); renderLike(); }).catch(() => {});
+        fetch(SBE().url + '/rest/v1/comments?post_id=eq.' + p.id + '&select=name,body,created_at&order=created_at.desc', { headers: sbHeaders(), cache: 'no-store' })
+          .then((r) => r.ok ? r.json() : []).then((rows) => { if (curPostObj !== p) return; renderCommentList(rows.map((c) => ({ name: c.name, text: c.body, at: c.created_at }))); }).catch(() => {});
+      } else {
+        const liked = localStorage.getItem(lkKey(p.num)) === '1';
+        curLiked = liked; curLikes = baseLikes(p.num) + (liked ? 1 : 0); renderLike();
+        renderCommentList(getComments(p.num).slice().reverse());
+      }
     };
     const blogBase = () => { const lang = document.documentElement.dataset.lang || 'en'; return (lang && lang !== 'en' ? '/' + lang : '') + '/blog'; };
     let curSlug = null, pendingSlug = null;
@@ -1403,7 +1421,8 @@
       if (rd.date) rd.date.textContent = (q.date || '').toUpperCase();
       if (rd.read) rd.read.textContent = dT('blog.minRead', '{n} MIN READ').replace('{n}', p.read);
       if (rd.text) rd.text.innerHTML = q.body.map(x => `<p>${x}</p>`).join('');
-      renderLike(); renderComments();
+      if (rd.cName && !rd.cName.value) { const pn = profile().name; if (pn) rd.cName.value = pn; }   // prefill from the saved profile
+      loadEngagement(p);
       reader.classList.add('is-open'); reader.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden'; reader.scrollTop = 0;
       try { document.title = String(q.title || '').replace(/<[^>]+>/g, '') + ' — Barakat Qurtas'; } catch (e) {}
@@ -1419,18 +1438,38 @@
     reader?.addEventListener('click', (e) => { if (e.target === reader) closeReader(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && reader.classList.contains('is-open')) closeReader(); });
     rd.like?.addEventListener('click', () => {
-      const liked = localStorage.getItem(lkKey(curNum)) === '1';
-      if (liked) localStorage.removeItem(lkKey(curNum)); else localStorage.setItem(lkKey(curNum), '1');
-      renderLike();
+      const p = curPostObj; if (!p) return;
+      if (p.id != null && SBE().url) {
+        const tok = myToken();
+        if (!curLiked) {
+          curLiked = true; curLikes++; renderLike();
+          fetch(SBE().url + '/rest/v1/post_likes', { method: 'POST', headers: Object.assign(sbHeaders(), { Prefer: 'resolution=ignore-duplicates' }), body: JSON.stringify({ post_id: p.id, token: tok }) }).catch(() => {});
+        } else {
+          curLiked = false; curLikes = Math.max(0, curLikes - 1); renderLike();
+          fetch(SBE().url + '/rest/v1/post_likes?post_id=eq.' + p.id + '&token=eq.' + encodeURIComponent(tok), { method: 'DELETE', headers: sbHeaders() }).catch(() => {});
+        }
+      } else {
+        const liked = localStorage.getItem(lkKey(p.num)) === '1';
+        if (liked) localStorage.removeItem(lkKey(p.num)); else localStorage.setItem(lkKey(p.num), '1');
+        curLiked = !liked; curLikes = baseLikes(p.num) + (curLiked ? 1 : 0); renderLike();
+      }
     });
     rd.cForm?.addEventListener('submit', (e) => {
       e.preventDefault();
+      const p = curPostObj; if (!p) return;
       const name = (rd.cName.value || '').trim() || dT('blog.anon', 'Anonymous');
       const text = (rd.cText.value || '').trim();
       if (!text) { rd.cText.focus(); return; }
-      const l = getComments(curNum); l.push({ name, text, at: Date.now() });
-      try { localStorage.setItem(cmKey(curNum), JSON.stringify(l)); } catch (x) {}
-      rd.cText.value = ''; renderComments();
+      const pp = profile(); pp.name = name; saveProfile(pp);   // remember the visitor for next time (lightweight profile)
+      if (p.id != null && SBE().url) {
+        const btn = rd.cForm.querySelector('button[type="submit"], button:not([type])'); if (btn) btn.disabled = true;
+        fetch(SBE().url + '/rest/v1/comments', { method: 'POST', headers: Object.assign(sbHeaders(), { Prefer: 'return=minimal' }), body: JSON.stringify({ post_id: p.id, name: name, body: text }) })
+          .then(() => { rd.cText.value = ''; loadEngagement(p); }).catch(() => {}).then(() => { if (btn) btn.disabled = false; });
+      } else {
+        const l = getComments(p.num); l.push({ name, text, at: Date.now() });
+        try { localStorage.setItem(cmKey(p.num), JSON.stringify(l)); } catch (x) {}
+        rd.cText.value = ''; renderCommentList(getComments(p.num).slice().reverse());
+      }
     });
     /* share — open the native share sheet or copy the link; the shared link
        carries the post's own cover (rewritten by the Pages Function). */
@@ -1497,7 +1536,7 @@
         if (rd.read) rd.read.textContent = dT('blog.minRead', '{n} MIN READ').replace('{n}', curPostObj.read);
         if (rd.text) rd.text.innerHTML = q.body.map(x => `<p>${x}</p>`).join('');
         if (rd.img) rd.img.alt = q.title;
-        renderComments();
+        loadEngagement(curPostObj);
       }
     });
   })();
