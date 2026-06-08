@@ -1706,3 +1706,7 @@ Object.keys(window.I18N_EXTRA_HS).forEach(function(l){ if(window.I18N[l]) Object
 /* ===== blog reader share button ===== */
 window.I18N_EXTRA_RDS = {"en":{"rd.share":"Share"},"ku":{"rd.share":"هاوبەشی"},"kmr":{"rd.share":"Parve bike"},"ar":{"rd.share":"مشاركة"},"fr":{"rd.share":"Partager"},"tr":{"rd.share":"Paylaş"},"sv":{"rd.share":"Dela"}};
 Object.keys(window.I18N_EXTRA_RDS).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_RDS[l]); });
+
+/* ===== blog reader: back + more ===== */
+window.I18N_EXTRA_RD2 = {"en":{"rd.back":"Back","rd.more":"More from the journal"},"ku":{"rd.back":"گەڕانەوە","rd.more":"زیاتر لە گۆڤارەکە"},"kmr":{"rd.back":"Vegere","rd.more":"Zêdetir ji kovarê"},"ar":{"rd.back":"رجوع","rd.more":"المزيد من المدونة"},"fr":{"rd.back":"Retour","rd.more":"Plus du journal"},"tr":{"rd.back":"Geri","rd.more":"Dergiden dahası"},"sv":{"rd.back":"Tillbaka","rd.more":"Mer från journalen"}};
+Object.keys(window.I18N_EXTRA_RD2).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_RD2[l]); });

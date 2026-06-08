@@ -6,6 +6,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#14100b" />
 
+  <!-- Meta (Facebook) Pixel -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '27084011407949160');
+    fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=27084011407949160&ev=PageView&noscript=1" alt="" /></noscript>
+  <!-- End Meta Pixel -->
+
   <!-- Primary SEO -->
   <title>Barakat Qurtas | Design • Printing • Advertising • AI</title>
   <meta name="description" content="Kurdish graphic & motion designer in Hewlêr — brand identity, editorial, books, logos, posters, advertising & video. 1000+ works. Let's create yours." />
@@ -113,7 +130,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"></noscript>
 
-  <link rel="stylesheet" href="css/style.css?v=109" />
+  <link rel="stylesheet" href="css/style.css?v=110" />
 </head>
 <body>
 
@@ -1350,56 +1367,71 @@
   <!-- ===== BLOG POST READER ===== -->
   <div class="reader" id="reader" aria-hidden="true">
     <article class="reader-panel" role="article">
-      <button class="reader-close" id="readerClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
-      <div class="reader-cover">
-        <img id="rdImg" src="" alt="" />
-        <span class="reader-cover-tag mono" id="rdTag"></span>
+      <div class="reader-bar">
+        <button class="reader-back" id="readerBack" aria-label="Back"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="rd.back">Back</span></button>
+        <button class="reader-close" id="readerClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div class="reader-body">
-        <h2 class="reader-title" id="rdTitle"></h2>
-        <div class="reader-meta">
-          <span class="reader-author">
-            <img src="assets/avatar.webp" alt="" />
-            <span><strong id="rdAuthor" data-i18n="name.full">Barakat Qurtas</strong><small class="mono" data-i18n="float.designer">Designer · Hewlêr</small></span>
-          </span>
-          <span class="reader-meta-dot" aria-hidden="true">·</span>
-          <span class="mono reader-date" id="rdDate"></span>
-          <span class="reader-meta-dot" aria-hidden="true">·</span>
-          <span class="mono reader-read" id="rdRead"></span>
-        </div>
-        <div class="reader-text" id="rdText"></div>
-
-        <!-- Like + comments -->
-        <div class="reader-engage">
-          <button class="reader-like" id="rdLike" aria-pressed="false">
-            <i class="fa-solid fa-heart"></i> <span id="rdLikeCount">0</span> <small data-i18n="rd.likes">likes</small>
-          </button>
-          <span class="reader-engage-count mono" id="rdCommentCount">0 comments</span>
-          <button class="reader-share" id="rdShare" aria-label="Share" data-i18n-title="rd.share" title="Share this post">
-            <i class="fa-solid fa-arrow-up-from-bracket"></i> <small data-i18n="rd.share">Share</small>
-          </button>
-        </div>
-
-        <div class="reader-comments" id="rdComments"></div>
-
-        <form class="reader-comment-form" id="rdCommentForm">
-          <div class="reader-comment-row">
-            <input type="text" id="rdCommentName" placeholder="Your name" data-i18n-ph="cf.name.ph" autocomplete="name" />
-            <button type="submit" aria-label="Post comment"><span data-i18n="rd.post">Post</span> <i class="fa-solid fa-paper-plane"></i></button>
+      <div class="reader-scroll" id="rdScroll">
+        <div class="reader-body">
+          <span class="reader-tag mono" id="rdTag"></span>
+          <h1 class="reader-title" id="rdTitle"></h1>
+          <div class="reader-meta">
+            <span class="reader-author">
+              <img src="assets/avatar.webp" alt="" />
+              <span><strong id="rdAuthor" data-i18n="name.full">Barakat Qurtas</strong><small class="mono" data-i18n="float.designer">Designer · Hewlêr</small></span>
+            </span>
+            <span class="reader-meta-dot" aria-hidden="true">·</span>
+            <span class="mono reader-date" id="rdDate"></span>
+            <span class="reader-meta-dot" aria-hidden="true">·</span>
+            <span class="mono reader-read" id="rdRead"></span>
           </div>
-          <textarea id="rdCommentText" placeholder="Share a thought…" data-i18n-ph="rd.cmt" rows="2"></textarea>
-        </form>
+          <figure class="reader-cover"><img id="rdImg" src="" alt="" /></figure>
+          <p class="reader-highlight" id="rdHighlight"></p>
+          <div class="reader-text" id="rdText"></div>
+
+          <!-- Like · comments · share -->
+          <div class="reader-engage">
+            <button class="reader-like" id="rdLike" aria-pressed="false">
+              <i class="fa-solid fa-heart"></i> <span id="rdLikeCount">0</span> <small data-i18n="rd.likes">likes</small>
+            </button>
+            <span class="reader-engage-count mono" id="rdCommentCount">0 comments</span>
+            <button class="reader-share" id="rdShare" aria-label="Share" title="Share this post">
+              <i class="fa-solid fa-arrow-up-from-bracket"></i> <small data-i18n="rd.share">Share</small>
+            </button>
+          </div>
+
+          <div class="reader-comments" id="rdComments"></div>
+
+          <form class="reader-comment-form" id="rdCommentForm">
+            <div class="reader-comment-row">
+              <input type="text" id="rdCommentName" placeholder="Your name" data-i18n-ph="cf.name.ph" autocomplete="name" />
+              <button type="submit" aria-label="Post comment"><span data-i18n="rd.post">Post</span> <i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+            <textarea id="rdCommentText" placeholder="Share a thought…" data-i18n-ph="rd.cmt" rows="2"></textarea>
+          </form>
+        </div>
+
+        <!-- More posts (instead of a footer) -->
+        <nav class="reader-more" id="readerMore" aria-label="More posts">
+          <div class="reader-more-head">
+            <button class="reader-more-nav" id="rdPrev" aria-label="Previous post"><i class="fa-solid fa-arrow-left"></i></button>
+            <span class="reader-more-title" data-i18n="rd.more">More from the journal</span>
+            <button class="reader-more-nav" id="rdNext" aria-label="Next post"><i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+          <div class="reader-more-grid" id="rdMoreGrid"></div>
+        </nav>
       </div>
+      <button class="reader-top" id="rdTop" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
     </article>
   </div>
 
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script src="js/i18n.js?v=109"></script>
-  <script src="js/chat-kb.js?v=109"></script>
-  <script src="js/main.js?v=109"></script>
-  <script src="js/gallery.js?v=109"></script>
-  <script src="js/enhance.js?v=109"></script>
+  <script src="js/i18n.js?v=110"></script>
+  <script src="js/chat-kb.js?v=110"></script>
+  <script src="js/main.js?v=110"></script>
+  <script src="js/gallery.js?v=110"></script>
+  <script src="js/enhance.js?v=110"></script>
 </body>
 </html>

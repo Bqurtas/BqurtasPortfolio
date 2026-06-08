@@ -1246,7 +1246,7 @@
 
     const PAGE_SIZE = 4;
     const slugify = (s) => String(s || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 60) || 'note';
-    POSTS.forEach((p) => { if (!p.slug) p.slug = slugify(p.title); });   // built-ins: slug from title
+    POSTS.forEach((p) => { if (!p.slug) p.slug = String(p.num || slugify(p.title)); });   // built-ins: numeric link
     let pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
     let page = 1;
 
@@ -1366,6 +1366,8 @@
       read: $('#rdRead'), text: $('#rdText'), like: $('#rdLike'), likeCount: $('#rdLikeCount'),
       commentCount: $('#rdCommentCount'), comments: $('#rdComments'),
       cForm: $('#rdCommentForm'), cName: $('#rdCommentName'), cText: $('#rdCommentText'),
+      highlight: $('#rdHighlight'), prev: $('#rdPrev'), next: $('#rdNext'),
+      scroll: $('#rdScroll'), top: $('#rdTop'), moreGrid: $('#rdMoreGrid'),
     };
     let curNum = null;
     let curPostObj = null;
@@ -1420,23 +1422,47 @@
       if (rd.title) rd.title.innerHTML = q.title;
       if (rd.date) rd.date.textContent = (q.date || '').toUpperCase();
       if (rd.read) rd.read.textContent = dT('blog.minRead', '{n} MIN READ').replace('{n}', p.read);
+      if (rd.highlight) rd.highlight.textContent = q.sub || p.sub || '';
       if (rd.text) rd.text.innerHTML = q.body.map(x => `<p>${x}</p>`).join('');
       if (rd.cName && !rd.cName.value) { const pn = profile().name; if (pn) rd.cName.value = pn; }   // prefill from the saved profile
       loadEngagement(p);
+      renderMore(p);
       reader.classList.add('is-open'); reader.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden'; reader.scrollTop = 0;
+      document.body.style.overflow = 'hidden';
+      if (rd.scroll) rd.scroll.scrollTop = 0;
+      if (rd.top) rd.top.classList.remove('is-shown');
       try { document.title = String(q.title || '').replace(/<[^>]+>/g, '') + ' — Barakat Qurtas'; } catch (e) {}
+      try { if (window.fbq) fbq('track', 'ViewContent', { content_type: 'article', content_name: String(q.title || '').replace(/<[^>]+>/g, '') }); } catch (e) {}
       if (!fromPop) { try { history.pushState({ bqPost: curSlug }, '', blogBase() + '/' + curSlug); } catch (e) {} }
     };
+    /* "More from the journal" grid + prev/next post navigation */
+    let curPrev = null, curNext = null;
+    const renderMore = (p) => {
+      const idx = POSTS.indexOf(p);
+      curPrev = idx > 0 ? POSTS[idx - 1] : null;
+      curNext = (idx > -1 && idx < POSTS.length - 1) ? POSTS[idx + 1] : null;
+      if (rd.prev) rd.prev.disabled = !curPrev;
+      if (rd.next) rd.next.disabled = !curNext;
+      const rel = [];
+      for (let i = 1; rel.length < 4 && i < POSTS.length; i++) { const q = POSTS[(Math.max(0, idx) + i) % POSTS.length]; if (q !== p && rel.indexOf(q) < 0) rel.push(q); }
+      if (rd.moreGrid) {
+        rd.moreGrid.innerHTML = rel.map(q => { const lq = L(q); return `<button class="reader-more-card" data-slug="${esc(q.slug || q.num)}"><span class="rm-img"><img src="${esc(lq.img)}" alt="" loading="lazy"></span><span class="rm-t"><span class="rm-tag">${esc(lq.tag || '')}</span><span class="rm-title">${esc(String(lq.title || '').replace(/<[^>]+>/g, ''))}</span></span></button>`; }).join('');
+        rd.moreGrid.querySelectorAll('.reader-more-card').forEach(b => b.addEventListener('click', () => { const q = findPostBySlug(b.getAttribute('data-slug')); if (q) { if (rd.scroll) rd.scroll.scrollTop = 0; openReader(q); } }));
+      }
+    };
     const closeReaderDom = () => { reader.classList.remove('is-open'); reader.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; };
-    const closeReader = () => {
+    const closeReader = () => {   // the × exits straight to the blog list
       closeReaderDom();
-      if (history.state && history.state.bqPost) history.back();
-      else if (/\/blog\/[^/]+/.test(location.pathname)) { try { history.replaceState(null, '', blogBase()); } catch (e) {} }
+      if (/\/blog\/[^/]+/.test(location.pathname)) { try { history.replaceState(null, '', blogBase()); } catch (e) {} }
     };
     $('#readerClose')?.addEventListener('click', closeReader);
+    $('#readerBack')?.addEventListener('click', () => { if (history.state && history.state.bqPost && history.length > 1) history.back(); else closeReader(); });
     reader?.addEventListener('click', (e) => { if (e.target === reader) closeReader(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && reader.classList.contains('is-open')) closeReader(); });
+    rd.prev?.addEventListener('click', () => { if (curPrev) { if (rd.scroll) rd.scroll.scrollTop = 0; openReader(curPrev); } });
+    rd.next?.addEventListener('click', () => { if (curNext) { if (rd.scroll) rd.scroll.scrollTop = 0; openReader(curNext); } });
+    rd.top?.addEventListener('click', () => { if (rd.scroll) rd.scroll.scrollTo({ top: 0, behavior: 'smooth' }); });
+    rd.scroll?.addEventListener('scroll', () => { if (rd.top) rd.top.classList.toggle('is-shown', rd.scroll.scrollTop > 420); }, { passive: true });
     rd.like?.addEventListener('click', () => {
       const p = curPostObj; if (!p) return;
       if (p.id != null && SBE().url) {
@@ -1505,7 +1531,7 @@
           const cms = (Array.isArray(rows) ? rows : []).map((p) => ({
             num: String(p.num || p.id || ''),
             id: p.id,
-            slug: (p.id ? p.id + '-' : '') + slugify(p.title || 'note'),
+            slug: String(p.id),
             tag: p.tag || 'Note',
             date: p.date || (p.created_at ? new Date(p.created_at).toLocaleDateString('en', { month: 'short', year: 'numeric' }) : ''),
             read: p.read_minutes || 4,

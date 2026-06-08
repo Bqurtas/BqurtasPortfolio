@@ -174,6 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       if (window.__bqCloseReader) window.__bqCloseReader();   // leaving via the rail closes an open post
       showRoom(route, true);
+      try { if (window.fbq) fbq('track', 'PageView'); } catch (e2) {}   // Meta Pixel — track SPA navigation
     });
   });
 
