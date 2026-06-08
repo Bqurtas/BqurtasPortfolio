@@ -1522,6 +1522,27 @@
        the dashboard can refresh the live blog instantly via window.__bqReloadBlog.
        The publishable key is public/safe; row-level security keeps the table
        read-only for visitors, while writes go through the secure Edge Function. */
+    /* homepage "Latest from the blog" — auto-fills with the newest posts (DB first), updates on publish */
+    const renderLatest = () => {
+      const grid = document.querySelector('.latest-blog-grid');
+      if (!grid) return;
+      const latest = POSTS.slice(0, 3);
+      if (!latest.length) return;
+      grid.innerHTML = latest.map((p) => {
+        const q = L(p);
+        const title = String(q.title || '').replace(/<[^>]+>/g, '');
+        return `<article class="blog-card" data-slug="${esc(p.slug || p.num)}" tabindex="0" role="button">
+          <span class="mono blog-meta"><i class="fa-solid fa-calendar"></i> ${esc(q.date || '')} · <i class="fa-solid fa-clock"></i> ${esc(String(p.read || 4))} min</span>
+          <h3>${esc(title)}</h3>
+          <p>${esc(q.sub || '')}</p>
+          <span class="blog-more"><span>${dT('blog.more', 'Read the essay')}</span> <i class="fa-solid fa-arrow-right"></i></span>
+        </article>`;
+      }).join('');
+      grid.querySelectorAll('.blog-card').forEach((c) => {
+        c.addEventListener('click', (e) => { e.preventDefault(); const p = findPostBySlug(c.getAttribute('data-slug')); if (p) openReader(p); });
+      });
+    };
+
     const BUILTIN_POSTS = POSTS.slice();
     const loadCmsPosts = () => {
       const SB = window.BQ_SUPA || {};
@@ -1546,6 +1567,7 @@
           pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
           if (page > pageCount) page = 1;
           renderPage();
+          renderLatest();
           if (pendingSlug) { const s = pendingSlug; pendingSlug = null; const p = findPostBySlug(s); if (p) openReader(p, true); }
         }).catch(() => {});
     };
@@ -1554,6 +1576,7 @@
     window.__bqLangCb.push(() => {
       curCat = 'all';
       renderPage();
+      renderLatest();
       if (reader && reader.classList.contains('is-open') && curPostObj) {
         const q = L(curPostObj);
         if (rd.tag) rd.tag.textContent = q.tag;

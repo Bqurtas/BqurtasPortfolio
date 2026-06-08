@@ -2673,7 +2673,8 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   .hero-meta--br { top: auto; bottom: 16px; }
   .hero-meta--tr { top: 16px; }
   .hero-meta--tl { top: 16px; }
-  .hero-eyebrow { font-size: 9px !important; }
+  .hero-eyebrow { font-size: 9px !important; align-items: flex-start; line-height: 1.5; }
+   .hero-eyebrow i { margin-top: 0.28em; }   /* keep the dot on the first line when the text wraps (en/fr/kmr) */
   .hero-marquee { margin-top: 28px; }
 
   .pitch-wrap { padding: 22px 18px; }
