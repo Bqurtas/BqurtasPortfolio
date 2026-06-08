@@ -1563,7 +1563,7 @@
             body: String(p.body || '').split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean),
             _i18n: p.i18n || null
           }));
-          POSTS = cms.concat(BUILTIN_POSTS);
+          POSTS = cms.length ? cms : BUILTIN_POSTS;   // DB is the source of truth; built-ins only fall back if the DB is empty/unreachable
           pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
           if (page > pageCount) page = 1;
           renderPage();
