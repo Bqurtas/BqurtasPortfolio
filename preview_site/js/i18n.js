@@ -1734,3 +1734,15 @@ Object.keys(T).forEach(function(l){ if(window.TAB_META_I18N[l]){ window.TAB_META
 /* ===== share this page ===== */
 window.I18N_EXTRA_SHP = {"en":{"share.page":"Share page"},"ku":{"share.page":"هاوبەشی پەڕە"},"kmr":{"share.page":"Rûpel parve bike"},"ar":{"share.page":"مشاركة الصفحة"},"fr":{"share.page":"Partager la page"},"tr":{"share.page":"Sayfayı paylaş"},"sv":{"share.page":"Dela sidan"}};
 Object.keys(window.I18N_EXTRA_SHP).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_SHP[l]); });
+
+/* ===== tab hover cards: merged Stationery + new AI (parity with the other tabs) ===== */
+(function(){
+  var T = window.TABCARD_I18N; if(!T) return;
+  var add = {
+    ku:  { stationery:{tag:"کەرەستەی نووسین",desc:"کارتی بازرگانی، سەرپەڕە، پسووڵە و وەسڵ — سیستەمی بێدەنگی پشت ناسنامەیەک."}, ai:{tag:"AI · تاقیکردنەوە",desc:"پۆستەر، ڤیدیۆ و تاقیکردنەوەی بینراو بە یارمەتی AI — بەمزووانە."} },
+    kmr: { stationery:{tag:"Qirtasiye",desc:"Kartên karsaziyê, serkaxez, fatûre û meqbûz — sîstema bêdeng a li pişt brandê."}, ai:{tag:"AI · Ezmûn",desc:"Poster, vîdyo û ezmûnên dîtbarî bi alîkariya AI — di demek nêz de."} },
+    ar:  { stationery:{tag:"القرطاسية",desc:"بطاقات العمل، الترويسات، الفواتير والإيصالات — النظام الهادئ خلف الهوية."}, ai:{tag:"AI · تجارب",desc:"ملصقات وفيديو وتجارب بصرية بمساعدة الذكاء الاصطناعي — قريباً."} },
+    fr:  { stationery:{tag:"Papeterie",desc:"Cartes de visite, en-têtes, factures et reçus — le système discret derrière une marque."}, ai:{tag:"IA · Expériences",desc:"Affiches, vidéos et expériences visuelles assistées par IA — bientôt."} }
+  };
+  Object.keys(add).forEach(function(l){ if(T[l]) Object.assign(T[l], add[l]); });
+})();

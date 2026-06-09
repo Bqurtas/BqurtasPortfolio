@@ -347,10 +347,10 @@
       posters:  { tag: 'Print',                   desc: 'Cultural, political, and typographic poster series.' },
       social:   { tag: 'Digital',                 desc: 'Social campaigns, grids, and digital storytelling.' },
       events:   { tag: 'Identity',                desc: 'Ceremony materials, banners, and event identity design.' },
-      business: { tag: 'Stationery',              desc: 'Business cards and personal & client stationery.' },
-      invoices: { tag: 'Stationery',              desc: 'Letterhead, invoice, and receipt systems.' },
+      stationery: { tag: 'Stationery',            desc: 'Business cards, letterheads, invoices & receipts — the quiet system behind a brand.' },
       video:    { tag: 'Motion',                  desc: 'Documentary edits, motion reels, and media coverage.' },
       other:    { tag: 'Miscellany',              desc: 'Flex banners, type experiments, and the small things.' },
+      ai:       { tag: 'AI · Experiments',        desc: 'AI-assisted posters, video, and visual experiments. Coming soon.' },
     };
 
     /* work counts per category from the gallery config */
