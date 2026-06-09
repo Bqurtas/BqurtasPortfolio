@@ -1730,3 +1730,7 @@ Object.keys(window.I18N_EXTRA_LATN).forEach(function(l){ if(window.I18N[l]) Obje
 /* ===== tab-header titles for the merged stationery + new AI tabs ===== */
 (function(){ if(!window.TAB_META_I18N) return; var T={en:{stationery:'Stationery',ai:'AI'},ku:{stationery:'نووسراو',ai:'AI'},kmr:{stationery:'Nivîsgeh',ai:'AI'},ar:{stationery:'قرطاسية',ai:'AI'},fr:{stationery:'Papeterie',ai:'IA'},tr:{stationery:'Kırtasiye',ai:'AI'},sv:{stationery:'Trycksaker',ai:'AI'}};
 Object.keys(T).forEach(function(l){ if(window.TAB_META_I18N[l]){ window.TAB_META_I18N[l].stationery={title:T[l].stationery,desc:'',note:''}; window.TAB_META_I18N[l].ai={title:T[l].ai,desc:'',note:''}; } }); })();
+
+/* ===== share this page ===== */
+window.I18N_EXTRA_SHP = {"en":{"share.page":"Share page"},"ku":{"share.page":"هاوبەشی پەڕە"},"kmr":{"share.page":"Rûpel parve bike"},"ar":{"share.page":"مشاركة الصفحة"},"fr":{"share.page":"Partager la page"},"tr":{"share.page":"Sayfayı paylaş"},"sv":{"share.page":"Dela sidan"}};
+Object.keys(window.I18N_EXTRA_SHP).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_SHP[l]); });

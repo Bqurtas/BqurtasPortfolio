@@ -265,6 +265,15 @@ document.addEventListener('DOMContentLoaded', () => {
   langPop?.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => langPop.classList.remove('is-open')));
   document.addEventListener('click', (e) => { if (!e.target.closest('.mobilebar-pop-wrap')) closePops(); });
 
+  /* share THIS page (current room/tab link) — native sheet on mobile, copy on desktop */
+  document.querySelectorAll('.share-page-btn').forEach((b) => b.addEventListener('click', async (e) => {
+    e.preventDefault(); e.stopPropagation();
+    const url = location.origin + location.pathname;
+    const title = document.title;
+    if (navigator.share) { try { await navigator.share({ title, url }); return; } catch (err) { if (err && err.name === 'AbortError') return; } }
+    try { await navigator.clipboard.writeText(url); b.classList.add('is-copied'); setTimeout(() => b.classList.remove('is-copied'), 1500); } catch (err) {}
+  }));
+
   /* ---------- TABS + PAGINATION + SECTION HEADER ---------- */
   const tabs = document.querySelectorAll('.tab');
   const PAGE_SIZE = 35;

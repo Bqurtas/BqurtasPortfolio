@@ -458,6 +458,10 @@ em { font-style: italic; color: var(--ember); }
   width: 22px; text-align: center;
 }
 .social-opt small { font-size: 13px; }
+button.social-opt { background: none; border: none; cursor: pointer; font-family: inherit; width: 100%; }
+.social-opt--share i { color: var(--ink); }
+.social-opt--share.is-copied, .social-opt--share.is-copied i { color: var(--gold); }
+.social-opt--share.is-copied small::after { content: ' ✓'; }
 
 /* ---------- Rail tool tooltips (a small label above each tool) ---------- */
 .rail-chat, .theme-btn { position: relative; }
@@ -624,12 +628,16 @@ em { font-style: italic; color: var(--ember); }
 }
 .mobilebar-pop--lang .mobile-lang.is-active { background: var(--gold-bright); color: var(--bg); }
 .mobilebar-pop--social { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.mobilebar-pop--social a {
+.mobilebar-pop--social a,
+.mobilebar-pop--social .share-page-btn {
   width: 46px; height: 46px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   border: 1px solid var(--line); color: var(--ink-soft); font-size: 16px;
+  background: none; cursor: pointer;
 }
-.mobilebar-pop--social a:active { color: var(--gold); border-color: var(--gold); }
+.mobilebar-pop--social a:active,
+.mobilebar-pop--social .share-page-btn:active,
+.mobilebar-pop--social .share-page-btn.is-copied { color: var(--gold); border-color: var(--gold); }
 
 /* Mobile menu — a dimmed backdrop with a compact bottom sheet (not full-screen) */
 .mobile-menu {
