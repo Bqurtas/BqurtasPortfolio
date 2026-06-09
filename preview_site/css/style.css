@@ -1069,18 +1069,20 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 }
 .tab {
   position: relative;
-  padding: 19px 10px 22px;
+  padding: 15px 8px 17px;
   font-family: 'Manrope', sans-serif;
-  font-size: 15px; font-weight: 600;
+  font-size: 14.5px; font-weight: 600;
   color: var(--ink-muted);
   background: transparent;
-  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  /* icon stacked above the label, centred in its grid cell — so icons line up
+     column-for-column across both rows instead of drifting with the label width */
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
   text-align: center;
   border-radius: 0; border: none;
   transition: color 0.25s ease;
   overflow: hidden;
 }
-.tab i { color: var(--gold); font-size: 16px; flex-shrink: 0; transition: transform 0.3s var(--ease); }
+.tab i { color: var(--gold); font-size: 20px; flex-shrink: 0; transition: transform 0.3s var(--ease); }
 .tab-label { transition: opacity 0.25s ease; }
 
 /* underline indicator — expands from center */

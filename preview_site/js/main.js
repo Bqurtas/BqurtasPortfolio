@@ -434,10 +434,17 @@ document.addEventListener('DOMContentLoaded', () => {
     tr:  { t: 'Yakında', s: 'AI destekli afişler ve video — çok yakında burada.' },
     sv:  { t: 'Kommer snart', s: 'AI-stödda affischer och video — landar här snart.' },
   };
+  /* shuffle the master deck so every visit / tab-switch surfaces a fresh set of
+     works at the top; the order then stays stable all the way through Load-more. */
+  const shuffleAllCards = () => {
+    const a = window.BQ_ALL_CARDS;
+    if (!Array.isArray(a)) return;
+    for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; const t = a[i]; a[i] = a[j]; a[j] = t; }
+  };
   /* render the gallery. reset=true rebuilds columns (tab switch / resize). */
   window.__bqRenderGallery = (reset) => {
     if (!gridEl) return;
-    if (reset) { buildColumns(colCountForWidth()); currentShown = 0; }
+    if (reset) { shuffleAllCards(); buildColumns(colCountForWidth()); currentShown = 0; }
     const matching = matchingCards();
     if (currentFilter === 'ai' && matching.length === 0) {   // AI tab, no works yet → coming soon
       gridEl.innerHTML = '';

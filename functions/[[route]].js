@@ -69,15 +69,15 @@ export async function onRequest(context) {
       const blogD = (OG[r.lang] && OG[r.lang].blog && OG[r.lang].blog.d) || OG.en.blog.d;
       meta = { t: String(tr.title || post.title || 'Journal').trim() + ' — Barakat Qurtas',
                d: String(tr.subtitle || post.subtitle || blogD).trim() };
-      img  = (post.cover && /^https?:\/\//.test(post.cover)) ? post.cover : (SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=2');
+      img  = (post.cover && /^https?:\/\//.test(post.cover)) ? post.cover : (SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=3');
       imgType = /\.png(\?|$)/i.test(img) ? 'image/png' : /\.webp(\?|$)/i.test(img) ? 'image/webp' : 'image/jpeg';
     } else {
       meta = (OG[r.lang] && OG[r.lang].blog) || OG.en.blog;
-      img  = SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=2';
+      img  = SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=3';
     }
   } else {
     meta = (OG[r.lang] && OG[r.lang][r.key]) || OG.en[r.key] || OG.en.home;
-    img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=2';
+    img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=3';
   }
 
   try {
