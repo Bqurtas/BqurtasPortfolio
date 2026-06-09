@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentLang = lang;
     setLangBadge(lang);
     setDocTitle();
-    if (routerReady) syncURL(false);             // keep the /lang prefix in the address bar
+    if (routerReady) { syncURL(false); try { if (window.umami) umami.track(); } catch (e) {} }   // Umami: count each language URL (replaceState isn't auto-tracked)
     if (window.__bqRerenderChrome) window.__bqRerenderChrome();
     if (window.__bqRenderActiveHonor) window.__bqRenderActiveHonor();
   };

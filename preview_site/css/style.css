@@ -166,7 +166,7 @@ em { font-style: italic; color: var(--ember); }
 .cursor-dot, .cursor-ring {
   position: fixed; top: 0; left: 0;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 2000000000;   /* always on top — above the reader/dashboard overlays */
   transform: translate(-50%, -50%);
   transition: opacity 0.2s ease;
   mix-blend-mode: difference;
