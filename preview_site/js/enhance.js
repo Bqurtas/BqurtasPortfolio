@@ -1672,3 +1672,59 @@
 @media(max-width:560px){.cms-row3{grid-template-columns:1fr 1fr}.cms-form{max-width:none}}`;
   document.head.appendChild(el);
 })();
+
+/* =======================================================
+   LATEST UPDATES — notification bell (rail + dock)
+   Shows posts added in the last 7 days; badge while any are fresh.
+   ======================================================= */
+(function latest() {
+  const $ = (s) => document.querySelector(s);
+  const SB = window.BQ_SUPA || {};
+  const panel = $('#latestPanel'), backdrop = $('#latestBackdrop'), list = $('#latestList');
+  if (!panel || !list) return;
+  const bell = $('#railLatest'), bellM = $('#railLatestM');
+  const badge = $('#railLatestBadge'), badgeM = $('#railLatestBadgeM');
+  const esc = (s) => String(s || '').replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+  const WEEK = 7 * 24 * 60 * 60 * 1000;
+  const dict = () => window.BQ_DICT || {};
+  const lang = () => document.documentElement.dataset.lang || 'en';
+  let items = [];
+
+  const open = () => { panel.classList.add('is-open'); panel.setAttribute('aria-hidden', 'false'); backdrop && backdrop.classList.add('is-open'); };
+  const close = () => { panel.classList.remove('is-open'); panel.setAttribute('aria-hidden', 'true'); backdrop && backdrop.classList.remove('is-open'); };
+  const toggle = () => (panel.classList.contains('is-open') ? close() : open());
+  const setBadge = (on) => { if (badge) badge.hidden = !on; if (badgeM) badgeM.hidden = !on; };
+
+  const render = () => {
+    const empty = dict()['latest.empty'] || 'No new updates this week.';
+    if (!items.length) { list.innerHTML = `<p class="latest-empty">${esc(empty)}</p>`; return; }
+    const L = lang();
+    list.innerHTML = items.map((p) => {
+      const tr = (p.i18n && p.i18n[L]) || {};
+      const title = esc(String(tr.title || p.title || '').replace(/<[^>]+>/g, ''));
+      const isNew = (Date.now() - new Date(p.created_at).getTime()) < WEEK;
+      return `<button class="latest-item" data-id="${esc(String(p.id))}">${p.cover ? `<img class="latest-item-img" src="${esc(p.cover)}" alt="" loading="lazy">` : ''}<span class="latest-item-body"><span class="latest-item-tag">${isNew ? '<span class="latest-item-new"></span>' : ''}${esc(p.tag || 'Note')}</span><span class="latest-item-title">${title}</span></span></button>`;
+    }).join('');
+    list.querySelectorAll('.latest-item').forEach((b) => b.addEventListener('click', () => {
+      const id = b.getAttribute('data-id'); close();
+      if (window.__bqShowRoom && document.body.dataset.room !== 'blog') window.__bqShowRoom('blog');
+      setTimeout(() => { if (window.__bqOpenPostSlug) window.__bqOpenPostSlug(id); }, 80);
+    }));
+  };
+
+  const load = () => {
+    if (!SB.url) return;
+    const since = new Date(Date.now() - WEEK).toISOString();
+    fetch(SB.url + '/rest/v1/posts?select=id,title,tag,cover,i18n,created_at&published=eq.true&created_at=gte.' + since + '&order=created_at.desc&limit=8', { headers: { apikey: SB.key }, cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : [])).then((rows) => { items = Array.isArray(rows) ? rows : []; setBadge(items.length > 0); render(); }).catch(() => {});
+  };
+
+  bell && bell.addEventListener('click', toggle);
+  bellM && bellM.addEventListener('click', toggle);
+  $('#latestClose') && $('#latestClose').addEventListener('click', close);
+  backdrop && backdrop.addEventListener('click', close);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && panel.classList.contains('is-open')) close(); });
+  if (window.__bqLangCb) window.__bqLangCb.push(render);
+  load();
+  window.__bqReloadLatest = load;
+})();

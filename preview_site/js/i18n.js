@@ -1718,3 +1718,7 @@ Object.keys(window.I18N_EXTRA_TABS).forEach(function(l){ if(window.I18N[l]) Obje
 /* ===== floating Design-room CTA ===== */
 window.I18N_EXTRA_CTA = {"en":{"cta.float":"Let's work together"},"ku":{"cta.float":"با پێکەوە کار بکەین"},"kmr":{"cta.float":"Em bi hev re bixebitin"},"ar":{"cta.float":"لنعمل معاً"},"fr":{"cta.float":"Travaillons ensemble"},"tr":{"cta.float":"Birlikte çalışalım"},"sv":{"cta.float":"Låt oss jobba ihop"}};
 Object.keys(window.I18N_EXTRA_CTA).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_CTA[l]); });
+
+/* ===== Latest updates bell ===== */
+window.I18N_EXTRA_LAT = {"en":{"tip.latest":"Latest","latest.empty":"No new updates this week."},"ku":{"tip.latest":"نوێترین","latest.empty":"ئەم هەفتەیە نوێکاری نییە."},"kmr":{"tip.latest":"Nû","latest.empty":"Vê hefteyê nûçe tune."},"ar":{"tip.latest":"الأحدث","latest.empty":"لا تحديثات جديدة هذا الأسبوع."},"fr":{"tip.latest":"Nouveautés","latest.empty":"Aucune nouveauté cette semaine."},"tr":{"tip.latest":"Yenilikler","latest.empty":"Bu hafta yeni güncelleme yok."},"sv":{"tip.latest":"Senaste","latest.empty":"Inga nya uppdateringar denna vecka."}};
+Object.keys(window.I18N_EXTRA_LAT).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_LAT[l]); });
