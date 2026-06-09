@@ -545,19 +545,20 @@
     min && min.addEventListener('click', close);
     backdrop && backdrop.addEventListener('click', close);
 
-    /* mobile: drag the header downward to dismiss the sheet */
+    /* mobile: drag the header downward to dismiss the sheet — firm (the sheet
+       tracks the finger and the page can't scroll under it) */
     const cHead = panel.querySelector('.chat-head');
     if (cHead) {
       const isMobile = () => window.matchMedia('(max-width: 820px)').matches;
       let sy = null, dy = 0, drag = false;
       const down = (y) => { if (!isMobile()) return; sy = y; dy = 0; drag = true; panel.style.transition = 'none'; };
-      const move = (y) => { if (!drag) return; dy = y - sy; if (dy < 0) dy = 0; panel.style.transform = `translateY(${dy}px)`; };
-      const up = () => { if (!drag) return; drag = false; sy = null; panel.style.transition = ''; panel.style.transform = ''; if (dy > 80) close(); };
+      const move = (y, ev) => { if (!drag) return; dy = y - sy; if (dy < 0) dy = 0; if (dy > 3 && ev && ev.cancelable) ev.preventDefault(); panel.style.transform = `translateY(${dy}px)`; };
+      const up = () => { if (!drag) return; drag = false; sy = null; panel.style.transition = ''; if (dy > 55) close(); panel.style.transform = ''; };
       cHead.addEventListener('touchstart', (e) => down(e.touches[0].clientY), { passive: true });
-      cHead.addEventListener('touchmove', (e) => move(e.touches[0].clientY), { passive: true });
+      cHead.addEventListener('touchmove', (e) => move(e.touches[0].clientY, e), { passive: false });
       cHead.addEventListener('touchend', up);
       cHead.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'touch') down(e.clientY); });
-      window.addEventListener('pointermove', (e) => { if (drag && e.pointerType !== 'touch') move(e.clientY); });
+      window.addEventListener('pointermove', (e) => { if (drag && e.pointerType !== 'touch') move(e.clientY, e); });
       window.addEventListener('pointerup', () => { if (drag) up(); });
     }
     /* rebuild quick chips in the new language (once) */
@@ -1944,6 +1945,21 @@
   $('#latestClose') && $('#latestClose').addEventListener('click', close);
   backdrop && backdrop.addEventListener('click', close);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && panel.classList.contains('is-open')) close(); });
+  /* mobile: drag the header down to dismiss — same firm gesture as the chat sheet */
+  const lHead = panel.querySelector('.latest-panel-head');
+  if (lHead) {
+    const isMobile = () => window.matchMedia('(max-width: 820px)').matches;
+    let sy = null, dy = 0, drag = false;
+    const down = (y) => { if (!isMobile()) return; sy = y; dy = 0; drag = true; panel.style.transition = 'none'; };
+    const move = (y, ev) => { if (!drag) return; dy = y - sy; if (dy < 0) dy = 0; if (dy > 3 && ev && ev.cancelable) ev.preventDefault(); panel.style.transform = `translateY(${dy}px)`; };
+    const up = () => { if (!drag) return; drag = false; sy = null; panel.style.transition = ''; if (dy > 55) close(); panel.style.transform = ''; };
+    lHead.addEventListener('touchstart', (e) => down(e.touches[0].clientY), { passive: true });
+    lHead.addEventListener('touchmove', (e) => move(e.touches[0].clientY, e), { passive: false });
+    lHead.addEventListener('touchend', up);
+    lHead.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'touch') down(e.clientY); });
+    window.addEventListener('pointermove', (e) => { if (drag && e.pointerType !== 'touch') move(e.clientY, e); });
+    window.addEventListener('pointerup', () => { if (drag) up(); });
+  }
   if (window.__bqLangCb) window.__bqLangCb.push(render);
   load(); loadWorks(); loadPins();
   window.__bqReloadLatest = () => { load(); loadPins(); try { sessionStorage.removeItem('bq_latest_works'); } catch (e) {} loadWorks(); };
