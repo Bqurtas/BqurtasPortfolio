@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- TABS + PAGINATION + SECTION HEADER ---------- */
   const tabs = document.querySelectorAll('.tab');
-  const PAGE_SIZE = 35;
+  const PAGE_SIZE = 40;
   let currentFilter = 'all';
   let currentShown  = 0;
 

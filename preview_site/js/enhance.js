@@ -1162,12 +1162,26 @@
         <div class="dash-latest-form">
           <label class="dash-field"><span class="mono">Headline</span><input id="laTitle" type="text" placeholder="e.g. New identity for Rwanga"></label>
           <label class="dash-field"><span class="mono">Opens tab</span><select id="laLink">${opts}</select></label>
-          <label class="dash-field"><span class="mono">Image link (optional)</span><input id="laImage" type="text" placeholder="https://… (leave empty for a star)"></label>
+          <label class="dash-field"><span class="mono">Image — choose a file (optional)</span>
+            <input id="laImageFile" type="file" accept="image/*" class="cms-file">
+            <input id="laImage" type="hidden">
+            <span class="dash-note mono" id="laUp"></span></label>
+          <div class="dash-latest-prev" id="laPrev" hidden><img src="" alt=""></div>
           <button class="dash-btn" id="laAdd"><i class="fa-solid fa-bell"></i> Pin to Latest</button>
           <span class="dash-note mono" id="laMsg"></span>
         </div>
         <div class="dash-latest-list" id="laList"><p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i></p></div>`;
-      const msg = $('#laMsg');
+      const msg = $('#laMsg'), upmsg = $('#laUp'), prev = $('#laPrev');
+      $('#laImageFile').addEventListener('change', async (ev) => {
+        const file = ev.target.files && ev.target.files[0]; if (!file) return;
+        upmsg.textContent = 'Uploading…';
+        try {
+          const b64 = await cmsResize(file, 1200, 0.82);
+          const d = await cmsApi({ action: 'upload', filename: file.name, contentType: 'image/webp', dataB64: b64 });
+          if (d && d.ok && d.url) { $('#laImage').value = d.url; prev.hidden = false; prev.querySelector('img').src = d.url; upmsg.textContent = 'Uploaded ✓'; }
+          else { upmsg.textContent = (d && (d.error === 'missing_token' || d.error === 'unauthorized')) ? 'Connect the editor first (Content tab).' : '✗ ' + ((d && d.error) || 'upload failed'); }
+        } catch (err) { upmsg.textContent = '✗ ' + err; }
+      });
       const loadList = () => {
         latestApi({ action: 'list' }).then(d => {
           const list = $('#laList'); if (!list) return;
@@ -1192,7 +1206,7 @@
         const image = $('#laImage').value.trim();
         msg.textContent = 'Saving…';
         latestApi({ action: 'add', item: { title, link, tag, image } }).then(d => {
-          if (d && d.ok) { $('#laTitle').value = ''; $('#laImage').value = ''; msg.textContent = 'Pinned ✓'; loadList(); if (window.__bqReloadLatest) window.__bqReloadLatest(); }
+          if (d && d.ok) { $('#laTitle').value = ''; $('#laImage').value = ''; $('#laImageFile').value = ''; prev.hidden = true; upmsg.textContent = ''; msg.textContent = 'Pinned ✓'; loadList(); if (window.__bqReloadLatest) window.__bqReloadLatest(); }
           else { msg.textContent = (d && (d.error === 'missing_token' || d.error === 'unauthorized')) ? 'Connect the editor first (Content tab).' : 'Could not save (live site only).'; }
         }).catch(() => { msg.textContent = 'Could not save.'; });
       });
