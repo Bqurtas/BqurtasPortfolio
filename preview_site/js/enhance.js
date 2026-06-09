@@ -1154,32 +1154,43 @@
         body: JSON.stringify(payload)
       }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
     };
-    const LATEST_TABS = [['logo','Logos'],['book','Book Covers'],['image','Photography'],['posters','Posters'],['social','Social'],['events','Events'],['stationery','Stationery'],['official','Official'],['video','Video'],['ai','AI'],['other','Other'],['','Design room (all)']];
+    const LATEST_TABS = [['logo','Logos'],['book','Book Covers'],['image','Photography'],['posters','Posters'],['social','Social'],['events','Events'],['stationery','Stationery'],['official','Official'],['video','Video'],['ai','AI'],['other','Other'],['','']];
+    const TAB_EN = Object.fromEntries(LATEST_TABS);
+    const LA_I18N = {
+      en: { note:'Pin an important work to the homepage “Latest” bell. It shows for 7 days, then drops off on its own — alongside the new works the bell already finds automatically.', headline:'Headline', headlinePh:'e.g. New identity for Rwanga', opens:'Opens tab', room:'Design room (all)', image:'Image — choose a file (optional)', pin:'Pin to Latest', uploading:'Uploading…', uploaded:'Uploaded ✓', connect:'Connect the editor first (Content tab).', live:'Reachable on the live site only.', empty:'Nothing pinned right now.', need:'Add a headline.', saving:'Saving…', pinned:'Pinned ✓', fail:'Could not save (live site only).' },
+      ku: { note:'کارێکی گرینگ بچەسپێنە بە زەنگی «نوێترین»ی پەڕەی سەرەکی. بۆ ٧ ڕۆژ دەردەکەوێت، پاشان خۆی لادەچێت — لەگەڵ ئەو کارە نوێیانەی زەنگەکە خۆکارانە دەیاندۆزێتەوە.', headline:'ناونیشان', headlinePh:'نموونە: ناسنامەی نوێ بۆ ڕوانگە', opens:'کام تاب دەکاتەوە', room:'ژووری دیزاین (هەموو)', image:'وێنە — فایلێک هەڵبژێرە (ئیختیاری)', pin:'بیچەسپێنە بۆ نوێترین', uploading:'بارکردن…', uploaded:'بارکرا ✓', connect:'سەرەتا ئەدیتەرەکە ببەستەوە (تابی ناوەڕۆک).', live:'تەنیا لەسەر سایتە زیندووەکە بەردەستە.', empty:'هیچ شتێک نەچەسپێنراوە.', need:'ناونیشانێک زیاد بکە.', saving:'پاشەکەوت دەکرێت…', pinned:'چەسپێنرا ✓', fail:'نەتوانرا پاشەکەوت بکرێت (تەنیا سایتی زیندوو).' },
+      kmr:{ note:'Karekî girîng bi zengê “Nûtirîn” ê rûpela sereke ve girêde. 7 rojan xuya dibe, paşê bi xwe radibe — ligel karên nû yên ku zeng bi xweber dibîne.', headline:'Sernav', headlinePh:'mînak: Nasnameya nû ji bo Rwanga', opens:'Kîjan tabê vedike', room:'Jûra sêwiranê (hemû)', image:'Wêne — pelekê hilbijêre (bijarte)', pin:'Bi Nûtirîn ve girêde', uploading:'Bardike…', uploaded:'Barkir ✓', connect:'Pêşî edîtorê girêde (tabê Naverok).', live:'Tenê li ser malpera zindî berdest e.', empty:'Tu tişt nehatiye girêdan.', need:'Sernavekê zêde bike.', saving:'Tê tomarkirin…', pinned:'Girêdayî ✓', fail:'Nehat tomarkirin (tenê malpera zindî).' },
+      ar: { note:'ثبّت عملاً مهماً على جرس «الأحدث» في الصفحة الرئيسية. يظهر لمدة ٧ أيام ثم يختفي تلقائياً — إلى جانب الأعمال الجديدة التي يكتشفها الجرس تلقائياً.', headline:'العنوان', headlinePh:'مثال: هوية جديدة لرونگا', opens:'يفتح تبويب', room:'غرفة التصميم (الكل)', image:'صورة — اختر ملفاً (اختياري)', pin:'تثبيت في الأحدث', uploading:'جارٍ الرفع…', uploaded:'تم الرفع ✓', connect:'اربط المحرر أولاً (تبويب المحتوى).', live:'متاح على الموقع المباشر فقط.', empty:'لا شيء مثبّت حالياً.', need:'أضف عنواناً.', saving:'جارٍ الحفظ…', pinned:'تم التثبيت ✓', fail:'تعذّر الحفظ (الموقع المباشر فقط).' },
+      fr: { note:'Épinglez un travail important à la cloche « Dernières » de la page d’accueil. Il s’affiche 7 jours puis disparaît de lui-même — aux côtés des nouveaux travaux que la cloche détecte automatiquement.', headline:'Titre', headlinePh:'ex. Nouvelle identité pour Rwanga', opens:'Ouvre l’onglet', room:'Salle design (tout)', image:'Image — choisir un fichier (facultatif)', pin:'Épingler aux Dernières', uploading:'Téléversement…', uploaded:'Téléversé ✓', connect:'Connectez d’abord l’éditeur (onglet Contenu).', live:'Disponible uniquement sur le site en ligne.', empty:'Rien d’épinglé pour le moment.', need:'Ajoutez un titre.', saving:'Enregistrement…', pinned:'Épinglé ✓', fail:'Impossible d’enregistrer (site en ligne uniquement).' }
+    };
+    const LAT = (k) => (LA_I18N[curLang()] || LA_I18N.en)[k] || LA_I18N.en[k];
+    const tabName = (v) => (window.BQ_DICT && window.BQ_DICT['tab.' + v]) || TAB_EN[v] || v;
     const renderLatest = () => {
-      const opts = LATEST_TABS.map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+      const t = (k) => esc(LAT(k));
+      const opts = LATEST_TABS.map(([v]) => `<option value="${v}">${esc(v ? tabName(v) : LAT('room'))}</option>`).join('');
       view.innerHTML = `
-        <p class="dash-note mono">Pin an important work to the homepage “Latest” bell. It shows for 7 days, then drops off on its own — alongside the new works the bell already finds automatically.</p>
+        <p class="dash-note mono">${t('note')}</p>
         <div class="dash-latest-form">
-          <label class="dash-field"><span class="mono">Headline</span><input id="laTitle" type="text" placeholder="e.g. New identity for Rwanga"></label>
-          <label class="dash-field"><span class="mono">Opens tab</span><select id="laLink">${opts}</select></label>
-          <label class="dash-field"><span class="mono">Image — choose a file (optional)</span>
+          <label class="dash-field"><span class="mono">${t('headline')}</span><input id="laTitle" type="text" placeholder="${t('headlinePh')}"></label>
+          <label class="dash-field"><span class="mono">${t('opens')}</span><select id="laLink">${opts}</select></label>
+          <label class="dash-field"><span class="mono">${t('image')}</span>
             <input id="laImageFile" type="file" accept="image/*" class="cms-file">
             <input id="laImage" type="hidden">
             <span class="dash-note mono" id="laUp"></span></label>
           <div class="dash-latest-prev" id="laPrev" hidden><img src="" alt=""></div>
-          <button class="dash-btn" id="laAdd"><i class="fa-solid fa-bell"></i> Pin to Latest</button>
+          <button class="dash-btn" id="laAdd"><i class="fa-solid fa-bell"></i> ${t('pin')}</button>
           <span class="dash-note mono" id="laMsg"></span>
         </div>
         <div class="dash-latest-list" id="laList"><p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i></p></div>`;
       const msg = $('#laMsg'), upmsg = $('#laUp'), prev = $('#laPrev');
       $('#laImageFile').addEventListener('change', async (ev) => {
         const file = ev.target.files && ev.target.files[0]; if (!file) return;
-        upmsg.textContent = 'Uploading…';
+        upmsg.textContent = LAT('uploading');
         try {
           const b64 = await cmsResize(file, 1200, 0.82);
           const d = await cmsApi({ action: 'upload', filename: file.name, contentType: 'image/webp', dataB64: b64 });
-          if (d && d.ok && d.url) { $('#laImage').value = d.url; prev.hidden = false; prev.querySelector('img').src = d.url; upmsg.textContent = 'Uploaded ✓'; }
-          else { upmsg.textContent = (d && (d.error === 'missing_token' || d.error === 'unauthorized')) ? 'Connect the editor first (Content tab).' : '✗ ' + ((d && d.error) || 'upload failed'); }
+          if (d && d.ok && d.url) { $('#laImage').value = d.url; prev.hidden = false; prev.querySelector('img').src = d.url; upmsg.textContent = LAT('uploaded'); }
+          else { upmsg.textContent = (d && (d.error === 'missing_token' || d.error === 'unauthorized')) ? LAT('connect') : '✗ ' + ((d && d.error) || ''); }
         } catch (err) { upmsg.textContent = '✗ ' + err; }
       });
       const loadList = () => {
@@ -1187,28 +1198,28 @@
           const list = $('#laList'); if (!list) return;
           if (!d || !d.ok) {
             const needTok = d && (d.error === 'missing_token' || d.error === 'unauthorized');
-            list.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${needTok ? 'Connect the editor first — open Content and enter your edit token.' : 'Reachable on the live site only.'}</p>`;
+            list.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${needTok ? LAT('connect') : LAT('live')}</p>`;
             return;
           }
           const items = d.items || [];
-          if (!items.length) { list.innerHTML = `<p class="dash-empty mono">Nothing pinned right now.</p>`; return; }
+          if (!items.length) { list.innerHTML = `<p class="dash-empty mono">${LAT('empty')}</p>`; return; }
           list.innerHTML = items.map(it => {
             const left = Math.max(0, 7 - Math.floor((Date.now() - new Date(it.created_at).getTime()) / 86400000));
-            return `<div class="dash-latest-row"><span class="dash-latest-tag mono">${esc(it.tag||'Featured')}</span><strong>${esc(it.title)}</strong><span class="mono dash-latest-left">${left}d</span><button class="dash-latest-del" data-id="${it.id}" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button></div>`;
+            return `<div class="dash-latest-row"><span class="dash-latest-tag mono">${esc((it.link && tabName(it.link)) || it.tag || 'Featured')}</span><strong>${esc(it.title)}</strong><span class="mono dash-latest-left">${left}d</span><button class="dash-latest-del" data-id="${it.id}" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button></div>`;
           }).join('');
           list.querySelectorAll('.dash-latest-del').forEach(b => b.addEventListener('click', () => { latestApi({ action: 'delete', id: Number(b.dataset.id) }).then(() => { loadList(); if (window.__bqReloadLatest) window.__bqReloadLatest(); }); }));
         }).catch(() => {});
       };
       $('#laAdd').addEventListener('click', () => {
         const title = $('#laTitle').value.trim();
-        if (!title) { msg.textContent = 'Add a headline.'; return; }
-        const sel = $('#laLink'), link = sel.value, tag = sel.options[sel.selectedIndex].text;
+        if (!title) { msg.textContent = LAT('need'); return; }
+        const link = $('#laLink').value, tag = TAB_EN[link] || 'Featured';
         const image = $('#laImage').value.trim();
-        msg.textContent = 'Saving…';
+        msg.textContent = LAT('saving');
         latestApi({ action: 'add', item: { title, link, tag, image } }).then(d => {
-          if (d && d.ok) { $('#laTitle').value = ''; $('#laImage').value = ''; $('#laImageFile').value = ''; prev.hidden = true; upmsg.textContent = ''; msg.textContent = 'Pinned ✓'; loadList(); if (window.__bqReloadLatest) window.__bqReloadLatest(); }
-          else { msg.textContent = (d && (d.error === 'missing_token' || d.error === 'unauthorized')) ? 'Connect the editor first (Content tab).' : 'Could not save (live site only).'; }
-        }).catch(() => { msg.textContent = 'Could not save.'; });
+          if (d && d.ok) { $('#laTitle').value = ''; $('#laImage').value = ''; $('#laImageFile').value = ''; prev.hidden = true; upmsg.textContent = ''; msg.textContent = LAT('pinned'); loadList(); if (window.__bqReloadLatest) window.__bqReloadLatest(); }
+          else { msg.textContent = (d && (d.error === 'missing_token' || d.error === 'unauthorized')) ? LAT('connect') : LAT('fail'); }
+        }).catch(() => { msg.textContent = LAT('fail'); });
       });
       loadList();
     };
@@ -1774,7 +1785,8 @@
     const newWord = dict()['latest.new'] || 'new';
     const pinHtml = pinItems.map((p) => {
       const img = p.image ? `<img class="latest-item-img" src="${esc(p.image)}" alt="" loading="lazy">` : `<span class="latest-item-img latest-item-img--pin"><i class="fa-solid fa-star"></i></span>`;
-      return `<button class="latest-item latest-item--pin" data-kind="pin" data-link="${esc(p.link || '')}">${img}<span class="latest-item-body"><span class="latest-item-tag"><span class="latest-item-new"></span>${esc(p.tag || 'Featured')}</span><span class="latest-item-title">${esc(String(p.title || ''))}</span></span></button>`;
+      const tg = (p.link && dict()['tab.' + p.link]) || p.tag || 'Featured';
+      return `<button class="latest-item latest-item--pin" data-kind="pin" data-link="${esc(p.link || '')}">${img}<span class="latest-item-body"><span class="latest-item-tag"><span class="latest-item-new"></span>${esc(tg)}</span><span class="latest-item-title">${esc(String(p.title || ''))}</span></span></button>`;
     }).join('');
     const workHtml = workItems.map((w) => {
       const name = dict()['tab.' + w.cat] || w.cat;

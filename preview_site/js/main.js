@@ -148,11 +148,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const toggleCta = () => {
     if (!designCta) return;
     if (document.body.dataset.room !== 'design') { designCta.classList.remove('is-shown'); return; }
+    const work = document.querySelector('.section.work');     // the "01 — Design Room" section
     const note = document.querySelector('.section.bio-teaser');
     const y = window.scrollY;
-    const past = y > window.innerHeight * 0.55;
+    // only once the viewer actually reaches the Design Room — not during the hero/Panjamor
+    const inDesign = work ? (y + window.innerHeight * 0.5) >= __absTop(work) : y > window.innerHeight * 0.55;
     const beforeNote = !note || (__absTop(note) - y) > window.innerHeight * 0.65;
-    designCta.classList.toggle('is-shown', past && beforeNote);
+    designCta.classList.toggle('is-shown', inDesign && beforeNote);
   };
   window.__bqToggleCta = toggleCta;
   window.addEventListener('scroll', () => {
@@ -588,6 +590,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (startRoomRaw === 'panjamor' || startRoomRaw === 'pencemor') {
     // a shared /panjamor link lands on the studio section
     setTimeout(() => document.getElementById('pencemorHero')?.scrollIntoView({ behavior: 'auto', block: 'start' }), 60);
+  } else if (startRoomRaw === 'design') {
+    // a shared /design link lands on the Design Room section, not the hero
+    // (otherwise the scroll-spy would immediately reset the URL back to "/")
+    setTimeout(() => document.querySelector('.section.work')?.scrollIntoView({ behavior: 'auto', block: 'start' }), 80);
   }
   routerReady = true;   // from here on, language switches update the URL prefix
   triggerReveals();
