@@ -265,8 +265,8 @@ document.addEventListener('DOMContentLoaded', () => {
     posters:  { title: 'Posters',         desc: 'Cultural, political, and typographic poster series.',                   note: 'Series · Erbil & Kurdistan Region' },
     social:   { title: 'Social Media',    desc: 'Instagram grids, campaigns, and digital storytelling.',                 note: '2023—Now · Various brands' },
     events:   { title: 'Events',          desc: 'Ceremony materials, banners, and event identity design.',                note: 'Conferences & cultural events · KRG' },
-    business: { title: 'Business Cards',  desc: 'Personal and client stationery — both sides of the conversation.',      note: '2024 · Print-ready' },
-    invoices: { title: 'Invoices',        desc: 'Stationery systems — letterhead, invoice, and receipt.',                note: '2024 · Various clients' },
+    stationery: { title: 'Stationery',    desc: 'Business cards, letterheads, invoices, and receipts.',                  note: '' },
+    ai:         { title: 'AI',            desc: 'AI-assisted posters, video, and experiments.',                          note: '' },
     video:    { title: 'Video',           desc: 'Documentary edits, motion reels, and protocol media coverage.',         note: '2019—Now · KRG official media' },
     other:    { title: 'Other Works',     desc: 'Miscellaneous — flex banners, type experiments, and notes.',            note: 'Always ongoing' },
   };
@@ -275,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
     (window.TAB_META_I18N && window.TAB_META_I18N[currentLang]) ||
     (window.TAB_META_I18N && window.TAB_META_I18N.en) || TAB_META;
 
+  const WORKS_WORD = { en: 'works', ku: 'کار', kmr: 'kar', ar: 'عمل', fr: 'œuvres', tr: 'iş', sv: 'verk' };
   const updateTabHeader = (filter, total) => {
     const tm    = getTabMeta();
     const meta  = tm[filter] || tm.all;
@@ -286,8 +287,9 @@ document.addEventListener('DOMContentLoaded', () => {
     title.classList.add('anim-out');
     setTimeout(() => {
       title.textContent = meta.title;
-      if (desc)  desc.textContent  = meta.desc;
-      if (note)  note.textContent  = meta.note;
+      // keep it clean — just the tab name + the count of works (no long blurb)
+      if (desc)  desc.textContent  = (filter === 'ai') ? '' : (total + ' ' + (WORKS_WORD[currentLang] || WORKS_WORD.en));
+      if (note)  note.textContent  = '';
       if (ghost) ghost.dataset.ghost = total;
       title.classList.remove('anim-out');
       title.classList.add('anim-in');
@@ -399,11 +401,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const matchingCards = () =>
     (window.BQ_ALL_CARDS || []).filter(e => currentFilter === 'all' || e.cat === currentFilter);
 
+  const COMING_SOON = {
+    en:  { t: 'Coming soon', s: 'AI-assisted posters and video — landing here shortly.' },
+    ku:  { t: 'بەم زووانە', s: 'پۆستەر و ڤیدیۆی بە یارمەتی AI — بەم زووانە لێرە دەردەکەون.' },
+    kmr: { t: 'Bi lez tê', s: 'Poster û vîdyoyên bi alîkariya AI — di demek nêz de li vir.' },
+    ar:  { t: 'قريباً', s: 'ملصقات وفيديو بمساعدة الذكاء الاصطناعي — قريباً هنا.' },
+    fr:  { t: 'Bientôt', s: 'Affiches et vidéos assistées par IA — bientôt ici.' },
+    tr:  { t: 'Yakında', s: 'AI destekli afişler ve video — çok yakında burada.' },
+    sv:  { t: 'Kommer snart', s: 'AI-stödda affischer och video — landar här snart.' },
+  };
   /* render the gallery. reset=true rebuilds columns (tab switch / resize). */
   window.__bqRenderGallery = (reset) => {
     if (!gridEl) return;
     if (reset) { buildColumns(colCountForWidth()); currentShown = 0; }
     const matching = matchingCards();
+    if (currentFilter === 'ai' && matching.length === 0) {   // AI tab, no works yet → coming soon
+      gridEl.innerHTML = '';
+      const cs = document.createElement('div');
+      cs.className = 'tab-coming-soon';
+      const t = COMING_SOON[currentLang] || COMING_SOON.en;
+      cs.innerHTML = '<i class="fa-solid fa-microchip"></i><h3></h3><p></p>';
+      cs.querySelector('h3').textContent = t.t; cs.querySelector('p').textContent = t.s;
+      gridEl.appendChild(cs);
+      updateTabHeader(currentFilter, 0);
+      updateLoadMore(0);
+      return;
+    }
     const batch = matching.slice(currentShown, currentShown + PAGE_SIZE);
     batch.forEach(e => placeCard(e.el));
     currentShown += batch.length;

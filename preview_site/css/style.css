@@ -1057,18 +1057,18 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 }
 .tab {
   position: relative;
-  padding: 17px 10px 20px;
+  padding: 19px 10px 22px;
   font-family: 'Manrope', sans-serif;
-  font-size: 13px; font-weight: 500;
+  font-size: 15px; font-weight: 600;
   color: var(--ink-muted);
   background: transparent;
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
   text-align: center;
   border-radius: 0; border: none;
   transition: color 0.25s ease;
   overflow: hidden;
 }
-.tab i { color: var(--gold); font-size: 13px; flex-shrink: 0; transition: transform 0.3s var(--ease); }
+.tab i { color: var(--gold); font-size: 16px; flex-shrink: 0; transition: transform 0.3s var(--ease); }
 .tab-label { transition: opacity 0.25s ease; }
 
 /* underline indicator — expands from center */
@@ -1126,11 +1126,15 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .tab-header-title.anim-out { opacity: 0; transform: translateY(14px); }
 .tab-header-title.anim-in  { opacity: 1; transform: translateY(0); }
 .tab-header-desc {
-  font-size: clamp(14px, 1.2vw, 16px);
-  color: var(--ink-soft); line-height: 1.65;
-  max-width: 560px; margin-bottom: 12px;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
+  font-size: 12px; letter-spacing: 0.08em;
+  color: var(--ink-muted); margin: 4px 0 0;
 }
-.tab-header-note { color: var(--gold-ink) !important; }
+.tab-header-note { display: none; }
+.tab-coming-soon { flex: 1 1 100%; width: 100%; text-align: center; padding: 86px 24px; }
+.tab-coming-soon i { font-size: 40px; color: var(--gold); opacity: 0.45; }
+.tab-coming-soon h3 { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 500; margin: 18px 0 8px; color: var(--ink); }
+.tab-coming-soon p { color: var(--ink-muted); font-size: 14px; max-width: 360px; margin: 0 auto; line-height: 1.6; }
 .tab-header-right { flex-shrink: 0; text-align: right; }
 .tab-header-ghost::after { content: attr(data-ghost); }
 .tab-header-ghost {

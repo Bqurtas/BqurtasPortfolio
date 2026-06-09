@@ -24,8 +24,9 @@ window.BQ_GALLERY = {
     logo:        { folder: 'LogoDesign',    prefix: 'Logo',        ext: 'webp', count: 28,  cat: 'logo',        tag: 'Logo',          icon: 'fa-pen-nib',        title: 'Logo' },
     tickerlogo:  { folder: 'TickerLogo',    prefix: 'TickerLogo',  ext: 'webp', count: 13,  cat: 'logo',        tag: 'Logo',          icon: 'fa-pen-nib',        title: 'Ticker Logo' },
     events:      { folder: 'EventandCon',   prefix: 'Event',       ext: 'webp', count: 16,  cat: 'events',      tag: 'Events',        icon: 'fa-calendar-day',   title: 'Event' },
-    business:    { folder: 'Businesscard',  prefix: 'Bcard',       ext: 'webp', count: 11,  cat: 'business',    tag: 'Business Card', icon: 'fa-id-card',        title: 'Business Card' },
-    invoices:    { folder: 'Invoice',       prefix: 'Invoice',     ext: 'webp', count: 12,  cat: 'invoices',    tag: 'Invoice',       icon: 'fa-file-invoice',   title: 'Invoice' },
+    business:    { folder: 'Businesscard',  prefix: 'Bcard',       ext: 'webp', count: 11,  cat: 'stationery',  tag: 'Business Card', icon: 'fa-id-card',        title: 'Business Card' },
+    invoices:    { folder: 'Invoice',       prefix: 'Invoice',     ext: 'webp', count: 12,  cat: 'stationery',  tag: 'Invoice',       icon: 'fa-file-invoice',   title: 'Invoice' },
+    ai:          { folder: 'AI',            prefix: 'AI',          ext: 'webp', count: 0,   cat: 'ai',          tag: 'AI',            icon: 'fa-microchip',      title: 'AI' },
     image:       { folder: 'Photos',        prefix: 'Photo',       ext: 'webp', count: 147, cat: 'image',       tag: 'Photo',         icon: 'fa-camera',         title: 'Photo' },
     other:       { folder: 'Other',         prefix: 'Other',       ext: 'webp', count: 45,  cat: 'other',       tag: 'Other',         icon: 'fa-ellipsis',       title: 'Other' },
     certificate: { folder: 'Certificate',   prefix: 'Certificate', ext: 'webp', count: 16,  cat: 'certificate', tag: 'Certificate',   icon: 'fa-award',          title: 'Certificate' }, /* bio only */
@@ -206,7 +207,7 @@ document.addEventListener('DOMContentLoaded', async () => {
      placement, filtering, and pagination. certificate is bio-only. */
   const ORDER = [
     'general','official','book','image','logo','tickerlogo',
-    'posters','social','events','business','invoices',
+    'posters','social','events','business','invoices','ai',
     'flex','video','other'
   ];
   window.BQ_ALL_CARDS = [];
