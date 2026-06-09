@@ -648,6 +648,12 @@
         tAi:'IA', tLang:'Langue', tTheme:'Thème', tAddAdmin:'Ajouter admin', tLogout:'Déconnexion', tClose:'Fermer',
         admYou:'Propriétaire', admName:'Nom', admEmail:'E-mail', admRole:'Rôle', admAdd:'Ajouter admin', admEmpty:'Aucun admin supplémentaire.', admRemove:'Retirer', admNote:'Une connexion partagée entre appareils nécessite le système backend ; pour l’instant ces admins sont enregistrés dans ce navigateur.', logoutAsk:'Se déconnecter de la console ?' }
     };
+    /* extra strings for the Visitors view (kept here so the long lang blocks above stay readable) */
+    Object.assign(DASH_I18N.en,  { vViews:'Page views', vVisitors:'Visitors', vViewsToday:'Views today', vVisToday:'Visitors today', v14:'Last 14 days', vTop:'Top pages', vCountries:'Countries', vRef:'Referrers', vDevices:'Devices', vRecent:'Recent visits', vNoVisits:'No visits yet', vNoData:'No data yet', vRefresh:'Refresh' });
+    Object.assign(DASH_I18N.ku,  { vViews:'بینین', vVisitors:'سەردانکەران', vViewsToday:'بینینی ئەمڕۆ', vVisToday:'سەردانی ئەمڕۆ', v14:'١٤ ڕۆژی ڕابردوو', vTop:'پەڕە بەرزەکان', vCountries:'وڵاتان', vRef:'سەرچاوەکان', vDevices:'ئامێرەکان', vRecent:'سەردانە نوێیەکان', vNoVisits:'هێشتا سەردان نییە', vNoData:'هێشتا داتا نییە', vRefresh:'نوێکردنەوە' });
+    Object.assign(DASH_I18N.kmr, { vViews:'Dîtin', vVisitors:'Mêvan', vViewsToday:'Dîtinên îro', vVisToday:'Mêvanên îro', v14:'14 rojên dawî', vTop:'Rûpelên jor', vCountries:'Welat', vRef:'Çavkanî', vDevices:'Amûr', vRecent:'Seredanên dawî', vNoVisits:'Hêj seredan tune', vNoData:'Hêj dane tune', vRefresh:'Nûke' });
+    Object.assign(DASH_I18N.ar,  { vViews:'المشاهدات', vVisitors:'الزوار', vViewsToday:'مشاهدات اليوم', vVisToday:'زوار اليوم', v14:'آخر ١٤ يوماً', vTop:'أهم الصفحات', vCountries:'الدول', vRef:'المصادر', vDevices:'الأجهزة', vRecent:'الزيارات الأخيرة', vNoVisits:'لا زيارات بعد', vNoData:'لا بيانات بعد', vRefresh:'تحديث' });
+    Object.assign(DASH_I18N.fr,  { vViews:'Pages vues', vVisitors:'Visiteurs', vViewsToday:"Vues aujourd'hui", vVisToday:"Visiteurs aujourd'hui", v14:'14 derniers jours', vTop:'Pages populaires', vCountries:'Pays', vRef:'Référents', vDevices:'Appareils', vRecent:'Visites récentes', vNoVisits:'Aucune visite', vNoData:'Aucune donnée', vRefresh:'Actualiser' });
     const curLang = () => { const l = document.documentElement.getAttribute('lang') || document.documentElement.dataset.lang || 'en'; return DASH_I18N[l] ? l : 'en'; };
     const DT = (k) => (DASH_I18N[curLang()][k] ?? DASH_I18N.en[k] ?? k);
     const LANG_LABELS = { en: 'English', ku: 'کوردیی سۆرانی', kmr: 'Kurmancî', ar: 'العربية', fr: 'Français', tr: 'Türkçe', sv: 'Svenska' };
@@ -1087,7 +1093,7 @@
       if (s < 86400) return Math.floor(s / 3600) + 'h ago';
       return Math.floor(s / 86400) + 'd ago'; };
     const bars = (rows, fmt) => {
-      if (!rows || !rows.length) return `<p class="dash-dim mono">No data yet</p>`;
+      if (!rows || !rows.length) return `<p class="dash-dim mono">${DT('vNoData')}</p>`;
       const max = Math.max(...rows.map(x => x.c), 1);
       return rows.map(r => `<div class="dash-bar-row"><span class="dash-bar-label">${fmt(r)}</span><span class="dash-bar"><span class="dash-bar-fill" style="width:${(r.c / max * 100).toFixed(0)}%"></span></span><span class="dash-bar-n mono">${r.c}</span></div>`).join('');
     };
@@ -1125,23 +1131,23 @@
 
       view.innerHTML = `
         <div class="dash-cards">
-          <div class="dash-card"><span class="dash-card-n">${d.views}</span><span class="mono">Page views</span></div>
-          <div class="dash-card"><span class="dash-card-n">${d.visitors}</span><span class="mono">Visitors</span></div>
-          <div class="dash-card"><span class="dash-card-n">${d.viewsToday}</span><span class="mono">Views today</span></div>
-          <div class="dash-card"><span class="dash-card-n">${d.visitorsToday}</span><span class="mono">Visitors today</span></div>
+          <div class="dash-card"><span class="dash-card-n">${d.views}</span><span class="mono">${DT('vViews')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${d.visitors}</span><span class="mono">${DT('vVisitors')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${d.viewsToday}</span><span class="mono">${DT('vViewsToday')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${d.visitorsToday}</span><span class="mono">${DT('vVisToday')}</span></div>
         </div>
-        ${chart ? `<div class="viz-wrap"><span class="dash-dim mono">Last 14 days</span><div class="viz-chart">${chart}</div></div>` : ''}
+        ${chart ? `<div class="viz-wrap"><span class="dash-dim mono">${DT('v14')}</span><div class="viz-chart">${chart}</div></div>` : ''}
         <div class="dash-grid2">
-          <div><h4 class="dash-h mono">Top pages</h4>${bars(d.paths, r => esc(r.path))}</div>
-          <div><h4 class="dash-h mono">Countries</h4>${bars(d.countries, r => flag(r.country) + ' ' + esc(r.country || '—'))}</div>
-          <div><h4 class="dash-h mono">Referrers</h4>${bars(d.referrers, r => esc(r.ref))}</div>
-          <div><h4 class="dash-h mono">Devices</h4>${bars(d.devices, r => esc(r.device || '—'))}</div>
+          <div><h4 class="dash-h mono">${DT('vTop')}</h4>${bars(d.paths, r => esc(r.path))}</div>
+          <div><h4 class="dash-h mono">${DT('vCountries')}</h4>${bars(d.countries, r => flag(r.country) + ' ' + esc(r.country || '—'))}</div>
+          <div><h4 class="dash-h mono">${DT('vRef')}</h4>${bars(d.referrers, r => esc(r.ref))}</div>
+          <div><h4 class="dash-h mono">${DT('vDevices')}</h4>${bars(d.devices, r => esc(r.device || '—'))}</div>
         </div>
-        <h4 class="dash-h mono">Recent visits</h4>
+        <h4 class="dash-h mono">${DT('vRecent')}</h4>
         <div class="dash-recent">${(d.recent || []).length ? d.recent.map(r =>
           `<div class="dash-recent-row mono"><span class="dash-recent-flag">${flag(r.country)}</span><span class="dash-recent-path">${esc(r.path)}</span><span class="dash-dim">${esc(r.device)}</span><span class="dash-dim">${ago(r.ts)}</span></div>`).join('')
-          : '<p class="dash-dim mono">No visits yet</p>'}</div>
-        <button class="dash-btn" id="stRefresh"><i class="fa-solid fa-rotate"></i> Refresh</button>`;
+          : `<p class="dash-dim mono">${DT('vNoVisits')}</p>`}</div>
+        <button class="dash-btn" id="stRefresh"><i class="fa-solid fa-rotate"></i> ${DT('vRefresh')}</button>`;
       $('#stRefresh')?.addEventListener('click', renderVisitors);
     };
 
