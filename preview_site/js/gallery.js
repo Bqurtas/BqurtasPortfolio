@@ -167,7 +167,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const buildCard = (item) => {
     const article = document.createElement('article');
-    article.className = 'card card--photo';
+    // Design works (logos, book covers, stationery, etc.) are exported with
+    // transparency — give them a clean white plate instead of the dark block
+    // that otherwise shows through. Photos/posters/social are full-bleed, left dark.
+    const PLATE_CATS = { book: 1, logo: 1, stationery: 1, events: 1, general: 1, other: 1 };
+    const plate = /\.png(\?|$)/i.test(item.url || '') || !!PLATE_CATS[item.cat];
+    article.className = 'card card--photo' + (plate ? ' card--plate' : '');
     const dispTag   = galTag(item.coll, item.tag);
     const dispTitle = galTitle(item.coll, item.index, item.titlePrefix || item.tag);
     article.dataset.cat   = item.cat;

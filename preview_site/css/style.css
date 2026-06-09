@@ -1253,6 +1253,9 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .card-art svg { width: 100%; height: 100%; transition: transform 0.8s var(--ease-out); }
 .card:hover .card-art svg { transform: scale(1.04); }
 .card:hover .card-art { transform: translateY(-4px); }
+/* transparent design works (logos, book covers, stationery…) sit on a clean
+   white plate instead of the dark block showing through their transparency */
+.card--plate .card-art { background: #fff; }
 
 .card-meta { display: flex; flex-direction: column; gap: 6px; padding-top: 18px; }
 .card-tag { color: var(--gold) !important; display: inline-flex; align-items: center; gap: 6px; }
