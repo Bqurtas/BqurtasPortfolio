@@ -745,15 +745,57 @@
         </div>
         <p class="dash-note mono">${DT('oWelcome')}</p>`;
     };
+    const wkApi = (payload) => {
+      const SB = window.BQ_SUPA || {};
+      return fetch(SB.url + '/functions/v1/work-upload', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SB.key, Authorization: 'Bearer ' + SB.key, 'x-edit-token': editToken() }, body: JSON.stringify(payload) }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
+    };
+    const WK_I18N = {
+      en:  { note:'Upload a finished design — it is auto-resized, converted to WebP and pushed to its folder on GitHub. It shows in the gallery shortly.', cat:'Category / folder', file:'Choose image (any size or format)', upload:'Publish to gallery', reading:'Preparing…', ready:'Ready — click Publish', pick:'Choose an image first.', uploading:'Publishing to GitHub…', done:'Published ✓ — it appears in the gallery shortly.', noToken:'A GitHub token isn’t set yet — add it once to turn publishing on.', connect:'Connect the editor first (Content tab).', fail:'Could not publish (works on the live site only).' },
+      ku:  { note:'دیزاینێکی تەواوکراو ئەپلۆد بکە — خۆکارانە ڕیسایز دەکرێت، دەکرێتە WebP و دەنێردرێت بۆ فۆڵدەرەکەی لە گیتهاب. بەمزووانە لە گەلەری دەردەکەوێت.', cat:'کاتگۆری / فۆڵدەر', file:'وێنە هەڵبژێرە (هەر سایز و فۆرماتێک)', upload:'بڵاوکردنەوە بۆ گەلەری', reading:'ئامادەکردن…', ready:'ئامادەیە — کلیکی بڵاوکردنەوە بکە', pick:'سەرەتا وێنەیەک هەڵبژێرە.', uploading:'بڵاو دەکرێتەوە بۆ گیتهاب…', done:'بڵاوکرایەوە ✓ — بەمزووانە لە گەلەری دەردەکەوێت.', noToken:'تۆکنی گیتهاب دانەنراوە — جارێک دایبنێ بۆ چالاککردنی بڵاوکردنەوە.', connect:'سەرەتا ئەدیتەرەکە ببەستەوە (تابی ناوەڕۆک).', fail:'نەتوانرا بڵاو بکرێتەوە (تەنیا سایتی زیندوو).' },
+      kmr: { note:'Sêwiraneke temam bar bike — bixweber tê resizekirin, li WebP tê veguhertin û li peldanka wê ya GitHub tê tomarkirin. Di demek nêz de di galerîyê de xuya dibe.', cat:'Kategorî / peldank', file:'Wêne hilbijêre (her mezinahî an format)', upload:'Belav bike li galerîyê', reading:'Tê amadekirin…', ready:'Amade ye — Belavkirinê bitikîne', pick:'Pêşî wêneyek hilbijêre.', uploading:'Li GitHub tê belavkirin…', done:'Belav bû ✓ — di demek nêz de di galerîyê de xuya dibe.', noToken:'Tokena GitHub hêj nehatiye danîn — carekê dayne.', connect:'Pêşî edîtorê girêde (tabê Naverok).', fail:'Nehat belavkirin (tenê malpera zindî).' },
+      ar:  { note:'ارفع تصميماً منتهياً — يُعاد تحجيمه تلقائياً ويُحوّل إلى WebP ثم يُرفع إلى مجلده على GitHub. يظهر في المعرض قريباً.', cat:'التصنيف / المجلد', file:'اختر صورة (أي حجم أو صيغة)', upload:'نشر في المعرض', reading:'جارٍ التحضير…', ready:'جاهز — اضغط نشر', pick:'اختر صورة أولاً.', uploading:'جارٍ النشر إلى GitHub…', done:'تم النشر ✓ — سيظهر في المعرض قريباً.', noToken:'لم يُضبط رمز GitHub بعد — أضفه مرة لتفعيل النشر.', connect:'اربط المحرر أولاً (تبويب المحتوى).', fail:'تعذّر النشر (الموقع المباشر فقط).' },
+      fr:  { note:'Téléversez un design fini — il est redimensionné, converti en WebP et poussé dans son dossier sur GitHub. Il apparaît dans la galerie sous peu.', cat:'Catégorie / dossier', file:'Choisir une image (toute taille/format)', upload:'Publier dans la galerie', reading:'Préparation…', ready:'Prêt — cliquez sur Publier', pick:'Choisissez d’abord une image.', uploading:'Publication sur GitHub…', done:'Publié ✓ — il apparaît dans la galerie sous peu.', noToken:'Le jeton GitHub n’est pas encore défini — ajoutez-le une fois.', connect:'Connectez d’abord l’éditeur (onglet Contenu).', fail:'Échec de la publication (site en ligne uniquement).' }
+    };
     const renderWorks = () => {
       const colls = collections();
+      const W = WK_I18N[curLang()] || WK_I18N.en;
+      const C = (window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS) || {};
+      const seen = {};
+      const opts = Object.keys(C).filter(k => C[k].ext !== 'mp4' && C[k].folder).filter(k => { if (seen[C[k].folder]) return false; seen[C[k].folder] = 1; return true; })
+        .map(k => `<option value="${esc(C[k].folder)}">${esc(C[k].title || C[k].tag || k)}</option>`).join('');
       const max = Math.max(...Object.values(colls).map(c => c.count || 0), 1);
-      view.innerHTML = `<div class="dash-bars">` + Object.entries(colls).map(([k, c]) =>
+      view.innerHTML = `
+        <div class="dash-latest-form">
+          <p class="dash-note mono">${esc(W.note)}</p>
+          <label class="dash-field"><span class="mono">${esc(W.cat)}</span><select id="wkFolder">${opts}</select></label>
+          <label class="dash-field"><span class="mono">${esc(W.file)}</span><input id="wkFile" type="file" accept="image/*" class="cms-file"><span class="dash-note mono" id="wkMsg"></span></label>
+          <div class="dash-latest-prev" id="wkPrev" hidden><img src="" alt=""></div>
+          <button class="dash-btn dash-btn--go" id="wkUp"><i class="fa-solid fa-cloud-arrow-up"></i> ${esc(W.upload)}</button>
+        </div>
+        <div class="dash-bars">` + Object.entries(colls).map(([k, c]) =>
         `<div class="dash-bar-row">
            <span class="dash-bar-label">${c.tag || k}</span>
            <span class="dash-bar"><span class="dash-bar-fill" style="width:${(c.count / max * 100).toFixed(1)}%"></span></span>
            <span class="dash-bar-n mono">${c.count}</span>
          </div>`).join('') + `</div>`;
+      let pend = null;
+      const fileIn = $('#wkFile'), prev = $('#wkPrev'), msg = $('#wkMsg');
+      fileIn.addEventListener('change', async (ev) => {
+        const file = ev.target.files && ev.target.files[0]; if (!file) return;
+        msg.textContent = W.reading;
+        try { const b64 = await cmsResize(file, 1600, 0.82); pend = b64; prev.hidden = false; prev.querySelector('img').src = 'data:image/webp;base64,' + b64; msg.textContent = W.ready; }
+        catch (e) { msg.textContent = '✗ ' + e; }
+      });
+      $('#wkUp').addEventListener('click', () => {
+        if (!pend) { msg.textContent = W.pick; return; }
+        msg.textContent = W.uploading;
+        wkApi({ folder: $('#wkFolder').value, dataB64: pend, ext: 'webp' }).then(d => {
+          if (d && d.ok) { msg.textContent = W.done; pend = null; fileIn.value = ''; prev.hidden = true; }
+          else if (d && d.error === 'no_github_token') { msg.textContent = W.noToken; }
+          else if (d && (d.error === 'missing_token' || d.error === 'unauthorized')) { msg.textContent = W.connect; }
+          else { msg.textContent = '✗ ' + ((d && (d.detail || d.error)) || 'failed'); }
+        }).catch(() => { msg.textContent = W.fail; });
+      });
     };
     const renderLeads = () => {
       const leads = getLeads();
