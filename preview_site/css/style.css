@@ -1039,6 +1039,10 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   font-size: clamp(16px, 1.4vw, 19px);
   color: var(--ink-soft); max-width: 620px; line-height: 1.6;
 }
+/* Design room: smaller heading, drop the instruction line — let the work lead */
+.section.work .section-head { margin-bottom: 32px; }
+.section.work .section-title { font-size: clamp(24px, 2.8vw, 38px); }
+.section.work .section-lede { display: none; }
 
 /* =========================================================
    TABS — 2 rows of 6, underline indicator

@@ -1722,3 +1722,11 @@ Object.keys(window.I18N_EXTRA_CTA).forEach(function(l){ if(window.I18N[l]) Objec
 /* ===== Latest updates bell ===== */
 window.I18N_EXTRA_LAT = {"en":{"tip.latest":"Latest","latest.empty":"No new updates this week."},"ku":{"tip.latest":"نوێترین","latest.empty":"ئەم هەفتەیە نوێکاری نییە."},"kmr":{"tip.latest":"Nû","latest.empty":"Vê hefteyê nûçe tune."},"ar":{"tip.latest":"الأحدث","latest.empty":"لا تحديثات جديدة هذا الأسبوع."},"fr":{"tip.latest":"Nouveautés","latest.empty":"Aucune nouveauté cette semaine."},"tr":{"tip.latest":"Yenilikler","latest.empty":"Bu hafta yeni güncelleme yok."},"sv":{"tip.latest":"Senaste","latest.empty":"Inga nya uppdateringar denna vecka."}};
 Object.keys(window.I18N_EXTRA_LAT).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_LAT[l]); });
+
+/* ===== latest: "new" word ===== */
+window.I18N_EXTRA_LATN = {"en":{"latest.new":"new"},"ku":{"latest.new":"نوێ"},"kmr":{"latest.new":"nû"},"ar":{"latest.new":"جديد"},"fr":{"latest.new":"nouveau"},"tr":{"latest.new":"yeni"},"sv":{"latest.new":"nya"}};
+Object.keys(window.I18N_EXTRA_LATN).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_LATN[l]); });
+
+/* ===== tab-header titles for the merged stationery + new AI tabs ===== */
+(function(){ if(!window.TAB_META_I18N) return; var T={en:{stationery:'Stationery',ai:'AI'},ku:{stationery:'نووسراو',ai:'AI'},kmr:{stationery:'Nivîsgeh',ai:'AI'},ar:{stationery:'قرطاسية',ai:'AI'},fr:{stationery:'Papeterie',ai:'IA'},tr:{stationery:'Kırtasiye',ai:'AI'},sv:{stationery:'Trycksaker',ai:'AI'}};
+Object.keys(T).forEach(function(l){ if(window.TAB_META_I18N[l]){ window.TAB_META_I18N[l].stationery={title:T[l].stationery,desc:'',note:''}; window.TAB_META_I18N[l].ai={title:T[l].ai,desc:'',note:''}; } }); })();

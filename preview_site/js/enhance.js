@@ -1688,27 +1688,41 @@
   const WEEK = 7 * 24 * 60 * 60 * 1000;
   const dict = () => window.BQ_DICT || {};
   const lang = () => document.documentElement.dataset.lang || 'en';
-  let items = [];
+  let items = [], workItems = [];
+  const GH = 'https://api.github.com/repos/Bqurtas/BqurtasPortfolio';
+  const CDN = (window.BQ_GALLERY && window.BQ_GALLERY.CDN_BASE) || '';
 
   const open = () => { panel.classList.add('is-open'); panel.setAttribute('aria-hidden', 'false'); backdrop && backdrop.classList.add('is-open'); };
   const close = () => { panel.classList.remove('is-open'); panel.setAttribute('aria-hidden', 'true'); backdrop && backdrop.classList.remove('is-open'); };
   const toggle = () => (panel.classList.contains('is-open') ? close() : open());
-  const setBadge = (on) => { if (badge) badge.hidden = !on; if (badgeM) badgeM.hidden = !on; };
+  const setBadge = () => { const on = (items.length + workItems.length) > 0; if (badge) badge.hidden = !on; if (badgeM) badgeM.hidden = !on; };
 
   const render = () => {
-    const empty = dict()['latest.empty'] || 'No new updates this week.';
-    if (!items.length) { list.innerHTML = `<p class="latest-empty">${esc(empty)}</p>`; return; }
     const L = lang();
-    list.innerHTML = items.map((p) => {
+    const newWord = dict()['latest.new'] || 'new';
+    const workHtml = workItems.map((w) => {
+      const name = dict()['tab.' + w.cat] || w.cat;
+      return `<button class="latest-item" data-kind="work" data-cat="${esc(w.cat)}">${w.thumb ? `<img class="latest-item-img" src="${esc(w.thumb)}" alt="" loading="lazy">` : ''}<span class="latest-item-body"><span class="latest-item-tag"><span class="latest-item-new"></span>${esc(name)}</span><span class="latest-item-title">${w.count} ${esc(newWord)}</span></span></button>`;
+    }).join('');
+    const blogHtml = items.map((p) => {
       const tr = (p.i18n && p.i18n[L]) || {};
       const title = esc(String(tr.title || p.title || '').replace(/<[^>]+>/g, ''));
       const isNew = (Date.now() - new Date(p.created_at).getTime()) < WEEK;
-      return `<button class="latest-item" data-id="${esc(String(p.id))}">${p.cover ? `<img class="latest-item-img" src="${esc(p.cover)}" alt="" loading="lazy">` : ''}<span class="latest-item-body"><span class="latest-item-tag">${isNew ? '<span class="latest-item-new"></span>' : ''}${esc(p.tag || 'Note')}</span><span class="latest-item-title">${title}</span></span></button>`;
+      return `<button class="latest-item" data-kind="post" data-id="${esc(String(p.id))}">${p.cover ? `<img class="latest-item-img" src="${esc(p.cover)}" alt="" loading="lazy">` : ''}<span class="latest-item-body"><span class="latest-item-tag">${isNew ? '<span class="latest-item-new"></span>' : ''}${esc(p.tag || 'Note')}</span><span class="latest-item-title">${title}</span></span></button>`;
     }).join('');
+    if (!workHtml && !blogHtml) { list.innerHTML = `<p class="latest-empty">${esc(dict()['latest.empty'] || 'No new updates this week.')}</p>`; return; }
+    list.innerHTML = workHtml + blogHtml;
     list.querySelectorAll('.latest-item').forEach((b) => b.addEventListener('click', () => {
-      const id = b.getAttribute('data-id'); close();
-      if (window.__bqShowRoom && document.body.dataset.room !== 'blog') window.__bqShowRoom('blog');
-      setTimeout(() => { if (window.__bqOpenPostSlug) window.__bqOpenPostSlug(id); }, 80);
+      close();
+      if (b.getAttribute('data-kind') === 'work') {
+        const cat = b.getAttribute('data-cat');
+        if (window.__bqShowRoom) window.__bqShowRoom('design');
+        setTimeout(() => { const tb = document.querySelector('.tab[data-filter="' + cat + '"]'); if (tb) tb.click(); const w = document.querySelector('.section.work'); if (w) w.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 130);
+      } else {
+        const id = b.getAttribute('data-id');
+        if (window.__bqShowRoom && document.body.dataset.room !== 'blog') window.__bqShowRoom('blog');
+        setTimeout(() => { if (window.__bqOpenPostSlug) window.__bqOpenPostSlug(id); }, 80);
+      }
     }));
   };
 
@@ -1716,7 +1730,38 @@
     if (!SB.url) return;
     const since = new Date(Date.now() - WEEK).toISOString();
     fetch(SB.url + '/rest/v1/posts?select=id,title,tag,cover,i18n,created_at&published=eq.true&created_at=gte.' + since + '&order=created_at.desc&limit=8', { headers: { apikey: SB.key }, cache: 'no-store' })
-      .then((r) => (r.ok ? r.json() : [])).then((rows) => { items = Array.isArray(rows) ? rows : []; setBadge(items.length > 0); render(); }).catch(() => {});
+      .then((r) => (r.ok ? r.json() : [])).then((rows) => { items = Array.isArray(rows) ? rows : []; setBadge(); render(); }).catch(() => {});
+  };
+
+  /* works added to the repo in the last 7 days, grouped by tab — 2 GitHub calls, cached 30 min */
+  const loadWorks = async () => {
+    try {
+      const CK = 'bq_latest_works';
+      const cached = sessionStorage.getItem(CK);
+      if (cached) { const o = JSON.parse(cached); if (Date.now() - o.t < 1800000) { workItems = o.w || []; setBadge(); render(); return; } }
+      const fc = {}, cols = (window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS) || {};
+      Object.keys(cols).forEach((k) => { fc[cols[k].folder] = cols[k].cat; });
+      const sinceISO = new Date(Date.now() - WEEK).toISOString();
+      const cr = await fetch(GH + '/commits?sha=main&until=' + sinceISO + '&per_page=1');
+      if (!cr.ok) return;
+      const cj = await cr.json();
+      const base = (Array.isArray(cj) && cj[0]) ? cj[0].sha : null;
+      if (!base) return;
+      const dr = await fetch(GH + '/compare/' + base + '...main');
+      if (!dr.ok) return;
+      const dj = await dr.json();
+      const IMG = /\.(webp|jpe?g|png|gif|avif|mp4|webm)$/i, byCat = {};
+      (dj.files || []).forEach((f) => {
+        if (f.status !== 'added' || !IMG.test(f.filename || '')) return;
+        const cat = fc[String(f.filename).split('/')[0]];
+        if (!cat) return;
+        if (!byCat[cat]) byCat[cat] = { count: 0, thumb: CDN + '/' + f.filename };
+        byCat[cat].count++;
+      });
+      workItems = Object.keys(byCat).map((cat) => ({ cat, count: byCat[cat].count, thumb: byCat[cat].thumb }));
+      sessionStorage.setItem(CK, JSON.stringify({ t: Date.now(), w: workItems }));
+      setBadge(); render();
+    } catch (e) {}
   };
 
   bell && bell.addEventListener('click', toggle);
@@ -1725,6 +1770,6 @@
   backdrop && backdrop.addEventListener('click', close);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && panel.classList.contains('is-open')) close(); });
   if (window.__bqLangCb) window.__bqLangCb.push(render);
-  load();
-  window.__bqReloadLatest = load;
+  load(); loadWorks();
+  window.__bqReloadLatest = () => { load(); try { sessionStorage.removeItem('bq_latest_works'); } catch (e) {} loadWorks(); };
 })();

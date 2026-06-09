@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const WORKS_WORD = { en: 'works', ku: 'کار', kmr: 'kar', ar: 'عمل', fr: 'œuvres', tr: 'iş', sv: 'verk' };
   const updateTabHeader = (filter, total) => {
     const tm    = getTabMeta();
-    const meta  = tm[filter] || tm.all;
+    const meta  = tm[filter] || TAB_META[filter] || tm.all;   // ai/stationery may only exist in the base TAB_META
     const title = document.getElementById('tabHeaderTitle');
     const desc  = document.getElementById('tabHeaderDesc');
     const note  = document.getElementById('tabHeaderNote');
@@ -302,8 +302,8 @@ document.addEventListener('DOMContentLoaded', () => {
     title.classList.add('anim-out');
     setTimeout(() => {
       title.textContent = meta.title;
-      // keep it clean — just the tab name + the count of works (no long blurb)
-      if (desc)  desc.textContent  = (filter === 'ai') ? '' : (total + ' ' + (WORKS_WORD[currentLang] || WORKS_WORD.en));
+      // keep it clean — just the tab name + the count of works (no long blurb), even when zero
+      if (desc)  desc.textContent  = total + ' ' + (WORKS_WORD[currentLang] || WORKS_WORD.en);
       if (note)  note.textContent  = '';
       if (ghost) ghost.dataset.ghost = total;
       title.classList.remove('anim-out');
