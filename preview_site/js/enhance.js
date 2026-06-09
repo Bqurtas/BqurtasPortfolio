@@ -1686,6 +1686,10 @@
   const badge = $('#railLatestBadge'), badgeM = $('#railLatestBadgeM');
   const esc = (s) => String(s || '').replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
   const WEEK = 7 * 24 * 60 * 60 * 1000;
+  // launch baseline — Latest only surfaces blogs/works added from here on, so the
+  // migrated/built-in posts don't show. After a week the rolling 7-day window takes over.
+  const LATEST_SINCE = Date.parse('2026-06-09T00:00:00Z');
+  const sinceStamp = () => new Date(Math.max(Date.now() - WEEK, LATEST_SINCE)).toISOString();
   const dict = () => window.BQ_DICT || {};
   const lang = () => document.documentElement.dataset.lang || 'en';
   let items = [], workItems = [];
@@ -1728,7 +1732,7 @@
 
   const load = () => {
     if (!SB.url) return;
-    const since = new Date(Date.now() - WEEK).toISOString();
+    const since = sinceStamp();
     fetch(SB.url + '/rest/v1/posts?select=id,title,tag,cover,i18n,created_at&published=eq.true&created_at=gte.' + since + '&order=created_at.desc&limit=8', { headers: { apikey: SB.key }, cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : [])).then((rows) => { items = Array.isArray(rows) ? rows : []; setBadge(); render(); }).catch(() => {});
   };
@@ -1741,7 +1745,7 @@
       if (cached) { const o = JSON.parse(cached); if (Date.now() - o.t < 1800000) { workItems = o.w || []; setBadge(); render(); return; } }
       const fc = {}, cols = (window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS) || {};
       Object.keys(cols).forEach((k) => { fc[cols[k].folder] = cols[k].cat; });
-      const sinceISO = new Date(Date.now() - WEEK).toISOString();
+      const sinceISO = sinceStamp();
       const cr = await fetch(GH + '/commits?sha=main&until=' + sinceISO + '&per_page=1');
       if (!cr.ok) return;
       const cj = await cr.json();
