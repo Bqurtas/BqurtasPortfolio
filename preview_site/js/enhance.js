@@ -602,7 +602,7 @@
 
     /* ---- Dashboard translations (follows the site language) ---- */
     const DASH_I18N = {
-      en: { overview:'Overview', visitors:'Visitors', works:'Works', leads:'Leads', profile:'Profile', settings:'Settings', content:'Content', assistant:'Assistant',
+      en: { overview:'Overview', visitors:'Visitors', works:'Works', latest:'Latest', leads:'Leads', profile:'Profile', settings:'Settings', content:'Content', assistant:'Assistant',
         gateTitle:'Enter access code', gatePrivate:'This console is private.', gatePh:'Access code', unlock:'Unlock', wrong:'✗ Wrong access code.', twoTitle:'Enter the SMS code', twoNote:'We texted a 6-digit code to your phone.', twoPh:'6-digit code', twoWrong:'✗ Wrong or expired code.', twoSending:'Sending code…', twoSetupBtn:'Set up 2FA (authenticator)', twoSetup1:'1) In Cloudflare set TOTP_SECRET to this (then Retry deployment):', twoSetup2:'2) Add the same key to Google Authenticator (manual entry: "Pencemor Studio"). Tap the key to copy.', twoSetupLink:'open in app',
         oTotal:'Total works', oColl:'Collections', oLeads:'Leads stored', oLangs:'Languages', oWelcome:'Welcome back — your studio console is private to you; data lives in this browser.',
         lEmpty:'No leads yet. Pitches from the Contact form appear here.', lClear:'Clear all leads', lConfirm:'Delete all stored leads?',
@@ -611,7 +611,7 @@
         vConnect:'Connect your analytics', vEnter:'Enter the STATS_TOKEN you set in Cloudflare.', vTokenPh:'Stats token', vConnectBtn:'Connect', vLoading:'Loading visitor data…',
         tAi:'AI', tLang:'Language', tTheme:'Theme', tAddAdmin:'Add admin', tLogout:'Log out', tClose:'Close',
         admYou:'Owner', admName:'Name', admEmail:'Email', admRole:'Role', admAdd:'Add admin', admEmpty:'No additional admins yet.', admRemove:'Remove', admNote:'Shared login across devices needs the backend login system; for now these admins are saved privately in this browser.', logoutAsk:'Log out of the console?' },
-      ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن', content:'ناوەڕۆک', assistant:'یاریدەدەر',
+      ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', latest:'نوێترین', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن', content:'ناوەڕۆک', assistant:'یاریدەدەر',
         gateTitle:'کۆدی چوونەژوورەوە بنووسە', gatePrivate:'ئەم کۆنسۆڵە تایبەتە.', gatePh:'کۆدی چوونەژوورەوە', unlock:'کردنەوە', wrong:'✗ کۆدەکە هەڵەیە.', twoTitle:'کۆدی SMS بنووسە', twoNote:'کۆدێکی ٦ ژمارەیی نێردرا بۆ مۆبایلەکەت.', twoPh:'کۆدی ٦ ژمارەیی', twoWrong:'✗ کۆد هەڵەیە یان بەسەرچووە.', twoSending:'ناردنی کۆد…', twoSetupBtn:'ڕێکخستنی 2FA (ئەپی ئۆتێنتیکەیتەر)', twoSetup1:'١) لە Cloudflare، TOTP_SECRET بکە بەمە (پاشان Retry deployment):', twoSetup2:'٢) هەمان کلیل بخە ناو Google Authenticator (داخڵکردنی دەستی: «Pencemor Studio»). کلیک لە کلیلەکە بکە بۆ کۆپی.', twoSetupLink:'لە ئەپ بیکەرەوە',
         oTotal:'کۆی کارەکان', oColl:'کۆکراوەکان', oLeads:'داواکاری هەڵگیراو', oLangs:'زمانەکان', oWelcome:'بەخێربێیتەوە — کۆنسۆڵی ستۆدیۆ تەنها بۆ تۆیە؛ زانیارییەکان لەم وێبگەڕەدا دەمێننەوە.',
         lEmpty:'هێشتا داواکاری نییە. پرۆژەکانی فۆڕمی پەیوەندی لێرە دەردەکەون.', lClear:'سڕینەوەی هەموو داواکارییەکان', lConfirm:'هەموو داواکارییە هەڵگیراوەکان بسڕێتەوە؟',
@@ -1145,7 +1145,61 @@
       $('#stRefresh')?.addEventListener('click', renderVisitors);
     };
 
-    const VIEWS = { overview: renderOverview, visitors: renderVisitors, works: renderWorks, content: renderContent, assistant: renderAssistant, admins: renderAdmins, leads: renderLeads, profile: renderProfile, settings: renderSettings };
+    /* ---- Latest: hand-pin an important work to the homepage bell for a week ---- */
+    const latestApi = (payload) => {
+      const SB = window.BQ_SUPA || {};
+      return fetch(SB.url + '/functions/v1/latest-admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: SB.key, Authorization: 'Bearer ' + SB.key, 'x-edit-token': editToken() },
+        body: JSON.stringify(payload)
+      }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
+    };
+    const LATEST_TABS = [['logo','Logos'],['book','Book Covers'],['image','Photography'],['posters','Posters'],['social','Social'],['events','Events'],['stationery','Stationery'],['official','Official'],['video','Video'],['ai','AI'],['other','Other'],['','Design room (all)']];
+    const renderLatest = () => {
+      const opts = LATEST_TABS.map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+      view.innerHTML = `
+        <p class="dash-note mono">Pin an important work to the homepage “Latest” bell. It shows for 7 days, then drops off on its own — alongside the new works the bell already finds automatically.</p>
+        <div class="dash-latest-form">
+          <label class="dash-field"><span class="mono">Headline</span><input id="laTitle" type="text" placeholder="e.g. New identity for Rwanga"></label>
+          <label class="dash-field"><span class="mono">Opens tab</span><select id="laLink">${opts}</select></label>
+          <label class="dash-field"><span class="mono">Image link (optional)</span><input id="laImage" type="text" placeholder="https://… (leave empty for a star)"></label>
+          <button class="dash-btn" id="laAdd"><i class="fa-solid fa-bell"></i> Pin to Latest</button>
+          <span class="dash-note mono" id="laMsg"></span>
+        </div>
+        <div class="dash-latest-list" id="laList"><p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i></p></div>`;
+      const msg = $('#laMsg');
+      const loadList = () => {
+        latestApi({ action: 'list' }).then(d => {
+          const list = $('#laList'); if (!list) return;
+          if (!d || !d.ok) {
+            const needTok = d && (d.error === 'missing_token' || d.error === 'unauthorized');
+            list.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${needTok ? 'Connect the editor first — open Content and enter your edit token.' : 'Reachable on the live site only.'}</p>`;
+            return;
+          }
+          const items = d.items || [];
+          if (!items.length) { list.innerHTML = `<p class="dash-empty mono">Nothing pinned right now.</p>`; return; }
+          list.innerHTML = items.map(it => {
+            const left = Math.max(0, 7 - Math.floor((Date.now() - new Date(it.created_at).getTime()) / 86400000));
+            return `<div class="dash-latest-row"><span class="dash-latest-tag mono">${esc(it.tag||'Featured')}</span><strong>${esc(it.title)}</strong><span class="mono dash-latest-left">${left}d</span><button class="dash-latest-del" data-id="${it.id}" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button></div>`;
+          }).join('');
+          list.querySelectorAll('.dash-latest-del').forEach(b => b.addEventListener('click', () => { latestApi({ action: 'delete', id: Number(b.dataset.id) }).then(() => { loadList(); if (window.__bqReloadLatest) window.__bqReloadLatest(); }); }));
+        }).catch(() => {});
+      };
+      $('#laAdd').addEventListener('click', () => {
+        const title = $('#laTitle').value.trim();
+        if (!title) { msg.textContent = 'Add a headline.'; return; }
+        const sel = $('#laLink'), link = sel.value, tag = sel.options[sel.selectedIndex].text;
+        const image = $('#laImage').value.trim();
+        msg.textContent = 'Saving…';
+        latestApi({ action: 'add', item: { title, link, tag, image } }).then(d => {
+          if (d && d.ok) { $('#laTitle').value = ''; $('#laImage').value = ''; msg.textContent = 'Pinned ✓'; loadList(); if (window.__bqReloadLatest) window.__bqReloadLatest(); }
+          else { msg.textContent = (d && (d.error === 'missing_token' || d.error === 'unauthorized')) ? 'Connect the editor first (Content tab).' : 'Could not save (live site only).'; }
+        }).catch(() => { msg.textContent = 'Could not save.'; });
+      });
+      loadList();
+    };
+
+    const VIEWS = { overview: renderOverview, visitors: renderVisitors, works: renderWorks, content: renderContent, latest: renderLatest, assistant: renderAssistant, admins: renderAdmins, leads: renderLeads, profile: renderProfile, settings: renderSettings };
     const showConsole = () => {
       gate.hidden = true; main.hidden = false;
       dash.classList.add('is-full');           // console takes the full screen
@@ -1692,18 +1746,22 @@
   const sinceStamp = () => new Date(Math.max(Date.now() - WEEK, LATEST_SINCE)).toISOString();
   const dict = () => window.BQ_DICT || {};
   const lang = () => document.documentElement.dataset.lang || 'en';
-  let items = [], workItems = [];
+  let items = [], workItems = [], pinItems = [];
   const GH = 'https://api.github.com/repos/Bqurtas/BqurtasPortfolio';
   const CDN = (window.BQ_GALLERY && window.BQ_GALLERY.CDN_BASE) || '';
 
   const open = () => { panel.classList.add('is-open'); panel.setAttribute('aria-hidden', 'false'); backdrop && backdrop.classList.add('is-open'); };
   const close = () => { panel.classList.remove('is-open'); panel.setAttribute('aria-hidden', 'true'); backdrop && backdrop.classList.remove('is-open'); };
   const toggle = () => (panel.classList.contains('is-open') ? close() : open());
-  const setBadge = () => { const on = (items.length + workItems.length) > 0; if (badge) badge.hidden = !on; if (badgeM) badgeM.hidden = !on; };
+  const setBadge = () => { const on = (items.length + workItems.length + pinItems.length) > 0; if (badge) badge.hidden = !on; if (badgeM) badgeM.hidden = !on; };
 
   const render = () => {
     const L = lang();
     const newWord = dict()['latest.new'] || 'new';
+    const pinHtml = pinItems.map((p) => {
+      const img = p.image ? `<img class="latest-item-img" src="${esc(p.image)}" alt="" loading="lazy">` : `<span class="latest-item-img latest-item-img--pin"><i class="fa-solid fa-star"></i></span>`;
+      return `<button class="latest-item latest-item--pin" data-kind="pin" data-link="${esc(p.link || '')}">${img}<span class="latest-item-body"><span class="latest-item-tag"><span class="latest-item-new"></span>${esc(p.tag || 'Featured')}</span><span class="latest-item-title">${esc(String(p.title || ''))}</span></span></button>`;
+    }).join('');
     const workHtml = workItems.map((w) => {
       const name = dict()['tab.' + w.cat] || w.cat;
       return `<button class="latest-item" data-kind="work" data-cat="${esc(w.cat)}">${w.thumb ? `<img class="latest-item-img" src="${esc(w.thumb)}" alt="" loading="lazy">` : ''}<span class="latest-item-body"><span class="latest-item-tag"><span class="latest-item-new"></span>${esc(name)}</span><span class="latest-item-title">${w.count} ${esc(newWord)}</span></span></button>`;
@@ -1714,14 +1772,19 @@
       const isNew = (Date.now() - new Date(p.created_at).getTime()) < WEEK;
       return `<button class="latest-item" data-kind="post" data-id="${esc(String(p.id))}">${p.cover ? `<img class="latest-item-img" src="${esc(p.cover)}" alt="" loading="lazy">` : ''}<span class="latest-item-body"><span class="latest-item-tag">${isNew ? '<span class="latest-item-new"></span>' : ''}${esc(p.tag || 'Note')}</span><span class="latest-item-title">${title}</span></span></button>`;
     }).join('');
-    if (!workHtml && !blogHtml) { list.innerHTML = `<p class="latest-empty">${esc(dict()['latest.empty'] || 'No new updates this week.')}</p>`; return; }
-    list.innerHTML = workHtml + blogHtml;
+    if (!pinHtml && !workHtml && !blogHtml) { list.innerHTML = `<p class="latest-empty">${esc(dict()['latest.empty'] || 'No new updates this week.')}</p>`; return; }
+    list.innerHTML = pinHtml + workHtml + blogHtml;
     list.querySelectorAll('.latest-item').forEach((b) => b.addEventListener('click', () => {
       close();
-      if (b.getAttribute('data-kind') === 'work') {
-        const cat = b.getAttribute('data-cat');
-        if (window.__bqShowRoom) window.__bqShowRoom('design');
-        setTimeout(() => { const tb = document.querySelector('.tab[data-filter="' + cat + '"]'); if (tb) tb.click(); const w = document.querySelector('.section.work'); if (w) w.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 130);
+      const kind = b.getAttribute('data-kind');
+      const goTab = (cat) => { if (window.__bqShowRoom) window.__bqShowRoom('design'); setTimeout(() => { const tb = document.querySelector('.tab[data-filter="' + cat + '"]'); if (tb) tb.click(); const w = document.querySelector('.section.work'); if (w) w.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 130); };
+      if (kind === 'work') {
+        goTab(b.getAttribute('data-cat'));
+      } else if (kind === 'pin') {
+        const link = b.getAttribute('data-link') || '';
+        if (/^https?:\/\//.test(link)) { window.open(link, '_blank', 'noopener'); }
+        else if (link) { goTab(link); }
+        else if (window.__bqShowRoom) { window.__bqShowRoom('design'); }
       } else {
         const id = b.getAttribute('data-id');
         if (window.__bqShowRoom && document.body.dataset.room !== 'blog') window.__bqShowRoom('blog');
@@ -1735,6 +1798,14 @@
     const since = sinceStamp();
     fetch(SB.url + '/rest/v1/posts?select=id,title,tag,cover,i18n,created_at&published=eq.true&created_at=gte.' + since + '&order=created_at.desc&limit=8', { headers: { apikey: SB.key }, cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : [])).then((rows) => { items = Array.isArray(rows) ? rows : []; setBadge(); render(); }).catch(() => {});
+  };
+
+  /* hand-pinned items the studio added from the dashboard — show for a week */
+  const loadPins = () => {
+    if (!SB.url) return;
+    const since = new Date(Date.now() - WEEK).toISOString();
+    fetch(SB.url + '/rest/v1/latest_items?select=id,title,tag,link,image,created_at&active=eq.true&created_at=gte.' + since + '&order=created_at.desc&limit=6', { headers: { apikey: SB.key }, cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : [])).then((rows) => { pinItems = Array.isArray(rows) ? rows : []; setBadge(); render(); }).catch(() => {});
   };
 
   /* works added to the repo in the last 7 days, grouped by tab — 2 GitHub calls, cached 30 min */
@@ -1774,6 +1845,6 @@
   backdrop && backdrop.addEventListener('click', close);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && panel.classList.contains('is-open')) close(); });
   if (window.__bqLangCb) window.__bqLangCb.push(render);
-  load(); loadWorks();
-  window.__bqReloadLatest = () => { load(); try { sessionStorage.removeItem('bq_latest_works'); } catch (e) {} loadWorks(); };
+  load(); loadWorks(); loadPins();
+  window.__bqReloadLatest = () => { load(); loadPins(); try { sessionStorage.removeItem('bq_latest_works'); } catch (e) {} loadWorks(); };
 })();

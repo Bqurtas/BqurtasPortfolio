@@ -507,6 +507,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab, true)));
 
+  /* Freshen the deck whenever the viewer scrolls away from the gallery (up to
+     the hero, or down past it) and comes back — re-shuffles while it's off
+     screen, keeping the same count so there's no jump, so each return shows a
+     different set of works. */
+  let galleryOnScreen = true, lastFreshen = 0;
+  const freshenGallery = () => {
+    if (!gridEl || !mCols.length || currentFilter === 'ai') return;
+    if (Date.now() - lastFreshen < 1200) return;
+    lastFreshen = Date.now();
+    const keep = Math.max(PAGE_SIZE, currentShown);
+    shuffleAllCards();
+    buildColumns(colCountForWidth());
+    currentShown = 0;
+    const matching = matchingCards();
+    matching.slice(0, Math.min(keep, matching.length)).forEach(e => { placeCard(e.el); currentShown++; });
+    updateLoadMore(matching.length);
+  };
+  if (gridEl && 'IntersectionObserver' in window) {
+    new IntersectionObserver((ents) => {
+      const vis = ents.some(e => e.isIntersecting);
+      if (!vis && galleryOnScreen) { galleryOnScreen = false; freshenGallery(); }
+      else if (vis) { galleryOnScreen = true; }
+    }, { threshold: 0 }).observe(gridEl);
+  }
+
   /* ---------- COUNT UP (statistics) ---------- */
   const animateCount = (el) => {
     const target = parseInt(el.dataset.count, 10) || 0;
