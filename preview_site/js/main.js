@@ -129,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setDocTitle();
     document.getElementById('mobileMenu')?.classList.remove('is-open');
     document.body.style.overflow = '';
+    if (window.__bqToggleCta) window.__bqToggleCta();
   };
   window.__bqShowRoom = showRoom;
 
@@ -141,7 +142,21 @@ document.addEventListener('DOMContentLoaded', () => {
      Works for every language and section. */
   let __urlResetT;
   const __absTop = (el) => el.getBoundingClientRect().top + window.scrollY;
+  /* floating "let's work together" CTA — visible while browsing the Design room,
+     hidden at the hero and once you reach the closing "A short note" section */
+  const designCta = document.getElementById('designCta');
+  const toggleCta = () => {
+    if (!designCta) return;
+    if (document.body.dataset.room !== 'design') { designCta.classList.remove('is-shown'); return; }
+    const note = document.querySelector('.section.bio-teaser');
+    const y = window.scrollY;
+    const past = y > window.innerHeight * 0.55;
+    const beforeNote = !note || (__absTop(note) - y) > window.innerHeight * 0.65;
+    designCta.classList.toggle('is-shown', past && beforeNote);
+  };
+  window.__bqToggleCta = toggleCta;
   window.addEventListener('scroll', () => {
+    toggleCta();
     if (document.body.dataset.room !== 'design') return;
     clearTimeout(__urlResetT);
     __urlResetT = setTimeout(() => {

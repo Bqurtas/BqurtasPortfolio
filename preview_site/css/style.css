@@ -2966,6 +2966,21 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   box-shadow: 0 14px 34px -10px rgba(0,0,0,0.35);
 }
 [dir="rtl"] .to-top { right: auto; left: 28px; }
+
+/* Floating "let's work together" CTA — only while browsing the Design room */
+.design-cta {
+  position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px); z-index: 95;
+  display: inline-flex; align-items: center; gap: 11px; padding: 14px 24px; border-radius: 999px;
+  background: var(--ink); color: var(--bg); font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 600;
+  box-shadow: 0 16px 40px -12px rgba(0,0,0,0.5); opacity: 0; pointer-events: none;
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease-out), gap 0.25s var(--ease);
+}
+.design-cta.is-shown { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+.design-cta:hover { gap: 16px; }
+.design-cta i { font-size: 12px; color: var(--bg); }
+[dir="rtl"] .design-cta i { transform: scaleX(-1); }
+.design-cta-dot { width: 8px; height: 8px; border-radius: 50%; background: #5fbf6a; flex-shrink: 0; }
+@media (max-width: 820px) { .design-cta { bottom: calc(var(--dock-h) + 16px); font-size: 13px; padding: 12px 19px; } }
 .to-top.is-shown { opacity: 1; transform: none; pointer-events: auto; }
 /* keep its own colour on hover — only a touch more shadow, no colour change */
 .to-top:hover { box-shadow: 0 18px 42px -12px rgba(0,0,0,0.5); }
