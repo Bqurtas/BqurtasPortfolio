@@ -913,6 +913,39 @@
         <form id="ctTokForm" class="dash-login"><input type="password" id="ctTok" placeholder="${t.tokPh}" autocomplete="off"><button type="submit">${t.conn} <i class="fa-solid fa-arrow-right"></i></button></form></div>`;
       $('#ctTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#ctTok').value.trim(); if (!v) return; try { localStorage.setItem('bq_edit_token', v); } catch (x) {} renderContent(); });
     };
+    const drawCms = () => {
+      const t = CT_I18N[curLang()] || CT_I18N.en;
+      const rows = CMS_POSTS.length ? CMS_POSTS.map((p, i) => {
+        const dd = p.date || (p.created_at ? new Date(p.created_at).toLocaleDateString('en', { month: 'short', year: 'numeric' }) : '');
+        const up = i === 0 ? ' disabled' : '', dn = i === CMS_POSTS.length - 1 ? ' disabled' : '';
+        return `<div class="cms-row" data-id="${p.id}">
+            <span class="dash-reorder"><button class="dash-ord" data-mv="-1" data-i="${i}"${up} aria-label="Up"><i class="fa-solid fa-chevron-up"></i></button><button class="dash-ord" data-mv="1" data-i="${i}"${dn} aria-label="Down"><i class="fa-solid fa-chevron-down"></i></button></span>
+            <span class="cms-row-t"><strong>${esc(p.title || '')}</strong><span class="mono">${esc(p.tag || 'Note')} · ${esc(dd)}${p.published === false ? ' · ' + t.draft : ''}</span></span>
+            <span class="cms-row-act">
+              <button class="cms-mini" data-act="edit" data-id="${p.id}" title="${t.editBtn}"><i class="fa-solid fa-pen"></i></button>
+              <button class="cms-mini cms-mini--del" data-act="del" data-id="${p.id}" title="${t.delBtn}"><i class="fa-solid fa-trash-can"></i></button>
+            </span></div>`;
+      }).join('') : `<p class="dash-dim mono">${t.empty}</p>`;
+      view.innerHTML = `
+        <div class="cms-head">
+          <button class="dash-btn dash-btn--go" id="ctNew"><i class="fa-solid fa-feather-pointed"></i> ${t.newBtn}</button>
+          <span class="mono cms-status">${CMS_POSTS.length} ${t.posts}</span>
+        </div>
+        <div class="cms-list">${rows}</div>`;
+      $('#ctNew').addEventListener('click', () => cmsEdit(null));
+      view.querySelectorAll('.cms-mini').forEach((b) => b.addEventListener('click', () => {
+        const id = b.getAttribute('data-id'), act = b.getAttribute('data-act');
+        if (act === 'edit') cmsEdit(CMS_POSTS.find((p) => String(p.id) === String(id)));
+        else cmsDel(id);
+      }));
+      view.querySelectorAll('.dash-ord').forEach((b) => b.addEventListener('click', () => {
+        const i = Number(b.dataset.i), j = i + Number(b.dataset.mv);
+        if (j < 0 || j >= CMS_POSTS.length) return;
+        const tmp = CMS_POSTS[i]; CMS_POSTS[i] = CMS_POSTS[j]; CMS_POSTS[j] = tmp;   // swap, persist the new order
+        drawCms();
+        cmsApi({ action: 'reorder', ids: CMS_POSTS.map((x) => x.id) }).then(() => { if (window.__bqReloadBlog) window.__bqReloadBlog(); });
+      }));
+    };
     const cmsList = () => {
       const t = CT_I18N[curLang()] || CT_I18N.en;
       view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i><br>${t.loading}</p>`;
@@ -920,27 +953,7 @@
         if (d && d.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
         if (!d || !d.ok) { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${t.err}</p><button class="dash-btn" id="ctRetry"><i class="fa-solid fa-rotate"></i> ${t.conn}</button>`; const rb = $('#ctRetry'); if (rb) rb.addEventListener('click', cmsList); return; }
         CMS_POSTS = Array.isArray(d.posts) ? d.posts : [];
-        const rows = CMS_POSTS.length ? CMS_POSTS.map((p) => {
-          const dd = p.date || (p.created_at ? new Date(p.created_at).toLocaleDateString('en', { month: 'short', year: 'numeric' }) : '');
-          return `<div class="cms-row" data-id="${p.id}">
-            <span class="cms-row-t"><strong>${esc(p.title || '')}</strong><span class="mono">${esc(p.tag || 'Note')} · ${esc(dd)}${p.published === false ? ' · ' + t.draft : ''}</span></span>
-            <span class="cms-row-act">
-              <button class="cms-mini" data-act="edit" data-id="${p.id}" title="${t.editBtn}"><i class="fa-solid fa-pen"></i></button>
-              <button class="cms-mini cms-mini--del" data-act="del" data-id="${p.id}" title="${t.delBtn}"><i class="fa-solid fa-trash-can"></i></button>
-            </span></div>`;
-        }).join('') : `<p class="dash-dim mono">${t.empty}</p>`;
-        view.innerHTML = `
-          <div class="cms-head">
-            <button class="dash-btn dash-btn--go" id="ctNew"><i class="fa-solid fa-feather-pointed"></i> ${t.newBtn}</button>
-            <span class="mono cms-status">${CMS_POSTS.length} ${t.posts}</span>
-          </div>
-          <div class="cms-list">${rows}</div>`;
-        $('#ctNew').addEventListener('click', () => cmsEdit(null));
-        view.querySelectorAll('.cms-mini').forEach((b) => b.addEventListener('click', () => {
-          const id = b.getAttribute('data-id'), act = b.getAttribute('data-act');
-          if (act === 'edit') cmsEdit(CMS_POSTS.find((p) => String(p.id) === String(id)));
-          else cmsDel(id);
-        }));
+        drawCms();
       }).catch(() => { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${t.err}</p>`; });
     };
     const cmsDel = (id) => {
@@ -1199,6 +1212,24 @@
           else { upmsg.textContent = (d && (d.error === 'missing_token' || d.error === 'unauthorized')) ? LAT('connect') : '✗ ' + ((d && d.error) || ''); }
         } catch (err) { upmsg.textContent = '✗ ' + err; }
       });
+      let LIST = [];
+      const drawList = () => {
+        const list = $('#laList'); if (!list) return;
+        if (!LIST.length) { list.innerHTML = `<p class="dash-empty mono">${LAT('empty')}</p>`; return; }
+        list.innerHTML = LIST.map((it, i) => {
+          const left = Math.max(0, 7 - Math.floor((Date.now() - new Date(it.created_at).getTime()) / 86400000));
+          const up = i === 0 ? ' disabled' : '', dn = i === LIST.length - 1 ? ' disabled' : '';
+          return `<div class="dash-latest-row"><span class="dash-reorder"><button class="dash-ord" data-mv="-1" data-i="${i}"${up} aria-label="Up"><i class="fa-solid fa-chevron-up"></i></button><button class="dash-ord" data-mv="1" data-i="${i}"${dn} aria-label="Down"><i class="fa-solid fa-chevron-down"></i></button></span><span class="dash-latest-tag mono">${esc((it.link && tabName(it.link)) || it.tag || 'Featured')}</span><strong>${esc(it.title)}</strong><span class="mono dash-latest-left">${left}d</span><button class="dash-latest-del" data-id="${it.id}" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button></div>`;
+        }).join('');
+        list.querySelectorAll('.dash-latest-del').forEach(b => b.addEventListener('click', () => { latestApi({ action: 'delete', id: Number(b.dataset.id) }).then(() => { loadList(); if (window.__bqReloadLatest) window.__bqReloadLatest(); }); }));
+        list.querySelectorAll('.dash-ord').forEach(b => b.addEventListener('click', () => {
+          const i = Number(b.dataset.i), j = i + Number(b.dataset.mv);
+          if (j < 0 || j >= LIST.length) return;
+          const t = LIST[i]; LIST[i] = LIST[j]; LIST[j] = t;   // swap, then persist the whole order
+          drawList();
+          latestApi({ action: 'reorder', ids: LIST.map(x => x.id) }).then(() => { if (window.__bqReloadLatest) window.__bqReloadLatest(); });
+        }));
+      };
       const loadList = () => {
         latestApi({ action: 'list' }).then(d => {
           const list = $('#laList'); if (!list) return;
@@ -1207,13 +1238,8 @@
             list.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${needTok ? LAT('connect') : LAT('live')}</p>`;
             return;
           }
-          const items = d.items || [];
-          if (!items.length) { list.innerHTML = `<p class="dash-empty mono">${LAT('empty')}</p>`; return; }
-          list.innerHTML = items.map(it => {
-            const left = Math.max(0, 7 - Math.floor((Date.now() - new Date(it.created_at).getTime()) / 86400000));
-            return `<div class="dash-latest-row"><span class="dash-latest-tag mono">${esc((it.link && tabName(it.link)) || it.tag || 'Featured')}</span><strong>${esc(it.title)}</strong><span class="mono dash-latest-left">${left}d</span><button class="dash-latest-del" data-id="${it.id}" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button></div>`;
-          }).join('');
-          list.querySelectorAll('.dash-latest-del').forEach(b => b.addEventListener('click', () => { latestApi({ action: 'delete', id: Number(b.dataset.id) }).then(() => { loadList(); if (window.__bqReloadLatest) window.__bqReloadLatest(); }); }));
+          LIST = d.items || [];
+          drawList();
         }).catch(() => {});
       };
       $('#laAdd').addEventListener('click', () => {
@@ -1632,7 +1658,7 @@
     const loadCmsPosts = () => {
       const SB = window.BQ_SUPA || {};
       if (!SB.url || !SB.key) return;
-      fetch(SB.url + '/rest/v1/posts?select=*&published=eq.true&order=created_at.desc', { headers: { apikey: SB.key }, cache: 'no-store' })
+      fetch(SB.url + '/rest/v1/posts?select=*&published=eq.true&order=pos.asc,created_at.desc', { headers: { apikey: SB.key }, cache: 'no-store' })
         .then((r) => r.json()).then((rows) => {
           const cms = (Array.isArray(rows) ? rows : []).map((p) => ({
             num: String(p.num || p.id || ''),
@@ -1836,7 +1862,7 @@
   const loadPins = () => {
     if (!SB.url) return;
     const since = new Date(Date.now() - WEEK).toISOString();
-    fetch(SB.url + '/rest/v1/latest_items?select=id,title,tag,link,image,created_at&active=eq.true&created_at=gte.' + since + '&order=created_at.desc&limit=6', { headers: { apikey: SB.key }, cache: 'no-store' })
+    fetch(SB.url + '/rest/v1/latest_items?select=id,title,tag,link,image,created_at&active=eq.true&created_at=gte.' + since + '&order=pos.asc,created_at.desc&limit=6', { headers: { apikey: SB.key }, cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : [])).then((rows) => { pinItems = Array.isArray(rows) ? rows : []; setBadge(); render(); }).catch(() => {});
   };
 
