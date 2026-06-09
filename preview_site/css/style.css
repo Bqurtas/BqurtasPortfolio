@@ -2809,8 +2809,8 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .rail-chat.is-active { background: var(--gold-bright); border-color: var(--gold); }
 .rail-chat.is-active i { color: var(--bg); }
 .rail-chat-dot {
-  position: absolute; top: 6px; right: 6px;
-  width: 7px; height: 7px; border-radius: 50%;
+  position: absolute; top: 7px; right: 7px;
+  width: 9px; height: 9px; border-radius: 50%;
   background: #6bbf59; box-shadow: 0 0 0 2px var(--rail-bg);
   animation: pulse 2.4s ease-in-out infinite;
 }

@@ -509,10 +509,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab, true)));
 
-  /* Freshen the deck whenever the viewer scrolls away from the gallery (up to
-     the hero, or down past it) and comes back — re-shuffles while it's off
-     screen, keeping the same count so there's no jump, so each return shows a
-     different set of works. */
+  /* Freshen the deck when the viewer scrolls UP off the gallery (to the hero)
+     and comes back — re-shuffles while it's off screen so each return shows a
+     different set. Only fires when the grid leaves via the BOTTOM (it's now
+     below the viewport); re-decking when it leaves via the top would reflow the
+     content under it and trap the scroll before "A short note" on mobile. */
   let galleryOnScreen = true, lastFreshen = 0;
   const freshenGallery = () => {
     if (!gridEl || !mCols.length || currentFilter === 'ai') return;
@@ -528,9 +529,11 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   if (gridEl && 'IntersectionObserver' in window) {
     new IntersectionObserver((ents) => {
-      const vis = ents.some(e => e.isIntersecting);
-      if (!vis && galleryOnScreen) { galleryOnScreen = false; freshenGallery(); }
-      else if (vis) { galleryOnScreen = true; }
+      const e = ents[0]; if (!e) return;
+      if (!e.isIntersecting && galleryOnScreen) {
+        galleryOnScreen = false;
+        if (e.boundingClientRect.top > 0) freshenGallery();   // left via the bottom only
+      } else if (e.isIntersecting) { galleryOnScreen = true; }
     }, { threshold: 0 }).observe(gridEl);
   }
 
