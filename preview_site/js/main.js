@@ -509,33 +509,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab, true)));
 
-  /* Freshen the deck when the viewer scrolls UP off the gallery (to the hero)
-     and comes back — re-shuffles while it's off screen so each return shows a
-     different set. Only fires when the grid leaves via the BOTTOM (it's now
-     below the viewport); re-decking when it leaves via the top would reflow the
-     content under it and trap the scroll before "A short note" on mobile. */
-  let galleryOnScreen = true, lastFreshen = 0;
-  const freshenGallery = () => {
-    if (!gridEl || !mCols.length || currentFilter === 'ai') return;
-    if (Date.now() - lastFreshen < 1200) return;
-    lastFreshen = Date.now();
-    const keep = Math.max(PAGE_SIZE, currentShown);
-    shuffleAllCards();
-    buildColumns(colCountForWidth());
-    currentShown = 0;
-    const matching = matchingCards();
-    matching.slice(0, Math.min(keep, matching.length)).forEach(e => { placeCard(e.el); currentShown++; });
-    updateLoadMore(matching.length);
-  };
-  if (gridEl && 'IntersectionObserver' in window) {
-    new IntersectionObserver((ents) => {
-      const e = ents[0]; if (!e) return;
-      if (!e.isIntersecting && galleryOnScreen) {
-        galleryOnScreen = false;
-        if (e.boundingClientRect.top > 0) freshenGallery();   // left via the bottom only
-      } else if (e.isIntersecting) { galleryOnScreen = true; }
-    }, { threshold: 0 }).observe(gridEl);
-  }
+  /* (The deck still re-shuffles on every page load and tab switch — that stays.
+     The old scroll-triggered re-shuffle was removed: it reshuffled the grid as
+     you scrolled past it, so works appeared to swap under you. No longer.) */
 
   /* ---------- COUNT UP (statistics) ---------- */
   const animateCount = (el) => {
