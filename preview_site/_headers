@@ -8,6 +8,9 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
+  # HTML must always revalidate so a new deploy's ?v= assets load at once
+  # (the more-specific css/js/assets rules below keep their own longer cache)
+  Cache-Control: public, max-age=0, must-revalidate
 
 # Images & fonts rarely change — cache for a week (not a year)
 /assets/*
