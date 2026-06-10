@@ -798,20 +798,26 @@
         }).catch(() => { msg.textContent = W.fail; });
       });
     };
+    let leadsPage = 1;
     const renderLeads = () => {
-      const leads = getLeads();
-      if (!leads.length) { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-inbox"></i><br>${DT('lEmpty')}</p>`; return; }
-      view.innerHTML = `<div class="dash-leads">` + leads.slice().reverse().map(l =>
+      const all = getLeads().slice().reverse();
+      if (!all.length) { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-inbox"></i><br>${DT('lEmpty')}</p>`; return; }
+      const pages = Math.max(1, Math.ceil(all.length / DASH_PER));
+      if (leadsPage > pages) leadsPage = pages;
+      const start = (leadsPage - 1) * DASH_PER;
+      const pager = dashPager(all.length, leadsPage, (n) => { leadsPage = n; renderLeads(); });
+      view.innerHTML = `<div class="dash-leads">` + all.slice(start, start + DASH_PER).map(l =>
         `<div class="dash-lead">
            <div class="dash-lead-top"><strong>${esc(l.name)}</strong><span class="mono">${l.type || ''}</span></div>
            <span class="mono dash-lead-mail">${esc(l.email)}</span>
            <p>${esc(l.message || '')}</p>
            <span class="mono dash-lead-meta">${l.budget || '—'} · ${l.timeline || '—'} · ${new Date(l.at).toLocaleDateString()}</span>
-         </div>`).join('') + `</div>
+         </div>`).join('') + `</div>${pager.html}
          <button class="dash-btn dash-btn--danger" id="dashClearLeads"><i class="fa-solid fa-trash"></i> ${DT('lClear')}</button>`;
       $('#dashClearLeads')?.addEventListener('click', () => {
-        if (confirm(DT('lConfirm'))) { localStorage.removeItem('bq_pitches'); renderLeads(); }
+        if (confirm(DT('lConfirm'))) { localStorage.removeItem('bq_pitches'); leadsPage = 1; renderLeads(); }
       });
+      pager.wire(view);
     };
     const renderSettings = () => {
       view.innerHTML = `
@@ -843,6 +849,26 @@
       });
     };
     const esc = (s) => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+
+    /* ---- Shared pager for dashboard lists (Content, Latest, Leads…) ----
+       When a list grows past DASH_PER items it splits into pages. Returns the
+       pager markup + a wire() that hooks up the page buttons. */
+    const DASH_PER = 8;
+    const dashPager = (total, cur, onGo, per) => {
+      per = per || DASH_PER;
+      const pages = Math.max(1, Math.ceil(total / per));
+      if (pages <= 1) return { html: '', wire() {} };
+      cur = Math.min(Math.max(1, cur), pages);
+      let nums = '';
+      for (let n = 1; n <= pages; n++) nums += `<button type="button" class="dash-page${n === cur ? ' is-active' : ''}" data-pg="${n}">${n}</button>`;
+      const html = `<div class="dash-pager">`
+        + `<button type="button" class="dash-page dash-page--nav" data-pg="${cur - 1}"${cur <= 1 ? ' disabled' : ''} aria-label="Previous">‹</button>`
+        + nums
+        + `<button type="button" class="dash-page dash-page--nav" data-pg="${cur + 1}"${cur >= pages ? ' disabled' : ''} aria-label="Next">›</button>`
+        + `</div>`;
+      const wire = (root) => { if (!root) return; root.querySelectorAll('.dash-pager .dash-page').forEach(b => b.addEventListener('click', () => { if (b.disabled) return; const n = Number(b.dataset.pg); if (n >= 1 && n <= pages && n !== cur) onGo(n); })); };
+      return { html, wire };
+    };
 
     /* ---- Owner profile (stored privately in this browser) ---- */
     const PROFILE_DEFAULT = { name: 'Barakat Qurtas', title: 'Founder · Studio Pencemor', avatar: '/assets/avatar.webp' };
@@ -956,11 +982,18 @@
         <form id="ctTokForm" class="dash-login"><input type="password" id="ctTok" placeholder="${t.tokPh}" autocomplete="off"><button type="submit">${t.conn} <i class="fa-solid fa-arrow-right"></i></button></form></div>`;
       $('#ctTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#ctTok').value.trim(); if (!v) return; try { localStorage.setItem('bq_edit_token', v); } catch (x) {} renderContent(); });
     };
+    let cmsPage = 1;
     const drawCms = () => {
       const t = CT_I18N[curLang()] || CT_I18N.en;
-      const rows = CMS_POSTS.length ? CMS_POSTS.map((p, i) => {
+      const total = CMS_POSTS.length;
+      const pages = Math.max(1, Math.ceil(total / DASH_PER));
+      if (cmsPage > pages) cmsPage = pages;
+      const start = (cmsPage - 1) * DASH_PER;
+      const pager = dashPager(total, cmsPage, (n) => { cmsPage = n; drawCms(); });
+      const rows = total ? CMS_POSTS.slice(start, start + DASH_PER).map((p, idx) => {
+        const i = start + idx;                                   // global index (reorder-safe)
         const dd = p.date || (p.created_at ? new Date(p.created_at).toLocaleDateString('en', { month: 'short', year: 'numeric' }) : '');
-        const up = i === 0 ? ' disabled' : '', dn = i === CMS_POSTS.length - 1 ? ' disabled' : '';
+        const up = i === 0 ? ' disabled' : '', dn = i === total - 1 ? ' disabled' : '';
         return `<div class="cms-row" data-id="${p.id}">
             <span class="dash-reorder"><button class="dash-ord" data-mv="-1" data-i="${i}"${up} aria-label="Up"><i class="fa-solid fa-chevron-up"></i></button><button class="dash-ord" data-mv="1" data-i="${i}"${dn} aria-label="Down"><i class="fa-solid fa-chevron-down"></i></button></span>
             <span class="cms-row-t"><strong>${esc(p.title || '')}</strong><span class="mono">${esc(p.tag || 'Note')} · ${esc(dd)}${p.published === false ? ' · ' + t.draft : ''}</span></span>
@@ -972,9 +1005,9 @@
       view.innerHTML = `
         <div class="cms-head">
           <button class="dash-btn dash-btn--go" id="ctNew"><i class="fa-solid fa-feather-pointed"></i> ${t.newBtn}</button>
-          <span class="mono cms-status">${CMS_POSTS.length} ${t.posts}</span>
+          <span class="mono cms-status">${total} ${t.posts}</span>
         </div>
-        <div class="cms-list">${rows}</div>`;
+        <div class="cms-list">${rows}</div>${pager.html}`;
       $('#ctNew').addEventListener('click', () => cmsEdit(null));
       view.querySelectorAll('.cms-mini').forEach((b) => b.addEventListener('click', () => {
         const id = b.getAttribute('data-id'), act = b.getAttribute('data-act');
@@ -985,9 +1018,11 @@
         const i = Number(b.dataset.i), j = i + Number(b.dataset.mv);
         if (j < 0 || j >= CMS_POSTS.length) return;
         const tmp = CMS_POSTS[i]; CMS_POSTS[i] = CMS_POSTS[j]; CMS_POSTS[j] = tmp;   // swap, persist the new order
+        cmsPage = Math.floor(j / DASH_PER) + 1;                  // follow the moved item to its page
         drawCms();
         cmsApi({ action: 'reorder', ids: CMS_POSTS.map((x) => x.id) }).then(() => { if (window.__bqReloadBlog) window.__bqReloadBlog(); });
       }));
+      pager.wire(view);
     };
     const cmsList = () => {
       const t = CT_I18N[curLang()] || CT_I18N.en;
@@ -996,6 +1031,7 @@
         if (d && d.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
         if (!d || !d.ok) { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${t.err}</p><button class="dash-btn" id="ctRetry"><i class="fa-solid fa-rotate"></i> ${t.conn}</button>`; const rb = $('#ctRetry'); if (rb) rb.addEventListener('click', cmsList); return; }
         CMS_POSTS = Array.isArray(d.posts) ? d.posts : [];
+        cmsPage = 1;
         drawCms();
       }).catch(() => { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${t.err}</p>`; });
     };
@@ -1255,23 +1291,31 @@
           else { upmsg.textContent = (d && (d.error === 'missing_token' || d.error === 'unauthorized')) ? LAT('connect') : '✗ ' + ((d && d.error) || ''); }
         } catch (err) { upmsg.textContent = '✗ ' + err; }
       });
-      let LIST = [];
+      let LIST = [], latPage = 1;
       const drawList = () => {
         const list = $('#laList'); if (!list) return;
         if (!LIST.length) { list.innerHTML = `<p class="dash-empty mono">${LAT('empty')}</p>`; return; }
-        list.innerHTML = LIST.map((it, i) => {
+        const total = LIST.length;
+        const pages = Math.max(1, Math.ceil(total / DASH_PER));
+        if (latPage > pages) latPage = pages;
+        const start = (latPage - 1) * DASH_PER;
+        const pager = dashPager(total, latPage, (n) => { latPage = n; drawList(); });
+        list.innerHTML = LIST.slice(start, start + DASH_PER).map((it, idx) => {
+          const i = start + idx;                                   // global index (reorder-safe)
           const left = Math.max(0, 7 - Math.floor((Date.now() - new Date(it.created_at).getTime()) / 86400000));
-          const up = i === 0 ? ' disabled' : '', dn = i === LIST.length - 1 ? ' disabled' : '';
+          const up = i === 0 ? ' disabled' : '', dn = i === total - 1 ? ' disabled' : '';
           return `<div class="dash-latest-row"><span class="dash-reorder"><button class="dash-ord" data-mv="-1" data-i="${i}"${up} aria-label="Up"><i class="fa-solid fa-chevron-up"></i></button><button class="dash-ord" data-mv="1" data-i="${i}"${dn} aria-label="Down"><i class="fa-solid fa-chevron-down"></i></button></span><span class="dash-latest-tag mono">${esc((it.link && tabName(it.link)) || it.tag || 'Featured')}</span><strong>${esc(it.title)}</strong><span class="mono dash-latest-left">${left}d</span><button class="dash-latest-del" data-id="${it.id}" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button></div>`;
-        }).join('');
+        }).join('') + pager.html;
         list.querySelectorAll('.dash-latest-del').forEach(b => b.addEventListener('click', () => { latestApi({ action: 'delete', id: Number(b.dataset.id) }).then(() => { loadList(); if (window.__bqReloadLatest) window.__bqReloadLatest(); }); }));
         list.querySelectorAll('.dash-ord').forEach(b => b.addEventListener('click', () => {
           const i = Number(b.dataset.i), j = i + Number(b.dataset.mv);
           if (j < 0 || j >= LIST.length) return;
           const t = LIST[i]; LIST[i] = LIST[j]; LIST[j] = t;   // swap, then persist the whole order
+          latPage = Math.floor(j / DASH_PER) + 1;              // follow the moved item to its page
           drawList();
           latestApi({ action: 'reorder', ids: LIST.map(x => x.id) }).then(() => { if (window.__bqReloadLatest) window.__bqReloadLatest(); });
         }));
+        pager.wire(list);
       };
       const loadList = () => {
         latestApi({ action: 'list' }).then(d => {

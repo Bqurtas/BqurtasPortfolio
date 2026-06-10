@@ -509,9 +509,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab, true)));
 
-  /* (The deck still re-shuffles on every page load and tab switch — that stays.
-     The old scroll-triggered re-shuffle was removed: it reshuffled the grid as
-     you scrolled past it, so works appeared to swap under you. No longer.) */
+  /* The deck re-shuffles on every page load and tab switch — that stays.
+     PLUS: re-shuffle ONLY when the gallery has fully left the viewport via the
+     BOTTOM, i.e. the user scrolled UP above it (into the hero). Scrolling DOWN
+     never reshuffles — that used to swap works under the user / trap mobile
+     scroll. So a fresh set greets them only on the next downward pass. */
+  (() => {
+    const work = document.querySelector('.section.work');
+    if (!work || !('IntersectionObserver' in window)) return;
+    let below = false;               // gallery currently fully below the fold?
+    const fo = new IntersectionObserver((entries) => {
+      const e = entries[0]; if (!e) return;
+      const vh = (e.rootBounds && e.rootBounds.height) || window.innerHeight;
+      const fullyBelow = !e.isIntersecting && e.boundingClientRect.top >= vh;
+      if (fullyBelow && !below) {
+        below = true;                // scrolled up past it → freshen the off-screen deck
+        if (typeof window.__bqRenderGallery === 'function') window.__bqRenderGallery(true);
+      } else if (!fullyBelow) {
+        below = false;               // back in view (or above) → arm for next up-scroll
+      }
+    }, { threshold: 0 });
+    fo.observe(work);
+  })();
 
   /* ---------- COUNT UP (statistics) ---------- */
   const animateCount = (el) => {
