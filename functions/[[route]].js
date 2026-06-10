@@ -80,9 +80,18 @@ export async function onRequest(context) {
     img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=3';
   }
 
+  // the HTML shell must always revalidate so a deploy's new ?v= asset links are
+  // picked up immediately (the ?v-versioned CSS/JS/images keep their long cache)
+  const FRESH = 'public, max-age=0, must-revalidate';
+  const withFresh = (res) => {
+    const headers = new Headers(res.headers);
+    headers.set('Cache-Control', FRESH);
+    return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+  };
+
   try {
     const shell = await env.ASSETS.fetch(new URL('/index.html', url.origin));
-    return new HTMLRewriter()
+    const out = new HTMLRewriter()
       .on('html',                             setLangAttr(r.lang))
       .on('title',                            setText(meta.t))
       .on('meta[name="description"]',         setContent(meta.d))
@@ -98,8 +107,9 @@ export async function onRequest(context) {
       .on('meta[name="twitter:image"]',       setContent(img))
       .on('link[rel="canonical"]',            setHref(r.canon))
       .transform(shell);
+    return withFresh(out);
   } catch (e) {
-    try { return await env.ASSETS.fetch(new URL('/index.html', url.origin)); }
+    try { return withFresh(await env.ASSETS.fetch(new URL('/index.html', url.origin))); }
     catch (_) { return next(); }
   }
 }
