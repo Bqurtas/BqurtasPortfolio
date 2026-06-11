@@ -53,6 +53,14 @@ window.BQ_GALLERY = {
     return `${this.RAW_BASE}/${c.folder}/${c.prefix}${i}.${c.ext}`;
   },
 
+  /* A lighter, on-the-fly resized WebP (via the free wsrv.nl image CDN) for
+     phone screens — keeps all 40 works but cuts the mobile image payload.
+     Desktop keeps the original full file; if the resizer ever fails, the card's
+     onerror falls back to the full image, so it can never break the gallery. */
+  thumb(url, w) {
+    return 'https://images.weserv.nl/?url=' + url.replace(/^https?:\/\//, '') + '&w=' + w + '&output=webp&q=78';
+  },
+
   items(coll) {
     const c   = this.COLLECTIONS[coll];
     const cat = c.cat || coll;
@@ -182,9 +190,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     article.dataset.title = dispTitle;
     article.dataset.type  = item.type;
 
+    // On phones, load a lighter resized copy; desktop & video keep the original full file.
+    const isPhone = typeof matchMedia === 'function' && matchMedia('(max-width: 700px)').matches;
+    const imgSrc = (item.type !== 'video' && isPhone) ? window.BQ_GALLERY.thumb(item.url, 640) : item.url;
     const mediaHtml = item.type === 'video'
       ? `<video muted loop playsinline preload="none" src="${item.url}" title="${dispTitle}"></video>`
-      : `<img loading="lazy" src="${item.url}" alt="${dispTitle}" />`;
+      : `<img loading="lazy" src="${imgSrc}" alt="${dispTitle}" />`;
 
     const playIcon = item.type === 'video' ? 'fa-play' : 'fa-magnifying-glass-plus';
 
@@ -202,6 +213,9 @@ document.addEventListener('DOMContentLoaded', async () => {
        jsDelivr hasn't cached yet); only then drop the card. */
     const media = article.querySelector('img, video');
     media.addEventListener('error', () => {
+      // resized phone copy failed → original full image (jsDelivr)
+      if (media.src !== item.url && !media.dataset.orig) { media.dataset.orig = '1'; media.src = item.url; return; }
+      // jsDelivr failed → raw.githubusercontent once
       if (item.rawUrl && !media.dataset.fb) { media.dataset.fb = '1'; media.src = item.rawUrl; return; }
       article.remove();
     });
