@@ -1621,7 +1621,28 @@
            <span class="index-row-title">${q.title}</span>
            <span class="mono index-row-tag">${q.tag}</span>`;
         a.addEventListener('mouseenter', () => { setActive(a); preview(p); });
-        a.addEventListener('click', (e) => { e.preventDefault(); openReader(p); });
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (!window.matchMedia('(max-width: 820px)').matches) { openReader(p); return; }
+          // Mobile: a tap opens an inline preview under the row; "Read more" opens the full post.
+          const isOpen = a.nextElementSibling && a.nextElementSibling.classList.contains('index-inline');
+          list.querySelectorAll('.index-inline').forEach(el => el.remove());
+          list.querySelectorAll('.index-row.is-expanded').forEach(r => r.classList.remove('is-expanded'));
+          if (isOpen) return;
+          a.classList.add('is-expanded');
+          const sum = q.sub || (Array.isArray(q.body) ? q.body[0] : q.body) || '';
+          const panel = document.createElement('div');
+          panel.className = 'index-inline';
+          panel.innerHTML =
+            `${q.img ? `<img class="index-inline-img" src="${q.img}" alt="" loading="lazy">` : ''}` +
+            `<span class="mono index-inline-tag">${q.tag} · ${q.date || ''}</span>` +
+            `<h4 class="index-inline-title">${q.title}</h4>` +
+            `<p class="index-inline-sub">${esc(sum)}</p>` +
+            `<button class="index-inline-more" type="button">${dT('blog.readMore', 'Read more')} →</button>`;
+          a.after(panel);
+          panel.querySelector('.index-inline-more').addEventListener('click', () => openReader(p));
+          panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
         list.appendChild(a);
       });
       if (slice[0]) preview(slice[0]);

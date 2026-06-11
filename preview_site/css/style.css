@@ -2611,6 +2611,16 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 /* Social card mark colours */
 .bio-social--linkedin .bio-social-mark { color: #0a66c2; }
 .bio-social--google .bio-social-mark { color: #4285f4; }
+/* Blog (mobile): inline preview that opens under a tapped row */
+.index-inline { padding: 12px 0 20px; border-bottom: 1px solid var(--line); animation: idxInlineIn 0.42s var(--ease-out); }
+.index-inline-img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 12px; background: var(--bg-2); margin-bottom: 12px; }
+.index-inline-tag { color: var(--gold); font-size: 11px; }
+.index-inline-title { font-family: 'Fraunces', serif; font-size: 21px; font-weight: 500; line-height: 1.2; margin: 6px 0 8px; }
+.index-inline-sub { color: var(--ink-soft); font-size: 14px; line-height: 1.6; margin-bottom: 14px; }
+.index-inline-more { background: var(--ink); color: var(--bg); border: none; border-radius: 999px; padding: 9px 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+.index-inline-more:hover { opacity: 0.85; }
+.index-row.is-expanded { color: var(--gold) !important; }
+@keyframes idxInlineIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 
 /* =========================================================
    RESPONSIVE
