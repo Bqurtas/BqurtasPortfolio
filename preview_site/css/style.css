@@ -2596,6 +2596,18 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
    ========================================================= */
 .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.85s var(--ease-out), transform 0.85s var(--ease-out); }
 .reveal.is-in { opacity: 1; transform: translateY(0); }
+/* Biography cards: a gentler, slower, softer reveal (they felt too quick) */
+#bio .reveal { transition-duration: 1.25s; transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+/* CV + Catalogue buttons under the bio cards */
+.bio-docs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 44px 0 8px; }
+.bio-doc-btn { display: flex; align-items: center; gap: 14px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-1); color: var(--ink); text-decoration: none; transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease); }
+.bio-doc-btn:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 14px 32px -18px rgba(0,0,0,0.4); }
+.bio-doc-btn > i:first-child { font-size: 22px; color: var(--gold); flex-shrink: 0; }
+.bio-doc-text { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.bio-doc-text strong { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 500; }
+.bio-doc-text small { color: var(--ink-soft); font-size: 12.5px; margin-top: 2px; }
+.bio-doc-go { color: var(--ink-muted); font-size: 13px; flex-shrink: 0; }
+@media (max-width: 600px) { .bio-docs { grid-template-columns: 1fr; gap: 12px; margin-top: 30px; } }
 
 /* =========================================================
    RESPONSIVE
