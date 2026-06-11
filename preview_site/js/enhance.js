@@ -773,6 +773,14 @@
           <div class="dash-latest-prev" id="wkPrev" hidden><img src="" alt=""></div>
           <button class="dash-btn dash-btn--go" id="wkUp"><i class="fa-solid fa-cloud-arrow-up"></i> ${esc(W.upload)}</button>
         </div>
+        <div class="dash-manage">
+          <div class="cms-head"><span class="mono cms-status">${W.manageTitle || 'Manage works — view & delete'}</span></div>
+          <div class="dash-mg-head">
+            <select id="wkMgFolder" class="dash-mg-sel">${opts}</select>
+            <button class="dash-btn" id="wkMgLoad"><i class="fa-solid fa-images"></i> ${W.manageBtn || 'Show images'}</button>
+          </div>
+          <div class="wk-grid" id="wkGrid"></div>
+        </div>
         <div class="dash-bars">` + Object.entries(colls).map(([k, c]) =>
         `<div class="dash-bar-row">
            <span class="dash-bar-label">${c.tag || k}</span>
@@ -798,6 +806,31 @@
           else { msg.textContent = '✗ ' + ((d && (d.detail || d.error)) || 'failed'); }
         }).catch(() => { msg.textContent = W.fail; });
       });
+      /* ---- Manage works: list every image in a folder + delete one ---- */
+      const wkGrid = $('#wkGrid'), wkMgFolder = $('#wkMgFolder');
+      const mgThumb = (p) => 'https://images.weserv.nl/?url=cdn.jsdelivr.net/gh/Bqurtas/BqurtasPortfolio@main/' + p + '&w=260&h=195&fit=cover&output=webp&q=72';
+      const mgRaw = (p) => 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/' + p;
+      const loadMg = () => {
+        const folder = wkMgFolder.value;
+        wkGrid.innerHTML = `<p class="dash-dim mono">${W.loading || 'Loading…'}</p>`;
+        wkApi({ action: 'list', folder }).then((d) => {
+          if (!d || !d.ok) { wkGrid.innerHTML = `<p class="dash-dim mono">✗ ${(d && (d.detail || d.error)) || (W.connect || 'Could not load')}</p>`; return; }
+          if (!d.files.length) { wkGrid.innerHTML = `<p class="dash-dim mono">${W.mgEmpty || 'No images in this folder yet.'}</p>`; return; }
+          wkGrid.innerHTML = `<p class="dash-dim mono">${d.files.length} ${W.mgCount || 'images'}</p><div class="wk-grid-inner">` + d.files.map((f) =>
+            `<div class="wk-cell" data-path="${esc(f.path)}" data-sha="${esc(f.sha)}"><img loading="lazy" src="${mgThumb(f.path)}" data-raw="${mgRaw(f.path)}" alt=""><button class="wk-del" type="button" aria-label="Delete"><i class="fa-solid fa-trash-can"></i></button></div>`).join('') + `</div>`;
+          wkGrid.querySelectorAll('.wk-cell img').forEach((img) => img.addEventListener('error', () => { if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = img.dataset.raw; } }));
+          wkGrid.querySelectorAll('.wk-del').forEach((b) => b.addEventListener('click', () => {
+            const cell = b.closest('.wk-cell'); const path = cell.dataset.path, sha = cell.dataset.sha;
+            if (!window.confirm((W.delAsk || 'Delete this image permanently?') + '\n' + path)) return;
+            b.disabled = true; cell.style.opacity = '0.45';
+            wkApi({ action: 'delete', path, sha }).then((r) => {
+              if (r && r.ok) cell.remove();
+              else { cell.style.opacity = '1'; b.disabled = false; window.alert('✗ ' + ((r && (r.detail || r.error)) || 'failed')); }
+            }).catch(() => { cell.style.opacity = '1'; b.disabled = false; window.alert(W.fail || 'Failed'); });
+          }));
+        }).catch(() => { wkGrid.innerHTML = `<p class="dash-dim mono">${W.fail || 'Could not load (live site only).'}</p>`; });
+      };
+      $('#wkMgLoad').addEventListener('click', loadMg);
     };
     let leadsPage = 1;
     const renderLeads = () => {
