@@ -858,7 +858,15 @@
       });
       pager.wire(view);
     };
+    const SET_I18N = {
+      en:  { twoH:'Two-factor (2FA)', pinH:'Dashboard password (PIN)', pinNote:'The code you type to open this console. The 2FA email code is the real lock — this is just the first step. Saved on this device.', pinNew:'New PIN', pinBtn:'Change PIN', edH:'Editor password', edNote:'The publish key for your works and blog. Connect the editor first (Content tab), then change it here. A strong one is safest.', edNew:'New editor password', edBtn:'Change', edGen:'Strong', min4:'✗ Use at least 4 characters', pinDone:'✓ PIN changed (saved on this device).', edConnect:'✗ Connect the editor first (Content tab)', edDone:'✓ Changed & reconnected.', edWrong:'✗ Current editor password is wrong', edFail:'✗ Failed (works on the live site only)' },
+      ku:  { twoH:'دوو-فاکتۆری (2FA)', pinH:'پاسۆردی داشبۆرد (PIN)', pinNote:'ئەو کۆدەی بۆ کردنەوەی کۆنسۆڵ دەینووسیت. کۆدی ئیمێڵی 2FA پاراستنی ڕاستەقینەیە — ئەمە تەنیا هەنگاوی یەکەمە. لەسەر ئەم ئامێرە هەڵدەگیرێت.', pinNew:'PINـی نوێ', pinBtn:'گۆڕینی PIN', edH:'پاسۆردی ئەدیتەر', edNote:'کلیلی بڵاوکردنی ئیش و بلۆگ. سەرەتا ئەدیتەر ببەستەوە (تابی ناوەڕۆک)، پاشان لێرە بیگۆڕە. بەهێز سەلامەتترە.', edNew:'پاسۆردی ئەدیتەری نوێ', edBtn:'گۆڕین', edGen:'بەهێز', min4:'✗ لانیکەم ٤ پیت', pinDone:'✓ PIN گۆڕدرا (لەسەر ئەم ئامێرە).', edConnect:'✗ سەرەتا ئەدیتەر ببەستەوە (تابی ناوەڕۆک)', edDone:'✓ گۆڕدرا و دووبارە بەستراوەوە.', edWrong:'✗ پاسۆردی ئەدیتەری ئێستا هەڵەیە', edFail:'✗ نەکرا (تەنیا سایتی زیندوو)' },
+      ar:  { twoH:'المصادقة الثنائية (2FA)', pinH:'كلمة مرور اللوحة (PIN)', pinNote:'الرمز الذي تكتبه لفتح هذه اللوحة. رمز 2FA بالبريد هو القفل الحقيقي — هذه مجرد الخطوة الأولى. يُحفظ على هذا الجهاز.', pinNew:'PIN جديد', pinBtn:'تغيير PIN', edH:'كلمة مرور المحرر', edNote:'مفتاح نشر أعمالك ومدوّنتك. اربط المحرر أولاً (تبويب المحتوى) ثم غيّره هنا. الأقوى أأمن.', edNew:'كلمة مرور محرر جديدة', edBtn:'تغيير', edGen:'قوية', min4:'✗ استخدم ٤ أحرف على الأقل', pinDone:'✓ تم تغيير PIN (على هذا الجهاز).', edConnect:'✗ اربط المحرر أولاً (تبويب المحتوى)', edDone:'✓ تم التغيير وإعادة الربط.', edWrong:'✗ كلمة مرور المحرر الحالية خاطئة', edFail:'✗ فشل (الموقع المباشر فقط)' },
+      kmr: { twoH:'Du-faktorî (2FA)', pinH:'Şîfreya panelê (PIN)', pinNote:'Koda ku tu dinivîsî da vê konsolê vekî. Koda 2FA ya e-nameyê kilîta rastîn e — ev tenê gava yekem e. Li vê amûrê tê tomarkirin.', pinNew:'PIN nû', pinBtn:'PIN biguhêre', edH:'Şîfreya edîtorê', edNote:'Mifteya weşandina karên te û blogê. Pêşî edîtorê girêde (tabê Naverok), paşê li vir biguhêre. Ya bihêz ewletir e.', edNew:'Şîfreya edîtorê ya nû', edBtn:'Biguhêre', edGen:'Bihêz', min4:'✗ Bi kêmî 4 tîp', pinDone:'✓ PIN hate guhertin (li vê amûrê).', edConnect:'✗ Pêşî edîtorê girêde (tabê Naverok)', edDone:'✓ Hate guhertin û ji nû ve girêdan.', edWrong:'✗ Şîfreya edîtorê ya niha çewt e', edFail:'✗ Neserketî (tenê malpera zindî)' },
+      fr:  { twoH:'Double authentification (2FA)', pinH:'Mot de passe du tableau (PIN)', pinNote:'Le code que vous saisissez pour ouvrir cette console. Le code 2FA par e-mail est le vrai verrou — ceci n’est que la première étape. Enregistré sur cet appareil.', pinNew:'Nouveau PIN', pinBtn:'Changer le PIN', edH:'Mot de passe éditeur', edNote:'La clé de publication de vos travaux et blog. Connectez d’abord l’éditeur (onglet Contenu), puis changez-la ici. Une forte est plus sûre.', edNew:'Nouveau mot de passe éditeur', edBtn:'Changer', edGen:'Fort', min4:'✗ Au moins 4 caractères', pinDone:'✓ PIN changé (sur cet appareil).', edConnect:'✗ Connectez d’abord l’éditeur (onglet Contenu)', edDone:'✓ Changé et reconnecté.', edWrong:'✗ Mot de passe éditeur actuel incorrect', edFail:'✗ Échec (site en ligne uniquement)' }
+    };
     const renderSettings = () => {
+      const S = SET_I18N[curLang()] || SET_I18N.en;
       view.innerHTML = `
         <div class="dash-set">
           <label class="dash-row"><span>${DT('sSplash')}</span>
@@ -869,24 +877,24 @@
         </div>
         <p class="dash-note mono">${DT('sNote')}</p>
         <div class="dash-box">
-          <div class="dash-box-h"><i class="fa-solid fa-shield-halved"></i> Two-factor (2FA)</div>
+          <div class="dash-box-h"><i class="fa-solid fa-shield-halved"></i> ${S.twoH}</div>
           <button class="dash-btn" id="gen2fa"><i class="fa-solid fa-shield-halved"></i> ${DT('twoSetupBtn')}</button>
           <div id="twofaOut" hidden></div>
         </div>
         <div class="dash-box">
-          <div class="dash-box-h"><i class="fa-solid fa-lock"></i> Dashboard password (PIN)</div>
-          <p class="dash-note mono">The code you type to open this console. The 2FA email code is the real lock — this is just the first step. Saved on this device.</p>
-          <label class="dash-field"><span class="mono">New PIN</span><input id="setNewPin" type="text" autocomplete="off" spellcheck="false"></label>
-          <button class="dash-btn dash-btn--go" id="setPinBtn"><i class="fa-solid fa-lock"></i> Change PIN</button>
+          <div class="dash-box-h"><i class="fa-solid fa-lock"></i> ${S.pinH}</div>
+          <p class="dash-note mono">${S.pinNote}</p>
+          <label class="dash-field"><span class="mono">${S.pinNew}</span><input id="setNewPin" type="text" autocomplete="off" spellcheck="false"></label>
+          <button class="dash-btn dash-btn--go" id="setPinBtn"><i class="fa-solid fa-lock"></i> ${S.pinBtn}</button>
           <span class="dash-note mono" id="setPinMsg"></span>
         </div>
         <div class="dash-box">
-          <div class="dash-box-h"><i class="fa-solid fa-key"></i> Editor password</div>
-          <p class="dash-note mono">The publish key for your works &amp; blog. Connect the editor first (Content tab), then change it here. A strong one is safest.</p>
-          <label class="dash-field"><span class="mono">New editor password</span><input id="setNewTok" type="text" autocomplete="off" spellcheck="false"></label>
+          <div class="dash-box-h"><i class="fa-solid fa-key"></i> ${S.edH}</div>
+          <p class="dash-note mono">${S.edNote}</p>
+          <label class="dash-field"><span class="mono">${S.edNew}</span><input id="setNewTok" type="text" autocomplete="off" spellcheck="false"></label>
           <div class="dash-mg-head">
-            <button class="dash-btn dash-btn--go" id="setTokBtn"><i class="fa-solid fa-key"></i> Change</button>
-            <button class="dash-btn" id="setTokGen"><i class="fa-solid fa-dice"></i> Strong</button>
+            <button class="dash-btn dash-btn--go" id="setTokBtn"><i class="fa-solid fa-key"></i> ${S.edBtn}</button>
+            <button class="dash-btn" id="setTokGen"><i class="fa-solid fa-dice"></i> ${S.edGen}</button>
           </div>
           <span class="dash-note mono" id="setTokMsg"></span>
         </div>`;
@@ -908,9 +916,9 @@
       const SBset = window.BQ_SUPA || {};
       $('#setPinBtn')?.addEventListener('click', () => {
         const m = $('#setPinMsg'); const np = ($('#setNewPin').value || '').trim();
-        if (np.length < 4) { m.textContent = '✗ Use at least 4 characters'; return; }
+        if (np.length < 4) { m.textContent = S.min4; return; }
         try { localStorage.setItem('bq_dash_pin', np); } catch (e) {}
-        m.textContent = '✓ PIN changed (saved on this device).'; $('#setNewPin').value = '';
+        m.textContent = S.pinDone; $('#setNewPin').value = '';
       });
       $('#setTokGen')?.addEventListener('click', () => {
         const A = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
@@ -920,15 +928,15 @@
       });
       $('#setTokBtn')?.addEventListener('click', () => {
         const m = $('#setTokMsg'); const nt = ($('#setNewTok').value || '').trim();
-        if (nt.length < 4) { m.textContent = '✗ Use at least 4 characters'; return; }
-        if (!editToken()) { m.textContent = '✗ Connect the editor first (Content tab)'; return; }
+        if (nt.length < 4) { m.textContent = S.min4; return; }
+        if (!editToken()) { m.textContent = S.edConnect; return; }
         m.textContent = '…';
         fetch(SBset.url + '/functions/v1/set-token', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SBset.key, Authorization: 'Bearer ' + SBset.key, 'x-edit-token': editToken() }, body: JSON.stringify({ new_token: nt }) })
           .then(r => r.json()).then(d => {
-            if (d && d.ok) { try { localStorage.setItem('bq_edit_token', nt); } catch (e) {} m.textContent = '✓ Changed & reconnected.'; $('#setNewTok').value = ''; }
-            else if (d && d.error === 'unauthorized') { m.textContent = '✗ Current editor password is wrong'; }
+            if (d && d.ok) { try { localStorage.setItem('bq_edit_token', nt); } catch (e) {} m.textContent = S.edDone; $('#setNewTok').value = ''; }
+            else if (d && d.error === 'unauthorized') { m.textContent = S.edWrong; }
             else { m.textContent = '✗ ' + ((d && (d.detail || d.error)) || 'failed'); }
-          }).catch(() => { m.textContent = '✗ Failed (works on the live site only)'; });
+          }).catch(() => { m.textContent = S.edFail; });
       });
     };
     const esc = (s) => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
