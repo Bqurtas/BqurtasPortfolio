@@ -605,7 +605,7 @@
     const DASH_I18N = {
       en: { overview:'Overview', visitors:'Visitors', works:'Works', latest:'Latest', leads:'Leads', profile:'Profile', settings:'Settings', content:'Content', assistant:'Assistant',
         gateTitle:'Enter access code', gatePrivate:'This console is private.', gatePh:'Access code', unlock:'Unlock', wrong:'✗ Wrong access code.', twoTitle:'Enter the SMS code', twoNote:'We texted a 6-digit code to your phone.', twoPh:'6-digit code', twoWrong:'✗ Wrong or expired code.', twoSending:'Sending code…', twoSetupBtn:'Set up 2FA (authenticator)', twoSetup1:'1) In Cloudflare set TOTP_SECRET to this (then Retry deployment):', twoSetup2:'2) Add the same key to Google Authenticator (manual entry: "Pencemor Studio"). Tap the key to copy.', twoSetupLink:'open in app',
-        oTotal:'Total works', oColl:'Collections', oLeads:'Leads stored', oLangs:'Languages', oWelcome:'Welcome back — your studio console is private to you; data lives in this browser.',
+        oTotal:'Total works', oColl:'Collections', oLeads:'Leads stored', oLangs:'Languages', oBlogs:'Blog posts', oAdmins:'Admins', oWelcome:'Welcome back — your studio console is private to you; data lives in this browser.',
         lEmpty:'No leads yet. Pitches from the Contact form appear here.', lClear:'Clear all leads', lConfirm:'Delete all stored leads?',
         pName:'Name', pTitle:'Title / role', pAvatar:'Avatar URL', pSave:'Save profile', pSaved:'✓ Saved', pNote:'Adding more admins needs a backend login system — that arrives with the content manager. For now this profile is yours, kept privately in this browser.',
         sSplash:'Show intro splash on load', sTheme:'Theme', sLight:'Light', sDark:'Dark', sReset:'Reset saved preferences', sResetConfirm:'Reset saved preferences?', sDone:'Done.', sNote:'Open anytime with ⌘ / Ctrl + B, or 5× click the Bq logo.',
@@ -614,7 +614,7 @@
         admYou:'Owner', admName:'Name', admEmail:'Email', admRole:'Role', admAdd:'Add admin', admEmpty:'No additional admins yet.', admRemove:'Remove', admNote:'Shared login across devices needs the backend login system; for now these admins are saved privately in this browser.', logoutAsk:'Log out of the console?' },
       ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', latest:'نوێترین', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن', content:'ناوەڕۆک', assistant:'یاریدەدەر',
         gateTitle:'کۆدی چوونەژوورەوە بنووسە', gatePrivate:'ئەم کۆنسۆڵە تایبەتە.', gatePh:'کۆدی چوونەژوورەوە', unlock:'کردنەوە', wrong:'✗ کۆدەکە هەڵەیە.', twoTitle:'کۆدی SMS بنووسە', twoNote:'کۆدێکی ٦ ژمارەیی نێردرا بۆ مۆبایلەکەت.', twoPh:'کۆدی ٦ ژمارەیی', twoWrong:'✗ کۆد هەڵەیە یان بەسەرچووە.', twoSending:'ناردنی کۆد…', twoSetupBtn:'ڕێکخستنی 2FA (ئەپی ئۆتێنتیکەیتەر)', twoSetup1:'١) لە Cloudflare، TOTP_SECRET بکە بەمە (پاشان Retry deployment):', twoSetup2:'٢) هەمان کلیل بخە ناو Google Authenticator (داخڵکردنی دەستی: «Pencemor Studio»). کلیک لە کلیلەکە بکە بۆ کۆپی.', twoSetupLink:'لە ئەپ بیکەرەوە',
-        oTotal:'کۆی کارەکان', oColl:'کۆکراوەکان', oLeads:'داواکاری هەڵگیراو', oLangs:'زمانەکان', oWelcome:'بەخێربێیتەوە — کۆنسۆڵی ستۆدیۆ تەنها بۆ تۆیە؛ زانیارییەکان لەم وێبگەڕەدا دەمێننەوە.',
+        oTotal:'کۆی کارەکان', oColl:'کۆکراوەکان', oLeads:'داواکاری هەڵگیراو', oLangs:'زمانەکان', oBlogs:'بابەتی بلۆگ', oAdmins:'بەڕێوەبەران', oWelcome:'بەخێربێیتەوە — کۆنسۆڵی ستۆدیۆ تەنها بۆ تۆیە؛ زانیارییەکان لەم وێبگەڕەدا دەمێننەوە.',
         lEmpty:'هێشتا داواکاری نییە. پرۆژەکانی فۆڕمی پەیوەندی لێرە دەردەکەون.', lClear:'سڕینەوەی هەموو داواکارییەکان', lConfirm:'هەموو داواکارییە هەڵگیراوەکان بسڕێتەوە؟',
         pName:'ناو', pTitle:'پلە / ڕۆڵ', pAvatar:'بەستەری وێنە', pSave:'پاشەکەوتکردنی پرۆفایل', pSaved:'✓ پاشەکەوتکرا', pNote:'زیادکردنی ئەدمینی زیاتر پێویستی بە سیستەمی چوونەژوورەوەی سێرڤەر هەیە — لەگەڵ بەڕێوەبەری ناوەڕۆکدا دێت. ئێستا ئەم پرۆفایلە هی تۆیە، بە تایبەتی لەم وێبگەڕەدا پارێزراوە.',
         sSplash:'پیشاندانی سپلاشی دەستپێک', sTheme:'ڕووکار', sLight:'ڕووناک', sDark:'تاریک', sReset:'ڕێکخستنە پاشەکەوتکراوەکان بسڕەوە', sResetConfirm:'ڕێکخستنە پاشەکەوتکراوەکان بسڕێتەوە؟', sDone:'تەواوبوو.', sNote:'هەر کاتێک بە ⌘ / Ctrl + B بیکەرەوە، یان ٥ جار کلیک لە لۆگۆی Bq بکە.',
@@ -737,11 +737,15 @@
       const total = Object.values(colls).reduce((a, c) => a + (c.count || 0), 0);
       const leads = getLeads();
       const cats = Object.keys(colls).length;
+      const admins = getAdmins().length + 1;          // +1 = you, the owner
+      const blogs = window.__bqBlogCount || 0;
       view.innerHTML = `
         <div class="dash-cards">
           <div class="dash-card"><span class="dash-card-n">${total}</span><span class="mono">${DT('oTotal')}</span></div>
-          <div class="dash-card"><span class="dash-card-n">${cats}</span><span class="mono">${DT('oColl')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${blogs}</span><span class="mono">${DT('oBlogs')}</span></div>
           <div class="dash-card"><span class="dash-card-n">${leads.length}</span><span class="mono">${DT('oLeads')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${cats}</span><span class="mono">${DT('oColl')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${admins}</span><span class="mono">${DT('oAdmins')}</span></div>
           <div class="dash-card"><span class="dash-card-n">7</span><span class="mono">${DT('oLangs')}</span></div>
         </div>
         <p class="dash-note mono">${DT('oWelcome')}</p>`;
@@ -1383,6 +1387,8 @@
       dash.classList.add('is-full');           // console takes the full screen
       syncHeaderProfile();
       localizeChrome();
+      // Always land on Overview when the console opens — reset the sidebar highlight too
+      $$('.dash-tab').forEach(x => x.classList.toggle('is-active', x.dataset.dash === 'overview'));
       renderOverview();
     };
     /* open a non-tab view (AI, admins) from a sidebar tool — clear the nav highlight */
@@ -1796,6 +1802,7 @@
             _i18n: p.i18n || null
           }));
           POSTS = cms.length ? cms : BUILTIN_POSTS;   // DB is the source of truth; built-ins only fall back if the DB is empty/unreachable
+          try { window.__bqBlogCount = POSTS.length; } catch (e) {}   // live blog count for the dashboard overview
           pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
           if (page > pageCount) page = 1;
           renderPage();
@@ -1803,6 +1810,7 @@
           if (pendingSlug) { const s = pendingSlug; pendingSlug = null; const p = findPostBySlug(s); if (p) openReader(p, true); }
         }).catch(() => {});
     };
+    try { window.__bqBlogCount = POSTS.length; } catch (e) {}   // initial count (built-ins) before the CMS fetch resolves
     loadCmsPosts();
     window.__bqReloadBlog = loadCmsPosts;
     window.__bqLangCb.push(() => {

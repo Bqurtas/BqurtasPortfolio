@@ -3719,10 +3719,9 @@ html:has(.dash.is-open) { overflow: hidden; }
    nearest screen/section when you let go. Mandatory traps tall grids on touch,
    so we never use it here. */
 @media (max-width: 820px) {
-  /* Gentle PROXIMITY snap on mobile — it NEVER traps (the tall gallery scrolls
-     freely under your thumb), but the page settles onto the nearest section when
-     you let go. Safe on touch, and it makes every room feel polished. */
-  html { scroll-snap-type: y proximity; scroll-padding-top: 0; }
+  /* Snap removed on mobile — it wasn't solid enough on touch, so phones just
+     scroll normally now. (Desktop keeps the section snap below.) */
+  html { scroll-snap-type: none; scroll-padding-top: 0; }
   .hero { height: auto; min-height: calc(100svh - var(--dock-h)); scroll-snap-align: start; }
   .room-hero,
   .pencemor-hero { min-height: calc(100svh - var(--dock-h)); scroll-snap-align: start; }
