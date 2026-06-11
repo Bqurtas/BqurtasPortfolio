@@ -2608,6 +2608,9 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .bio-doc-text small { color: var(--ink-soft); font-size: 12.5px; margin-top: 2px; }
 .bio-doc-go { color: var(--ink-muted); font-size: 13px; flex-shrink: 0; }
 @media (max-width: 600px) { .bio-docs { grid-template-columns: 1fr; gap: 12px; margin-top: 30px; } }
+/* Social card mark colours */
+.bio-social--linkedin .bio-social-mark { color: #0a66c2; }
+.bio-social--google .bio-social-mark { color: #4285f4; }
 
 /* =========================================================
    RESPONSIVE
