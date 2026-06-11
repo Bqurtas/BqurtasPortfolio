@@ -3034,7 +3034,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .latest-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 11px; cursor: pointer; transition: background 0.2s; text-align: left; }
 [dir="rtl"] .latest-item { text-align: right; }
 .latest-item:hover { background: var(--bg-2); }
-.latest-item-img { width: 54px; height: 42px; border-radius: 8px; object-fit: cover; background: var(--ink); flex-shrink: 0; }
+.latest-item-img { width: 54px; height: 42px; border-radius: 8px; object-fit: cover; background: var(--bg); border: 1px solid var(--line-soft); flex-shrink: 0; }
 .latest-item-img--pin { display: inline-flex; align-items: center; justify-content: center; color: var(--gold); }
 .latest-item-img--pin i { font-size: 15px; }
 .latest-item--pin .latest-item-tag { color: var(--gold); }
@@ -3373,6 +3373,23 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 /* Row hovers — gentle lift + gold edge */
 .cms-row, .dash-latest-row { transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease); }
 .cms-row:hover, .dash-latest-row:hover { border-color: var(--gold); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+
+/* ---- Buttons, refined further ---- */
+.dash-btn { border-radius: 10px; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.dash-btn:hover { transform: translateY(-1px); box-shadow: 0 7px 18px rgba(0,0,0,0.09); }
+.dash-btn:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+.dash-btn--go { box-shadow: 0 4px 14px rgba(0,0,0,0.16); }
+.dash-btn--go:hover { box-shadow: 0 9px 24px rgba(0,0,0,0.22); }
+/* Edit / delete mini buttons on each row (were unstyled) */
+.cms-mini { width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--line); background: var(--bg-1); color: var(--ink-soft); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.2s var(--ease); }
+.cms-mini:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.cms-mini--del:hover { border-color: var(--ember); color: var(--ember); }
+/* Up/down reorder buttons — a touch more tactile */
+.dash-ord { transition: all 0.18s var(--ease); }
+.dash-ord:hover:not([disabled]) { background: var(--bg-2); transform: translateY(-1px); }
+.dash-ord:active:not([disabled]) { transform: translateY(0); }
+.dash-latest-del { transition: all 0.2s var(--ease); }
+.dash-latest-del:hover { transform: translateY(-1px); }
 
 /* ---------- 8 · SUBSCRIBE BOX (blog room) ---------- */
 .subscribe {

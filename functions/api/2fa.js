@@ -54,7 +54,9 @@ export async function onRequestPost(context) {
   if (String(body.pin || '') !== String(env.DASH_PIN || '107502')) return json({ ok: false, error: 'bad-pin' }, 401);
 
   const hasTOTP = !!env.TOTP_SECRET;
-  const hasSMS = env.TWILIO_SID && env.TWILIO_TOKEN && env.TWILIO_FROM;
+  const hasInfobip = env.INFOBIP_API_KEY && env.INFOBIP_BASE_URL && env.INFOBIP_FROM;
+  const hasTwilio = env.TWILIO_SID && env.TWILIO_TOKEN && env.TWILIO_FROM;
+  const hasSMS = hasInfobip || hasTwilio;
   if (!hasTOTP && !hasSMS) return json({ ok: false, error: 'not-configured' });
 
   /* begin a challenge */
@@ -67,12 +69,23 @@ export async function onRequestPost(context) {
     const id = crypto.randomUUID();
     await env.DB.prepare('INSERT INTO twofa (id,code,exp,tries) VALUES (?,?,?,0)').bind(id, await sha(code), Date.now() + 5 * 60 * 1000).run();
     const to = env.OWNER_PHONE || '+9647517884985';
-    const form = new URLSearchParams({ To: to, From: env.TWILIO_FROM, Body: 'Pencemor studio login code: ' + code });
+    const text = 'Pencemor studio login code: ' + code;
     let tr;
     try {
-      tr = await fetch('https://api.twilio.com/2010-04-01/Accounts/' + env.TWILIO_SID + '/Messages.json', {
-        method: 'POST', headers: { Authorization: 'Basic ' + btoa(env.TWILIO_SID + ':' + env.TWILIO_TOKEN), 'Content-Type': 'application/x-www-form-urlencoded' }, body: form.toString()
-      });
+      if (hasInfobip) {
+        // Infobip SMS — INFOBIP_BASE_URL looks like https://xxxxx.api.infobip.com (scheme optional)
+        const host = String(env.INFOBIP_BASE_URL).replace(/^https?:\/\//, '').replace(/\/+$/, '');
+        tr = await fetch('https://' + host + '/sms/2/text/advanced', {
+          method: 'POST',
+          headers: { Authorization: 'App ' + env.INFOBIP_API_KEY, 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ messages: [{ destinations: [{ to: to.replace(/^\+/, '') }], from: env.INFOBIP_FROM, text }] })
+        });
+      } else {
+        const form = new URLSearchParams({ To: to, From: env.TWILIO_FROM, Body: text });
+        tr = await fetch('https://api.twilio.com/2010-04-01/Accounts/' + env.TWILIO_SID + '/Messages.json', {
+          method: 'POST', headers: { Authorization: 'Basic ' + btoa(env.TWILIO_SID + ':' + env.TWILIO_TOKEN), 'Content-Type': 'application/x-www-form-urlencoded' }, body: form.toString()
+        });
+      }
     } catch (e) { return json({ ok: false, error: 'sms-failed' }); }
     if (!tr.ok) { const td = await tr.text(); return json({ ok: false, error: 'sms-failed', detail: td.slice(0, 160) }); }
     return json({ ok: true, id });

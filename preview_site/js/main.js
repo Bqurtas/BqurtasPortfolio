@@ -278,7 +278,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- TABS + PAGINATION + SECTION HEADER ---------- */
   const tabs = document.querySelectorAll('.tab');
-  const PAGE_SIZE = 40;
+  // Smaller first paint on phones (lighter network payload → faster mobile LCP);
+  // desktop keeps the full 40-per-batch the gallery was tuned for.
+  const PAGE_SIZE = (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 640px)').matches) ? 16 : 40;
   let currentFilter = 'all';
   let currentShown  = 0;
 
@@ -510,26 +512,24 @@ document.addEventListener('DOMContentLoaded', () => {
   tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab, true)));
 
   /* The deck re-shuffles on every page load and tab switch — that stays.
-     PLUS: re-shuffle ONLY when the gallery has fully left the viewport via the
-     BOTTOM, i.e. the user scrolled UP above it (into the hero). Scrolling DOWN
-     never reshuffles — that used to swap works under the user / trap mobile
-     scroll. So a fresh set greets them only on the next downward pass. */
+     PLUS infinite scroll, like mobile: as the reader scrolls DOWN and nears the
+     end of the gallery, the next batch loads in automatically, so fresh works
+     keep appearing beneath them. Scrolling UP changes nothing (no reshuffle, no
+     jump) — works never swap under the reader. The "Load more" button remains
+     as a manual fallback. */
   (() => {
-    const work = document.querySelector('.section.work');
-    if (!work || !('IntersectionObserver' in window)) return;
-    let below = false;               // gallery currently fully below the fold?
-    const fo = new IntersectionObserver((entries) => {
-      const e = entries[0]; if (!e) return;
-      const vh = (e.rootBounds && e.rootBounds.height) || window.innerHeight;
-      const fullyBelow = !e.isIntersecting && e.boundingClientRect.top >= vh;
-      if (fullyBelow && !below) {
-        below = true;                // scrolled up past it → freshen the off-screen deck
-        if (typeof window.__bqRenderGallery === 'function') window.__bqRenderGallery(true);
-      } else if (!fullyBelow) {
-        below = false;               // back in view (or above) → arm for next up-scroll
-      }
-    }, { threshold: 0 });
-    fo.observe(work);
+    const wrap = document.getElementById('loadMoreWrap');
+    if (!wrap || !('IntersectionObserver' in window)) return;
+    let loading = false;
+    const io2 = new IntersectionObserver((entries) => {
+      if (!entries[0] || !entries[0].isIntersecting || loading) return;
+      const btn = document.getElementById('loadMoreBtn');
+      if (!btn || btn.style.display === 'none') return;   // nothing left to show
+      loading = true;
+      if (typeof window.__bqRenderGallery === 'function') window.__bqRenderGallery(false);
+      setTimeout(() => { loading = false; }, 250);         // debounce; re-arms after layout settles
+    }, { root: null, rootMargin: '500px 0px', threshold: 0 });
+    io2.observe(wrap);
   })();
 
   /* ---------- COUNT UP (statistics) ---------- */
