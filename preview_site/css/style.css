@@ -60,7 +60,7 @@ input, select, textarea { font-family: inherit; color: inherit; }
   --ink: #232220;
   --ink-2: #34332f;
   --ink-soft: #4b4a45;
-  --ink-muted: #84837c;
+  --ink-muted: #6b6a63;   /* AA-contrast (>=4.5:1) for small muted labels */
   --gold: #232220;       /* accent = ink — soft charcoal & off-white, no gold */
   --gold-ink: #232220;
   --line: rgba(0, 0, 0, 0.11);
