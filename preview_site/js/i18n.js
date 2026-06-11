@@ -140,7 +140,7 @@ window.I18N = {
     'd.note': 'Kısa bir not',
     'd.teaser.title': '<em>Basılı malzeme</em> tasarımcısı, 2014\'ten beri Hewlêr\'de çalışıyor.',
     'd.teaser.link': 'Biyografinin tamamını okuyun',
-    'd.teaser.body': 'Kürdistan Bölgesi Erbil\'de yerleşik bağımsız grafik tasarımcı. Şu anda Cumhurbaşkanlığı Basın İşleri Direktörlüğü\'nde. Daha önce - KBY Başbakanlık ofisinde Protokol Medyası ve eski şehirdeki bir matbaada uzun bir serbest çalışma.',
+    'd.teaser.body': 'Erbil, Kürdistan Bölgesi merkezli bağımsız grafik tasarımcı — markalaşma, editöryal, afiş, reklam ve baskıda on yılı aşkın serbest çalışma.',
     'st.books': 'Kitaplar',
     'st.logos': 'Logolar',
     'st.clients': 'Müşteriler',
@@ -367,7 +367,7 @@ window.I18N = {
     'd.note': 'En kort notis',
     'd.teaser.title': 'Designer av <em>trycksaker</em>, arbetat från Hewlêr sedan 2014.',
     'd.teaser.link': 'Läs hela biografin',
-    'd.teaser.body': 'Oberoende grafisk designer baserad i Erbil, Kurdistan Region. För närvarande vid direktoratet för mediafrågor vid presidentens kansli. Tidigare – Protocol Media på KRG:s premiärministerkontor och en lång frilansövning på ett tryckeri i den gamla staden.',
+    'd.teaser.body': 'Oberoende grafisk designer baserad i Erbil, Kurdistanregionen — över ett decennium av frilansarbete inom varumärke, editorial, affischer, reklam och tryck.',
     'st.books': 'Böcker',
     'st.logos': 'Logotyper',
     'st.clients': 'Kunder',
@@ -925,7 +925,7 @@ window.I18N_EXTRA = {
  "en": {
   "d.note": "A short note",
   "d.teaser.title": "Designer of <em>printed matter</em>, working from Hewlêr since 2014.",
-  "d.teaser.body": "Independent graphic designer based in Erbil, Kurdistan Region. Currently with the Directorate of Media Affairs at the Office of the President. Earlier — Protocol Media at the KRG Prime Minister’s office, and a long freelance practice at a printing shop in the old city.",
+  "d.teaser.body": "Independent graphic designer based in Erbil, Kurdistan Region — more than a decade of freelance practice across branding, editorial, posters, advertising, and print.",
   "d.teaser.link": "Read the full biography",
   "st.designs": "Designs",
   "st.clients": "Clients",
@@ -990,7 +990,7 @@ window.I18N_EXTRA = {
  "ku": {
   "d.note": "تێبینییەکی کورت",
   "d.teaser.title": "دیزاینەری <em>کاری چاپکراو</em>، لە هەولێرەوە لە ٢٠١٤ـەوە.",
-  "d.teaser.body": "دیزاینەری گرافیکی سەربەخۆ لە هەولێر، هەرێمی کوردستان. ئێستا لەگەڵ بەڕێوەبەرایەتیی کاروباری ڕاگەیاندن لە نووسینگەی سەرۆک. پێشتر — میدیای پرۆتۆکۆڵ لە نووسینگەی سەرۆک‌وەزیرانی هەرێم، و ماوەیەکی دوورودرێژ کاری ئازاد لە چاپخانەیەک لە شاری کۆن.",
+  "d.teaser.body": "دیزاینەری گرافیکی سەربەخۆ لە هەولێر، هەرێمی کوردستان — زیاتر لە دە ساڵ کاری ئازاد لە بەرەندسازی، دیزاینی ئێدیتۆریاڵ، پۆستەر، ڕیکلام و چاپ.",
   "d.teaser.link": "بایۆگرافیی تەواو بخوێنەوە",
   "st.designs": "دیزاین",
   "st.clients": "کڕیار",
@@ -1055,7 +1055,7 @@ window.I18N_EXTRA = {
  "kmr": {
   "d.note": "Noteyek kurt",
   "d.teaser.title": "Sêwirmendê <em>karên çapkirî</em>, ji Hewlêr ji 2014.",
-  "d.teaser.body": "Sêwirmendê grafîk ê serbixwe li Hewlêr, Herêma Kurdistanê. Niha bi Bereyê Karûbarên Medyayê li Nivîsgeha Serok re. Berê — Medyaya Protokolê li nivîsgeha Serokwezîrê HHK, û demeke dirêj karê azad li çapxaneyek li bajarê kevn.",
+  "d.teaser.body": "Sêwirmendê grafîk ê serbixwe li Hewlêr, Herêma Kurdistanê — zêdetirî deh salan ezmûna karê azad di branding, edîtorî, poster, reklam û çapê de.",
   "d.teaser.link": "Jînenîgariya temam bixwîne",
   "st.designs": "Sêwiran",
   "st.clients": "Mişterî",
@@ -1120,7 +1120,7 @@ window.I18N_EXTRA = {
  "ar": {
   "d.note": "ملاحظة قصيرة",
   "d.teaser.title": "مصمم <em>المطبوعات</em>، يعمل من أربيل منذ ٢٠١٤.",
-  "d.teaser.body": "مصمم جرافيك مستقل في أربيل، إقليم كردستان. حاليًا مع مديرية الشؤون الإعلامية في مكتب الرئيس. سابقًا — إعلام البروتوكول في مكتب رئيس وزراء الإقليم، وممارسة حرة طويلة في مطبعة بالمدينة القديمة.",
+  "d.teaser.body": "مصمم جرافيك مستقل في أربيل، إقليم كردستان — أكثر من عقد من العمل الحر في الهوية البصرية والتصميم التحريري والملصقات والإعلان والطباعة.",
   "d.teaser.link": "اقرأ السيرة كاملة",
   "st.designs": "تصاميم",
   "st.clients": "عملاء",
@@ -1185,7 +1185,7 @@ window.I18N_EXTRA = {
  "fr": {
   "d.note": "Une courte note",
   "d.teaser.title": "Designer de <em>l’imprimé</em>, depuis Hewlêr depuis 2014.",
-  "d.teaser.body": "Designer graphique indépendant à Erbil, Région du Kurdistan. Actuellement à la Direction des affaires médiatiques au Cabinet du Président. Auparavant — Médias du protocole au cabinet du Premier ministre du GRK, et une longue pratique en indépendant dans une imprimerie de la vieille ville.",
+  "d.teaser.body": "Graphiste indépendant basé à Erbil, Région du Kurdistan — plus d’une décennie de pratique en freelance : identité, éditorial, affiches, publicité et impression.",
   "d.teaser.link": "Lire la biographie complète",
   "st.designs": "Créations",
   "st.clients": "Clients",

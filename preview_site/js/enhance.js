@@ -340,7 +340,7 @@
 
     const INFO = {
       all:      { tag: 'Full catalogue',         desc: 'Every discipline gathered in one place — the complete body of work.' },
-      official: { tag: 'Government · Editorial',  desc: 'Editorial design for the Kurdistan Region Presidency & Media Affairs.' },
+      official: { tag: 'Official · Editorial',  desc: 'Editorial design — books, layouts, and official publications.' },
       book:     { tag: 'Print · Covers',          desc: 'Book covers — typography, illustration, and print composition.' },
       image:    { tag: 'Photography',             desc: 'Photo editing, composites, and editorial retouching.' },
       logo:     { tag: 'Brand identity',          desc: 'Logos, wordmarks, and visual identities drawn by hand.' },
@@ -429,7 +429,7 @@
       { k: ['contact','reach','email','phone','whatsapp','hire','start'],
         a: "Easiest ways to reach Barakat:<br>• ✉️ <a href='mailto:info@bqurtas.com'>info@bqurtas.com</a><br>• 📱 <a href='https://wa.me/9647517884985' target='_blank' rel='noopener'>WhatsApp +964 751 788 4985</a><br>Or open the <b>Contact</b> room and send a pitch." },
       { k: ['who','about','experience','barakat','you'],
-        a: "Barakat Qurtas is an independent graphic designer in <b>Erbil, Kurdistan</b>, working since <b>2014</b> — currently with the Directorate of Media Affairs at the Office of the President. 1000+ works across print & digital." },
+        a: "Barakat Qurtas is an independent graphic designer in <b>Erbil, Kurdistan</b>, working freelance since <b>2014</b> — 1000+ works across branding, editorial, print & digital." },
       { k: ['language','languages','speak'],
         a: "Barakat works in <b>Kurdish (Sorani & Kurmancî)</b>, <b>Arabic</b>, <b>English</b>, and some <b>French</b>." },
       { k: ['book','cover'], a: "Book covers are a specialty — 99 covers and counting. Open the <b>Book</b> tab in the Design room to browse them." },
