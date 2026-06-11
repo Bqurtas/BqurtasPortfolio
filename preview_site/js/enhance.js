@@ -57,16 +57,20 @@
 
     const onScroll = () => {
       const h = document.documentElement;
+      // window.scrollY is reliable on mobile; documentElement.scrollTop can read 0 there
+      const st = window.scrollY || (document.scrollingElement || h).scrollTop || 0;
       const max = (h.scrollHeight - h.clientHeight) || 1;
-      const p = Math.min(Math.max(h.scrollTop / max, 0), 1);
+      const p = Math.min(Math.max(st / max, 0), 1);
       if (railFill) railFill.style.height = (p * 100) + '%';
       if (ring) ring.style.strokeDashoffset = C * (1 - p);
-      /* hidden at the very top of the page; shown once you've scrolled down
-         (and it STAYS shown until you go back up) — in every room. */
-      if (toTop) toTop.classList.toggle('is-shown', h.scrollTop > 200);
+      /* hidden at the very top; shown once you've scrolled down — in every room. */
+      if (toTop) toTop.classList.toggle('is-shown', st > 200);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('touchmove', onScroll, { passive: true });   // some mobile browsers throttle 'scroll'
     window.addEventListener('resize', onScroll);
+    window.addEventListener('popstate', () => setTimeout(onScroll, 140)); // re-check after back/forward room change
+    window.__bqOnScroll = onScroll;                                       // router calls this after navigating
     onScroll();
 
     toTop && toTop.addEventListener('click', () =>

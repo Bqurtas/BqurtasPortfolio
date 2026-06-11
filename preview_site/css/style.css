@@ -2290,6 +2290,11 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   align-items: center;
   gap: 28px 24px;
 }
+/* Mobile: a tidy 3-up grid so the hand-drawn logos are bigger and aligned */
+@media (max-width: 600px) {
+  .logos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .logos-grid .logo-mark { width: auto; padding: 12px; }
+}
 .logo-mark {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;

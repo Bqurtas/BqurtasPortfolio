@@ -130,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('mobileMenu')?.classList.remove('is-open');
     document.body.style.overflow = '';
     if (window.__bqToggleCta) window.__bqToggleCta();
+    requestAnimationFrame(() => { if (window.__bqOnScroll) window.__bqOnScroll(); });   // refresh the back-to-top button on every room change
   };
   window.__bqShowRoom = showRoom;
 
