@@ -278,9 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- TABS + PAGINATION + SECTION HEADER ---------- */
   const tabs = document.querySelectorAll('.tab');
-  // Smaller first paint on phones (lighter network payload → faster mobile LCP);
-  // desktop keeps the full 40-per-batch the gallery was tuned for.
-  const PAGE_SIZE = (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 640px)').matches) ? 16 : 40;
+  const PAGE_SIZE = 40;
   let currentFilter = 'all';
   let currentShown  = 0;
 
@@ -512,25 +510,9 @@ document.addEventListener('DOMContentLoaded', () => {
   tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab, true)));
 
   /* The deck re-shuffles on every page load and tab switch — that stays.
-     PLUS infinite scroll, like mobile: as the reader scrolls DOWN and nears the
-     end of the gallery, the next batch loads in automatically, so fresh works
-     keep appearing beneath them. Scrolling UP changes nothing (no reshuffle, no
-     jump) — works never swap under the reader. The "Load more" button remains
-     as a manual fallback. */
-  (() => {
-    const wrap = document.getElementById('loadMoreWrap');
-    if (!wrap || !('IntersectionObserver' in window)) return;
-    let loading = false;
-    const io2 = new IntersectionObserver((entries) => {
-      if (!entries[0] || !entries[0].isIntersecting || loading) return;
-      const btn = document.getElementById('loadMoreBtn');
-      if (!btn || btn.style.display === 'none') return;   // nothing left to show
-      loading = true;
-      if (typeof window.__bqRenderGallery === 'function') window.__bqRenderGallery(false);
-      setTimeout(() => { loading = false; }, 250);         // debounce; re-arms after layout settles
-    }, { root: null, rootMargin: '500px 0px', threshold: 0 });
-    io2.observe(wrap);
-  })();
+     The gallery shows exactly one batch (PAGE_SIZE = 40) at a time; the reader
+     taps "Load more" to reveal the next 40. No auto-infinite-scroll — the works
+     never all load at once, and nothing swaps under the reader as they scroll. */
 
   /* ---------- COUNT UP (statistics) ---------- */
   const animateCount = (el) => {
