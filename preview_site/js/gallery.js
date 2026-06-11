@@ -112,6 +112,22 @@ window.BQ_GALLERY = {
         }
       } catch (e) {}
     }
+    if (!paths) {
+      /* GitHub's tree API is rate-limited (60/hr) — if it was throttled, fall back
+         to jsDelivr's data API (no rate limit) so counts/works still stay live. */
+      try {
+        const ctrl2 = new AbortController();
+        const timer2 = setTimeout(() => ctrl2.abort(), 6000);
+        const r2 = await fetch(`https://data.jsdelivr.com/v1/packages/gh/${this.REPO}@${this.BRANCH}`, { signal: ctrl2.signal, headers: { Accept: 'application/json' } });
+        clearTimeout(timer2);
+        if (r2.ok) {
+          const j2 = await r2.json();
+          const out = [];
+          (function walk(nodes, pre) { for (const n of (nodes || [])) { if (n.type === 'directory') walk(n.files, pre + n.name + '/'); else if (n.name) out.push(pre + n.name); } })(j2.files, '');
+          if (out.length) { paths = out; try { sessionStorage.setItem(KEY, JSON.stringify({ t: Date.now(), paths })); } catch (e) {} }
+        }
+      } catch (e) {}
+    }
     if (!paths) return (this._ok = false);
 
     const IMG = /\.(webp|jpe?g|png|gif|avif|svg)$/i;

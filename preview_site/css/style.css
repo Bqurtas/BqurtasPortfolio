@@ -3323,7 +3323,8 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .dash-bar-n { color: var(--ink-soft) !important; font-size: 11px; text-align: right; }
 
 /* ---- Works manager: image grid with delete (like the Content list) ---- */
-.dash-manage { margin: 24px 0; }
+.dash-manage { margin: 24px 0; padding: 20px 20px 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-1); }
+.dash-manage > .cms-head { margin-bottom: 14px; }
 .dash-mg-head { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; flex-wrap: wrap; }
 .dash-mg-sel { padding: 9px 13px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg-1); color: var(--ink); font-family: inherit; font-size: 13px; }
 .dash-mg-sel:focus { outline: none; border-color: var(--gold); }
