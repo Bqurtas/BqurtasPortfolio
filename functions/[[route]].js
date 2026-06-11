@@ -83,15 +83,36 @@ export async function onRequest(context) {
   // the HTML shell must always revalidate so a deploy's new ?v= asset links are
   // picked up immediately (the ?v-versioned CSS/JS/images keep their long cache)
   const FRESH = 'public, max-age=0, must-revalidate';
+  /* Per-request nonce → a strong, XSS-effective Content-Security-Policy with NO
+     'unsafe-inline' for scripts. Every <script> in the shell gets this nonce
+     below; 'strict-dynamic' then trusts whatever those scripts load (GA, Pixel,
+     Umami…). 'unsafe-inline' https: are ignored by modern browsers (they honour
+     the nonce) but keep very old browsers working. */
+  const nonce = crypto.randomUUID().replace(/-/g, '');
+  const CSP = [
+    "default-src 'self'", "base-uri 'self'", "object-src 'none'",
+    "frame-ancestors 'self'", "form-action 'self'", "upgrade-insecure-requests",
+    "script-src 'nonce-" + nonce + "' 'strict-dynamic' 'unsafe-inline' https:",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
+    "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net",
+    "img-src 'self' data: blob: https://cdn.jsdelivr.net https://raw.githubusercontent.com https://images.weserv.nl https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com https://www.facebook.com",
+    "media-src 'self' blob: https://cdn.jsdelivr.net https://raw.githubusercontent.com",
+    "connect-src 'self' https://cloud.umami.is https://api.umami.is https://*.supabase.co https://api.github.com https://api.web3forms.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://connect.facebook.net https://www.facebook.com https://cdn.jsdelivr.net https://raw.githubusercontent.com",
+    "frame-src 'self' https://www.facebook.com https://connect.facebook.net",
+    "worker-src 'self' blob:"
+  ].join('; ');
   const withFresh = (res) => {
     const headers = new Headers(res.headers);
     headers.set('Cache-Control', FRESH);
+    headers.set('Content-Security-Policy', CSP);
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
   };
+  const addNonce = { element(el) { el.setAttribute('nonce', nonce); } };
 
   try {
     const shell = await env.ASSETS.fetch(new URL('/index.html', url.origin));
     const out = new HTMLRewriter()
+      .on('script',                           addNonce)
       .on('html',                             setLangAttr(r.lang))
       .on('title',                            setText(meta.t))
       .on('meta[name="description"]',         setContent(meta.d))
@@ -109,7 +130,9 @@ export async function onRequest(context) {
       .transform(shell);
     return withFresh(out);
   } catch (e) {
-    try { return withFresh(await env.ASSETS.fetch(new URL('/index.html', url.origin))); }
-    catch (_) { return next(); }
+    try {
+      const shell = await env.ASSETS.fetch(new URL('/index.html', url.origin));
+      return withFresh(new HTMLRewriter().on('script', addNonce).transform(shell));
+    } catch (_) { return next(); }
   }
 }

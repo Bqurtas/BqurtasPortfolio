@@ -3300,8 +3300,11 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 /* No visible scrollbar anywhere in the console — content still scrolls (wheel /
    trackpad / touch) when a room is genuinely tall, but short rooms never show a
    phantom track, so there's no "feels like it scrolls" gutter. */
-.dash-view, .dash-side-nav { scrollbar-width: none; -ms-overflow-style: none; }
-.dash-view::-webkit-scrollbar, .dash-side-nav::-webkit-scrollbar { width: 0; height: 0; display: none; }
+/* No visible scrollbar ANYWHERE inside the console — not the view, not the
+   sidebar, not any inner list. Content still scrolls (wheel/trackpad/touch) when
+   a room is genuinely tall, but nothing ever shows a stray scroll track. */
+.dash, .dash * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+.dash::-webkit-scrollbar, .dash *::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }
 
 .dash-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 .dash-card { padding: 24px; border: 1px solid var(--line); border-radius: 14px; background: var(--card-bg); display: flex; flex-direction: column; gap: 8px; transition: transform 0.3s var(--ease), border-color 0.3s var(--ease), box-shadow 0.3s var(--ease); }
