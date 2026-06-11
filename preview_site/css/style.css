@@ -3297,12 +3297,11 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .dash-admin-row .mono { font-size: 10px; letter-spacing: 0.04em; color: var(--ink-muted); }
 
 .dash-view { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 30px 40px 26px; }
-/* hide the scrollbar gutter so short sections don't show a meaningless track */
-.dash-view { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
-.dash-view::-webkit-scrollbar { width: 8px; }
-.dash-view::-webkit-scrollbar-thumb { background: var(--line); border-radius: 8px; }
-.dash-view::-webkit-scrollbar-thumb:hover { background: var(--ink-muted); }
-.dash-view::-webkit-scrollbar-track { background: transparent; }
+/* No visible scrollbar anywhere in the console — content still scrolls (wheel /
+   trackpad / touch) when a room is genuinely tall, but short rooms never show a
+   phantom track, so there's no "feels like it scrolls" gutter. */
+.dash-view, .dash-side-nav { scrollbar-width: none; -ms-overflow-style: none; }
+.dash-view::-webkit-scrollbar, .dash-side-nav::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
 .dash-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 .dash-card { padding: 24px; border: 1px solid var(--line); border-radius: 14px; background: var(--card-bg); display: flex; flex-direction: column; gap: 8px; transition: transform 0.3s var(--ease), border-color 0.3s var(--ease), box-shadow 0.3s var(--ease); }
