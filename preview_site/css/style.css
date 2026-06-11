@@ -3326,14 +3326,19 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .dash-mg-sel { padding: 9px 13px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg-1); color: var(--ink); font-family: inherit; font-size: 13px; }
 .dash-mg-sel:focus { outline: none; border-color: var(--gold); }
 .wk-grid-inner { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; margin-top: 10px; }
-.wk-cell { position: relative; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: var(--bg); transition: border-color 0.2s var(--ease); }
-.wk-cell:hover { border-color: var(--gold); }
-.wk-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.wk-del { position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; border-radius: 8px; border: none; background: rgba(20,16,11,0.72); color: #fff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; opacity: 0; transition: opacity 0.2s var(--ease), background 0.2s var(--ease); }
-.wk-cell:hover .wk-del, .wk-del:focus-visible { opacity: 1; }
-.wk-del:hover { background: var(--ember); }
+.wk-cell { position: relative; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--bg); box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: border-color 0.22s var(--ease), transform 0.22s var(--ease), box-shadow 0.22s var(--ease); }
+.wk-cell:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 12px 26px -10px rgba(0,0,0,0.28); }
+.wk-cell img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.45s var(--ease); }
+.wk-cell:hover img { transform: scale(1.06); }
+.wk-del { position: absolute; top: 7px; right: 7px; width: 32px; height: 32px; border-radius: 9px; border: none; background: rgba(20,16,11,0.66); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); color: #fff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 12.5px; opacity: 0; transform: scale(0.9); transition: opacity 0.2s var(--ease), background 0.2s var(--ease), transform 0.2s var(--ease); }
+.wk-cell:hover .wk-del, .wk-del:focus-visible { opacity: 1; transform: scale(1); }
+.wk-del:hover { background: var(--ember); transform: scale(1.08); }
 .wk-del[disabled] { cursor: default; }
 [dir="rtl"] .wk-del { right: auto; left: 6px; }
+
+/* When the studio console is open it fills the screen — lock the page behind it
+   so the site's own scrollbar doesn't show as a stray line down the side. */
+html:has(.dash.is-open) { overflow: hidden; }
 
 .dash-leads { display: flex; flex-direction: column; gap: 12px; }
 .dash-lead { padding: 16px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--card-bg); }

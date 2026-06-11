@@ -800,7 +800,7 @@
         if (pend.length > 6000000) { msg.textContent = '✗ ' + (W.tooBig || 'Image is too large — please pick a smaller source image.'); return; }
         msg.textContent = W.uploading;
         wkApi({ folder: $('#wkFolder').value, dataB64: pend, ext: 'webp' }).then(d => {
-          if (d && d.ok) { msg.textContent = W.done; pend = null; fileIn.value = ''; prev.hidden = true; }
+          if (d && d.ok) { try { sessionStorage.removeItem('bq_gallery_tree_v1'); } catch (e) {} msg.textContent = (W.done || 'Published ✓') + ' — reload the site to see it.'; pend = null; fileIn.value = ''; prev.hidden = true; }
           else if (d && d.error === 'no_github_token') { msg.textContent = W.noToken; }
           else if (d && (d.error === 'missing_token' || d.error === 'unauthorized')) { msg.textContent = W.connect; }
           else { msg.textContent = '✗ ' + ((d && (d.detail || d.error)) || 'failed'); }
