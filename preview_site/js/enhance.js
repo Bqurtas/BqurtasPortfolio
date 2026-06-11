@@ -784,11 +784,12 @@
       fileIn.addEventListener('change', async (ev) => {
         const file = ev.target.files && ev.target.files[0]; if (!file) return;
         msg.textContent = W.reading;
-        try { const b64 = await cmsResize(file, 1600, 0.82); pend = b64; prev.hidden = false; prev.querySelector('img').src = 'data:image/webp;base64,' + b64; msg.textContent = W.ready; }
+        try { const b64 = await cmsResize(file, 1400, 0.78); pend = b64; prev.hidden = false; prev.querySelector('img').src = 'data:image/webp;base64,' + b64; msg.textContent = W.ready; }
         catch (e) { msg.textContent = '✗ ' + e; }
       });
       $('#wkUp').addEventListener('click', () => {
         if (!pend) { msg.textContent = W.pick; return; }
+        if (pend.length > 6000000) { msg.textContent = '✗ ' + (W.tooBig || 'Image is too large — please pick a smaller source image.'); return; }
         msg.textContent = W.uploading;
         wkApi({ folder: $('#wkFolder').value, dataB64: pend, ext: 'webp' }).then(d => {
           if (d && d.ok) { msg.textContent = W.done; pend = null; fileIn.value = ''; prev.hidden = true; }
