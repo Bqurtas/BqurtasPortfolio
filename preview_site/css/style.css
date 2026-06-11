@@ -3342,6 +3342,29 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
    so the site's own scrollbar doesn't show as a stray line down the side. */
 html:has(.dash.is-open) { overflow: hidden; }
 
+/* ============ Console — a more premium, professional finish ============ */
+/* Sidebar: subtle depth, sharper active state */
+.dash-tabs { background: linear-gradient(180deg, var(--surface), var(--bg-3)); }
+.dash-tab { transition: background 0.22s var(--ease), color 0.22s var(--ease), box-shadow 0.22s var(--ease); }
+.dash-tab.is-active { box-shadow: 0 10px 24px -12px rgba(0,0,0,0.45); }
+.dash-side-id { padding-bottom: 22px; }
+/* Stat cards: soft gradient + lift */
+.dash-card { background: linear-gradient(162deg, var(--card-bg), var(--bg-2)); box-shadow: 0 2px 10px -6px rgba(0,0,0,0.10); }
+.dash-card:hover { box-shadow: 0 22px 50px -28px rgba(0,0,0,0.5); }
+/* Section labels: a small gold tick before each heading */
+.dash-h { position: relative; padding-left: 13px; }
+.dash-h::before { content: ''; position: absolute; left: 0; top: 52%; transform: translateY(-50%); width: 3px; height: 13px; background: var(--gold-bright); border-radius: 2px; }
+[dir="rtl"] .dash-h { padding-left: 0; padding-right: 13px; }
+[dir="rtl"] .dash-h::before { left: auto; right: 0; }
+/* Charts + bars: richer gold gradient */
+.viz-day-fill { background: linear-gradient(180deg, var(--gold-bright), var(--gold-deep)); border-radius: 3px 3px 0 0; }
+.dash-bar-fill { background: linear-gradient(90deg, var(--gold-deep), var(--gold-bright)); }
+/* Rows + leads: gentler card surface, smoother hover */
+.dash-lead { transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease); }
+.dash-lead:hover { border-color: var(--gold); transform: translateY(-1px); box-shadow: 0 10px 26px -16px rgba(0,0,0,0.4); }
+.dash-recent-row { border-radius: 8px; padding: 9px 12px; transition: background 0.18s var(--ease); }
+.dash-recent-row:hover { background: var(--bg-2); }
+
 .dash-leads { display: flex; flex-direction: column; gap: 12px; }
 .dash-lead { padding: 16px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--card-bg); }
 .dash-lead-top { display: flex; justify-content: space-between; align-items: baseline; }
