@@ -870,6 +870,15 @@
         <div class="dash-2fa">
           <button class="dash-btn" id="gen2fa"><i class="fa-solid fa-shield-halved"></i> ${DT('twoSetupBtn')}</button>
           <div id="twofaOut" hidden></div>
+        </div>
+        <div class="dash-2fa">
+          <p class="dash-note mono">🔑 پاسۆردی ئەدیتەر — کلیلی بڵاوکردن/سڕینەوەی ئیش و بلۆگ. سەرەتا لە تابی «ناوەڕۆک» ئەدیتەر ببەستەوە، پاشان لێرە بیگۆڕە. · Editor (publish) password.</p>
+          <label class="dash-field"><span class="mono">پاسۆردی نوێ · New editor password</span><input id="setNewTok" type="text" autocomplete="off" spellcheck="false"></label>
+          <div class="dash-mg-head">
+            <button class="dash-btn dash-btn--go" id="setTokBtn"><i class="fa-solid fa-key"></i> گۆڕین · Change</button>
+            <button class="dash-btn" id="setTokGen"><i class="fa-solid fa-dice"></i> بەهێز · Strong</button>
+          </div>
+          <span class="dash-note mono" id="setTokMsg"></span>
         </div>`;
       $('#setSplash').addEventListener('change', (e) => localStorage.setItem('bq_splash', e.target.checked ? 'on' : 'off'));
       const themeSel = $('#setTheme'); themeSel.value = document.documentElement.dataset.theme || 'light';
@@ -884,6 +893,26 @@
         out.innerHTML = `<p class="dash-note mono">${DT('twoSetup1')}</p><code class="dash-secret" id="twoSec">${sec}</code>
           <p class="dash-note mono">${DT('twoSetup2')}</p><a class="dash-note mono" href="${uri}">otpauth://… (${DT('twoSetupLink')})</a>`;
         const c = $('#twoSec'); c.addEventListener('click', () => { try { navigator.clipboard.writeText(sec); c.classList.add('copied'); } catch (e) {} });
+      });
+      // ---- Change the editor (publish) password — you type it, never me ----
+      const SBset = window.BQ_SUPA || {};
+      $('#setTokGen')?.addEventListener('click', () => {
+        const A = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+        const r = crypto.getRandomValues(new Uint8Array(22)); let s = 'bqedit_';
+        for (const b of r) s += A[b % A.length];
+        const f = $('#setNewTok'); if (f) f.value = s;
+      });
+      $('#setTokBtn')?.addEventListener('click', () => {
+        const m = $('#setTokMsg'); const nt = ($('#setNewTok').value || '').trim();
+        if (nt.length < 4) { m.textContent = '✗ کەمتر لە ٤ پیت · too short'; return; }
+        if (!editToken()) { m.textContent = '✗ سەرەتا ئەدیتەر ببەستەوە (تابی ناوەڕۆک) · connect the editor first'; return; }
+        m.textContent = '…';
+        fetch(SBset.url + '/functions/v1/set-token', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SBset.key, Authorization: 'Bearer ' + SBset.key, 'x-edit-token': editToken() }, body: JSON.stringify({ new_token: nt }) })
+          .then(r => r.json()).then(d => {
+            if (d && d.ok) { try { localStorage.setItem('bq_edit_token', nt); } catch (e) {} m.textContent = '✓ گۆڕدرا — ئەدیتەر بە پاسۆردی نوێ بەستراوەتەوە · Changed & reconnected.'; $('#setNewTok').value = ''; }
+            else if (d && d.error === 'unauthorized') { m.textContent = '✗ پاسۆردی ئێستا هەڵەیە · current editor password is wrong'; }
+            else { m.textContent = '✗ ' + ((d && (d.detail || d.error)) || 'failed'); }
+          }).catch(() => { m.textContent = '✗ نەکرا (تەنیا سایتی زیندوو) · live site only'; });
       });
     };
     const esc = (s) => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
