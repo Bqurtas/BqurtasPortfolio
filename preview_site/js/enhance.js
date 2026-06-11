@@ -698,12 +698,12 @@
     $('#dashClose')?.addEventListener('click', closeDash);
     dash.addEventListener('click', (e) => { if (e.target === dash) closeDash(); });
 
-    let twoFAId = null;
+    let twoFAId = null, twoFAVia = null;
     const doUnlock = () => { unlocked = true; sessionStorage.setItem('bq_dash_ok', '1'); twoFAId = null; showConsole(); };
     const enter2FA = () => {
       const g = $('#dashGate'); if (!g) return;
       const h = g.querySelector('h3'); if (h) h.textContent = DT('twoTitle');
-      const p = g.querySelector('p.mono'); if (p) p.textContent = DT('twoNote');
+      const p = g.querySelector('p.mono'); if (p) p.textContent = (twoFAVia === 'email') ? 'کۆدی ٦ ژمارەیی نێردرا بۆ ئیمێڵەکەت / A 6-digit code was emailed to you (check spam too).' : DT('twoNote');
       const k = $('#dashKey'); if (k) { k.value = ''; k.placeholder = DT('twoPh'); setTimeout(() => k.focus(), 50); }
       hint.textContent = '';
     };
@@ -721,7 +721,7 @@
       if (val === KEY) {
         hint.textContent = DT('twoSending');
         fetch('/api/2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: val, action: 'send' }) })
-          .then(r => r.json()).then(d => { if (d.ok && d.id) { twoFAId = d.id; enter2FA(); } else { doUnlock(); } })  // not-configured / offline → PIN-only
+          .then(r => r.json()).then(d => { if (d.ok && d.id) { twoFAId = d.id; twoFAVia = d.via || null; enter2FA(); } else { doUnlock(); } })  // not-configured / offline → PIN-only
           .catch(() => doUnlock());
       } else {
         hint.textContent = DT('wrong');
