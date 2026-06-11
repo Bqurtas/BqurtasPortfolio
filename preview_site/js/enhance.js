@@ -596,7 +596,8 @@
   (function dashboard() {
     const dash = $('#dash');
     if (!dash) return;
-    const KEY = '107502';                   // access code
+    const KEY = '107502';                   // server PIN (matches Cloudflare DASH_PIN) — always sent to the 2FA call
+    const currentPin = () => { try { return localStorage.getItem('bq_dash_pin') || KEY; } catch (e) { return KEY; } };  // what you type to open (changeable, saved per device)
     const gate = $('#dashGate'), main = $('#dashMain'), view = $('#dashView');
     const hint = $('#dashHint');
     let unlocked = sessionStorage.getItem('bq_dash_ok') === '1';
@@ -718,9 +719,9 @@
         return;
       }
       // step 1 — the access code
-      if (val === KEY) {
+      if (val === currentPin()) {
         hint.textContent = DT('twoSending');
-        fetch('/api/2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: val, action: 'send' }) })
+        fetch('/api/2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: KEY, action: 'send' }) })
           .then(r => r.json()).then(d => { if (d.ok && d.id) { twoFAId = d.id; twoFAVia = d.via || null; enter2FA(); } else { doUnlock(); } })  // not-configured / offline → PIN-only
           .catch(() => doUnlock());
       } else {
@@ -867,16 +868,25 @@
           <button class="dash-btn" id="setReset"><i class="fa-solid fa-rotate"></i> ${DT('sReset')}</button>
         </div>
         <p class="dash-note mono">${DT('sNote')}</p>
-        <div class="dash-2fa">
+        <div class="dash-box">
+          <div class="dash-box-h"><i class="fa-solid fa-shield-halved"></i> Two-factor (2FA)</div>
           <button class="dash-btn" id="gen2fa"><i class="fa-solid fa-shield-halved"></i> ${DT('twoSetupBtn')}</button>
           <div id="twofaOut" hidden></div>
         </div>
-        <div class="dash-2fa">
-          <p class="dash-note mono">🔑 پاسۆردی ئەدیتەر — کلیلی بڵاوکردن/سڕینەوەی ئیش و بلۆگ. سەرەتا لە تابی «ناوەڕۆک» ئەدیتەر ببەستەوە، پاشان لێرە بیگۆڕە. · Editor (publish) password.</p>
-          <label class="dash-field"><span class="mono">پاسۆردی نوێ · New editor password</span><input id="setNewTok" type="text" autocomplete="off" spellcheck="false"></label>
+        <div class="dash-box">
+          <div class="dash-box-h"><i class="fa-solid fa-lock"></i> Dashboard password (PIN)</div>
+          <p class="dash-note mono">The code you type to open this console. The 2FA email code is the real lock — this is just the first step. Saved on this device.</p>
+          <label class="dash-field"><span class="mono">New PIN</span><input id="setNewPin" type="text" autocomplete="off" spellcheck="false"></label>
+          <button class="dash-btn dash-btn--go" id="setPinBtn"><i class="fa-solid fa-lock"></i> Change PIN</button>
+          <span class="dash-note mono" id="setPinMsg"></span>
+        </div>
+        <div class="dash-box">
+          <div class="dash-box-h"><i class="fa-solid fa-key"></i> Editor password</div>
+          <p class="dash-note mono">The publish key for your works &amp; blog. Connect the editor first (Content tab), then change it here. A strong one is safest.</p>
+          <label class="dash-field"><span class="mono">New editor password</span><input id="setNewTok" type="text" autocomplete="off" spellcheck="false"></label>
           <div class="dash-mg-head">
-            <button class="dash-btn dash-btn--go" id="setTokBtn"><i class="fa-solid fa-key"></i> گۆڕین · Change</button>
-            <button class="dash-btn" id="setTokGen"><i class="fa-solid fa-dice"></i> بەهێز · Strong</button>
+            <button class="dash-btn dash-btn--go" id="setTokBtn"><i class="fa-solid fa-key"></i> Change</button>
+            <button class="dash-btn" id="setTokGen"><i class="fa-solid fa-dice"></i> Strong</button>
           </div>
           <span class="dash-note mono" id="setTokMsg"></span>
         </div>`;
@@ -894,8 +904,14 @@
           <p class="dash-note mono">${DT('twoSetup2')}</p><a class="dash-note mono" href="${uri}">otpauth://… (${DT('twoSetupLink')})</a>`;
         const c = $('#twoSec'); c.addEventListener('click', () => { try { navigator.clipboard.writeText(sec); c.classList.add('copied'); } catch (e) {} });
       });
-      // ---- Change the editor (publish) password — you type it, never me ----
+      // ---- Change the dashboard PIN (this device) + the editor (publish) password — you type them, never me ----
       const SBset = window.BQ_SUPA || {};
+      $('#setPinBtn')?.addEventListener('click', () => {
+        const m = $('#setPinMsg'); const np = ($('#setNewPin').value || '').trim();
+        if (np.length < 4) { m.textContent = '✗ Use at least 4 characters'; return; }
+        try { localStorage.setItem('bq_dash_pin', np); } catch (e) {}
+        m.textContent = '✓ PIN changed (saved on this device).'; $('#setNewPin').value = '';
+      });
       $('#setTokGen')?.addEventListener('click', () => {
         const A = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
         const r = crypto.getRandomValues(new Uint8Array(22)); let s = 'bqedit_';
@@ -904,15 +920,15 @@
       });
       $('#setTokBtn')?.addEventListener('click', () => {
         const m = $('#setTokMsg'); const nt = ($('#setNewTok').value || '').trim();
-        if (nt.length < 4) { m.textContent = '✗ کەمتر لە ٤ پیت · too short'; return; }
-        if (!editToken()) { m.textContent = '✗ سەرەتا ئەدیتەر ببەستەوە (تابی ناوەڕۆک) · connect the editor first'; return; }
+        if (nt.length < 4) { m.textContent = '✗ Use at least 4 characters'; return; }
+        if (!editToken()) { m.textContent = '✗ Connect the editor first (Content tab)'; return; }
         m.textContent = '…';
         fetch(SBset.url + '/functions/v1/set-token', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SBset.key, Authorization: 'Bearer ' + SBset.key, 'x-edit-token': editToken() }, body: JSON.stringify({ new_token: nt }) })
           .then(r => r.json()).then(d => {
-            if (d && d.ok) { try { localStorage.setItem('bq_edit_token', nt); } catch (e) {} m.textContent = '✓ گۆڕدرا — ئەدیتەر بە پاسۆردی نوێ بەستراوەتەوە · Changed & reconnected.'; $('#setNewTok').value = ''; }
-            else if (d && d.error === 'unauthorized') { m.textContent = '✗ پاسۆردی ئێستا هەڵەیە · current editor password is wrong'; }
+            if (d && d.ok) { try { localStorage.setItem('bq_edit_token', nt); } catch (e) {} m.textContent = '✓ Changed & reconnected.'; $('#setNewTok').value = ''; }
+            else if (d && d.error === 'unauthorized') { m.textContent = '✗ Current editor password is wrong'; }
             else { m.textContent = '✗ ' + ((d && (d.detail || d.error)) || 'failed'); }
-          }).catch(() => { m.textContent = '✗ نەکرا (تەنیا سایتی زیندوو) · live site only'; });
+          }).catch(() => { m.textContent = '✗ Failed (works on the live site only)'; });
       });
     };
     const esc = (s) => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));

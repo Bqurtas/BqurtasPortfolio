@@ -3324,6 +3324,10 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 
 /* ---- Works manager: image grid with delete (like the Content list) ---- */
 .dash-manage { margin: 24px 0; padding: 20px 20px 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-1); }
+/* Settings: each control framed in its own box */
+.dash-box { margin: 18px 0; padding: 18px 18px 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-1); }
+.dash-box-h { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 6px; color: var(--ink); }
+.dash-box-h i { color: var(--gold-bright); font-size: 13px; }
 .dash-manage > .cms-head { margin-bottom: 14px; }
 .dash-mg-head { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; flex-wrap: wrap; }
 .dash-mg-sel { padding: 9px 13px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg-1); color: var(--ink); font-family: inherit; font-size: 13px; }
