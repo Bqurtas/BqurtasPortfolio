@@ -3661,12 +3661,10 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
    (the browser only snaps at its edges).
    ========================================================= */
 @media (min-width: 821px) and (pointer: fine) {
-  html { scroll-snap-type: y mandatory; scroll-padding-top: 0; }
-  .hero,
-  .room-hero,
-  .pencemor-hero,
-  .room > .section,
-  .footer { scroll-snap-align: start; scroll-snap-stop: always; }
+  /* Section snap removed — it made the page "jump"/scroll on its own to the next
+     section, which felt like an unwanted auto-scroll. The page now scrolls
+     freely and smoothly in every room. */
+  html { scroll-snap-type: none; scroll-padding-top: 0; }
 }
 /* Mobile: PROXIMITY snapping — the page always scrolls freely (nothing is ever
    trapped, so the tall gallery scrolls normally) but it firmly settles onto the
