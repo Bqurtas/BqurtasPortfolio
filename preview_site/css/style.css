@@ -1704,7 +1704,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
     /* EVERY card is exactly the same size so the pile is perfectly even — and
        nothing is ever cut off: taller content scrolls quietly inside the card
        (no visible scrollbar). */
-    height: min(72vh, 560px);
+    height: min(80vh, 650px);
     overflow-y: auto; overflow-x: hidden;
     scrollbar-width: none;
   }
@@ -1730,6 +1730,10 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   .bio-stack > .bio-block:nth-child(8) { top: 66px; }
   .bio-stack > .bio-block:nth-child(9) { top: 72px; }
   .bio-stack > .bio-block:nth-child(10) { top: 78px; }
+  .bio-stack > .bio-block:nth-child(11) { top: 84px; }
+  .bio-stack > .bio-block:nth-child(12) { top: 90px; }
+  .bio-stack > .bio-block:nth-child(13) { top: 96px; }
+  .bio-stack > .bio-block:nth-child(14) { top: 102px; }
   .bio-stack > .bio-block:last-child { margin-bottom: 0; }
 }
 
@@ -2634,6 +2638,30 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 /* Social card mark colours */
 .bio-social--linkedin .bio-social-mark { color: #0a66c2; }
 .bio-social--google .bio-social-mark { color: #4285f4; }
+/* Mobile: COMPACT the bio-card contents so everything FITS the equal cards —
+   smaller type and tighter grids instead of clipping anything. */
+@media (max-width: 820px) {
+  .bio-stack .bio-block-title { font-size: 16px; margin-bottom: 14px; padding-bottom: 10px; }
+  .bio-stack .bio-block-lede { font-size: 12.5px; }
+  .bio-stack .bio-phil-label { font-size: 24px; margin-bottom: 12px; }
+  .bio-stack .bio-phil-quote { font-size: 15px; }
+  .bio-stack .bio-philosophy p { font-size: 12.5px; line-height: 1.55; }
+  .bio-stack .tools-grid { gap: 6px; }
+  .bio-stack .tool { padding: 6px 9px; }
+  .bio-stack .tool-name { font-size: 10.5px; }
+  .bio-stack .tools-cat { font-size: 9px; letter-spacing: 0.12em; }
+  .bio-stack .langs-grid { grid-template-columns: 1fr 1fr; gap: 9px 14px; }
+  .bio-stack .lang-item h4 { font-size: 12.5px; }
+  .bio-stack .lang-item p { font-size: 9.5px; }
+  .bio-stack .orgs h4 { font-size: 13px; }
+  .bio-stack .orgs p { font-size: 10.5px; }
+  .bio-stack .services-grid { gap: 8px; }
+  .bio-stack .service { padding: 9px 10px; font-size: 11px; }
+  .bio-stack .cert-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .bio-stack .bio-social-title { font-size: 22px; }
+  .bio-stack .bio-social-desc { font-size: 12.5px; }
+  .bio-stack .bio-social-mark { width: 64px; height: 64px; font-size: 30px; }
+}
 /* Blog (mobile): inline preview that opens under a tapped row */
 .index-inline { padding: 12px 0 20px; border-bottom: 1px solid var(--line); animation: idxInlineIn 0.42s var(--ease-out); }
 .index-inline-img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 12px; background: var(--bg-2); margin-bottom: 12px; }
@@ -3792,6 +3820,9 @@ html:has(.dash.is-open) { overflow: hidden; }
   .hero { height: auto; min-height: calc(100svh - var(--dock-h)); scroll-snap-align: start; }
   .room-hero,
   .pencemor-hero { min-height: calc(100svh - var(--dock-h)); scroll-snap-align: start; }
+  /* dvh tracks Safari's collapsing URL bar — the hero always ends EXACTLY at the
+     dock, so a slice of the next section never peeks underneath. */
+  .hero, .room-hero, .pencemor-hero { min-height: calc(100dvh - var(--dock-h)); }
   /* Only the heroes snap — sections, gallery/cert grids and the footer are free. */
   .room > .section,
   .room > .section:has(#grid),

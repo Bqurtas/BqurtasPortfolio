@@ -74,29 +74,35 @@
     window.__bqOnScroll = onScroll;                                       // router calls this after navigating
     onScroll();
 
+    /* rAF glide — bulletproof on iOS, where native smooth scrollTo is sometimes
+       ignored right after touch momentum. Eases to the target, then hard-sets it. */
+    const glideTo = (target, ms) => {
+      const from = window.scrollY || (document.scrollingElement || document.documentElement).scrollTop || 0;
+      const d = target - from, t0 = performance.now();
+      const step = (now) => {
+        const t = Math.min((now - t0) / (ms || 480), 1);
+        const e = 1 - Math.pow(1 - t, 3);
+        window.scrollTo(0, Math.round(from + d * e));
+        if (t < 1) requestAnimationFrame(step);
+        else { window.scrollTo(0, target); onScroll(); }
+      };
+      requestAnimationFrame(step);
+    };
+
     toTop && toTop.addEventListener('click', () => {
-      /* glide to the ABSOLUTE top — suspend snap so it can't stop short, then
-         force exact 0 and restore. Reliable in every room, desktop + mobile. */
+      /* to the ABSOLUTE top in every room — snap suspended during the glide so
+         nothing can stop it short, then exact 0 is forced. */
       const h = document.documentElement;
       const prevSnap = h.style.scrollSnapType;
       h.style.scrollSnapType = 'none';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      let tries = 0;
-      const iv = setInterval(() => {
-        const y = window.scrollY || (document.scrollingElement || h).scrollTop || 0;
-        if (y <= 1 || ++tries > 100) {
-          clearInterval(iv);
-          window.scrollTo(0, 0);
-          h.style.scrollSnapType = prevSnap;
-          onScroll();
-        }
-      }, 60);
+      glideTo(0, 520);
+      setTimeout(() => { window.scrollTo(0, 0); h.style.scrollSnapType = prevSnap; onScroll(); }, 600);
     });
 
-    /* Mobile: FIRM hero snap in JS (CSS snap is unreliable on touch). When the
-       scroll settles with a room hero mostly in view but misaligned, glide it
-       to the top. Works for every hero in every room; galleries, sections and
-       the footer scroll completely free. */
+    /* Mobile: FIRM hero snap (pure JS — CSS snap and native smooth scrolling are
+       both unreliable on touch). When the scroll settles with a hero mostly in
+       view but misaligned, glide it exactly to the top. Every hero, every room;
+       galleries, sections and the footer stay completely free. */
     if (window.matchMedia('(max-width: 820px)').matches) {
       let st = null, gliding = false;
       const settleSnap = () => {
@@ -106,15 +112,17 @@
           const r = hero.getBoundingClientRect();
           if (!r.height) continue;                                  // hidden room
           const visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
-          if (visible > vh * 0.6 && Math.abs(r.top) > 3) {
+          if (visible > vh * 0.55 && Math.abs(r.top) > 3) {
             gliding = true;
-            window.scrollTo({ top: Math.max(0, (window.scrollY || 0) + r.top), behavior: 'smooth' });
-            setTimeout(() => { gliding = false; }, 900);
+            glideTo(Math.max(0, (window.scrollY || 0) + r.top), 460);
+            setTimeout(() => { gliding = false; }, 560);
             break;
           }
         }
       };
-      window.addEventListener('scroll', () => { clearTimeout(st); st = setTimeout(settleSnap, 160); }, { passive: true });
+      const queue = () => { clearTimeout(st); st = setTimeout(settleSnap, 150); };
+      window.addEventListener('scroll', queue, { passive: true });
+      window.addEventListener('touchend', queue, { passive: true });
     }
   })();
 
