@@ -1652,10 +1652,8 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
        is ever cut off: if a card's content is taller it scrolls quietly inside
        (no visible scrollbar). */
     height: min(84vh, 800px);
-    overflow-y: auto; overflow-x: hidden;
-    scrollbar-width: none;
+    overflow: hidden;
   }
-  .bio-stack > .bio-block::-webkit-scrollbar { display: none; }
   /* social cards already use a horizontal flex — keep it centred in the tall card */
   .bio-stack > .bio-social { align-items: center; }
   /* compact the experience timeline so it fits one card */
@@ -1705,10 +1703,8 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
        nothing is ever cut off: taller content scrolls quietly inside the card
        (no visible scrollbar). */
     height: min(80vh, 650px);
-    overflow-y: auto; overflow-x: hidden;
-    scrollbar-width: none;
+    overflow: hidden;
   }
-  .bio-stack > .bio-block::-webkit-scrollbar { display: none; }
   :root[data-theme="dark"] .bio-stack > .bio-block { background: var(--bg-2); }
   .bio-stack > .bio-social { align-items: center; text-align: center; }
   /* compact the timeline so the experience card fits */
@@ -2659,7 +2655,8 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   .bio-stack .orgs p { font-size: 10.5px; }
   .bio-stack .services-grid { gap: 8px; }
   .bio-stack .service { padding: 9px 10px; font-size: 11px; }
-  .bio-stack .cert-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .bio-stack .cert-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .bio-stack .index-preview { display: none; }   /* honors: list only on phones — the big preview card can't fit */
   .bio-stack .bio-social-title { font-size: 22px; }
   .bio-stack .bio-social-desc { font-size: 12.5px; }
   .bio-stack .bio-social-mark { width: 64px; height: 64px; font-size: 30px; }
