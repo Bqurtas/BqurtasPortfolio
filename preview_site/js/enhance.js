@@ -26,16 +26,13 @@
     const fill = $('#splashFill');
     const pct  = $('#splashPct');
     const start = performance.now();
-    const PASS = 720, PASSES = 2, TOTAL = PASS * PASSES;   // the line sweeps twice before it opens
+    const DUR = 1100;   // a single, smooth sweep 0 → 100
 
     const tick = (now) => {
-      const e = now - start;
-      const t = Math.min(e / TOTAL, 1);
-      // percent counts smoothly 0→100 once across both sweeps
-      if (pct) pct.textContent = String(Math.round((1 - Math.pow(1 - t, 2)) * 100)).padStart(2, '0');
-      // line fills 0→100, resets, then fills 0→100 again
-      const inPass = Math.min((e % PASS) / PASS, 1);
-      if (fill) fill.style.width = (t >= 1 ? 100 : Math.round((1 - Math.pow(1 - inPass, 2)) * 100)) + '%';
+      const t = Math.min((now - start) / DUR, 1);
+      const v = Math.round((1 - Math.pow(1 - t, 2)) * 100);
+      if (fill) fill.style.width = v + '%';
+      if (pct)  pct.textContent = String(v).padStart(2, '0');
       if (t < 1) requestAnimationFrame(tick);
       else finish();
     };

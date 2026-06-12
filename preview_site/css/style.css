@@ -1677,6 +1677,10 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   .bio-stack > .bio-block:nth-child(8) { top: 170px; }
   .bio-stack > .bio-block:nth-child(9) { top: 182px; }
   .bio-stack > .bio-block:nth-child(10) { top: 194px; }
+  .bio-stack > .bio-block:nth-child(11) { top: 206px; }
+  .bio-stack > .bio-block:nth-child(12) { top: 218px; }
+  .bio-stack > .bio-block:nth-child(13) { top: 230px; }
+  .bio-stack > .bio-block:nth-child(14) { top: 242px; }
   .bio-stack > .bio-block:last-child { margin-bottom: 0; }
   /* the honours index inside a card: drop its own sticky to avoid nesting */
   .bio-stack .index-preview { position: relative; top: 0; align-self: stretch; }
