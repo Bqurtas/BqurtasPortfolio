@@ -74,8 +74,48 @@
     window.__bqOnScroll = onScroll;                                       // router calls this after navigating
     onScroll();
 
-    toTop && toTop.addEventListener('click', () =>
-      window.scrollTo({ top: 0, behavior: 'smooth' }));
+    toTop && toTop.addEventListener('click', () => {
+      /* glide to the ABSOLUTE top — suspend snap so it can't stop short, then
+         force exact 0 and restore. Reliable in every room, desktop + mobile. */
+      const h = document.documentElement;
+      const prevSnap = h.style.scrollSnapType;
+      h.style.scrollSnapType = 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      let tries = 0;
+      const iv = setInterval(() => {
+        const y = window.scrollY || (document.scrollingElement || h).scrollTop || 0;
+        if (y <= 1 || ++tries > 100) {
+          clearInterval(iv);
+          window.scrollTo(0, 0);
+          h.style.scrollSnapType = prevSnap;
+          onScroll();
+        }
+      }, 60);
+    });
+
+    /* Mobile: FIRM hero snap in JS (CSS snap is unreliable on touch). When the
+       scroll settles with a room hero mostly in view but misaligned, glide it
+       to the top. Works for every hero in every room; galleries, sections and
+       the footer scroll completely free. */
+    if (window.matchMedia('(max-width: 820px)').matches) {
+      let st = null, gliding = false;
+      const settleSnap = () => {
+        if (gliding) return;
+        const vh = window.innerHeight;
+        for (const hero of document.querySelectorAll('.room-hero, .pencemor-hero, .hero')) {
+          const r = hero.getBoundingClientRect();
+          if (!r.height) continue;                                  // hidden room
+          const visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+          if (visible > vh * 0.6 && Math.abs(r.top) > 3) {
+            gliding = true;
+            window.scrollTo({ top: Math.max(0, (window.scrollY || 0) + r.top), behavior: 'smooth' });
+            setTimeout(() => { gliding = false; }, 900);
+            break;
+          }
+        }
+      };
+      window.addEventListener('scroll', () => { clearTimeout(st); st = setTimeout(settleSnap, 160); }, { passive: true });
+    }
   })();
 
   /* =======================================================
