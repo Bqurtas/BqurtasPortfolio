@@ -651,7 +651,9 @@ button.social-opt { background: none; border: none; cursor: pointer; font-family
 }
 .mobile-menu.is-open { opacity: 1; pointer-events: auto; }
 /* the scroll-to-top control hides while the menu is open */
-body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform: scale(0.8); }
+/* hide the button only while the mobile menu is REALLY open (:has reads the menu's
+   actual state — a stale body class can never strand the button hidden again) */
+body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: none; transform: scale(0.8); }
 
 .mobile-sheet {
   position: absolute; left: 0; right: 0; bottom: var(--dock-h);   /* sits on top of the dock */
@@ -2633,9 +2635,9 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
 .bio-doc-text small { color: var(--ink-soft); font-size: 12.5px; margin-top: 2px; }
 .bio-doc-go { color: var(--ink-muted); font-size: 13px; flex-shrink: 0; }
 @media (max-width: 600px) { .bio-docs { grid-template-columns: 1fr; gap: 12px; margin-top: 30px; } }
-/* Social card mark colours */
-.bio-social--linkedin .bio-social-mark { color: #0a66c2; }
-.bio-social--google .bio-social-mark { color: #4285f4; }
+/* Google card brand colour (LinkedIn/Behance set theirs next to the card styles).
+   The mark keeps its WHITE icon on the brand background — never brand-on-brand. */
+.bio-social--google { --brand: #4285f4; }
 /* Mobile: COMPACT the bio-card contents so everything FITS the equal cards —
    smaller type and tighter grids instead of clipping anything. */
 @media (max-width: 820px) {
