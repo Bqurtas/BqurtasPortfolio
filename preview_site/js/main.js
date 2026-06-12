@@ -70,7 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mobile language button cycles open the mobile menu
   const langToggleM = document.getElementById('langToggleM');
   langToggleM?.addEventListener('click', () => {
-    document.getElementById('mobileMenu')?.classList.toggle('is-open');
+    const m = document.getElementById('mobileMenu');
+    m?.classList.toggle('is-open');
+    document.body.classList.toggle('menu-open', !!m && m.classList.contains('is-open'));   // keep body in sync — it hides .to-top
   });
 
   // Initial language: ALWAYS English by default — only a /lang prefix in the
@@ -128,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
     syncURL(push);
     setDocTitle();
     document.getElementById('mobileMenu')?.classList.remove('is-open');
+    document.body.classList.remove('menu-open');   // body.menu-open force-hides .to-top — if it lingers, the button never comes back
     document.body.style.overflow = '';
     if (window.__bqToggleCta) window.__bqToggleCta();
     requestAnimationFrame(() => { if (window.__bqOnScroll) window.__bqOnScroll(); });   // refresh the back-to-top button on every room change
