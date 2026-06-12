@@ -3726,9 +3726,9 @@ html:has(.dash.is-open) { overflow: hidden; }
 /* ---------- Enhancement responsive ---------- */
 @media (max-width: 820px) {
   .rail-card { display: none; }
-  /* Bottom-LEFT on mobile: the right edge is where floating widgets (AI browser
-     extensions, chat bubbles) live and they can swallow the tap — the left is clear. */
-  .to-top, [dir="rtl"] .to-top { bottom: calc(var(--dock-h) + 16px); left: 16px; right: auto; width: 46px; height: 46px; z-index: 950; }
+  /* Bottom-right on mobile (like desktop) — z-index raised so the tap always lands. */
+  .to-top { bottom: calc(var(--dock-h) + 16px); right: 16px; left: auto; width: 46px; height: 46px; z-index: 950; }
+  [dir="rtl"] .to-top { right: auto; left: 16px; }
   .to-top-ring { width: 44px; height: 44px; }
   .chat { top: auto; bottom: var(--dock-h); left: 0; right: 0; width: 100%; height: 62vh; max-height: 62vh; border-radius: 24px 24px 0 0; transform-origin: bottom center; }
   [dir="rtl"] .chat { right: 0; left: 0; }
@@ -3767,19 +3767,20 @@ html:has(.dash.is-open) { overflow: hidden; }
    nearest screen/section when you let go. Mandatory traps tall grids on touch,
    so we never use it here. */
 @media (max-width: 820px) {
-  /* Snap removed on mobile — it wasn't solid enough on touch, so phones just
-     scroll normally now. (Desktop keeps the section snap below.) */
-  html { scroll-snap-type: none; scroll-padding-top: 0; }
+  /* Mobile: gentle PROXIMITY snap on the HEROES ONLY — the room intros are striking,
+     so the page settles onto them; everything else (galleries, sections, footer)
+     scrolls completely freely and never traps your thumb. */
+  html { scroll-snap-type: y proximity; scroll-padding-top: 0; }
   .hero { height: auto; min-height: calc(100svh - var(--dock-h)); scroll-snap-align: start; }
   .room-hero,
   .pencemor-hero { min-height: calc(100svh - var(--dock-h)); scroll-snap-align: start; }
-  .room > .section { scroll-snap-align: start; }
-  /* The gallery / certificate grids are far taller than the screen — never make
-     them snap targets, so the works always scroll freely under your thumb. */
+  /* Only the heroes snap — sections, gallery/cert grids and the footer are free. */
+  .room > .section,
   .room > .section:has(#grid),
-  .room > .section:has(#certGrid) { scroll-snap-align: none; }
-  #grid, .grid, .cert-grid { scroll-snap-align: none; }
-  .footer { scroll-snap-align: start; padding-bottom: 20px; }   /* .main already reserves --dock-h; don't double it */
+  .room > .section:has(#certGrid),
+  #grid, .grid, .cert-grid,
+  .footer { scroll-snap-align: none; }
+  .footer { padding-bottom: 20px; }   /* .main already reserves --dock-h; don't double it */
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-snap-type: none; }
