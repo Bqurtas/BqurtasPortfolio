@@ -1669,8 +1669,9 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
   .bio-stack .tl-skills { margin-top: 8px; padding-top: 8px; font-size: 11px; }
   .bio-stack .tl-dot { width: 14px; height: 14px; top: 16px; }
   .bio-stack .bio-block-title { margin-bottom: 22px; padding-bottom: 12px; }
-  /* 16 certificates at 4-up overflow the equal card — 6-up fits in 3 rows */
-  .bio-stack .cert-grid { grid-template-columns: repeat(6, 1fr); gap: 12px; }
+  /* 16 certificates: 8-up = 2 rows — the only layout that fits the equal card
+     (the certs are portrait, so rows are tall); the lightbox shows them big */
+  .bio-stack .cert-grid { grid-template-columns: repeat(8, 1fr); gap: 10px; }
   :root[data-theme="dark"] .bio-stack > .bio-block { background: var(--bg-2); }
   /* incremental tops → a small peek of each stacked card */
   .bio-stack > .bio-block:nth-child(1) { top: 86px; }
