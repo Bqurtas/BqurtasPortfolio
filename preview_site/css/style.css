@@ -2644,9 +2644,9 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   .bio-stack .bio-phil-label { font-size: 24px; margin-bottom: 12px; }
   .bio-stack .bio-phil-quote { font-size: 15px; }
   .bio-stack .bio-philosophy p { font-size: 12.5px; line-height: 1.55; }
-  .bio-stack .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
-  .bio-stack .tool { padding: 5px 6px; }
-  .bio-stack .tool-ic { width: 15px; min-width: 15px; font-size: 11px; }
+  .bio-stack .tools-grid { gap: 8px 14px; }
+  .bio-stack .tool { padding: 4px 7px; gap: 5px; }
+  .bio-stack .tool-ic { display: none; }           /* names only — chips pack tighter */
   .bio-stack .tool-name { font-size: 9.5px; }
   .bio-stack .tools-cat { font-size: 9px; letter-spacing: 0.12em; margin-bottom: 4px; }
   .bio-stack .tools-group { margin-bottom: 10px; }
@@ -2661,7 +2661,7 @@ body.menu-open .to-top { opacity: 0 !important; pointer-events: none; transform:
   .bio-stack .orgs p { font-size: 10.5px; }
   .bio-stack .services-grid { gap: 8px; }
   .bio-stack .service { padding: 9px 10px; font-size: 11px; }
-  .bio-stack .cert-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .bio-stack .cert-grid { grid-template-columns: repeat(5, 1fr); gap: 5px; }
   .bio-stack .index-preview { display: none; }   /* honors: list only on phones — the big preview card can't fit */
   .bio-stack .bio-social-title { font-size: 22px; }
   .bio-stack .bio-social-desc { font-size: 12.5px; }
