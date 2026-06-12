@@ -73,6 +73,20 @@
     window.addEventListener('popstate', () => setTimeout(onScroll, 140)); // re-check after back/forward room change
     window.__bqOnScroll = onScroll;                                       // router calls this after navigating
     onScroll();
+    /* Belt & braces: some environments (in-app browsers, extensions patching the
+       scroll APIs) swallow 'scroll' events entirely. A tiny rAF watcher reads the
+       REAL scroll position every frame, so the button, rail-progress and hero-snap
+       can never go blind — on any device. */
+    let lastWatchY = -1;
+    (function watchScroll() {
+      const y = window.scrollY || (document.scrollingElement || document.documentElement).scrollTop || 0;
+      if (y !== lastWatchY) {
+        lastWatchY = y;
+        onScroll();
+        if (window.__bqQueueSnap) window.__bqQueueSnap();
+      }
+      requestAnimationFrame(watchScroll);
+    })();
 
     /* rAF glide — bulletproof on iOS, where native smooth scrollTo is sometimes
        ignored right after touch momentum. Eases to the target, then hard-sets it. */
@@ -123,6 +137,7 @@
       const queue = () => { clearTimeout(st); st = setTimeout(settleSnap, 150); };
       window.addEventListener('scroll', queue, { passive: true });
       window.addEventListener('touchend', queue, { passive: true });
+      window.__bqQueueSnap = queue;   // the rAF scroll-watcher drives this too (event-less browsers)
     }
   })();
 
