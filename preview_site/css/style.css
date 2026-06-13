@@ -590,6 +590,7 @@ button.social-opt { background: none; border: none; cursor: pointer; font-family
 }
 .mobilebar-btn {
   width: 46px; height: 46px; border-radius: 50%;
+  flex: 0 0 auto; aspect-ratio: 1 / 1; box-sizing: border-box;   /* never let the row squeeze a circle into an oval */
   display: flex; align-items: center; justify-content: center;
   border: 1px solid var(--line); background: var(--surface);
   color: var(--gold-ink); font-size: 16px;
