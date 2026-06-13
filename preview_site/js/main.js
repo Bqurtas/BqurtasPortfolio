@@ -914,3 +914,34 @@ document.addEventListener('DOMContentLoaded', () => {
     if ((e.ctrlKey || e.metaKey) && (k === 'u' || k === 's')) { e.preventDefault(); return; }
   });
 })();
+
+/* =========================================================
+   COOKIE NOTICE — calm, dismissible, self-closing after 30s
+   ========================================================= */
+(function cookieNotice() {
+  const card = document.getElementById('cookieCard');
+  if (!card) return;
+  const ok = document.getElementById('cookieOk');
+  let accepted = false, seenThisSession = false;
+  try { accepted = !!localStorage.getItem('bq_cookie_ok'); } catch (e) {}
+  try { seenThisSession = !!sessionStorage.getItem('bq_cookie_seen'); } catch (e) {}
+  if (accepted || seenThisSession) return;            // already handled — stay quiet
+
+  let autoT = null;
+  const hide = (persist) => {
+    clearTimeout(autoT);
+    card.classList.remove('is-shown');
+    card.setAttribute('aria-hidden', 'true');
+    try { sessionStorage.setItem('bq_cookie_seen', '1'); } catch (e) {}   // don't re-nag this visit
+    if (persist) { try { localStorage.setItem('bq_cookie_ok', '1'); } catch (e) {} }  // "Got it" → never again
+  };
+  const show = () => {
+    card.classList.add('is-shown');
+    card.setAttribute('aria-hidden', 'false');
+    autoT = setTimeout(() => hide(false), 30000);     // 30s of no interaction → close itself
+  };
+
+  ok && ok.addEventListener('click', () => hide(true));
+  /* show a moment after load so it doesn't fight the splash */
+  setTimeout(show, 1400);
+})();

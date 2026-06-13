@@ -262,6 +262,7 @@ window.I18N = {
     'li.desc': 'Deneyim, tavsiyeler ve mesleki kayıtlar güncel ve işbirliğine açık tutuldu.',
     'be.eye': 'Portföy · Yaratıcı Ağ',
     'go.eye': 'Arama · Bilgi Paneli', 'go.title': 'Google’da <em>Barakat</em>', 'go.desc': 'Barakat Qurtas’ı Google’da bulun — profil, seçilmiş işler ve web’deki varlığı.',
+    'ck.title': 'Çerezler', 'ck.text': 'Bu site, trafiği ölçmek ve deneyiminizi geliştirmek için çerez kullanır.', 'ck.accept': 'Anladım',
     'be.desc': 'Tüm yaratıcı portföy; projeler, vaka çalışmaları ve devam eden çalışmalar tek bir yerde toplanmıştır.',
     'float.album': '{n} çalışıyor · açmak için tıklayın',
     'be.title': '<em>Behance</em>\'de Barakat',
@@ -490,6 +491,7 @@ window.I18N = {
     'li.desc': 'Erfarenhet, rekommendationer och yrkeskunskaper – hålls aktuella och öppna för samarbete.',
     'be.eye': 'Portfölj · Kreativt nätverk',
     'go.eye': 'Sök · Kunskapspanel', 'go.title': 'Barakat på <em>Google</em>', 'go.desc': 'Hitta Barakat Qurtas på Google — profil, utvalda arbeten och närvaro på webben.',
+    'ck.title': 'Cookies', 'ck.text': 'Denna webbplats använder cookies för att mäta trafik och förbättra din upplevelse.', 'ck.accept': 'Jag förstår',
     'be.desc': 'Hela kreativa portföljen – projekt, fallstudier och pågående arbeten samlade på ett ställe.',
     'float.album': '{n} fungerar · klicka för att öppna',
     'be.title': 'Barakat på <em>Behance</em>',
@@ -1317,6 +1319,7 @@ window.I18N_EXTRA_B = {
   "soc.open": "Open",
   "be.eye": "Portfolio · Creative Network",
   "go.eye": "Search · Knowledge Panel", "go.title": "Barakat on <em>Google</em>", "go.desc": "Find Barakat Qurtas on Google — profile, selected work, and presence across the web.",
+  "ck.title": "Cookies", "ck.text": "This site uses cookies to measure traffic and improve your experience.", "ck.accept": "Got it",
   "be.title": "Barakat on <em>Behance</em>",
   "be.desc": "The full creative portfolio — projects, case studies, and work in progress, curated in one place."
  },
@@ -1383,6 +1386,7 @@ window.I18N_EXTRA_B = {
   "soc.open": "کردنەوە",
   "be.eye": "پۆرتفۆلیۆ · تۆڕی داهێنەران",
   "go.eye": "گەڕان · پانێڵی زانیاری", "go.title": "بەرکەت لە <em>گووگڵ</em>", "go.desc": "بەرکەت قورتاس لە گووگڵ بدۆزەرەوە — پرۆفایل، کارە هەڵبژێردراوەکان و ئامادەیی لەسەر تۆڕ.",
+  "ck.title": "کووکی", "ck.text": "ئەم ماڵپەڕە کووکی بەکاردەهێنێت بۆ پێوانەی ڕێبواری و باشترکردنی ئەزموونەکەت.", "ck.accept": "تێگەیشتم",
   "be.title": "بەرەکات لە <em>Behance</em>",
   "be.desc": "پۆرتفۆلیۆی داهێنەرانەی تەواو — پڕۆژە، لێکۆڵینەوەی حاڵەت، و کاری بەردەوام، لە یەک شوێندا کۆکراوەتەوە."
  },
@@ -1449,6 +1453,7 @@ window.I18N_EXTRA_B = {
   "soc.open": "Veke",
   "be.eye": "Portfolyo · Tora Afirîner",
   "go.eye": "Lêgerîn · Panela Zanînê", "go.title": "Barakat li <em>Google</em>", "go.desc": "Barakat Qurtas li Google bibîne — profîl, karên bijartî û hebûna li ser torê.",
+  "ck.title": "Çerez", "ck.text": "Ev malper çerez bikar tîne da ku trafîkê bipîve û ezmûna te baştir bike.", "ck.accept": "Fêhm kir",
   "be.title": "Barakat li <em>Behance</em>",
   "be.desc": "Portfolyoya afirîner a temam — proje, lêkolînên rewşê, û karê berdewam, li yek cî berhevkirî."
  },
@@ -1515,6 +1520,7 @@ window.I18N_EXTRA_B = {
   "soc.open": "فتح",
   "be.eye": "بورتفوليو · شبكة إبداعية",
   "go.eye": "بحث · لوحة المعرفة", "go.title": "بركات على <em>جوجل</em>", "go.desc": "اعثر على بركات قورتاس في جوجل — الملف الشخصي، أعمال مختارة، وحضوره على الويب.",
+  "ck.title": "ملفات الارتباط", "ck.text": "يستخدم هذا الموقع ملفات تعريف الارتباط لقياس الزيارات وتحسين تجربتك.", "ck.accept": "حسناً",
   "be.title": "بركات على <em>Behance</em>",
   "be.desc": "البورتفوليو الإبداعي الكامل — مشاريع ودراسات حالة وأعمال جارية، مجموعة في مكان واحد."
  },
@@ -1581,6 +1587,7 @@ window.I18N_EXTRA_B = {
   "soc.open": "Ouvrir",
   "be.eye": "Portfolio · Réseau créatif",
   "go.eye": "Recherche · Fiche Google", "go.title": "Barakat sur <em>Google</em>", "go.desc": "Retrouvez Barakat Qurtas sur Google — profil, travaux choisis et présence sur le web.",
+  "ck.title": "Cookies", "ck.text": "Ce site utilise des cookies pour mesurer le trafic et améliorer votre expérience.", "ck.accept": "J’ai compris",
   "be.title": "Barakat sur <em>Behance</em>",
   "be.desc": "Le portfolio créatif complet — projets, études de cas et travaux en cours, réunis en un seul endroit."
  }
