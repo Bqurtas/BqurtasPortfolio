@@ -590,11 +590,16 @@
 
     let greeted = false;
     const backdrop = $('#chatBackdrop');
+    /* a quiet minute with no interaction → the chat closes itself */
+    let idleT = null;
+    const armIdle = () => { clearTimeout(idleT); idleT = setTimeout(() => close(), 60000); };
     const open = () => {
+      if (window.__bqExclusive) window.__bqExclusive('chat');   // opening the chat closes Latest/menu/popovers
       panel.classList.add('is-open');
       backdrop && backdrop.classList.add('is-open');
       triggers.forEach(t => t.classList.add('is-active'));
       panel.setAttribute('aria-hidden', 'false');
+      armIdle();
       if (!greeted) {
         greeted = true;
         const hadHistory = restore();
@@ -604,11 +609,16 @@
       setTimeout(() => input.focus(), 300);
     };
     const close = () => {
+      clearTimeout(idleT);
       panel.classList.remove('is-open');
       backdrop && backdrop.classList.remove('is-open');
       triggers.forEach(t => t.classList.remove('is-active'));
       panel.setAttribute('aria-hidden', 'true');
     };
+    ['pointerdown', 'keydown', 'touchstart'].forEach((ev) =>
+      panel.addEventListener(ev, () => { if (panel.classList.contains('is-open')) armIdle(); }, { passive: true }));
+    window.__bqPanels = window.__bqPanels || {};
+    window.__bqPanels.chat = close;
     triggers.forEach(t => t.addEventListener('click', () => panel.classList.contains('is-open') ? close() : open()));
     min && min.addEventListener('click', close);
     backdrop && backdrop.addEventListener('click', close);
@@ -2078,8 +2088,15 @@
   const GH = 'https://api.github.com/repos/Bqurtas/BqurtasPortfolio';
   const CDN = (window.BQ_GALLERY && window.BQ_GALLERY.CDN_BASE) || '';
 
-  const open = () => { panel.classList.add('is-open'); panel.setAttribute('aria-hidden', 'false'); backdrop && backdrop.classList.add('is-open'); };
-  const close = () => { panel.classList.remove('is-open'); panel.setAttribute('aria-hidden', 'true'); backdrop && backdrop.classList.remove('is-open'); };
+  /* a quiet minute with no interaction → Latest closes itself */
+  let idleT = null;
+  const armIdle = () => { clearTimeout(idleT); idleT = setTimeout(() => close(), 60000); };
+  const open = () => { if (window.__bqExclusive) window.__bqExclusive('latest'); panel.classList.add('is-open'); panel.setAttribute('aria-hidden', 'false'); backdrop && backdrop.classList.add('is-open'); armIdle(); };
+  const close = () => { clearTimeout(idleT); panel.classList.remove('is-open'); panel.setAttribute('aria-hidden', 'true'); backdrop && backdrop.classList.remove('is-open'); };
+  ['pointerdown', 'touchstart', 'wheel'].forEach((ev) =>
+    panel.addEventListener(ev, () => { if (panel.classList.contains('is-open')) armIdle(); }, { passive: true }));
+  window.__bqPanels = window.__bqPanels || {};
+  window.__bqPanels.latest = close;
   const toggle = () => (panel.classList.contains('is-open') ? close() : open());
   const setBadge = () => { const on = (items.length + workItems.length + pinItems.length) > 0; if (badge) badge.hidden = !on; if (badgeM) badgeM.hidden = !on; };
 

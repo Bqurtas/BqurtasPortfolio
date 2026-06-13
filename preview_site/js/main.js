@@ -72,7 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
   langToggleM?.addEventListener('click', () => {
     const m = document.getElementById('mobileMenu');
     m?.classList.toggle('is-open');
-    document.body.classList.toggle('menu-open', !!m && m.classList.contains('is-open'));   // keep body in sync — it hides .to-top
+    const nowOpen = !!m && m.classList.contains('is-open');
+    document.body.classList.toggle('menu-open', nowOpen);   // keep body in sync — it hides .to-top
+    if (nowOpen && window.__bqExclusive) window.__bqExclusive('menu');
   });
 
   // Initial language: ALWAYS English by default — only a /lang prefix in the
@@ -220,10 +222,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const menuBtn = document.getElementById('menuToggle');
   const mobileMenu = document.getElementById('mobileMenu');
   const setMenu = (open) => {
+    if (open && window.__bqExclusive) window.__bqExclusive('menu');   // opening the menu closes chat/Latest/popovers
     mobileMenu?.classList.toggle('is-open', open);
     document.body.classList.toggle('menu-open', open);
     document.body.style.overflow = open ? 'hidden' : '';
   };
+  window.__bqPanels = window.__bqPanels || {};
+  window.__bqPanels.menu = () => setMenu(false);
   menuBtn?.addEventListener('click', () => setMenu(!mobileMenu?.classList.contains('is-open')));
   document.getElementById('mobileMenuClose')?.addEventListener('click', () => setMenu(false));
   mobileMenu?.addEventListener('click', (e) => { if (e.target === mobileMenu) setMenu(false); });
@@ -255,18 +260,26 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('pointerup', () => { if (dragging) onUp(); });
   }
 
-  /* ---------- MOBILE BOTTOM-BAR POPUPS (language · socials) ---------- */
+  /* ---------- MOBILE BOTTOM-BAR POPUPS (language · socials) ----------
+     Every floating panel (chat · Latest · menu · these popovers) is EXCLUSIVE:
+     opening one closes all the others, through a tiny shared registry. */
+  window.__bqPanels = window.__bqPanels || {};
+  window.__bqExclusive = window.__bqExclusive || ((except) => {
+    Object.keys(window.__bqPanels).forEach((k) => { if (k !== except) { try { window.__bqPanels[k](); } catch (e) {} } });
+  });
   const langPop = document.getElementById('langPop');
   const socialPop = document.getElementById('socialPop');
   const closePops = (except) => {
     if (langPop && except !== 'lang') langPop.classList.remove('is-open');
     if (socialPop && except !== 'social') socialPop.classList.remove('is-open');
   };
+  window.__bqPanels.lang = () => langPop && langPop.classList.remove('is-open');
+  window.__bqPanels.social = () => socialPop && socialPop.classList.remove('is-open');
   document.getElementById('langPopBtn')?.addEventListener('click', (e) => {
-    e.stopPropagation(); closePops('lang'); langPop?.classList.toggle('is-open');
+    e.stopPropagation(); window.__bqExclusive('lang'); langPop?.classList.toggle('is-open');
   });
   document.getElementById('socialPopBtn')?.addEventListener('click', (e) => {
-    e.stopPropagation(); closePops('social'); socialPop?.classList.toggle('is-open');
+    e.stopPropagation(); window.__bqExclusive('social'); socialPop?.classList.toggle('is-open');
   });
   langPop?.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => langPop.classList.remove('is-open')));
   document.addEventListener('click', (e) => { if (!e.target.closest('.mobilebar-pop-wrap')) closePops(); });
