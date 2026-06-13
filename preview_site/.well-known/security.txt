@@ -1,0 +1,4 @@
+Contact: mailto:info@bqurtas.com
+Preferred-Languages: en, ckb, ar
+Canonical: https://bqurtas.com/.well-known/security.txt
+Expires: 2027-06-14T00:00:00.000Z

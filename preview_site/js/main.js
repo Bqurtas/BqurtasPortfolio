@@ -922,23 +922,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const card = document.getElementById('cookieCard');
   if (!card) return;
   const ok = document.getElementById('cookieOk');
-  let accepted = false, seenThisSession = false;
+  let accepted = false;
   try { accepted = !!localStorage.getItem('bq_cookie_ok'); } catch (e) {}
-  try { seenThisSession = !!sessionStorage.getItem('bq_cookie_seen'); } catch (e) {}
-  if (accepted || seenThisSession) return;            // already handled — stay quiet
+  if (accepted) return;                               // already accepted — never show again
 
   let autoT = null;
   const hide = (persist) => {
     clearTimeout(autoT);
     card.classList.remove('is-shown');
     card.setAttribute('aria-hidden', 'true');
-    try { sessionStorage.setItem('bq_cookie_seen', '1'); } catch (e) {}   // don't re-nag this visit
-    if (persist) { try { localStorage.setItem('bq_cookie_ok', '1'); } catch (e) {} }  // "Got it" → never again
+    // only "Got it" makes it permanent — a 30s auto-close does NOT, so the visitor
+    // still gets the chance to accept on the next page load
+    if (persist) { try { localStorage.setItem('bq_cookie_ok', '1'); } catch (e) {} }
   };
   const show = () => {
     card.classList.add('is-shown');
     card.setAttribute('aria-hidden', 'false');
-    autoT = setTimeout(() => hide(false), 30000);     // 30s of no interaction → close itself
+    autoT = setTimeout(() => hide(false), 30000);     // 30s of no interaction → close itself (temporarily)
   };
 
   ok && ok.addEventListener('click', () => hide(true));
