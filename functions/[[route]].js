@@ -97,7 +97,7 @@ export async function onRequest(context) {
     "font-src 'self' data: https://cdn.jsdelivr.net",
     "img-src 'self' data: blob: https://cdn.jsdelivr.net https://raw.githubusercontent.com https://images.weserv.nl https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com https://www.facebook.com",
     "media-src 'self' blob: https://cdn.jsdelivr.net https://raw.githubusercontent.com",
-    "connect-src 'self' https://cloud.umami.is https://api.umami.is https://*.supabase.co https://api.github.com https://api.web3forms.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://connect.facebook.net https://www.facebook.com https://cdn.jsdelivr.net https://raw.githubusercontent.com",
+    "connect-src 'self' https://cloud.umami.is https://api.umami.is https://gateway.umami.is https://*.supabase.co https://api.github.com https://api.web3forms.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://connect.facebook.net https://www.facebook.com https://cdn.jsdelivr.net https://raw.githubusercontent.com",
     "frame-src 'self' https://www.facebook.com https://connect.facebook.net",
     "worker-src 'self' blob:"
   ].join('; ');
