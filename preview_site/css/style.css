@@ -2657,7 +2657,8 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
   .bio-stack .tool-name { font-size: 8.5px; }
   .bio-stack .tools-cat { font-size: 9px; letter-spacing: 0.12em; margin-bottom: 4px; }
   .bio-stack .tools-group { margin-bottom: 10px; }
-  .bio-stack .tools-typing { display: none; }      /* save the room — the chips tell the story */
+  .bio-stack .tools-typing { display: flex; margin-top: 14px; padding-top: 12px; font-size: 11px; gap: 8px; }
+  .bio-stack .tools-typing i { font-size: 14px; }
   .bio-stack .tl-skills { display: none; }         /* experience: keep role+place+desc, drop the tag row */
   .bio-stack .tl-desc { font-size: 11px; }
   .bio-stack .cert-label { font-size: 7.5px; letter-spacing: 0.08em; margin-top: 3px; }
