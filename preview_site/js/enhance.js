@@ -73,6 +73,21 @@
     window.addEventListener('popstate', () => setTimeout(onScroll, 140)); // re-check after back/forward room change
     window.__bqOnScroll = onScroll;                                       // router calls this after navigating
     onScroll();
+
+    /* In-app browsers (Google app, Gmail, Instagram webviews) sometimes DON'T
+       update CSS `dvh` when their toolbar collapses/expands, leaving the hero
+       too short → a blank gap below it. We mirror the REAL window.innerHeight
+       into a `--app-vh` custom property; the hero CSS uses it with a `100dvh`
+       fallback, so normal browsers are unchanged and webviews get the right
+       height that tracks the toolbar. */
+    const setAppVh = () => {
+      const h = window.innerHeight;
+      if (h > 200) document.documentElement.style.setProperty('--app-vh', h + 'px');
+    };
+    setAppVh();
+    window.addEventListener('resize', setAppVh, { passive: true });
+    window.addEventListener('orientationchange', () => setTimeout(setAppVh, 120));
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', setAppVh, { passive: true });
     /* Belt & braces: some environments (in-app browsers, extensions patching the
        scroll APIs) swallow 'scroll' events entirely. A tiny rAF watcher reads the
        REAL scroll position every frame, so the button, rail-progress and hero-snap

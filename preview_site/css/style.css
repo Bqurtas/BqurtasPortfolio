@@ -3846,6 +3846,9 @@ html:has(.dash.is-open) { overflow: hidden; }
   /* dvh tracks Safari's collapsing URL bar — the hero always ends EXACTLY at the
      dock, so a slice of the next section never peeks underneath. */
   .hero, .room-hero, .pencemor-hero { min-height: calc(100dvh - var(--dock-h)); }
+  /* --app-vh = the REAL window.innerHeight (set by enhance.js), used where a
+     webview's dvh is stale; falls back to 100dvh when JS hasn't set it yet. */
+  .hero, .room-hero, .pencemor-hero { min-height: calc(var(--app-vh, 100dvh) - var(--dock-h)); }
   /* Only the heroes snap — sections, gallery/cert grids and the footer are free. */
   .room > .section,
   .room > .section:has(#grid),
