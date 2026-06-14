@@ -1822,7 +1822,6 @@
       if (rd.scroll) rd.scroll.scrollTop = 0;
       if (rd.top) rd.top.classList.remove('is-shown');
       try { document.title = String(q.title || '').replace(/<[^>]+>/g, '') + ' — Barakat Qurtas'; } catch (e) {}
-      try { if (window.fbq) fbq('track', 'ViewContent', { content_type: 'article', content_name: String(q.title || '').replace(/<[^>]+>/g, '') }); } catch (e) {}
       if (!fromPop) { try { history.pushState({ bqPost: curSlug }, '', blogBase() + '/' + curSlug); } catch (e) {} }
     };
     /* "More from the journal" grid + prev/next post navigation */
