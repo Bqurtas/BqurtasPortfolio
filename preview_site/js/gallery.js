@@ -206,9 +206,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     article.dataset.title = dispTitle;
     article.dataset.type  = item.type;
 
-    // On phones, load a lighter resized copy; desktop & video keep the original full file.
+    // Cards are small (≤280px) on every screen, so load a resized WebP for ALL
+    // images — phones get 640px, desktop 820px (retina-crisp). Videos and the
+    // zoom lightbox (data-full) still use the ORIGINAL full file, so quality is
+    // untouched where it shows big. Cuts multi-MB originals to ~30–60 KB each.
     const isPhone = typeof matchMedia === 'function' && matchMedia('(max-width: 700px)').matches;
-    const imgSrc = (item.type !== 'video' && isPhone) ? window.BQ_GALLERY.thumb(item.url, 640) : item.url;
+    const imgSrc = (item.type !== 'video') ? window.BQ_GALLERY.thumb(item.url, isPhone ? 640 : 820) : item.url;
     const mediaHtml = item.type === 'video'
       ? `<video muted loop playsinline preload="none" src="${item.url}" title="${dispTitle}"></video>`
       : `<img loading="lazy" src="${imgSrc}" alt="${dispTitle}" />`;
@@ -356,12 +359,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const all = [...wLogos, ...wLogos]; // duplicate for seamless loop
     marqueeTrack.innerHTML = all.map(src =>
       `<div class="logo-chip logo-chip--img">
-         <img src="${src}" alt="" loading="lazy" />
+         <img src="${window.BQ_GALLERY.thumb(src, 240)}" data-full="${src}" alt="" loading="lazy" />
        </div>`
     ).join('');
-    /* remove broken images */
+    /* resized copy failed → original full file once; only then drop the chip */
     marqueeTrack.querySelectorAll('img').forEach(img =>
-      img.addEventListener('error', () => img.closest('.logo-chip')?.remove())
+      img.addEventListener('error', () => {
+        if (img.dataset.full && img.src !== img.dataset.full) { img.src = img.dataset.full; return; }
+        img.closest('.logo-chip')?.remove();
+      })
     );
   }
 
