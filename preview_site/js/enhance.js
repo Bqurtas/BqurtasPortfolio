@@ -2220,6 +2220,11 @@
     window.addEventListener('pointerup', () => { if (drag) up(); });
   }
   if (window.__bqLangCb) window.__bqLangCb.push(render);
-  load(); loadWorks(); loadPins();
+  /* These feed the Latest BELL (hidden until tapped) and hit GitHub/Supabase APIs
+     (~175 KB). Defer them off the critical render path — they run once the browser
+     is idle, so first paint isn't waiting on them. The badge just appears a beat later. */
+  const startLatest = () => { load(); loadWorks(); loadPins(); };
+  if ('requestIdleCallback' in window) requestIdleCallback(startLatest, { timeout: 3500 });
+  else setTimeout(startLatest, 2000);
   window.__bqReloadLatest = () => { load(); loadPins(); try { sessionStorage.removeItem('bq_latest_works'); } catch (e) {} loadWorks(); };
 })();
