@@ -944,3 +944,19 @@ document.addEventListener('DOMContentLoaded', () => {
   /* show a moment after load so it doesn't fight the splash */
   setTimeout(show, 1400);
 })();
+
+/* =========================================================
+   AI pill — tap to reveal "Shaping the future" (reliable on
+   touch, where :focus on a <span> is flaky on iOS)
+   ========================================================= */
+(function aiPill() {
+  var pill = document.querySelector('.hero-services-ai');
+  if (!pill) return;
+  pill.addEventListener('click', function (e) {
+    e.stopPropagation();
+    pill.classList.toggle('is-open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!pill.contains(e.target)) pill.classList.remove('is-open');
+  });
+})();

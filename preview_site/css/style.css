@@ -853,8 +853,8 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
 .hero-ai-future { display: inline-block; max-width: 0; overflow: hidden; white-space: nowrap; opacity: 0; transition: max-width 0.5s var(--ease), opacity 0.35s ease, margin-left 0.4s var(--ease); }
 .hero-ai-future::before { content: '\2192\00a0'; }
 /* reveal on hover OR focus (tap on the tabindex pill focuses it — works on touch) */
-.hero-services-ai:hover, .hero-services-ai:focus, .hero-services-ai:focus-within { border-color: currentColor; outline: none; }
-.hero-services-ai:hover .hero-ai-future, .hero-services-ai:focus .hero-ai-future, .hero-services-ai:focus-within .hero-ai-future { max-width: 300px; opacity: 0.85; margin-left: 9px; }
+.hero-services-ai:hover, .hero-services-ai:focus, .hero-services-ai:focus-within, .hero-services-ai.is-open { border-color: currentColor; outline: none; }
+.hero-services-ai:hover .hero-ai-future, .hero-services-ai:focus .hero-ai-future, .hero-services-ai:focus-within .hero-ai-future, .hero-services-ai.is-open .hero-ai-future { max-width: 300px; opacity: 0.85; margin-left: 9px; }
 @media (max-width: 560px) { .hero-services { flex-direction: column; gap: 10px; margin-top: 18px; } }
 /* the short "AI" label only ever appears on mobile-tap (see below) */
 .hero-ai-short { display: none; }
@@ -864,9 +864,11 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
 @media (max-width: 820px) {
   .hero-ai-future { white-space: nowrap; }
   .hero-services-ai:focus .hero-ai-label,
-  .hero-services-ai:focus-within .hero-ai-label { display: none; }
+  .hero-services-ai:focus-within .hero-ai-label,
+  .hero-services-ai.is-open .hero-ai-label { display: none; }
   .hero-services-ai:focus .hero-ai-short,
-  .hero-services-ai:focus-within .hero-ai-short { display: inline; }
+  .hero-services-ai:focus-within .hero-ai-short,
+  .hero-services-ai.is-open .hero-ai-short { display: inline; }
 }
 
 /* =========================================================
