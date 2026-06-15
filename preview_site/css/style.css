@@ -792,7 +792,16 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
   margin-bottom: 4px; letter-spacing: -0.01em;
   opacity: 0; animation: fadeUp 1s var(--ease-out) 0.7s forwards;
 }
-.hero-hello::after { content: ' \1F44B'; }
+/* the wave emoji must render as a normal colour emoji — never inherit the
+   heading's italic / text-fill / stroke (which gave it an outline on some systems) */
+.hero-hello::after {
+  content: ' \1F44B';
+  font-style: normal;
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+  -webkit-text-fill-color: initial;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+}
 .hero-title {
   font-family: 'Fraunces', serif;
   font-weight: 500;

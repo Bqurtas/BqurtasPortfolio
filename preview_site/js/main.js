@@ -960,3 +960,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!pill.contains(e.target)) pill.classList.remove('is-open');
   });
 })();
+
+/* =========================================================
+   Scroll cues — tap "SCROLL" (hero) or the room-hero cue to
+   glide down past the hero to the content below it
+   ========================================================= */
+(function scrollCues() {
+  const glide = (cue) => {
+    const hero = cue.closest('.hero, .room-hero, .pencemor-hero');
+    const top = hero ? Math.max(0, hero.getBoundingClientRect().bottom + window.scrollY - 2)
+                     : window.scrollY + window.innerHeight * 0.9;
+    window.scrollTo({ top, behavior: 'smooth' });
+  };
+  document.querySelectorAll('.hero-meta--br, .room-hero-scroll').forEach((cue) => {
+    cue.style.cursor = 'pointer';
+    cue.setAttribute('role', 'button');
+    cue.setAttribute('tabindex', '0');
+    cue.removeAttribute('aria-hidden');
+    cue.addEventListener('click', () => glide(cue));
+    cue.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); glide(cue); } });
+  });
+})();

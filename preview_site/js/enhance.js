@@ -141,17 +141,19 @@
           const r = hero.getBoundingClientRect();
           if (!r.height) continue;                                  // hidden room
           const visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
-          if (visible > vh * 0.55 && Math.abs(r.top) > 3) {
+          /* firm: if MORE THAN HALF the hero is in view and it isn't already flush
+             to the top, snap it the rest of the way (quick, decisive glide) */
+          if (visible > vh * 0.5 && Math.abs(r.top) > 2) {
             gliding = true;
-            glideTo(Math.max(0, (window.scrollY || 0) + r.top), 460);
-            setTimeout(() => { gliding = false; }, 560);
+            glideTo(Math.max(0, (window.scrollY || 0) + r.top), 360);
+            setTimeout(() => { gliding = false; }, 440);
             break;
           }
         }
       };
-      const queue = () => { clearTimeout(st); st = setTimeout(settleSnap, 150); };
+      const queue = () => { clearTimeout(st); st = setTimeout(settleSnap, 100); };   // settles quickly once scrolling stops
       window.addEventListener('scroll', queue, { passive: true });
-      window.addEventListener('touchend', queue, { passive: true });
+      window.addEventListener('touchend', () => setTimeout(settleSnap, 60), { passive: true });   // decisive on finger lift
       window.__bqQueueSnap = queue;   // the rAF scroll-watcher drives this too (event-less browsers)
     }
   })();
