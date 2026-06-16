@@ -1581,38 +1581,6 @@
     const P = (num, tag, date, read, accent, img, title, sub, body) =>
       ({ num, tag, date, read, accent, img: IMG(img), title, sub, body });
     let POSTS = [
-      P('01','Editorial','May 2026',6,'#1a2740','Official/Official7.webp','On the architecture of meaning','Typography is not decoration — it is the floorplan of the page.',
-        ["Typography is not decoration. It is the floorplan of the page — the place where a reader pauses, breathes, and finds their footing.","When I set a page I am choosing a pace, not just a typeface. A wide margin is a held breath; a tight column an urgent whisper.","Get the architecture right and the content feels inevitable — as if it could not have been arranged any other way."]),
-      P('02','Place','Apr 2026',4,'#5a1a1a','GeneralDesign/GDesign1.webp',"A printer's room in Hewlêr","The old quarter, third floor, north-facing light. A notebook, a small press.",
-        ["The old quarter, third floor, north-facing light. A notebook, a small press, and a slow habit of asking why.","Work made here carries the place inside it — the smell of ink not yet dry, the weight of paper waiting.","I keep this room deliberately small. Constraints are the first and most honest collaborator."]),
-      P('03','Type','Mar 2026',8,'#2a1a0e','LogoDesign/Logo3.webp','Two scripts, one wordmark','Designing for Kurdish and Latin in one logo is not translation — it is duet.',
-        ["Designing for Kurdish and Latin in the same logo is not translation — it is a duet. Two scripts, each with its own rhythm.","The Kurdish letterforms want to flow; the Latin wants to stand. The work is to find the posture where neither feels a guest.","When it works, a reader of either script feels at home — and never notices the quiet diplomacy it took."]),
-      P('04','Craft','Feb 2026',5,'#0e1a26','Book/BookCover1.webp','Why I still print proofs','The screen lies, gently. Paper tells you the truth about colour and weight.',
-        ["The screen lies, gently. Paper tells you the truth about colour, weight, and the unsaid air between letters.","A margin that looked generous on a monitor can feel mean in the palm; a grey that seemed soft can turn cold under lamplight.","Proofing is not a final check. It is a conversation with the object the work will become."]),
-      P('05','Practice','Jan 2026',7,'#3a2616','GeneralDesign/GDesign17.webp','On choosing clients carefully','Two projects a quarter. Always independent publishers, always close readers.',
-        ["Two projects a quarter. Always independent publishers, always someone who reads the small text.","Choosing clients carefully is not arrogance — it is the only way I know to keep the work honest.","The projects I am proudest of all began the same way: a long conversation, no rush."]),
-      P('06','Colour','Dec 2025',3,'#a8862f','Poster/Poster6.webp','The year, in three colours','Burnt gold, warm ink, cream. A palette that refused to leave the studio.',
-        ["Burnt gold, warm ink, cream. A short reflection on a palette that refused to leave the studio.","Some years arrive with a colour already attached. This one came in three.","I did not choose them so much as notice them — and once noticed, they organised everything else."]),
-      P('07','Process','Nov 2025',5,'#243018','LogoDesign/Logo14.webp','The first ten thumbnails','Every good mark begins as a bad sketch — ten of them, usually.',
-        ["Every good mark begins as a bad sketch. Ten of them, usually, before anything worth keeping appears.","The thumbnails are not the work; they are permission to be wrong quickly, on cheap paper, where it costs nothing.","Speed early buys patience later. I draw badly so I can decide well."]),
-      P('08','Place','Oct 2025',6,'#1a2740','GeneralDesign/GDesign40.webp','Soran, where it started','A boy, a mountain, and a borrowed pencil.',
-        ["I was born in Soran, between the stillness of the mountains and the noise of a growing town.","My first tools were borrowed and my first audience was patient. Both taught me to make do — and then to make better.","Erbil gave me the city; Soran gave me the eye. I carry both into every page."]),
-      P('09','Tools','Sep 2025',4,'#5a1a1a','Official/Official94.webp','In praise of the grid','Freedom, it turns out, loves a constraint.',
-        ["A grid is not a cage. It is a handrail in the dark — something to trust when taste runs out.","Freedom, it turns out, loves a constraint. The blank page is not liberating; it is paralysing.","I build the grid first so the ideas have somewhere to stand."]),
-      P('10','Type','Aug 2025',7,'#2a1a0e','Book/BookCover28.webp','Kerning is a kind of listening','The space between letters is where the music lives.',
-        ["Kerning is a kind of listening. You are not moving letters; you are tuning the silence between them.","Most readers will never see it. They will only feel that a word sits right — calm, even, unhurried.","The invisible work is the work. That is the whole craft, really."]),
-      P('11','Print','Jul 2025',5,'#3a2616','Poster/Poster14.webp','The smell of fresh ink','Some things a PDF will never give you.',
-        ["There is a moment when a press first kisses paper that no screen will ever reproduce.","Print is stubborn, expensive, and final — and that is exactly why it makes you careful.","A file can be undone forever. A printed sheet asks you to mean it."]),
-      P('12','Practice','Jun 2025',6,'#0e1a26','GeneralDesign/GDesign56.webp','Saying no, kindly','A clear no protects a generous yes.',
-        ["Most of design is deciding what not to do. Most of a career is deciding whom not to work with.","A clear no, said early and kindly, protects the generous yes you give to the right project.","Scarcity is not strategy. But honesty about time is a form of respect."]),
-      P('13','Colour','May 2025',4,'#a8862f','Official/Official132.webp','Gold is a verb','Used sparingly, it does the most work.',
-        ["Gold is not a colour you add; it is an emphasis you earn. A whole page of it says nothing.","Used sparingly — a rule, a full stop, a single letter — it does the most work for the least noise.","Restraint is the luxury. The gold just points at it."]),
-      P('14','Craft','Apr 2025',8,'#1a2740','Book/BookCover45.webp','Designing the invisible','The best protocol design is never noticed.',
-        ["Working with state protocol taught me that the best design here is the design no one notices.","Clarity under pressure, dignity without drama, the same calm on the worst day as the best.","Invisible is not lazy. Invisible is the hardest thing to do on purpose."]),
-      P('15','Story','Mar 2025',5,'#5a1a1a','LogoDesign/Logo19.webp','The fingerprint and the brand','Why Pencemor carries a print, not a polish.',
-        ["I named the studio Pencemor — a fingerprint — because a mark of ownership matters more than a mark of shine.","A fingerprint cannot be faked or borrowed. It says: this passed through a real pair of hands.","While our fingerprint stays on top, the worry is mine to carry, not yours."]),
-      P('16','Notes','Feb 2025',3,'#243018','GeneralDesign/GDesign83.webp','Three things on my desk','A pen, a proof, and a patient cup of tea.',
-        ["A pen that never quite runs dry, a proof with red all over it, and a cup of tea going slowly cold.","These three keep me honest: ink to commit, marks to correct, and a pause to think again.","Tools are small confessions of how you like to work. Mine say: slowly, by hand, with patience."]),
     ];
 
     const PAGE_SIZE = 4;
@@ -1954,7 +1922,7 @@
             body: String(p.body || '').split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean),
             _i18n: p.i18n || null
           }));
-          POSTS = cms.length ? cms : BUILTIN_POSTS;   // DB is the source of truth; built-ins only fall back if the DB is empty/unreachable
+          POSTS = cms;   // DB is the ONLY source — when it's empty the blog is empty (no demo posts), until the owner writes their own
           try { window.__bqBlogCount = POSTS.length; } catch (e) {}   // live blog count for the dashboard overview
           pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
           if (page > pageCount) page = 1;
