@@ -952,13 +952,15 @@ document.addEventListener('DOMContentLoaded', () => {
 (function aiPill() {
   var pill = document.querySelector('.hero-services-ai');
   if (!pill) return;
-  pill.addEventListener('click', function (e) {
-    e.stopPropagation();
-    pill.classList.toggle('is-open');
-  });
-  document.addEventListener('click', function (e) {
-    if (!pill.contains(e.target)) pill.classList.remove('is-open');
-  });
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    // DESKTOP (real mouse) — reveal while hovering
+    pill.addEventListener('mouseenter', function () { pill.classList.add('is-open'); });
+    pill.addEventListener('mouseleave', function () { pill.classList.remove('is-open'); });
+  } else {
+    // TOUCH — tap toggles, tap anywhere else closes
+    pill.addEventListener('click', function (e) { e.stopPropagation(); pill.classList.toggle('is-open'); });
+    document.addEventListener('click', function (e) { if (!pill.contains(e.target)) pill.classList.remove('is-open'); });
+  }
 })();
 
 /* =========================================================

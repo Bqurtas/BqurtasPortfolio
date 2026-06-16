@@ -586,8 +586,8 @@ button.social-opt { background: none; border: none; cursor: pointer; font-family
   background: var(--bg);
   border-top: 1px solid var(--line);
   box-shadow: 0 -10px 30px -18px rgba(0,0,0,0.4);
-  justify-content: center; align-items: center;
-  gap: clamp(6px, 3vw, 26px);   /* responsive — 6 round buttons fit even narrow phones, roomy on tablets */
+  justify-content: space-evenly; align-items: center;
+  gap: clamp(4px, 2vw, 14px);   /* space-evenly spreads the 6 round buttons with EQUAL gaps across the bar */
 }
 .mobilebar-btn {
   width: 46px; height: auto; border-radius: 50%;
@@ -864,18 +864,12 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
 .hero-services-ai { position: relative; transition: border-color 0.3s var(--ease); }
 .hero-ai-future { display: inline-block; max-width: 0; overflow: hidden; white-space: nowrap; opacity: 0; transition: max-width 0.5s var(--ease), opacity 0.35s ease, margin-left 0.4s var(--ease); }
 .hero-ai-future::before { content: '\2192\00a0'; }
-/* TAP / CLICK (.is-open, set by JS) reveals the tagline on EVERY device. NOTE:
-   deliberately NOT :focus — tapping the <span> keeps it focused, which made it
-   impossible to close. */
+/* Reveal is driven ENTIRELY by .is-open (set by JS: mouseenter on desktop, tap on
+   touch). There is deliberately NO CSS :hover/:focus — some phones falsely report
+   hover and would leak the long "Artificial Intelligence • AI → Shaping the future"
+   on a tap. JS owns it, so behaviour is identical and predictable on every device. */
 .hero-services-ai.is-open { border-color: currentColor; outline: none; }
 .hero-services-ai.is-open .hero-ai-future { max-width: 300px; opacity: 0.85; margin-left: 9px; }
-/* HOVER reveal ONLY on a real mouse pointer (desktop). On phones a tap emulates
-   :hover, which would otherwise show the long "Artificial Intelligence • AI →
-   Shaping the future" — this gate keeps that off touch entirely. */
-@media (hover: hover) and (pointer: fine) {
-  .hero-services-ai:hover { border-color: currentColor; outline: none; }
-  .hero-services-ai:hover .hero-ai-future { max-width: 300px; opacity: 0.85; margin-left: 9px; }
-}
 @media (max-width: 560px) { .hero-services { flex-direction: column; gap: 10px; margin-top: 18px; } }
 /* the short "AI" label only ever appears on mobile when open (see below) */
 .hero-ai-short { display: none; }
