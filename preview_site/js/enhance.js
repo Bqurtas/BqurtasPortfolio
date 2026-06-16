@@ -137,12 +137,35 @@
       }, 50);
     });
 
-    /* Mobile hero snapping is now done with NATIVE CSS `scroll-snap-type: y
-       proximity` (see style.css) — reliable on touch, never traps the gallery.
-       The old JS settle-snap is gone; we only keep a no-op so the rAF watcher and
-       the go-to-top handler that reference __bqQueueSnap stay safe. */
+    /* Mobile: NATIVE CSS `scroll-snap-type: y proximity` does the base snapping
+       (reliable, never traps the gallery). On top of it a FIRM JS assist — once
+       the scroll fully stops, if a hero is more than half in view but not flush,
+       glide it the rest of the way. It suspends snap + scroll-behavior during its
+       own glide (so neither fights it) and skips while the go-to-top runs. */
     if (window.matchMedia('(max-width: 820px)').matches) {
-      window.__bqQueueSnap = function () {};
+      let st = null, settling = false;
+      const settle = () => {
+        if (settling || window.__bqNoSnap) return;
+        const vh = window.innerHeight;
+        for (const hero of document.querySelectorAll('.hero, .pencemor-hero, .room-hero')) {
+          const r = hero.getBoundingClientRect();
+          if (!r.height) continue;                                  // hidden room
+          const visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+          if (visible > vh * 0.55 && Math.abs(r.top) > 4) {         // mostly on the hero, not flush → settle it
+            settling = true;
+            const target = Math.max(0, (window.scrollY || 0) + r.top);
+            const h = document.documentElement;
+            h.style.scrollSnapType = 'none'; h.style.scrollBehavior = 'auto';
+            glideTo(target, 300);
+            setTimeout(() => { h.style.scrollSnapType = ''; h.style.scrollBehavior = ''; settling = false; }, 380);
+            break;
+          }
+        }
+      };
+      const queue = () => { clearTimeout(st); st = setTimeout(settle, 110); };  // fire once scrolling has stopped
+      window.addEventListener('scroll', queue, { passive: true });
+      window.addEventListener('touchend', () => setTimeout(settle, 70), { passive: true });
+      window.__bqQueueSnap = queue;   // the rAF scroll-watcher drives this too
     }
   })();
 
@@ -1112,11 +1135,11 @@
     /* ---- Blog manager — posts live in Supabase (free; edit in its studio) ---- */
     const SB_STUDIO = 'https://supabase.com/dashboard/project/dcnkhzrishphpismmxuu/editor';
         const CT_I18N = {
-      en: { gate:'Publish to your blog', note:'Enter your edit token to write, edit and publish posts.', tokPh:'Edit token', conn:'Connect', newBtn:'Write new post', editBtn:'Edit', delBtn:'Delete', delAsk:'Delete this post permanently?', fTitle:'Title', fSub:'Subtitle', fTag:'Label', fCover:'Cover image link', fCoverPh:'https://…  paste any image link', fAccent:'Accent', fMin:'Read (min)', fBody:'Body', fBodyPh:'Write your post here…  Leave one empty line between paragraphs.', fPub:'Published — visible on the site', save:'Publish', saving:'Publishing…', savedMsg:"Saved — it's on your blog now.", cancel:'Cancel', back:'All posts', loading:'Loading your posts…', empty:'No posts yet — write your first one.', err:'Could not reach the blog service (works on the live site).', needTitle:'Please add a title.', posts:'posts', draft:'draft', studio:'Advanced (raw database)' },
-      ku: { gate:'بڵاوکردنەوە بۆ بلۆگەکەت', note:'تۆکنی دەستکاریت بنووسە بۆ نووسین، دەستکاری و بڵاوکردنەوەی بابەت.', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', newBtn:'نووسینی بابەتی نوێ', editBtn:'دەستکاری', delBtn:'سڕینەوە', delAsk:'ئەم بابەتە بە تەواوی بسڕێتەوە؟', fTitle:'سەردێڕ', fSub:'ژێر-سەردێڕ', fTag:'لەیبڵ', fCover:'بەستەری وێنەی سەرەکی', fCoverPh:'https://…  هەر بەستەرێکی وێنە', fAccent:'ڕەنگ', fMin:'خوێندنەوە (خ)', fBody:'دەق', fBodyPh:'لێرە بابەتەکەت بنووسە…  دێڕێکی بەتاڵ لە نێوان پەرەگرافەکان بهێڵە.', fPub:'بڵاوکراوە — لەسەر سایت دیارە', save:'بڵاوکردنەوە', saving:'بڵاودەکرێتەوە…', savedMsg:'پاشەکەوتکرا — ئێستا لەسەر بلۆگەکەتە.', cancel:'هەڵوەشاندنەوە', back:'هەموو بابەتەکان', loading:'بارکردنی بابەتەکانت…', empty:'هێشتا بابەت نییە — یەکەمیان بنووسە.', err:'نەگەیشتە خزمەتگوزاری بلۆگ (لەسەر سایتە زیندووەکە کاردەکات).', needTitle:'تکایە سەردێڕێک زیاد بکە.', posts:'بابەت', draft:'ڕەشنووس', studio:'پێشکەوتوو (داتابەیس)' },
-      ar: { gate:'انشر في مدونتك', note:'أدخل رمز التحرير للكتابة والتعديل والنشر.', tokPh:'رمز التحرير', conn:'اتصال', newBtn:'كتابة مقال جديد', editBtn:'تعديل', delBtn:'حذف', delAsk:'حذف هذا المقال نهائياً؟', fTitle:'العنوان', fSub:'العنوان الفرعي', fTag:'التصنيف', fCover:'رابط صورة الغلاف', fCoverPh:'https://…  ألصق أي رابط صورة', fAccent:'اللون', fMin:'القراءة (د)', fBody:'النص', fBodyPh:'اكتب مقالك هنا…  اترك سطراً فارغاً بين الفقرات.', fPub:'منشور — ظاهر على الموقع', save:'نشر', saving:'جارٍ النشر…', savedMsg:'تم الحفظ — إنه الآن على مدونتك.', cancel:'إلغاء', back:'كل المقالات', loading:'جارٍ تحميل مقالاتك…', empty:'لا مقالات بعد — اكتب أول واحد.', err:'تعذّر الوصول إلى خدمة المدونة (تعمل على الموقع المباشر).', needTitle:'الرجاء إضافة عنوان.', posts:'مقالات', draft:'مسودة', studio:'متقدم (قاعدة البيانات)' },
-      kmr: { gate:'Li blogê biweşîne', note:'Ji bo nivîsîn, guhertin û weşandinê tokena xwe binivîse.', tokPh:'Tokena guhertinê', conn:'Girêde', newBtn:'Nivîsa nû binivîse', editBtn:'Biguhere', delBtn:'Jê bibe', delAsk:'Ev nivîs bi temamî were jêbirin?', fTitle:'Sernav', fSub:'Bin-sernav', fTag:'Etîket', fCover:'Girêdana wêneyê', fCoverPh:'https://…  her girêdana wêneyê', fAccent:'Reng', fMin:'Xwendin (deq)', fBody:'Nivîs', fBodyPh:'Nivîsa xwe li vir binivîse…  Rêzeke vala di navbera paragrafan de bihêle.', fPub:'Weşandî — li ser malperê xuya ye', save:'Biweşîne', saving:'Tê weşandin…', savedMsg:'Hat tomarkirin — niha li ser blogê ye.', cancel:'Betal', back:'Hemû nivîs', loading:'Nivîsên te tên barkirin…', empty:'Hêj nivîs tune — ya yekem binivîse.', err:'Negihîşt xizmeta blogê (li ser malpera zindî dixebite).', needTitle:'Ji kerema xwe sernavekê zêde bike.', posts:'nivîs', draft:'reşnivîs', studio:'Pêşketî (database)' },
-      fr: { gate:'Publier sur votre blog', note:"Saisissez votre jeton d'édition pour écrire, modifier et publier.", tokPh:"Jeton d'édition", conn:'Connecter', newBtn:'Écrire un article', editBtn:'Modifier', delBtn:'Supprimer', delAsk:'Supprimer définitivement cet article ?', fTitle:'Titre', fSub:'Sous-titre', fTag:'Étiquette', fCover:"Lien de l'image", fCoverPh:"https://…  collez un lien d'image", fAccent:'Couleur', fMin:'Lecture (min)', fBody:'Texte', fBodyPh:'Écrivez votre article ici…  Laissez une ligne vide entre les paragraphes.', fPub:'Publié — visible sur le site', save:'Publier', saving:'Publication…', savedMsg:"Enregistré — c'est sur votre blog.", cancel:'Annuler', back:'Tous les articles', loading:'Chargement de vos articles…', empty:'Aucun article — écrivez le premier.', err:'Service du blog inaccessible (fonctionne sur le site en ligne).', needTitle:'Veuillez ajouter un titre.', posts:'articles', draft:'brouillon', studio:'Avancé (base de données)' }
+      en: { gate:'Publish to your blog', note:'Enter your edit token to write, edit and publish posts.', tokPh:'Edit token', conn:'Connect', newBtn:'Write new post', editBtn:'Edit', delBtn:'Delete', delAsk:'Delete this post permanently?', fTitle:'Title', fSub:'Subtitle', fTag:'Label', fCover:'Cover image link', fCoverPh:'https://…  paste any image link', fAccent:'Accent', fMin:'Read (min)', fBody:'Body', fBodyPh:'Write your post here…  Leave one empty line between paragraphs.', fPub:'Published — visible on the site', save:'Publish', update:'Update', saving:'Publishing…', updating:'Updating…', savedMsg:"Saved — it's on your blog now.", cancel:'Cancel', back:'All posts', loading:'Loading your posts…', empty:'No posts yet — write your first one.', err:'Could not reach the blog service (works on the live site).', needTitle:'Please add a title.', posts:'posts', draft:'draft', studio:'Advanced (raw database)' },
+      ku: { gate:'بڵاوکردنەوە بۆ بلۆگەکەت', note:'تۆکنی دەستکاریت بنووسە بۆ نووسین، دەستکاری و بڵاوکردنەوەی بابەت.', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', newBtn:'نووسینی بابەتی نوێ', editBtn:'دەستکاری', delBtn:'سڕینەوە', delAsk:'ئەم بابەتە بە تەواوی بسڕێتەوە؟', fTitle:'سەردێڕ', fSub:'ژێر-سەردێڕ', fTag:'لەیبڵ', fCover:'بەستەری وێنەی سەرەکی', fCoverPh:'https://…  هەر بەستەرێکی وێنە', fAccent:'ڕەنگ', fMin:'خوێندنەوە (خ)', fBody:'دەق', fBodyPh:'لێرە بابەتەکەت بنووسە…  دێڕێکی بەتاڵ لە نێوان پەرەگرافەکان بهێڵە.', fPub:'بڵاوکراوە — لەسەر سایت دیارە', save:'بڵاوکردنەوە', update:'نوێکردنەوە', saving:'بڵاودەکرێتەوە…', updating:'نوێدەکرێتەوە…', savedMsg:'پاشەکەوتکرا — ئێستا لەسەر بلۆگەکەتە.', cancel:'هەڵوەشاندنەوە', back:'هەموو بابەتەکان', loading:'بارکردنی بابەتەکانت…', empty:'هێشتا بابەت نییە — یەکەمیان بنووسە.', err:'نەگەیشتە خزمەتگوزاری بلۆگ (لەسەر سایتە زیندووەکە کاردەکات).', needTitle:'تکایە سەردێڕێک زیاد بکە.', posts:'بابەت', draft:'ڕەشنووس', studio:'پێشکەوتوو (داتابەیس)' },
+      ar: { gate:'انشر في مدونتك', note:'أدخل رمز التحرير للكتابة والتعديل والنشر.', tokPh:'رمز التحرير', conn:'اتصال', newBtn:'كتابة مقال جديد', editBtn:'تعديل', delBtn:'حذف', delAsk:'حذف هذا المقال نهائياً؟', fTitle:'العنوان', fSub:'العنوان الفرعي', fTag:'التصنيف', fCover:'رابط صورة الغلاف', fCoverPh:'https://…  ألصق أي رابط صورة', fAccent:'اللون', fMin:'القراءة (د)', fBody:'النص', fBodyPh:'اكتب مقالك هنا…  اترك سطراً فارغاً بين الفقرات.', fPub:'منشور — ظاهر على الموقع', save:'نشر', update:'تحديث', saving:'جارٍ النشر…', updating:'جارٍ التحديث…', savedMsg:'تم الحفظ — إنه الآن على مدونتك.', cancel:'إلغاء', back:'كل المقالات', loading:'جارٍ تحميل مقالاتك…', empty:'لا مقالات بعد — اكتب أول واحد.', err:'تعذّر الوصول إلى خدمة المدونة (تعمل على الموقع المباشر).', needTitle:'الرجاء إضافة عنوان.', posts:'مقالات', draft:'مسودة', studio:'متقدم (قاعدة البيانات)' },
+      kmr: { gate:'Li blogê biweşîne', note:'Ji bo nivîsîn, guhertin û weşandinê tokena xwe binivîse.', tokPh:'Tokena guhertinê', conn:'Girêde', newBtn:'Nivîsa nû binivîse', editBtn:'Biguhere', delBtn:'Jê bibe', delAsk:'Ev nivîs bi temamî were jêbirin?', fTitle:'Sernav', fSub:'Bin-sernav', fTag:'Etîket', fCover:'Girêdana wêneyê', fCoverPh:'https://…  her girêdana wêneyê', fAccent:'Reng', fMin:'Xwendin (deq)', fBody:'Nivîs', fBodyPh:'Nivîsa xwe li vir binivîse…  Rêzeke vala di navbera paragrafan de bihêle.', fPub:'Weşandî — li ser malperê xuya ye', save:'Biweşîne', update:'Nûve bike', saving:'Tê weşandin…', updating:'Tê nûvekirin…', savedMsg:'Hat tomarkirin — niha li ser blogê ye.', cancel:'Betal', back:'Hemû nivîs', loading:'Nivîsên te tên barkirin…', empty:'Hêj nivîs tune — ya yekem binivîse.', err:'Negihîşt xizmeta blogê (li ser malpera zindî dixebite).', needTitle:'Ji kerema xwe sernavekê zêde bike.', posts:'nivîs', draft:'reşnivîs', studio:'Pêşketî (database)' },
+      fr: { gate:'Publier sur votre blog', note:"Saisissez votre jeton d'édition pour écrire, modifier et publier.", tokPh:"Jeton d'édition", conn:'Connecter', newBtn:'Écrire un article', editBtn:'Modifier', delBtn:'Supprimer', delAsk:'Supprimer définitivement cet article ?', fTitle:'Titre', fSub:'Sous-titre', fTag:'Étiquette', fCover:"Lien de l'image", fCoverPh:"https://…  collez un lien d'image", fAccent:'Couleur', fMin:'Lecture (min)', fBody:'Texte', fBodyPh:'Écrivez votre article ici…  Laissez une ligne vide entre les paragraphes.', fPub:'Publié — visible sur le site', save:'Publier', update:'Mettre à jour', saving:'Publication…', updating:'Mise à jour…', savedMsg:"Enregistré — c'est sur votre blog.", cancel:'Annuler', back:'Tous les articles', loading:'Chargement de vos articles…', empty:'Aucun article — écrivez le premier.', err:'Service du blog inaccessible (fonctionne sur le site en ligne).', needTitle:'Veuillez ajouter un titre.', posts:'articles', draft:'brouillon', studio:'Avancé (base de données)' }
     };
     const editToken = () => { try { return localStorage.getItem('bq_edit_token') || ''; } catch (e) { return ''; } };
         const cmsApi = (payload) => {
@@ -1244,7 +1267,7 @@
           <label class="cms-field"><span>${t.fBody}</span><textarea id="cf_body" rows="12" placeholder="${esc(t.fBodyPh)}">${esc(p.body || '')}</textarea></label>
           <label class="cms-check"><input type="checkbox" id="cf_pub" ${p.published === false ? '' : 'checked'}> <span>${t.fPub}</span></label>
           <div class="cms-actions">
-            <button type="submit" class="dash-btn dash-btn--go" id="ctSave"><i class="fa-solid fa-paper-plane"></i> ${t.save}</button>
+            <button type="submit" class="dash-btn dash-btn--go" id="ctSave"><i class="fa-solid fa-paper-plane"></i> ${p.id ? (t.update || 'Update') : t.save}</button>
             <button type="button" class="dash-btn" id="ctCancel">${t.cancel}</button>
             <span class="mono cms-savemsg" id="ctMsg"></span>
           </div>
@@ -1285,7 +1308,7 @@
           read_minutes: Number($('#cf_min').value) || 4, accent: $('#cf_accent').value,
           cover: $('#cf_cover').value.trim(), body: $('#cf_body').value, published: $('#cf_pub').checked
         } };
-        const btn = $('#ctSave'); btn.disabled = true; msg.textContent = t.saving;
+        const btn = $('#ctSave'); btn.disabled = true; msg.textContent = (p.id ? (t.updating || t.saving) : t.saving);
         cmsApi(payload).then((d) => {
           btn.disabled = false;
           if (d && d.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
