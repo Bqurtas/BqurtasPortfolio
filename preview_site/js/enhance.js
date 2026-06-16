@@ -119,42 +119,30 @@
     };
 
     toTop && toTop.addEventListener('click', () => {
-      /* to the ABSOLUTE top in every room — snap suspended during the glide so
-         nothing can stop it short, then exact 0 is forced. */
+      /* to the ABSOLUTE top in every room. We turn OFF both the CSS scroll-snap
+         (so proximity can't stop us short) and CSS scroll-behavior:smooth (so our
+         own rAF glide isn't fought), poll until we truly reach 0, then restore. */
       const h = document.documentElement;
-      const prevSnap = h.style.scrollSnapType;
       h.style.scrollSnapType = 'none';
-      glideTo(0, 520);
-      setTimeout(() => { window.scrollTo(0, 0); h.style.scrollSnapType = prevSnap; onScroll(); }, 600);
+      h.style.scrollBehavior = 'auto';
+      glideTo(0, 480);
+      let tries = 0;
+      const iv = setInterval(() => {
+        if (window.scrollY <= 1 || ++tries > 40) {
+          clearInterval(iv);
+          window.scrollTo(0, 0);
+          onScroll();
+          requestAnimationFrame(() => { h.style.scrollSnapType = ''; h.style.scrollBehavior = ''; });
+        }
+      }, 50);
     });
 
-    /* Mobile: FIRM hero snap (pure JS — CSS snap and native smooth scrolling are
-       both unreliable on touch). When the scroll settles with a hero mostly in
-       view but misaligned, glide it exactly to the top. Every hero, every room;
-       galleries, sections and the footer stay completely free. */
+    /* Mobile hero snapping is now done with NATIVE CSS `scroll-snap-type: y
+       proximity` (see style.css) — reliable on touch, never traps the gallery.
+       The old JS settle-snap is gone; we only keep a no-op so the rAF watcher and
+       the go-to-top handler that reference __bqQueueSnap stay safe. */
     if (window.matchMedia('(max-width: 820px)').matches) {
-      let st = null, gliding = false;
-      const settleSnap = () => {
-        if (gliding || window.__bqNoSnap) return;   // suspended during a deliberate SCROLL-cue / to-top glide
-        const vh = window.innerHeight;
-        for (const hero of document.querySelectorAll('.room-hero, .pencemor-hero, .hero')) {
-          const r = hero.getBoundingClientRect();
-          if (!r.height) continue;                                  // hidden room
-          const visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
-          /* snap only when you're CLEARLY still on the hero (>62% in view) so a
-             normal swipe scrolls away freely, but a small nudge settles it flush */
-          if (visible > vh * 0.62 && Math.abs(r.top) > 2) {
-            gliding = true;
-            glideTo(Math.max(0, (window.scrollY || 0) + r.top), 360);
-            setTimeout(() => { gliding = false; }, 440);
-            break;
-          }
-        }
-      };
-      const queue = () => { clearTimeout(st); st = setTimeout(settleSnap, 100); };   // settles quickly once scrolling stops
-      window.addEventListener('scroll', queue, { passive: true });
-      window.addEventListener('touchend', () => setTimeout(settleSnap, 60), { passive: true });   // decisive on finger lift
-      window.__bqQueueSnap = queue;   // the rAF scroll-watcher drives this too (event-less browsers)
+      window.__bqQueueSnap = function () {};
     }
   })();
 

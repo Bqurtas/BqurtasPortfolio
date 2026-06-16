@@ -3855,10 +3855,10 @@ html:has(.dash.is-open) { overflow: hidden; }
    nearest screen/section when you let go. Mandatory traps tall grids on touch,
    so we never use it here. */
 @media (max-width: 820px) {
-  /* Mobile: CSS snap OFF — a small script does a FIRM hero-only snap instead
-     (CSS proximity was unreliable on touch and could stop the go-to-top short).
-     Galleries, sections and the footer scroll completely free. */
-  html { scroll-snap-type: none; scroll-padding-top: 0; }
+  /* Mobile: NATIVE CSS proximity snap — rock-solid on touch and never traps the
+     tall gallery (proximity only settles when you're already near a hero). The
+     go-to-top button momentarily turns this off while it glides to 0. */
+  html { scroll-snap-type: y proximity; scroll-padding-top: 0; }
   .hero { height: auto; min-height: calc(100svh - var(--dock-h)); scroll-snap-align: start; }
   .room-hero,
   .pencemor-hero { min-height: calc(100svh - var(--dock-h)); scroll-snap-align: start; }
