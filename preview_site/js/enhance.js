@@ -137,38 +137,10 @@
       }, 50);
     });
 
-    /* Mobile: NATIVE CSS `scroll-snap-type: y proximity` does the base snapping
-       (reliable, never traps the gallery). On top of it a FIRM JS assist — once
-       the scroll fully stops, if a hero is more than half in view but not flush,
-       glide it the rest of the way. It suspends snap + scroll-behavior during its
-       own glide (so neither fights it) and skips while the go-to-top runs. */
-    if (window.matchMedia('(max-width: 820px)').matches) {
-      let st = null, settling = false;
-      const settle = () => {
-        if (settling || window.__bqNoSnap) return;
-        const vh = window.innerHeight;
-        for (const hero of document.querySelectorAll('.hero, .pencemor-hero, .room-hero')) {
-          const r = hero.getBoundingClientRect();
-          if (!r.height) continue;                                  // hidden room
-          const visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
-          /* measure against the HERO'S OWN height (it's vh − dock, not the full
-             viewport) — so "more than half the hero on screen" is judged right */
-          if (visible > r.height * 0.5 && Math.abs(r.top) > 4) {    // mostly on the hero, not flush → settle it
-            settling = true;
-            const target = Math.max(0, (window.scrollY || 0) + r.top);
-            const h = document.documentElement;
-            h.style.scrollSnapType = 'none'; h.style.scrollBehavior = 'auto';
-            glideTo(target, 300);
-            setTimeout(() => { h.style.scrollSnapType = ''; h.style.scrollBehavior = ''; settling = false; }, 380);
-            break;
-          }
-        }
-      };
-      const queue = () => { clearTimeout(st); st = setTimeout(settle, 110); };  // fire once scrolling has stopped
-      window.addEventListener('scroll', queue, { passive: true });
-      window.addEventListener('touchend', () => setTimeout(settle, 70), { passive: true });
-      window.__bqQueueSnap = queue;   // the rAF scroll-watcher drives this too
-    }
+    /* Mobile scroll is now PLAIN and free — no hero snapping at all (it caught in
+       too many places on touch). Keep a no-op so the rAF watcher / go-to-top that
+       reference __bqQueueSnap stay safe. */
+    window.__bqQueueSnap = function () {};
   })();
 
   /* =======================================================
