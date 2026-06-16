@@ -952,14 +952,14 @@ document.addEventListener('DOMContentLoaded', () => {
 (function aiPill() {
   var pill = document.querySelector('.hero-services-ai');
   if (!pill) return;
+  // TAP / CLICK toggles on EVERY device — the reliable primary path (works on a
+  // phone tap whether or not the browser falsely reports hover capability).
+  pill.addEventListener('click', function (e) { e.stopPropagation(); pill.classList.toggle('is-open'); });
+  document.addEventListener('click', function (e) { if (!pill.contains(e.target)) pill.classList.remove('is-open'); });
+  // Desktop bonus: also reveal while the real mouse hovers.
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    // DESKTOP (real mouse) — reveal while hovering
     pill.addEventListener('mouseenter', function () { pill.classList.add('is-open'); });
     pill.addEventListener('mouseleave', function () { pill.classList.remove('is-open'); });
-  } else {
-    // TOUCH — tap toggles, tap anywhere else closes
-    pill.addEventListener('click', function (e) { e.stopPropagation(); pill.classList.toggle('is-open'); });
-    document.addEventListener('click', function (e) { if (!pill.contains(e.target)) pill.classList.remove('is-open'); });
   }
 })();
 
@@ -972,7 +972,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const hero = cue.closest('.hero, .room-hero, .pencemor-hero');
     const top = hero ? Math.max(0, hero.getBoundingClientRect().bottom + window.scrollY - 2)
                      : window.scrollY + window.innerHeight * 0.9;
+    window.__bqNoSnap = true;                       // don't let the hero-snap fight this deliberate scroll-down
     window.scrollTo({ top, behavior: 'smooth' });
+    setTimeout(() => { window.__bqNoSnap = false; }, 900);
   };
   document.querySelectorAll('.hero-meta--br, .room-hero-scroll').forEach((cue) => {
     cue.style.cursor = 'pointer';

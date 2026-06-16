@@ -135,15 +135,15 @@
     if (window.matchMedia('(max-width: 820px)').matches) {
       let st = null, gliding = false;
       const settleSnap = () => {
-        if (gliding) return;
+        if (gliding || window.__bqNoSnap) return;   // suspended during a deliberate SCROLL-cue / to-top glide
         const vh = window.innerHeight;
         for (const hero of document.querySelectorAll('.room-hero, .pencemor-hero, .hero')) {
           const r = hero.getBoundingClientRect();
           if (!r.height) continue;                                  // hidden room
           const visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
-          /* firm: if MORE THAN HALF the hero is in view and it isn't already flush
-             to the top, snap it the rest of the way (quick, decisive glide) */
-          if (visible > vh * 0.5 && Math.abs(r.top) > 2) {
+          /* snap only when you're CLEARLY still on the hero (>62% in view) so a
+             normal swipe scrolls away freely, but a small nudge settles it flush */
+          if (visible > vh * 0.62 && Math.abs(r.top) > 2) {
             gliding = true;
             glideTo(Math.max(0, (window.scrollY || 0) + r.top), 360);
             setTimeout(() => { gliding = false; }, 440);
