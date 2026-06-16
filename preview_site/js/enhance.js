@@ -151,7 +151,9 @@
           const r = hero.getBoundingClientRect();
           if (!r.height) continue;                                  // hidden room
           const visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
-          if (visible > vh * 0.55 && Math.abs(r.top) > 4) {         // mostly on the hero, not flush → settle it
+          /* measure against the HERO'S OWN height (it's vh − dock, not the full
+             viewport) — so "more than half the hero on screen" is judged right */
+          if (visible > r.height * 0.5 && Math.abs(r.top) > 4) {    // mostly on the hero, not flush → settle it
             settling = true;
             const target = Math.max(0, (window.scrollY || 0) + r.top);
             const h = document.documentElement;
