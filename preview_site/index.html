@@ -114,13 +114,45 @@
       { "@type": "SiteNavigationElement", "position": 2, "name": "Blog", "url": "https://bqurtas.com/blog" },
       { "@type": "SiteNavigationElement", "position": 3, "name": "Biography", "url": "https://bqurtas.com/bio" },
       { "@type": "SiteNavigationElement", "position": 4, "name": "Contact", "url": "https://bqurtas.com/contact" },
-      { "@type": "SiteNavigationElement", "position": 5, "name": "Panjamor", "url": "https://bqurtas.com/panjamor" }
+      { "@type": "SiteNavigationElement", "position": 5, "name": "Panjamor", "url": "https://bqurtas.com/panjamor" },
+      {
+        "@type": "ProfessionalService",
+        "@id": "https://bqurtas.com/#service",
+        "name": "Barakat Qurtas — Independent Design Studio (Panjamor)",
+        "description": "Independent graphic & motion design studio in Hewlêr (Erbil), Kurdistan Region of Iraq — brand identity, logos, book covers, editorial layout, posters, printing, photography and video. A decade of practice, 1000+ works since 2014.",
+        "url": "https://bqurtas.com/",
+        "image": "https://bqurtas.com/assets/portrait.webp",
+        "email": "info@bqurtas.com",
+        "telephone": "+9647517884985",
+        "priceRange": "$$",
+        "founder": { "@id": "https://bqurtas.com/#person" },
+        "areaServed": [ { "@type": "Place", "name": "Kurdistan Region, Iraq" }, { "@type": "Place", "name": "Iraq" }, { "@type": "Place", "name": "Worldwide (remote)" } ],
+        "address": { "@type": "PostalAddress", "addressLocality": "Erbil", "addressRegion": "Kurdistan Region", "addressCountry": "IQ" },
+        "knowsLanguage": ["ckb", "ku", "ar", "en"],
+        "makesOffer": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Brand Identity & Logo Design" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Book Cover & Editorial Design" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Poster & Print Design" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Photography & Photo Editing" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Video Editing & Motion Graphics" } }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://bqurtas.com/#faq",
+        "mainEntity": [
+          { "@type": "Question", "name": "Who is Barakat Qurtas?", "acceptedAnswer": { "@type": "Answer", "text": "Barakat Qurtas is an independent graphic and motion designer based in Hewlêr (Erbil), Kurdistan Region of Iraq, with a decade of practice and 1000+ works since 2014. He works across brand identity, logos, book covers, editorial layout, posters, printing, photography and video through his studio, Panjamor." } },
+          { "@type": "Question", "name": "What design services does Barakat Qurtas offer?", "acceptedAnswer": { "@type": "Answer", "text": "Brand identity and logo design, book cover and editorial design, posters and print design, photography and photo editing, and video editing and motion graphics. He is available for select commissions and replies to every serious enquiry within 48 hours." } },
+          { "@type": "Question", "name": "Where is Barakat Qurtas located and what areas does he serve?", "acceptedAnswer": { "@type": "Answer", "text": "He is based in Hewlêr (Erbil), Kurdistan Region of Iraq, and works with clients across Kurdistan and Iraq, as well as internationally on a remote basis. He works in Kurdish (Sorani), Arabic and English." } },
+          { "@type": "Question", "name": "How can I hire or contact Barakat Qurtas?", "acceptedAnswer": { "@type": "Answer", "text": "Email info@bqurtas.com or use the contact page at https://bqurtas.com/contact. He replies to every serious enquiry within 48 hours." } }
+        ]
+      }
     ]
   }
   </script>
 
   <!-- Fonts — self-hosted (no external Google Fonts dependency; faster + private) -->
-  <link rel="stylesheet" href="css/fonts.css?v=202">
+  <link rel="stylesheet" href="css/fonts.css?v=203">
 
   <!-- jsDelivr serves Font Awesome + the gallery images — connect early -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -138,7 +170,7 @@
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous"></noscript>
   <script>(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css';l.integrity='sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g';l.crossOrigin='anonymous';l.referrerPolicy='no-referrer';document.head.appendChild(l);})();</script>
 
-  <link rel="stylesheet" href="css/style.css?v=202" />
+  <link rel="stylesheet" href="css/style.css?v=203" />
 </head>
 <body>
 
@@ -1497,10 +1529,10 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script src="js/i18n.js?v=202"></script>
-  <script src="js/chat-kb.js?v=202"></script>
-  <script src="js/main.js?v=202"></script>
-  <script src="js/gallery.js?v=202"></script>
-  <script src="js/enhance.js?v=202"></script>
+  <script src="js/i18n.js?v=203"></script>
+  <script src="js/chat-kb.js?v=203"></script>
+  <script src="js/main.js?v=203"></script>
+  <script src="js/gallery.js?v=203"></script>
+  <script src="js/enhance.js?v=203"></script>
 </body>
 </html>

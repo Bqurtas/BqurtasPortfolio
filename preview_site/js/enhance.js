@@ -132,7 +132,11 @@
           clearInterval(iv);
           window.scrollTo(0, 0);
           onScroll();
-          requestAnimationFrame(() => { h.style.scrollSnapType = ''; h.style.scrollBehavior = ''; });
+          /* the mobile URL bar usually re-appears on the way up, shrinking the
+             viewport — recompute --app-vh so the hero fills EXACTLY to the dock
+             again (otherwise a small blank gap shows below it). */
+          window.dispatchEvent(new Event('resize'));
+          requestAnimationFrame(() => { h.style.scrollSnapType = ''; h.style.scrollBehavior = ''; window.dispatchEvent(new Event('resize')); });
         }
       }, 50);
     });
