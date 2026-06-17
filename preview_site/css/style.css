@@ -3389,6 +3389,7 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
 .dash-hint { color: var(--ember) !important; font-size: 11px; min-height: 14px; }
 
 .dash-main { flex: 1; display: flex; min-height: 0; }
+.dash-mbar { display: none; }   /* mobile-only compact bar; shown in the ≤820px block */
 .dash-tabs { width: 248px; flex-shrink: 0; border-right: 1px solid var(--line); padding: 0; display: flex; flex-direction: column; gap: 0; background: var(--surface); }
 [dir="rtl"] .dash-tabs { border-right: none; border-left: 1px solid var(--line); }
 
@@ -3820,19 +3821,66 @@ html:has(.dash.is-open) { overflow: hidden; }
   .to-top-ring { width: 44px; height: 44px; }
   .chat { top: auto; bottom: var(--dock-h); left: 0; right: 0; width: 100%; height: 62vh; max-height: 62vh; border-radius: 24px 24px 0 0; transform-origin: bottom center; }
   [dir="rtl"] .chat { right: 0; left: 0; }
-  .dash-main { flex-direction: column; }
-  .dash-tabs { width: 100%; flex-direction: row; align-items: stretch; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--line); }
+  /* ---- Mobile dashboard: a clean sticky top bar that drops a polished
+         card-grid menu — tap the bar to open the sections, tap one (or
+         outside) to collapse. Premium, roomy, never cramped. ---- */
+  .dash-main { flex-direction: column; min-height: 0; }
+  .dash-tabs {
+    width: 100%; flex-direction: column; align-items: stretch; overflow: visible;
+    border-right: none; border-bottom: 1px solid var(--line);
+    background: var(--surface); position: sticky; top: 0; z-index: 6;
+  }
+  .dash-tabs.is-menu-open { box-shadow: 0 26px 50px -26px rgba(0,0,0,0.5); border-bottom-color: transparent; }
   [dir="rtl"] .dash-tabs { border-left: none; }
-  .dash-side-id { border-bottom: none; border-right: 1px solid var(--line); padding: 12px 14px; flex-shrink: 0; }
-  [dir="rtl"] .dash-side-id { border-right: none; border-left: 1px solid var(--line); }
-  .dash-side-meta { display: none; }
-  .dash-side-nav { flex: 0 0 auto; flex-direction: row; padding: 8px; gap: 4px; overflow: visible; }
-  .dash-side-tools { flex: 0 0 auto; flex-direction: row; border-top: none; border-left: 1px solid var(--line); padding: 8px; gap: 2px; }
-  [dir="rtl"] .dash-side-tools { border-left: none; border-right: 1px solid var(--line); }
-  .dash-tool span { display: none; }
-  .dash-tool { padding: 10px 12px; }
-  .dash-lang-pop { bottom: auto; top: calc(100% + 6px); left: auto; right: 0; min-width: 170px; }
-  .dash-tab { white-space: nowrap; }
+  /* the compact always-visible bar */
+  .dash-mbar { display: flex; align-items: center; gap: 13px; width: 100%; padding: 14px 16px; cursor: pointer; background: none; text-align: left; }
+  [dir="rtl"] .dash-mbar { text-align: right; }
+  .dash-mbar-av { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-style: italic; font-weight: 600; font-size: 17px; color: var(--ink); background: var(--bg-2); border: 1px solid var(--line); background-size: cover; background-position: center; }
+  .dash-mbar-av.has-av { color: transparent; }
+  .dash-mbar-cur { flex: 1; min-width: 0; font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dash-mbar-bars { width: 40px; height: 40px; flex-shrink: 0; border-radius: 12px; border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; color: var(--ink-soft); font-size: 15px; transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.4s var(--ease), border-color 0.25s var(--ease); }
+  .dash-tabs.is-menu-open .dash-mbar-bars { background: var(--ink); color: var(--bg); border-color: var(--ink); transform: rotate(90deg); }
+  /* the desktop id block is replaced by the mbar on mobile */
+  .dash-side-id { display: none; }
+
+  /* SECTION TILES — a 2-column grid of soft cards (icon chip + label) */
+  .dash-side-nav {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    flex: 0 0 auto; max-height: 0; opacity: 0; padding: 0 14px; overflow: hidden;
+    transition: max-height 0.42s var(--ease), opacity 0.3s var(--ease), padding 0.42s var(--ease);
+  }
+  .dash-tabs.is-menu-open .dash-side-nav { max-height: 72vh; opacity: 1; padding: 6px 14px 4px; overflow-y: auto; }
+  .dash-tabs .dash-tab {
+    flex-direction: row; align-items: center; gap: 12px; padding: 13px 13px;
+    border-radius: 15px; border: 1px solid var(--line); background: var(--bg-1);
+    color: var(--ink-soft); font-size: 14px; font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .dash-tabs .dash-tab i {
+    width: 36px; height: 36px; flex-shrink: 0; border-radius: 11px; opacity: 1;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--bg-3); color: var(--ink); font-size: 14px;
+  }
+  .dash-tabs .dash-tab.is-active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .dash-tabs .dash-tab.is-active i { background: rgba(255,255,255,0.16); color: var(--bg); opacity: 1; }
+
+  /* TOOLS — a wrap of compact pill chips below a divider */
+  .dash-side-tools {
+    display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px; flex: 0 0 auto;
+    max-height: 0; opacity: 0; padding: 0 14px; overflow: hidden; border: none;
+    transition: max-height 0.42s var(--ease), opacity 0.3s var(--ease), padding 0.42s var(--ease);
+  }
+  .dash-tabs.is-menu-open .dash-side-tools { max-height: 50vh; opacity: 1; padding: 12px 14px 18px; border-top: 1px solid var(--line); margin-top: 8px; overflow-y: auto; }
+  [dir="rtl"] .dash-side-tools { border-left: none; border-right: none; }
+  .dash-tabs .dash-tool {
+    flex: 0 0 auto; gap: 8px; padding: 9px 14px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--bg-1); color: var(--ink-soft);
+    font-size: 12.5px; font-weight: 600; white-space: nowrap;
+  }
+  .dash-tabs .dash-tool i { width: auto; opacity: 0.9; }
+  .dash-tool-langwrap { flex: 0 0 auto; }
+  .dash-tool span { display: inline; }
+  .dash-lang-pop { position: static; box-shadow: none; background: var(--bg-2); margin-top: 8px; width: 100%; }
   .hero-float { display: none; }
 }
 

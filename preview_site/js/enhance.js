@@ -757,6 +757,9 @@
       tl('#dashAi', 'tAi'); tl('#dashTheme', 'tTheme'); tl('#dashAddAdmin', 'tAddAdmin'); tl('#dashLogout', 'tLogout'); tl('#dashClose', 'tClose');
       const ln = $('#dashLangNow'); if (ln) ln.textContent = LANG_LABELS[curSiteLang()] || 'English';
       $$('#dashLangPop [data-lang]').forEach(b => b.classList.toggle('is-active', b.dataset.lang === curSiteLang()));
+      // keep the mobile bar's current-section label localized
+      const mc = $('#dashMbarCur'); const act = $('.dash-tab.is-active');
+      if (mc && act) mc.textContent = DT(act.dataset.dash);
     };
 
     const openDash = () => {
@@ -1052,11 +1055,11 @@
       const p = profile();
       const nm = $('#dashSideName'); if (nm) nm.textContent = p.name;
       const sub = $('#dashHeadSub'); if (sub) sub.textContent = p.title || 'Studio Console';
-      const av = $('#dashSideAv');
-      if (av) {
+      [ $('#dashSideAv'), $('#dashMbarAv') ].forEach((av) => {
+        if (!av) return;
         if (p.avatar) { av.style.backgroundImage = `url("${p.avatar}")`; av.classList.add('has-av'); av.textContent = ''; }
         else { av.style.backgroundImage = ''; av.classList.remove('has-av'); av.textContent = 'Bq'; }
-      }
+      });
     };
     const renderProfile = () => {
       const p = profile();
@@ -1113,11 +1116,11 @@
     /* ---- Blog manager — posts live in Supabase (free; edit in its studio) ---- */
     const SB_STUDIO = 'https://supabase.com/dashboard/project/dcnkhzrishphpismmxuu/editor';
         const CT_I18N = {
-      en: { gate:'Publish to your blog', note:'Enter your edit token to write, edit and publish posts.', tokPh:'Edit token', conn:'Connect', newBtn:'Write new post', editBtn:'Edit', delBtn:'Delete', delAsk:'Delete this post permanently?', fTitle:'Title', fSub:'Subtitle', fTag:'Label', fCover:'Cover image link', fCoverPh:'https://…  paste any image link', fAccent:'Accent', fMin:'Read (min)', fBody:'Body', fBodyPh:'Write your post here…  Leave one empty line between paragraphs.', fPub:'Published — visible on the site', save:'Publish', update:'Update', saving:'Publishing…', updating:'Updating…', savedMsg:"Saved — it's on your blog now.", cancel:'Cancel', back:'All posts', loading:'Loading your posts…', empty:'No posts yet — write your first one.', err:'Could not reach the blog service (works on the live site).', needTitle:'Please add a title.', posts:'posts', draft:'draft', studio:'Advanced (raw database)' },
-      ku: { gate:'بڵاوکردنەوە بۆ بلۆگەکەت', note:'تۆکنی دەستکاریت بنووسە بۆ نووسین، دەستکاری و بڵاوکردنەوەی بابەت.', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', newBtn:'نووسینی بابەتی نوێ', editBtn:'دەستکاری', delBtn:'سڕینەوە', delAsk:'ئەم بابەتە بە تەواوی بسڕێتەوە؟', fTitle:'سەردێڕ', fSub:'ژێر-سەردێڕ', fTag:'لەیبڵ', fCover:'بەستەری وێنەی سەرەکی', fCoverPh:'https://…  هەر بەستەرێکی وێنە', fAccent:'ڕەنگ', fMin:'خوێندنەوە (خ)', fBody:'دەق', fBodyPh:'لێرە بابەتەکەت بنووسە…  دێڕێکی بەتاڵ لە نێوان پەرەگرافەکان بهێڵە.', fPub:'بڵاوکراوە — لەسەر سایت دیارە', save:'بڵاوکردنەوە', update:'نوێکردنەوە', saving:'بڵاودەکرێتەوە…', updating:'نوێدەکرێتەوە…', savedMsg:'پاشەکەوتکرا — ئێستا لەسەر بلۆگەکەتە.', cancel:'هەڵوەشاندنەوە', back:'هەموو بابەتەکان', loading:'بارکردنی بابەتەکانت…', empty:'هێشتا بابەت نییە — یەکەمیان بنووسە.', err:'نەگەیشتە خزمەتگوزاری بلۆگ (لەسەر سایتە زیندووەکە کاردەکات).', needTitle:'تکایە سەردێڕێک زیاد بکە.', posts:'بابەت', draft:'ڕەشنووس', studio:'پێشکەوتوو (داتابەیس)' },
-      ar: { gate:'انشر في مدونتك', note:'أدخل رمز التحرير للكتابة والتعديل والنشر.', tokPh:'رمز التحرير', conn:'اتصال', newBtn:'كتابة مقال جديد', editBtn:'تعديل', delBtn:'حذف', delAsk:'حذف هذا المقال نهائياً؟', fTitle:'العنوان', fSub:'العنوان الفرعي', fTag:'التصنيف', fCover:'رابط صورة الغلاف', fCoverPh:'https://…  ألصق أي رابط صورة', fAccent:'اللون', fMin:'القراءة (د)', fBody:'النص', fBodyPh:'اكتب مقالك هنا…  اترك سطراً فارغاً بين الفقرات.', fPub:'منشور — ظاهر على الموقع', save:'نشر', update:'تحديث', saving:'جارٍ النشر…', updating:'جارٍ التحديث…', savedMsg:'تم الحفظ — إنه الآن على مدونتك.', cancel:'إلغاء', back:'كل المقالات', loading:'جارٍ تحميل مقالاتك…', empty:'لا مقالات بعد — اكتب أول واحد.', err:'تعذّر الوصول إلى خدمة المدونة (تعمل على الموقع المباشر).', needTitle:'الرجاء إضافة عنوان.', posts:'مقالات', draft:'مسودة', studio:'متقدم (قاعدة البيانات)' },
-      kmr: { gate:'Li blogê biweşîne', note:'Ji bo nivîsîn, guhertin û weşandinê tokena xwe binivîse.', tokPh:'Tokena guhertinê', conn:'Girêde', newBtn:'Nivîsa nû binivîse', editBtn:'Biguhere', delBtn:'Jê bibe', delAsk:'Ev nivîs bi temamî were jêbirin?', fTitle:'Sernav', fSub:'Bin-sernav', fTag:'Etîket', fCover:'Girêdana wêneyê', fCoverPh:'https://…  her girêdana wêneyê', fAccent:'Reng', fMin:'Xwendin (deq)', fBody:'Nivîs', fBodyPh:'Nivîsa xwe li vir binivîse…  Rêzeke vala di navbera paragrafan de bihêle.', fPub:'Weşandî — li ser malperê xuya ye', save:'Biweşîne', update:'Nûve bike', saving:'Tê weşandin…', updating:'Tê nûvekirin…', savedMsg:'Hat tomarkirin — niha li ser blogê ye.', cancel:'Betal', back:'Hemû nivîs', loading:'Nivîsên te tên barkirin…', empty:'Hêj nivîs tune — ya yekem binivîse.', err:'Negihîşt xizmeta blogê (li ser malpera zindî dixebite).', needTitle:'Ji kerema xwe sernavekê zêde bike.', posts:'nivîs', draft:'reşnivîs', studio:'Pêşketî (database)' },
-      fr: { gate:'Publier sur votre blog', note:"Saisissez votre jeton d'édition pour écrire, modifier et publier.", tokPh:"Jeton d'édition", conn:'Connecter', newBtn:'Écrire un article', editBtn:'Modifier', delBtn:'Supprimer', delAsk:'Supprimer définitivement cet article ?', fTitle:'Titre', fSub:'Sous-titre', fTag:'Étiquette', fCover:"Lien de l'image", fCoverPh:"https://…  collez un lien d'image", fAccent:'Couleur', fMin:'Lecture (min)', fBody:'Texte', fBodyPh:'Écrivez votre article ici…  Laissez une ligne vide entre les paragraphes.', fPub:'Publié — visible sur le site', save:'Publier', update:'Mettre à jour', saving:'Publication…', updating:'Mise à jour…', savedMsg:"Enregistré — c'est sur votre blog.", cancel:'Annuler', back:'Tous les articles', loading:'Chargement de vos articles…', empty:'Aucun article — écrivez le premier.', err:'Service du blog inaccessible (fonctionne sur le site en ligne).', needTitle:'Veuillez ajouter un titre.', posts:'articles', draft:'brouillon', studio:'Avancé (base de données)' }
+      en: { gate:'Publish to your blog', note:'Enter your edit token to write, edit and publish posts.', tokPh:'Edit token', conn:'Connect', newBtn:'Write new post', editBtn:'Edit', delBtn:'Delete', delAsk:'Delete this post permanently?', fTitle:'Title', fSub:'Subtitle', fTag:'Label', fCover:'Cover image link', fCoverPh:'https://…  paste any image link', fAccent:'Accent', fMin:'Read (min)', fBody:'Body', fBodyPh:'Write your post here…  Leave one empty line between paragraphs.', fPub:'Published — visible on the site', save:'Publish', update:'Update', saving:'Publishing…', updating:'Updating…', translating:'Translating to all languages…', savedMsg:"Saved — it's on your blog now.", cancel:'Cancel', back:'All posts', loading:'Loading your posts…', empty:'No posts yet — write your first one.', err:'Could not reach the blog service (works on the live site).', needTitle:'Please add a title.', posts:'posts', draft:'draft', studio:'Advanced (raw database)' },
+      ku: { gate:'بڵاوکردنەوە بۆ بلۆگەکەت', note:'تۆکنی دەستکاریت بنووسە بۆ نووسین، دەستکاری و بڵاوکردنەوەی بابەت.', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', newBtn:'نووسینی بابەتی نوێ', editBtn:'دەستکاری', delBtn:'سڕینەوە', delAsk:'ئەم بابەتە بە تەواوی بسڕێتەوە؟', fTitle:'سەردێڕ', fSub:'ژێر-سەردێڕ', fTag:'لەیبڵ', fCover:'بەستەری وێنەی سەرەکی', fCoverPh:'https://…  هەر بەستەرێکی وێنە', fAccent:'ڕەنگ', fMin:'خوێندنەوە (خ)', fBody:'دەق', fBodyPh:'لێرە بابەتەکەت بنووسە…  دێڕێکی بەتاڵ لە نێوان پەرەگرافەکان بهێڵە.', fPub:'بڵاوکراوە — لەسەر سایت دیارە', save:'بڵاوکردنەوە', update:'نوێکردنەوە', saving:'بڵاودەکرێتەوە…', updating:'نوێدەکرێتەوە…', translating:'وەردەگێڕدرێت بۆ هەموو زمانەکان…', savedMsg:'پاشەکەوتکرا — ئێستا لەسەر بلۆگەکەتە.', cancel:'هەڵوەشاندنەوە', back:'هەموو بابەتەکان', loading:'بارکردنی بابەتەکانت…', empty:'هێشتا بابەت نییە — یەکەمیان بنووسە.', err:'نەگەیشتە خزمەتگوزاری بلۆگ (لەسەر سایتە زیندووەکە کاردەکات).', needTitle:'تکایە سەردێڕێک زیاد بکە.', posts:'بابەت', draft:'ڕەشنووس', studio:'پێشکەوتوو (داتابەیس)' },
+      ar: { gate:'انشر في مدونتك', note:'أدخل رمز التحرير للكتابة والتعديل والنشر.', tokPh:'رمز التحرير', conn:'اتصال', newBtn:'كتابة مقال جديد', editBtn:'تعديل', delBtn:'حذف', delAsk:'حذف هذا المقال نهائياً؟', fTitle:'العنوان', fSub:'العنوان الفرعي', fTag:'التصنيف', fCover:'رابط صورة الغلاف', fCoverPh:'https://…  ألصق أي رابط صورة', fAccent:'اللون', fMin:'القراءة (د)', fBody:'النص', fBodyPh:'اكتب مقالك هنا…  اترك سطراً فارغاً بين الفقرات.', fPub:'منشور — ظاهر على الموقع', save:'نشر', update:'تحديث', saving:'جارٍ النشر…', updating:'جارٍ التحديث…', translating:'جارٍ الترجمة إلى كل اللغات…', savedMsg:'تم الحفظ — إنه الآن على مدونتك.', cancel:'إلغاء', back:'كل المقالات', loading:'جارٍ تحميل مقالاتك…', empty:'لا مقالات بعد — اكتب أول واحد.', err:'تعذّر الوصول إلى خدمة المدونة (تعمل على الموقع المباشر).', needTitle:'الرجاء إضافة عنوان.', posts:'مقالات', draft:'مسودة', studio:'متقدم (قاعدة البيانات)' },
+      kmr: { gate:'Li blogê biweşîne', note:'Ji bo nivîsîn, guhertin û weşandinê tokena xwe binivîse.', tokPh:'Tokena guhertinê', conn:'Girêde', newBtn:'Nivîsa nû binivîse', editBtn:'Biguhere', delBtn:'Jê bibe', delAsk:'Ev nivîs bi temamî were jêbirin?', fTitle:'Sernav', fSub:'Bin-sernav', fTag:'Etîket', fCover:'Girêdana wêneyê', fCoverPh:'https://…  her girêdana wêneyê', fAccent:'Reng', fMin:'Xwendin (deq)', fBody:'Nivîs', fBodyPh:'Nivîsa xwe li vir binivîse…  Rêzeke vala di navbera paragrafan de bihêle.', fPub:'Weşandî — li ser malperê xuya ye', save:'Biweşîne', update:'Nûve bike', saving:'Tê weşandin…', updating:'Tê nûvekirin…', translating:'Ji bo hemû zimanan tê wergerandin…', savedMsg:'Hat tomarkirin — niha li ser blogê ye.', cancel:'Betal', back:'Hemû nivîs', loading:'Nivîsên te tên barkirin…', empty:'Hêj nivîs tune — ya yekem binivîse.', err:'Negihîşt xizmeta blogê (li ser malpera zindî dixebite).', needTitle:'Ji kerema xwe sernavekê zêde bike.', posts:'nivîs', draft:'reşnivîs', studio:'Pêşketî (database)' },
+      fr: { gate:'Publier sur votre blog', note:"Saisissez votre jeton d'édition pour écrire, modifier et publier.", tokPh:"Jeton d'édition", conn:'Connecter', newBtn:'Écrire un article', editBtn:'Modifier', delBtn:'Supprimer', delAsk:'Supprimer définitivement cet article ?', fTitle:'Titre', fSub:'Sous-titre', fTag:'Étiquette', fCover:"Lien de l'image", fCoverPh:"https://…  collez un lien d'image", fAccent:'Couleur', fMin:'Lecture (min)', fBody:'Texte', fBodyPh:'Écrivez votre article ici…  Laissez une ligne vide entre les paragraphes.', fPub:'Publié — visible sur le site', save:'Publier', update:'Mettre à jour', saving:'Publication…', updating:'Mise à jour…', translating:'Traduction dans toutes les langues…', savedMsg:"Enregistré — c'est sur votre blog.", cancel:'Annuler', back:'Tous les articles', loading:'Chargement de vos articles…', empty:'Aucun article — écrivez le premier.', err:'Service du blog inaccessible (fonctionne sur le site en ligne).', needTitle:'Veuillez ajouter un titre.', posts:'articles', draft:'brouillon', studio:'Avancé (base de données)' }
     };
     const editToken = () => { try { return localStorage.getItem('bq_edit_token') || ''; } catch (e) { return ''; } };
         const cmsApi = (payload) => {
@@ -1128,6 +1131,55 @@
         body: JSON.stringify(payload)
       }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
     };
+
+    /* ---- Auto-translate in the BROWSER ----
+       Google's free translate endpoint blocks data-center IPs (so the Supabase
+       Edge Function could never translate — titles AND bodies came back empty).
+       The browser runs on a residential IP, which Google allows, and the endpoint
+       sends `access-control-allow-origin: *`, so we translate here and hand the
+       finished i18n object to the function purely to store. */
+    const TR_LANGS = { en: 'en', ku: 'ckb', kmr: 'ku', ar: 'ar', fr: 'fr', tr: 'tr', sv: 'sv' };
+    const trOne = async (text, tl) => {
+      const u = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=' + tl + '&dt=t&q=' + encodeURIComponent(text);
+      try { const r = await fetch(u); if (!r.ok) return ''; const j = await r.json(); return (j[0] || []).map((s) => (s && s[0]) || '').join(''); }
+      catch (e) { return ''; }
+    };
+    // Chunk by ENCODED url length — Kurdish/Arabic letters become 6 url-chars each,
+    // so a char-count chunk would blow past Google's GET limit and fail silently.
+    const trChunks = (s) => {
+      const MAX = 1200, enc = (x) => encodeURIComponent(x).length, out = [];
+      let buf = '';
+      for (const tok of String(s).split(/(\n+)/)) {
+        if (enc(tok) > MAX) { if (buf) { out.push(buf); buf = ''; } for (const w of tok.split(/( )/)) { if (buf && enc(buf + w) > MAX) { out.push(buf); buf = ''; } buf += w; } continue; }
+        if (buf && enc(buf + tok) > MAX) { out.push(buf); buf = ''; }
+        buf += tok;
+      }
+      if (buf) out.push(buf);
+      return out;
+    };
+    const trText = async (text, tl) => {
+      const s = String(text || ''); if (!s.trim()) return '';
+      let out = '';
+      for (const c of trChunks(s)) { if (!c.trim()) { out += c; continue; } const r = await trOne(c, tl); out += (r && r.trim()) ? r : c; }
+      return out;
+    };
+    // Translate a post into every language; languages run one-by-one (gentle on
+    // the endpoint) while a post's three fields translate together.
+    const buildI18n = async (post, onProgress) => {
+      const langs = Object.keys(TR_LANGS), i18n = {};
+      for (let k = 0; k < langs.length; k++) {
+        const lang = langs[k], tl = TR_LANGS[lang];
+        const [title, subtitle, body] = await Promise.all([trText(post.title, tl), trText(post.subtitle, tl), trText(post.body, tl)]);
+        i18n[lang] = {
+          title: (title && title.trim()) ? title : (post.title || ''),
+          subtitle: (subtitle && subtitle.trim()) ? subtitle : (post.subtitle || ''),
+          body: (body && body.trim()) ? body : (post.body || '')
+        };
+        if (onProgress) onProgress(k + 1, langs.length);
+      }
+      return i18n;
+    };
+
     let CMS_POSTS = [];
     const CT_X = {
       en:  { fTag:'Category', fCover:'Cover image', uploading:'Uploading…', uploaded:'Uploaded ✓', fCoverHint:'Choose an image — it uploads automatically.' },
@@ -1275,7 +1327,7 @@
           else { upmsg.textContent = '✗ ' + ((d && d.error) || ''); }
         } catch (err) { upmsg.textContent = '✗ ' + err; }
       });
-      $('#ctForm').addEventListener('submit', (e) => {
+      $('#ctForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const title = $('#cf_title').value.trim();
         const msg = $('#ctMsg');
@@ -1286,7 +1338,15 @@
           read_minutes: Number($('#cf_min').value) || 4, accent: $('#cf_accent').value,
           cover: $('#cf_cover').value.trim(), body: $('#cf_body').value, published: $('#cf_pub').checked
         } };
-        const btn = $('#ctSave'); btn.disabled = true; msg.textContent = (p.id ? (t.updating || t.saving) : t.saving);
+        const btn = $('#ctSave'); btn.disabled = true;
+        // Translate every field into all 7 languages here in the browser, then
+        // hand the finished i18n to the function (its server IP is Google-blocked).
+        try {
+          const i18n = await buildI18n(payload.post, (done, total) => { msg.textContent = (t.translating || 'Translating…') + ' ' + done + '/' + total; });
+          payload.i18n = i18n;
+        } catch (x) {}
+        payload.translate = false;
+        msg.textContent = (p.id ? (t.updating || t.saving) : t.saving);
         cmsApi(payload).then((d) => {
           btn.disabled = false;
           if (d && d.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
@@ -1526,10 +1586,23 @@
       localizeChrome();
       // Always land on Overview when the console opens — reset the sidebar highlight too
       $$('.dash-tab').forEach(x => x.classList.toggle('is-active', x.dataset.dash === 'overview'));
+      setCur(DT('overview')); closeMenu();
       renderOverview();
     };
+    /* ---- Mobile menu: tap the bar to expand the nav, tap a section to collapse ---- */
+    const dashTabs = $('#dashTabs'), menuToggle = $('#dashMenuToggle'), mbarCur = $('#dashMbarCur');
+    const setCur = (label) => { if (mbarCur && label) mbarCur.textContent = label; };
+    const closeMenu = () => { dashTabs?.classList.remove('is-menu-open'); menuToggle?.setAttribute('aria-expanded', 'false'); };
+    menuToggle?.addEventListener('click', () => {
+      const open = dashTabs.classList.toggle('is-menu-open');
+      menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    // tap outside the open menu (e.g. on the content area) to collapse it
+    document.addEventListener('click', (e) => {
+      if (dashTabs?.classList.contains('is-menu-open') && !dashTabs.contains(e.target)) closeMenu();
+    });
     /* open a non-tab view (AI, admins) from a sidebar tool — clear the nav highlight */
-    const openTool = (fn) => { $$('.dash-tab').forEach(x => x.classList.remove('is-active')); (fn || renderOverview)(); };
+    const openTool = (fn, label) => { $$('.dash-tab').forEach(x => x.classList.remove('is-active')); if (label) setCur(label); closeMenu(); (fn || renderOverview)(); };
 
     // dark / light toggle
     $('#dashTheme')?.addEventListener('click', () => {
@@ -1538,8 +1611,8 @@
       try { localStorage.setItem('bq_theme', next); } catch (e) {}
     });
     // AI + Add-admin sidebar tools
-    $('#dashAi')?.addEventListener('click', () => openTool(renderAssistant));
-    $('#dashAddAdmin')?.addEventListener('click', () => openTool(renderAdmins));
+    $('#dashAi')?.addEventListener('click', () => openTool(renderAssistant, DT('tAi')));
+    $('#dashAddAdmin')?.addEventListener('click', () => openTool(renderAdmins, DT('tAddAdmin')));
     // Log out — lock the console again
     $('#dashLogout')?.addEventListener('click', () => {
       if (!confirm(DT('logoutAsk'))) return;
@@ -1565,6 +1638,8 @@
     $$('.dash-tab').forEach(t => t.addEventListener('click', () => {
       $$('.dash-tab').forEach(x => x.classList.remove('is-active'));
       t.classList.add('is-active');
+      setCur(DT(t.dataset.dash));
+      closeMenu();
       (VIEWS[t.dataset.dash] || renderOverview)();
     }));
   })();
@@ -1604,10 +1679,15 @@
     const blogLang = () => (document.documentElement.dataset.lang || 'en');
     const L = (p) => {
       const cm = p._i18n && p._i18n[blogLang()];
-      if (cm && (cm.title || cm.body)) {
+      const has = (v) => v && String(v).trim();
+      const toParas = (s) => String(s).split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean);
+      // Use the translation only for the fields it actually filled — a blank/
+      // whitespace value (e.g. a failed body translation) falls back to the
+      // original so the reader never shows an empty article.
+      if (cm && (has(cm.title) || has(cm.body))) {
         return { num: p.num, accent: p.accent, img: p.img, read: p.read, tag: p.tag, date: p.date,
-                 title: cm.title || p.title, sub: cm.subtitle || p.sub,
-                 body: cm.body ? String(cm.body).split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean) : p.body };
+                 title: has(cm.title) ? cm.title : p.title, sub: has(cm.subtitle) ? cm.subtitle : p.sub,
+                 body: has(cm.body) ? toParas(cm.body) : p.body };
       }
       const t = window.BLOG_I18N && window.BLOG_I18N[blogLang()] && window.BLOG_I18N[blogLang()][p.num];
       if (!t) return p;

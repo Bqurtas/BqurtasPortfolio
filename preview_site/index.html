@@ -122,12 +122,24 @@
         "description": "Independent graphic & motion design studio in Hewlêr (Erbil), Kurdistan Region of Iraq — brand identity, logos, book covers, editorial layout, posters, printing, photography and video. A decade of practice, 1000+ works since 2014.",
         "url": "https://bqurtas.com/",
         "image": "https://bqurtas.com/assets/portrait.webp",
+        "logo": "https://bqurtas.com/assets/portrait.webp",
         "email": "info@bqurtas.com",
         "telephone": "+9647517884985",
         "priceRange": "$$",
+        "currenciesAccepted": "IQD, USD",
+        "paymentAccepted": "Cash, Bank transfer",
+        "sameAs": [
+          "https://www.linkedin.com/in/bqurtas/",
+          "https://instagram.com/bqurtas",
+          "https://www.behance.net/bqurtas"
+        ],
         "founder": { "@id": "https://bqurtas.com/#person" },
         "areaServed": [ { "@type": "Place", "name": "Kurdistan Region, Iraq" }, { "@type": "Place", "name": "Iraq" }, { "@type": "Place", "name": "Worldwide (remote)" } ],
         "address": { "@type": "PostalAddress", "addressLocality": "Erbil", "addressRegion": "Kurdistan Region", "addressCountry": "IQ" },
+        "geo": { "@type": "GeoCoordinates", "latitude": 36.1901, "longitude": 44.0091 },
+        "openingHoursSpecification": [
+          { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"], "opens": "10:00", "closes": "18:00" }
+        ],
         "knowsLanguage": ["ckb", "ku", "ar", "en"],
         "makesOffer": [
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Brand Identity & Logo Design" } },
@@ -152,7 +164,7 @@
   </script>
 
   <!-- Fonts — self-hosted (no external Google Fonts dependency; faster + private) -->
-  <link rel="stylesheet" href="css/fonts.css?v=203">
+  <link rel="stylesheet" href="css/fonts.css?v=204">
 
   <!-- jsDelivr serves Font Awesome + the gallery images — connect early -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -170,7 +182,7 @@
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous"></noscript>
   <script>(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css';l.integrity='sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g';l.crossOrigin='anonymous';l.referrerPolicy='no-referrer';document.head.appendChild(l);})();</script>
 
-  <link rel="stylesheet" href="css/style.css?v=203" />
+  <link rel="stylesheet" href="css/style.css?v=204" />
 </head>
 <body>
 
@@ -1422,7 +1434,13 @@
 
       <!-- Console -->
       <div class="dash-main" id="dashMain" hidden>
-        <nav class="dash-tabs">
+        <nav class="dash-tabs" id="dashTabs">
+          <!-- Mobile-only compact bar: avatar + current section + menu toggle -->
+          <button class="dash-mbar" id="dashMenuToggle" type="button" aria-expanded="false" aria-controls="dashTabs" aria-label="Menu">
+            <span class="dash-mbar-av" id="dashMbarAv">Bq</span>
+            <span class="dash-mbar-cur" id="dashMbarCur">Overview</span>
+            <span class="dash-mbar-bars" aria-hidden="true"><i class="fa-solid fa-bars"></i></span>
+          </button>
           <div class="dash-side-id">
             <span class="dash-side-av" id="dashSideAv">Bq</span>
             <div class="dash-side-meta">
@@ -1529,10 +1547,10 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script src="js/i18n.js?v=203"></script>
-  <script src="js/chat-kb.js?v=203"></script>
-  <script src="js/main.js?v=203"></script>
-  <script src="js/gallery.js?v=203"></script>
-  <script src="js/enhance.js?v=203"></script>
+  <script src="js/i18n.js?v=204"></script>
+  <script src="js/chat-kb.js?v=204"></script>
+  <script src="js/main.js?v=204"></script>
+  <script src="js/gallery.js?v=204"></script>
+  <script src="js/enhance.js?v=204"></script>
 </body>
 </html>
