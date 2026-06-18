@@ -3103,6 +3103,9 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
 .hf-sub { font-size: 9px; letter-spacing: 0.14em; color: var(--ink-muted); }
 .hf-go { font-size: 9px; letter-spacing: 0.18em; color: var(--gold); text-transform: uppercase; margin-top: 2px; }
 .hero-float.is-portrait .hf-go { display: none; }
+/* the name shown with the cursor (portrait mode only) is set in Liana — Barakat's
+   logo font — while discipline titles in album mode keep Fraunces. */
+.hero-float.is-portrait .hf-title { font-family: 'Liana', 'Fraunces', serif; font-style: normal; font-size: 27px; line-height: 1.05; }
 
 /* ---------- 5 · GO TO TOP (bottom-right) ---------- */
 .to-top {

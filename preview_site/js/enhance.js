@@ -1714,6 +1714,16 @@
       }, 160);
     };
 
+    /* the rich preview card is itself a shortcut into the post it's showing —
+       its "Click to read the full note" now actually opens that post. */
+    if (els.card) {
+      els.card.style.cursor = 'pointer';
+      els.card.setAttribute('role', 'button');
+      els.card.setAttribute('tabindex', '0');
+      els.card.addEventListener('click', () => { if (curPost) openReader(curPost); });
+      els.card.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && curPost) { e.preventDefault(); openReader(curPost); } });
+    }
+
     /* ----- render the current page of rows ----- */
     let curCat = 'all';
     const catNorm = (s) => String(s || '').trim().toLowerCase();
