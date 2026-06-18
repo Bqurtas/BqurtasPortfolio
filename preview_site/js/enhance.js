@@ -688,7 +688,7 @@
 
     /* ---- Dashboard translations (follows the site language) ---- */
     const DASH_I18N = {
-      en: { overview:'Overview', visitors:'Visitors', works:'Works', latest:'Latest', leads:'Leads', profile:'Profile', settings:'Settings', content:'Content', assistant:'Assistant',
+      en: { overview:'Overview', visitors:'Visitors', works:'Works', latest:'Latest', leads:'Leads', profile:'Profile', settings:'Settings', content:'Content', cases:'Projects', assistant:'Assistant',
         gateTitle:'Enter access code', gatePrivate:'This console is private.', gatePh:'Access code', unlock:'Unlock', wrong:'✗ Wrong access code.', twoTitle:'Enter the SMS code', twoNote:'We texted a 6-digit code to your phone.', twoPh:'6-digit code', twoWrong:'✗ Wrong or expired code.', twoSending:'Sending code…', twoSetupBtn:'Set up 2FA (authenticator)', twoSetup1:'1) In Cloudflare set TOTP_SECRET to this (then Retry deployment):', twoSetup2:'2) Add the same key to Google Authenticator (manual entry: "Pencemor Studio"). Tap the key to copy.', twoSetupLink:'open in app',
         oTotal:'Total works', oColl:'Collections', oLeads:'Leads stored', oLangs:'Languages', oBlogs:'Blog posts', oAdmins:'Admins', oWelcome:'Welcome back — your studio console is private to you; data lives in this browser.',
         lEmpty:'No leads yet. Pitches from the Contact form appear here.', lClear:'Clear all leads', lConfirm:'Delete all stored leads?',
@@ -697,7 +697,7 @@
         vConnect:'Connect your analytics', vEnter:'Enter the STATS_TOKEN you set in Cloudflare.', vTokenPh:'Stats token', vConnectBtn:'Connect', vLoading:'Loading visitor data…',
         tAi:'AI', tLang:'Language', tTheme:'Theme', tAddAdmin:'Add admin', tLogout:'Log out', tClose:'Close',
         admYou:'Owner', admName:'Name', admEmail:'Email', admRole:'Role', admAdd:'Add admin', admEmpty:'No additional admins yet.', admRemove:'Remove', admNote:'Shared login across devices needs the backend login system; for now these admins are saved privately in this browser.', logoutAsk:'Log out of the console?' },
-      ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', latest:'نوێترین', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن', content:'ناوەڕۆک', assistant:'یاریدەدەر',
+      ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', latest:'نوێترین', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن', content:'ناوەڕۆک', cases:'پڕۆژەکان', assistant:'یاریدەدەر',
         gateTitle:'کۆدی چوونەژوورەوە بنووسە', gatePrivate:'ئەم کۆنسۆڵە تایبەتە.', gatePh:'کۆدی چوونەژوورەوە', unlock:'کردنەوە', wrong:'✗ کۆدەکە هەڵەیە.', twoTitle:'کۆدی SMS بنووسە', twoNote:'کۆدێکی ٦ ژمارەیی نێردرا بۆ مۆبایلەکەت.', twoPh:'کۆدی ٦ ژمارەیی', twoWrong:'✗ کۆد هەڵەیە یان بەسەرچووە.', twoSending:'ناردنی کۆد…', twoSetupBtn:'ڕێکخستنی 2FA (ئەپی ئۆتێنتیکەیتەر)', twoSetup1:'١) لە Cloudflare، TOTP_SECRET بکە بەمە (پاشان Retry deployment):', twoSetup2:'٢) هەمان کلیل بخە ناو Google Authenticator (داخڵکردنی دەستی: «Pencemor Studio»). کلیک لە کلیلەکە بکە بۆ کۆپی.', twoSetupLink:'لە ئەپ بیکەرەوە',
         oTotal:'کۆی کارەکان', oColl:'کۆکراوەکان', oLeads:'داواکاری هەڵگیراو', oLangs:'زمانەکان', oBlogs:'بابەتی بلۆگ', oAdmins:'بەڕێوەبەران', oWelcome:'بەخێربێیتەوە — کۆنسۆڵی ستۆدیۆ تەنها بۆ تۆیە؛ زانیارییەکان لەم وێبگەڕەدا دەمێننەوە.',
         lEmpty:'هێشتا داواکاری نییە. پرۆژەکانی فۆڕمی پەیوەندی لێرە دەردەکەون.', lClear:'سڕینەوەی هەموو داواکارییەکان', lConfirm:'هەموو داواکارییە هەڵگیراوەکان بسڕێتەوە؟',
@@ -706,7 +706,7 @@
         vConnect:'ئامارەکانت ببەستەوە', vEnter:'ئەو STATS_TOKENـەی لە Cloudflare دانراوە بنووسە.', vTokenPh:'تۆکنی ئامار', vConnectBtn:'بەستنەوە', vLoading:'بارکردنی زانیاری سەردانکەران…',
         tAi:'AI', tLang:'زمان', tTheme:'ڕووکار', tAddAdmin:'زیادکردنی ئەدمین', tLogout:'چوونەدەرەوە', tClose:'داخستن',
         admYou:'خاوەن', admName:'ناو', admEmail:'ئیمەیل', admRole:'ڕۆڵ', admAdd:'زیادکردنی ئەدمین', admEmpty:'هێشتا ئەدمینی زیاتر نییە.', admRemove:'لابردن', admNote:'چوونەژوورەوەی هاوبەش لەنێوان ئامێرەکان پێویستی بە سیستەمی سێرڤەرە؛ ئێستا ئەم ئەدمینانە بە تایبەتی لەم وێبگەڕەدا هەڵگیراون.', logoutAsk:'لە کۆنسۆڵ بچیتە دەرەوە؟' },
-      ar: { overview:'نظرة عامة', visitors:'الزوار', works:'الأعمال', leads:'الطلبات', profile:'الملف', settings:'الإعدادات', content:'المحتوى', assistant:'المساعد',
+      ar: { overview:'نظرة عامة', visitors:'الزوار', works:'الأعمال', leads:'الطلبات', profile:'الملف', settings:'الإعدادات', content:'المحتوى', cases:'المشاريع', assistant:'المساعد',
         gateTitle:'أدخل رمز الدخول', gatePrivate:'هذه اللوحة خاصة.', gatePh:'رمز الدخول', unlock:'فتح', wrong:'✗ رمز خاطئ.', twoTitle:'أدخل رمز الرسالة', twoNote:'أرسلنا رمزاً من ٦ أرقام إلى هاتفك.', twoPh:'رمز من ٦ أرقام', twoWrong:'✗ رمز خاطئ أو منتهٍ.', twoSending:'جار إرسال الرمز…', twoSetupBtn:'إعداد 2FA (تطبيق المصادقة)', twoSetup1:'١) في Cloudflare اضبط TOTP_SECRET على هذا (ثم Retry deployment):', twoSetup2:'٢) أضف نفس المفتاح إلى Google Authenticator (إدخال يدوي: «Pencemor Studio»). انقر المفتاح للنسخ.', twoSetupLink:'افتح في التطبيق',
         oTotal:'إجمالي الأعمال', oColl:'المجموعات', oLeads:'الطلبات المحفوظة', oLangs:'اللغات', oWelcome:'أهلاً بعودتك — لوحة الاستوديو خاصة بك؛ البيانات تبقى في هذا المتصفح.',
         lEmpty:'لا طلبات بعد. تظهر هنا مشاريع نموذج التواصل.', lClear:'مسح كل الطلبات', lConfirm:'حذف كل الطلبات المحفوظة؟',
@@ -715,7 +715,7 @@
         vConnect:'اربط تحليلاتك', vEnter:'أدخل STATS_TOKEN الذي ضبطته في Cloudflare.', vTokenPh:'رمز الإحصاءات', vConnectBtn:'اتصال', vLoading:'تحميل بيانات الزوار…',
         tAi:'AI', tLang:'اللغة', tTheme:'المظهر', tAddAdmin:'إضافة مشرف', tLogout:'تسجيل الخروج', tClose:'إغلاق',
         admYou:'المالك', admName:'الاسم', admEmail:'البريد', admRole:'الدور', admAdd:'إضافة مشرف', admEmpty:'لا مشرفين إضافيين بعد.', admRemove:'إزالة', admNote:'تسجيل الدخول المشترك بين الأجهزة يحتاج نظام الخادم؛ حالياً هؤلاء المشرفون محفوظون في هذا المتصفح فقط.', logoutAsk:'تسجيل الخروج من اللوحة؟' },
-      kmr: { overview:'Giştî', visitors:'Mêvan', works:'Kar', leads:'Daxwaz', profile:'Profîl', settings:'Mîheng', content:'Naverok', assistant:'Alîkar',
+      kmr: { overview:'Giştî', visitors:'Mêvan', works:'Kar', leads:'Daxwaz', profile:'Profîl', settings:'Mîheng', content:'Naverok', cases:'Proje', assistant:'Alîkar',
         gateTitle:'Koda gihiştinê binivîse', gatePrivate:'Ev konsol taybet e.', gatePh:'Koda gihiştinê', unlock:'Veke', wrong:'✗ Koda çewt.', twoTitle:'Koda SMSê binivîse', twoNote:'Me koda 6-hejmarî şand telefona te.', twoPh:'Koda 6-hejmarî', twoWrong:'✗ Koda çewt an qediyayî.', twoSending:'Kod tê şandin…', twoSetupBtn:'Sazkirina 2FA (sepana erêkirinê)', twoSetup1:'1) Li Cloudflare TOTP_SECRET wiha saz bike (paşê Retry deployment):', twoSetup2:'2) Heman mifte têxe Google Authenticator (têketina destî: "Pencemor Studio"). Li mifte bitikîne ji bo kopî.', twoSetupLink:'di sepanê de veke',
         oTotal:'Tevahiya karan', oColl:'Berhevok', oLeads:'Daxwazên tomarkirî', oLangs:'Ziman', oWelcome:'Bi xêr hatî — konsola studyoyê taybet e ji te re; dane di vê gerokê de dimînin.',
         lEmpty:'Hêj daxwaz tune. Pêşniyarên forma têkiliyê li vir xuya dibin.', lClear:'Hemû daxwazan paqij bike', lConfirm:'Hemû daxwazên tomarkirî werin jêbirin?',
@@ -724,7 +724,7 @@
         vConnect:'Analîtîkên xwe girêde', vEnter:'STATS_TOKEN ya ku te di Cloudflare de danî binivîse.', vTokenPh:'Tokena statîstîkê', vConnectBtn:'Girêde', vLoading:'Daneyên mêvanan tê barkirin…',
         tAi:'AI', tLang:'Ziman', tTheme:'Tema', tAddAdmin:'Admîn zêde bike', tLogout:'Derkeve', tClose:'Bigire',
         admYou:'Xwedî', admName:'Nav', admEmail:'E-name', admRole:'Rol', admAdd:'Admîn zêde bike', admEmpty:'Hêj admînên din tune.', admRemove:'Rake', admNote:'Têketina hevpar a di navbera amûran de pêdivî bi sîstema backend heye; niha ev admîn bi taybetî di vê gerokê de tên parastin.', logoutAsk:'Ji konsolê derkevî?' },
-      fr: { overview:'Aperçu', visitors:'Visiteurs', works:'Travaux', leads:'Demandes', profile:'Profil', settings:'Réglages', content:'Contenu', assistant:'Assistant',
+      fr: { overview:'Aperçu', visitors:'Visiteurs', works:'Travaux', leads:'Demandes', profile:'Profil', settings:'Réglages', content:'Contenu', cases:'Projets', assistant:'Assistant',
         gateTitle:"Entrez le code d'accès", gatePrivate:'Cette console est privée.', gatePh:"Code d'accès", unlock:'Déverrouiller', wrong:'✗ Code incorrect.', twoTitle:'Entrez le code SMS', twoNote:'Un code à 6 chiffres a été envoyé à votre téléphone.', twoPh:'Code à 6 chiffres', twoWrong:'✗ Code incorrect ou expiré.', twoSending:'Envoi du code…', twoSetupBtn:'Configurer la 2FA (authentification)', twoSetup1:'1) Dans Cloudflare, définissez TOTP_SECRET sur ceci (puis Retry deployment) :', twoSetup2:'2) Ajoutez la même clé à Google Authenticator (saisie manuelle : « Pencemor Studio »). Cliquez la clé pour copier.', twoSetupLink:'ouvrir dans l’app',
         oTotal:'Total des travaux', oColl:'Collections', oLeads:'Demandes enregistrées', oLangs:'Langues', oWelcome:'Bon retour — votre console studio est privée ; les données restent dans ce navigateur.',
         lEmpty:'Aucune demande pour l’instant. Les projets du formulaire de contact apparaissent ici.', lClear:'Effacer toutes les demandes', lConfirm:'Supprimer toutes les demandes enregistrées ?',
@@ -1578,7 +1578,97 @@
       loadList();
     };
 
-    const VIEWS = { overview: renderOverview, visitors: renderVisitors, works: renderWorks, content: renderContent, latest: renderLatest, assistant: renderAssistant, admins: renderAdmins, leads: renderLeads, profile: renderProfile, settings: renderSettings };
+    /* ---- Projects / Case studies manager (Supabase `projects` via projects-admin) ---- */
+    const PR_I18N = {
+      en: { gate:'Manage case studies', note:'Enter your edit token to add and edit projects.', conn:'Connect', tokPh:'Edit token', newBtn:'New case study', edit:'Edit', del:'Delete', delAsk:'Delete this project permanently?', back:'All projects', loading:'Loading…', empty:'No case studies yet — add your first.', fTitle:'Project title', fClient:'Client', fYear:'Year', fRole:'Role / scope', fTag:'Category', fAccent:'Accent colour', fCover:'Cover image', fSummary:'The brief (one strong paragraph)', fBody:'The story (separate paragraphs with a blank line)', fPalette:'Palette — one per line, e.g.  Clay #BD4A2C', fGallery:'In-use images', fPub:'Published — visible on the site', save:'Publish', update:'Update', translating:'Translating to all languages…', saving:'Saving…', saved:'Saved ✓', err:'Could not reach the service (works on the live site).', needTitle:'Please add a title.', uploading:'Uploading…', add:'Add', remove:'Remove' },
+      ku: { gate:'بەڕێوەبردنی تاوتوێی پڕۆژە', note:'تۆکنی دەستکاریت بنووسە بۆ زیادکردن و دەستکاری.', conn:'بەستنەوە', tokPh:'تۆکنی دەستکاری', newBtn:'تاوتوێی پڕۆژەی نوێ', edit:'دەستکاری', del:'سڕینەوە', delAsk:'ئەم پڕۆژەیە بە تەواوی بسڕێتەوە؟', back:'هەموو پڕۆژەکان', loading:'بارکردن…', empty:'هێشتا هیچ تاوتوێیەک نییە — یەکەمیان زیاد بکە.', fTitle:'ناونیشانی پڕۆژە', fClient:'کڕیار', fYear:'ساڵ', fRole:'ڕۆڵ / مەودا', fTag:'کەتەگۆری', fAccent:'ڕەنگی سەرەکی', fCover:'وێنەی سەرەکی', fSummary:'بریف (یەک پەرەگرافی بەهێز)', fBody:'چیرۆکەکە (پەرەگرافەکان بە دێڕی بەتاڵ جیابکەرەوە)', fPalette:'پاڵێت — هەر دێڕێک، نموونە  Clay #BD4A2C', fGallery:'وێنەکانی بەکارهێنان', fPub:'بڵاوکراوە — لەسەر سایت دیارە', save:'بڵاوکردنەوە', update:'نوێکردنەوە', translating:'وەردەگێڕدرێت بۆ هەموو زمانەکان…', saving:'پاشەکەوت دەکرێت…', saved:'پاشەکەوتکرا ✓', err:'نەگەیشتە خزمەتگوزاری (لەسەر سایتە زیندووەکە کاردەکات).', needTitle:'تکایە ناونیشانێک زیاد بکە.', uploading:'بارکردن…', add:'زیادکردن', remove:'لابردن' },
+      ar: { gate:'إدارة دراسات الحالة', note:'أدخل رمز التحرير للإضافة والتعديل.', conn:'اتصال', tokPh:'رمز التحرير', newBtn:'دراسة حالة جديدة', edit:'تعديل', del:'حذف', delAsk:'حذف هذا المشروع نهائياً؟', back:'كل المشاريع', loading:'جارٍ التحميل…', empty:'لا دراسات حالة بعد — أضف أول واحدة.', fTitle:'عنوان المشروع', fClient:'العميل', fYear:'السنة', fRole:'الدور / النطاق', fTag:'التصنيف', fAccent:'اللون الأساسي', fCover:'صورة الغلاف', fSummary:'الموجز (فقرة قوية واحدة)', fBody:'القصة (افصل الفقرات بسطر فارغ)', fPalette:'الألوان — واحد بكل سطر، مثل  Clay #BD4A2C', fGallery:'صور الاستخدام', fPub:'منشور — ظاهر على الموقع', save:'نشر', update:'تحديث', translating:'جارٍ الترجمة إلى كل اللغات…', saving:'جارٍ الحفظ…', saved:'تم الحفظ ✓', err:'تعذّر الوصول إلى الخدمة (تعمل على الموقع المباشر).', needTitle:'الرجاء إضافة عنوان.', uploading:'جارٍ الرفع…', add:'إضافة', remove:'حذف' },
+      kmr: { gate:'Birêvebirina lêkolînên rewşê', note:'Ji bo zêdekirin û guhertinê tokena xwe binivîse.', conn:'Girêde', tokPh:'Tokena guhertinê', newBtn:'Lêkolîna nû', edit:'Biguhere', del:'Jê bibe', delAsk:'Ev proje bi temamî were jêbirin?', back:'Hemû proje', loading:'Tê barkirin…', empty:'Hêj lêkolîn tune — ya yekem zêde bike.', fTitle:'Sernavê projeyê', fClient:'Mişterî', fYear:'Sal', fRole:'Rol / qad', fTag:'Kategorî', fAccent:'Rengê sereke', fCover:'Wêneyê bergê', fSummary:'Kurte (paragrafek xurt)', fBody:'Çîrok (paragrafan bi rêzeke vala veqetîne)', fPalette:'Palet — her rêz yek, mînak  Clay #BD4A2C', fGallery:'Wêneyên bikaranînê', fPub:'Weşandî — li ser malperê xuya ye', save:'Biweşîne', update:'Nûve bike', translating:'Ji bo hemû zimanan tê wergerandin…', saving:'Tê tomarkirin…', saved:'Hat tomarkirin ✓', err:'Negihîşt xizmetê (li ser malpera zindî dixebite).', needTitle:'Ji kerema xwe sernavekê zêde bike.', uploading:'Tê barkirin…', add:'Zêde bike', remove:'Rake' },
+      fr: { gate:'Gérer les études de cas', note:"Saisissez votre jeton d'édition pour ajouter et modifier.", conn:'Connecter', tokPh:"Jeton d'édition", newBtn:'Nouvelle étude de cas', edit:'Modifier', del:'Supprimer', delAsk:'Supprimer définitivement ce projet ?', back:'Tous les projets', loading:'Chargement…', empty:'Aucune étude de cas — ajoutez la première.', fTitle:'Titre du projet', fClient:'Client', fYear:'Année', fRole:'Rôle / périmètre', fTag:'Catégorie', fAccent:'Couleur d’accent', fCover:'Image de couverture', fSummary:'Le brief (un paragraphe fort)', fBody:'Le récit (séparez les paragraphes par une ligne vide)', fPalette:'Palette — une par ligne, ex.  Clay #BD4A2C', fGallery:'Images en usage', fPub:'Publié — visible sur le site', save:'Publier', update:'Mettre à jour', translating:'Traduction dans toutes les langues…', saving:'Enregistrement…', saved:'Enregistré ✓', err:'Service inaccessible (fonctionne sur le site en ligne).', needTitle:'Veuillez ajouter un titre.', uploading:'Téléversement…', add:'Ajouter', remove:'Retirer' }
+    };
+    const PT = (k) => (PR_I18N[curLang()] || PR_I18N.en)[k] || PR_I18N.en[k] || k;
+    const prjApi = (payload) => { const SB = window.BQ_SUPA || {}; return fetch(SB.url + '/functions/v1/projects-admin', { method:'POST', headers:{ 'Content-Type':'application/json', apikey:SB.key, Authorization:'Bearer ' + SB.key, 'x-edit-token':editToken() }, body:JSON.stringify(payload) }).then(r => r.json().catch(() => ({ error:'bad_response' }))); };
+    const parsePalette = (txt) => String(txt || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => { const m = l.match(/(#[0-9a-fA-F]{3,8})\s*$/); const hex = m ? m[1] : ''; const name = (m ? l.slice(0, m.index) : l).replace(/[,:\s]+$/, '').trim(); return hex ? { name: name || hex, hex } : null; }).filter(Boolean);
+    const paletteToText = (arr) => (Array.isArray(arr) ? arr : []).map(s => (s.name ? s.name + ' ' : '') + (s.hex || '')).join('\n');
+    const buildProjectI18n = async (p, onProgress) => {
+      const langs = Object.keys(TR_LANGS), i18n = {}; const pick = (t, b) => (t && t.trim()) ? t : (b || '');
+      for (let k = 0; k < langs.length; k++) {
+        const tl = TR_LANGS[langs[k]];
+        const [title, client, role, tag, summary, body] = await Promise.all([trText(p.title, tl), trText(p.client, tl), trText(p.role, tl), trText(p.tag, tl), trText(p.summary, tl), trText(p.body, tl)]);
+        i18n[langs[k]] = { title: pick(title, p.title), client: pick(client, p.client), role: pick(role, p.role), tag: pick(tag, p.tag), summary: pick(summary, p.summary), body: pick(body, p.body) };
+        if (onProgress) onProgress(k + 1, langs.length);
+      }
+      return i18n;
+    };
+    const prjGate = () => {
+      view.innerHTML = `<div class="cms-gate"><h3>${esc(PT('gate'))}</h3><p class="dash-note mono">${esc(PT('note'))}</p>
+        <form id="prjTokForm" class="cms-tokform"><input id="prjTok" type="password" placeholder="${esc(PT('tokPh'))}" autocomplete="off"><button class="dash-btn dash-btn--go" type="submit">${esc(PT('conn'))}</button></form></div>`;
+      $('#prjTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#prjTok').value.trim(); if (!v) return; try { localStorage.setItem('bq_edit_token', v); } catch (x) {} renderCases(); });
+    };
+    const prjList = () => {
+      view.innerHTML = `<div class="cms-head"><span class="mono cms-status">${esc(PT('loading'))}</span><button class="dash-btn dash-btn--go" id="prjNew"><i class="fa-solid fa-plus"></i> ${esc(PT('newBtn'))}</button></div><div id="prjRows"></div>`;
+      $('#prjNew').addEventListener('click', () => prjForm({}));
+      prjApi({ action:'list' }).then((d) => {
+        if (d && (d.error === 'unauthorized' || d.error === 'missing_token')) { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} prjGate(); return; }
+        const rows = (d && d.projects) || [];
+        $('.cms-status').textContent = rows.length ? '' : PT('empty');
+        $('#prjRows').innerHTML = rows.map(p => `<div class="cms-row"><span class="cms-row-dot" style="background:${esc(p.accent || '#bd4a2c')}"></span>
+          <div class="cms-row-t"><strong>${esc(p.title)}</strong><span class="mono">${esc([p.client, p.year].filter(Boolean).join(' · '))}${p.published ? '' : ' · draft'}</span></div>
+          <div class="cms-row-act"><button class="dash-btn" data-edit="${p.id}"><i class="fa-solid fa-pen"></i> ${esc(PT('edit'))}</button><button class="dash-btn dash-btn--danger" data-del="${p.id}"><i class="fa-solid fa-trash"></i></button></div></div>`).join('');
+        $('#prjRows').querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => prjForm(rows.find(x => String(x.id) === b.getAttribute('data-edit')) || {})));
+        $('#prjRows').querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm(PT('delAsk'))) return; prjApi({ action:'delete', id: Number(b.getAttribute('data-del')) }).then(() => { if (window.__bqReloadWork) window.__bqReloadWork(); prjList(); }); }));
+      }).catch(() => { $('.cms-status').textContent = PT('err'); });
+    };
+    const prjForm = (p) => {
+      let gal = Array.isArray(p.gallery) ? p.gallery.slice() : [];
+      const drawGal = () => { const g = $('#prjGalList'); if (!g) return; g.innerHTML = gal.map((x, i) => `<span class="cms-gal"><img src="${esc(x.url)}" alt=""><button type="button" data-rm="${i}" aria-label="remove">×</button></span>`).join(''); g.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => { gal.splice(Number(b.getAttribute('data-rm')), 1); drawGal(); })); };
+      view.innerHTML = `<form id="prjForm" class="cms-form">
+        <div class="cms-head"><button class="dash-btn" type="button" id="prjBack"><i class="fa-solid fa-arrow-left"></i> ${esc(PT('back'))}</button></div>
+        <div class="dash-grid-2">
+          <label class="dash-field"><span class="mono">${esc(PT('fTitle'))}</span><input id="pf_title" value="${esc(p.title || '')}"></label>
+          <label class="dash-field"><span class="mono">${esc(PT('fClient'))}</span><input id="pf_client" value="${esc(p.client || '')}"></label>
+          <label class="dash-field"><span class="mono">${esc(PT('fYear'))}</span><input id="pf_year" value="${esc(p.year || '')}"></label>
+          <label class="dash-field"><span class="mono">${esc(PT('fRole'))}</span><input id="pf_role" value="${esc(p.role || '')}"></label>
+          <label class="dash-field"><span class="mono">${esc(PT('fTag'))}</span><input id="pf_tag" value="${esc(p.tag || 'Brand Identity')}"></label>
+          <label class="dash-field"><span class="mono">${esc(PT('fAccent'))}</span><input id="pf_accent" type="color" value="${esc(p.accent || '#bd4a2c')}" class="cms-color"></label>
+        </div>
+        <label class="dash-field"><span class="mono">${esc(PT('fCover'))}</span><input id="pf_coverfile" type="file" accept="image/*" class="cms-file"><span class="dash-note mono" id="pf_upmsg"></span></label>
+        <figure class="cms-cover-prev" id="pf_prev"${p.cover ? '' : ' hidden'}><img src="${esc(p.cover || '')}" alt=""></figure>
+        <input type="hidden" id="pf_cover" value="${esc(p.cover || '')}">
+        <label class="dash-field"><span class="mono">${esc(PT('fSummary'))}</span><textarea id="pf_summary" rows="3">${esc(p.summary || '')}</textarea></label>
+        <label class="dash-field"><span class="mono">${esc(PT('fBody'))}</span><textarea id="pf_body" rows="9">${esc(p.body || '')}</textarea></label>
+        <label class="dash-field"><span class="mono">${esc(PT('fPalette'))}</span><textarea id="pf_palette" rows="4" placeholder="Clay #BD4A2C">${esc(paletteToText(p.palette))}</textarea></label>
+        <label class="dash-field"><span class="mono">${esc(PT('fGallery'))}</span><input id="pf_galfile" type="file" accept="image/*" multiple class="cms-file"><span class="dash-note mono" id="pf_galmsg"></span></label>
+        <div class="cms-gal-list" id="prjGalList"></div>
+        <label class="cms-check"><input type="checkbox" id="pf_pub"${p.published ? ' checked' : ''}> <span>${esc(PT('fPub'))}</span></label>
+        <div class="cms-head"><button type="submit" class="dash-btn dash-btn--go" id="pf_save"><i class="fa-solid fa-paper-plane"></i> ${p.id ? esc(PT('update')) : esc(PT('save'))}</button><span class="dash-note mono" id="pf_msg"></span></div>
+      </form>`;
+      drawGal();
+      $('#prjBack').addEventListener('click', prjList);
+      $('#pf_coverfile').addEventListener('change', async (ev) => { const f = ev.target.files && ev.target.files[0]; if (!f) return; const um = $('#pf_upmsg'); um.textContent = PT('uploading'); try { const b64 = await cmsResize(f, 1600, 0.82); const d = await prjApi({ action:'upload', filename:f.name, contentType:'image/webp', dataB64:b64 }); if (d && d.ok && d.url) { $('#pf_cover').value = d.url; const pr = $('#pf_prev'); pr.hidden = false; pr.querySelector('img').src = d.url; um.textContent = '✓'; } else um.textContent = '✗'; } catch (e) { um.textContent = '✗'; } });
+      $('#pf_galfile').addEventListener('change', async (ev) => { const files = [...(ev.target.files || [])]; const gm = $('#pf_galmsg'); for (const f of files) { gm.textContent = PT('uploading'); try { const b64 = await cmsResize(f, 1600, 0.82); const d = await prjApi({ action:'upload', filename:f.name, contentType:'image/webp', dataB64:b64 }); if (d && d.ok && d.url) gal.push({ url:d.url }); } catch (e) {} } gm.textContent = '✓'; ev.target.value = ''; drawGal(); });
+      $('#prjForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msg = $('#pf_msg'); const title = $('#pf_title').value.trim();
+        if (!title) { msg.textContent = PT('needTitle'); return; }
+        const proj = { id: p.id || undefined, title, client: $('#pf_client').value.trim(), year: $('#pf_year').value.trim(), role: $('#pf_role').value.trim(), tag: $('#pf_tag').value.trim() || 'Brand Identity', accent: $('#pf_accent').value, cover: $('#pf_cover').value.trim(), summary: $('#pf_summary').value, body: $('#pf_body').value, palette: parsePalette($('#pf_palette').value), gallery: gal, published: $('#pf_pub').checked };
+        const btn = $('#pf_save'); btn.disabled = true;
+        let i18n = null;
+        try { i18n = await buildProjectI18n(proj, (d, n) => { msg.textContent = PT('translating') + ' ' + d + '/' + n; }); } catch (x) {}
+        msg.textContent = p.id ? PT('saving') : PT('saving');
+        prjApi({ action:'upsert', project: proj, i18n }).then((d) => {
+          btn.disabled = false;
+          if (d && (d.error === 'unauthorized' || d.error === 'missing_token')) { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} prjGate(); return; }
+          if (!d || !d.ok) { msg.textContent = '✗ ' + ((d && d.error) || ''); return; }
+          msg.textContent = PT('saved');
+          if (window.__bqReloadWork) window.__bqReloadWork();
+          setTimeout(prjList, 700);
+        }).catch(() => { btn.disabled = false; msg.textContent = PT('err'); });
+      });
+    };
+    const renderCases = () => { if (!editToken()) { prjGate(); return; } prjList(); };
+
+    const VIEWS = { overview: renderOverview, visitors: renderVisitors, works: renderWorks, content: renderContent, cases: renderCases, latest: renderLatest, assistant: renderAssistant, admins: renderAdmins, leads: renderLeads, profile: renderProfile, settings: renderSettings };
     const showConsole = () => {
       gate.hidden = true; main.hidden = false;
       dash.classList.add('is-full');           // console takes the full screen

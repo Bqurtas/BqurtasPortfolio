@@ -4131,3 +4131,17 @@ html[dir="rtl"] .bb-row-h, html[dir="rtl"] .bb-type small, html[dir="rtl"] .bb-c
 .wc-next .mono { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255, 255, 255, 0.8); }
 .wc-next-title { font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; color: #fff; }
 html[dir="rtl"] .wc-hero-tag, html[dir="rtl"] .wc-hero-meta, html[dir="rtl"] .wc-rh, html[dir="rtl"] .work-card-tag, html[dir="rtl"] .work-card-sub, html[dir="rtl"] .wc-next .mono, html[dir="rtl"] .wc-back, html[dir="rtl"] .wc-sw .mono { letter-spacing: 0; }
+
+/* ---- Dashboard: Projects (case studies) editor extras ---- */
+.cms-gate { text-align: center; max-width: 440px; margin: 36px auto; }
+.cms-gate h3 { font-family: 'Fraunces', serif; font-style: italic; font-size: 24px; margin-bottom: 8px; color: var(--ink); }
+.cms-tokform { display: flex; gap: 8px; margin-top: 16px; }
+.cms-tokform input { flex: 1; padding: 12px 14px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg-2); color: var(--ink); font-size: 14px; }
+.dash-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 620px) { .dash-grid-2 { grid-template-columns: 1fr; } }
+.cms-color { padding: 4px; height: 44px; cursor: pointer; border-radius: 8px; border: 1px solid var(--line); background: var(--bg-1); }
+.cms-row-dot { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.15); }
+.cms-gal-list { display: flex; flex-wrap: wrap; gap: 9px; margin: 4px 0 16px; }
+.cms-gal { position: relative; width: 86px; height: 64px; border-radius: 9px; overflow: hidden; border: 1px solid var(--line); }
+.cms-gal img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cms-gal button { position: absolute; top: 3px; right: 3px; width: 20px; height: 20px; border-radius: 50%; background: rgba(0,0,0,0.6); color: #fff; font-size: 14px; line-height: 1; cursor: pointer; border: none; }
