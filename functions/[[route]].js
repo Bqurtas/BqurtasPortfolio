@@ -16,7 +16,16 @@ const SITE = 'https://bqurtas.com';
 const SUPA = 'https://dcnkhzrishphpismmxuu.supabase.co';             // blog posts live here
 const SUPA_KEY = 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3';   // publishable (read-only, safe in client)
 const LANGS = ['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];                 // en = no prefix
-const ROOMS = ['blog', 'bio', 'contact'];
+const ROOMS = ['blog', 'bio', 'contact', 'brandboard'];
+const BB_OG = {
+  en:{t:'Brand Board — a free bilingual identity starter | Barakat Qurtas',d:'Generate a free brand board — your name in Kurdish and Latin, with a palette and type pairing. Then build the real thing with Barakat Qurtas.'},
+  ku:{t:'تابلۆی براند — دەستپێکی ناسنامەی بێ بەرامبەر | بەرەکات قورتاس',d:'تابلۆیەکی براندی بێ بەرامبەر دروست بکە — ناوەکەت بە کوردی و لاتین، لەگەڵ پاڵێت و جووتی فۆنت. دواتر هی ڕاستەقینە لەگەڵ بەرەکات قورتاس دروست بکە.'},
+  ar:{t:'لوحة العلامة — بداية هوية مجانية | بركات قرطاس',d:'أنشئ لوحة علامة مجانية — اسمك بالكردية واللاتينية، مع لوحة ألوان وتناغم خطوط. ثم اصنع الحقيقية مع بركات قرطاس.'},
+  kmr:{t:'Tabloya Brandê — destpêkek nasnameyê ya bêpere | Barakat Qurtas',d:'Tabloyek brandê ya bêpere çêbike — navê te bi kurdî û latînî, bi palet û cotê fontan. Paşê ya rastîn bi Barakat Qurtas ava bike.'},
+  fr:{t:'Planche de marque — un départ d’identité gratuit | Barakat Qurtas',d:'Générez une planche de marque gratuite — votre nom en kurde et en latin, avec palette et duo de polices. Puis créez la vraie avec Barakat Qurtas.'},
+  tr:{t:'Marka Panosu — ücretsiz iki dilli kimlik başlangıcı | Barakat Qurtas',d:'Ücretsiz bir marka panosu oluşturun — adınız Kürtçe ve Latin alfabesinde, palet ve yazı tipi eşleşmesiyle. Sonra gerçeğini Barakat Qurtas ile yapın.'},
+  sv:{t:'Varumärkestavla — en gratis tvåspråkig identitetsstart | Barakat Qurtas',d:'Skapa en gratis varumärkestavla — ditt namn på kurdiska och latin, med palett och typsnittspar. Bygg sedan den riktiga med Barakat Qurtas.'}
+};
 const TABS  = ['official','book','image','logo','posters','social','events','stationery','ai','business','invoices','video','other'];
 const LOCALE = { en:'en_US', ku:'ckb_IQ', kmr:'kmr_TR', ar:'ar_IQ', fr:'fr_FR', tr:'tr_TR', sv:'sv_SE' };
 // The author's name written in each language's own script — so AI engines and
@@ -97,6 +106,9 @@ export async function onRequest(context) {
       meta = (OG[r.lang] && OG[r.lang].blog) || OG.en.blog;
       img  = SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=3';
     }
+  } else if (r.key === 'brandboard') {
+    meta = BB_OG[r.lang] || BB_OG.en;
+    img  = SITE + '/assets/covers/' + r.lang + '-design.jpg?v=3';
   } else {
     meta = (OG[r.lang] && OG[r.lang][r.key]) || OG.en[r.key] || OG.en.home;
     img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=3';
