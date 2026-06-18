@@ -117,9 +117,9 @@ export async function onRequest(context) {
     "script-src 'nonce-" + nonce + "' 'strict-dynamic' 'unsafe-inline' https:",
     "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
     "font-src 'self' data: https://cdn.jsdelivr.net",
-    "img-src 'self' data: blob: https://cdn.jsdelivr.net https://raw.githubusercontent.com https://images.weserv.nl https://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com",
+    "img-src 'self' data: blob: https://cdn.jsdelivr.net https://raw.githubusercontent.com https://images.weserv.nl https://*.supabase.co",
     "media-src 'self' blob: https://cdn.jsdelivr.net https://raw.githubusercontent.com",
-    "connect-src 'self' https://cloud.umami.is https://api.umami.is https://gateway.umami.is https://*.supabase.co https://api.github.com https://api.web3forms.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://cdn.jsdelivr.net https://data.jsdelivr.com https://images.weserv.nl https://raw.githubusercontent.com",
+    "connect-src 'self' https://cloud.umami.is https://api.umami.is https://gateway.umami.is https://*.supabase.co https://api.github.com https://api.web3forms.com https://cdn.jsdelivr.net https://data.jsdelivr.com https://images.weserv.nl https://raw.githubusercontent.com",
     "frame-src 'self'",
     "worker-src 'self' blob:"
   ].join('; ');
