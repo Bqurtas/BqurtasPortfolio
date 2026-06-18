@@ -10,7 +10,7 @@
        same-origin script (no SRI needed → full Subresource-Integrity pass).
        The tracker still posts events to Umami cloud (gateway.umami.is/api/send,
        its built-in default), so the dashboard keeps receiving data. -->
-  <script defer src="js/umami.js?v=208" data-website-id="f58c1ade-02c7-4c2e-95b3-2bcbf2e354fa"></script>
+  <script defer src="js/umami.js?v=209" data-website-id="f58c1ade-02c7-4c2e-95b3-2bcbf2e354fa"></script>
 
   <!-- Google Analytics REMOVED 2026-06-18 — it was redundant with Umami (and
        showed no data in Semrush). gtag.js can't carry SRI, so dropping it gives
@@ -158,7 +158,7 @@
   </script>
 
   <!-- Fonts — self-hosted (no external Google Fonts dependency; faster + private) -->
-  <link rel="stylesheet" href="css/fonts.css?v=208">
+  <link rel="stylesheet" href="css/fonts.css?v=209">
 
   <!-- jsDelivr serves Font Awesome + the gallery images — connect early -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -176,7 +176,7 @@
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous"></noscript>
   <script>(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css';l.integrity='sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g';l.crossOrigin='anonymous';l.referrerPolicy='no-referrer';document.head.appendChild(l);})();</script>
 
-  <link rel="stylesheet" href="css/style.css?v=208" />
+  <link rel="stylesheet" href="css/style.css?v=209" />
 </head>
 <body>
 
@@ -246,6 +246,13 @@
         <span class="rail-tip">
           <span class="rail-tip-num">05</span>
           <span class="rail-tip-text" data-i18n="nav.brandboard">Brand Board</span>
+        </span>
+      </a>
+      <a href="/work" class="rail-link" data-route="work" aria-label="Selected Work">
+        <i class="fa-solid fa-folder-open rail-icon"></i>
+        <span class="rail-tip">
+          <span class="rail-tip-num">06</span>
+          <span class="rail-tip-text" data-i18n="nav.work">Selected Work</span>
         </span>
       </a>
     </nav>
@@ -419,6 +426,10 @@
         <a href="/brandboard" class="mobile-link" data-route="brandboard">
           <i class="fa-solid fa-swatchbook"></i>
           <span data-i18n="nav.brandboard">Brand Board</span>
+        </a>
+        <a href="/work" class="mobile-link" data-route="work">
+          <i class="fa-solid fa-folder-open"></i>
+          <span data-i18n="nav.work">Selected Work</span>
         </a>
       </nav>
     </div>
@@ -1338,6 +1349,38 @@
       </div>
     </section>
 
+    <!-- =====================================================================
+         SELECTED WORK ROOM (#06) — brand-identity case studies.
+         Index + immersive case-study view are built by js/work.js.
+         ===================================================================== -->
+    <section class="room is-hidden" id="work" data-room="work">
+      <div class="room-hero">
+        <a class="room-hero-return" href="/design" data-route="design" aria-label="Return to start"><i class="fa-solid fa-arrow-left-long"></i> <span data-i18n="rh.return">Return to start</span></a>
+        <span class="room-hero-corner room-hero-corner--tr mono"><i class="fa-solid fa-location-dot"></i> <span data-i18n="krg">Hewlêr · KRG</span></span>
+        <span class="room-hero-corner room-hero-corner--bl mono">36.19° N · 44.01° E</span>
+        <div class="room-hero-inner">
+          <span class="room-hero-ghost" aria-hidden="true">06</span>
+          <span class="mono room-hero-num" data-i18n="rh.work.num">№ 06 · Selected Work</span>
+          <h2 class="room-hero-title" data-i18n="rh.work.title">Selected <em>Work</em></h2>
+          <p class="room-hero-sub" data-i18n="rh.work.sub">Brand identities, in full — the brief, the marks, the palette, and the system in use.</p>
+        </div>
+        <div class="room-hero-scroll" aria-hidden="true">
+          <span class="mono" data-i18n="rh.scroll">Scroll</span>
+          <span class="room-hero-scroll-line"></span>
+        </div>
+      </div>
+
+      <div class="section">
+        <header class="section-head">
+          <span class="section-num mono"><i class="fa-solid fa-folder-open"></i> &nbsp; 06 — <span data-i18n="work.label">Case Studies</span></span>
+          <h2 class="section-title" data-i18n="work.title">Identities, in <em>full</em>.</h2>
+          <p class="section-lede" data-i18n="work.lede">A closer look at a few brand systems — how each one was found, drawn and made.</p>
+        </header>
+        <div id="workIndex" class="work-index"></div>
+        <div id="workView" class="work-view" hidden></div>
+      </div>
+    </section>
+
     <!-- ===== FOOTER ===== -->
     <footer class="footer">
       <!-- CTA strip -->
@@ -1373,6 +1416,7 @@
               <a href="/bio" data-route="bio" data-i18n="nav.bio">Biography</a>
               <a href="/contact" data-route="contact" data-i18n="nav.contact">Contact</a>
               <a href="/brandboard" data-route="brandboard" data-i18n="nav.brandboard">Brand Board</a>
+              <a href="/work" data-route="work" data-i18n="nav.work">Selected Work</a>
             </nav>
           </div>
 
@@ -1584,11 +1628,12 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script src="js/i18n.js?v=208"></script>
-  <script src="js/chat-kb.js?v=208"></script>
-  <script src="js/main.js?v=208"></script>
-  <script src="js/gallery.js?v=208"></script>
-  <script src="js/enhance.js?v=208"></script>
-  <script src="js/brandboard.js?v=208"></script>
+  <script src="js/i18n.js?v=209"></script>
+  <script src="js/chat-kb.js?v=209"></script>
+  <script src="js/main.js?v=209"></script>
+  <script src="js/gallery.js?v=209"></script>
+  <script src="js/enhance.js?v=209"></script>
+  <script src="js/brandboard.js?v=209"></script>
+  <script src="js/work.js?v=209"></script>
 </body>
 </html>

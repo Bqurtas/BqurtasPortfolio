@@ -16,7 +16,16 @@ const SITE = 'https://bqurtas.com';
 const SUPA = 'https://dcnkhzrishphpismmxuu.supabase.co';             // blog posts live here
 const SUPA_KEY = 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3';   // publishable (read-only, safe in client)
 const LANGS = ['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];                 // en = no prefix
-const ROOMS = ['blog', 'bio', 'contact', 'brandboard'];
+const ROOMS = ['blog', 'bio', 'contact', 'brandboard', 'work'];
+const WORK_OG = {
+  en:{t:'Selected Work — brand-identity case studies | Barakat Qurtas',d:'A closer look at brand systems by Barakat Qurtas — the brief, the marks, the palette and the system in use. Bilingual identity for Kurdistan and beyond.'},
+  ku:{t:'کارە هەڵبژێردراوەکان — تاوتوێی پڕۆژەی ناسنامە | بەرەکات قورتاس',d:'سەیرێکی نزیکتر بۆ سیستەمی براندەکانی بەرەکات قورتاس — بریف، مارک، پاڵێت و سیستەم لە بەکارهێنان. ناسنامەی دووزمانی بۆ کوردستان و دەرەوەی.'},
+  ar:{t:'أعمال مختارة — دراسات حالة لهويات العلامات | بركات قرطاس',d:'نظرة أقرب على أنظمة العلامات لبركات قرطاس — الموجز والعلامات والألوان والنظام في الاستخدام. هوية ثنائية اللغة لكردستان وخارجها.'},
+  kmr:{t:'Karên Hilbijartî — lêkolînên rewşê yên nasnameyê | Barakat Qurtas',d:'Nêrînek nêztir li sîstemên brandê yên Barakat Qurtas — kurte, nîşan, palet û sîstem di bikaranînê de.'},
+  fr:{t:'Travaux choisis — études de cas d’identité de marque | Barakat Qurtas',d:'Un regard de plus près sur les systèmes de marque de Barakat Qurtas — le brief, les marques, la palette et le système en usage.'},
+  tr:{t:'Seçilmiş İşler — marka kimliği vaka çalışmaları | Barakat Qurtas',d:'Barakat Qurtas’ın marka sistemlerine daha yakından bir bakış — özet, işaretler, palet ve kullanımdaki sistem.'},
+  sv:{t:'Utvalda arbeten — fallstudier i varumärkesidentitet | Barakat Qurtas',d:'En närmare titt på Barakat Qurtas varumärkessystem — briefen, märkena, paletten och systemet i bruk.'}
+};
 const BB_OG = {
   en:{t:'Brand Board — a free bilingual identity starter | Barakat Qurtas',d:'Generate a free brand board — your name in Kurdish and Latin, with a palette and type pairing. Then build the real thing with Barakat Qurtas.'},
   ku:{t:'تابلۆی براند — دەستپێکی ناسنامەی بێ بەرامبەر | بەرەکات قورتاس',d:'تابلۆیەکی براندی بێ بەرامبەر دروست بکە — ناوەکەت بە کوردی و لاتین، لەگەڵ پاڵێت و جووتی فۆنت. دواتر هی ڕاستەقینە لەگەڵ بەرەکات قورتاس دروست بکە.'},
@@ -49,6 +58,7 @@ function resolve(pathname) {
   }
   if (first === 'panjamor' || first === 'pencemor') return { lang, key: 'panjamor', canon: SITE + prefix + '/panjamor' };
   if (first === 'blog' && seg[1]) return { lang, key: 'blogpost', slug: seg[1], canon: SITE + prefix + '/blog/' + seg[1] };
+  if (first === 'work' && seg[1]) return { lang, key: 'work', slug: seg[1], canon: SITE + prefix + '/work/' + seg[1] };
   if (ROOMS.includes(first)) return { lang, key: first, canon: SITE + prefix + '/' + first };
   return null;   // unknown → let Pages handle (404 / SPA fallback)
 }
@@ -108,6 +118,9 @@ export async function onRequest(context) {
     }
   } else if (r.key === 'brandboard') {
     meta = BB_OG[r.lang] || BB_OG.en;
+    img  = SITE + '/assets/covers/' + r.lang + '-design.jpg?v=3';
+  } else if (r.key === 'work') {
+    meta = WORK_OG[r.lang] || WORK_OG.en;
     img  = SITE + '/assets/covers/' + r.lang + '-design.jpg?v=3';
   } else {
     meta = (OG[r.lang] && OG[r.lang][r.key]) || OG.en[r.key] || OG.en.home;

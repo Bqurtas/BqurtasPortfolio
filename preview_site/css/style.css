@@ -4079,3 +4079,55 @@ html:has(.dash.is-open) { overflow: hidden; }
 .bb-cta a:hover { color: var(--ink-soft); }
 /* RTL: Arabic script must not inherit Latin letter-spacing (it breaks joining) */
 html[dir="rtl"] .bb-row-h, html[dir="rtl"] .bb-type small, html[dir="rtl"] .bb-credit .mono { letter-spacing: 0; }
+
+/* =========================================================
+   SELECTED WORK room (#work) — brand-identity case studies.
+   ========================================================= */
+.work-index { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; max-width: 1100px; margin: 0 auto; }
+@media (max-width: 720px) { .work-index { grid-template-columns: 1fr; gap: 20px; } }
+.work-empty { text-align: center; color: var(--ink-muted); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; padding: 40px 0; }
+.work-card { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--card-bg); text-decoration: none; color: inherit; transition: transform 0.4s var(--ease), border-color 0.3s var(--ease); }
+.work-card:hover { transform: translateY(-5px); border-color: var(--ink); }
+.work-card-cover { position: relative; aspect-ratio: 16 / 10; background: var(--accent, #bd4a2c); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.work-card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease-out); }
+.work-card:hover .work-card-img { transform: scale(1.04); }
+.work-card-mark { font-family: 'Fraunces', serif; font-style: italic; font-size: 72px; color: rgba(255, 255, 255, 0.92); line-height: 1; }
+.work-card-meta { display: flex; flex-direction: column; gap: 7px; padding: 22px 24px 26px; }
+.work-card-tag { font-size: 9px; letter-spacing: 0.18em; color: var(--ink-muted); text-transform: uppercase; }
+.work-card-title { font-family: 'Fraunces', serif; font-style: italic; font-size: 24px; font-weight: 500; line-height: 1.18; color: var(--ink); }
+.work-card-sub { font-size: 10px; letter-spacing: 0.06em; color: var(--ink-muted); text-transform: uppercase; }
+
+/* ---- immersive case-study view ---- */
+.work-view { max-width: 880px; margin: 0 auto; }
+.wc-back { display: inline-flex; align-items: center; gap: 9px; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft); background: none; cursor: pointer; padding: 8px 0; margin-bottom: 18px; transition: color 0.2s var(--ease); }
+.wc-back:hover { color: var(--ink); }
+.wc-hero { position: relative; border-radius: 20px; overflow: hidden; background: var(--accent, #bd4a2c); padding: 70px 40px 56px; text-align: center; }
+.wc-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.32; }
+.wc-hero-inner { position: relative; }
+.wc-hero-tag { font-size: 10px; letter-spacing: 0.26em; text-transform: uppercase; color: rgba(255, 255, 255, 0.78); }
+.wc-hero-title { font-family: 'Fraunces', serif; font-style: italic; font-weight: 500; font-size: clamp(32px, 5vw, 54px); line-height: 1.05; color: #fff; margin: 16px 0 14px; }
+.wc-hero-meta { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255, 255, 255, 0.86); }
+.wc-brief { padding: 40px 8px 10px; }
+.wc-brief p { font-family: 'Fraunces', serif; font-size: clamp(20px, 2.6vw, 27px); line-height: 1.5; color: var(--ink); font-style: italic; max-width: 720px; }
+.wc-block { padding: 34px 8px; border-top: 1px solid var(--line); margin-top: 30px; }
+.wc-rh { display: block; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 22px; }
+.wc-swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 560px) { .wc-swatches { grid-template-columns: repeat(2, 1fr); } }
+.wc-sw b { display: block; height: 96px; border-radius: 12px; border: 1px solid var(--line); }
+.wc-sw .mono { display: block; font-size: 9px; letter-spacing: 0.04em; color: var(--ink-muted); margin-top: 9px; }
+.wc-body { max-width: 680px; }
+.wc-body p { font-size: 17px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 18px; }
+.wc-shots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+@media (max-width: 560px) { .wc-shots { grid-template-columns: 1fr; } }
+.wc-shot { margin: 0; border-radius: 14px; overflow: hidden; aspect-ratio: 4 / 3; }
+.wc-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.wc-shot figcaption { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); padding: 8px 2px; }
+.wc-shot--mock { display: flex; align-items: center; justify-content: center; padding: 18px; text-align: center; border: 1px solid var(--line); }
+.wc-shot--mock span { font-family: 'Fraunces', serif; font-style: italic; font-size: clamp(20px, 3vw, 30px); word-break: break-word; }
+.wc-shot--ink { background: var(--ink); } .wc-shot--ink span { color: var(--bg); }
+.wc-shot--accent { background: var(--accent, #bd4a2c); } .wc-shot--accent span { color: #fff; }
+.wc-shot--paper { background: var(--bg-2); } .wc-shot--paper span { color: var(--ink); }
+.wc-next { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 34px; padding: 26px 28px; border-radius: 18px; background: var(--accent, #bd4a2c); text-decoration: none; }
+.wc-next .mono { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255, 255, 255, 0.8); }
+.wc-next-title { font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; color: #fff; }
+html[dir="rtl"] .wc-hero-tag, html[dir="rtl"] .wc-hero-meta, html[dir="rtl"] .wc-rh, html[dir="rtl"] .work-card-tag, html[dir="rtl"] .work-card-sub, html[dir="rtl"] .wc-next .mono, html[dir="rtl"] .wc-back, html[dir="rtl"] .wc-sw .mono { letter-spacing: 0; }
