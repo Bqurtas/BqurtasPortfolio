@@ -1433,6 +1433,7 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
   border: 1px solid var(--line);
   background: var(--card-bg);
   display: flex; flex-direction: column; gap: 14px;
+  text-decoration: none; color: inherit;   /* cards can be <a> links to their post */
   transition: transform 0.4s var(--ease), border-color 0.3s var(--ease), background 0.3s var(--ease);
 }
 .blog-card:hover { transform: translateY(-4px); border-color: var(--gold); }

@@ -1743,7 +1743,11 @@
       slice.forEach((p, i) => {
         const q = L(p);
         const a = document.createElement('a');
-        a.href = '#'; a.className = 'index-row' + (i === 0 ? ' is-active' : '');
+        // a REAL link to the post's own page — crawlable for Google/AI and lets
+        // right-click / open-in-new-tab work; the click handler still does the
+        // smooth in-app open (preventDefault).
+        a.href = blogBase() + '/' + (p.slug || slugify(p.title));
+        a.className = 'index-row' + (i === 0 ? ' is-active' : '');
         a.innerHTML =
           `<span class="mono index-row-num">${p.num} / ${String(FP.length).padStart(2,'0')}</span>
            <span class="index-row-title">${q.title}</span>
@@ -1974,15 +1978,22 @@
       grid.innerHTML = latest.map((p) => {
         const q = L(p);
         const title = String(q.title || '').replace(/<[^>]+>/g, '');
-        return `<article class="blog-card" data-slug="${esc(p.slug || p.num)}" tabindex="0" role="button">
+        // a REAL link to the post's own page — crawlable for Google/AI, opens in a
+        // new tab on middle/ctrl-click, while a normal click still does the smooth
+        // in-app reader (preventDefault below).
+        const href = blogBase() + '/' + (p.slug || slugify(q.title || p.title || ''));
+        return `<a class="blog-card" href="${esc(href)}" data-slug="${esc(p.slug || p.num)}">
           <span class="mono blog-meta"><i class="fa-solid fa-calendar"></i> ${esc(q.date || '')} · <i class="fa-solid fa-clock"></i> ${esc(String(p.read || 4))} min</span>
           <h3>${esc(title)}</h3>
           <p>${esc(q.sub || '')}</p>
           <span class="blog-more"><span>${dT('blog.more', 'Read the essay')}</span> <i class="fa-solid fa-arrow-right"></i></span>
-        </article>`;
+        </a>`;
       }).join('');
       grid.querySelectorAll('.blog-card').forEach((c) => {
-        c.addEventListener('click', (e) => { e.preventDefault(); const p = findPostBySlug(c.getAttribute('data-slug')); if (p) openReader(p); });
+        c.addEventListener('click', (e) => {
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return; // let new-tab work
+          e.preventDefault(); const p = findPostBySlug(c.getAttribute('data-slug')); if (p) openReader(p);
+        });
       });
     };
 

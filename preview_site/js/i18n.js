@@ -1725,6 +1725,10 @@ Object.keys(window.I18N_EXTRA_RDS).forEach(function(l){ if(window.I18N[l]) Objec
 window.I18N_EXTRA_RD2 = {"en":{"rd.back":"Back","rd.more":"More from the journal"},"ku":{"rd.back":"گەڕانەوە","rd.more":"زیاتر لە گۆڤارەکە"},"kmr":{"rd.back":"Vegere","rd.more":"Zêdetir ji kovarê"},"ar":{"rd.back":"رجوع","rd.more":"المزيد من المدونة"},"fr":{"rd.back":"Retour","rd.more":"Plus du journal"},"tr":{"rd.back":"Geri","rd.more":"Dergiden dahası"},"sv":{"rd.back":"Tillbaka","rd.more":"Mer från journalen"}};
 Object.keys(window.I18N_EXTRA_RD2).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_RD2[l]); });
 
+/* ===== blog index: "Read more" (mobile inline card) — localized per language ===== */
+window.I18N_EXTRA_RM = {"en":{"blog.readMore":"Read more"},"ku":{"blog.readMore":"خوێندنەوەی زیاتر"},"kmr":{"blog.readMore":"Bêtir bixwîne"},"ar":{"blog.readMore":"اقرأ المزيد"},"fr":{"blog.readMore":"Lire la suite"},"tr":{"blog.readMore":"Devamını oku"},"sv":{"blog.readMore":"Läs mer"}};
+Object.keys(window.I18N_EXTRA_RM).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_RM[l]); });
+
 /* ===== tabs: merged stationery + new AI ===== */
 window.I18N_EXTRA_TABS = {"en":{"tab.stationery":"Stationery","tab.ai":"AI"},"ku":{"tab.stationery":"نووسراو","tab.ai":"AI"},"kmr":{"tab.stationery":"Nivîsgeh","tab.ai":"AI"},"ar":{"tab.stationery":"قرطاسية","tab.ai":"AI"},"fr":{"tab.stationery":"Papeterie","tab.ai":"IA"},"tr":{"tab.stationery":"Kırtasiye","tab.ai":"AI"},"sv":{"tab.stationery":"Trycksaker","tab.ai":"AI"}};
 Object.keys(window.I18N_EXTRA_TABS).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_TABS[l]); });
