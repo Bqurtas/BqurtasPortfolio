@@ -16,11 +16,11 @@ window.I18N = {
     'pj.contact': 'Get in touch', 'pj.work': 'View the work',
     'pj.tl': '№ 02 — The Studio', 'pj.tr': 'Hewlêr · Est. 2014',
     'rh.return': 'Return to start', 'rh.scroll': 'Scroll',
-    'rh.blog.num': '№ 02 · The Journal', 'rh.blog.title': 'The <em>Journal</em>',
+    'rh.blog.num': '№ 04 · The Journal', 'rh.blog.title': 'The <em>Journal</em>',
     'rh.blog.sub': 'Short notes from the desk — on typography, place, and the slow craft of design.',
-    'rh.bio.num': '№ 03 · The Designer', 'rh.bio.title': 'The <em>Designer</em>',
+    'rh.bio.num': '№ 05 · The Designer', 'rh.bio.title': 'The <em>Designer</em>',
     'rh.bio.sub': 'A decade of practice in Hewlêr — the story, the work, and the people behind it.',
-    'rh.contact.num': "№ 04 · Let's Talk", 'rh.contact.title': "Let's <em>talk</em>.",
+    'rh.contact.num': "№ 06 · Let's Talk", 'rh.contact.title': "Let's <em>talk</em>.",
     'rh.contact.sub': 'Pitch a project in one careful letter. I reply to every serious enquiry within 48 hours.',
     'nav.design': 'Design',
     'nav.blog': 'Blog',
@@ -87,11 +87,11 @@ window.I18N = {
     'pj.contact': 'İletişime geç', 'pj.work': 'Çalışmaları gör',
     'pj.tl': '№ 02 — Stüdyo', 'pj.tr': 'Hewlêr · 2014’ten beri',
     'rh.return': 'Başa dön', 'rh.scroll': 'Kaydır',
-    'rh.blog.num': '№ 02 · Günlük', 'rh.blog.title': '<em>Günlük</em>',
+    'rh.blog.num': '№ 04 · Günlük', 'rh.blog.title': '<em>Günlük</em>',
     'rh.blog.sub': 'Masadan kısa notlar — tipografi, mekân ve tasarımın yavaş zanaatı üzerine.',
-    'rh.bio.num': '№ 03 · Tasarımcı', 'rh.bio.title': '<em>Tasarımcı</em>',
+    'rh.bio.num': '№ 05 · Tasarımcı', 'rh.bio.title': '<em>Tasarımcı</em>',
     'rh.bio.sub': 'Hewlêr’de on yıllık pratik — hikâye, işler ve arkasındaki insanlar.',
-    'rh.contact.num': '№ 04 · Konuşalım', 'rh.contact.title': '<em>Konuşalım</em>.',
+    'rh.contact.num': '№ 06 · Konuşalım', 'rh.contact.title': '<em>Konuşalım</em>.',
     'rh.contact.sub': 'Projenizi özenli bir mektupla anlatın. Her ciddi başvuruyu 48 saat içinde yanıtlıyorum.',
     'nav.design': 'Tasarım', 'nav.blog': 'Blog', 'nav.bio': 'Biyografi', 'nav.contact': 'İletişim',
     'hero.eyebrow': '— Bağımsız Tasarımcı · Seçkin projeler için müsait',
@@ -316,11 +316,11 @@ window.I18N = {
     'pj.contact': 'Hör av dig', 'pj.work': 'Se arbetet',
     'pj.tl': '№ 02 — Studion', 'pj.tr': 'Hewlêr · Est. 2014',
     'rh.return': 'Tillbaka till start', 'rh.scroll': 'Skrolla',
-    'rh.blog.num': '№ 02 · Journalen', 'rh.blog.title': '<em>Journalen</em>',
+    'rh.blog.num': '№ 04 · Journalen', 'rh.blog.title': '<em>Journalen</em>',
     'rh.blog.sub': 'Korta anteckningar från skrivbordet — om typografi, plats och designens långsamma hantverk.',
-    'rh.bio.num': '№ 03 · Formgivaren', 'rh.bio.title': '<em>Formgivaren</em>',
+    'rh.bio.num': '№ 05 · Formgivaren', 'rh.bio.title': '<em>Formgivaren</em>',
     'rh.bio.sub': 'Ett decennium av arbete i Hewlêr — historien, verken och människorna bakom.',
-    'rh.contact.num': '№ 04 · Låt oss prata', 'rh.contact.title': 'Låt oss <em>prata</em>.',
+    'rh.contact.num': '№ 06 · Låt oss prata', 'rh.contact.title': 'Låt oss <em>prata</em>.',
     'rh.contact.sub': 'Presentera ett projekt i ett genomtänkt brev. Jag svarar på varje seriös förfrågan inom 48 timmar.',
     'nav.design': 'Design', 'nav.blog': 'Blogg', 'nav.bio': 'Biografi', 'nav.contact': 'Kontakt',
     'hero.eyebrow': '— Oberoende Formgivare · Tillgänglig för utvalda uppdrag',
@@ -545,11 +545,11 @@ window.I18N = {
     'pj.contact': 'پەیوەندیمان پێوە بکە', 'pj.work': 'بینینی کارەکان',
     'pj.tl': '№ ٠٢ — ستۆدیۆ', 'pj.tr': 'هەولێر · لە ٢٠١٤ـەوە',
     'rh.return': 'گەڕانەوە بۆ سەرەتا', 'rh.scroll': 'بۆ خوارەوە',
-    'rh.blog.num': '№ ٠٢ · گۆڤار', 'rh.blog.title': '<em>گۆڤارەکە</em>',
+    'rh.blog.num': '№ ٠٤ · گۆڤار', 'rh.blog.title': '<em>گۆڤارەکە</em>',
     'rh.blog.sub': 'تێبینی کورت لە مێزی کارەوە — لەسەر تایپۆگرافی، شوێن، و پیشەی نەرمی دیزاین.',
-    'rh.bio.num': '№ ٠٣ · دیزاینەر', 'rh.bio.title': '<em>دیزاینەرەکە</em>',
+    'rh.bio.num': '№ ٠٥ · دیزاینەر', 'rh.bio.title': '<em>دیزاینەرەکە</em>',
     'rh.bio.sub': 'دەیەیەک پراکتیک لە هەولێر — چیرۆکەکە، کارەکە، و ئەو کەسانەی لە پشتیەوەن.',
-    'rh.contact.num': '№ ٠٤ · با قسە بکەین', 'rh.contact.title': 'با <em>قسە</em> بکەین.',
+    'rh.contact.num': '№ ٠٦ · با قسە بکەین', 'rh.contact.title': 'با <em>قسە</em> بکەین.',
     'rh.contact.sub': 'پڕۆژەیەک پێشکەش بکە بە نامەیەکی وردبینانە. لە ماوەی ٤٨ کاتژمێردا وەڵامی هەموو داواکارییەکی جددی دەدەمەوە.',
     'nav.design': 'دیزاین',
     'nav.blog': 'بلۆگ',
@@ -616,11 +616,11 @@ window.I18N = {
     'pj.contact': 'Têkilî daîne', 'pj.work': 'Karan bibîne',
     'pj.tl': '№ 02 — Studyo', 'pj.tr': 'Hewlêr · Ji 2014',
     'rh.return': 'Vegere destpêkê', 'rh.scroll': 'Berjêr',
-    'rh.blog.num': '№ 02 · Kovar', 'rh.blog.title': '<em>Kovar</em>',
+    'rh.blog.num': '№ 04 · Kovar', 'rh.blog.title': '<em>Kovar</em>',
     'rh.blog.sub': 'Notên kurt ji maseyê — li ser tîpografî, cî, û pîşeya hêdî ya sêwirandinê.',
-    'rh.bio.num': '№ 03 · Sêwirmend', 'rh.bio.title': '<em>Sêwirmend</em>',
+    'rh.bio.num': '№ 05 · Sêwirmend', 'rh.bio.title': '<em>Sêwirmend</em>',
     'rh.bio.sub': 'Deh sal pratîk li Hewlêr — çîrok, kar, û mirovên li pişt wê.',
-    'rh.contact.num': '№ 04 · Em biaxivin', 'rh.contact.title': 'Em <em>biaxivin</em>.',
+    'rh.contact.num': '№ 06 · Em biaxivin', 'rh.contact.title': 'Em <em>biaxivin</em>.',
     'rh.contact.sub': 'Projeyek bi nameyeke baldarane pêşkêş bike. Ez di 48 saetan de bersiva her daxwazeke cidî didim.',
     'nav.design': 'Sêwirandin',
     'nav.blog': 'Blog',
@@ -687,11 +687,11 @@ window.I18N = {
     'pj.contact': 'تواصل معنا', 'pj.work': 'شاهد الأعمال',
     'pj.tl': '№ ٠٢ — الاستوديو', 'pj.tr': 'أربيل · منذ ٢٠١٤',
     'rh.return': 'العودة إلى البداية', 'rh.scroll': 'مرّر للأسفل',
-    'rh.blog.num': '№ ٠٢ · المدونة', 'rh.blog.title': '<em>المدونة</em>',
+    'rh.blog.num': '№ ٠٤ · المدونة', 'rh.blog.title': '<em>المدونة</em>',
     'rh.blog.sub': 'ملاحظات قصيرة من المكتب — عن الطباعة، المكان، وحرفة التصميم البطيئة.',
-    'rh.bio.num': '№ ٠٣ · المصمم', 'rh.bio.title': '<em>المصمم</em>',
+    'rh.bio.num': '№ ٠٥ · المصمم', 'rh.bio.title': '<em>المصمم</em>',
     'rh.bio.sub': 'عقد من الممارسة في أربيل — القصة، والعمل، والأشخاص خلفه.',
-    'rh.contact.num': '№ ٠٤ · لنتحدث', 'rh.contact.title': '<em>لنتحدث</em>.',
+    'rh.contact.num': '№ ٠٦ · لنتحدث', 'rh.contact.title': '<em>لنتحدث</em>.',
     'rh.contact.sub': 'قدّم مشروعك في رسالة واحدة دقيقة. أرد على كل استفسار جدي خلال ٤٨ ساعة.',
     'nav.design': 'التصميم',
     'nav.blog': 'المدونة',
@@ -758,11 +758,11 @@ window.I18N = {
     'pj.contact': 'Prendre contact', 'pj.work': 'Voir les travaux',
     'pj.tl': '№ 02 — Le Studio', 'pj.tr': 'Hewlêr · Depuis 2014',
     'rh.return': 'Retour au début', 'rh.scroll': 'Défiler',
-    'rh.blog.num': '№ 02 · Le Journal', 'rh.blog.title': 'Le <em>Journal</em>',
+    'rh.blog.num': '№ 04 · Le Journal', 'rh.blog.title': 'Le <em>Journal</em>',
     'rh.blog.sub': "De brèves notes du bureau — sur la typographie, le lieu et l'artisanat lent du design.",
-    'rh.bio.num': '№ 03 · Le Designer', 'rh.bio.title': 'Le <em>Designer</em>',
+    'rh.bio.num': '№ 05 · Le Designer', 'rh.bio.title': 'Le <em>Designer</em>',
     'rh.bio.sub': "Une décennie de pratique à Hewlêr — l'histoire, le travail et les gens derrière.",
-    'rh.contact.num': '№ 04 · Parlons', 'rh.contact.title': '<em>Parlons</em>.',
+    'rh.contact.num': '№ 06 · Parlons', 'rh.contact.title': '<em>Parlons</em>.',
     'rh.contact.sub': "Présentez un projet en une lettre soignée. Je réponds à chaque demande sérieuse sous 48 h.",
     'nav.design': 'Design',
     'nav.blog': 'Blog',
@@ -1767,24 +1767,45 @@ Object.keys(window.I18N_EXTRA_SHP).forEach(function(l){ if(window.I18N[l]) Objec
 
 /* ===== Brand Board room (#brandboard) — nav label + room-hero + section head ===== */
 window.I18N_EXTRA_BB = {
- en:{"nav.brandboard":"Brand Board","rh.bb.num":"№ 05 · Brand Board","rh.bb.title":"The <em>Brand Board</em>","rh.bb.sub":"A free tool — your name, in Kurdish and Latin, with a palette and type pairing. Built in seconds.","bb.label":"Free Tool","bb.title":"Start your <em>identity</em>.","bb.lede":"A bilingual brand board in seconds — your name in Kurdish and Latin, a palette and a type pairing. Then let's make the real thing."},
- ku:{"nav.brandboard":"تابلۆی براند","rh.bb.num":"№ ٠٥ · تابلۆی براند","rh.bb.title":"<em>تابلۆی براند</em>","rh.bb.sub":"ئامرازێکی بێ بەرامبەر — ناوەکەت، بە کوردی و لاتین، لەگەڵ پاڵێتی ڕەنگ و جووتی فۆنت. لە چەند چرکەیەکدا.","bb.label":"ئامرازی بێ بەرامبەر","bb.title":"ناسنامەکەت <em>دەستپێبکە</em>.","bb.lede":"تابلۆیەکی براندی دووزمانی لە چەند چرکەیەکدا — ناوەکەت بە کوردی و لاتین، پاڵێت و جووتی فۆنت. دواتر با هی ڕاستەقینە دروست بکەین."},
- ar:{"nav.brandboard":"لوحة العلامة","rh.bb.num":"№ ٠٥ · لوحة العلامة","rh.bb.title":"<em>لوحة العلامة</em>","rh.bb.sub":"أداة مجانية — اسمك، بالكردية واللاتينية، مع لوحة ألوان وتناغم خطوط. في ثوانٍ.","bb.label":"أداة مجانية","bb.title":"ابدأ <em>هويتك</em>.","bb.lede":"لوحة علامة ثنائية اللغة في ثوانٍ — اسمك بالكردية واللاتينية، ألوان وتناغم خطوط. ثم لنصنع الحقيقية."},
- kmr:{"nav.brandboard":"Tabloya Brandê","rh.bb.num":"№ 05 · Tabloya Brandê","rh.bb.title":"<em>Tabloya Brandê</em>","rh.bb.sub":"Amûreke bêpere — navê te, bi kurdî û latînî, bi paletek û cotê fontan. Di çend saniyeyan de.","bb.label":"Amûra Bêpere","bb.title":"Nasnameya xwe <em>dest pê bike</em>.","bb.lede":"Tabloyek brandê ya duzimanî di çend saniyeyan de — navê te bi kurdî û latînî, palet û cotê fontan. Paşê em ya rastîn çêbikin."},
- fr:{"nav.brandboard":"Planche de marque","rh.bb.num":"№ 05 · Planche de marque","rh.bb.title":"La <em>planche de marque</em>","rh.bb.sub":"Un outil gratuit — votre nom, en kurde et en latin, avec une palette et un duo de polices. En quelques secondes.","bb.label":"Outil gratuit","bb.title":"Lancez votre <em>identité</em>.","bb.lede":"Une planche de marque bilingue en quelques secondes — votre nom en kurde et en latin, une palette et un duo de polices. Puis créons la vraie."},
- tr:{"nav.brandboard":"Marka Panosu","rh.bb.num":"№ 05 · Marka Panosu","rh.bb.title":"<em>Marka Panosu</em>","rh.bb.sub":"Ücretsiz bir araç — adınız, Kürtçe ve Latin alfabesinde, palet ve yazı tipi eşleşmesiyle. Saniyeler içinde.","bb.label":"Ücretsiz Araç","bb.title":"<em>Kimliğinizi</em> başlatın.","bb.lede":"Saniyeler içinde iki dilli bir marka panosu — adınız Kürtçe ve Latin alfabesinde, palet ve yazı tipi eşleşmesi. Sonra gerçeğini yapalım."},
- sv:{"nav.brandboard":"Varumärkestavla","rh.bb.num":"№ 05 · Varumärkestavla","rh.bb.title":"<em>Varumärkestavlan</em>","rh.bb.sub":"Ett gratis verktyg — ditt namn, på kurdiska och latin, med en palett och typsnittspar. På sekunder.","bb.label":"Gratis verktyg","bb.title":"Starta din <em>identitet</em>.","bb.lede":"En tvåspråkig varumärkestavla på sekunder — ditt namn på kurdiska och latin, en palett och ett typsnittspar. Sedan gör vi den riktiga."}
+ en:{"nav.brandboard":"Brand Board","rh.bb.num":"№ 03 · Brand Board","rh.bb.title":"The <em>Brand Board</em>","rh.bb.sub":"A free tool — your name, in Kurdish and Latin, with a palette and type pairing. Built in seconds.","bb.label":"Free Tool","bb.title":"Start your <em>identity</em>.","bb.lede":"A bilingual brand board in seconds — your name in Kurdish and Latin, a palette and a type pairing. Then let's make the real thing."},
+ ku:{"nav.brandboard":"تابلۆی براند","rh.bb.num":"№ ٠٣ · تابلۆی براند","rh.bb.title":"<em>تابلۆی براند</em>","rh.bb.sub":"ئامرازێکی بێ بەرامبەر — ناوەکەت، بە کوردی و لاتین، لەگەڵ پاڵێتی ڕەنگ و جووتی فۆنت. لە چەند چرکەیەکدا.","bb.label":"ئامرازی بێ بەرامبەر","bb.title":"ناسنامەکەت <em>دەستپێبکە</em>.","bb.lede":"تابلۆیەکی براندی دووزمانی لە چەند چرکەیەکدا — ناوەکەت بە کوردی و لاتین، پاڵێت و جووتی فۆنت. دواتر با هی ڕاستەقینە دروست بکەین."},
+ ar:{"nav.brandboard":"لوحة العلامة","rh.bb.num":"№ ٠٣ · لوحة العلامة","rh.bb.title":"<em>لوحة العلامة</em>","rh.bb.sub":"أداة مجانية — اسمك، بالكردية واللاتينية، مع لوحة ألوان وتناغم خطوط. في ثوانٍ.","bb.label":"أداة مجانية","bb.title":"ابدأ <em>هويتك</em>.","bb.lede":"لوحة علامة ثنائية اللغة في ثوانٍ — اسمك بالكردية واللاتينية، ألوان وتناغم خطوط. ثم لنصنع الحقيقية."},
+ kmr:{"nav.brandboard":"Tabloya Brandê","rh.bb.num":"№ 03 · Tabloya Brandê","rh.bb.title":"<em>Tabloya Brandê</em>","rh.bb.sub":"Amûreke bêpere — navê te, bi kurdî û latînî, bi paletek û cotê fontan. Di çend saniyeyan de.","bb.label":"Amûra Bêpere","bb.title":"Nasnameya xwe <em>dest pê bike</em>.","bb.lede":"Tabloyek brandê ya duzimanî di çend saniyeyan de — navê te bi kurdî û latînî, palet û cotê fontan. Paşê em ya rastîn çêbikin."},
+ fr:{"nav.brandboard":"Planche de marque","rh.bb.num":"№ 03 · Planche de marque","rh.bb.title":"La <em>planche de marque</em>","rh.bb.sub":"Un outil gratuit — votre nom, en kurde et en latin, avec une palette et un duo de polices. En quelques secondes.","bb.label":"Outil gratuit","bb.title":"Lancez votre <em>identité</em>.","bb.lede":"Une planche de marque bilingue en quelques secondes — votre nom en kurde et en latin, une palette et un duo de polices. Puis créons la vraie."},
+ tr:{"nav.brandboard":"Marka Panosu","rh.bb.num":"№ 03 · Marka Panosu","rh.bb.title":"<em>Marka Panosu</em>","rh.bb.sub":"Ücretsiz bir araç — adınız, Kürtçe ve Latin alfabesinde, palet ve yazı tipi eşleşmesiyle. Saniyeler içinde.","bb.label":"Ücretsiz Araç","bb.title":"<em>Kimliğinizi</em> başlatın.","bb.lede":"Saniyeler içinde iki dilli bir marka panosu — adınız Kürtçe ve Latin alfabesinde, palet ve yazı tipi eşleşmesi. Sonra gerçeğini yapalım."},
+ sv:{"nav.brandboard":"Varumärkestavla","rh.bb.num":"№ 03 · Varumärkestavla","rh.bb.title":"<em>Varumärkestavlan</em>","rh.bb.sub":"Ett gratis verktyg — ditt namn, på kurdiska och latin, med en palett och typsnittspar. På sekunder.","bb.label":"Gratis verktyg","bb.title":"Starta din <em>identitet</em>.","bb.lede":"En tvåspråkig varumärkestavla på sekunder — ditt namn på kurdiska och latin, en palett och ett typsnittspar. Sedan gör vi den riktiga."}
 };
 Object.keys(window.I18N_EXTRA_BB).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_BB[l]); });
 
 /* ===== Selected Work room (#work) — case studies: nav + room-hero + section + view ===== */
 window.I18N_EXTRA_WORK = {
- en:{"nav.work":"Selected Work","rh.work.num":"№ 06 · Selected Work","rh.work.title":"Selected <em>Work</em>","rh.work.sub":"Brand identities, in full — the brief, the marks, the palette, and the system in use.","work.label":"Case Studies","work.title":"Identities, in <em>full</em>.","work.lede":"A closer look at a few brand systems — how each one was found, drawn and made.","work.empty":"Case studies are on their way.","work.back":"All work","work.client":"Client","work.brief":"The brief","work.palette":"Palette","work.story":"The work","work.inuse":"In use","work.next":"Next project"},
- ku:{"nav.work":"کارە هەڵبژێردراوەکان","rh.work.num":"№ ٠٦ · کارە هەڵبژێردراوەکان","rh.work.title":"کارە <em>هەڵبژێردراوەکان</em>","rh.work.sub":"ناسنامەی براند، بە تەواوی — بریف، مارک، پاڵێت، و سیستەم لە بەکارهێنان.","work.label":"تاوتوێی پڕۆژە","work.title":"ناسنامە، بە <em>تەواوی</em>.","work.lede":"سەیرێکی نزیکتر بۆ چەند سیستەمێکی براند — چۆن هەریەکەیان دۆزرایەوە، کێشرا و دروستکرا.","work.empty":"تاوتوێی پڕۆژەکان لە ڕێگان.","work.back":"هەموو کارەکان","work.client":"کڕیار","work.brief":"بریف","work.palette":"پاڵێت","work.story":"کارەکە","work.inuse":"لە بەکارهێنان","work.next":"پڕۆژەی دواتر"},
- ar:{"nav.work":"أعمال مختارة","rh.work.num":"№ ٠٦ · أعمال مختارة","rh.work.title":"أعمال <em>مختارة</em>","rh.work.sub":"هويات بصرية كاملة — الموجز، العلامات، الألوان، والنظام في الاستخدام.","work.label":"دراسات حالة","work.title":"هويات، <em>بالكامل</em>.","work.lede":"نظرة أقرب على بعض أنظمة العلامات — كيف وُجد كل منها ورُسم وصُنع.","work.empty":"دراسات الحالة في الطريق.","work.back":"كل الأعمال","work.client":"العميل","work.brief":"الموجز","work.palette":"الألوان","work.story":"العمل","work.inuse":"في الاستخدام","work.next":"المشروع التالي"},
- kmr:{"nav.work":"Karên Hilbijartî","rh.work.num":"№ 06 · Karên Hilbijartî","rh.work.title":"Karên <em>Hilbijartî</em>","rh.work.sub":"Nasnameyên brandê, bi temamî — kurte, nîşan, palet, û sîstem di bikaranînê de.","work.label":"Lêkolînên Rewşê","work.title":"Nasname, bi <em>temamî</em>.","work.lede":"Nêrînek nêztir li çend sîstemên brandê — her yek çawa hat dîtin, xêzkirin û çêkirin.","work.empty":"Lêkolînên rewşê di rê de ne.","work.back":"Hemû kar","work.client":"Mişterî","work.brief":"Kurte","work.palette":"Palet","work.story":"Kar","work.inuse":"Di bikaranînê de","work.next":"Projeya pêş"},
- fr:{"nav.work":"Travaux choisis","rh.work.num":"№ 06 · Travaux choisis","rh.work.title":"Travaux <em>choisis</em>","rh.work.sub":"Des identités de marque, en entier — le brief, les marques, la palette et le système en usage.","work.label":"Études de cas","work.title":"Des identités, en <em>entier</em>.","work.lede":"Un regard de plus près sur quelques systèmes de marque — comment chacun a été trouvé, dessiné et réalisé.","work.empty":"Les études de cas arrivent.","work.back":"Tous les travaux","work.client":"Client","work.brief":"Le brief","work.palette":"Palette","work.story":"Le travail","work.inuse":"En usage","work.next":"Projet suivant"},
- tr:{"nav.work":"Seçilmiş İşler","rh.work.num":"№ 06 · Seçilmiş İşler","rh.work.title":"Seçilmiş <em>İşler</em>","rh.work.sub":"Marka kimlikleri, tam haliyle — özet, işaretler, palet ve kullanımdaki sistem.","work.label":"Vaka Çalışmaları","work.title":"Kimlikler, <em>tam</em> haliyle.","work.lede":"Birkaç marka sistemine daha yakından bir bakış — her biri nasıl bulundu, çizildi ve yapıldı.","work.empty":"Vaka çalışmaları yolda.","work.back":"Tüm işler","work.client":"Müşteri","work.brief":"Özet","work.palette":"Palet","work.story":"İş","work.inuse":"Kullanımda","work.next":"Sonraki proje"},
- sv:{"nav.work":"Utvalda arbeten","rh.work.num":"№ 06 · Utvalda arbeten","rh.work.title":"Utvalda <em>arbeten</em>","rh.work.sub":"Varumärkesidentiteter, i sin helhet — briefen, märkena, paletten och systemet i bruk.","work.label":"Fallstudier","work.title":"Identiteter, i sin <em>helhet</em>.","work.lede":"En närmare titt på några varumärkessystem — hur vart och ett hittades, ritades och gjordes.","work.empty":"Fallstudier är på väg.","work.back":"Alla arbeten","work.client":"Kund","work.brief":"Briefen","work.palette":"Palett","work.story":"Arbetet","work.inuse":"I bruk","work.next":"Nästa projekt"}
+ en:{"nav.work":"Selected Work","rh.work.num":"№ 02 · Selected Work","rh.work.title":"Selected <em>Work</em>","rh.work.sub":"Brand identities, in full — the brief, the marks, the palette, and the system in use.","work.label":"Case Studies","work.title":"Identities, in <em>full</em>.","work.lede":"A closer look at a few brand systems — how each one was found, drawn and made.","work.empty":"Case studies are on their way.","work.back":"All work","work.client":"Client","work.brief":"The brief","work.palette":"Palette","work.story":"The work","work.inuse":"In use","work.next":"Next project"},
+ ku:{"nav.work":"کارە هەڵبژێردراوەکان","rh.work.num":"№ ٠٢ · کارە هەڵبژێردراوەکان","rh.work.title":"کارە <em>هەڵبژێردراوەکان</em>","rh.work.sub":"ناسنامەی براند، بە تەواوی — بریف، مارک، پاڵێت، و سیستەم لە بەکارهێنان.","work.label":"تاوتوێی پڕۆژە","work.title":"ناسنامە، بە <em>تەواوی</em>.","work.lede":"سەیرێکی نزیکتر بۆ چەند سیستەمێکی براند — چۆن هەریەکەیان دۆزرایەوە، کێشرا و دروستکرا.","work.empty":"تاوتوێی پڕۆژەکان لە ڕێگان.","work.back":"هەموو کارەکان","work.client":"کڕیار","work.brief":"بریف","work.palette":"پاڵێت","work.story":"کارەکە","work.inuse":"لە بەکارهێنان","work.next":"پڕۆژەی دواتر"},
+ ar:{"nav.work":"أعمال مختارة","rh.work.num":"№ ٠٢ · أعمال مختارة","rh.work.title":"أعمال <em>مختارة</em>","rh.work.sub":"هويات بصرية كاملة — الموجز، العلامات، الألوان، والنظام في الاستخدام.","work.label":"دراسات حالة","work.title":"هويات، <em>بالكامل</em>.","work.lede":"نظرة أقرب على بعض أنظمة العلامات — كيف وُجد كل منها ورُسم وصُنع.","work.empty":"دراسات الحالة في الطريق.","work.back":"كل الأعمال","work.client":"العميل","work.brief":"الموجز","work.palette":"الألوان","work.story":"العمل","work.inuse":"في الاستخدام","work.next":"المشروع التالي"},
+ kmr:{"nav.work":"Karên Hilbijartî","rh.work.num":"№ 02 · Karên Hilbijartî","rh.work.title":"Karên <em>Hilbijartî</em>","rh.work.sub":"Nasnameyên brandê, bi temamî — kurte, nîşan, palet, û sîstem di bikaranînê de.","work.label":"Lêkolînên Rewşê","work.title":"Nasname, bi <em>temamî</em>.","work.lede":"Nêrînek nêztir li çend sîstemên brandê — her yek çawa hat dîtin, xêzkirin û çêkirin.","work.empty":"Lêkolînên rewşê di rê de ne.","work.back":"Hemû kar","work.client":"Mişterî","work.brief":"Kurte","work.palette":"Palet","work.story":"Kar","work.inuse":"Di bikaranînê de","work.next":"Projeya pêş"},
+ fr:{"nav.work":"Travaux choisis","rh.work.num":"№ 02 · Travaux choisis","rh.work.title":"Travaux <em>choisis</em>","rh.work.sub":"Des identités de marque, en entier — le brief, les marques, la palette et le système en usage.","work.label":"Études de cas","work.title":"Des identités, en <em>entier</em>.","work.lede":"Un regard de plus près sur quelques systèmes de marque — comment chacun a été trouvé, dessiné et réalisé.","work.empty":"Les études de cas arrivent.","work.back":"Tous les travaux","work.client":"Client","work.brief":"Le brief","work.palette":"Palette","work.story":"Le travail","work.inuse":"En usage","work.next":"Projet suivant"},
+ tr:{"nav.work":"Seçilmiş İşler","rh.work.num":"№ 02 · Seçilmiş İşler","rh.work.title":"Seçilmiş <em>İşler</em>","rh.work.sub":"Marka kimlikleri, tam haliyle — özet, işaretler, palet ve kullanımdaki sistem.","work.label":"Vaka Çalışmaları","work.title":"Kimlikler, <em>tam</em> haliyle.","work.lede":"Birkaç marka sistemine daha yakından bir bakış — her biri nasıl bulundu, çizildi ve yapıldı.","work.empty":"Vaka çalışmaları yolda.","work.back":"Tüm işler","work.client":"Müşteri","work.brief":"Özet","work.palette":"Palet","work.story":"İş","work.inuse":"Kullanımda","work.next":"Sonraki proje"},
+ sv:{"nav.work":"Utvalda arbeten","rh.work.num":"№ 02 · Utvalda arbeten","rh.work.title":"Utvalda <em>arbeten</em>","rh.work.sub":"Varumärkesidentiteter, i sin helhet — briefen, märkena, paletten och systemet i bruk.","work.label":"Fallstudier","work.title":"Identiteter, i sin <em>helhet</em>.","work.lede":"En närmare titt på några varumärkessystem — hur vart och ett hittades, ritades och gjordes.","work.empty":"Fallstudier är på väg.","work.back":"Alla arbeten","work.client":"Kund","work.brief":"Briefen","work.palette":"Palett","work.story":"Arbetet","work.inuse":"I bruk","work.next":"Nästa projekt"}
 };
 Object.keys(window.I18N_EXTRA_WORK).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_WORK[l]); });
+
+/* ===== Menu relabel — evocative room names (Design · Selected Work · The Brand Board · The Journal · The Designer · Let's talk.) ===== */
+window.I18N_EXTRA_NAV = {
+ en:{"nav.blog":"The Journal","nav.bio":"The Designer","nav.contact":"Let's talk.","nav.brandboard":"The Brand Board"},
+ ku:{"nav.blog":"گۆڤارەکە","nav.bio":"دیزاینەرەکە","nav.contact":"با قسە بکەین","nav.brandboard":"تابلۆی براند"},
+ ar:{"nav.blog":"المجلة","nav.bio":"المصمم","nav.contact":"لنتحدث","nav.brandboard":"لوحة العلامة"},
+ kmr:{"nav.blog":"Kovar","nav.bio":"Sêwirmend","nav.contact":"Em biaxivin","nav.brandboard":"Tabloya Brandê"},
+ fr:{"nav.blog":"Le Journal","nav.bio":"Le Designer","nav.contact":"Parlons.","nav.brandboard":"La planche de marque"},
+ tr:{"nav.blog":"Dergi","nav.bio":"Tasarımcı","nav.contact":"Konuşalım.","nav.brandboard":"Marka Panosu"},
+ sv:{"nav.blog":"Tidningen","nav.bio":"Designern","nav.contact":"Låt oss prata.","nav.brandboard":"Varumärkestavlan"}
+};
+Object.keys(window.I18N_EXTRA_NAV).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_NAV[l]); });
+
+/* rail-card (hover) text for Selected Work + Brand Board, per language (en/tr/sv fall back to the English defaults in enhance.js ROOMS) */
+window.ROOMCARD_EXTRA = {
+ ku:{work:{tag:"تاوتوێی پڕۆژە",count:"سیستەمی براند",desc:"ناسنامەی براند بە تەواوی — بریف، مارک، پاڵێت، و سیستەم لە بەکارهێنان."},brandboard:{tag:"ئامرازی بێ بەرامبەر",count:"کوردی + لاتین",desc:"ناسنامەیەکی سەرەتایی بێ بەرامبەر — ناوەکەت بە کوردی و لاتین، لەگەڵ پاڵێت و جووتی فۆنت."}},
+ kmr:{work:{tag:"Lêkolînên Rewşê",count:"Sîstemên brandê",desc:"Nasnameyên brandê bi temamî — kurte, nîşan, palet, û sîstem di bikaranînê de."},brandboard:{tag:"Amûra Bêpere",count:"Kurdî + Latînî",desc:"Nasnameyek destpêkê ya bêpere — navê te bi kurdî û latînî, bi palet û cotê fontan."}},
+ ar:{work:{tag:"دراسات حالة",count:"أنظمة علامات",desc:"هويات بصرية كاملة — الموجز، العلامات، الألوان، والنظام في الاستخدام."},brandboard:{tag:"أداة مجانية",count:"كردي + لاتيني",desc:"هوية بداية مجانية — اسمك بالكردية واللاتينية، مع لوحة ألوان وتناغم خطوط."}},
+ fr:{work:{tag:"Études de cas",count:"Systèmes de marque",desc:"Des identités de marque en entier — le brief, les marques, la palette et le système en usage."},brandboard:{tag:"Outil gratuit",count:"Kurde + latin",desc:"Une identité de départ gratuite — votre nom en kurde et en latin, avec palette et duo de polices."}}
+};
+if (window.ROOMCARD_I18N) Object.keys(window.ROOMCARD_EXTRA).forEach(function(l){ window.ROOMCARD_I18N[l] = window.ROOMCARD_I18N[l] || {}; Object.assign(window.ROOMCARD_I18N[l], window.ROOMCARD_EXTRA[l]); });
