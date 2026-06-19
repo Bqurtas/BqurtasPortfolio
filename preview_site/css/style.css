@@ -766,6 +766,20 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
   50% { transform: scale(1.05); opacity: 0.85; }
 }
 
+/* Fluid moving backdrop (canvas drawn by js/hero-art.js) — glowing forms behind
+   the name. Above the radial wash (z 1), below the content (z 4). */
+.hero-art {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  opacity: 0; animation: heroArtIn 2.4s var(--ease-out) 0.3s forwards;
+}
+@keyframes heroArtIn { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .hero-art { animation: none; opacity: 1; } }
+/* Dark hero = the bold, animated first impression: deepen the background so the
+   fluid glows, and drop the off-white letterbox strips for a clean canvas. */
+:root[data-theme="dark"] .hero { background: #0a0a09; }
+:root[data-theme="dark"] .hero-letterbox { display: none; }
+:root[data-theme="dark"] .hero-radial { opacity: 0.5; }
+
 .hero-meta { position: absolute; z-index: 6; opacity: 0; animation: fadeIn 1s ease 1.6s forwards; }
 .hero-meta .mono { color: var(--bg); display: block; }   /* inverts: white text on dark strip (light mode), black text on white strip (dark mode) */
 .hero-meta i { margin-right: 6px; }
@@ -804,9 +818,9 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
 }
 .hero-title {
   font-family: 'Fraunces', serif;
-  font-weight: 500;
-  font-size: clamp(60px, 14vw, 190px);
-  line-height: 0.88; letter-spacing: -0.04em;
+  font-weight: 600;
+  font-size: clamp(64px, 15vw, 210px);
+  line-height: 0.86; letter-spacing: -0.045em;
   color: var(--ink);
 }
 .hero-line {

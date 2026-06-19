@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   let savedTheme = null;
   try { savedTheme = localStorage.getItem('bq_theme'); } catch(e){}
-  applyTheme(savedTheme || 'light');
+  applyTheme(savedTheme || 'dark');
   themeBtns.forEach(btn => btn.addEventListener('click', () => {
     const cur = document.documentElement.dataset.theme;
     applyTheme(cur === 'dark' ? 'light' : 'dark');
