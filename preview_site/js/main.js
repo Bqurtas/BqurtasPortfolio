@@ -976,7 +976,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scrollTo({ top, behavior: 'smooth' });
     setTimeout(() => { window.__bqNoSnap = false; }, 900);
   };
-  document.querySelectorAll('.hero-meta--br, .room-hero-scroll').forEach((cue) => {
+  document.querySelectorAll('.hero-meta--br, .hero-scrolldown, .room-hero-scroll').forEach((cue) => {
     cue.style.cursor = 'pointer';
     cue.setAttribute('role', 'button');
     cue.setAttribute('tabindex', '0');
@@ -984,4 +984,41 @@ document.addEventListener('DOMContentLoaded', () => {
     cue.addEventListener('click', () => glide(cue));
     cue.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); glide(cue); } });
   });
+})();
+
+/* ---- Hero (dark) — gentle cursor parallax on the portrait + light nav over it ---- */
+(function () {
+  const hero = document.querySelector('.hero');
+  const portrait = document.getElementById('heroPortrait');
+  if (portrait) {
+    setTimeout(() => portrait.classList.add('is-in'), 850);
+    if (window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
+      let raf = 0;
+      window.addEventListener('mousemove', (e) => {
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          const mx = (e.clientX / window.innerWidth - 0.5) * 22;
+          const my = (e.clientY / window.innerHeight - 0.5) * 22;
+          portrait.style.setProperty('--mx', mx.toFixed(1) + 'px');
+          portrait.style.setProperty('--my', my.toFixed(1) + 'px');
+        });
+      }, { passive: true });
+    }
+  }
+  if (hero) {
+    const updNav = () => {
+      // hero is a dark island only inside the Design room; light nav while its
+      // bottom is still well within the viewport.
+      const onDesign = (document.body.dataset.room || 'design') === 'design';
+      const r = hero.getBoundingClientRect();
+      document.body.classList.toggle('nav-on-dark', onDesign && r.bottom > 140);
+    };
+    updNav();
+    window.addEventListener('scroll', updNav, { passive: true });
+    window.addEventListener('resize', updNav);
+    window.addEventListener('hashchange', () => setTimeout(updNav, 60));
+    window.addEventListener('popstate', () => setTimeout(updNav, 60));
+    document.addEventListener('click', (e) => { if (e.target.closest('[data-route]')) setTimeout(updNav, 90); });
+  }
 })();

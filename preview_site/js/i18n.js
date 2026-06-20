@@ -1821,3 +1821,15 @@ window.I18N_EXTRA_FEAT = {
  sv:{"d.work.eye":"Utvalda arbeten","d.work.title":"Varumärkesidentiteter, i sin helhet.","d.work.sub":"Briefen, märkena, paletten och systemet i bruk — varje projekt, på nära håll.","d.work.go":"Se fallstudier","d.bb.eye":"Gratis verktyg","d.bb.title":"Gör en varumärkestavla.","d.bb.sub":"Ditt namn på kurdiska och latin, med palett och typsnittspar — gratis, på sekunder.","d.bb.go":"Öppna verktyget"}
 };
 Object.keys(window.I18N_EXTRA_FEAT).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_FEAT[l]); });
+
+/* ===== Hero lede (new dark hero) ===== */
+window.I18N_EXTRA_HEROLEDE = {
+ en:{"hero.lede":"I'm Barakat Qurtas — a graphic & motion designer crafting brand identities and editorial systems for over a decade."},
+ ku:{"hero.lede":"من بەرەکات قورتاسم — دیزاینەری گرافیک و مۆشن، زیاتر لە دەیەیەکە ناسنامەی براند و سیستەمی ئەدیتۆریاڵ دروست دەکەم."},
+ ar:{"hero.lede":"أنا بركات قرطاس — مصمم جرافيك وموشن، أصنع هويات العلامات والأنظمة التحريرية منذ أكثر من عقد."},
+ kmr:{"hero.lede":"Ez Barakat Qurtas im — sêwirmendê grafîk û motion, zêdetirî dehsalekê nasname û sîstemên edîtoriyal çêdikim."},
+ fr:{"hero.lede":"Je suis Barakat Qurtas — designer graphique & motion, je crée des identités de marque et des systèmes éditoriaux depuis plus de dix ans."},
+ tr:{"hero.lede":"Ben Barakat Qurtas — bir grafik ve hareket tasarımcısı, on yılı aşkın süredir marka kimlikleri ve editoryal sistemler tasarlıyorum."},
+ sv:{"hero.lede":"Jag är Barakat Qurtas — en grafisk och motion-designer som skapar varumärkesidentiteter och redaktionella system i över ett decennium."}
+};
+Object.keys(window.I18N_EXTRA_HEROLEDE).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_HEROLEDE[l]); });
