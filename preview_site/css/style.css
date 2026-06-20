@@ -4288,3 +4288,70 @@ body.nav-on-dark .rail-dot{ background:#efece6 !important; }
 .mm-cap-t{ font-family:'Fraunces',serif; font-style:italic; font-size:22px; line-height:1.25; color:#f3f1ea; }
 @media (max-width:760px){ .mobile-sheet{ grid-template-columns:1fr; width:100%; } .mm-right{ display:none; } }
 @media (prefers-reduced-motion: reduce){ .mobile-sheet{ transition:none; } }
+
+/* =========================================================
+   v221 — bolder hero name  +  TOP BAR nav (centered menu, distributed tools)
+   ========================================================= */
+
+/* 1) Bolder, more striking hero name (all widths) */
+:root[lang="en"] .hero-name, :root[lang="kmr"] .hero-name, :root[lang="fr"] .hero-name,
+:root[lang="tr"] .hero-name, :root[lang="sv"] .hero-name{
+  -webkit-text-stroke:1.4px currentColor; text-stroke:1.4px currentColor;
+}
+:root[lang="ku"] .hero-name, :root[lang="ar"] .hero-name{
+  font-weight:800; -webkit-text-stroke:0; text-stroke:0;
+}
+
+/* 2) Desktop: the left rail becomes a horizontal floating top header */
+@media (min-width:821px){
+  :root{ --topbar-h:70px; }
+
+  .rail{
+    top:0; left:0; right:0; bottom:auto;
+    width:auto; height:var(--topbar-h);
+    flex-direction:row; align-items:center; justify-content:space-between;
+    padding:0 clamp(24px,3.4vw,54px);
+    border-right:none !important; border-left:none !important;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(18,18,18,.62); -webkit-backdrop-filter:blur(14px) saturate(1.08); backdrop-filter:blur(14px) saturate(1.08);
+  }
+  [dir="rtl"] .rail{ left:0; right:0; }
+  body.nav-on-dark .rail{ border-bottom-color:transparent !important; }
+
+  /* logo — left */
+  .rail-logo{ margin:0; }
+
+  /* MENU — centered pill with visible label */
+  .rail-menu{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:auto; height:40px; margin:0; padding:0 18px; gap:11px; flex-direction:row;
+    border:1px solid rgba(255,255,255,.18); border-radius:999px; background:none;
+  }
+  .rail-menu:hover{ background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.34); }
+  .rail-menu .rail-menu-bars{ flex-direction:column; gap:3.5px; }
+  .rail-menu .rail-menu-bars i{ width:16px; }
+  .rail-menu .rail-tip{
+    position:static; opacity:1; visibility:visible; transform:none; pointer-events:none;
+    background:none; border:none; padding:0; box-shadow:none; white-space:nowrap;
+  }
+  .rail-menu .rail-tip::before{ display:none; }
+  .rail-menu .rail-tip-text{ font-size:11.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--ink); }
+
+  /* tools — horizontal row on the right */
+  .rail-tools{ flex-direction:row; align-items:center; gap:clamp(8px,1vw,14px); margin:0; }
+  .lang-hover, .social-hover{ position:relative; }
+
+  /* the vertical-only bits don't belong in a horizontal bar */
+  .rail-nav, .rail-status, .rail-progress{ display:none; }
+
+  /* flyouts drop DOWN from their button (rail flew them out sideways) */
+  .lang-flyout, .social-flyout{ top:calc(100% + 12px) !important; bottom:auto !important; left:auto !important; right:0 !important; transform:translateY(-8px) !important; }
+  [dir="rtl"] .lang-flyout, [dir="rtl"] .social-flyout{ left:0 !important; right:auto !important; transform:translateY(-8px) !important; }
+  .lang-hover:hover .lang-flyout, .lang-hover.is-hovering .lang-flyout, .lang-hover:focus-within .lang-flyout, .lang-flyout.is-open,
+  .social-hover:hover .social-flyout, .social-hover.is-hovering .social-flyout, .social-hover:focus-within .social-flyout{ transform:translateY(0) !important; }
+
+  /* content is full-bleed; the translucent bar floats over it (hero/room-heroes
+     centre their content, so nothing hides under the 70px bar) */
+  .main{ margin-left:0; margin-right:0; }
+  [dir="rtl"] .main{ margin-left:0; margin-right:0; }
+}
