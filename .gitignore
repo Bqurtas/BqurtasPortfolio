@@ -6,3 +6,6 @@
 .claude/
 node_modules/
 *.log
+
+# Archived experiments (local-only, not deployed)
+_attic/
