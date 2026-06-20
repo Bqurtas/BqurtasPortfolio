@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   let savedTheme = null;
   try { savedTheme = localStorage.getItem('bq_theme'); } catch(e){}
-  applyTheme(savedTheme || 'light');
+  applyTheme(savedTheme || 'dark');
   themeBtns.forEach(btn => btn.addEventListener('click', () => {
     const cur = document.documentElement.dataset.theme;
     applyTheme(cur === 'dark' ? 'light' : 'dark');
@@ -229,8 +229,11 @@ document.addEventListener('DOMContentLoaded', () => {
   window.__bqPanels = window.__bqPanels || {};
   window.__bqPanels.menu = () => setMenu(false);
   menuBtn?.addEventListener('click', () => setMenu(!mobileMenu?.classList.contains('is-open')));
+  document.getElementById('railMenu')?.addEventListener('click', () => setMenu(!mobileMenu?.classList.contains('is-open')));
   document.getElementById('mobileMenuClose')?.addEventListener('click', () => setMenu(false));
   mobileMenu?.addEventListener('click', (e) => { if (e.target === mobileMenu) setMenu(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+  mobileMenu?.querySelectorAll('.mm-link, .mm-touch, .mm-logo').forEach((a) => a.addEventListener('click', () => setMenu(false)));
 
   /* Drag the sheet (grab the handle / top) downward to dismiss it. */
   const sheet = mobileMenu?.querySelector('.mobile-sheet');

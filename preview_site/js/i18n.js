@@ -1833,3 +1833,15 @@ window.I18N_EXTRA_HEROLEDE = {
  sv:{"hero.lede":"Jag är Barakat Qurtas — en grafisk och motion-designer som skapar varumärkesidentiteter och redaktionella system i över ett decennium."}
 };
 Object.keys(window.I18N_EXTRA_HEROLEDE).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_HEROLEDE[l]); });
+
+/* ===== Full-screen menu (lamedia-style) ===== */
+window.I18N_EXTRA_MENU = {
+ en:{"profile.btn2":"Get in touch","tip.menu":"Menu","mm.cap":"Designed by hand, in Hewlêr."},
+ ku:{"profile.btn2":"پەیوەندی بکە","tip.menu":"مینیو","mm.cap":"بە دەست دروستکراوە، لە هەولێر."},
+ ar:{"profile.btn2":"تواصل معنا","tip.menu":"القائمة","mm.cap":"مصنوع يدويًا، في أربيل."},
+ kmr:{"profile.btn2":"Têkilî daîne","tip.menu":"Menû","mm.cap":"Bi dest hatiye çêkirin, li Hewlêr."},
+ fr:{"profile.btn2":"Prendre contact","tip.menu":"Menu","mm.cap":"Fait main, à Hewlêr."},
+ tr:{"profile.btn2":"İletişime geç","tip.menu":"Menü","mm.cap":"Elle yapıldı, Hewlêr'de."},
+ sv:{"profile.btn2":"Hör av dig","tip.menu":"Meny","mm.cap":"Gjord för hand, i Hewlêr."}
+};
+Object.keys(window.I18N_EXTRA_MENU).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_MENU[l]); });

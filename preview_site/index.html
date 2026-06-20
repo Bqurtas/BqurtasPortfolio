@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <base href="/" />
@@ -10,7 +10,7 @@
        same-origin script (no SRI needed → full Subresource-Integrity pass).
        The tracker still posts events to Umami cloud (gateway.umami.is/api/send,
        its built-in default), so the dashboard keeps receiving data. -->
-  <script defer src="js/umami.js?v=217" data-website-id="f58c1ade-02c7-4c2e-95b3-2bcbf2e354fa"></script>
+  <script defer src="js/umami.js?v=218" data-website-id="f58c1ade-02c7-4c2e-95b3-2bcbf2e354fa"></script>
 
   <!-- Google Analytics REMOVED 2026-06-18 — it was redundant with Umami (and
        showed no data in Semrush). gtag.js can't carry SRI, so dropping it gives
@@ -158,7 +158,7 @@
   </script>
 
   <!-- Fonts — self-hosted (no external Google Fonts dependency; faster + private) -->
-  <link rel="stylesheet" href="css/fonts.css?v=217">
+  <link rel="stylesheet" href="css/fonts.css?v=218">
 
   <!-- jsDelivr serves Font Awesome + the gallery images — connect early -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -176,7 +176,7 @@
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous"></noscript>
   <script>(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css';l.integrity='sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g';l.crossOrigin='anonymous';l.referrerPolicy='no-referrer';document.head.appendChild(l);})();</script>
 
-  <link rel="stylesheet" href="css/style.css?v=217" />
+  <link rel="stylesheet" href="css/style.css?v=218" />
 </head>
 <body>
 
@@ -211,6 +211,11 @@
     <a href="#" class="rail-logo" id="railLogo" data-route="design" aria-label="Bq — Barakat Qurtas, home">
       <span class="rail-logo-mark">Bq</span>
     </a>
+
+    <button class="rail-menu" id="railMenu" aria-label="Open menu">
+      <span class="rail-menu-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="rail-tip"><span class="rail-tip-text" data-i18n="tip.menu">Menu</span></span>
+    </button>
 
     <nav class="rail-nav" aria-label="Rooms">
       <a href="/design" class="rail-link is-active" data-route="design" aria-label="Design">
@@ -396,42 +401,34 @@
   </section>
 
   <!-- Mobile menu — bottom sheet -->
-  <div class="mobile-menu" id="mobileMenu" aria-label="Mobile navigation">
+  <div class="mobile-menu" id="mobileMenu" aria-label="Menu">
     <div class="mobile-sheet" role="dialog" aria-modal="true" aria-label="Menu">
-      <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
-
-      <div class="mobile-menu-profile">
-        <span class="mobile-menu-photo"><img src="assets/avatar.webp" alt="Barakat Qurtas" /></span>
-        <h3 class="mobile-menu-name" data-i18n="name.full">Barakat Qurtas</h3>
-        <span class="mono mobile-menu-role" data-i18n="profile.eye">Independent Designer · Hewlêr</span>
+      <div class="mm-left">
+        <div class="mm-top">
+          <a href="/" class="mm-logo" data-route="design">Bq.</a>
+          <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <nav class="mm-nav" aria-label="Rooms">
+          <a href="/design" class="mm-link" data-route="design"><span class="mm-n">01</span> <span data-i18n="nav.design">Design</span></a>
+          <a href="/work" class="mm-link" data-route="work"><span class="mm-n">02</span> <span data-i18n="nav.work">Selected Work</span></a>
+          <a href="/brandboard" class="mm-link" data-route="brandboard"><span class="mm-n">03</span> <span data-i18n="nav.brandboard">The Brand Board</span></a>
+          <a href="/blog" class="mm-link" data-route="blog"><span class="mm-n">04</span> <span data-i18n="nav.blog">The Journal</span></a>
+          <a href="/bio" class="mm-link" data-route="bio"><span class="mm-n">05</span> <span data-i18n="nav.bio">The Designer</span></a>
+          <a href="/contact" class="mm-link" data-route="contact"><span class="mm-n">06</span> <span data-i18n="nav.contact">Let's talk.</span></a>
+        </nav>
+        <div class="mm-foot">
+          <a class="mm-touch" href="/contact" data-route="contact"><span data-i18n="profile.btn2">Get in touch</span> <i class="fa-solid fa-arrow-right"></i></a>
+          <div class="mm-socs">
+            <a href="https://instagram.com/bqurtas" target="_blank" rel="noopener">Instagram</a>
+            <a href="https://www.behance.net/bqurtas" target="_blank" rel="noopener">Behance</a>
+            <a href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </div>
       </div>
-
-      <nav class="mobile-nav" aria-label="Rooms">
-        <a href="/design" class="mobile-link" data-route="design">
-          <i class="fa-solid fa-compass-drafting"></i>
-          <span data-i18n="nav.design">Design</span>
-        </a>
-        <a href="/work" class="mobile-link" data-route="work">
-          <i class="fa-solid fa-folder-open"></i>
-          <span data-i18n="nav.work">Selected Work</span>
-        </a>
-        <a href="/brandboard" class="mobile-link" data-route="brandboard">
-          <i class="fa-solid fa-swatchbook"></i>
-          <span data-i18n="nav.brandboard">The Brand Board</span>
-        </a>
-        <a href="/blog" class="mobile-link" data-route="blog">
-          <i class="fa-solid fa-feather-pointed"></i>
-          <span data-i18n="nav.blog">The Journal</span>
-        </a>
-        <a href="/bio" class="mobile-link" data-route="bio">
-          <i class="fa-solid fa-user-pen"></i>
-          <span data-i18n="nav.bio">The Designer</span>
-        </a>
-        <a href="/contact" class="mobile-link" data-route="contact">
-          <i class="fa-solid fa-paper-plane"></i>
-          <span data-i18n="nav.contact">Let's talk.</span>
-        </a>
-      </nav>
+      <div class="mm-right" aria-hidden="true">
+        <img src="assets/portrait.webp" alt="" />
+        <div class="mm-cap"><span class="mono" data-i18n="pj.tr">Hewlêr · Est. 2014</span><span class="mm-cap-t" data-i18n="mm.cap">Designed by hand, in Hewlêr.</span></div>
+      </div>
     </div>
   </div>
 
@@ -448,13 +445,6 @@
         <div class="hero-letterbox hero-letterbox--top" aria-hidden="true"></div>
         <div class="hero-letterbox hero-letterbox--bottom" aria-hidden="true"></div>
         <div class="hero-radial" aria-hidden="true"></div>
-
-        <div class="hero-meta hero-meta--tl">
-          <span class="mono"><i class="fa-solid fa-bookmark"></i> <span data-i18n="hero.portfolio">Portfolio · 2026</span></span>
-        </div>
-        <div class="hero-meta hero-meta--tr">
-          <span class="mono" data-i18n="hero.issue">Vol. 04 / Issue 01</span>
-        </div>
 
         <div class="hero-inner">
           <p class="hero-eyebrow mono">
@@ -493,14 +483,6 @@
         </div>
 
         <div class="hero-scrolldown" aria-hidden="true"><span class="bar"></span><span class="mono" data-i18n="hero.scroll">Scroll</span></div>
-
-        <div class="hero-meta hero-meta--bl">
-          <span class="mono">36.19° N</span>
-          <span class="mono">44.01° E</span>
-        </div>
-        <div class="hero-meta hero-meta--br">
-          <span class="mono"><span data-i18n="hero.scroll">Scroll</span> <i class="fa-solid fa-arrow-down"></i></span>
-        </div>
       </div>
 
       <!-- ===== PENCEMOR — second hero (studio) ===== -->
@@ -1650,12 +1632,12 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script src="js/i18n.js?v=217"></script>
-  <script src="js/chat-kb.js?v=217"></script>
-  <script src="js/main.js?v=217"></script>
-  <script src="js/gallery.js?v=217"></script>
-  <script src="js/enhance.js?v=217"></script>
-  <script src="js/brandboard.js?v=217"></script>
-  <script src="js/work.js?v=217"></script>
+  <script src="js/i18n.js?v=218"></script>
+  <script src="js/chat-kb.js?v=218"></script>
+  <script src="js/main.js?v=218"></script>
+  <script src="js/gallery.js?v=218"></script>
+  <script src="js/enhance.js?v=218"></script>
+  <script src="js/brandboard.js?v=218"></script>
+  <script src="js/work.js?v=218"></script>
 </body>
 </html>
