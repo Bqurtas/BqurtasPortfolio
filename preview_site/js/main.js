@@ -880,17 +880,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     animateRing();
     document.body.addEventListener('mouseover', (e) => {
-      /* Over gallery images: hide the custom cursor so the system zoom cursor
-         stays clearly visible (it was getting lost over busy photos). */
-      const overPhoto = e.target.closest('.card--photo, .cert-item');
-      dot.style.opacity  = overPhoto ? '0' : '';
-      ring.style.opacity = overPhoto ? '0' : '';
-
-      if (e.target.closest('a, button, .tab, input, select, textarea, .qc-card, .blog-card, .service, .stat, .logo-mark, .logo-chip, .index-row')) {
-        ring.classList.add('is-hover');
-      } else {
-        ring.classList.remove('is-hover');
-      }
+      const overCard = e.target.closest('.card');        // gallery work cards → an "Open" disc
+      const overZoom = e.target.closest('.cert-item');   // certificates keep the system zoom cursor
+      const overLink = e.target.closest('a, button, .tab, input, select, textarea, .qc-card, .blog-card, .service, .stat, .logo-mark, .logo-chip, .index-row');
+      ring.classList.toggle('is-open',  !!overCard && !overZoom);
+      ring.classList.toggle('is-hover', !overCard && !!overLink);
+      dot.style.opacity  = (overCard || overZoom) ? '0' : '';
+      ring.style.opacity = overZoom ? '0' : '';
     });
   }
 });
