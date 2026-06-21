@@ -4447,3 +4447,28 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
   }
   .latest-panel.is-open, .chat.is-open{ transform:translateY(0) scale(1); }
 }
+
+/* =========================================================
+   v225 — simpler rooms (compact editorial header, not a full-screen hero)
+          + sticky portfolio tabs
+   ========================================================= */
+/* Room header: compact & left-aligned like the Villo / atelier interiors, instead
+   of a full-screen hero with a giant ghost number, corner labels & scroll cue. */
+.room-hero{
+  min-height:0 !important;
+  padding:calc(var(--topbar-h, 70px) + clamp(46px,8vh,104px)) var(--pad-x) clamp(26px,4vh,44px) !important;
+  justify-content:flex-end; align-items:flex-start; text-align:left; overflow:visible;
+}
+.room-hero::before, .room-hero::after{ display:none !important; }
+.room-hero-ghost, .room-hero-corner, .room-hero-scroll, .room-hero-return{ display:none !important; }
+.room-hero-inner{ width:100%; max-width:980px; margin:0; }
+.room-hero-num{ margin-bottom:12px; }
+.room-hero-title{ margin:0; }
+.room-hero-sub{ margin:16px 0 0 !important; max-width:580px; }
+[dir="rtl"] .room-hero{ align-items:flex-end; text-align:right; }
+[dir="rtl"] .room-hero-inner{ margin-left:auto; }
+.room-hero + .section{ padding-top:clamp(20px,4vh,48px); }
+
+/* Sticky portfolio tabs — stay reachable while scrolling the gallery */
+.tabs-wrap{ position:sticky; top:0; z-index:90; background:var(--bg); }
+@media (min-width:821px){ .tabs-wrap{ top:var(--topbar-h); } }
