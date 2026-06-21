@@ -4656,3 +4656,24 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 /* let the name & email fields span the full width now their partner is gone */
 .pitch-form .row-2:has(#pName),
 .pitch-form .row-2:has(#pEmail){ display:block !important; }
+
+/* =========================================================
+   v235 — Panjamor even simpler & aligned to the side + features/journal closer
+   ========================================================= */
+.pencemor-hero.pencemor-compact{
+  padding:clamp(38px,6vh,74px) var(--pad-x) !important;
+  align-items:flex-start !important; text-align:left;
+}
+.pencemor-compact .pencemor-hero-eyebrow{ display:none !important; }
+.pencemor-compact .pencemor-hero-inner{ align-items:flex-start !important; max-width:640px; margin:0; }
+.pencemor-compact .pencemor-hero-mark{ width:46px !important; margin:0 0 12px !important; }
+.pencemor-compact .pencemor-hero-name{ font-size:clamp(32px,4.4vw,54px) !important; }
+.pencemor-compact .pencemor-hero-tag{ margin:10px 0 18px !important; max-width:440px; }
+.pencemor-compact .pencemor-hero-actions{ justify-content:flex-start; }
+[dir="rtl"] .pencemor-hero.pencemor-compact{ align-items:flex-end !important; text-align:right; }
+[dir="rtl"] .pencemor-compact .pencemor-hero-inner{ align-items:flex-end !important; margin-left:auto; }
+[dir="rtl"] .pencemor-compact .pencemor-hero-actions{ justify-content:flex-end; }
+
+/* draw the feature cards + the journal teaser together as one block */
+.room-features{ padding-bottom:clamp(10px,2vh,22px) !important; }
+.latest-blog{ padding-top:clamp(10px,2vh,22px) !important; }
