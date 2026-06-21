@@ -4472,3 +4472,47 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 /* Sticky portfolio tabs — stay reachable while scrolling the gallery */
 .tabs-wrap{ position:sticky; top:0; z-index:90; background:var(--bg); }
 @media (min-width:821px){ .tabs-wrap{ top:var(--topbar-h); } }
+
+/* =========================================================
+   v226 — portfolio filters become a VERTICAL side menu (sticky) on desktop,
+          instead of a horizontal bar pinned uglily to the top.
+   ========================================================= */
+/* undo the top-pinned sticky; desktop re-adds a side-sticky in the grid below */
+.tabs-wrap{ position:static !important; top:auto !important; background:transparent; }
+
+@media (min-width:821px){
+  /* gallery laid out as  [ vertical filter menu | masonry grid ] */
+  .section.work{
+    display:grid;
+    grid-template-columns:188px minmax(0,1fr);
+    column-gap:clamp(30px,4vw,60px);
+    align-items:start;
+  }
+  .section.work > .section-head{ grid-column:1 / -1; }
+  .section.work > .tabs-wrap{
+    grid-column:1; grid-row:2 / span 3;
+    position:sticky !important; top:calc(var(--topbar-h) + 26px) !important; align-self:start;
+  }
+  .section.work > .tab-header{ grid-column:2; grid-row:2; }
+  .section.work > .grid{ grid-column:2; grid-row:3; }
+  .section.work > .load-more-wrap{ grid-column:2; grid-row:4; }
+
+  /* the tabs themselves: a clean vertical list */
+  .tabs{ flex-direction:column; gap:0; }
+  .tabs-row{ display:flex !important; flex-direction:column; grid-template-columns:none !important; border-bottom:none !important; gap:2px; }
+  .tabs-row + .tabs-row{ margin-top:2px; }
+  .tab{
+    flex-direction:row !important; justify-content:flex-start; text-align:left;
+    padding:10px 12px !important; gap:13px; border-radius:9px; font-size:14px;
+  }
+  .tab i{ font-size:15px !important; width:18px; text-align:center; }
+  .tab:hover{ background:var(--surface); }
+  .tab.is-active{ background:var(--surface); }
+  /* active indicator: a left bar instead of a bottom underline */
+  .tab::after{ left:0 !important; right:auto !important; top:20% !important; bottom:20% !important;
+    width:2px !important; height:auto !important; border-radius:0 2px 2px 0; }
+  .tab:hover::after{ opacity:.35 !important; }
+  .tab.is-active::after{ opacity:1 !important; }
+  [dir="rtl"] .tab{ text-align:right; }
+  [dir="rtl"] .tab::after{ left:auto !important; right:0 !important; border-radius:2px 0 0 2px; }
+}
