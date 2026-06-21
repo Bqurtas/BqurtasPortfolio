@@ -59,4 +59,27 @@
       }, 90);
     }, true);
   }
+
+  /* ---- page-transition curtain when moving between rooms ---- */
+  if (!reduce) {
+    var curtain = document.createElement('div');
+    curtain.className = 'lux-transition';
+    curtain.setAttribute('aria-hidden', 'true');
+    curtain.innerHTML = '<span class="lux-transition-mark">Bq.</span>';
+    document.body.appendChild(curtain);
+
+    var busy = false;
+    document.addEventListener('click', function (ev) {
+      var link = ev.target.closest('[data-route]');
+      if (!link || busy) return;
+      var route = link.getAttribute('data-route');
+      if (route && route === document.body.dataset.room) return;   // same room → no curtain
+      busy = true;
+      curtain.classList.remove('is-leaving');
+      curtain.classList.add('is-active');             // sweep up to cover (room swaps underneath)
+      setTimeout(function () { curtain.classList.add('is-leaving'); }, 520);   // sweep away to reveal
+      setTimeout(function () { curtain.classList.remove('is-active', 'is-leaving'); busy = false; }, 1180);
+    }, true);
+    addEventListener('pagehide', function () { curtain.classList.remove('is-active', 'is-leaving'); }, { once: true });
+  }
 })();

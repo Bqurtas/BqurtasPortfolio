@@ -4460,7 +4460,11 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
   justify-content:flex-end; align-items:flex-start; text-align:left; overflow:visible;
 }
 .room-hero::before, .room-hero::after{ display:none !important; }
-.room-hero-ghost, .room-hero-corner, .room-hero-scroll, .room-hero-return{ display:none !important; }
+.room-hero-ghost, .room-hero-corner, .room-hero-scroll{ display:none !important; }
+/* keep the Return link — as a small static pill above the room title */
+.room-hero-return{ position:static !important; display:inline-flex !important; align-self:flex-start;
+  margin:0 0 22px !important; top:auto !important; }
+[dir="rtl"] .room-hero-return{ align-self:flex-end; }
 .room-hero-inner{ width:100%; max-width:980px; margin:0; }
 .room-hero-num{ margin-bottom:12px; }
 .room-hero-title{ margin:0; }
@@ -4603,4 +4607,39 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 .footer-lead{ max-width:300px; }
 @media (min-width:821px){
   .footer-cols{ grid-template-columns:auto auto !important; gap:clamp(48px,7vw,120px); justify-content:flex-end; align-self:start; }
+}
+
+/* =========================================================
+   v233 — page-transition curtain (room→room) + richer menu open
+   ========================================================= */
+.lux-transition{
+  position:fixed; inset:0; z-index:1500; background:var(--ink);
+  transform:translateY(101%); pointer-events:none;
+  display:flex; align-items:center; justify-content:center;
+}
+.lux-transition.is-active{ transform:translateY(0); transition:transform .5s cubic-bezier(.76,0,.24,1); }
+.lux-transition.is-active.is-leaving{ transform:translateY(-101%); transition:transform .6s cubic-bezier(.76,0,.24,1); }
+.lux-transition-mark{ font-family:'Fraunces',serif; font-style:italic; font-size:clamp(36px,5vw,58px);
+  color:var(--bg); opacity:0; transform:translateY(8px); transition:opacity .25s ease, transform .4s var(--ease); }
+.lux-transition.is-active .lux-transition-mark{ opacity:1; transform:none; }
+.lux-transition.is-leaving .lux-transition-mark{ opacity:0; transition:opacity .2s ease; }
+@media (prefers-reduced-motion: reduce){ .lux-transition{ display:none !important; } }
+
+/* richer menu open: links travel further + stagger longer, numbers ease in,
+   the logo + close fade/slide in */
+.mm-link{ transform:translateY(42px); }
+.mobile-menu.is-open .mm-link{ transition:opacity .6s var(--ease), transform .75s var(--ease), color .3s var(--ease), padding-left .4s var(--ease); }
+.mobile-menu.is-open .mm-link:nth-child(1){ transition-delay:.34s,.34s,0s,0s; }
+.mobile-menu.is-open .mm-link:nth-child(2){ transition-delay:.41s,.41s,0s,0s; }
+.mobile-menu.is-open .mm-link:nth-child(3){ transition-delay:.48s,.48s,0s,0s; }
+.mobile-menu.is-open .mm-link:nth-child(4){ transition-delay:.55s,.55s,0s,0s; }
+.mobile-menu.is-open .mm-link:nth-child(5){ transition-delay:.62s,.62s,0s,0s; }
+.mobile-menu.is-open .mm-link:nth-child(6){ transition-delay:.69s,.69s,0s,0s; }
+.mm-link .mm-n{ opacity:0; transition:opacity .5s ease; }
+.mobile-menu.is-open .mm-link .mm-n{ opacity:1; transition-delay:.5s; }
+.mm-logo, .mobile-menu-close{ opacity:0; transform:translateY(-10px); }
+.mobile-menu.is-open .mm-logo{ opacity:1; transform:none; transition:opacity .5s var(--ease) .15s, transform .5s var(--ease) .15s; }
+.mobile-menu.is-open .mobile-menu-close{ opacity:1; transform:none; transition:opacity .5s var(--ease) .22s, transform .5s var(--ease) .22s; }
+@media (prefers-reduced-motion: reduce){
+  .mm-link, .mm-link .mm-n, .mm-logo, .mobile-menu-close{ opacity:1 !important; transform:none !important; }
 }
