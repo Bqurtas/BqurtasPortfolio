@@ -829,7 +829,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Reliable delivery: paste a free Web3Forms access key (web3forms.com, tied
       // to hello@bqurtas.com) below and every pitch is auto-emailed to you. Until
       // then it falls back to opening a prefilled mail in the visitor's mail app.
-      const WEB3FORMS_KEY = '6396c177-b988-43d0-ac42-5c398151cde9'; // delivers each pitch to hello@bqurtas.com
+      const WEB3FORMS_KEY = 'cd575d52-8847-4286-af53-efa296c04686'; // delivers each pitch to hello@bqurtas.com
       const fields = {
         company:      val('#pCompany'),
         phone:        val('#pPhone'),

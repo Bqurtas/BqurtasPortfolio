@@ -10,7 +10,7 @@
        same-origin script (no SRI needed → full Subresource-Integrity pass).
        The tracker still posts events to Umami cloud (gateway.umami.is/api/send,
        its built-in default), so the dashboard keeps receiving data. -->
-  <script defer src="js/umami.js?v=236" data-website-id="f58c1ade-02c7-4c2e-95b3-2bcbf2e354fa"></script>
+  <script defer src="js/umami.js?v=237" data-website-id="f58c1ade-02c7-4c2e-95b3-2bcbf2e354fa"></script>
 
   <!-- Google Analytics REMOVED 2026-06-18 — it was redundant with Umami (and
        showed no data in Semrush). gtag.js can't carry SRI, so dropping it gives
@@ -158,7 +158,7 @@
   </script>
 
   <!-- Fonts — self-hosted (no external Google Fonts dependency; faster + private) -->
-  <link rel="stylesheet" href="css/fonts.css?v=236">
+  <link rel="stylesheet" href="css/fonts.css?v=237">
 
   <!-- jsDelivr serves Font Awesome + the gallery images — connect early -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -176,7 +176,7 @@
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous"></noscript>
   <script>(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css';l.integrity='sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g';l.crossOrigin='anonymous';l.referrerPolicy='no-referrer';document.head.appendChild(l);})();</script>
 
-  <link rel="stylesheet" href="css/style.css?v=236" />
+  <link rel="stylesheet" href="css/style.css?v=237" />
 </head>
 <body>
 
@@ -651,6 +651,16 @@
 
       <!-- ===== FEATURED: Selected Work + Brand Board (in Design room) ===== -->
       <div class="section room-features">
+        <!-- Panjamor studio — now sits beside the two feature cards -->
+        <div class="pencemor-aside" id="pencemorHero">
+          <span class="mono pencemor-hero-eyebrow" data-i18n="pj.eyebrow">Design Studio</span>
+          <h2 class="pencemor-hero-name" data-i18n="pj.name">Panjamor</h2>
+          <p class="pencemor-hero-tag" data-i18n="pj.tag">While our fingerprint sits your work atop, let your <em>every worry stop</em>.</p>
+          <div class="pencemor-hero-actions">
+            <a href="/contact" data-route="contact" class="pencemor-hero-btn pencemor-hero-btn--primary" data-i18n="pj.contact">Get in touch</a>
+            <button type="button" class="pencemor-hero-btn pencemor-hero-btn--ghost" id="pencemorViewWork" data-i18n="pj.work">View the work</button>
+          </div>
+        </div>
         <a class="feature-card feature-card--work" href="/work" data-route="work" style="--accent:#bd4a2c">
           <span class="mono feature-eye"><i class="fa-solid fa-folder-open"></i> <span data-i18n="d.work.eye">Selected Work</span></span>
           <h3 class="feature-title" data-i18n="d.work.title">Brand identities, in full.</h3>
@@ -694,19 +704,6 @@
         </div>
       </div>
 
-      <!-- ===== PENCEMOR — studio strip (moved lower + made compact) ===== -->
-      <section class="pencemor-hero pencemor-compact" id="pencemorHero">
-        <div class="pencemor-hero-inner">
-          <img class="pencemor-hero-mark" src="assets/pencemor.webp" alt="Panjamor" />
-          <span class="mono pencemor-hero-eyebrow" data-i18n="pj.eyebrow">Design Studio</span>
-          <h2 class="pencemor-hero-name" data-i18n="pj.name">Panjamor</h2>
-          <p class="pencemor-hero-tag" data-i18n="pj.tag">While our fingerprint sits your work atop, let your <em>every worry stop</em>.</p>
-          <div class="pencemor-hero-actions">
-            <a href="/contact" data-route="contact" class="pencemor-hero-btn pencemor-hero-btn--primary" data-i18n="pj.contact">Get in touch</a>
-            <button type="button" class="pencemor-hero-btn pencemor-hero-btn--ghost" id="pencemorViewWork" data-i18n="pj.work">View the work</button>
-          </div>
-        </div>
-      </section>
     </section>
 
     <!-- ============================================================
@@ -1620,13 +1617,13 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script src="js/i18n.js?v=236"></script>
-  <script src="js/chat-kb.js?v=236"></script>
-  <script src="js/main.js?v=236"></script>
-  <script src="js/gallery.js?v=236"></script>
-  <script src="js/enhance.js?v=236"></script>
-  <script src="js/brandboard.js?v=236"></script>
-  <script src="js/work.js?v=236"></script>
-  <script src="js/lux.js?v=236"></script>
+  <script src="js/i18n.js?v=237"></script>
+  <script src="js/chat-kb.js?v=237"></script>
+  <script src="js/main.js?v=237"></script>
+  <script src="js/gallery.js?v=237"></script>
+  <script src="js/enhance.js?v=237"></script>
+  <script src="js/brandboard.js?v=237"></script>
+  <script src="js/work.js?v=237"></script>
+  <script src="js/lux.js?v=237"></script>
 </body>
 </html>
