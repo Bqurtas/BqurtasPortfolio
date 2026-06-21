@@ -507,7 +507,7 @@
       { k: ['time','timeline','how long','deadline','fast','urgent'],
         a: "Typical timelines: a logo in <b>1–2 weeks</b>, a full identity in <b>3–5 weeks</b>, a book cover in <b>1 week</b>. Rush work is possible — tell me your deadline." },
       { k: ['contact','reach','email','phone','whatsapp','hire','start'],
-        a: "Easiest ways to reach Barakat:<br>• ✉️ <a href='mailto:info@bqurtas.com'>info@bqurtas.com</a><br>• 📱 <a href='https://wa.me/9647517884985' target='_blank' rel='noopener'>WhatsApp +964 751 788 4985</a><br>Or open the <b>Contact</b> room and send a pitch." },
+        a: "Easiest ways to reach Barakat:<br>• ✉️ <a href='mailto:hello@bqurtas.com'>hello@bqurtas.com</a><br>• 📱 <a href='https://wa.me/9647517884985' target='_blank' rel='noopener'>WhatsApp +964 751 788 4985</a><br>Or open the <b>Contact</b> room and send a pitch." },
       { k: ['who','about','experience','barakat','you'],
         a: "Barakat Qurtas is an independent graphic designer in <b>Erbil, Kurdistan</b>, working freelance since <b>2014</b> — 1000+ works across branding, editorial, print & digital." },
       { k: ['language','languages','speak'],

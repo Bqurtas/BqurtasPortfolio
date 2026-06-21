@@ -794,41 +794,50 @@ document.addEventListener('DOMContentLoaded', () => {
   if (form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const name = form.querySelector('#pName').value.trim();
-      const email = form.querySelector('#pEmail').value.trim();
-      const type = form.querySelector('#pType').value;
-      const message = form.querySelector('#pMessage').value.trim();
-      if (!name || !email || !type || !message) {
+      // safe readers — the form now shows only name/email/message; the other
+      // fields may be hidden or absent, so never assume they exist.
+      const val = (sel) => { const el = form.querySelector(sel); return el ? el.value.trim() : ''; };
+      const chk = (sel) => { const el = form.querySelector(sel); return !!(el && el.checked); };
+      const name = val('#pName');
+      const email = val('#pEmail');
+      const message = val('#pMessage');
+      const type = val('#pType') || 'Project enquiry';   // optional now
+      if (!name || !email || !message) {
         status.style.color = 'var(--ember)';
-        status.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Please fill in name, email, project type, and message.';
+        status.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Please add your name, email and a short message.';
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        status.style.color = 'var(--ember)';
+        status.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Please enter a valid email address.';
         return;
       }
       const submissions = JSON.parse(localStorage.getItem('bq_pitches') || '[]');
       submissions.push({
         id: Date.now(),
         name, email, type, message,
-        company: form.querySelector('#pCompany').value,
-        phone:   form.querySelector('#pPhone').value,
-        budget:  form.querySelector('#pBudget').value,
-        timeline:form.querySelector('#pTimeline').value,
-        hear:    form.querySelector('#pHear').value,
-        nda:     form.querySelector('#pNDA').checked,
+        company: val('#pCompany'),
+        phone:   val('#pPhone'),
+        budget:  val('#pBudget'),
+        timeline:val('#pTimeline'),
+        hear:    val('#pHear'),
+        nda:     chk('#pNDA'),
         at: new Date().toISOString()
       });
       try { localStorage.setItem('bq_pitches', JSON.stringify(submissions)); } catch(e){}
 
       // Reliable delivery: paste a free Web3Forms access key (web3forms.com, tied
-      // to info@bqurtas.com) below and every pitch is auto-emailed to you. Until
+      // to hello@bqurtas.com) below and every pitch is auto-emailed to you. Until
       // then it falls back to opening a prefilled mail in the visitor's mail app.
-      const WEB3FORMS_KEY = '6396c177-b988-43d0-ac42-5c398151cde9'; // delivers each pitch to info@bqurtas.com
+      const WEB3FORMS_KEY = '6396c177-b988-43d0-ac42-5c398151cde9'; // delivers each pitch to hello@bqurtas.com
       const fields = {
-        company:      form.querySelector('#pCompany').value,
-        phone:        form.querySelector('#pPhone').value,
+        company:      val('#pCompany'),
+        phone:        val('#pPhone'),
         project_type: type,
-        budget:       form.querySelector('#pBudget').value,
-        timeline:     form.querySelector('#pTimeline').value,
-        heard_about:  form.querySelector('#pHear').value,
-        nda:          form.querySelector('#pNDA').checked ? 'Yes' : 'No'
+        budget:       val('#pBudget'),
+        timeline:     val('#pTimeline'),
+        heard_about:  val('#pHear'),
+        nda:          chk('#pNDA') ? 'Yes' : 'No'
       };
 
       if (WEB3FORMS_KEY) {
@@ -842,20 +851,20 @@ document.addEventListener('DOMContentLoaded', () => {
           status.style.color = d.success ? 'var(--gold)' : 'var(--ember)';
           status.innerHTML = d.success
             ? '<i class="fa-solid fa-circle-check"></i> Thank you — your pitch has been sent. I reply within 48 hours.'
-            : '<i class="fa-solid fa-circle-exclamation"></i> Could not send — please write directly to info@bqurtas.com.';
+            : '<i class="fa-solid fa-circle-exclamation"></i> Could not send — please write directly to hello@bqurtas.com.';
           if (d.success) form.reset();
         }).catch(() => {
           status.style.color = 'var(--ember)';
-          status.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Could not send — please write directly to info@bqurtas.com.';
+          status.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Could not send — please write directly to hello@bqurtas.com.';
         });
       } else {
         const subject = encodeURIComponent(`Pitch — ${type} — ${name}`);
         const body = encodeURIComponent(
           `Name: ${name}\nEmail: ${email}\nCompany: ${fields.company}\nPhone: ${fields.phone}\nProject type: ${type}\nBudget: ${fields.budget}\nTimeline: ${fields.timeline}\nHeard about: ${fields.heard_about}\nNDA: ${fields.nda}\n\n---\n${message}`
         );
-        window.location.href = `mailto:info@bqurtas.com?subject=${subject}&body=${body}`;
+        window.location.href = `mailto:hello@bqurtas.com?subject=${subject}&body=${body}`;
         status.style.color = 'var(--gold)';
-        status.innerHTML = '<i class="fa-solid fa-circle-check"></i> Pitch prepared. Your mail client will open — or write directly to info@bqurtas.com.';
+        status.innerHTML = '<i class="fa-solid fa-circle-check"></i> Pitch prepared. Your mail client will open — or write directly to hello@bqurtas.com.';
         form.reset();
       }
     });

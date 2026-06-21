@@ -4677,3 +4677,14 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 /* draw the feature cards + the journal teaser together as one block */
 .room-features{ padding-bottom:clamp(10px,2vh,22px) !important; }
 .latest-blog{ padding-top:clamp(10px,2vh,22px) !important; }
+
+/* =========================================================
+   v236 — footer: a prominent email + a little calmer still
+   ========================================================= */
+.footer .footer-list a[href^="mailto"]{
+  font-family:'Fraunces', serif; font-style:italic;
+  font-size:clamp(20px,2.3vw,30px); line-height:1.1;
+  display:inline-block; margin-bottom:6px;
+}
+.footer .footer-list a[href^="mailto"]:hover{ opacity:.7; }
+.footer-list{ display:flex; flex-direction:column; gap:9px; }

@@ -1,7 +1,7 @@
 /* Two-factor login for the studio console. Two ways to turn it on:
 
    FREE — emailed code (recommended, no app needed):
-     Variables → TWOFA_EMAIL = info@bqurtas.com. A 6-digit code is emailed there
+     Variables → TWOFA_EMAIL = hello@bqurtas.com. A 6-digit code is emailed there
      using the SAME free Web3Forms key the contact form already uses (no new
      service, no secret). Needs the D1 binding (DB). Optional: WEB3FORMS_KEY to
      override the key.
@@ -60,7 +60,7 @@ export async function onRequestPost(context) {
   if (String(body.pin || '') !== String(env.DASH_PIN || '107502')) return json({ ok: false, error: 'bad-pin' }, 401);
 
   const hasTOTP = !!env.TOTP_SECRET;
-  const hasEmail = !!env.TWOFA_EMAIL;   // set TWOFA_EMAIL=info@bqurtas.com → emailed codes (free)
+  const hasEmail = !!env.TWOFA_EMAIL;   // set TWOFA_EMAIL=hello@bqurtas.com → emailed codes (free)
   const hasInfobip = env.INFOBIP_API_KEY && env.INFOBIP_BASE_URL && env.INFOBIP_FROM;
   const hasTwilio = env.TWILIO_SID && env.TWILIO_TOKEN && env.TWILIO_FROM;
   const hasSMS = hasInfobip || hasTwilio;
@@ -77,7 +77,7 @@ export async function onRequestPost(context) {
     await env.DB.prepare('INSERT INTO twofa (id,code,exp,tries) VALUES (?,?,?,0)').bind(id, await sha(code), Date.now() + 5 * 60 * 1000).run();
 
     /* EMAIL (free) — reuses the same Web3Forms key the contact form uses, which
-       delivers to info@bqurtas.com. Only TWOFA_EMAIL needs to be set. */
+       delivers to hello@bqurtas.com. Only TWOFA_EMAIL needs to be set. */
     if (hasEmail) {
       const KEY = env.WEB3FORMS_KEY || '6396c177-b988-43d0-ac42-5c398151cde9';
       let er;
