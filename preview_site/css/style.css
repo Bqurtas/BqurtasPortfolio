@@ -4643,3 +4643,16 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 @media (prefers-reduced-motion: reduce){
   .mm-link, .mm-link .mm-n, .mm-logo, .mobile-menu-close{ opacity:1 !important; transform:none !important; }
 }
+
+/* =========================================================
+   v234 — Contact room: a much simpler form (name · email · message only)
+   ========================================================= */
+/* drop the project-type/budget and timeline/hear rows, plus company, phone & NDA */
+.pitch-form .row-2:has(#pType),
+.pitch-form .row-2:has(#pTimeline){ display:none !important; }
+.pitch-form .field:has(#pCompany),
+.pitch-form .field:has(#pPhone),
+.pitch-form .field:has(#pNDA){ display:none !important; }
+/* let the name & email fields span the full width now their partner is gone */
+.pitch-form .row-2:has(#pName),
+.pitch-form .row-2:has(#pEmail){ display:block !important; }
