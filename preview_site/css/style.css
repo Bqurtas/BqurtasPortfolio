@@ -4720,3 +4720,12 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
   .tab.is-active i, .tab.is-active .tab-label{ color:var(--bg) !important; }
   .tab:hover:not(.is-active){ background:var(--surface) !important; }
 }
+
+/* =========================================================
+   v238 — Contact room: calmer & Villo-like (one intro, then contacts + the form)
+   ========================================================= */
+#contact .section > .section-head{ display:none; }      /* drop the duplicate "Start a conversation" header */
+#contact .contact-quick{ margin-top:0; }
+/* lighter quick-contact cards — less boxy */
+#contact .qc-card{ background:transparent; border-color:var(--line-soft); }
+#contact .qc-card:hover{ border-color:var(--line); background:var(--surface); }
