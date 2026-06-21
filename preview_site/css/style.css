@@ -4190,7 +4190,7 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 .hero-line--2{ color:var(--ink) !important; font-style:normal !important; }
 .hero-line--2 .hero-name{ font-style:normal !important; }
 :root[lang="en"] .hero-name, :root[lang="kmr"] .hero-name, :root[lang="fr"] .hero-name,
-:root[lang="tr"] .hero-name, :root[lang="sv"] .hero-name{ font-family:'Anton', sans-serif !important; }
+:root[lang="tr"] .hero-name, :root[lang="sv"] .hero-name{ font-family:'Fraunces', serif !important; font-weight:700 !important; letter-spacing:-.01em; }
 .hero-name{ color:var(--ink); }
 
 .hero-portrait{ position:absolute; top:50%; left:50%; z-index:4;
@@ -4287,14 +4287,14 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
    v221 — bolder hero name  +  TOP BAR nav (centered menu, distributed tools)
    ========================================================= */
 
-/* 1) Hero name weight — Anton (Latin) is fat; thicken it FURTHER with a matching
-   stroke so the name reads heavy & strong. ku/ar: Noto Kufi 900 + a light stroke. */
+/* 1) Hero name — Latin is now Fraunces 700 (elegant high-contrast serif), no stroke
+   (a stroke muddies a serif). ku/ar stay Noto Kufi 900 with a light stroke. */
 :root[lang="en"] .hero-name, :root[lang="kmr"] .hero-name, :root[lang="fr"] .hero-name,
 :root[lang="tr"] .hero-name, :root[lang="sv"] .hero-name{
-  -webkit-text-stroke:1.8px currentColor; text-stroke:1.8px currentColor;
+  -webkit-text-stroke:0; text-stroke:0;
 }
 :root[lang="ku"] .hero-name, :root[lang="ar"] .hero-name{
-  font-weight:900; -webkit-text-stroke:1px currentColor; text-stroke:1px currentColor;
+  font-weight:900; -webkit-text-stroke:.6px currentColor; text-stroke:.6px currentColor;
 }
 
 /* 2) Desktop: the left rail becomes a horizontal floating top header */
@@ -4589,4 +4589,18 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 @media (prefers-reduced-motion: reduce){
   .lux-reveal{ opacity:1 !important; transform:none !important; transition:none !important; }
   .lux-gray .card-art img, .lux-gray .card-art video, .lux-gray .card-art svg{ filter:none !important; }
+}
+
+/* =========================================================
+   v232 — calmer, simpler footer (the nav, availability pill & coords were noise)
+   ========================================================= */
+.footer-col2:has(.footer-nav){ display:none; }   /* the room nav already lives in the menu */
+.footer-nav{ display:none; }                      /* fallback if :has is unsupported */
+.footer-avail{ display:none; }                    /* duplicate "available" pill */
+.footer-coords-min{ display:none; }               /* drop the coordinates from the bottom bar */
+.footer-cta{ padding-top:clamp(46px,7vh,88px) !important; padding-bottom:clamp(34px,6vh,64px) !important; }
+.footer-body{ gap:clamp(40px,6vw,100px); align-items:flex-start; padding-bottom:6px; }
+.footer-lead{ max-width:300px; }
+@media (min-width:821px){
+  .footer-cols{ grid-template-columns:auto auto !important; gap:clamp(48px,7vw,120px); justify-content:flex-end; align-self:start; }
 }
