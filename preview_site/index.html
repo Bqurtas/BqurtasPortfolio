@@ -10,7 +10,7 @@
        same-origin script (no SRI needed → full Subresource-Integrity pass).
        The tracker still posts events to Umami cloud (gateway.umami.is/api/send,
        its built-in default), so the dashboard keeps receiving data. -->
-  <script defer src="js/umami.js?v=221" data-website-id="f58c1ade-02c7-4c2e-95b3-2bcbf2e354fa"></script>
+  <script defer src="js/umami.js?v=222" data-website-id="f58c1ade-02c7-4c2e-95b3-2bcbf2e354fa"></script>
 
   <!-- Google Analytics REMOVED 2026-06-18 — it was redundant with Umami (and
        showed no data in Semrush). gtag.js can't carry SRI, so dropping it gives
@@ -158,7 +158,7 @@
   </script>
 
   <!-- Fonts — self-hosted (no external Google Fonts dependency; faster + private) -->
-  <link rel="stylesheet" href="css/fonts.css?v=221">
+  <link rel="stylesheet" href="css/fonts.css?v=222">
 
   <!-- jsDelivr serves Font Awesome + the gallery images — connect early -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -176,7 +176,7 @@
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous"></noscript>
   <script>(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css';l.integrity='sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g';l.crossOrigin='anonymous';l.referrerPolicy='no-referrer';document.head.appendChild(l);})();</script>
 
-  <link rel="stylesheet" href="css/style.css?v=221" />
+  <link rel="stylesheet" href="css/style.css?v=222" />
 </head>
 <body>
 
@@ -211,11 +211,6 @@
     <a href="#" class="rail-logo" id="railLogo" data-route="design" aria-label="Bq — Barakat Qurtas, home">
       <span class="rail-logo-mark">Bq</span>
     </a>
-
-    <button class="rail-menu" id="railMenu" aria-label="Open menu">
-      <span class="rail-menu-bars" aria-hidden="true"><i></i><i></i><i></i></span>
-      <span class="rail-tip"><span class="rail-tip-text" data-i18n="tip.menu">Menu</span></span>
-    </button>
 
     <nav class="rail-nav" aria-label="Rooms">
       <a href="/design" class="rail-link is-active" data-route="design" aria-label="Design">
@@ -328,6 +323,14 @@
       <span class="rail-status-text" data-i18n="krg">Hewlêr · KRG</span>
     </div>
   </aside>
+
+  <!-- MENU — vertical tab on the screen edge (desktop); opens the full-screen overlay.
+       Lives outside .rail so its position:fixed anchors to the viewport, not the
+       backdrop-filtered bar. Hidden on mobile (the bottom bar has its own trigger). -->
+  <button class="rail-menu" id="railMenu" aria-label="Open menu">
+    <span class="rail-menu-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="rail-tip"><span class="rail-tip-text" data-i18n="tip.menu">Menu</span></span>
+  </button>
 
   <!-- Profile card (hover the Bq logo) -->
   <div class="profile-card" id="profileCard" aria-hidden="true">
@@ -1632,12 +1635,12 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script src="js/i18n.js?v=221"></script>
-  <script src="js/chat-kb.js?v=221"></script>
-  <script src="js/main.js?v=221"></script>
-  <script src="js/gallery.js?v=221"></script>
-  <script src="js/enhance.js?v=221"></script>
-  <script src="js/brandboard.js?v=221"></script>
-  <script src="js/work.js?v=221"></script>
+  <script src="js/i18n.js?v=222"></script>
+  <script src="js/chat-kb.js?v=222"></script>
+  <script src="js/main.js?v=222"></script>
+  <script src="js/gallery.js?v=222"></script>
+  <script src="js/enhance.js?v=222"></script>
+  <script src="js/brandboard.js?v=222"></script>
+  <script src="js/work.js?v=222"></script>
 </body>
 </html>
