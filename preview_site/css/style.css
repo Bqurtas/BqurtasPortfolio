@@ -4535,3 +4535,29 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
     box-shadow:none !important;     /* drop the heavy stacking shadows */
   }
 }
+
+/* =========================================================
+   v228 — Panjamor as a compact studio strip (moved lower) + lighter footer
+   ========================================================= */
+.pencemor-hero.pencemor-compact{
+  min-height:0 !important; height:auto !important;
+  padding:clamp(54px,9vh,110px) var(--pad-x) !important;
+  scroll-snap-align:none !important;
+}
+.pencemor-compact .pencemor-watermark, .pencemor-compact .pencemor-hero-tl,
+.pencemor-compact .pencemor-hero-tr, .pencemor-compact .pencemor-hero-rule,
+.pencemor-compact .pencemor-hero-desc, .pencemor-compact .pencemor-hero-social{ display:none !important; }
+.pencemor-compact .pencemor-hero-inner{ max-width:560px; }
+.pencemor-compact .pencemor-hero-mark{ width:clamp(54px,7vw,82px) !important; height:auto; margin-bottom:16px; }
+.pencemor-compact .pencemor-hero-name{ font-size:clamp(40px,6vw,72px) !important; margin:6px 0 0; }
+.pencemor-compact .pencemor-hero-tag{ margin:14px auto 22px !important; max-width:460px; }
+
+/* lighter, simpler footer — drop the repeated bio paragraph & the duplicate pill,
+   give the columns more air */
+.footer-lead-text{ display:none; }
+.footer-avail{ margin-top:14px; }
+.footer-cta{ padding-bottom:clamp(28px,4vh,44px); }
+.footer-body{ gap:clamp(28px,4vw,64px); }
+@media (min-width:821px){
+  .footer-lead{ max-width:300px; }
+}
