@@ -8,12 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeBtns = [document.getElementById('themeToggle'), document.getElementById('themeToggleM')].filter(Boolean);
   const applyTheme = (t) => {
     document.documentElement.dataset.theme = t;
-    try { localStorage.setItem('bq_theme', t); } catch(e){}
+    try { localStorage.setItem('bq_theme2', t); } catch(e){}
     themeBtns.forEach(b => b.setAttribute('aria-checked', t === 'dark' ? 'true' : 'false'));
   };
+  // Default is LIGHT now (a new key so an old saved 'dark' pref doesn't override it).
   let savedTheme = null;
-  try { savedTheme = localStorage.getItem('bq_theme'); } catch(e){}
-  applyTheme(savedTheme || 'dark');
+  try { savedTheme = localStorage.getItem('bq_theme2'); } catch(e){}
+  applyTheme(savedTheme || 'light');
   themeBtns.forEach(btn => btn.addEventListener('click', () => {
     const cur = document.documentElement.dataset.theme;
     applyTheme(cur === 'dark' ? 'light' : 'dark');
