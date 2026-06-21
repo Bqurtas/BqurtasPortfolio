@@ -14,9 +14,12 @@
   # so it can carry a fresh nonce (nonce-based script-src, no 'unsafe-inline' for
   # scripts → XSS-effective). It is intentionally NOT set here to avoid a second,
   # conflicting CSP header on the HTML responses.
-  # HTML must always revalidate so a new deploy's ?v= assets load at once
-  # (the more-specific css/js/assets rules below keep their own longer cache)
-  Cache-Control: public, max-age=0, must-revalidate
+  # HTML must NEVER be cached so a new deploy's ?v= assets load at once. We use
+  # no-store (not max-age=0, must-revalidate) because Cloudflare's edge ignored
+  # must-revalidate and kept serving a stale HIT (~31h old) — the site looked old
+  # until a hard refresh. This rule only bites HTML; the more-specific css/js/
+  # assets rules below override Cache-Control and keep their own longer cache.
+  Cache-Control: no-store
 
 # Images & fonts rarely change — cache for 30 days (still not a year)
 /assets/*

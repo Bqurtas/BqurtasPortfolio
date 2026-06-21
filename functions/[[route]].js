@@ -127,9 +127,12 @@ export async function onRequest(context) {
     img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=3';
   }
 
-  // the HTML shell must always revalidate so a deploy's new ?v= asset links are
-  // picked up immediately (the ?v-versioned CSS/JS/images keep their long cache)
-  const FRESH = 'public, max-age=0, must-revalidate';
+  // The HTML shell must NEVER be cached (not by the browser, not by Cloudflare's
+  // edge) so a deploy's new ?v= asset links are picked up at once. `max-age=0,
+  // must-revalidate` wasn't enough — Cloudflare's edge kept serving a stale HIT
+  // (age ~31h), so the site appeared "old/broken" until a hard refresh. `no-store`
+  // is unambiguous; the ?v-versioned CSS/JS/images keep their own long cache.
+  const FRESH = 'no-store';
   /* Per-request nonce → a strong, XSS-effective Content-Security-Policy with NO
      'unsafe-inline' for scripts. Every <script> in the shell gets this nonce
      below; 'strict-dynamic' then trusts whatever those scripts load (GA, Pixel,
@@ -151,6 +154,7 @@ export async function onRequest(context) {
   const withFresh = (res) => {
     const headers = new Headers(res.headers);
     headers.set('Cache-Control', FRESH);
+    headers.set('CDN-Cache-Control', 'no-store');   // Cloudflare edge: don't cache the HTML shell
     headers.set('Content-Security-Policy', CSP);
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
   };
