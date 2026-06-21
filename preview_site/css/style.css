@@ -4516,3 +4516,22 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
   [dir="rtl"] .tab{ text-align:right; }
   [dir="rtl"] .tab::after{ left:auto !important; right:0 !important; border-radius:2px 0 0 2px; }
 }
+
+/* =========================================================
+   v227 — simplify cluttered rooms
+   Bio: the 12 full-height sticky "stacking" cards (≈800px each → a ~9500px room)
+   become a calm, compact 2-column grid that's quick to scan.
+   ========================================================= */
+@media (min-width:821px){
+  #bio .bio-stack{
+    display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:20px; align-items:start;
+  }
+  #bio .bio-stack > .bio-block{
+    position:static !important;     /* no sticky pile-up */
+    height:auto !important; min-height:0 !important; overflow:visible !important;
+    margin:0 !important;
+    padding:26px clamp(22px,2.4vw,36px) !important;
+    box-shadow:none !important;     /* drop the heavy stacking shadows */
+  }
+}
