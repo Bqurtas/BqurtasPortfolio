@@ -4287,14 +4287,14 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
    v221 — bolder hero name  +  TOP BAR nav (centered menu, distributed tools)
    ========================================================= */
 
-/* 1) Hero name weight — Anton is already a fat display face (Latin), so no stroke;
-   ku/ar use Noto Kufi at its heaviest weight. */
+/* 1) Hero name weight — Anton (Latin) is fat; thicken it FURTHER with a matching
+   stroke so the name reads heavy & strong. ku/ar: Noto Kufi 900 + a light stroke. */
 :root[lang="en"] .hero-name, :root[lang="kmr"] .hero-name, :root[lang="fr"] .hero-name,
 :root[lang="tr"] .hero-name, :root[lang="sv"] .hero-name{
-  -webkit-text-stroke:0; text-stroke:0;
+  -webkit-text-stroke:1.8px currentColor; text-stroke:1.8px currentColor;
 }
 :root[lang="ku"] .hero-name, :root[lang="ar"] .hero-name{
-  font-weight:900; -webkit-text-stroke:0; text-stroke:0;
+  font-weight:900; -webkit-text-stroke:1px currentColor; text-stroke:1px currentColor;
 }
 
 /* 2) Desktop: the left rail becomes a horizontal floating top header */
@@ -4423,3 +4423,27 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 .mm-socs a{ color:var(--ink-muted); }
 .mm-socs a:hover{ color:var(--ink); }
 .mm-cap .mono{ color:var(--ink-muted); }
+
+/* =========================================================
+   v224 — panels open from the TOP BAR, each under its own trigger
+   (profile card ← centred logo · notifications + chat ← top-right icons).
+   They were anchored to the old left rail (--rail-w), so they popped up in
+   three different wrong corners. ========================================= */
+@media (min-width:821px){
+  .profile-card{
+    top:calc(var(--topbar-h) + 8px); left:50%; right:auto; bottom:auto;
+    transform:translate(-50%,-8px) scale(.98); transform-origin:top center;
+  }
+  [dir="rtl"] .profile-card{ left:50%; right:auto; transform:translate(-50%,-8px) scale(.98); }
+  .profile-card.is-shown{ transform:translate(-50%,0) scale(1); }
+
+  .latest-panel, .chat{
+    top:calc(var(--topbar-h) + 8px); right:clamp(16px,3vw,44px); left:auto; bottom:auto;
+    height:min(560px,72vh);
+    transform:translateY(-8px) scale(.98); transform-origin:top right;
+  }
+  [dir="rtl"] .latest-panel, [dir="rtl"] .chat{
+    left:clamp(16px,3vw,44px); right:auto; transform-origin:top left; transform:translateY(-8px) scale(.98);
+  }
+  .latest-panel.is-open, .chat.is-open{ transform:translateY(0) scale(1); }
+}
