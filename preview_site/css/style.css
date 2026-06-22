@@ -4579,7 +4579,7 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 /* (mobile filters reverted to their original 2×6 grid — the swipe-strip is removed) */
 
 @media (prefers-reduced-motion: reduce){
-  .lux-reveal{ opacity:1 !important; transform:none !important; transition:none !important; }
+  /* keep a gentle reveal even here, but drop the greyscale shift */
   .lux-gray .card-art img, .lux-gray .card-art video, .lux-gray .card-art svg{ filter:none !important; }
 }
 
@@ -4833,13 +4833,12 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
   #bio .cert-img-wrap{ aspect-ratio:4/3 !important; border-radius:14px !important; }
 }
 
-/* ---- dramatic hero entrance on load (staggered slide-up) ---- */
-@media (prefers-reduced-motion: no-preference){
-  .hero-eyebrow   { animation:heroEnter .9s var(--ease) .10s both; }
-  .hero-line--1   { animation:heroEnter 1s  var(--ease) .26s both; }
-  .hero-line--2   { animation:heroEnter 1s  var(--ease) .40s both; }
-  .hero-spark     { animation:heroEnter .9s var(--ease) .62s both; }
-  .hero-lede      { animation:heroEnter .9s var(--ease) .74s both; }
-  .hero-scrolldown{ animation:heroEnter .9s var(--ease) .92s both; }
-  @keyframes heroEnter{ from{ opacity:0; transform:translateY(46px); } to{ opacity:1; transform:translateY(0); } }
-}
+/* ---- dramatic hero entrance on load (staggered slide-up) ----
+   plays ALWAYS (even with the OS "Reduce Motion" on) so the site never looks dead */
+.hero-eyebrow   { animation:heroEnter .9s var(--ease) .10s both; }
+.hero-line--1   { animation:heroEnter 1s  var(--ease) .26s both; }
+.hero-line--2   { animation:heroEnter 1s  var(--ease) .40s both; }
+.hero-spark     { animation:heroEnter .9s var(--ease) .62s both; }
+.hero-lede      { animation:heroEnter .9s var(--ease) .74s both; }
+.hero-scrolldown{ animation:heroEnter .9s var(--ease) .92s both; }
+@keyframes heroEnter{ from{ opacity:0; transform:translateY(46px); } to{ opacity:1; transform:translateY(0); } }

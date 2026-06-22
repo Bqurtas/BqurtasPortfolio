@@ -33,8 +33,9 @@
   var grid = document.getElementById('grid');
   if (grid) new MutationObserver(queueScan).observe(grid, { childList: true, subtree: true });
 
-  /* ---- reveal-on-scroll ---- */
-  if (!reduce) {
+  /* ---- reveal-on-scroll (runs even with Reduce Motion — a gentle fade keeps the
+     page from feeling dead; the heavier continuous motion stays gated) ---- */
+  {
     var revealObs = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (e.isIntersecting) { e.target.classList.add('lux-in'); revealObs.unobserve(e.target); }
