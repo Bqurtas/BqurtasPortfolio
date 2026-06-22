@@ -141,7 +141,20 @@
         var previewNo = document.getElementById('menuPreviewNo');
         var previewTitle = document.getElementById('menuPreviewTitle');
         var previewNote = document.getElementById('menuPreviewNote');
+        var previewImg = document.getElementById('menuPreviewImg');
         var roomLinks = Array.from(menu.querySelectorAll('.mm-link'));
+        var swapImg = function (src) {
+          if (!previewImg || !src || previewImg.getAttribute('src') === src) return;
+          previewImg.classList.add('is-swapping');
+          var next = new Image();
+          next.onload = function () {
+            previewImg.src = src;
+            requestAnimationFrame(function () { previewImg.classList.remove('is-swapping'); });
+          };
+          next.src = src;
+        };
+        var card = menu.querySelector('.mm-right');
+        var nav = menu.querySelector('.mm-nav');
         var updatePreview = function (link) {
           if (!link) return;
           var number = link.querySelector('.mm-n');
@@ -149,18 +162,35 @@
           if (previewNo && number) previewNo.textContent = number.textContent.trim() + ' / 06';
           if (previewTitle && title) previewTitle.textContent = title.textContent.trim();
           if (previewNote) previewNote.textContent = link.dataset.menuNote || '';
+          swapImg(link.dataset.menuImg);
           menu.dataset.previewRoom = link.dataset.route || 'design';
         };
+        var showCard = function () { if (card && fine) card.classList.add('is-shown'); };
+        var hideCard = function () { if (card) card.classList.remove('is-shown'); };
         roomLinks.forEach(function (link) {
-          link.addEventListener('mouseenter', function () { updatePreview(link); });
+          link.addEventListener('mouseenter', function () { updatePreview(link); showCard(); });
           link.addEventListener('focus', function () { updatePreview(link); });
+          link.addEventListener('mouseleave', hideCard);
         });
-        menu.addEventListener('pointermove', function (event) {
-          var x = (event.clientX / innerWidth - 0.5) * 8;
-          var y = (event.clientY / innerHeight - 0.5) * 8;
-          menu.style.setProperty('--menu-orbit-x', x.toFixed(1) + 'px');
-          menu.style.setProperty('--menu-orbit-y', y.toFixed(1) + 'px');
-        });
+        if (nav) nav.addEventListener('mouseleave', hideCard);
+
+        /* the preview card eases toward the pointer, leaning into the open side */
+        if (card && fine && !reduce) {
+          var tx = innerWidth * 0.72, ty = innerHeight * 0.5, cx = tx, cy = ty;
+          menu.addEventListener('pointermove', function (event) {
+            var off = Math.min(240, innerWidth * 0.17);
+            var lean = event.clientX < innerWidth * 0.5 ? off : -off;
+            tx = clamp(event.clientX + lean, 190, innerWidth - 190);
+            ty = clamp(event.clientY, 240, innerHeight - 240);
+          });
+          var follow = function () {
+            cx += (tx - cx) * 0.16; cy += (ty - cy) * 0.16;
+            card.style.left = cx.toFixed(1) + 'px';
+            card.style.top = cy.toFixed(1) + 'px';
+            requestAnimationFrame(follow);
+          };
+          follow();
+        }
         updatePreview(menu.querySelector('.mm-link.is-active') || roomLinks[0]);
       }
 

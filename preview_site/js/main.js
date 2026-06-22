@@ -915,24 +915,39 @@ document.addEventListener('DOMContentLoaded', () => {
       dot.style.left = mx + 'px';
       dot.style.top  = my + 'px';
     });
+    let magnet = null;
     const animateRing = () => {
-      rx += (mx - rx) * 0.18;
-      ry += (my - ry) * 0.18;
+      let tx = mx, ty = my;
+      if (magnet) {
+        const r = magnet.getBoundingClientRect();
+        if (r.width) {                 // a soft magnetic pull toward the control's centre
+          tx = mx + (r.left + r.width / 2 - mx) * 0.42;
+          ty = my + (r.top + r.height / 2 - my) * 0.42;
+        }
+      }
+      rx += (tx - rx) * 0.2;
+      ry += (ty - ry) * 0.2;
       ring.style.left = rx + 'px';
       ring.style.top  = ry + 'px';
       requestAnimationFrame(animateRing);
     };
     animateRing();
+    const MAGNET = '.rail-link, .rail-tool, .rail-chat, .theme-btn, .social-current, ' +
+                   '.lang-current, .lang-opt, .social-opt, .footer-top-btn, ' +
+                   '.mobile-menu-close, .to-top, .profile-card-btn, .reader-top';
     document.body.addEventListener('mouseover', (e) => {
       const overCard = e.target.closest(
         '.card, .service-trigger, .feature-card, .blog-card, .qc-card, .index-row, ' +
         '.footer-cta-btn, .footer-room-nav a, .mm-link, .tab, .software-chip, ' +
         '#bio .bio-block, .bio-doc-btn, .work-card'
       );
+      const overMagnet = e.target.closest(MAGNET);
       const overZoom = e.target.closest('.cert-item');   // certificates keep the system zoom cursor
-      const overLink = e.target.closest('a, button, .tab, input, select, textarea, .qc-card, .blog-card, .service, .stat, .logo-mark, .logo-chip, .index-row');
-      ring.classList.toggle('is-open',  !!overCard && !overZoom);
-      ring.classList.toggle('is-hover', !overCard && !!overLink);
+      const overLink = e.target.closest('a, button, .tab, input, select, textarea, .service, .stat, .logo-mark, .logo-chip, .index-row');
+      magnet = (!overCard && overMagnet) ? overMagnet : null;
+      ring.classList.toggle('is-open',   !!overCard && !overZoom);
+      ring.classList.toggle('is-magnet', !overCard && !!overMagnet);
+      ring.classList.toggle('is-hover',  !overCard && !overMagnet && !!overLink);
       if (ringLabel && overCard) {
         let label = 'Open';
         if (overCard.matches('.tab')) label = 'View';
@@ -947,6 +962,8 @@ document.addEventListener('DOMContentLoaded', () => {
       dot.style.opacity  = (overCard || overZoom) ? '0' : '';
       ring.style.opacity = overZoom ? '0' : '';
     });
+    document.addEventListener('mousedown', () => ring.classList.add('is-press'));
+    document.addEventListener('mouseup',   () => ring.classList.remove('is-press'));
   }
 });
 

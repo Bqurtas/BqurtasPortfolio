@@ -7117,3 +7117,82 @@ html[lang] .splash-name {
   color: var(--ink-muted) !important;   /* same token as .footer-column-label */
 }
 .footer-v249 .footer-bottom .footer-top-btn:hover{ color: var(--ink) !important; }
+
+/* =========================================================
+   v253 — menu: centred rooms · Liana signature name · image hover-preview
+           card · no shape dots · iPhone-classy glass
+   ========================================================= */
+
+/* the signature name, in Liana, beside Bq. on the top bar */
+.rail-logo{ display:flex; align-items:baseline; gap:9px; }
+.rail-logo-name{
+  font-family:'Liana','Fraunces',serif; font-weight:400; font-style:normal;
+  text-transform:none; letter-spacing:0; font-size:22px; line-height:1;
+  color:var(--ink-soft); white-space:nowrap; transition:color .3s var(--ease);
+}
+.rail-logo:hover .rail-logo-name{ color:var(--ink); }
+.rail-room-name{ display:none !important; }       /* the signature name replaces the room label */
+@media (max-width:1080px){ .rail-logo-name{ display:none; } }   /* tight bars: keep the mark only */
+
+/* the menu's own name set in the signature face too */
+.mm-logo small{
+  font-family:'Liana','Fraunces',serif !important; text-transform:none !important;
+  font-size:17px; letter-spacing:0; opacity:.82;
+}
+
+/* rooms sit in the optical centre of the curtain (they used to ride high) */
+.mm-nav{ flex:1 1 auto !important; align-self:center; width:min(940px,100%);
+  display:flex; flex-direction:column; justify-content:center !important;
+  margin:0 !important; }
+.mm-foot{ margin-top:0 !important; }
+
+/* drop the little active-room dot, the divider rules between rooms, and any
+   leftover decorative shapes — a clean, quiet list reads classier */
+.mm-link.is-active::after{ display:none !important; }
+.mm-link{ border:0 !important; }
+.mm-preview-orbit, .mm-preview-mark{ display:none !important; }
+
+/* the hover preview — a classy iPhone-glass card that FLOATS by the pointer
+   as you sweep the room list (JS positions it; here we just dress it) */
+.mm-right{
+  display:block !important; position:fixed !important; top:0; left:0; z-index:40;
+  width:clamp(250px,21vw,350px); height:clamp(310px,27vw,430px);
+  margin:0; padding:0; background:none !important; overflow:visible;
+  pointer-events:none; opacity:0; will-change:transform,opacity;
+  transform:translate(-50%,-50%) scale(.9);
+  transition:opacity .38s var(--ease), transform .5s var(--ease);
+}
+.mm-right.is-shown{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+.mm-figure{ position:relative; width:100%; height:100%; margin:0;
+  border-radius:24px; overflow:hidden; background:#161616;
+  box-shadow:0 50px 90px -40px rgba(0,0,0,.7), inset 0 0 0 1px rgba(255,255,255,.09); }
+.mm-figure img{ width:100%; height:100%; object-fit:cover; display:block;
+  filter:grayscale(.08) contrast(1.03);
+  transition:opacity .45s var(--ease), transform 1s var(--ease); }
+.mm-figure img.is-swapping{ opacity:0; transform:scale(1.05); }
+/* the designed covers carry their own titles, so the card stays a clean image */
+.mm-figcap{ display:none !important; }
+@media (max-width:860px){ .mm-right{ display:none !important; } }   /* touch: no floating card */
+
+/* =========================================================
+   v254 — magnetic / press custom cursor + a classier iPhone finish
+   ========================================================= */
+/* the ring snaps softly onto controls, and dips on press */
+.cursor-ring{ transition:width .3s var(--ease), height .3s var(--ease), transform .24s var(--ease), opacity .2s ease; }
+.cursor-ring.is-magnet{
+  width:52px; height:52px;
+  background:color-mix(in srgb, var(--ink) 7%, transparent);
+  border-color:color-mix(in srgb, var(--ink) 38%, transparent);
+}
+.cursor-ring.is-press{ transform:translate(-50%,-50%) scale(.8); }
+
+/* iPhone-soft corners across the remaining cards (the signature touch) */
+.qc-card, .work-card{ border-radius:22px; }
+.software-chip{ border-radius:18px; }
+.cert-img-wrap{ border-radius:16px !important; }
+
+/* non-tilt cards get a gentle spring lift (the tilt cards keep their own transform) */
+@media (min-width:821px) and (prefers-reduced-motion:no-preference){
+  .qc-card{ transition:transform .45s var(--ease), box-shadow .45s var(--ease), border-color .35s var(--ease); }
+  .qc-card:hover{ transform:translateY(-5px); box-shadow:0 28px 56px -36px rgba(0,0,0,.36); }
+}
