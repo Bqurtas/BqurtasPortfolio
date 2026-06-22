@@ -529,18 +529,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab, true)));
 
-  // Desktop: hovering a tab previews that category beside the menu (debounced so a
-  // quick pass over the list doesn't thrash the grid).
-  if (window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
-    let hoverTimer;
-    tabs.forEach(tab => tab.addEventListener('mouseenter', () => {
-      if (tab.classList.contains('is-active')) return;
-      clearTimeout(hoverTimer);
-      hoverTimer = setTimeout(() => activateTab(tab, false), 160);
-    }));
-    document.querySelector('.tabs-wrap')?.addEventListener('mouseleave', () => clearTimeout(hoverTimer));
-  }
-
   /* The deck re-shuffles on every page load and tab switch — that stays.
      The gallery shows exactly one batch (PAGE_SIZE = 40) at a time; the reader
      taps "Load more" to reveal the next 40. No auto-infinite-scroll — the works

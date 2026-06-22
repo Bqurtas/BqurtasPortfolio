@@ -82,4 +82,18 @@
     }, true);
     addEventListener('pagehide', function () { curtain.classList.remove('is-active', 'is-leaving'); }, { once: true });
   }
+
+  /* ---- the client-logo marquee SLOWS (doesn't stop) on hover ---- */
+  (function () {
+    var mq = document.querySelector('.logo-marquee');
+    var track = mq && mq.querySelector('.logo-marquee-track');
+    if (!mq || !track || !track.getAnimations) return;
+    var rate = function (v) {
+      track.getAnimations().forEach(function (a) {
+        if (a.updatePlaybackRate) a.updatePlaybackRate(v); else a.playbackRate = v;
+      });
+    };
+    mq.addEventListener('mouseenter', function () { rate(0.22); });
+    mq.addEventListener('mouseleave', function () { rate(1); });
+  })();
 })();

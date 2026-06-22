@@ -467,14 +467,15 @@
       $('#tcN', card).textContent = count || '';
       $('#tcCount', card).innerHTML = `<i class="fa-solid fa-layer-group"></i> ${worksT.replace('{n}', count)}`;
 
-      /* position below the tab, clamped to the viewport, flip up if needed */
+      /* the filters are a vertical side menu now, so the card opens BESIDE the tab
+         (to its right), vertically centred and clamped to the viewport */
       card.style.visibility = 'hidden'; card.classList.add('is-shown');
       const cw = card.offsetWidth, ch = card.offsetHeight;
       const b = tab.getBoundingClientRect();
-      let left = b.left + b.width / 2 - cw / 2;
-      left = Math.max(12, Math.min(left, window.innerWidth - cw - 12));
-      let top = b.bottom + 12;
-      if (top + ch > window.innerHeight - 12) top = b.top - ch - 12;
+      let left = b.right + 14;
+      if (left + cw > window.innerWidth - 12) left = b.left - cw - 14;   // flip left if no room
+      let top = b.top + b.height / 2 - ch / 2;
+      top = Math.max(12, Math.min(top, window.innerHeight - ch - 12));
       card.style.left = left + 'px';
       card.style.top = top + 'px';
       card.style.visibility = '';

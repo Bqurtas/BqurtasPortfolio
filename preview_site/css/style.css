@@ -4741,3 +4741,39 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
   #bio .bio-stack > .bio-block{ break-inside:avoid; -webkit-column-break-inside:avoid;
     width:100%; margin:0 0 20px !important; }
 }
+
+/* =========================================================
+   v240 — Panjamor card · modern tabs · logos (slow marquee, smaller+multiply)
+   ========================================================= */
+/* Panjamor becomes a card like the other two, with its own accent */
+.pencemor-aside{
+  --pj-accent:#5e6b5a;
+  padding:34px 32px !important; border:1px solid var(--line); border-radius:18px;
+  background:var(--card-bg); position:relative; overflow:hidden; justify-content:center;
+  transition:transform .4s var(--ease), border-color .3s var(--ease);
+}
+.pencemor-aside::before{ content:''; position:absolute; top:0; left:0; right:0; height:4px; background:var(--pj-accent); opacity:.9; }
+.pencemor-aside:hover{ transform:translateY(-5px); border-color:var(--pj-accent); }
+@media (min-width:821px){
+  .room-features{ max-width:none !important; margin:0 !important; }   /* span like the other sections */
+  .pencemor-aside{ align-self:stretch; }
+}
+
+/* modern, less-classic tabs */
+@media (min-width:821px){
+  .tab{ padding:11px 14px !important; gap:13px; font-size:13.5px; }
+  .tab .tab-label{ font-family:'Manrope',sans-serif; font-weight:600; }
+  .tab i{ font-size:14px !important; opacity:.8; }
+  .tab:hover:not(.is-active){ background:var(--surface) !important; transform:translateX(3px);
+    transition:background .25s var(--ease), transform .25s var(--ease); }
+  .tab.is-active{ box-shadow:0 10px 22px -12px rgba(0,0,0,.32); }
+  .tab.is-active i{ opacity:1; }
+}
+
+/* hand-drawn logos: smaller + multiply-blended with the cream page */
+.logos-grid .logo-mark{ transform:scale(.82); }
+.logos-grid .logo-mark img, .logos-grid .logo-mark svg{ mix-blend-mode:multiply; }
+:root[data-theme="dark"] .logos-grid .logo-mark img, :root[data-theme="dark"] .logos-grid .logo-mark svg{ mix-blend-mode:screen; }
+
+/* the client marquee no longer hard-pauses on hover (lux.js slows it instead) */
+.logo-marquee:hover .logo-marquee-track{ animation-play-state:running !important; }
