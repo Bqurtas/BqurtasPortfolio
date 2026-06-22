@@ -4809,3 +4809,37 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
   .feature-go:hover, .latest-blog-all:hover{ gap:14px; }
   .bio-teaser-link:hover, .text-link:hover{ gap:14px; }
 }
+
+/* =========================================================
+   v242 — tidy Bio (one header · equal stacking cards that hide below · bigger
+          certificates) + a dramatic hero entrance so the site feels ALIVE
+   ========================================================= */
+@media (min-width:821px){
+  /* one header, not two */
+  #bio .section > .section-head .section-num,
+  #bio .section > .section-head .section-title{ display:none; }
+  #bio .section > .section-head .section-lede{ margin-top:0; }
+
+  /* equal-size cards, ALL pinned to the same line so each fully covers (hides)
+     the one beneath it — a clean deck, no peeking edges */
+  #bio .bio-stack > .bio-block{
+    top:calc(var(--topbar-h) + 28px) !important;
+    height:min(80vh,640px) !important; overflow:hidden !important;
+    margin:0 0 34px !important;
+  }
+  /* the certificates card holds a gallery → let it grow and show every cert */
+  #bio .bio-stack > .bio-block:has(.cert-grid){ height:auto !important; min-height:min(80vh,640px); overflow:visible !important; }
+  #bio .cert-grid{ grid-template-columns:repeat(4,1fr) !important; gap:16px !important; }
+  #bio .cert-img-wrap{ aspect-ratio:4/3 !important; border-radius:14px !important; }
+}
+
+/* ---- dramatic hero entrance on load (staggered slide-up) ---- */
+@media (prefers-reduced-motion: no-preference){
+  .hero-eyebrow   { animation:heroEnter .9s var(--ease) .10s both; }
+  .hero-line--1   { animation:heroEnter 1s  var(--ease) .26s both; }
+  .hero-line--2   { animation:heroEnter 1s  var(--ease) .40s both; }
+  .hero-spark     { animation:heroEnter .9s var(--ease) .62s both; }
+  .hero-lede      { animation:heroEnter .9s var(--ease) .74s both; }
+  .hero-scrolldown{ animation:heroEnter .9s var(--ease) .92s both; }
+  @keyframes heroEnter{ from{ opacity:0; transform:translateY(46px); } to{ opacity:1; transform:translateY(0); } }
+}
