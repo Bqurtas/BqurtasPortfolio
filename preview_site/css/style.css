@@ -4842,3 +4842,39 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 .hero-lede      { animation:heroEnter .9s var(--ease) .74s both; }
 .hero-scrolldown{ animation:heroEnter .9s var(--ease) .92s both; }
 @keyframes heroEnter{ from{ opacity:0; transform:translateY(46px); } to{ opacity:1; transform:translateY(0); } }
+
+/* =========================================================
+   v244 — a soft light that travels around every card on hover (the lovely
+          stat-box line, everywhere) + iPhone-soft corners
+   ========================================================= */
+@property --beam-angle{ syntax:'<angle>'; initial-value:0deg; inherits:false; }
+@keyframes beamSpin{ to{ --beam-angle:360deg; } }
+
+/* iPhone-soft corners on all the cards */
+.feature-card, .blog-card, .qc-card, .stat,
+#bio .bio-stack > .bio-block{ border-radius:22px; }
+
+/* the travelling-border beam — ::after where it's free, ::before on the bio cards
+   (whose ::after already holds the watermark glyph) */
+.feature-card::after, .blog-card::after, .qc-card::after, .stat::after,
+#bio .bio-stack > .bio-block::before{
+  content:''; position:absolute; inset:0; border-radius:inherit; padding:1.6px;
+  background:conic-gradient(from var(--beam-angle),
+     transparent 0deg, var(--accent, var(--ink)) 60deg, transparent 135deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:0; transition:opacity .4s var(--ease); pointer-events:none; z-index:3;
+}
+.feature-card:hover::after, .blog-card:hover::after, .qc-card:hover::after, .stat:hover::after,
+#bio .bio-stack > .bio-block:hover::before{
+  opacity:1; animation:beamSpin 2.6s linear infinite;
+}
+/* keep the bio card body above its beam */
+#bio .bio-stack > .bio-block > *{ position:relative; z-index:4; }
+
+/* iPhone-style hover: a soft float + gentle shadow */
+@media (min-width:821px) and (prefers-reduced-motion: no-preference){
+  .stat{ transition:transform .4s var(--ease), box-shadow .4s var(--ease), border-color .3s var(--ease); }
+  .stat:hover{ transform:translateY(-4px); box-shadow:0 26px 54px -34px rgba(0,0,0,.35); }
+}
