@@ -4858,9 +4858,9 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
    (whose ::after already holds the watermark glyph) */
 .feature-card::after, .blog-card::after, .qc-card::after, .stat::after,
 #bio .bio-stack > .bio-block::before{
-  content:''; position:absolute; inset:0; border-radius:inherit; padding:1.6px;
+  content:''; position:absolute; inset:0; border-radius:inherit; padding:1px;
   background:conic-gradient(from var(--beam-angle),
-     transparent 0deg, var(--accent, var(--ink)) 60deg, transparent 135deg, transparent 360deg);
+     transparent 0deg, var(--accent, var(--ink)) 48deg, transparent 110deg, transparent 360deg);
   -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite:xor; mask-composite:exclude;
@@ -4868,7 +4868,7 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 }
 .feature-card:hover::after, .blog-card:hover::after, .qc-card:hover::after, .stat:hover::after,
 #bio .bio-stack > .bio-block:hover::before{
-  opacity:1; animation:beamSpin 2.6s linear infinite;
+  opacity:.55; animation:beamSpin 3.4s linear infinite;
 }
 /* keep the bio card body above its beam */
 #bio .bio-stack > .bio-block > *{ position:relative; z-index:4; }
@@ -4880,29 +4880,15 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 }
 
 /* =========================================================
-   v245 — drop the bio-card shadow · give the gallery cards the beam too · classier
+   v245 — drop the bio-card shadow · keep the gallery photos plain (no beam, no
+          rounded frame) · the section beams stay thin & quiet
    ========================================================= */
 /* no heavy shadow under the bio stacking cards */
 @media (min-width:821px){
   #bio .bio-stack > .bio-block{ box-shadow:none !important; }
 }
 
-/* gallery work cards: iPhone-rounded image + the same travelling-border beam */
-.card-art{ border-radius:14px !important; }
-.card{ border-radius:14px; }
-.card::after{
-  content:''; position:absolute; inset:0; border-radius:14px; padding:1.6px;
-  background:conic-gradient(from var(--beam-angle),
-     transparent 0deg, var(--ink) 55deg, transparent 130deg, transparent 360deg);
-  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor; mask-composite:exclude;
-  opacity:0; transition:opacity .4s var(--ease); pointer-events:none; z-index:4;
-}
-.card:hover::after{ opacity:1; animation:beamSpin 2.6s linear infinite; }
-
-/* classier beam — a touch brighter & a soft glow under the travelling light */
-.feature-card::after, .blog-card::after, .qc-card::after, .stat::after,
-.card::after, #bio .bio-stack > .bio-block::before{
-  filter:drop-shadow(0 0 5px var(--accent, var(--ink)));
-}
+/* gallery work photos: plain, square, no travelling line */
+.card-art{ border-radius:0 !important; }
+.card{ border-radius:0; }
+.card::after{ content:none !important; }
