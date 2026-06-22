@@ -48,12 +48,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const t = d['meta.title.' + room];
     if (t) document.title = t;
   };
+  const roomLabelKeys = {
+    design: 'nav.design',
+    work: 'nav.work',
+    brandboard: 'nav.brandboard',
+    blog: 'nav.blog',
+    bio: 'nav.bio',
+    contact: 'nav.contact'
+  };
+  const roomLabelFallbacks = {
+    design: 'Design',
+    work: 'Selected Work',
+    brandboard: 'The Brand Board',
+    blog: 'The Journal',
+    bio: 'The Designer',
+    contact: "Let's talk."
+  };
+  const setRoomChrome = (room) => {
+    const key = roomLabelKeys[room] || roomLabelKeys.design;
+    const label = (window.BQ_DICT && window.BQ_DICT[key]) || roomLabelFallbacks[room] || roomLabelFallbacks.design;
+    const roomName = document.getElementById('railRoomName');
+    if (roomName) {
+      roomName.dataset.i18n = key;
+      roomName.textContent = label;
+    }
+    document.documentElement.style.setProperty('--room-index', String(Math.max(0, Object.keys(roomLabelKeys).indexOf(room))));
+  };
   const originalApplyLang = window.applyLang;
   window.applyLang = function(lang) {
     originalApplyLang(lang);
     currentLang = lang;
     setLangBadge(lang);
     setDocTitle();
+    setRoomChrome(document.body.dataset.room || 'design');
     if (routerReady) { syncURL(false); try { if (window.umami) umami.track(); } catch (e) {} }   // Umami: count each language URL (replaceState isn't auto-tracked)
     if (window.__bqRerenderChrome) window.__bqRerenderChrome();
     if (window.__bqRenderActiveHonor) window.__bqRenderActiveHonor();
@@ -87,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- ROUTER (room switcher + deep-links) ---------- */
   const rooms = document.querySelectorAll('.room');
   const routeLinks = document.querySelectorAll('[data-route]');
-  const validRooms = ['design','blog','bio','contact'];
+  const validRooms = ['design','work','brandboard','blog','bio','contact'];
 
   let triggerReveals = () => {};
   let moveUnderline  = () => {};
@@ -123,11 +150,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const showRoom = (id, push) => {
     rooms.forEach(r => r.classList.toggle('is-hidden', r.id !== id));
-    document.querySelectorAll('.rail-link, .mobile-link').forEach(l => {
+    document.querySelectorAll('.rail-link, .mobile-link, .mm-link').forEach(l => {
       l.classList.toggle('is-active', l.dataset.route === id);
     });
     window.scrollTo({ top: 0, behavior: 'auto' });
     document.body.dataset.room = id;
+    setRoomChrome(id);
     document.querySelectorAll('.reveal').forEach(el => el.classList.remove('is-in'));
     requestAnimationFrame(() => triggerReveals());
     syncURL(push);
@@ -156,12 +184,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!designCta) return;
     if (document.body.dataset.room !== 'design') { designCta.classList.remove('is-shown'); return; }
     const work = document.querySelector('.section.work');     // the "01 — Design Room" section
-    const note = document.querySelector('.section.bio-teaser');
+    const note = document.querySelector('.practice-note');
+    const services = document.querySelector('.service-showcase');
     const y = window.scrollY;
     // only once the viewer actually reaches the Design Room — not during the hero/Panjamor
     const inDesign = work ? (y + window.innerHeight * 0.5) >= __absTop(work) : y > window.innerHeight * 0.55;
-    const beforeNote = !note || (__absTop(note) - y) > window.innerHeight * 0.65;
-    designCta.classList.toggle('is-shown', inDesign && beforeNote);
+    const ctaEnd = services || note;
+    const beforeEnd = !ctaEnd || (__absTop(ctaEnd) - y) > window.innerHeight * 0.65;
+    designCta.classList.toggle('is-shown', inDesign && beforeEnd);
   };
   window.__bqToggleCta = toggleCta;
   window.addEventListener('scroll', () => {
@@ -174,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const base = prefix || '/';
       const pen  = document.getElementById('pencemorHero');       // Panjamor studio
       const work = document.querySelector('.section.work');       // "01 — Design Room" + grid
-      const note = document.querySelector('.section.bio-teaser'); // "A short note" → back to simple
+      const note = document.querySelector('.practice-note'); // "A short note" → back to simple
       const y = window.scrollY + window.innerHeight * 0.38;       // a touch below the fold
       let path = base;
       if (note && y >= __absTop(note)) {
@@ -235,6 +265,10 @@ document.addEventListener('DOMContentLoaded', () => {
   mobileMenu?.addEventListener('click', (e) => { if (e.target === mobileMenu) setMenu(false); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
   mobileMenu?.querySelectorAll('.mm-link, .mm-touch, .mm-logo').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+
+  document.querySelector('[data-footer-top]')?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 
   /* Drag the sheet (grab the handle / top) downward to dismiss it. */
   const sheet = mobileMenu?.querySelector('.mobile-sheet');
@@ -874,6 +908,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const dot = document.getElementById('cursorDot');
   const ring = document.getElementById('cursorRing');
   if (dot && ring && window.matchMedia('(pointer: fine)').matches) {
+    const ringLabel = ring.querySelector('.cursor-ring-label');
     let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
     document.addEventListener('mousemove', (e) => {
       mx = e.clientX; my = e.clientY;
@@ -889,11 +924,26 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     animateRing();
     document.body.addEventListener('mouseover', (e) => {
-      const overCard = e.target.closest('.card');        // gallery work cards → an "Open" disc
+      const overCard = e.target.closest(
+        '.card, .service-trigger, .feature-card, .blog-card, .qc-card, .index-row, ' +
+        '.footer-cta-btn, .footer-room-nav a, .mm-link, .tab, .software-chip, ' +
+        '#bio .bio-block, .bio-doc-btn, .work-card'
+      );
       const overZoom = e.target.closest('.cert-item');   // certificates keep the system zoom cursor
       const overLink = e.target.closest('a, button, .tab, input, select, textarea, .qc-card, .blog-card, .service, .stat, .logo-mark, .logo-chip, .index-row');
       ring.classList.toggle('is-open',  !!overCard && !overZoom);
       ring.classList.toggle('is-hover', !overCard && !!overLink);
+      if (ringLabel && overCard) {
+        let label = 'Open';
+        if (overCard.matches('.tab')) label = 'View';
+        else if (overCard.matches('.software-chip')) label = 'Tool';
+        else if (overCard.matches('.footer-cta-btn')) label = 'Talk';
+        else if (overCard.matches('.mm-link, .footer-room-nav a')) label = 'Go';
+        else if (overCard.matches('.service-trigger')) label = 'More';
+        ringLabel.textContent = label;
+      } else if (ringLabel) {
+        ringLabel.textContent = 'Open';
+      }
       dot.style.opacity  = (overCard || overZoom) ? '0' : '';
       ring.style.opacity = overZoom ? '0' : '';
     });

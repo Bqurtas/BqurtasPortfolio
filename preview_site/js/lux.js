@@ -66,20 +66,45 @@
     var curtain = document.createElement('div');
     curtain.className = 'lux-transition';
     curtain.setAttribute('aria-hidden', 'true');
-    curtain.innerHTML = '<span class="lux-transition-mark">Bq.</span>';
+    curtain.innerHTML =
+      '<span class="lux-transition-room">Design</span>' +
+      '<span class="lux-transition-no">01 / 06</span>' +
+      '<span class="lux-transition-line"></span>';
     document.body.appendChild(curtain);
 
+    var roomNumbers = {
+      design: '01 / 06',
+      work: '02 / 06',
+      brandboard: '03 / 06',
+      blog: '04 / 06',
+      bio: '05 / 06',
+      contact: '06 / 06'
+    };
+    var roomFallbacks = {
+      design: 'Design',
+      work: 'Selected Work',
+      brandboard: 'The Brand Board',
+      blog: 'The Journal',
+      bio: 'The Designer',
+      contact: "Let's talk."
+    };
     var busy = false;
     document.addEventListener('click', function (ev) {
       var link = ev.target.closest('[data-route]');
       if (!link || busy) return;
       var route = link.getAttribute('data-route');
       if (route && route === document.body.dataset.room) return;   // same room → no curtain
+      var translated = document.querySelector('.mm-link[data-route="' + route + '"] .mm-link-text');
+      var roomName = translated ? translated.textContent.trim() : roomFallbacks[route];
+      var nameNode = curtain.querySelector('.lux-transition-room');
+      var noNode = curtain.querySelector('.lux-transition-no');
+      if (nameNode) nameNode.textContent = roomName || roomFallbacks.design;
+      if (noNode) noNode.textContent = roomNumbers[route] || roomNumbers.design;
       busy = true;
       curtain.classList.remove('is-leaving');
       curtain.classList.add('is-active');             // sweep up to cover (room swaps underneath)
-      setTimeout(function () { curtain.classList.add('is-leaving'); }, 520);   // sweep away to reveal
-      setTimeout(function () { curtain.classList.remove('is-active', 'is-leaving'); busy = false; }, 1180);
+      setTimeout(function () { curtain.classList.add('is-leaving'); }, 670);   // sweep away to reveal
+      setTimeout(function () { curtain.classList.remove('is-active', 'is-leaving'); busy = false; }, 1420);
     }, true);
     addEventListener('pagehide', function () { curtain.classList.remove('is-active', 'is-leaving'); }, { once: true });
   }

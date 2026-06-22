@@ -10,7 +10,7 @@
        same-origin script (no SRI needed → full Subresource-Integrity pass).
        The tracker still posts events to Umami cloud (gateway.umami.is/api/send,
        its built-in default), so the dashboard keeps receiving data. -->
-  <script defer src="js/umami.js?v=246" data-website-id="f58c1ade-02c7-4c2e-95b3-2bcbf2e354fa"></script>
+  <script defer src="js/umami.js?v=248" data-website-id="f58c1ade-02c7-4c2e-95b3-2bcbf2e354fa"></script>
 
   <!-- Google Analytics REMOVED 2026-06-18 — it was redundant with Umami (and
        showed no data in Semrush). gtag.js can't carry SRI, so dropping it gives
@@ -158,7 +158,7 @@
   </script>
 
   <!-- Fonts — self-hosted (no external Google Fonts dependency; faster + private) -->
-  <link rel="stylesheet" href="css/fonts.css?v=246">
+  <link rel="stylesheet" href="css/fonts.css?v=248">
 
   <!-- jsDelivr serves Font Awesome + the gallery images — connect early -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -176,7 +176,7 @@
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous"></noscript>
   <script>(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css';l.integrity='sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g';l.crossOrigin='anonymous';l.referrerPolicy='no-referrer';document.head.appendChild(l);})();</script>
 
-  <link rel="stylesheet" href="css/style.css?v=246" />
+  <link rel="stylesheet" href="css/style.css?v=252" />
 </head>
 <body>
 
@@ -210,6 +210,7 @@
     <!-- Wordmark — hover for the profile card -->
     <a href="#" class="rail-logo" id="railLogo" data-route="design" aria-label="Bq — Barakat Qurtas, home">
       <span class="rail-logo-mark">Bq</span>
+      <span class="rail-room-name" id="railRoomName" data-i18n="nav.design">Design</span>
     </a>
 
     <nav class="rail-nav" aria-label="Rooms">
@@ -262,6 +263,7 @@
       <button class="rail-chat rail-latest" id="railLatest" aria-label="Latest">
         <i class="fa-solid fa-bell"></i>
         <span class="rail-latest-badge" id="railLatestBadge" aria-hidden="true" hidden></span>
+        <span class="rail-action-label" data-i18n="tip.latest">Latest</span>
         <span class="tool-tip" data-i18n="tip.latest">Latest</span>
       </button>
 
@@ -269,6 +271,7 @@
       <button class="rail-chat" id="railChat" aria-label="Chat with studio assistant">
         <i class="fa-solid fa-comment-dots"></i>
         <span class="rail-chat-dot" aria-hidden="true"></span>
+        <span class="rail-action-label" data-i18n="tip.chat">Assistant</span>
         <span class="tool-tip" data-i18n="tip.chat">Assistant</span>
       </button>
 
@@ -408,16 +411,17 @@
     <div class="mobile-sheet" role="dialog" aria-modal="true" aria-label="Menu">
       <div class="mm-left">
         <div class="mm-top">
-          <a href="/" class="mm-logo" data-route="design">Bq.</a>
+          <a href="/" class="mm-logo" data-route="design"><span>Bq.</span><small>Barakat Qurtas</small></a>
+          <span class="mm-top-label mono">Rooms / 01—06</span>
           <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <nav class="mm-nav" aria-label="Rooms">
-          <a href="/design" class="mm-link" data-route="design"><span class="mm-n">01</span> <span data-i18n="nav.design">Design</span></a>
-          <a href="/work" class="mm-link" data-route="work"><span class="mm-n">02</span> <span data-i18n="nav.work">Selected Work</span></a>
-          <a href="/brandboard" class="mm-link" data-route="brandboard"><span class="mm-n">03</span> <span data-i18n="nav.brandboard">The Brand Board</span></a>
-          <a href="/blog" class="mm-link" data-route="blog"><span class="mm-n">04</span> <span data-i18n="nav.blog">The Journal</span></a>
-          <a href="/bio" class="mm-link" data-route="bio"><span class="mm-n">05</span> <span data-i18n="nav.bio">The Designer</span></a>
-          <a href="/contact" class="mm-link" data-route="contact"><span class="mm-n">06</span> <span data-i18n="nav.contact">Let's talk.</span></a>
+          <a href="/design" class="mm-link" data-route="design" data-menu-note="Selected design and visual systems"><span class="mm-n">01</span> <span class="mm-link-text" data-i18n="nav.design">Design</span><i class="fa-solid fa-arrow-up-right"></i></a>
+          <a href="/work" class="mm-link" data-route="work" data-menu-note="Identity case studies, from brief to system"><span class="mm-n">02</span> <span class="mm-link-text" data-i18n="nav.work">Selected Work</span><i class="fa-solid fa-arrow-up-right"></i></a>
+          <a href="/brandboard" class="mm-link" data-route="brandboard" data-menu-note="A free bilingual identity starter"><span class="mm-n">03</span> <span class="mm-link-text" data-i18n="nav.brandboard">The Brand Board</span><i class="fa-solid fa-arrow-up-right"></i></a>
+          <a href="/blog" class="mm-link" data-route="blog" data-menu-note="Notes on typography, place and practice"><span class="mm-n">04</span> <span class="mm-link-text" data-i18n="nav.blog">The Journal</span><i class="fa-solid fa-arrow-up-right"></i></a>
+          <a href="/bio" class="mm-link" data-route="bio" data-menu-note="Experience, tools, awards and biography"><span class="mm-n">05</span> <span class="mm-link-text" data-i18n="nav.bio">The Designer</span><i class="fa-solid fa-arrow-up-right"></i></a>
+          <a href="/contact" class="mm-link" data-route="contact" data-menu-note="Start a clear, useful conversation"><span class="mm-n">06</span> <span class="mm-link-text" data-i18n="nav.contact">Let's talk.</span><i class="fa-solid fa-arrow-up-right"></i></a>
         </nav>
         <div class="mm-foot">
           <a class="mm-touch" href="/contact" data-route="contact"><span data-i18n="profile.btn2">Get in touch</span> <i class="fa-solid fa-arrow-right"></i></a>
@@ -429,8 +433,14 @@
         </div>
       </div>
       <div class="mm-right" aria-hidden="true">
-        <img src="assets/portrait.webp" alt="" />
-        <div class="mm-cap"><span class="mono" data-i18n="pj.tr">Hewlêr · Est. 2014</span><span class="mm-cap-t" data-i18n="mm.cap">Designed by hand, in Hewlêr.</span></div>
+        <div class="mm-preview-orbit"><span></span><span></span><span></span></div>
+        <div class="mm-preview-no mono" id="menuPreviewNo">01 / 06</div>
+        <div class="mm-preview-copy">
+          <span class="mm-preview-kicker mono" data-i18n="pj.tr">Hewlêr · Est. 2014</span>
+          <strong class="mm-preview-title" id="menuPreviewTitle" data-i18n="nav.design">Design</strong>
+          <p class="mm-preview-note" id="menuPreviewNote">Selected design and visual systems</p>
+        </div>
+        <div class="mm-preview-mark">Bq.</div>
       </div>
     </div>
   </div>
@@ -560,8 +570,143 @@
         </div>
       </div>
 
+      <!-- ===== SERVICES — interactive accordion ===== -->
+      <div class="section service-showcase" id="services">
+        <header class="service-showcase-head" data-motion>
+          <div>
+            <span class="section-num mono"><i class="fa-solid fa-shapes"></i> &nbsp; <span data-i18n="svc.eye">What I do</span></span>
+            <h2 class="service-showcase-title" data-i18n="svc.title">Ideas, made <em>visible</em>.</h2>
+          </div>
+          <p class="service-showcase-lede" data-i18n="svc.lede">A focused practice across identity, print, campaigns and motion — built as one clear visual system.</p>
+        </header>
+
+        <div class="service-accordion" data-motion>
+          <article class="service-panel is-active" data-service="identity" data-no="01">
+            <button class="service-trigger" type="button" aria-expanded="true">
+              <span class="service-index mono">01</span>
+              <span class="service-icon"><i class="fa-solid fa-pen-nib"></i></span>
+              <span class="service-name" data-i18n="svc.identity">Brand Identity &amp; Logo</span>
+              <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
+            </button>
+            <div class="service-detail">
+              <div class="service-detail-inner">
+                <p data-i18n="svc.identity.desc">Distinctive marks and flexible identity systems designed to remain clear across every touchpoint.</p>
+                <ul>
+                  <li data-i18n="svc.identity.a">Logo &amp; wordmark design</li>
+                  <li data-i18n="svc.identity.b">Typography &amp; colour systems</li>
+                  <li data-i18n="svc.identity.c">Guidelines &amp; stationery</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
+          <article class="service-panel" data-service="editorial" data-no="02">
+            <button class="service-trigger" type="button" aria-expanded="false">
+              <span class="service-index mono">02</span>
+              <span class="service-icon"><i class="fa-solid fa-book-open"></i></span>
+              <span class="service-name" data-i18n="svc.editorial">Editorial &amp; Print</span>
+              <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
+            </button>
+            <div class="service-detail">
+              <div class="service-detail-inner">
+                <p data-i18n="svc.editorial.desc">Printed matter with hierarchy, rhythm and a strong sense of place — from a single cover to a full publication.</p>
+                <ul>
+                  <li data-i18n="svc.editorial.a">Books &amp; editorial layouts</li>
+                  <li data-i18n="svc.editorial.b">Posters &amp; cultural print</li>
+                  <li data-i18n="svc.editorial.c">Packaging &amp; production</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
+          <article class="service-panel" data-service="campaign" data-no="03">
+            <button class="service-trigger" type="button" aria-expanded="false">
+              <span class="service-index mono">03</span>
+              <span class="service-icon"><i class="fa-solid fa-bullhorn"></i></span>
+              <span class="service-name" data-i18n="svc.campaign">Campaigns &amp; Social</span>
+              <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
+            </button>
+            <div class="service-detail">
+              <div class="service-detail-inner">
+                <p data-i18n="svc.campaign.desc">Campaign systems that stay coherent from the first key visual to the final social post or event application.</p>
+                <ul>
+                  <li data-i18n="svc.campaign.a">Advertising campaigns</li>
+                  <li data-i18n="svc.campaign.b">Social media systems</li>
+                  <li data-i18n="svc.campaign.c">Events &amp; public communication</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
+          <article class="service-panel" data-service="motion" data-no="04">
+            <button class="service-trigger" type="button" aria-expanded="false">
+              <span class="service-index mono">04</span>
+              <span class="service-icon"><i class="fa-solid fa-play"></i></span>
+              <span class="service-name" data-i18n="svc.motion">Motion, Image &amp; AI</span>
+              <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
+            </button>
+            <div class="service-detail">
+              <div class="service-detail-inner">
+                <p data-i18n="svc.motion.desc">Image and motion work that extends the identity without losing its character, supported by careful AI-assisted exploration.</p>
+                <ul>
+                  <li data-i18n="svc.motion.a">Video editing &amp; motion</li>
+                  <li data-i18n="svc.motion.b">Photography &amp; retouching</li>
+                  <li data-i18n="svc.motion.c">AI-assisted visual development</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <a class="service-cta mono" href="/contact" data-route="contact" data-motion>
+          <span data-i18n="svc.cta">Discuss a project</span>
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </a>
+      </div>
+
+      <!-- ===== PRACTICE NOTE + SOFTWARE EXPERIENCE ===== -->
+      <div class="section practice-note">
+      <div class="software-experience">
+        <header class="software-head" data-motion>
+          <span class="section-num mono"><i class="fa-solid fa-wand-magic-sparkles"></i> &nbsp; <span data-i18n="soft.eye">Software experience</span></span>
+          <h2 class="software-title" data-i18n="soft.title">The tools behind the <em>work</em>.</h2>
+          <a href="/bio" data-route="bio" class="software-link mono"><span data-i18n="soft.link">View full experience</span> <i class="fa-solid fa-arrow-right"></i></a>
+        </header>
+
+        <div class="software-lines" aria-label="Software and tools">
+          <div class="software-line software-line--forward">
+            <div class="software-track">
+              <span class="software-chip"><img src="assets/logos/photoshop.svg" alt="">Photoshop</span>
+              <span class="software-chip"><img src="assets/logos/illustrator.svg" alt="">Illustrator</span>
+              <span class="software-chip"><img src="assets/logos/indesign.svg" alt="">InDesign</span>
+              <span class="software-chip"><img src="assets/logos/aftereffects.svg" alt="">After Effects</span>
+              <span class="software-chip"><img src="assets/logos/premiere.svg" alt="">Premiere Pro</span>
+              <span class="software-chip"><img src="assets/logos/photoshop.svg" alt="">Photoshop</span>
+              <span class="software-chip"><img src="assets/logos/illustrator.svg" alt="">Illustrator</span>
+              <span class="software-chip"><img src="assets/logos/indesign.svg" alt="">InDesign</span>
+              <span class="software-chip"><img src="assets/logos/aftereffects.svg" alt="">After Effects</span>
+              <span class="software-chip"><img src="assets/logos/premiere.svg" alt="">Premiere Pro</span>
+            </div>
+          </div>
+          <div class="software-line software-line--reverse">
+            <div class="software-track">
+              <span class="software-chip"><img src="assets/logos/davinci.svg" alt="">DaVinci Resolve</span>
+              <span class="software-chip"><img src="assets/logos/filmora.svg" alt="">Filmora</span>
+              <span class="software-chip"><img src="assets/logos/canva.svg" alt="">Canva</span>
+              <span class="software-chip"><img src="assets/logos/chatgpt.svg" alt="">ChatGPT</span>
+              <span class="software-chip"><img src="assets/logos/firefly.svg" alt="">Firefly</span>
+              <span class="software-chip"><img src="assets/logos/davinci.svg" alt="">DaVinci Resolve</span>
+              <span class="software-chip"><img src="assets/logos/filmora.svg" alt="">Filmora</span>
+              <span class="software-chip"><img src="assets/logos/canva.svg" alt="">Canva</span>
+              <span class="software-chip"><img src="assets/logos/chatgpt.svg" alt="">ChatGPT</span>
+              <span class="software-chip"><img src="assets/logos/firefly.svg" alt="">Firefly</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- ===== BIO TEASER + STATISTICS ===== -->
-      <div class="section bio-teaser">
+      <div class="bio-teaser">
         <div class="bio-teaser-grid">
           <div class="bio-teaser-text">
             <span class="section-num mono"><i class="fa-solid fa-user-pen"></i> &nbsp; <span data-i18n="d.note">A short note</span></span>
@@ -592,6 +737,7 @@
             </li>
           </ul>
         </div>
+      </div>
       </div>
 
       <!-- ===== CLIENT LOGOS — places worked with ===== -->
@@ -1370,68 +1516,48 @@
     </section>
 
     <!-- ===== FOOTER ===== -->
-    <footer class="footer">
-      <!-- CTA strip -->
-      <div class="footer-cta">
-        <div class="footer-cta-left">
-          <span class="mono"><i class="fa-solid fa-handshake-angle"></i> <span data-i18n="f.cta.eye">Have a project in mind?</span></span>
+    <footer class="footer footer-v249">
+      <div class="footer-stage">
+        <div class="footer-stage-copy">
+          <span class="footer-kicker mono"><span class="footer-live-dot"></span><span data-i18n="f.avail">Available for select commissions</span></span>
           <h3 class="footer-cta-title" data-i18n="f.cta.title">Let's make something <em>quietly</em> good together.</h3>
         </div>
         <a href="/contact" class="footer-cta-btn" data-route="contact">
-          <i class="fa-solid fa-paper-plane"></i>
           <span data-i18n="f.cta.btn">Start a conversation</span>
-          <i class="fa-solid fa-arrow-right"></i>
+          <i class="fa-solid fa-arrow-up-right"></i>
         </a>
       </div>
 
-      <!-- Balanced editorial body -->
-      <div class="footer-body">
-        <div class="footer-lead">
-          <span class="footer-bq">Bq</span>
-          <p class="footer-lead-text" data-i18n="f.lead">Independent graphic designer crafting brand identity, editorial, and books from the old quarter of Hewlêr — Kurdistan, since 2014.</p>
-          <a href="/contact" class="footer-avail" data-route="contact">
-            <span class="footer-avail-dot" aria-hidden="true"></span>
-            <span data-i18n="f.avail">Available for select commissions</span>
-          </a>
+      <div class="footer-main-v249">
+        <div class="footer-signature">
+          <span class="footer-bq">Bq.</span>
+          <p data-i18n="f.lead">Independent graphic designer crafting brand identity, editorial, and books from the old quarter of Hewlêr — Kurdistan, since 2014.</p>
+          <!--email_off--><a class="footer-email" href="mailto:hello@bqurtas.com">hello@bqurtas.com <i class="fa-solid fa-arrow-up-right"></i></a><!--/email_off-->
         </div>
 
-        <div class="footer-cols">
-          <div class="footer-col2">
-            <span class="footer-col2-title mono" data-i18n="f.explore">Explore</span>
-            <nav class="footer-nav" aria-label="Footer">
-              <a href="/design" data-route="design" data-i18n="nav.design">Design</a>
-              <a href="/work" data-route="work" data-i18n="nav.work">Selected Work</a>
-              <a href="/brandboard" data-route="brandboard" data-i18n="nav.brandboard">The Brand Board</a>
-              <a href="/blog" data-route="blog" data-i18n="nav.blog">The Journal</a>
-              <a href="/bio" data-route="bio" data-i18n="nav.bio">The Designer</a>
-              <a href="/contact" data-route="contact" data-i18n="nav.contact">Let's talk.</a>
-            </nav>
-          </div>
+        <nav class="footer-room-nav" aria-label="Footer">
+          <span class="footer-column-label mono" data-i18n="f.explore">Explore</span>
+          <a href="/design" data-route="design"><small>01</small><span data-i18n="nav.design">Design</span><i class="fa-solid fa-arrow-right"></i></a>
+          <a href="/work" data-route="work"><small>02</small><span data-i18n="nav.work">Selected Work</span><i class="fa-solid fa-arrow-right"></i></a>
+          <a href="/brandboard" data-route="brandboard"><small>03</small><span data-i18n="nav.brandboard">The Brand Board</span><i class="fa-solid fa-arrow-right"></i></a>
+          <a href="/blog" data-route="blog"><small>04</small><span data-i18n="nav.blog">The Journal</span><i class="fa-solid fa-arrow-right"></i></a>
+          <a href="/bio" data-route="bio"><small>05</small><span data-i18n="nav.bio">The Designer</span><i class="fa-solid fa-arrow-right"></i></a>
+          <a href="/contact" data-route="contact"><small>06</small><span data-i18n="nav.contact">Let's talk.</span><i class="fa-solid fa-arrow-right"></i></a>
+        </nav>
 
-          <div class="footer-col2">
-            <span class="footer-col2-title mono" data-i18n="f.studio">Studio</span>
-            <ul class="footer-list">
-              <li><!--email_off--><a href="mailto:hello@bqurtas.com">hello@bqurtas.com</a><!--/email_off--></li>
-              <li><a href="https://wa.me/9647517884985" target="_blank" rel="noopener">+964 751 788 4985</a></li>
-              <li><a href="https://share.google/67XybyFvgDmQXvogA" target="_blank" rel="noopener" data-i18n="f.loc">Erbil — Kurdistan, Iraq</a></li>
-            </ul>
-          </div>
-
-          <div class="footer-col2">
-            <span class="footer-col2-title mono" data-i18n="f.connect">Connect</span>
-            <div class="footer-social-min">
-              <a href="https://instagram.com/bqurtas" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-              <a href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-              <a href="https://www.behance.net/bqurtas" target="_blank" rel="noopener" aria-label="Behance"><i class="fa-brands fa-behance"></i></a>
-              <a href="https://wa.me/9647517884985" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-            </div>
-          </div>
+        <div class="footer-connect-v249">
+          <span class="footer-column-label mono" data-i18n="f.connect">Connect</span>
+          <a href="https://instagram.com/bqurtas" target="_blank" rel="noopener"><span>Instagram</span><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener"><span>LinkedIn</span><i class="fa-brands fa-linkedin-in"></i></a>
+          <a href="https://www.behance.net/bqurtas" target="_blank" rel="noopener"><span>Behance</span><i class="fa-brands fa-behance"></i></a>
+          <a href="https://wa.me/9647517884985" target="_blank" rel="noopener"><span>WhatsApp</span><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="https://share.google/67XybyFvgDmQXvogA" target="_blank" rel="noopener"><span data-i18n="f.loc">Erbil — Kurdistan, Iraq</span><i class="fa-solid fa-location-dot"></i></a>
         </div>
       </div>
 
       <div class="footer-bottom mono">
         <span>© 2026 <span data-i18n="name.full">Barakat Qurtas</span></span>
-        <span class="footer-coords-min"><i class="fa-solid fa-location-crosshairs"></i> 36.19° N · 44.01° E</span>
+        <button type="button" class="footer-top-btn" data-footer-top><span>Back to top</span><i class="fa-solid fa-arrow-up"></i></button>
         <span data-i18n="f.set">Set in Fraunces &amp; Manrope</span>
       </div>
     </footer>
@@ -1617,13 +1743,14 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script src="js/i18n.js?v=246"></script>
-  <script src="js/chat-kb.js?v=246"></script>
-  <script src="js/main.js?v=246"></script>
-  <script src="js/gallery.js?v=246"></script>
-  <script src="js/enhance.js?v=246"></script>
-  <script src="js/brandboard.js?v=246"></script>
-  <script src="js/work.js?v=246"></script>
-  <script src="js/lux.js?v=246"></script>
+  <script src="js/i18n.js?v=252"></script>
+  <script src="js/chat-kb.js?v=252"></script>
+  <script src="js/main.js?v=252"></script>
+  <script src="js/gallery.js?v=252"></script>
+  <script src="js/enhance.js?v=252"></script>
+  <script src="js/brandboard.js?v=252"></script>
+  <script src="js/work.js?v=252"></script>
+  <script src="js/lux.js?v=252"></script>
+  <script src="js/motion.js?v=252"></script>
 </body>
 </html>

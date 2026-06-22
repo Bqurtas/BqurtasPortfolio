@@ -1845,3 +1845,64 @@ window.I18N_EXTRA_MENU = {
  sv:{"profile.btn2":"Hör av dig","tip.menu":"Meny","mm.cap":"Gjord för hand, i Hewlêr."}
 };
 Object.keys(window.I18N_EXTRA_MENU).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_MENU[l]); });
+
+/* ===== v248 — home services + software experience ===== */
+window.I18N_EXTRA_MOTION248 = {
+  en:{
+    "svc.eye":"What I do","svc.title":"Ideas, made <em>visible</em>.","svc.lede":"A focused practice across identity, print, campaigns and motion — built as one clear visual system.",
+    "svc.identity":"Brand Identity & Logo","svc.identity.desc":"Distinctive marks and flexible identity systems designed to remain clear across every touchpoint.","svc.identity.a":"Logo & wordmark design","svc.identity.b":"Typography & colour systems","svc.identity.c":"Guidelines & stationery",
+    "svc.editorial":"Editorial & Print","svc.editorial.desc":"Printed matter with hierarchy, rhythm and a strong sense of place — from a single cover to a full publication.","svc.editorial.a":"Books & editorial layouts","svc.editorial.b":"Posters & cultural print","svc.editorial.c":"Packaging & production",
+    "svc.campaign":"Campaigns & Social","svc.campaign.desc":"Campaign systems that stay coherent from the first key visual to the final social post or event application.","svc.campaign.a":"Advertising campaigns","svc.campaign.b":"Social media systems","svc.campaign.c":"Events & public communication",
+    "svc.motion":"Motion, Image & AI","svc.motion.desc":"Image and motion work that extends the identity without losing its character, supported by careful AI-assisted exploration.","svc.motion.a":"Video editing & motion","svc.motion.b":"Photography & retouching","svc.motion.c":"AI-assisted visual development",
+    "svc.cta":"Discuss a project","soft.eye":"Software experience","soft.title":"The tools behind the <em>work</em>.","soft.link":"View full experience"
+  },
+  ku:{
+    "svc.eye":"ئەوەی دەیکەم","svc.title":"بیرۆکە، بە شێوەیەکی <em>بینراو</em>.","svc.lede":"کارێکی ورد لە ناسنامە، چاپ، کەمپەین و مۆشن — هەمووی وەک یەک سیستەمی بینراوی ڕوون.",
+    "svc.identity":"ناسنامەی براند و لۆگۆ","svc.identity.desc":"نیشانەی تایبەت و سیستەمی ناسنامەی گونجاو کە لە هەموو شوێنێکدا ڕوون و یەکگرتوو دەمێنێتەوە.","svc.identity.a":"دیزاینی لۆگۆ و وۆردمارک","svc.identity.b":"سیستەمی فۆنت و ڕەنگ","svc.identity.c":"ڕێنمایی براند و نووسراو",
+    "svc.editorial":"ئەدیتۆریاڵ و چاپ","svc.editorial.desc":"کارە چاپییەکان بە پلەبەندی، ڕیتم و هەستی شوێن — لە بەرگێکی تاکەوە تا بڵاوکراوەیەکی تەواو.","svc.editorial.a":"کتێب و لاپەڕەسازی","svc.editorial.b":"پۆستەر و چاپی کولتووری","svc.editorial.c":"پاکەت و بەرهەمهێنان",
+    "svc.campaign":"کەمپەین و سۆشیاڵ","svc.campaign.desc":"سیستەمی کەمپەین کە لە یەکەم وێنەی سەرەکییەوە تا دوا پۆست یان ڕووداو یەکگرتوو دەمێنێتەوە.","svc.campaign.a":"کەمپەینی ڕیکلام","svc.campaign.b":"سیستەمی تۆڕە کۆمەڵایەتییەکان","svc.campaign.c":"ڕووداو و پەیوەندی گشتی",
+    "svc.motion":"مۆشن، وێنە و AI","svc.motion.desc":"کارکردن لە وێنە و جوڵە کە ناسنامەکە فراوان دەکات بەبێ لەدەستدانی کەسایەتییەکەی، لەگەڵ تاقیکردنەوەی وریای AI.","svc.motion.a":"ئیدیتی ڤیدیۆ و مۆشن","svc.motion.b":"فۆتۆگرافی و ڕیتاچ","svc.motion.c":"پەرەپێدانی بینراو بە یارمەتی AI",
+    "svc.cta":"گفتوگۆ لەسەر پڕۆژە","soft.eye":"ئەزموونی بەرنامەکان","soft.title":"ئەو ئامرازانەی لە پشت <em>کارەکانن</em>.","soft.link":"بینینی ئەزموونی تەواو"
+  },
+  kmr:{
+    "svc.eye":"Ez çi dikim","svc.title":"Raman, bi awayekî <em>dîtbar</em>.","svc.lede":"Pratîkeke hûrgulî di nasname, çap, kampanya û motionê de — wek sîstemeke dîtbarî ya zelal.",
+    "svc.identity":"Nasnameya Brandê & Logo","svc.identity.desc":"Nîşanên taybet û sîstemên nasnameyê yên nerm ku li hemû xalên têkiliyê zelal dimînin.","svc.identity.a":"Sêwirana logo û wordmarkê","svc.identity.b":"Sîstemên tîpografî û rengan","svc.identity.c":"Rêbername û qirtasiye",
+    "svc.editorial":"Edîtoryal & Çap","svc.editorial.desc":"Karên çapkirî bi hiyerarşî, rîtm û hesteke xurt a cihê — ji bergê yekane heta weşana temam.","svc.editorial.a":"Pirtûk û rêzkirina edîtoryal","svc.editorial.b":"Poster û çapa çandî","svc.editorial.c":"Ambalaj û hilberîn",
+    "svc.campaign":"Kampanya & Civakî","svc.campaign.desc":"Sîstemên kampanyayê ku ji dîtina sereke heta posta dawî an karanîna bûyerê yekgirtî dimînin.","svc.campaign.a":"Kampanyayên reklamê","svc.campaign.b":"Sîstemên medyaya civakî","svc.campaign.c":"Bûyer û ragihandina giştî",
+    "svc.motion":"Motion, Wêne & AI","svc.motion.desc":"Karê wêne û motionê ku nasnameyê berfireh dike bêyî ku karaktera wê winda bike, bi lêkolîna hişmend a AI.","svc.motion.a":"Edîta vîdyoyê û motion","svc.motion.b":"Fotografî û retouch","svc.motion.c":"Pêşxistina dîtbarî bi AI",
+    "svc.cta":"Li ser projeyekê biaxive","soft.eye":"Ezmûna nermalavê","soft.title":"Amûrên li pişt <em>karê</em>.","soft.link":"Ezmûna temam bibîne"
+  },
+  ar:{
+    "svc.eye":"ما أقدمه","svc.title":"أفكار تصبح <em>مرئية</em>.","svc.lede":"ممارسة مركزة في الهوية والطباعة والحملات والموشن — مبنية كنظام بصري واحد وواضح.",
+    "svc.identity":"هوية العلامة والشعار","svc.identity.desc":"علامات مميزة وأنظمة هوية مرنة تبقى واضحة ومتناسقة في جميع نقاط التواصل.","svc.identity.a":"تصميم الشعار والعلامة النصية","svc.identity.b":"أنظمة الخطوط والألوان","svc.identity.c":"دليل الهوية والقرطاسية",
+    "svc.editorial":"التحرير والطباعة","svc.editorial.desc":"مطبوعات ذات تسلسل وإيقاع وإحساس بالمكان — من غلاف واحد إلى منشور متكامل.","svc.editorial.a":"الكتب والتخطيط التحريري","svc.editorial.b":"الملصقات والطباعة الثقافية","svc.editorial.c":"التغليف والإنتاج",
+    "svc.campaign":"الحملات والتواصل","svc.campaign.desc":"أنظمة حملات متماسكة من الصورة الرئيسية الأولى إلى آخر منشور أو تطبيق للفعالية.","svc.campaign.a":"الحملات الإعلانية","svc.campaign.b":"أنظمة التواصل الاجتماعي","svc.campaign.c":"الفعاليات والتواصل العام",
+    "svc.motion":"الموشن والصورة وAI","svc.motion.desc":"عمل بصري وحركي يوسع الهوية دون أن يفقد شخصيتها، مدعوماً باستكشاف مدروس بمساعدة الذكاء الاصطناعي.","svc.motion.a":"تحرير الفيديو والموشن","svc.motion.b":"التصوير والمعالجة","svc.motion.c":"تطوير بصري بمساعدة AI",
+    "svc.cta":"ناقش مشروعاً","soft.eye":"خبرة البرامج","soft.title":"الأدوات خلف <em>العمل</em>.","soft.link":"عرض الخبرة كاملة"
+  },
+  fr:{
+    "svc.eye":"Ce que je fais","svc.title":"Des idées rendues <em>visibles</em>.","svc.lede":"Une pratique ciblée autour de l'identité, de l'impression, des campagnes et du motion — pensée comme un système visuel clair.",
+    "svc.identity":"Identité & Logo","svc.identity.desc":"Des signes distinctifs et des systèmes d'identité flexibles, clairs sur chaque point de contact.","svc.identity.a":"Logo & mot-symbole","svc.identity.b":"Systèmes typographiques & couleurs","svc.identity.c":"Guides & papeterie",
+    "svc.editorial":"Éditorial & Impression","svc.editorial.desc":"Des imprimés avec hiérarchie, rythme et sens du lieu — d'une couverture à une publication complète.","svc.editorial.a":"Livres & mises en page","svc.editorial.b":"Affiches & imprimés culturels","svc.editorial.c":"Packaging & production",
+    "svc.campaign":"Campagnes & Social","svc.campaign.desc":"Des systèmes cohérents du premier visuel clé au dernier post ou support événementiel.","svc.campaign.a":"Campagnes publicitaires","svc.campaign.b":"Systèmes pour réseaux sociaux","svc.campaign.c":"Événements & communication publique",
+    "svc.motion":"Motion, Image & IA","svc.motion.desc":"L'image et le mouvement prolongent l'identité sans perdre son caractère, avec une exploration IA mesurée.","svc.motion.a":"Montage vidéo & motion","svc.motion.b":"Photographie & retouche","svc.motion.c":"Développement visuel assisté par IA",
+    "svc.cta":"Parler d'un projet","soft.eye":"Expérience logiciels","soft.title":"Les outils derrière le <em>travail</em>.","soft.link":"Voir l'expérience complète"
+  },
+  tr:{
+    "svc.eye":"Ne yapıyorum","svc.title":"Fikirler, <em>görünür</em> hâle gelir.","svc.lede":"Kimlik, baskı, kampanya ve motion alanlarında odaklı bir pratik — tek ve açık bir görsel sistem olarak.",
+    "svc.identity":"Marka Kimliği & Logo","svc.identity.desc":"Her temas noktasında açık kalan özgün işaretler ve esnek kimlik sistemleri.","svc.identity.a":"Logo ve kelime markası","svc.identity.b":"Tipografi ve renk sistemleri","svc.identity.c":"Kılavuz ve kırtasiye",
+    "svc.editorial":"Editoryal & Baskı","svc.editorial.desc":"Tek bir kapaktan tam yayına kadar hiyerarşi, ritim ve yer duygusu taşıyan basılı işler.","svc.editorial.a":"Kitap ve editoryal düzen","svc.editorial.b":"Afiş ve kültürel baskı","svc.editorial.c":"Ambalaj ve üretim",
+    "svc.campaign":"Kampanya & Sosyal","svc.campaign.desc":"İlk ana görselden son sosyal gönderiye veya etkinlik uygulamasına kadar tutarlı kampanya sistemleri.","svc.campaign.a":"Reklam kampanyaları","svc.campaign.b":"Sosyal medya sistemleri","svc.campaign.c":"Etkinlik ve kamusal iletişim",
+    "svc.motion":"Motion, Görsel & AI","svc.motion.desc":"Kimliğin karakterini kaybetmeden onu genişleten görsel ve hareket çalışmaları, ölçülü AI araştırmasıyla desteklenir.","svc.motion.a":"Video kurgu ve motion","svc.motion.b":"Fotoğraf ve rötuş","svc.motion.c":"AI destekli görsel geliştirme",
+    "svc.cta":"Bir projeyi konuşalım","soft.eye":"Yazılım deneyimi","soft.title":"İşin arkasındaki <em>araçlar</em>.","soft.link":"Tüm deneyimi gör"
+  },
+  sv:{
+    "svc.eye":"Vad jag gör","svc.title":"Idéer som blir <em>synliga</em>.","svc.lede":"En fokuserad praktik inom identitet, tryck, kampanjer och motion — byggd som ett tydligt visuellt system.",
+    "svc.identity":"Varumärkesidentitet & Logo","svc.identity.desc":"Särpräglade märken och flexibla identitetssystem som förblir tydliga i varje kontaktpunkt.","svc.identity.a":"Logo & ordmärke","svc.identity.b":"Typografi- & färgsystem","svc.identity.c":"Riktlinjer & trycksaker",
+    "svc.editorial":"Redaktionellt & Tryck","svc.editorial.desc":"Trycksaker med hierarki, rytm och platskänsla — från ett omslag till en hel publikation.","svc.editorial.a":"Böcker & redaktionell layout","svc.editorial.b":"Affischer & kulturtryck","svc.editorial.c":"Förpackning & produktion",
+    "svc.campaign":"Kampanjer & Socialt","svc.campaign.desc":"Sammanhållna kampanjsystem från första huvudbilden till sista inlägget eller evenemanget.","svc.campaign.a":"Reklamkampanjer","svc.campaign.b":"System för sociala medier","svc.campaign.c":"Evenemang & offentlig kommunikation",
+    "svc.motion":"Motion, Bild & AI","svc.motion.desc":"Bild och rörelse som utvecklar identiteten utan att förlora dess karaktär, med genomtänkt AI-stöd.","svc.motion.a":"Videoredigering & motion","svc.motion.b":"Fotografi & retusch","svc.motion.c":"AI-stödd visuell utveckling",
+    "svc.cta":"Diskutera ett projekt","soft.eye":"Programvaruerfarenhet","soft.title":"Verktygen bakom <em>arbetet</em>.","soft.link":"Se hela erfarenheten"
+  }
+};
+Object.keys(window.I18N_EXTRA_MOTION248).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_MOTION248[l]); });
