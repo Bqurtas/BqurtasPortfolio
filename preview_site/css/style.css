@@ -4526,19 +4526,7 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
    Bio: the 12 full-height sticky "stacking" cards (≈800px each → a ~9500px room)
    become a calm, compact 2-column grid that's quick to scan.
    ========================================================= */
-@media (min-width:821px){
-  #bio .bio-stack{
-    display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:20px; align-items:start;
-  }
-  #bio .bio-stack > .bio-block{
-    position:static !important;     /* no sticky pile-up */
-    height:auto !important; min-height:0 !important; overflow:visible !important;
-    margin:0 !important;
-    padding:26px clamp(22px,2.4vw,36px) !important;
-    box-shadow:none !important;     /* drop the heavy stacking shadows */
-  }
-}
+/* (v227's compact 2-col grid was superseded by the v239 stacking layout below) */
 
 /* =========================================================
    v228 — Panjamor as a compact studio strip (moved lower) + lighter footer
@@ -4736,10 +4724,28 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
    v239 — one-row features (above) + tidy Bio (masonry, no uneven gaps)
    ========================================================= */
 @media (min-width:821px){
-  /* masonry so the 12 bio cards pack tightly instead of leaving uneven gaps */
-  #bio .bio-stack{ display:block; column-count:2; column-gap:20px; }
-  #bio .bio-stack > .bio-block{ break-inside:avoid; -webkit-column-break-inside:avoid;
-    width:100%; margin:0 0 20px !important; }
+  /* Bio cards STACK as you scroll: each is sticky and slides up to cover (hide)
+     the previous, fanned a touch so the pile reads cleanly & beautifully. */
+  #bio .bio-stack{ display:block; column-count:initial; max-width:780px; margin:0 auto; }
+  #bio .bio-stack > .bio-block{
+    position:sticky; height:auto !important; min-height:0; overflow:visible !important;
+    margin:0 0 26px !important; padding:34px clamp(28px,3.4vw,48px) !important;
+    background:var(--bg-3); border:1px solid var(--line); border-radius:22px;
+    box-shadow:0 34px 70px -38px rgba(0,0,0,.5);
+  }
+  :root[data-theme="dark"] #bio .bio-stack > .bio-block{ background:var(--bg-2); }
+  #bio .bio-stack > .bio-block:nth-child(1){ top:calc(var(--topbar-h) + 24px); }
+  #bio .bio-stack > .bio-block:nth-child(2){ top:calc(var(--topbar-h) + 33px); }
+  #bio .bio-stack > .bio-block:nth-child(3){ top:calc(var(--topbar-h) + 42px); }
+  #bio .bio-stack > .bio-block:nth-child(4){ top:calc(var(--topbar-h) + 51px); }
+  #bio .bio-stack > .bio-block:nth-child(5){ top:calc(var(--topbar-h) + 60px); }
+  #bio .bio-stack > .bio-block:nth-child(6){ top:calc(var(--topbar-h) + 69px); }
+  #bio .bio-stack > .bio-block:nth-child(7){ top:calc(var(--topbar-h) + 78px); }
+  #bio .bio-stack > .bio-block:nth-child(8){ top:calc(var(--topbar-h) + 87px); }
+  #bio .bio-stack > .bio-block:nth-child(9){ top:calc(var(--topbar-h) + 96px); }
+  #bio .bio-stack > .bio-block:nth-child(10){ top:calc(var(--topbar-h) + 105px); }
+  #bio .bio-stack > .bio-block:nth-child(11){ top:calc(var(--topbar-h) + 114px); }
+  #bio .bio-stack > .bio-block:nth-child(12){ top:calc(var(--topbar-h) + 123px); }
 }
 
 /* =========================================================
@@ -4777,3 +4783,29 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 
 /* the client marquee no longer hard-pauses on hover (lux.js slows it instead) */
 .logo-marquee:hover .logo-marquee-track{ animation-play-state:running !important; }
+
+/* =========================================================
+   v241 — more life & motion (the site should feel alive, not frozen)
+   ========================================================= */
+@media (prefers-reduced-motion: no-preference){
+  /* hero portrait gently floats forever (under the cursor parallax) */
+  .hero-portrait{ animation:heroBob 5.5s ease-in-out infinite; }
+  @keyframes heroBob{ 0%,100%{ margin-top:0; } 50%{ margin-top:-11px; } }
+
+  /* stronger, livelier reveal-on-scroll */
+  .lux-reveal{ transform:translateY(40px) scale(.984); }
+  .lux-reveal.lux-in{ transform:none; }
+}
+
+@media (min-width:821px) and (prefers-reduced-motion: no-preference){
+  /* everything lifts to meet the cursor */
+  .blog-card{ transition:transform .4s var(--ease), border-color .3s var(--ease), box-shadow .4s var(--ease); }
+  .blog-card:hover{ transform:translateY(-7px); box-shadow:0 32px 64px -38px rgba(0,0,0,.4); }
+  .qc-card{ transition:transform .35s var(--ease), border-color .3s var(--ease), background .3s; }
+  .qc-card:hover{ transform:translateY(-5px); }
+  .logos-grid .logo-mark{ transition:transform .4s var(--ease-out); }
+  .logos-grid .logo-mark:hover{ transform:scale(.92); }
+  .pencemor-hero-btn, .feature-go, .latest-blog-all{ transition:transform .3s var(--ease), gap .3s var(--ease), background .3s, color .3s, border-color .3s; }
+  .feature-go:hover, .latest-blog-all:hover{ gap:14px; }
+  .bio-teaser-link:hover, .text-link:hover{ gap:14px; }
+}
