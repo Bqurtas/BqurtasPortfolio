@@ -4878,3 +4878,31 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
   .stat{ transition:transform .4s var(--ease), box-shadow .4s var(--ease), border-color .3s var(--ease); }
   .stat:hover{ transform:translateY(-4px); box-shadow:0 26px 54px -34px rgba(0,0,0,.35); }
 }
+
+/* =========================================================
+   v245 — drop the bio-card shadow · give the gallery cards the beam too · classier
+   ========================================================= */
+/* no heavy shadow under the bio stacking cards */
+@media (min-width:821px){
+  #bio .bio-stack > .bio-block{ box-shadow:none !important; }
+}
+
+/* gallery work cards: iPhone-rounded image + the same travelling-border beam */
+.card-art{ border-radius:14px !important; }
+.card{ border-radius:14px; }
+.card::after{
+  content:''; position:absolute; inset:0; border-radius:14px; padding:1.6px;
+  background:conic-gradient(from var(--beam-angle),
+     transparent 0deg, var(--ink) 55deg, transparent 130deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:0; transition:opacity .4s var(--ease); pointer-events:none; z-index:4;
+}
+.card:hover::after{ opacity:1; animation:beamSpin 2.6s linear infinite; }
+
+/* classier beam — a touch brighter & a soft glow under the travelling light */
+.feature-card::after, .blog-card::after, .qc-card::after, .stat::after,
+.card::after, #bio .bio-stack > .bio-block::before{
+  filter:drop-shadow(0 0 5px var(--accent, var(--ink)));
+}
