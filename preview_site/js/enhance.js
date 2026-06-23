@@ -225,19 +225,9 @@
   });
 
   /* =======================================================
-     3a · PROFILE CARD — hover the Bq logo
+     3a · PROFILE CARD — disabled (hover card removed per design)
      ======================================================= */
-  (function profileCard() {
-    const logo = $('#railLogo'), card = $('#profileCard');
-    if (!logo || !card) return;
-    let t;
-    const show = () => { clearTimeout(t); card.classList.add('is-shown'); card.setAttribute('aria-hidden', 'false'); };
-    const hide = () => { clearTimeout(t); t = setTimeout(() => { card.classList.remove('is-shown'); card.setAttribute('aria-hidden', 'true'); }, 260); };
-    logo.addEventListener('mouseenter', show);
-    logo.addEventListener('mouseleave', hide);
-    card.addEventListener('mouseenter', show);
-    card.addEventListener('mouseleave', hide);
-  })();
+  // Profile card on hover disabled — card hidden via CSS display:none
 
   /* =======================================================
      4 · HERO — discipline cards + name portrait

@@ -2957,6 +2957,7 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
   border-radius: 18px; box-shadow: 0 34px 80px -28px rgba(0,0,0,0.5);
   opacity: 0; pointer-events: none; transform: translateX(-14px) scale(0.97);
   transition: opacity 0.32s var(--ease), transform 0.42s var(--ease-out);
+  display: none;
 }
 [dir="rtl"] .profile-card { left: auto; right: calc(var(--rail-w) + 14px); transform: translateX(14px) scale(0.97); }
 .profile-card.is-shown { opacity: 1; pointer-events: auto; transform: none; }
@@ -7132,7 +7133,7 @@ html[lang] .splash-name {
 }
 .rail-logo:hover .rail-logo-name{ color:var(--ink); }
 .rail-room-name{ display:none !important; }       /* the signature name replaces the room label */
-@media (max-width:1080px){ .rail-logo-name{ display:none; } }   /* tight bars: keep the mark only */
+@media (max-width:820px){ .rail-logo-name{ display:none; } }   /* tight bars: keep the mark only */
 
 /* the menu's own name set in the signature face too */
 .mm-logo small{
