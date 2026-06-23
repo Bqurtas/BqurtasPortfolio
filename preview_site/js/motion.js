@@ -153,8 +153,6 @@
           };
           next.src = src;
         };
-        var card = menu.querySelector('.mm-right');
-        var nav = menu.querySelector('.mm-nav');
         var updatePreview = function (link) {
           if (!link) return;
           var number = link.querySelector('.mm-n');
@@ -165,32 +163,11 @@
           swapImg(link.dataset.menuImg);
           menu.dataset.previewRoom = link.dataset.route || 'design';
         };
-        var showCard = function () { if (card && fine) card.classList.add('is-shown'); };
-        var hideCard = function () { if (card) card.classList.remove('is-shown'); };
+        /* the preview is a stationary side panel — it just swaps image on hover */
         roomLinks.forEach(function (link) {
-          link.addEventListener('mouseenter', function () { updatePreview(link); showCard(); });
+          link.addEventListener('mouseenter', function () { updatePreview(link); });
           link.addEventListener('focus', function () { updatePreview(link); });
-          link.addEventListener('mouseleave', hideCard);
         });
-        if (nav) nav.addEventListener('mouseleave', hideCard);
-
-        /* the preview card eases toward the pointer, leaning into the open side */
-        if (card && fine && !reduce) {
-          var tx = innerWidth * 0.72, ty = innerHeight * 0.5, cx = tx, cy = ty;
-          menu.addEventListener('pointermove', function (event) {
-            var off = Math.min(240, innerWidth * 0.17);
-            var lean = event.clientX < innerWidth * 0.5 ? off : -off;
-            tx = clamp(event.clientX + lean, 190, innerWidth - 190);
-            ty = clamp(event.clientY, 240, innerHeight - 240);
-          });
-          var follow = function () {
-            cx += (tx - cx) * 0.16; cy += (ty - cy) * 0.16;
-            card.style.left = cx.toFixed(1) + 'px';
-            card.style.top = cy.toFixed(1) + 'px';
-            requestAnimationFrame(follow);
-          };
-          follow();
-        }
         updatePreview(menu.querySelector('.mm-link.is-active') || roomLinks[0]);
       }
 
