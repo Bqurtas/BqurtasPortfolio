@@ -7901,3 +7901,97 @@ html[lang] .splash-name {
   transition: background .4s cubic-bezier(.22,1,.36,1),
               color .45s cubic-bezier(.22,1,.36,1) !important;
 }
+
+/* =========================================================
+   v272 — (1) profile card = site bg colour, drops to tool-icon level;
+            (2) mm-foot anchored to bottom-left corner;
+            (3) rooms all white; active room = white pill underline + black text
+   ========================================================= */
+
+/* --- 1) Profile card: website background colour + lower position --- */
+.profile-card{
+  background: var(--bg) !important;
+  border-color: rgba(0,0,0,.1) !important;
+  box-shadow: 0 28px 64px -24px rgba(0,0,0,.38), 0 0 0 1px rgba(0,0,0,.06) !important;
+  /* drop to the level of the tool icons (below topbar) */
+  top: 86px !important;
+  /* entry from that level: slide in from slightly above */
+  transform: translate(0, -10px) scale(.97) !important;
+  transform-origin: top left !important;
+}
+:root[data-theme="dark"] .profile-card{
+  border-color: rgba(255,255,255,.08) !important;
+  box-shadow: 0 28px 64px -24px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.05) !important;
+}
+.profile-card.is-shown{ transform: translate(0,0) scale(1) !important; }
+[dir="rtl"] .profile-card{
+  transform: translate(0,-10px) scale(.97) !important;
+  transform-origin: top right !important;
+}
+[dir="rtl"] .profile-card.is-shown{ transform: translate(0,0) scale(1) !important; }
+
+/* text/buttons inherit site colours naturally via var(--ink), var(--bg) */
+.profile-card-name{ color: var(--ink) !important; }
+.profile-card-bio{ color: var(--ink-soft) !important; }
+.profile-card-eyebrow{ color: var(--ink-muted) !important; }
+
+/* --- 2) mm-foot: anchor to BOTTOM-LEFT of the content area --- */
+.mm-foot{
+  justify-content: flex-end !important;   /* push content to the bottom */
+  align-self: stretch !important;         /* stretch full height of row 2 */
+  padding-bottom: 0 !important;
+}
+
+/* --- 3) All rooms WHITE; active room gets white underline + black text --- */
+
+/* all rooms: full white text */
+.mm-link .mm-n{
+  color: rgba(255,255,255,.35) !important;
+}
+.mm-link .mm-link-text{
+  color: #ffffff !important;
+}
+.mm-link::after{
+  color: rgba(255,255,255,.4) !important;
+}
+
+/* hovered (non-active): slightly brighter number, title stays white, slides */
+.mm-link:hover .mm-n,
+.mm-link:focus-visible .mm-n{
+  color: rgba(255,255,255,.6) !important;
+}
+.mm-link:hover .mm-link-text,
+.mm-link:focus-visible .mm-link-text{
+  color: #ffffff !important;
+  transform: translateX(10px) !important;
+}
+.mm-link:hover::after,
+.mm-link:focus-visible::after{
+  color: rgba(255,255,255,.55) !important;
+}
+
+/* ACTIVE room: white background pill under the title, black text */
+.mm-link.is-active{
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.mm-link.is-active .mm-n{
+  color: rgba(0,0,0,.45) !important;
+}
+.mm-link.is-active .mm-link-text{
+  color: #0a0a0a !important;
+  transform: none !important;
+  /* white underline pill */
+  background: #ffffff !important;
+  border-radius: 4px !important;
+  padding: 2px 8px !important;
+  display: inline-block !important;
+}
+.mm-link.is-active::after{
+  color: rgba(0,0,0,.45) !important;
+}
+/* RTL slide */
+[dir="rtl"] .mm-link:hover .mm-link-text,
+[dir="rtl"] .mm-link:focus-visible .mm-link-text{
+  transform: translateX(-10px) !important;
+}
