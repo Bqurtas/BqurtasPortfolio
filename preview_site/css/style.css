@@ -7539,22 +7539,36 @@ html[lang] .splash-name {
             the hover profile-card, now removed) · the ghost 699 is medium &
             faint, not loud
    ========================================================= */
-/* signature name on the bar — Liana, full height visible */
+/* signature name on the bar — Liana, perfectly baseline-aligned with Bq. */
 .rail-logo-name{
   font-family:'Liana','Fraunces',serif !important; font-style:normal !important;
   font-weight:400 !important; font-size:22px !important;
   font-feature-settings:normal !important; font-variant-ligatures:normal !important;
-  display:inline-block !important; overflow:visible !important;
-  line-height:1.6 !important; max-height:none !important; vertical-align:middle !important;
+  overflow:visible !important;
+  line-height:1 !important; max-height:none !important;
+  padding:0 !important; margin:0 !important;
+  position:relative !important; top:0px !important;
   clip:auto !important; clip-path:none !important;
-  padding-top:4px !important; padding-bottom:4px !important;
 }
-/* make the logo pill and the rail bar itself never clip the name */
+/* logo: baseline alignment so Bq. and the script name share the same text baseline */
 .rail-logo{
   overflow:visible !important;
-  align-items:center !important;
+  align-items:baseline !important;
 }
 .rail{ overflow:visible !important; }
+
+/* =========================================================
+   v268 — profile card drops 10 mm below topbar edge;
+           hero eyebrow + name drop 5 mm; worked-with section drops 5 mm
+   ========================================================= */
+/* profile card: push 10 mm (≈38 px) lower from topbar */
+.profile-card{ top: 62px !important; }
+[dir="rtl"] .profile-card{ top: 62px !important; }
+/* hero eyebrow (— Independent Designer · …) 5 mm lower */
+.hero-eyebrow{ margin-top: 19px !important; }
+/* worked-with section header: 5 mm lower */
+.logos-title{ margin-top: 19px !important; }
+.section-num{ margin-top: 19px !important; }
 
 /* the centred ghost work-number: medium, soft and quiet (not loud) */
 @media (max-width:820px){
