@@ -232,15 +232,19 @@
     var wrap = document.querySelector('.section.work > .tabs-wrap');
     var section = document.querySelector('.section.work');
     if (!wrap || !section) return;
+    var grid = section.querySelector('.grid');
     var mq = matchMedia('(max-width:820px)');
     var raf = 0;
     var update = function () {
       raf = 0;
       if (!mq.matches) { wrap.style.opacity = ''; wrap.style.pointerEvents = ''; return; }
-      var bottom = section.getBoundingClientRect().bottom;   // section base vs viewport top
+      var ref = grid || section;
+      var bottom = ref.getBoundingClientRect().bottom;       // gallery base vs viewport top
       var h = wrap.offsetHeight || 120;
-      var fade = 170;
-      var o = (bottom - h) / fade;                           // 1 while gallery fills, → 0 at the end
+      var fade = 200;
+      // fully gone while the gallery base is still ~h+40 below the pinned tabs,
+      // i.e. before the "Load more" row ever reaches them
+      var o = (bottom - (h + 40)) / fade;
       o = o < 0 ? 0 : o > 1 ? 1 : o;
       wrap.style.opacity = o.toFixed(2);
       wrap.style.pointerEvents = o < 0.06 ? 'none' : '';
