@@ -173,6 +173,32 @@
           link.addEventListener('focus', function () { updatePreview(link); });
         });
         updatePreview(menu.querySelector('.mm-link.is-active') || roomLinks[0]);
+
+        /* ---- v271: sync --mm-row-h so hairlines extend across .mm-right ---- */
+        var sheet = menu.querySelector('.mobile-sheet');
+        var syncRowH = function () {
+          if (!sheet || !roomLinks[0]) return;
+          var h = roomLinks[0].getBoundingClientRect().height;
+          if (h > 0) sheet.style.setProperty('--mm-row-h', h + 'px');
+          /* top offset: where .mm-nav starts inside .mm-left */
+          var nav = menu.querySelector('.mm-nav');
+          var sheetRect = sheet.getBoundingClientRect();
+          var navRect = nav ? nav.getBoundingClientRect() : null;
+          var offset = navRect ? (navRect.top - sheetRect.top) : 0;
+          sheet.style.setProperty('--mm-row-offset', offset + 'px');
+        };
+        /* run once on open, then on resize */
+        var menuObserver = new ResizeObserver(syncRowH);
+        menuObserver.observe(sheet || menu);
+        /* also run whenever the menu opens */
+        var origSetMenu = window.__bqSetMenu;
+        var menuBtn = document.getElementById('menuBtn') || document.getElementById('railMenu');
+        if (menuBtn) {
+          menuBtn.addEventListener('click', function () {
+            requestAnimationFrame(function () { requestAnimationFrame(syncRowH); });
+          });
+        }
+        syncRowH();
       }
 
       /* ---- biography spotlight follows the pointer without moving layout ---- */

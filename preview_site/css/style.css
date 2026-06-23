@@ -7738,3 +7738,86 @@ html[lang] .splash-name {
 .mm-figure[data-room="blog"]       .mm-cover{ --cov-1:#6c4a74 !important; --cov-2:#291c30 !important; }
 .mm-figure[data-room="bio"]        .mm-cover{ --cov-1:#bd9450 !important; --cov-2:#544022 !important; }
 .mm-figure[data-room="contact"]    .mm-cover{ --cov-1:#4b4b50 !important; --cov-2:#161618 !important; }
+
+/* =========================================================
+   v271 — (a) hover rooms go black & white (brand monochrome);
+            (b) hairline dividers extend across the full sheet
+                width, reaching under the card column.
+            Cards (.mm-cover) keep their per-room colour.
+   ========================================================= */
+
+/* --- 1) B&W hover: replace per-room brand colours with near-black --- */
+/* override ALL per-room colour rules from v270 */
+.mm-link[data-route="design"]:hover,
+.mm-link[data-route="design"].is-active,
+.mm-link[data-route="work"]:hover,
+.mm-link[data-route="work"].is-active,
+.mm-link[data-route="brandboard"]:hover,
+.mm-link[data-route="brandboard"].is-active,
+.mm-link[data-route="blog"]:hover,
+.mm-link[data-route="blog"].is-active,
+.mm-link[data-route="bio"]:hover,
+.mm-link[data-route="bio"].is-active,
+.mm-link[data-route="contact"]:hover,
+.mm-link[data-route="contact"].is-active{
+  background: #0a0a0a !important;       /* deep black — pure B&W brand */
+  box-shadow: 0 24px 52px -30px rgba(0,0,0,.9) !important;
+}
+/* also cover the generic hover rule from v267 (cream) */
+.mm-link:hover, .mm-link:focus-visible, .mm-link.is-active{
+  background: #0a0a0a !important;
+  box-shadow: 0 24px 52px -30px rgba(0,0,0,.9) !important;
+}
+/* text stays white on black */
+.mm-link:hover .mm-n,
+.mm-link.is-active .mm-n,
+.mm-link:focus-visible .mm-n{
+  color: rgba(255,255,255,.45) !important;
+}
+.mm-link:hover .mm-link-text,
+.mm-link.is-active .mm-link-text,
+.mm-link:focus-visible .mm-link-text{
+  color: #ffffff !important;
+}
+.mm-link:hover::after,
+.mm-link.is-active::after,
+.mm-link:focus-visible::after{
+  color: rgba(255,255,255,.5) !important;
+  background: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+/* active dot stays white on black */
+.mm-link.is-active::before{
+  background: #ffffff !important;
+  opacity: .55 !important;
+}
+
+/* cards (.mm-cover) are NOT touched — they keep the colourful vars from v270 */
+
+/* --- 2) Extend hairlines across .mm-right so each room line spans full width ---
+   Strategy: .mm-right::before is an absolutely-positioned overlay with a
+   repeating-linear-gradient whose period equals one .mm-link row height.
+   The custom property --mm-row-h is set by JS (see motion.js patch);
+   the 70px fallback is the typical value at desktop.
+   The first-child top border is mirrored too (+1 line at top).             */
+.mm-right{
+  position: relative !important;   /* anchor for ::before */
+}
+.mm-right::before{
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  /* lines at the BOTTOM of each row, matching .mm-link border-bottom */
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent calc(var(--mm-row-h, 70px) - 1px),
+    rgba(255,255,255,.08) calc(var(--mm-row-h, 70px) - 1px),
+    rgba(255,255,255,.08) var(--mm-row-h, 70px)
+  ) !important;
+  /* offset by the top padding of .mm-left so first line aligns */
+  background-position: 0 var(--mm-row-offset, 0px) !important;
+}
