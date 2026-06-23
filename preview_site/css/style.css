@@ -7539,6 +7539,7 @@ html[lang] .splash-name {
             the hover profile-card, now removed) · the ghost 699 is medium &
             faint, not loud
    ========================================================= */
+<<<<<<< Updated upstream
 /* signature name on the bar — Liana, perfectly baseline-aligned with Bq. */
 .rail-logo-name{
   font-family:'Liana','Fraunces',serif !important; font-style:normal !important;
@@ -7549,6 +7550,13 @@ html[lang] .splash-name {
   padding:0 !important; margin:0 !important;
   position:relative !important; top:0px !important;
   clip:auto !important; clip-path:none !important;
+=======
+/* signature name on the bar — Liana, shown in full (no clipping, not cut) */
+.rail-logo-name{
+  font-family:'Liana','Fraunces',serif !important; font-style:normal !important;
+  font-weight:400 !important; font-size:22px !important;
+  overflow:visible !important; max-height:none !important; line-height:1 !important;
+>>>>>>> Stashed changes
 }
 /* logo: baseline alignment so Bq. and the script name share the same text baseline */
 .rail-logo{
