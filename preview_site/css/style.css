@@ -7512,3 +7512,24 @@ html[lang] .splash-name {
   font-family:'Liana','Fraunces',serif !important; font-style:normal !important;
   font-size:16px !important; letter-spacing:0 !important; text-transform:none !important;
 }
+
+/* =========================================================
+   v265 — the ghost work-number (699) sits centred behind the gallery heading
+            on mobile, a touch larger, blended soft-light
+   ========================================================= */
+@media (max-width:820px){
+  .tab-header-inner{ position:relative; }
+  .tab-header-left{ position:relative; z-index:1; }
+  .tab-header-right{
+    position:absolute !important; left:50% !important; top:50% !important;
+    transform:translate(-50%,-50%) !important; right:auto !important;
+    width:auto; text-align:center; z-index:0; pointer-events:none;
+  }
+  .tab-header-ghost{
+    font-size:clamp(72px, 24vw, 120px) !important; line-height:1 !important;
+    opacity:.85;
+  }
+}
+
+/* the splash shows only the Bq. mark — drop the tagline writing under it */
+.splash-tag{ display:none !important; }
