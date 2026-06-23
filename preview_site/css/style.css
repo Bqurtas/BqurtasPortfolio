@@ -2957,7 +2957,6 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
   border-radius: 18px; box-shadow: 0 34px 80px -28px rgba(0,0,0,0.5);
   opacity: 0; pointer-events: none; transform: translateX(-14px) scale(0.97);
   transition: opacity 0.32s var(--ease), transform 0.42s var(--ease-out);
-  display: none;
 }
 [dir="rtl"] .profile-card { left: auto; right: calc(var(--rail-w) + 14px); transform: translateX(14px) scale(0.97); }
 .profile-card.is-shown { opacity: 1; pointer-events: auto; transform: none; }
@@ -5619,8 +5618,8 @@ body.is-scrolled .rail-room-name,
     transition: background .35s var(--ease), border-color .35s var(--ease);
   }
   .rail-logo:hover {
-    background: var(--surface);
-    border-color: var(--line);
+    background: transparent;
+    border-color: transparent;
   }
   .rail-tools {
     gap: 4px;
