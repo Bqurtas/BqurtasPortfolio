@@ -143,15 +143,28 @@
         var previewNote = document.getElementById('menuPreviewNote');
         var figure = document.getElementById('menuFigure');
         var roomLinks = Array.from(menu.querySelectorAll('.mm-link'));
-        var updatePreview = function (link) {
-          if (!link) return;
+        var applyPreview = function (link) {
           var number = link.querySelector('.mm-n');
           var title = link.querySelector('.mm-link-text');
           if (previewNo && number) previewNo.textContent = number.textContent.trim() + ' / 06';
           if (previewTitle && title) previewTitle.textContent = title.textContent.trim();
           if (previewNote) previewNote.textContent = link.dataset.menuNote || '';
+          if (figure) figure.dataset.room = link.dataset.route || 'design';
+        };
+        var updatePreview = function (link) {
+          if (!link) return;
           var room = link.dataset.route || 'design';
-          if (figure) figure.dataset.room = room;   /* swaps the designed cover's palette */
+          /* smooth Strida-style swap: fade the cover content out, change, fade back */
+          if (figure && figure.dataset.room && figure.dataset.room !== room && !reduce) {
+            figure.classList.add('is-fading');
+            clearTimeout(figure._ft);
+            figure._ft = setTimeout(function () {
+              applyPreview(link);
+              requestAnimationFrame(function () { figure.classList.remove('is-fading'); });
+            }, 190);
+          } else {
+            applyPreview(link);
+          }
           menu.dataset.previewRoom = room;
         };
         /* the preview is a stationary side panel — it just swaps image on hover */
