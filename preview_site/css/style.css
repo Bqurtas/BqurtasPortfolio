@@ -7539,14 +7539,15 @@ html[lang] .splash-name {
             the hover profile-card, now removed) · the ghost 699 is medium &
             faint, not loud
    ========================================================= */
-/* signature name back on the bar */
+/* signature name back on the bar — Liana, but the script's under-swash is
+   clipped so no flourish/shape protrudes beneath it (menu + footer keep theirs) */
 .rail-logo-name{
   font-family:'Liana','Fraunces',serif !important; font-style:normal !important;
   font-weight:400 !important; font-size:22px !important;
   font-feature-settings:normal !important; font-variant-ligatures:normal !important;
+  display:inline-block !important; overflow:hidden !important;
+  line-height:.74 !important; max-height:.8em !important; vertical-align:-.04em !important;
 }
-/* the hover profile-card was the shape opening under the name — drop it */
-.profile-card{ display:none !important; }
 
 /* the centred ghost work-number: medium, soft and quiet (not loud) */
 @media (max-width:820px){
@@ -7627,8 +7628,6 @@ html[lang] .splash-name {
 }
 .tab-header-ghost{ opacity:.16 !important; font-size:clamp(34px,8vw,52px) !important; }
 
-/* --- 2) smooth scrolling — drop the mandatory snap that added an extra pull --- */
-html{ scroll-snap-type:none !important; }
 
 /* --- 4) menu room cards: pure monochrome (no cream / no bronze) + one quiet dot --- */
 .mm-link{ position:relative !important; }
@@ -7680,3 +7679,41 @@ html{ scroll-snap-type:none !important; }
 @media (max-width:820px){
   .tab-header-ghost{ font-size:clamp(58px, 16vw, 92px) !important; opacity:.12 !important; }
 }
+
+/* =========================================================
+   v270 — menu like Strida: one unified background, a hairline under each room,
+            full-width cards that fill with the room's OWN colour on hover/active,
+            morphing smoothly. (Colours restored per request.)
+   ========================================================= */
+/* one continuous menu background — no separate panels */
+.mobile-sheet, .mm-left, .mm-right{ background:#121212 !important; }
+.mm-right{ box-shadow:none !important; }
+
+/* full-width room cards, a hairline divider under each (cards sit on the lines) */
+.mm-nav{ max-width:none !important; width:100% !important; gap:0 !important; }
+.mm-link{
+  width:100% !important; border-radius:0 !important; box-shadow:none !important;
+  border-bottom:1px solid rgba(255,255,255,.08) !important;
+  transition:background .55s cubic-bezier(.22,1,.36,1), color .4s var(--ease) !important;
+}
+.mm-link:first-child{ border-top:1px solid rgba(255,255,255,.08) !important; }
+
+/* each room fills with its own colour on hover / when active */
+.mm-link[data-route="design"]:hover,     .mm-link[data-route="design"].is-active{     background:#b65f3f !important; }
+.mm-link[data-route="work"]:hover,        .mm-link[data-route="work"].is-active{        background:#2c5d6e !important; }
+.mm-link[data-route="brandboard"]:hover,  .mm-link[data-route="brandboard"].is-active{  background:#69744d !important; }
+.mm-link[data-route="blog"]:hover,        .mm-link[data-route="blog"].is-active{        background:#66456e !important; }
+.mm-link[data-route="bio"]:hover,         .mm-link[data-route="bio"].is-active{         background:#b08a4a !important; }
+.mm-link[data-route="contact"]:hover,     .mm-link[data-route="contact"].is-active{     background:#46464b !important; }
+.mm-link:hover .mm-n, .mm-link.is-active .mm-n{ color:rgba(255,255,255,.72) !important; }
+.mm-link:hover .mm-link-text, .mm-link.is-active .mm-link-text{ color:#fff !important; }
+.mm-link:hover::after, .mm-link.is-active::after{ color:rgba(255,255,255,.8) !important; background:none !important; }
+.mm-link.is-active::before{ background:#fff !important; opacity:.85 !important; }
+
+/* covers: restore the per-room colours (they morph smoothly between rooms) */
+.mm-figure[data-room="design"]     .mm-cover{ --cov-1:#c26a48 !important; --cov-2:#5c2a1d !important; }
+.mm-figure[data-room="work"]       .mm-cover{ --cov-1:#2f6173 !important; --cov-2:#112a33 !important; }
+.mm-figure[data-room="brandboard"] .mm-cover{ --cov-1:#6f7a52 !important; --cov-2:#2b3421 !important; }
+.mm-figure[data-room="blog"]       .mm-cover{ --cov-1:#6c4a74 !important; --cov-2:#291c30 !important; }
+.mm-figure[data-room="bio"]        .mm-cover{ --cov-1:#bd9450 !important; --cov-2:#544022 !important; }
+.mm-figure[data-room="contact"]    .mm-cover{ --cov-1:#4b4b50 !important; --cov-2:#161618 !important; }
