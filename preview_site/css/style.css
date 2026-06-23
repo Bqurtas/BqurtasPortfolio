@@ -7740,84 +7740,164 @@ html[lang] .splash-name {
 .mm-figure[data-room="contact"]    .mm-cover{ --cov-1:#4b4b50 !important; --cov-2:#161618 !important; }
 
 /* =========================================================
-   v271 — (a) hover rooms go black & white (brand monochrome);
-            (b) hairline dividers extend across the full sheet
-                width, reaching under the card column.
-            Cards (.mm-cover) keep their per-room colour.
+   v271 — B&W hover on rooms; hairlines removed from .mm-right.
+           Active room = white; others = muted dark; animated slide.
+           .mm-foot moves to left sidebar beside the nav.
    ========================================================= */
 
-/* --- 1) B&W hover: replace per-room brand colours with near-black --- */
-/* override ALL per-room colour rules from v270 */
-.mm-link[data-route="design"]:hover,
-.mm-link[data-route="design"].is-active,
-.mm-link[data-route="work"]:hover,
-.mm-link[data-route="work"].is-active,
-.mm-link[data-route="brandboard"]:hover,
-.mm-link[data-route="brandboard"].is-active,
-.mm-link[data-route="blog"]:hover,
-.mm-link[data-route="blog"].is-active,
-.mm-link[data-route="bio"]:hover,
-.mm-link[data-route="bio"].is-active,
-.mm-link[data-route="contact"]:hover,
-.mm-link[data-route="contact"].is-active{
-  background: #0a0a0a !important;       /* deep black — pure B&W brand */
-  box-shadow: 0 24px 52px -30px rgba(0,0,0,.9) !important;
+/* --- remove ::before lines from .mm-right (no longer needed) --- */
+.mm-right::before{ display: none !important; content: none !important; }
+
+/* --- remove border lines under/above each room link --- */
+.mm-link{ border-top: none !important; border-bottom: none !important; }
+.mm-link:first-child{ border-top: none !important; }
+
+/* --- .mm-left becomes a 2-col inner layout: sidebar (foot) + nav --- */
+.mm-left{
+  display: grid !important;
+  grid-template-rows: auto 1fr !important;
+  grid-template-columns: auto 1fr !important;
 }
-/* also cover the generic hover rule from v267 (cream) */
-.mm-link:hover, .mm-link:focus-visible, .mm-link.is-active{
-  background: #0a0a0a !important;
-  box-shadow: 0 24px 52px -30px rgba(0,0,0,.9) !important;
+/* .mm-top spans full width at the top */
+.mm-top{
+  grid-row: 1 !important;
+  grid-column: 1 / -1 !important;
 }
-/* text stays white on black */
+/* .mm-foot: left sidebar column, vertically centred beside the nav */
+.mm-foot{
+  grid-row: 2 !important;
+  grid-column: 1 !important;
+  margin-top: 0 !important;
+  border-top: none !important;
+  padding-top: 0 !important;
+  border-right: 1px solid rgba(255,255,255,.08) !important;
+  padding-right: clamp(20px,2.4vw,36px) !important;
+  margin-right: clamp(20px,2.4vw,36px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  gap: 28px !important;
+  min-width: clamp(90px,10vw,140px) !important;
+}
+/* .mm-nav: right column, full height */
+.mm-nav{
+  grid-row: 2 !important;
+  grid-column: 2 !important;
+  flex: unset !important;
+  align-self: center !important;
+  margin: 0 !important;
+  gap: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+/* .mm-touch inside the sidebar: small, vertical */
+.mm-touch{
+  font-family: 'Fraunces', serif !important;
+  font-style: italic !important;
+  font-size: clamp(11px,1.1vw,14px) !important;
+  color: rgba(255,255,255,.45) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 4px !important;
+  line-height: 1.2 !important;
+  transition: color .3s var(--ease) !important;
+  white-space: nowrap !important;
+}
+.mm-touch i{ display: none !important; }  /* hide arrow in sidebar layout */
+.mm-touch:hover{ color: rgba(255,255,255,.9) !important; }
+
+/* social links stacked vertically */
+.mm-socs{
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  align-items: flex-start !important;
+}
+.mm-socs a{
+  font-family: 'Manrope', sans-serif !important;
+  font-size: clamp(9px,0.85vw,11px) !important;
+  letter-spacing: .06em !important;
+  text-transform: uppercase !important;
+  color: rgba(255,255,255,.28) !important;
+  white-space: nowrap !important;
+  transition: color .3s var(--ease) !important;
+}
+.mm-socs a:hover{ color: rgba(255,255,255,.85) !important; }
+
+/* --- room links: inactive = muted, active/hover = pure white + slide animation --- */
+/* remove per-room background colours and borders — clean, no fill */
+.mm-link[data-route]:hover,
+.mm-link[data-route].is-active,
+.mm-link:hover,
+.mm-link:focus-visible,
+.mm-link.is-active{
+  background: transparent !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+/* inactive number: very dark/dim */
+.mm-link .mm-n{
+  color: rgba(255,255,255,.12) !important;
+  transition: color .45s cubic-bezier(.22,1,.36,1) !important;
+}
+/* inactive title: dark muted */
+.mm-link .mm-link-text{
+  color: rgba(255,255,255,.22) !important;
+  transition: color .45s cubic-bezier(.22,1,.36,1),
+              transform .45s cubic-bezier(.22,1,.36,1) !important;
+  display: inline-block !important;
+}
+/* inactive subtitle */
+.mm-link::after{
+  color: rgba(255,255,255,.14) !important;
+  transition: color .45s cubic-bezier(.22,1,.36,1) !important;
+}
+/* ACTIVE / HOVERED → white + slide right */
 .mm-link:hover .mm-n,
 .mm-link.is-active .mm-n,
 .mm-link:focus-visible .mm-n{
-  color: rgba(255,255,255,.45) !important;
+  color: rgba(255,255,255,.55) !important;
 }
 .mm-link:hover .mm-link-text,
 .mm-link.is-active .mm-link-text,
 .mm-link:focus-visible .mm-link-text{
   color: #ffffff !important;
+  transform: translateX(10px) !important;
 }
 .mm-link:hover::after,
 .mm-link.is-active::after,
 .mm-link:focus-visible::after{
-  color: rgba(255,255,255,.5) !important;
+  color: rgba(255,255,255,.45) !important;
   background: none !important;
   background-color: transparent !important;
   box-shadow: none !important;
 }
-/* active dot stays white on black */
+/* RTL: slide left */
+[dir="rtl"] .mm-link:hover .mm-link-text,
+[dir="rtl"] .mm-link.is-active .mm-link-text{
+  transform: translateX(-10px) !important;
+}
+/* padding: no indent shift on hover (clean) */
+.mm-link:hover,
+.mm-link:focus-visible,
+.mm-link.is-active{
+  padding-left: clamp(16px,1.8vw,26px) !important;
+}
+/* active dot — small white notch on the right */
 .mm-link.is-active::before{
   background: #ffffff !important;
   opacity: .55 !important;
 }
+/* cards (.mm-cover) keep the colourful vars from v270 — untouched */
 
-/* cards (.mm-cover) are NOT touched — they keep the colourful vars from v270 */
-
-/* --- 2) Extend hairlines across .mm-right so each room line spans full width ---
-   Strategy: .mm-right::before is an absolutely-positioned overlay with a
-   repeating-linear-gradient whose period equals one .mm-link row height.
-   The custom property --mm-row-h is set by JS (see motion.js patch);
-   the 70px fallback is the typical value at desktop.
-   The first-child top border is mirrored too (+1 line at top).             */
-.mm-right{
-  position: relative !important;   /* anchor for ::before */
-}
-.mm-right::before{
-  content: '' !important;
-  position: absolute !important;
-  inset: 0 !important;
-  pointer-events: none !important;
-  z-index: 0 !important;
-  /* lines at the BOTTOM of each row, matching .mm-link border-bottom */
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0px,
-    transparent calc(var(--mm-row-h, 70px) - 1px),
-    rgba(255,255,255,.08) calc(var(--mm-row-h, 70px) - 1px),
-    rgba(255,255,255,.08) var(--mm-row-h, 70px)
-  ) !important;
-  /* offset by the top padding of .mm-left so first line aligns */
-  background-position: 0 var(--mm-row-offset, 0px) !important;
+/* --- overall link transition (covers background reset + color) --- */
+.mm-link{
+  transition: background .4s cubic-bezier(.22,1,.36,1),
+              color .45s cubic-bezier(.22,1,.36,1) !important;
 }
