@@ -8061,3 +8061,194 @@ html[lang] .splash-name {
 [dir="rtl"] .mm-link:focus-visible .mm-link-text{
   transform: translateX(-10px) !important;
 }
+
+/* =========================================================
+   v273 — MENU POLISH: a calmer, more elegant full-screen menu.
+   Goal: better rhythm & breathing room, refined hairline dividers,
+   a softer (no longer harsh-white) active state, a more premium cover
+   card, and a tidier header / footer. Pure additive layer.
+   ========================================================= */
+
+/* --- 1) Overlay: a deeper, richer backdrop with a subtle vignette --- */
+.mobile-menu{
+  background:
+    radial-gradient(120% 90% at 18% 0%, rgba(255,255,255,.045), transparent 60%),
+    #0f0f0f !important;
+}
+.mobile-sheet, .mm-left{ background:transparent !important; }
+
+/* --- 2) Generous, balanced padding on the left column --- */
+.mm-left{
+  padding:clamp(30px,4.4vw,72px) clamp(26px,4vw,64px) clamp(26px,3.4vw,52px) !important;
+  gap:clamp(20px,2.6vw,40px) !important;
+}
+
+/* --- 3) Header row: a quieter wordmark + a clear section caption --- */
+.mm-top{ align-items:center !important; gap:18px !important; padding-bottom:6px !important; }
+.mm-logo{
+  font-size:clamp(20px,2vw,26px) !important; letter-spacing:.01em !important;
+  display:inline-flex !important; align-items:baseline !important; gap:9px !important;
+}
+.mm-logo small{
+  font-family:'Manrope',sans-serif !important; font-style:normal !important;
+  font-size:11px !important; letter-spacing:.16em !important; text-transform:uppercase !important;
+  color:rgba(255,255,255,.4) !important;
+}
+.mm-top-label{
+  font-size:10px !important; letter-spacing:.24em !important; text-transform:uppercase !important;
+  color:rgba(255,255,255,.34) !important;
+}
+
+/* --- 4) Close button: refined, larger tap target, smooth spin --- */
+.mobile-menu-close{
+  width:44px !important; height:44px !important; font-size:16px !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  color:rgba(255,255,255,.85) !important;
+  transition:background .35s var(--ease), color .35s var(--ease),
+             border-color .35s var(--ease), transform .45s cubic-bezier(.22,1,.36,1) !important;
+}
+.mobile-menu-close:hover{
+  background:#fff !important; color:#0f0f0f !important;
+  border-color:#fff !important; transform:rotate(90deg) !important;
+}
+
+/* --- 5) Nav: even vertical rhythm + hairline dividers between rooms --- */
+.mm-nav{ gap:0 !important; }
+.mm-link{
+  display:grid !important;
+  grid-template-columns:auto 1fr !important;
+  column-gap:clamp(16px,1.8vw,28px) !important;
+  align-items:center !important;
+  padding:clamp(15px,1.9vw,24px) clamp(14px,1.6vw,22px) !important;
+  border-radius:14px !important;
+  border-bottom:1px solid rgba(255,255,255,.07) !important;
+  position:relative !important;
+  transition:background .5s cubic-bezier(.22,1,.36,1),
+             color .4s var(--ease),
+             padding-left .45s cubic-bezier(.22,1,.36,1) !important;
+}
+.mm-nav .mm-link:last-child{ border-bottom:none !important; }
+
+/* number — quiet, monospace-feeling ghost index */
+.mm-link .mm-n{
+  font-size:clamp(20px,2.4vw,30px) !important; font-weight:300 !important;
+  color:rgba(255,255,255,.26) !important; align-self:center !important;
+  grid-row:1 / span 2 !important;
+  transition:color .4s var(--ease) !important;
+}
+.mm-link .mm-link-text{
+  font-size:clamp(24px,3.6vw,40px) !important; font-weight:500 !important;
+  color:rgba(255,255,255,.92) !important; align-self:end !important;
+}
+.mm-link::after{
+  font-size:12.5px !important; letter-spacing:.01em !important;
+  color:rgba(255,255,255,.34) !important; align-self:start !important;
+  margin-top:3px !important;
+}
+
+/* hover (non-active): warm-white text, slight lift of the whole row */
+.mm-link:hover, .mm-link:focus-visible{
+  background:rgba(255,255,255,.05) !important;
+  padding-left:clamp(20px,2.4vw,32px) !important;
+  box-shadow:none !important;
+}
+.mm-link:hover .mm-n, .mm-link:focus-visible .mm-n{ color:rgba(255,255,255,.55) !important; }
+.mm-link:hover .mm-link-text, .mm-link:focus-visible .mm-link-text{
+  color:#fff !important; transform:none !important;
+}
+.mm-link:hover::after, .mm-link:focus-visible::after{ color:rgba(255,255,255,.55) !important; }
+[dir="rtl"] .mm-link:hover, [dir="rtl"] .mm-link:focus-visible{
+  padding-left:clamp(14px,1.6vw,22px) !important; padding-right:clamp(20px,2.4vw,32px) !important;
+}
+[dir="rtl"] .mm-link:hover .mm-link-text, [dir="rtl"] .mm-link:focus-visible .mm-link-text{ transform:none !important; }
+
+/* ACTIVE: soft frosted card (not harsh pure-white), with a quiet accent bar */
+.mm-link.is-active{
+  background:rgba(255,255,255,.10) !important;
+  border-bottom-color:transparent !important;
+  border-radius:14px !important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10) !important;
+  padding-left:clamp(20px,2.4vw,32px) !important;
+}
+.mm-link.is-active .mm-n{ color:rgba(255,255,255,.5) !important; }
+.mm-link.is-active .mm-link-text{ color:#fff !important; transform:none !important; }
+.mm-link.is-active::after{ color:rgba(255,255,255,.6) !important; }
+/* accent bar on the active room (left edge) instead of the small dot */
+.mm-link.is-active::before{
+  content:'' !important; display:block !important;
+  position:absolute !important; left:0 !important; top:18% !important; bottom:18% !important;
+  right:auto !important; transform:none !important;
+  width:3px !important; height:auto !important; border-radius:3px !important;
+  background:#fff !important; opacity:.85 !important; z-index:3 !important;
+}
+[dir="rtl"] .mm-link.is-active::before{ left:auto !important; right:0 !important; }
+
+/* --- 6) Footer: cleaner separation, calmer social row --- */
+.mm-foot{
+  border-top:1px solid rgba(255,255,255,.09) !important;
+  padding-top:clamp(20px,2.2vw,30px) !important;
+  margin-top:clamp(16px,2vw,28px) !important;
+}
+.mm-touch{ font-size:clamp(18px,1.9vw,22px) !important; color:rgba(255,255,255,.8) !important; }
+.mm-touch:hover{ color:#fff !important; }
+.mm-socs a{ color:rgba(255,255,255,.42) !important; }
+.mm-socs a:hover{ color:#fff !important; }
+
+/* --- 7) Cover card: a more premium, framed preview with depth --- */
+.mm-right{ padding:clamp(22px,2.6vw,46px) !important; }
+.mm-figure{
+  border-radius:20px !important;
+  box-shadow:0 60px 110px -50px rgba(0,0,0,.85),
+             inset 0 0 0 1px rgba(255,255,255,.08) !important;
+}
+.mm-cover{ padding:clamp(28px,2.8vw,42px) !important; }
+.mm-cover::before{
+  background:radial-gradient(130% 85% at 80% -10%, rgba(255,255,255,.24), transparent 58%) !important;
+}
+.mm-cover-mark{ opacity:.5 !important; }
+.mm-cover-title{
+  font-size:clamp(32px,3.4vw,48px) !important; letter-spacing:-.012em !important;
+  text-shadow:0 2px 30px rgba(0,0,0,.3) !important;
+}
+.mm-cover-note{ color:rgba(255,255,255,.86) !important; }
+
+/* --- 8) Light theme: invert the polish to soft ink-on-cream --- */
+:root[data-theme="light"] .mobile-menu{
+  background:
+    radial-gradient(120% 90% at 18% 0%, rgba(0,0,0,.03), transparent 60%),
+    var(--bg) !important;
+}
+:root[data-theme="light"] .mm-logo small,
+:root[data-theme="light"] .mm-top-label{ color:rgba(0,0,0,.42) !important; }
+:root[data-theme="light"] .mobile-menu-close{ border-color:rgba(0,0,0,.16) !important; color:rgba(0,0,0,.75) !important; }
+:root[data-theme="light"] .mobile-menu-close:hover{ background:var(--ink) !important; color:var(--bg) !important; border-color:var(--ink) !important; }
+:root[data-theme="light"] .mm-link{ border-bottom-color:rgba(0,0,0,.08) !important; }
+:root[data-theme="light"] .mm-link .mm-n{ color:rgba(0,0,0,.26) !important; }
+:root[data-theme="light"] .mm-link .mm-link-text{ color:rgba(0,0,0,.88) !important; }
+:root[data-theme="light"] .mm-link::after{ color:rgba(0,0,0,.4) !important; }
+:root[data-theme="light"] .mm-link:hover, :root[data-theme="light"] .mm-link:focus-visible{ background:rgba(0,0,0,.04) !important; }
+:root[data-theme="light"] .mm-link:hover .mm-link-text, :root[data-theme="light"] .mm-link:focus-visible .mm-link-text{ color:#000 !important; }
+:root[data-theme="light"] .mm-link:hover .mm-n, :root[data-theme="light"] .mm-link:focus-visible .mm-n{ color:rgba(0,0,0,.5) !important; }
+:root[data-theme="light"] .mm-link.is-active{ background:rgba(0,0,0,.06) !important; box-shadow:inset 0 0 0 1px rgba(0,0,0,.1) !important; }
+:root[data-theme="light"] .mm-link.is-active .mm-n{ color:rgba(0,0,0,.5) !important; }
+:root[data-theme="light"] .mm-link.is-active .mm-link-text{ color:#000 !important; }
+:root[data-theme="light"] .mm-link.is-active::before{ background:var(--ink) !important; }
+:root[data-theme="light"] .mm-foot{ border-top-color:rgba(0,0,0,.1) !important; }
+:root[data-theme="light"] .mm-touch{ color:rgba(0,0,0,.78) !important; }
+:root[data-theme="light"] .mm-touch:hover{ color:#000 !important; }
+:root[data-theme="light"] .mm-socs a{ color:rgba(0,0,0,.45) !important; }
+:root[data-theme="light"] .mm-socs a:hover{ color:#000 !important; }
+
+/* --- 9) Mobile (single column): tighten the nav, keep it airy --- */
+@media (max-width:860px){
+  .mm-left{ padding:clamp(24px,7vw,40px) clamp(20px,6vw,34px) clamp(24px,6vw,36px) !important; }
+  .mm-link{ padding:clamp(14px,4vw,20px) clamp(12px,3vw,16px) !important; }
+  .mm-link .mm-link-text{ font-size:clamp(26px,8vw,40px) !important; }
+  .mm-link .mm-n{ font-size:clamp(18px,5vw,26px) !important; }
+  .mm-link::after{ font-size:12px !important; }
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .mm-link, .mobile-menu-close{ transition:none !important; }
+}
