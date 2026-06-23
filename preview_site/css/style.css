@@ -7545,8 +7545,16 @@ html[lang] .splash-name {
   font-weight:400 !important; font-size:22px !important;
   font-feature-settings:normal !important; font-variant-ligatures:normal !important;
   display:inline-block !important; overflow:visible !important;
-  line-height:1.2 !important; max-height:none !important; vertical-align:baseline !important;
+  line-height:1.6 !important; max-height:none !important; vertical-align:middle !important;
+  clip:auto !important; clip-path:none !important;
+  padding-top:4px !important; padding-bottom:4px !important;
 }
+/* make the logo pill and the rail bar itself never clip the name */
+.rail-logo{
+  overflow:visible !important;
+  align-items:center !important;
+}
+.rail{ overflow:visible !important; }
 
 /* the centred ghost work-number: medium, soft and quiet (not loud) */
 @media (max-width:820px){
