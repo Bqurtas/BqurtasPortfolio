@@ -7539,14 +7539,13 @@ html[lang] .splash-name {
             the hover profile-card, now removed) · the ghost 699 is medium &
             faint, not loud
    ========================================================= */
-/* signature name back on the bar — Liana, but the script's under-swash is
-   clipped so no flourish/shape protrudes beneath it (menu + footer keep theirs) */
+/* signature name on the bar — Liana, full height visible */
 .rail-logo-name{
   font-family:'Liana','Fraunces',serif !important; font-style:normal !important;
   font-weight:400 !important; font-size:22px !important;
   font-feature-settings:normal !important; font-variant-ligatures:normal !important;
-  display:inline-block !important; overflow:hidden !important;
-  line-height:.74 !important; max-height:.8em !important; vertical-align:-.04em !important;
+  display:inline-block !important; overflow:visible !important;
+  line-height:1.2 !important; max-height:none !important; vertical-align:baseline !important;
 }
 
 /* the centred ghost work-number: medium, soft and quiet (not loud) */
