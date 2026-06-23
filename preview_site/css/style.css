@@ -8089,10 +8089,11 @@ html[lang] .splash-name {
   font-size:clamp(20px,2vw,26px) !important; letter-spacing:.01em !important;
   display:inline-flex !important; align-items:baseline !important; gap:9px !important;
 }
+/* the name keeps Barakat's own signature face (Liana) — never a system font */
 .mm-logo small{
-  font-family:'Manrope',sans-serif !important; font-style:normal !important;
-  font-size:11px !important; letter-spacing:.16em !important; text-transform:uppercase !important;
-  color:rgba(255,255,255,.4) !important;
+  font-family:'Liana','Fraunces',serif !important; font-style:normal !important;
+  font-size:17px !important; letter-spacing:0 !important; text-transform:none !important;
+  color:rgba(255,255,255,.62) !important;
 }
 .mm-top-label{
   font-size:10px !important; letter-spacing:.24em !important; text-transform:uppercase !important;
@@ -8251,4 +8252,304 @@ html[lang] .splash-name {
 /* respect reduced motion */
 @media (prefers-reduced-motion: reduce){
   .mm-link, .mobile-menu-close{ transition:none !important; }
+}
+
+/* =========================================================
+   v274 — ACTIVE ROOM = bold white card (bigger), nicer entrance &
+           hover choreography, more graceful menu direction.
+           Overrides v272/v273. Additive layer.
+   ========================================================= */
+
+/* --- 1) Smoother, classier entrance: links rise + un-blur in sequence --- */
+.mm-link{
+  opacity:0;
+  transform:translateY(34px);
+  filter:blur(6px);
+}
+.mobile-menu.is-open .mm-link{
+  opacity:1;
+  transform:translateY(0);
+  filter:blur(0);
+  transition:opacity .7s cubic-bezier(.22,1,.36,1),
+             transform .8s cubic-bezier(.22,1,.36,1),
+             filter .7s cubic-bezier(.22,1,.36,1),
+             background .5s cubic-bezier(.22,1,.36,1),
+             padding .55s cubic-bezier(.22,1,.36,1),
+             box-shadow .5s var(--ease) !important;
+}
+/* a touch more breathing room between each link's arrival */
+.mobile-menu.is-open .mm-link:nth-child(1){ transition-delay:.26s,.26s,.26s,0s,0s,0s !important; }
+.mobile-menu.is-open .mm-link:nth-child(2){ transition-delay:.34s,.34s,.34s,0s,0s,0s !important; }
+.mobile-menu.is-open .mm-link:nth-child(3){ transition-delay:.42s,.42s,.42s,0s,0s,0s !important; }
+.mobile-menu.is-open .mm-link:nth-child(4){ transition-delay:.50s,.50s,.50s,0s,0s,0s !important; }
+.mobile-menu.is-open .mm-link:nth-child(5){ transition-delay:.58s,.58s,.58s,0s,0s,0s !important; }
+.mobile-menu.is-open .mm-link:nth-child(6){ transition-delay:.66s,.66s,.66s,0s,0s,0s !important; }
+
+/* header / footer / cover ease in more gently */
+.mobile-menu.is-open .mm-top{ transition:opacity .7s var(--ease) .14s, transform .7s cubic-bezier(.22,1,.36,1) .14s !important; }
+.mobile-menu.is-open .mm-foot{ transition:opacity .7s var(--ease) .8s, transform .7s cubic-bezier(.22,1,.36,1) .8s !important; }
+.mobile-menu.is-open .mm-right{ transition:opacity 1s var(--ease) .1s !important; }
+.mobile-menu.is-open .mm-right img,
+.mobile-menu.is-open .mm-cover{ transition:transform 1.4s cubic-bezier(.22,1,.36,1) !important; }
+
+/* --- 2) Base room rows: roomy, with quiet hairlines --- */
+.mm-link{
+  padding:clamp(16px,2vw,26px) clamp(16px,1.8vw,24px) !important;
+  border-radius:16px !important;
+  border-bottom:1px solid rgba(255,255,255,.07) !important;
+}
+.mm-nav .mm-link:last-child{ border-bottom:none !important; }
+
+/* number + title sizes (base) */
+.mm-link .mm-n{
+  color:rgba(255,255,255,.28) !important;
+  font-size:clamp(20px,2.4vw,30px) !important;
+  transition:color .45s cubic-bezier(.22,1,.36,1) !important;
+}
+.mm-link .mm-link-text{
+  color:rgba(255,255,255,.9) !important;
+  font-size:clamp(25px,3.7vw,42px) !important; font-weight:500 !important;
+  transition:color .45s var(--ease), transform .55s cubic-bezier(.22,1,.36,1) !important;
+}
+.mm-link::after{
+  color:rgba(255,255,255,.34) !important;
+  font-size:13px !important;
+  transition:color .45s var(--ease) !important;
+}
+
+/* --- 3) HOVER (non-active): gentle highlight + nudge (no harsh fill) --- */
+.mm-link:hover, .mm-link:focus-visible{
+  background:rgba(255,255,255,.06) !important;
+  padding-left:clamp(22px,2.6vw,34px) !important;
+  box-shadow:none !important;
+  border-bottom-color:transparent !important;
+}
+.mm-link:hover .mm-n, .mm-link:focus-visible .mm-n{ color:rgba(255,255,255,.6) !important; }
+.mm-link:hover .mm-link-text, .mm-link:focus-visible .mm-link-text{
+  color:#fff !important; transform:translateX(6px) !important;
+}
+.mm-link:hover::after, .mm-link:focus-visible::after{ color:rgba(255,255,255,.6) !important; }
+[dir="rtl"] .mm-link:hover, [dir="rtl"] .mm-link:focus-visible{
+  padding-left:clamp(16px,1.8vw,24px) !important; padding-right:clamp(22px,2.6vw,34px) !important;
+}
+[dir="rtl"] .mm-link:hover .mm-link-text, [dir="rtl"] .mm-link:focus-visible .mm-link-text{
+  transform:translateX(-6px) !important;
+}
+
+/* --- 4) ACTIVE ROOM = bold SOLID WHITE card, bigger & elevated ---
+   NOTE: the v271 rule `.mm-link[data-route].is-active{background:transparent}`
+   has (0,3,0) specificity, so we MUST match that to win — hence [data-route]. */
+.mm-link[data-route].is-active,
+.mm-link.is-active{
+  background:#ffffff !important;
+  border-radius:18px !important;
+  border-bottom-color:transparent !important;
+  /* grows visibly above the rest */
+  transform:scale(1.04) !important;
+  padding:clamp(20px,2.5vw,32px) clamp(22px,2.4vw,32px) !important;
+  box-shadow:0 30px 70px -26px rgba(0,0,0,.6),
+             0 0 0 1px rgba(255,255,255,.6) !important;
+  z-index:4 !important;
+  transition:transform .6s cubic-bezier(.34,1.56,.64,1),
+             background .5s var(--ease),
+             box-shadow .55s var(--ease) !important;
+}
+[dir="rtl"] .mm-link.is-active{ transform:scale(1.04) !important; }
+/* black ink on the white card, larger title */
+.mm-link[data-route].is-active .mm-n,
+.mm-link.is-active .mm-n{ color:rgba(0,0,0,.4) !important; }
+.mm-link[data-route].is-active .mm-link-text,
+.mm-link.is-active .mm-link-text{
+  color:#0a0a0a !important; font-weight:600 !important;
+  font-size:clamp(28px,4.1vw,48px) !important;
+  transform:none !important;
+}
+.mm-link[data-route].is-active::after,
+.mm-link.is-active::after{ color:rgba(0,0,0,.5) !important; }
+/* drop the old accent bar / dot — the white card itself is the signal */
+.mm-link.is-active::before{ display:none !important; }
+
+/* keep the entrance offset/scale from fighting the active scale once open */
+.mobile-menu.is-open .mm-link.is-active{ transform:scale(1.04) !important; }
+
+/* --- 5) LIGHT THEME parity --- */
+:root[data-theme="light"] .mm-link{ border-bottom-color:rgba(0,0,0,.08) !important; }
+:root[data-theme="light"] .mm-link .mm-n{ color:rgba(0,0,0,.28) !important; }
+:root[data-theme="light"] .mm-link .mm-link-text{ color:rgba(0,0,0,.88) !important; }
+:root[data-theme="light"] .mm-link::after{ color:rgba(0,0,0,.4) !important; }
+:root[data-theme="light"] .mm-link:hover, :root[data-theme="light"] .mm-link:focus-visible{ background:rgba(0,0,0,.05) !important; }
+:root[data-theme="light"] .mm-link:hover .mm-link-text, :root[data-theme="light"] .mm-link:focus-visible .mm-link-text{ color:#000 !important; }
+:root[data-theme="light"] .mm-link:hover .mm-n, :root[data-theme="light"] .mm-link:focus-visible .mm-n{ color:rgba(0,0,0,.55) !important; }
+/* light theme: active card stays bold white with a hairline ring + ink text */
+:root[data-theme="light"] .mm-link.is-active{
+  background:#ffffff !important;
+  box-shadow:0 26px 60px -24px rgba(0,0,0,.32), 0 0 0 1px rgba(0,0,0,.08) !important;
+}
+:root[data-theme="light"] .mm-link.is-active .mm-n{ color:rgba(0,0,0,.4) !important; }
+:root[data-theme="light"] .mm-link.is-active .mm-link-text{ color:#0a0a0a !important; }
+:root[data-theme="light"] .mm-link.is-active::after{ color:rgba(0,0,0,.5) !important; }
+
+/* --- 6) Mobile: keep the white card readable, slightly less scale --- */
+@media (max-width:860px){
+  .mm-link{ padding:clamp(14px,4vw,20px) clamp(14px,3.4vw,18px) !important; }
+  .mm-link .mm-link-text{ font-size:clamp(26px,8vw,40px) !important; }
+  .mm-link.is-active{ transform:scale(1.025) !important; padding:clamp(16px,4.4vw,22px) clamp(16px,3.6vw,20px) !important; }
+  .mobile-menu.is-open .mm-link.is-active{ transform:scale(1.025) !important; }
+  .mm-link.is-active .mm-link-text{ font-size:clamp(28px,8.6vw,44px) !important; }
+}
+
+/* --- 7) Reduced motion: no blur / no scale spring --- */
+@media (prefers-reduced-motion: reduce){
+  .mm-link{ filter:none !important; transform:none !important; opacity:1 !important; }
+  .mm-link.is-active, .mobile-menu.is-open .mm-link.is-active{ transform:none !important; }
+}
+
+/* =========================================================
+   v275 — "Worked with" no longer scrolls + the two logo sections
+           sit closer together. (Static, tidy, centered chips.)
+   ========================================================= */
+
+/* 1) STOP the auto-scroll entirely (CSS animation + any slowed JS rate) */
+.logo-marquee-track{
+  animation:none !important;
+  transform:none !important;
+  /* wrap the chips into neat centered rows instead of one long strip */
+  flex-wrap:wrap !important;
+  justify-content:center !important;
+  width:auto !important;
+  gap:16px 18px !important;
+  white-space:normal !important;
+}
+.logo-marquee:hover .logo-marquee-track{ animation:none !important; }   /* no hover-slow either */
+
+/* 2) the marquee frame: drop the side-fade mask (only needed for scrolling)
+      and bring the next section much closer */
+.logo-marquee{
+  mask-image:none !important; -webkit-mask-image:none !important;
+  overflow:visible !important;
+  padding:20px 0 !important;
+  margin-bottom:28px !important;     /* was 80px — pull "Designed by hand" up */
+}
+
+/* 3) hide the duplicate half (the loop copy) so each logo shows once.
+      The track is built as [logos, logos] — 32 image chips / 22 text chips.
+      We reveal only the first half by capping with a flex line and hiding
+      anything past the original set via nth-child ranges. */
+.logo-marquee-track .logo-chip--img:nth-child(n+17){ display:none !important; }  /* 16 real WorkWith logos */
+.logo-marquee-track .logo-chip:not(.logo-chip--img):nth-child(n+12){ display:none !important; } /* 11 text fallbacks */
+
+/* 4) trim the big top gap on the second header so the pair reads as one block */
+.logos-section .logos-head + .logos-grid{ margin-top:8px !important; }
+.logos-section .logo-marquee + .logos-head{ margin-top:0 !important; }
+
+/* 5) tighten the section's own vertical padding a touch */
+.logos-section{ padding-top:64px !important; padding-bottom:64px !important; }
+
+@media (max-width:600px){
+  .logo-marquee{ margin-bottom:22px !important; }
+  .logo-marquee-track{ gap:12px 12px !important; }
+}
+
+/* =========================================================
+   v276 — menu refinements:
+   (1) the whole room CARD is the clickable link (clear pointer)
+   (2) the NAME keeps Barakat's Liana signature (handled in v273 fix)
+   (3) "Get in touch" (mm-touch) is back, visible & a touch smaller
+   (4) a soft decorative SHAPE sits under each room; on hover it
+       glides gently downward (no hard underline)
+   (5) slightly smaller room sizing overall
+   ========================================================= */
+
+/* --- (1) full card is the link --- */
+.mm-link{ cursor:pointer !important; text-decoration:none !important; overflow:hidden !important; }
+.mm-link *{ pointer-events:none !important; }   /* clicks always hit the <a>, never a child */
+
+/* --- (5) gentler, slightly smaller room sizing --- */
+.mm-link{ padding:clamp(13px,1.7vw,21px) clamp(15px,1.7vw,22px) !important; }
+.mm-link .mm-link-text{ font-size:clamp(22px,3.2vw,36px) !important; }
+.mm-link .mm-n{ font-size:clamp(18px,2.1vw,26px) !important; }
+.mm-link.is-active{
+  transform:scale(1.03) !important;
+  padding:clamp(16px,2vw,26px) clamp(18px,2vw,28px) !important;
+}
+.mobile-menu.is-open .mm-link.is-active{ transform:scale(1.03) !important; }
+.mm-link.is-active .mm-link-text{ font-size:clamp(25px,3.6vw,42px) !important; }
+
+/* --- (4) the soft SHAPE under each room ----------------------------------
+   A wide, blurred pill sits just below the row, hidden above it. On hover /
+   active it eases down into view — a gentle "shape" rather than a line. */
+.mm-link::after{ /* keep the subtitle, but make room for the shape below it */
+  margin-bottom:10px !important;
+}
+.mm-link .mm-shape{
+  content:'' ;
+  position:absolute !important;
+  left:clamp(15px,1.7vw,22px) !important; right:clamp(15px,1.7vw,22px) !important;
+  bottom:6px !important;
+  height:10px !important;
+  border-radius:999px !important;
+  background:linear-gradient(90deg,
+              rgba(255,255,255,0) 0%,
+              rgba(255,255,255,.55) 22%,
+              rgba(255,255,255,.9) 50%,
+              rgba(255,255,255,.55) 78%,
+              rgba(255,255,255,0) 100%) !important;
+  filter:blur(.4px) !important;
+  opacity:0 !important;
+  transform:translateY(-14px) scaleX(.6) !important;   /* tucked up, narrow */
+  transform-origin:center !important;
+  transition:opacity .55s cubic-bezier(.22,1,.36,1),
+             transform .7s cubic-bezier(.22,1,.36,1) !important;
+  pointer-events:none !important;
+  z-index:2 !important;
+}
+/* on hover / active: the shape glides softly down & spreads */
+.mm-link:hover .mm-shape,
+.mm-link:focus-visible .mm-shape{
+  opacity:.85 !important;
+  transform:translateY(0) scaleX(1) !important;
+}
+.mm-link.is-active .mm-shape{
+  opacity:1 !important;
+  transform:translateY(0) scaleX(1) !important;
+  background:linear-gradient(90deg,
+              rgba(0,0,0,0) 0%,
+              rgba(0,0,0,.28) 24%,
+              rgba(0,0,0,.5) 50%,
+              rgba(0,0,0,.28) 76%,
+              rgba(0,0,0,0) 100%) !important;   /* dark shape reads on the white card */
+}
+/* light theme: shapes are ink-toned */
+:root[data-theme="light"] .mm-link .mm-shape{
+  background:linear-gradient(90deg,
+              rgba(0,0,0,0) 0%, rgba(0,0,0,.32) 22%, rgba(0,0,0,.6) 50%,
+              rgba(0,0,0,.32) 78%, rgba(0,0,0,0) 100%) !important;
+}
+
+/* --- (3) bring back "Get in touch" — clearly visible, a touch smaller --- */
+.mm-foot{ display:flex !important; opacity:1 !important; }
+.mobile-menu.is-open .mm-foot{ opacity:1 !important; }
+.mm-touch{
+  display:inline-flex !important;
+  font-family:'Fraunces',serif !important; font-style:italic !important;
+  font-size:clamp(15px,1.5vw,18px) !important;       /* smaller than before */
+  color:rgba(255,255,255,.78) !important;
+  gap:9px !important; align-items:center !important;
+  padding:9px 16px !important; border-radius:999px !important;
+  border:1px solid rgba(255,255,255,.22) !important;
+  transition:gap .3s var(--ease), color .3s var(--ease),
+             background .35s var(--ease), border-color .35s var(--ease) !important;
+}
+.mm-touch i{ display:inline !important; font-size:.9em !important; }
+.mm-touch:hover{
+  gap:13px !important; color:#0f0f0f !important;
+  background:#fff !important; border-color:#fff !important;
+}
+:root[data-theme="light"] .mm-touch{ color:rgba(0,0,0,.78) !important; border-color:rgba(0,0,0,.2) !important; }
+:root[data-theme="light"] .mm-touch:hover{ color:#fff !important; background:var(--ink) !important; border-color:var(--ink) !important; }
+
+/* reduced motion: shapes just fade, no glide */
+@media (prefers-reduced-motion: reduce){
+  .mm-link .mm-shape{ transition:opacity .3s ease !important; transform:none !important; }
+  .mm-link:hover .mm-shape, .mm-link.is-active .mm-shape{ transform:none !important; }
 }
