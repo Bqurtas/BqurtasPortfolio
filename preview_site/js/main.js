@@ -943,8 +943,9 @@ document.addEventListener('DOMContentLoaded', () => {
       );
       const overMagnet = e.target.closest(MAGNET);
       const overZoom = e.target.closest('.cert-item');   // certificates keep the system zoom cursor
+      const overHide = e.target.closest('#railLogo, .rail-logo, .profile-card');  // no custom-cursor shape over the wordmark / profile card
       const overLink = e.target.closest('a, button, .tab, input, select, textarea, .service, .stat, .logo-mark, .logo-chip, .index-row');
-      magnet = (!overCard && overMagnet) ? overMagnet : null;
+      magnet = (!overCard && overMagnet && !overHide) ? overMagnet : null;
       ring.classList.toggle('is-open',   !!overCard && !overZoom);
       ring.classList.toggle('is-magnet', !overCard && !!overMagnet);
       ring.classList.toggle('is-hover',  !overCard && !overMagnet && !!overLink);
@@ -959,8 +960,8 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (ringLabel) {
         ringLabel.textContent = 'Open';
       }
-      dot.style.opacity  = (overCard || overZoom) ? '0' : '';
-      ring.style.opacity = overZoom ? '0' : '';
+      dot.style.opacity  = (overCard || overZoom || overHide) ? '0' : '';
+      ring.style.opacity = (overZoom || overHide) ? '0' : '';
     });
     document.addEventListener('mousedown', () => ring.classList.add('is-press'));
     document.addEventListener('mouseup',   () => ring.classList.remove('is-press'));

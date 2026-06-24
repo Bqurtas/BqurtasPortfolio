@@ -7539,8 +7539,7 @@ html[lang] .splash-name {
             the hover profile-card, now removed) · the ghost 699 is medium &
             faint, not loud
    ========================================================= */
-<<<<<<< Updated upstream
-/* signature name on the bar — Liana, perfectly baseline-aligned with Bq. */
+/* signature name on the bar — Liana, shown in full (no clipping, not cut) */
 .rail-logo-name{
   font-family:'Liana','Fraunces',serif !important; font-style:normal !important;
   font-weight:400 !important; font-size:22px !important;
@@ -7550,13 +7549,6 @@ html[lang] .splash-name {
   padding:0 !important; margin:0 !important;
   position:relative !important; top:0px !important;
   clip:auto !important; clip-path:none !important;
-=======
-/* signature name on the bar — Liana, shown in full (no clipping, not cut) */
-.rail-logo-name{
-  font-family:'Liana','Fraunces',serif !important; font-style:normal !important;
-  font-weight:400 !important; font-size:22px !important;
-  overflow:visible !important; max-height:none !important; line-height:1 !important;
->>>>>>> Stashed changes
 }
 /* logo: baseline alignment so Bq. and the script name share the same text baseline */
 .rail-logo{
@@ -8260,3 +8252,56 @@ html[lang] .splash-name {
 @media (prefers-reduced-motion: reduce){
   .mm-link, .mobile-menu-close{ transition:none !important; }
 }
+
+/* =========================================================
+   v278 — Menu: COLOURED room cards + strictly black & white dividers.
+   The brief: the divider lines stay neutral (black & white, no colour),
+   but each room card fills with its own colour on hover / active
+   (Strida-style), with white text on the fill.
+   Also: hide the custom cursor (dot + ring) over the wordmark / profile
+   card — the "shape" complaint — and show the native pointer there.
+   ========================================================= */
+
+/* --- dividers: strictly neutral black & white (no colour bleed) --- */
+.mm-link{ border-bottom:1px solid rgba(255,255,255,.08) !important; }
+.mm-nav .mm-link:last-child{ border-bottom:none !important; }
+:root[data-theme="light"] .mm-link{ border-bottom-color:rgba(0,0,0,.08) !important; }
+
+/* --- COLOURED cards on hover + active (per room) --- */
+.mm-link[data-route="design"]:hover,     .mm-link[data-route="design"].is-active{     background:#b65f3f !important; }
+.mm-link[data-route="work"]:hover,        .mm-link[data-route="work"].is-active{        background:#2c5d6e !important; }
+.mm-link[data-route="brandboard"]:hover,  .mm-link[data-route="brandboard"].is-active{  background:#69744d !important; }
+.mm-link[data-route="blog"]:hover,        .mm-link[data-route="blog"].is-active{        background:#66456e !important; }
+.mm-link[data-route="bio"]:hover,         .mm-link[data-route="bio"].is-active{         background:#b08a4a !important; }
+.mm-link[data-route="contact"]:hover,     .mm-link[data-route="contact"].is-active{     background:#46464b !important; }
+
+/* the coloured card: rounded, soft depth, hairline hidden under the fill */
+.mm-link:hover, .mm-link:focus-visible, .mm-link.is-active{
+  border-radius:14px !important;
+  border-bottom-color:transparent !important;
+  box-shadow:0 14px 40px -18px rgba(0,0,0,.55) !important;
+}
+
+/* white text reads cleanly on every room colour (hover + active) */
+.mm-link:hover .mm-n,         .mm-link.is-active .mm-n,         .mm-link:focus-visible .mm-n{         color:rgba(255,255,255,.72) !important; }
+.mm-link:hover .mm-link-text, .mm-link.is-active .mm-link-text, .mm-link:focus-visible .mm-link-text{ color:#fff !important; transform:none !important; }
+.mm-link:hover::after,        .mm-link.is-active::after,        .mm-link:focus-visible::after{        color:rgba(255,255,255,.8) !important; }
+
+/* active accent bar stays a subtle white notch on the colour */
+.mm-link.is-active::before{ background:#fff !important; opacity:.9 !important; }
+
+/* light theme: same coloured cards, white text still reads on the fills */
+:root[data-theme="light"] .mm-link:hover .mm-link-text,
+:root[data-theme="light"] .mm-link.is-active .mm-link-text{ color:#fff !important; }
+:root[data-theme="light"] .mm-link:hover .mm-n,
+:root[data-theme="light"] .mm-link.is-active .mm-n{ color:rgba(255,255,255,.72) !important; }
+:root[data-theme="light"] .mm-link:hover::after,
+:root[data-theme="light"] .mm-link.is-active::after{ color:rgba(255,255,255,.8) !important; }
+:root[data-theme="light"] .mm-link.is-active::before{ background:#fff !important; }
+
+/* --- custom cursor never paints a dot/ring over the wordmark / profile card;
+       show the native pointer there instead (JS hides the custom one) --- */
+.rail-logo, .rail-logo *,
+.rail-logo-mark, .rail-logo-name{ cursor:pointer !important; }
+.profile-card{ cursor:auto !important; }
+.profile-card-btn, .profile-card a{ cursor:pointer !important; }
