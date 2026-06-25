@@ -8793,3 +8793,32 @@ html .splash-name, html[lang] .splash-name,
   .logos-grid .logo-mark--img{ height:84px !important; }
   .logo-marquee{ margin-top:4px !important; }
 }
+
+/* =========================================================
+   v284 — (1) "Get in touch" is always reachable: the room list scrolls,
+          the footer stays pinned, and it reveals sooner; (2) the Design
+          Room card overlaps & rises over the hero (desktop + mobile);
+          (3) hand-drawn logos bigger again, with "A short note" + the logos
+          flowing as one continuous section.
+   ========================================================= */
+
+/* ---------- 1) menu: pin the footer, let the room list scroll, reveal sooner ---------- */
+.mm-left{ height:100dvh !important; display:flex !important; flex-direction:column !important; }
+.mm-nav{ flex:1 1 auto !important; min-height:0 !important; overflow-y:auto !important; -webkit-overflow-scrolling:touch; }
+.mm-foot{ flex:0 0 auto !important; }
+.mobile-menu.is-open .mm-foot{ transition-delay:.26s !important; }
+.mobile-menu.is-open .mm-foot,
+.mm-foot{ visibility:visible !important; }
+
+/* ---------- 2) Design Room overlaps the hero and rises over it like a card ---------- */
+#design > .section.work{ margin-top:calc(-1 * clamp(30px, 5vh, 58px)) !important; }
+
+/* ---------- 3) bigger hand-drawn logos; "A short note" + logos = one flowing section ---------- */
+@media (min-width:821px){
+  .logos-grid .logo-mark--img{ height:138px !important; padding:6px !important; }
+  .logos-grid{ gap:22px 26px !important; }
+  /* no snap between them — they read as one continuous block */
+  #design > .bio-teaser, #design > .logos-section{ scroll-snap-align:none !important; }
+}
+.bio-teaser{ padding-bottom:clamp(24px,3vh,36px) !important; }
+.logos-section{ padding-top:clamp(24px,3vh,36px) !important; }
