@@ -8670,7 +8670,84 @@ html .splash-name, html[lang] .splash-name,
   box-shadow:0 -30px 56px -30px rgba(0,0,0,.5);
 }
 :root[data-theme="dark"] #design > .section.work{ box-shadow:0 -30px 60px -30px rgba(0,0,0,.75); }
-/* on mobile the home hero stays pinned, so the card visibly slides up over it */
-@media (max-width:820px){
-  #design > .hero{ position:sticky !important; top:0 !important; z-index:1 !important; }
+/* NOTE: the hero is deliberately NOT sticky — a sticky hero stayed pinned behind
+   the whole room and re-appeared through later sections. The work card simply
+   rises over it with its rounded top + shadow as you scroll. */
+
+/* =========================================================
+   v282 — (1) splash name never clips on mobile; (2) the active room in the
+          menu is a WHITE card (no colour); (3) every menu cover is the
+          site's near-black; (4) a black-&-white avatar + "Graphic Designer"
+          beside the wordmark, in both the menu screen and the top bar.
+   ========================================================= */
+
+/* ---------- 1) SPLASH: fit the one-line name on any phone, never clip ---------- */
+.splash-inner{ overflow:visible !important; max-width:96vw !important; }
+@media (max-width:600px){
+  html .splash-name, html[lang] .splash-name,
+  :root[lang] .splash-name, :root[lang="ku"] .splash-name, :root[lang="ar"] .splash-name{
+    font-size:clamp(26px, 8vw, 48px) !important;
+  }
+  .splash-inner{ width:min(94vw, 420px) !important; }
+  .splash-line{ width:min(200px, 56vw) !important; }
 }
+
+/* ---------- 2) MENU: the active room is a WHITE card (colour retired) ---------- */
+.mm-link.is-active,
+.mm-link[data-route].is-active{
+  background:#ffffff !important;
+  box-shadow:0 12px 36px -14px rgba(0,0,0,.55) !important;
+  border-bottom-color:transparent !important; border-radius:14px !important;
+}
+.mm-link.is-active .mm-n{ color:rgba(0,0,0,.42) !important; }
+.mm-link.is-active .mm-link-text{ color:#0a0a0a !important; }
+.mm-link.is-active::after{ color:rgba(0,0,0,.5) !important; }
+.mm-link.is-active::before{ background:#0a0a0a !important; opacity:.6 !important; }
+/* light-theme menu is cream → the active card flips to ink for contrast */
+:root[data-theme="light"] .mm-link.is-active,
+:root[data-theme="light"] .mm-link[data-route].is-active{ background:var(--ink) !important; }
+:root[data-theme="light"] .mm-link.is-active .mm-n{ color:rgba(255,255,255,.5) !important; }
+:root[data-theme="light"] .mm-link.is-active .mm-link-text{ color:#fff !important; }
+:root[data-theme="light"] .mm-link.is-active::after{ color:rgba(255,255,255,.6) !important; }
+:root[data-theme="light"] .mm-link.is-active::before{ background:#fff !important; }
+
+/* ---------- 3) MENU covers: all the site's near-black (no per-room colour) ---------- */
+.mm-figure[data-room] .mm-cover,
+.mm-figure .mm-cover{
+  --cov-1:#1b1b1b !important; --cov-2:#0c0c0c !important;
+  background:linear-gradient(157deg, #1b1b1b 0%, #0c0c0c 100%) !important;
+}
+
+/* ---------- 4) Avatar (B&W) + "Graphic Designer" beside the wordmark ---------- */
+/* menu screen header */
+.mm-logo{ display:flex !important; align-items:center !important; gap:12px !important; }
+.mm-logo-av{
+  width:46px !important; height:46px !important; border-radius:50% !important; object-fit:cover !important;
+  filter:grayscale(1) contrast(1.04) !important; border:1px solid rgba(255,255,255,.2) !important;
+  flex:0 0 auto !important; display:block !important;
+}
+.mm-logo span.mm-logo-txt{ display:flex !important; flex-direction:column !important; line-height:1.06 !important; gap:2px !important; }
+.mm-logo small.mm-logo-name{ transform:none !important; display:block !important; }
+.mm-logo span.mm-logo-role{
+  display:block !important;
+  font-family:'Manrope',sans-serif !important; font-size:10px !important; font-weight:600 !important;
+  letter-spacing:.15em !important; text-transform:uppercase !important; color:rgba(255,255,255,.5) !important;
+}
+:root[data-theme="light"] .mm-logo-av{ border-color:rgba(0,0,0,.18) !important; }
+:root[data-theme="light"] .mm-logo-role{ color:rgba(0,0,0,.5) !important; }
+
+/* top bar wordmark */
+.rail-logo{ display:flex !important; align-items:center !important; gap:11px !important; }
+.rail-logo-av{
+  width:38px !important; height:38px !important; border-radius:50% !important; object-fit:cover !important;
+  filter:grayscale(1) contrast(1.04) !important; border:1px solid var(--line) !important;
+  flex:0 0 auto !important; display:block !important;
+}
+.rail-logo-txt{ display:flex !important; flex-direction:column !important; line-height:1.02 !important; }
+.rail-logo-name{ transform:none !important; }   /* avatar layout centres it now */
+.rail-logo-role{
+  font-family:'Manrope',sans-serif !important; font-size:9px !important; font-weight:600 !important;
+  letter-spacing:.15em !important; text-transform:uppercase !important; color:var(--ink-muted) !important;
+  white-space:nowrap !important;
+}
+@media (max-width:820px){ .rail-logo-av, .rail-logo-role{ display:none !important; } }  /* rail is hidden on mobile anyway */
