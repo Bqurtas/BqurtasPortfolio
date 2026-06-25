@@ -8305,3 +8305,167 @@ html[lang] .splash-name {
 .rail-logo-mark, .rail-logo-name{ cursor:pointer !important; }
 .profile-card{ cursor:auto !important; }
 .profile-card-btn, .profile-card a{ cursor:pointer !important; }
+
+/* =========================================================
+   v279 — (1) "Bq" abbreviation retired everywhere → full "Barakat Qurtas"
+              in the Liana signature (splash, rail, menu, footer, cover);
+          (2) splash shows the name on TWO lines, no loading bar;
+          (3) "What I do" becomes a hover-revealed INDEX + detail pane (B&W);
+          (4) menu cover text neutralised to pure B&W;
+          (5) mobile: heroes lose the big top gap, calmer rhythm.
+   ========================================================= */
+
+/* ---------- 1) SPLASH: two-line Liana name, no "Bq." mark, no loading bar ---------- */
+.splash-inner::before{ content:none !important; display:none !important; }   /* retire the big "Bq." flourish */
+html .splash-name,
+html[lang] .splash-name,
+:root[lang] .splash-name,
+:root[lang="ku"] .splash-name,
+:root[lang="ar"] .splash-name{
+  display:flex !important; flex-direction:column !important; align-items:center !important;
+  gap:0 !important; margin:0 !important; line-height:.9 !important;
+  font-family:'Liana','Fraunces',serif !important;
+}
+.splash-name-l{
+  font-family:'Liana','Fraunces',serif !important; font-style:normal !important;
+  font-weight:400 !important; color:var(--ink) !important;
+  font-size:clamp(48px, 13vw, 104px) !important; line-height:.94 !important; letter-spacing:0 !important;
+}
+.splash-line, .splash-line-fill, .splash-pct{ display:none !important; }   /* the line goes */
+
+/* ---------- 2) RAIL wordmark: only the full Liana name (mark removed in HTML) ---------- */
+.rail-logo{ gap:0 !important; }
+.rail-logo-mark{ display:none !important; }
+
+/* ---------- 3) MENU header logo: just "Barakat Qurtas" in Liana, pure white ---------- */
+.mm-logo{ color:#fff !important; }
+.mm-logo span{ display:none !important; }
+.mm-logo small{
+  display:inline !important; color:#fff !important; opacity:1 !important;
+  font-family:'Liana','Fraunces',serif !important; font-style:normal !important;
+  font-weight:400 !important; text-transform:none !important; letter-spacing:0 !important;
+  font-size:clamp(20px, 2.6vw, 26px) !important;
+}
+
+/* ---------- 4) FOOTER signature: "Barakat Qurtas" in Liana, B&W (was gold "Bq.") ---------- */
+:root[lang] .footer-bq{ font-family:'Liana','Fraunces',serif !important; }   /* beat the Fraunces force at the top of the file */
+.footer-bq,
+.footer-lead .footer-bq,
+.footer-signature .footer-bq{
+  font-family:'Liana','Fraunces',serif !important; font-style:normal !important;
+  font-weight:400 !important; letter-spacing:0 !important;
+  color:var(--ink) !important;                            /* B&W signature, adapts to light/dark theme */
+  opacity:.9 !important;
+  font-size:clamp(30px, 5.4vw, 52px) !important; line-height:1.05 !important;
+}
+.footer-bq::after{ content:none !important; }            /* drop the gold period */
+
+/* ---------- MENU cover: full Liana name + strictly B&W text (no warm cream) ---------- */
+.mm-cover-mark{
+  font-family:'Liana','Fraunces',serif !important; font-style:normal !important;
+  font-size:clamp(22px, 2.6vw, 30px) !important; color:rgba(255,255,255,.5) !important;
+}
+.mm-cover-mark::after{ content:none !important; }
+.mm-cover-eyebrow, .mm-cover-no{ color:rgba(255,255,255,.72) !important; }
+.mm-cover-note{ color:rgba(255,255,255,.84) !important; }
+.mm-cover-base{ color:rgba(255,255,255,.55) !important; }
+
+/* =========================================================
+   "WHAT I DO" → an INDEX that reveals its detail on hover (no downward
+   accordion), as a calm two-column black-&-white directory.
+   Desktop only; mobile keeps the original tap-to-expand accordion.
+   ========================================================= */
+@media (min-width:821px){
+  .service-accordion{
+    position:relative !important; display:block !important;
+    padding-right:46% !important; border-top:1px solid var(--line) !important;
+  }
+  [dir="rtl"] .service-accordion{ padding-right:0 !important; padding-left:46% !important; }
+
+  /* each room = a clean index row on the left; positioning context is the accordion */
+  .service-panel{
+    position:static !important; background:none !important;
+    border-bottom:1px solid var(--line) !important; overflow:visible !important;
+  }
+  .service-panel::after{ display:none !important; }   /* remove the giant ghost number */
+
+  /* trigger = number + name only (icon & +/- toggle hidden) */
+  .service-trigger{
+    display:flex !important; align-items:baseline !important; gap:18px !important;
+    width:100% !important; padding:clamp(15px,1.9vw,26px) 0 !important;
+    background:none !important; border:0 !important; text-align:left !important;
+    transition:padding-left .4s var(--ease) !important;
+  }
+  .service-icon, .service-toggle{ display:none !important; }
+  .service-index{
+    font-family:'Manrope',sans-serif !important; font-size:13px !important;
+    color:var(--ink-muted) !important; background:none !important; border:0 !important;
+    padding:0 !important; min-width:24px !important; letter-spacing:.04em !important;
+    transition:color .3s var(--ease) !important;
+  }
+  .service-name{
+    font-family:'Fraunces',serif !important; font-style:normal !important; font-weight:400 !important;
+    font-size:clamp(22px,2.6vw,34px) !important; line-height:1.06 !important;
+    color:var(--ink-soft) !important; transition:color .3s var(--ease) !important;
+  }
+  .service-panel:hover .service-name,
+  .service-panel.is-active .service-name,
+  .service-panel:hover .service-index,
+  .service-panel.is-active .service-index{ color:var(--ink) !important; }
+  .service-panel.is-active .service-trigger{ padding-left:14px !important; }
+  [dir="rtl"] .service-panel.is-active .service-trigger{ padding-left:0 !important; padding-right:14px !important; }
+
+  /* the detail pane — pinned to the right, only the active room's detail shows */
+  .service-detail{
+    position:absolute !important; top:0 !important; right:0 !important;
+    width:42% !important; height:100% !important;
+    display:flex !important; align-items:center !important;
+    grid-template-rows:none !important; overflow:visible !important;
+    opacity:0 !important; visibility:hidden !important; pointer-events:none !important;
+    transition:opacity .45s var(--ease) !important;
+    border-left:1px solid var(--line) !important;
+    padding:0 0 0 clamp(28px,3.4vw,56px) !important;
+  }
+  [dir="rtl"] .service-detail{
+    right:auto !important; left:0 !important;
+    border-left:0 !important; border-right:1px solid var(--line) !important;
+    padding:0 clamp(28px,3.4vw,56px) 0 0 !important;
+  }
+  .service-panel.is-active .service-detail{ opacity:1 !important; visibility:visible !important; pointer-events:auto !important; }
+
+  .service-detail-inner{ display:block !important; padding:0 !important; }
+  .service-detail-inner p{
+    color:var(--ink-soft) !important; margin:0 0 22px !important;
+    font-size:clamp(15px,1.15vw,18px) !important; line-height:1.6 !important; max-width:42ch !important;
+  }
+  .service-detail-inner ul{
+    list-style:none !important; margin:0 !important; padding:0 !important;
+    display:flex !important; flex-direction:column !important; gap:11px !important;
+  }
+  .service-detail-inner li{
+    color:var(--ink) !important; font-size:14px !important; border:0 !important;
+    padding-left:22px !important; position:relative !important;
+  }
+  [dir="rtl"] .service-detail-inner li{ padding-left:0 !important; padding-right:22px !important; }
+  .service-detail-inner li::before{
+    content:'' !important; position:absolute !important; left:0 !important; top:.64em !important;
+    width:11px !important; height:1px !important; background:var(--ink) !important;
+  }
+  [dir="rtl"] .service-detail-inner li::before{ left:auto !important; right:0 !important; }
+}
+
+/* =========================================================
+   MOBILE: trim the big empty space at the top of every room/hero,
+   for a calmer rhythm and a smoother (snap-free) scroll.
+   ========================================================= */
+@media (max-width:820px){
+  .hero, .room-hero, .pencemor-hero{
+    min-height:auto !important;                    /* content-sized → no big empty band */
+    justify-content:flex-start !important;         /* content rides near the top, not floating in the middle */
+    padding-top:clamp(40px, 7vh, 72px) !important;
+    padding-bottom:clamp(40px, 7vh, 64px) !important;
+    scroll-snap-align:none !important;             /* belt-and-braces: never snap on touch */
+  }
+  /* the home hero keeps a little more presence (big wordmark + avatar) */
+  .hero{ min-height:min(74vh, 560px) !important; justify-content:center !important; }
+}
