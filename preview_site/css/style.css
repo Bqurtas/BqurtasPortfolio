@@ -8469,3 +8469,112 @@ html[lang] .splash-name,
   /* the home hero keeps a little more presence (big wordmark + avatar) */
   .hero{ min-height:min(74vh, 560px) !important; justify-content:center !important; }
 }
+
+/* =========================================================
+   v280 — (1) mobile: kill the top empty band on every room + tighten the
+              vertical rhythm so nothing needs an extra scroll;
+          (2) footer: smaller signature, big italic email, balanced base;
+          (3) "What I do" → Strida-style cards (big number, bold active
+              card) in black & white;
+          (4) menu dividers kept clean black & white.
+   ========================================================= */
+
+/* ---------- MOBILE: no empty band at the top of any hero/room ---------- */
+@media (max-width:820px){
+  .hero, .room-hero, .pencemor-hero{
+    min-height:0 !important;
+    justify-content:flex-start !important;
+    padding-top:clamp(14px, 2.4vh, 26px) !important;     /* content rides right at the top */
+    padding-bottom:clamp(30px, 5vh, 50px) !important;
+  }
+  /* tighten the long editorial sections so they don't demand extra scroll */
+  .bio-teaser, .logos-section, .service-showcase, .practice-note{
+    padding-top:clamp(34px, 6vh, 52px) !important;
+    padding-bottom:clamp(34px, 6vh, 52px) !important;
+  }
+  .bio-teaser-grid{ gap:26px !important; }
+  .stats{ gap:14px !important; }
+  /* "Worked with" and "Designed by hand" sit close together — no gap to scroll past */
+  .logos-section .logo-marquee + .logos-head{ margin-top:clamp(20px,5vw,30px) !important; }
+  .logos-section .logos-head{ margin-bottom:14px !important; }
+  .logos-grid{ gap:10px !important; }
+}
+
+/* ---------- FOOTER: smaller signature, big italic email, balanced base ---------- */
+.footer-bq,
+.footer-lead .footer-bq,
+.footer-signature .footer-bq{
+  font-size:clamp(24px, 4vw, 38px) !important;           /* smaller signature */
+}
+.footer-email{
+  font-family:'Fraunces', serif !important;
+  font-style:italic !important;                          /* slanted, elegant */
+  font-size:clamp(20px, 2.6vw, 30px) !important;         /* stays big */
+  letter-spacing:0 !important;
+}
+@media (max-width:760px){
+  .footer-v249 .footer-bottom,
+  .footer-bottom{
+    flex-direction:column !important;
+    align-items:center !important;
+    text-align:center !important;
+    gap:14px !important;
+  }
+  .footer-bottom > *{ width:100% !important; justify-content:center !important; }
+  .footer-top-btn{ order:0 !important; justify-content:center !important; }
+}
+
+/* ---------- TOP BAR: optically centre the Liana wordmark with the menu bars + icons ---------- */
+/* the script sits a touch high in its em-box vs the geometric bars/icons → nudge down */
+.rail-logo-name{ transform:translateY(3px) !important; }
+.mm-top{ align-items:center !important; }
+.mm-logo small{ transform:translateY(2px) !important; }
+
+/* ---------- MENU dividers: kept strictly black & white, a touch clearer ---------- */
+.mm-link{ border-bottom-color:rgba(255,255,255,.10) !important; }
+.mm-nav .mm-link:last-child{ border-bottom-color:transparent !important; }
+:root[data-theme="light"] .mm-link{ border-bottom-color:rgba(0,0,0,.10) !important; }
+
+/* =========================================================
+   "WHAT I DO" → Strida-style index: each service is a card, the active one
+   is a bold filled card with a big number; detail pane stays on the right.
+   Strictly black & white. (desktop ≥821px)
+   ========================================================= */
+@media (min-width:821px){
+  .service-panel{ border-bottom:1px solid var(--line) !important; }
+  .service-trigger{
+    display:grid !important;
+    grid-template-columns:auto 1fr !important;
+    align-items:center !important; gap:clamp(18px,2vw,30px) !important;
+    width:100% !important; text-align:left !important;
+    padding:clamp(14px,1.6vw,22px) clamp(16px,1.7vw,24px) !important;
+    border-radius:18px !important; border:0 !important; background:none !important;
+    transition:background .45s var(--ease), color .35s var(--ease), padding .4s var(--ease) !important;
+  }
+  .service-index{
+    font-family:'Fraunces',serif !important; font-style:normal !important;
+    font-weight:300 !important; line-height:1 !important;
+    font-size:clamp(26px,2.8vw,40px) !important; color:var(--ink-muted) !important;
+    opacity:.55 !important; min-width:auto !important; letter-spacing:0 !important;
+    transition:font-size .4s var(--ease), color .35s var(--ease) !important;
+  }
+  .service-name{
+    font-family:'Fraunces',serif !important; font-style:normal !important; font-weight:400 !important;
+    font-size:clamp(22px,2.4vw,32px) !important; line-height:1.05 !important;
+    color:var(--ink-soft) !important; transition:color .35s var(--ease) !important;
+  }
+  .service-panel:hover:not(.is-active) .service-name{ color:var(--ink) !important; }
+  .service-panel:hover:not(.is-active) .service-index{ color:var(--ink-soft) !important; opacity:.8 !important; }
+
+  /* ACTIVE = bold filled card (B&W) with a big number, like Strida's yellow card */
+  .service-panel.is-active{ border-bottom-color:transparent !important; }
+  .service-panel.is-active .service-trigger{
+    background:var(--ink) !important;
+    box-shadow:0 18px 50px -22px rgba(0,0,0,.55) !important;
+    padding-top:clamp(20px,2.2vw,30px) !important; padding-bottom:clamp(20px,2.2vw,30px) !important;
+  }
+  .service-panel.is-active .service-index{
+    font-size:clamp(40px,4.6vw,68px) !important; color:var(--bg) !important; opacity:.5 !important;
+  }
+  .service-panel.is-active .service-name{ color:var(--bg) !important; }
+}

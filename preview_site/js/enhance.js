@@ -1065,7 +1065,7 @@
       [ $('#dashSideAv'), $('#dashMbarAv') ].forEach((av) => {
         if (!av) return;
         if (p.avatar) { av.style.backgroundImage = `url("${p.avatar}")`; av.classList.add('has-av'); av.textContent = ''; }
-        else { av.style.backgroundImage = ''; av.classList.remove('has-av'); av.textContent = 'Bq'; }
+        else { av.style.backgroundImage = ''; av.classList.remove('has-av'); av.textContent = 'BQ'; }
       });
     };
     const renderProfile = () => {
