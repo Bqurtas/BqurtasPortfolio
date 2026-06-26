@@ -9031,3 +9031,13 @@ body::before{
     gap:24px 26px !important;
   }
 }
+
+/* =========================================================
+   v289 — tighten the logos section: less air between each eyebrow and its
+   title, and between "Worked with" and "Designed by hand".
+   ========================================================= */
+.logos-section .logos-head{ gap:4px !important; margin-bottom:8px !important; }
+.logos-section .logos-head .section-num{ margin-top:0 !important; margin-bottom:0 !important; }
+.logos-section .logos-title{ margin-top:0 !important; margin-bottom:0 !important; }
+.logos-section .logo-marquee{ margin-top:8px !important; margin-bottom:0 !important; }
+.logos-section .logo-marquee + .logos-head{ margin-top:30px !important; }
