@@ -8945,16 +8945,15 @@ html .splash-name, html[lang] .splash-name,
   text-transform:uppercase !important; color:var(--ink-muted) !important; margin-top:7px !important;
 }
 
-/* ---------- 3) faint soft-light dot grid behind everything ---------- */
-body::after{
-  content:'' !important; position:fixed !important; inset:0 !important; z-index:0 !important;
+/* ---------- 3) faint dot grid BEHIND everything (z-index:-1 so it never covers
+       content and never disturbs the fixed menu / dock / splash overlays) ---------- */
+body::before{
+  content:'' !important; position:fixed !important; inset:0 !important; z-index:-1 !important;
   pointer-events:none !important;
   background-image:radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1.4px) !important;
   background-size:26px 26px !important;
-  mix-blend-mode:soft-light !important; opacity:.7 !important;
 }
-:root[data-theme="light"] body::after{ background-image:radial-gradient(circle, rgba(0,0,0,.05) 1px, transparent 1.4px) !important; }
-.rail, .mobilebar, .mobile-menu, .splash, .footer, main, .main{ position:relative; z-index:1; }
+:root[data-theme="light"] body::before{ background-image:radial-gradient(circle, rgba(0,0,0,.045) 1px, transparent 1.4px) !important; }
 
 /* ---------- 4) snapped sections never tuck under the fixed top bar ---------- */
 @media (min-width:821px){
@@ -8980,3 +8979,23 @@ body::after{
   .service-detail-inner li::before{ top:auto !important; position:static !important; margin-right:12px !important; flex:0 0 auto !important; }
   [dir="rtl"] .service-detail-inner li::before{ margin-right:0 !important; margin-left:12px !important; }
 }
+
+/* =========================================================
+   v286 — (1) mobile snap-scroll is active again; (2) the "What I do"
+          deliverable dividers match the menu room dividers exactly.
+   ========================================================= */
+
+/* ---------- 1) MOBILE: snap-scroll active (gentle proximity) ---------- */
+@media (max-width:820px){
+  html{ scroll-snap-type:y proximity !important; }
+  .hero, .room-hero, .pencemor-hero, .room > .section, .footer{
+    scroll-snap-align:start !important;
+  }
+}
+
+/* ---------- 2) deliverable dividers == menu room dividers ---------- */
+@media (min-width:821px){
+  .service-detail-inner li{ border-bottom:1px solid rgba(255,255,255,.10) !important; }
+  .service-detail-inner li:last-child{ border-bottom:0 !important; }
+}
+:root[data-theme="light"] .service-detail-inner li{ border-bottom-color:rgba(0,0,0,.10) !important; }
