@@ -8945,15 +8945,20 @@ html .splash-name, html[lang] .splash-name,
   text-transform:uppercase !important; color:var(--ink-muted) !important; margin-top:7px !important;
 }
 
-/* ---------- 3) faint dot grid BEHIND everything (z-index:-1 so it never covers
-       content and never disturbs the fixed menu / dock / splash overlays) ---------- */
-body::before{
+/* ---------- 3) faint dot grid BEHIND everything — on its OWN dedicated layer
+       (body::after) so it is ALWAYS on, on every room & section, on mobile as
+       well as desktop. It used to live on body::before, which it shared with the
+       pointer-spotlight (opacity:0 / shown on hover) — so the dots only appeared
+       on desktop hover and vanished under Reduce Motion. body::after is never
+       tied to that opacity and never hidden by Reduce Motion; z-index:-1 keeps
+       it behind all content and the fixed menu / dock / splash overlays. ---------- */
+body::after{
   content:'' !important; position:fixed !important; inset:0 !important; z-index:-1 !important;
-  pointer-events:none !important;
+  pointer-events:none !important; opacity:1 !important;
   background-image:radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1.4px) !important;
-  background-size:26px 26px !important;
+  background-size:26px 26px !important; background-position:0 0 !important;
 }
-:root[data-theme="light"] body::before{ background-image:radial-gradient(circle, rgba(0,0,0,.045) 1px, transparent 1.4px) !important; }
+:root[data-theme="light"] body::after{ background-image:radial-gradient(circle, rgba(0,0,0,.045) 1px, transparent 1.4px) !important; }
 
 /* ---------- 4) snapped sections never tuck under the fixed top bar ---------- */
 @media (min-width:821px){
@@ -9105,4 +9110,38 @@ body::before{
     background:color-mix(in srgb, var(--ink) 7%, transparent) !important;
     border-radius:14px !important; padding-left:12px !important; padding-right:12px !important;
   }
+}
+
+/* =========================================================
+   v293 — the fine dot grid now shows on EVERY room & section
+   (mobile + desktop). The grid moved to its own always-on layer
+   (body::after, above). Two opaque panels still painted over it — let
+   the texture come through them too. Cards/menus keep their own surfaces.
+   ========================================================= */
+
+/* the dots used to ride on body::before, which it shared with a dormant
+   pointer-spotlight. Now that the dots have their own layer (body::after),
+   body::before would revive that glow — keep it OFF, since the site already
+   has a custom cursor (dot + ring) and a third cursor-tracking effect would
+   clutter. (Flip this to re-enable the subtle pointer light.) */
+body::before{ display:none !important; }
+
+/* the home hero painted a solid --bg that hid the dots — make it
+   transparent so the global grid shows behind the wordmark too
+   (its faint film-grain ::before overlay stays untouched) */
+.hero{ background:transparent !important; }
+
+/* the Design room's PORTFOLIO panel used a solid --bg (same colour as the
+   page) that hid the dots — make it transparent so the global theme-aware
+   grid shows through it too (this is the portfolio you pointed out). The
+   work cards keep their own surfaces, so only the gaps get the texture. */
+#design .section.work{ background:transparent !important; }
+
+/* the footer is an always-CREAM panel (its --bg/--ink are flipped — dark text
+   on cream in both themes) — so it needs DARK dots, like the light-theme grid,
+   layered over its cream colour (white dots would be invisible here) */
+.footer{
+  background-image:radial-gradient(circle, rgba(0,0,0,.045) 1px, transparent 1.4px) !important;
+  background-size:26px 26px !important;
+  background-position:0 0 !important;
 }
