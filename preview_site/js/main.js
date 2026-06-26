@@ -943,13 +943,16 @@ document.addEventListener('DOMContentLoaded', () => {
       );
       const overMagnet = e.target.closest(MAGNET);
       const overZoom = e.target.closest('.cert-item');   // certificates keep the system zoom cursor
-      const overHide = e.target.closest('#railLogo, .rail-logo, .profile-card, #railMenu, .rail-menu, #menuToggle, .menu-toggle-btn');  // no custom-cursor shape over the wordmark / profile card / menu button
+      const overHide = e.target.closest('#railLogo, .rail-logo, .profile-card');  // no custom-cursor shape over the wordmark / profile card
+      const overMenuBtn = e.target.closest('#railMenu, .rail-menu, #menuToggle, .menu-toggle-btn');  // the hamburger gets a labelled "Menu" ring
       const overLink = e.target.closest('a, button, .tab, input, select, textarea, .service, .stat, .logo-mark, .logo-chip, .index-row');
       magnet = (!overCard && overMagnet && !overHide) ? overMagnet : null;
       ring.classList.toggle('is-open',   !!overCard && !overZoom);
-      ring.classList.toggle('is-magnet', !overCard && !!overMagnet);
-      ring.classList.toggle('is-hover',  !overCard && !overMagnet && !!overLink);
-      if (ringLabel && overCard) {
+      ring.classList.toggle('is-magnet', !overCard && !!overMagnet && !overMenuBtn);
+      ring.classList.toggle('is-hover',  (!overCard && !overMagnet && !!overLink) || !!overMenuBtn);
+      if (ringLabel && overMenuBtn) {
+        ringLabel.textContent = 'Menu';
+      } else if (ringLabel && overCard) {
         let label = 'Open';
         if (overCard.matches('.tab')) label = 'View';
         else if (overCard.matches('.software-chip')) label = 'Tool';

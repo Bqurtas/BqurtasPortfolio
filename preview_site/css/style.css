@@ -8916,3 +8916,67 @@ html .splash-name, html[lang] .splash-name,
   .logos-grid .logo-mark--img{ height:120px !important; width:auto !important; }
   .logo-marquee{ margin-top:2px !important; }
 }
+
+/* =========================================================
+   v285 — (1) Design Room NO LONGER overlaps the hero (reverted);
+          (2) splash is a calm chip: photo + smaller name + "Graphic
+          Designer"; (3) a faint soft-light dot grid in the background;
+          (4) snapped sections never hide under the top bar; (5) the
+          "What I do" detail reads as a refined menu-style card.
+   ========================================================= */
+
+/* ---------- 1) revert: the Design Room sits cleanly after the hero ---------- */
+#design > .section.work{
+  margin-top:0 !important;
+  border-top-left-radius:0 !important; border-top-right-radius:0 !important;
+  box-shadow:none !important;
+}
+
+/* ---------- 2) SPLASH = a quiet profile chip ---------- */
+.splash-logo{ display:block !important; }
+.splash-logo img{ width:74px !important; height:74px !important; filter:grayscale(1) contrast(1.04) !important; }
+html .splash-name, html[lang] .splash-name,
+:root[lang] .splash-name, :root[lang="ku"] .splash-name, :root[lang="ar"] .splash-name{
+  font-size:clamp(26px, 6.2vw, 50px) !important; margin-top:14px !important;
+}
+.splash-tag{
+  display:block !important; font-family:'Manrope',sans-serif !important;
+  font-size:10px !important; font-weight:600 !important; letter-spacing:.18em !important;
+  text-transform:uppercase !important; color:var(--ink-muted) !important; margin-top:7px !important;
+}
+
+/* ---------- 3) faint soft-light dot grid behind everything ---------- */
+body::after{
+  content:'' !important; position:fixed !important; inset:0 !important; z-index:0 !important;
+  pointer-events:none !important;
+  background-image:radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1.4px) !important;
+  background-size:26px 26px !important;
+  mix-blend-mode:soft-light !important; opacity:.7 !important;
+}
+:root[data-theme="light"] body::after{ background-image:radial-gradient(circle, rgba(0,0,0,.05) 1px, transparent 1.4px) !important; }
+.rail, .mobilebar, .mobile-menu, .splash, .footer, main, .main{ position:relative; z-index:1; }
+
+/* ---------- 4) snapped sections never tuck under the fixed top bar ---------- */
+@media (min-width:821px){
+  html{ scroll-padding-top:86px !important; }
+}
+
+/* ---------- 5) "What I do" detail = a refined menu-style card ---------- */
+@media (min-width:821px){
+  .service-detail-inner{
+    background:linear-gradient(155deg, color-mix(in srgb, var(--ink) 9%, transparent), color-mix(in srgb, var(--ink) 4%, transparent)) !important;
+    border:1px solid var(--line) !important; border-radius:22px !important;
+    padding:clamp(28px,2.6vw,40px) !important;
+    box-shadow:0 30px 70px -42px rgba(0,0,0,.6) !important;
+  }
+  .service-detail-inner p{ color:var(--ink) !important; font-family:'Fraunces',serif !important; font-size:clamp(16px,1.2vw,19px) !important; }
+  .service-detail-inner ul{ border-top:1px solid var(--line) !important; padding-top:16px !important; margin-top:18px !important; }
+  .service-detail-inner li{
+    display:flex !important; align-items:center !important;
+    padding:9px 0 !important; border-bottom:1px solid var(--line-soft) !important;
+    font-size:13.5px !important; color:var(--ink-soft) !important;
+  }
+  .service-detail-inner li:last-child{ border-bottom:0 !important; }
+  .service-detail-inner li::before{ top:auto !important; position:static !important; margin-right:12px !important; flex:0 0 auto !important; }
+  [dir="rtl"] .service-detail-inner li::before{ margin-right:0 !important; margin-left:12px !important; }
+}
