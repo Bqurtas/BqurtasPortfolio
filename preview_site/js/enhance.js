@@ -548,7 +548,7 @@
       try {
         const msgs = Array.from(body.querySelectorAll('.chat-msg:not(.is-typing)'))
           .map(el => ({ who: el.classList.contains('chat-msg--me') ? 'me' : 'bot', html: el.innerHTML }));
-        localStorage.setItem(HKEY, JSON.stringify(msgs.slice(-100)));
+        localStorage.setItem(HKEY, JSON.stringify({ ts: Date.now(), msgs: msgs.slice(-100) }));
       } catch (e) {}
     };
     const add = (who, html, noPersist) => {
@@ -560,9 +560,13 @@
       if (!noPersist) persist();
       return el;
     };
+    const HMAXAGE = 60 * 60 * 1000;   // chats older than 1 hour are cleared
     const restore = () => {
-      let msgs = [];
-      try { msgs = JSON.parse(localStorage.getItem(HKEY) || '[]'); } catch (e) {}
+      let data = null;
+      try { data = JSON.parse(localStorage.getItem(HKEY) || 'null'); } catch (e) {}
+      const fresh = data && Array.isArray(data.msgs) && (Date.now() - (data.ts || 0) < HMAXAGE);
+      const msgs = fresh ? data.msgs : null;
+      if (!msgs) { try { localStorage.removeItem(HKEY); } catch (e) {} return false; }
       msgs.forEach(m => add(m.who, m.html, true));
       return msgs.length > 0;
     };
