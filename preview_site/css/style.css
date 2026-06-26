@@ -9041,3 +9041,17 @@ body::before{
 .logos-section .logos-title{ margin-top:0 !important; margin-bottom:0 !important; }
 .logos-section .logo-marquee{ margin-top:8px !important; margin-bottom:0 !important; }
 .logos-section .logo-marquee + .logos-head{ margin-top:30px !important; }
+
+/* =========================================================
+   v290 — DESKTOP: the logos section fills the screen and centres its content
+   vertically, so nothing tucks under the menu button at the top and there's
+   no large empty band at the bottom.
+   ========================================================= */
+@media (min-width:821px){
+  .logos-section{
+    min-height:100vh !important;
+    display:flex !important; flex-direction:column !important; justify-content:center !important;
+    padding-top:clamp(88px, 11vh, 112px) !important;
+    padding-bottom:clamp(88px, 11vh, 112px) !important;   /* symmetric → truly centred */
+  }
+}
