@@ -9019,3 +9019,15 @@ body::before{
     scroll-snap-align:none !important; scroll-snap-stop:normal !important;
   }
 }
+
+/* =========================================================
+   v288 — "Designed by hand" logos sit on an even 4-up grid on desktop, so
+   the last two never trail alone on their own row.
+   ========================================================= */
+@media (min-width:821px){
+  .logos-grid{
+    display:grid !important; grid-template-columns:repeat(4, 1fr) !important;
+    justify-items:center !important; align-items:center !important;
+    gap:24px 26px !important;
+  }
+}
