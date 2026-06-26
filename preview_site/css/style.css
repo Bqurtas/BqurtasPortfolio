@@ -8999,3 +8999,23 @@ body::before{
   .service-detail-inner li:last-child{ border-bottom:0 !important; }
 }
 :root[data-theme="light"] .service-detail-inner li{ border-bottom-color:rgba(0,0,0,.10) !important; }
+
+/* =========================================================
+   v287 — (1) DESKTOP fix: the 86px scroll-padding was overkill — each
+          section's own top padding already clears the fixed hamburger, and
+          the extra push was clipping the section's CTA at the bottom. Drop
+          it to a small buffer so nothing is cut. (2) MOBILE: scroll is now
+          completely free, natural and smooth (no snapping at all).
+   ========================================================= */
+
+/* ---------- 1) desktop: tiny buffer instead of 86px (no clipped CTAs) ---------- */
+@media (min-width:821px){ html{ scroll-padding-top:18px !important; } }
+
+/* ---------- 2) mobile: fully free, natural, smooth native scrolling ---------- */
+@media (max-width:820px){
+  html{ scroll-snap-type:none !important; }
+  .hero, .room-hero, .pencemor-hero,
+  .room > .section, .section, .bio-teaser, .logos-section, .footer{
+    scroll-snap-align:none !important; scroll-snap-stop:normal !important;
+  }
+}
