@@ -85,9 +85,23 @@
       if (h > 200) document.documentElement.style.setProperty('--app-vh', h + 'px');
     };
     setAppVh();
+    /* re-measure a few times across the moment the viewport settles (toolbars
+       animate in/out over a few hundred ms after the app/tab regains focus) */
+    const setAppVhSoon = () => { setAppVh(); setTimeout(setAppVh, 60); setTimeout(setAppVh, 250); setTimeout(setAppVh, 600); };
     window.addEventListener('resize', setAppVh, { passive: true });
     window.addEventListener('orientationchange', () => setTimeout(setAppVh, 120));
-    if (window.visualViewport) window.visualViewport.addEventListener('resize', setAppVh, { passive: true });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', setAppVh, { passive: true });
+      window.visualViewport.addEventListener('scroll', setAppVh, { passive: true });
+    }
+    /* The real fix for "hero is clipped after coming back to the browser": when the
+       tab/app was backgrounded the viewport often changed with NO resize event, so
+       --app-vh went stale. Re-measure on every kind of return so the hero is always
+       exactly full — on mobile and desktop, in every case. */
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) setAppVhSoon(); });
+    window.addEventListener('pageshow', setAppVhSoon);          /* incl. bfcache restore */
+    window.addEventListener('focus', setAppVhSoon);
+    window.addEventListener('load', setAppVhSoon);
     /* Belt & braces: some environments (in-app browsers, extensions patching the
        scroll APIs) swallow 'scroll' events entirely. A tiny rAF watcher reads the
        REAL scroll position every frame, so the button, rail-progress and hero-snap
