@@ -9119,12 +9119,9 @@ body::after{
    the texture come through them too. Cards/menus keep their own surfaces.
    ========================================================= */
 
-/* the dots used to ride on body::before, which it shared with a dormant
-   pointer-spotlight. Now that the dots have their own layer (body::after),
-   body::before would revive that glow — keep it OFF, since the site already
-   has a custom cursor (dot + ring) and a third cursor-tracking effect would
-   clutter. (Flip this to re-enable the subtle pointer light.) */
-body::before{ display:none !important; }
+/* the dots moved to their own layer (body::after, above), so body::before is
+   free again for the soft page-wide "mouse light" — re-enabled & tuned in the
+   v295 block at the very end of this file (kept uniform across every room). */
 
 /* the home hero painted a solid --bg that hid the dots — make it
    transparent so the global grid shows behind the wordmark too
@@ -9171,3 +9168,20 @@ body::before{ display:none !important; }
     min-height:200px !important;
   }
 }
+
+/* =========================================================
+   v295 — bring back the soft "mouse light", UNIFORM across every room
+   & section. It lives on body::before: a fixed, page-wide radial that
+   follows --cursor-x/y (set globally by motion.js on pointermove), so
+   it is identical in every room — no per-section inconsistency. It had
+   been switched off; re-enable it and give it a touch more presence so
+   it reads clearly while staying quiet/premium. The dot grid
+   (body::after) is untouched; Reduce Motion still hides the light since
+   it tracks the pointer (the dots stay, so the page is never "dead").
+   ========================================================= */
+body::before{
+  display:block !important;
+  background:radial-gradient(500px circle at var(--cursor-x, 50vw) var(--cursor-y, 50vh),
+    color-mix(in srgb, var(--ink) 10%, transparent), transparent 70%) !important;
+}
+@media (prefers-reduced-motion: reduce){ body::before{ display:none !important; } }
