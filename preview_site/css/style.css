@@ -9189,3 +9189,18 @@ body::before{
     transparent 80%) !important;
 }
 @media (prefers-reduced-motion: reduce){ body::before{ display:none !important; } }
+
+/* =========================================================
+   v298 — remove the frosted "circle" behind the hamburger.
+   #railMenu carried backdrop-filter:blur(14px) clipped to a
+   border-radius:999px box over a TRANSPARENT background — so the blur
+   smoothed the dotted background into a rounded pill that read as a
+   circle behind the three lines and bled onto the avatar. The menu
+   button needs no surface of its own, so drop the blur entirely.
+   (border-radius stays — harmless with no background, and it keeps the
+   hover state a tidy rounded pill.)
+   ========================================================= */
+.rail-menu, #railMenu{
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
