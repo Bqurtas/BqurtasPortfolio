@@ -166,15 +166,8 @@
   <link rel="preconnect" href="https://dcnkhzrishphpismmxuu.supabase.co" crossorigin>
   <link rel="dns-prefetch" href="https://api.github.com">
 
-  <!-- Font Awesome icons — loaded directly. (The strict nonce-CSP blocks the old
-       inline onload="this.media='all'" media-swap trick, which had hidden the
-       icons; loading it normally keeps every icon working.) -->
-  <!-- FontAwesome loaded ASYNC so it never blocks first paint (icons appear a beat
-       later). Preload warms the cache; a nonce'd inline script attaches it as a
-       stylesheet without render-blocking. SRI kept on both. -->
-  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous">
-  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous"></noscript>
-  <script>(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css';l.integrity='sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g';l.crossOrigin='anonymous';l.referrerPolicy='no-referrer';document.head.appendChild(l);})();</script>
+  <!-- Font Awesome icons — direct SRI-protected load for scanner-visible integrity. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous" referrerpolicy="no-referrer">
 
   <link rel="stylesheet" href="css/style.css?v=306" />
 </head>
@@ -1750,7 +1743,7 @@
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
   <!-- Lenis: buttery momentum scrolling on mobile (desktop keeps native scroll-snap) -->
-  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js" integrity="sha384-eD5ubmuCcvTdCADWuSchJYE7wcj2nzNr0itbrh6w/KJyBiltSZ8w3VFRBSWu5YQ8" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
   <script>
     window.addEventListener('load', function () {
       /* Mobile scrolling is left to the browser's own momentum engine — natural,
