@@ -469,7 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   let portfolioRevealObserver = null;
-  const prepPortfolioReveal = (card, colIndex) => {
+  const prepPortfolioReveal = (card, colIndex, media) => {
     if (!card) return;
     card.classList.remove('portfolio-in');
     card.classList.add('portfolio-scroll-card');
@@ -494,10 +494,27 @@ document.addEventListener('DOMContentLoaded', () => {
       portfolioRevealObserver.observe(card);
     };
 
-    /* Wait until lazy media placeholders have real layout. Observing immediately
-       can mark deeper masonry cards visible while their images still measure as
-       tiny, which makes the scroll reveal fire too early. */
-    setTimeout(observeCard, 320 + Math.min(colIndex || 0, 5) * 24);
+    /* Wait for the real media dimensions instead of forcing a placeholder
+       height. The masonry keeps each card's natural image size, while the
+       reveal still avoids firing before layout settles. */
+    let done = false;
+    const queueObserve = () => {
+      if (done) return;
+      done = true;
+      setTimeout(observeCard, 80 + Math.min(colIndex || 0, 5) * 24);
+    };
+    const fallback = setTimeout(queueObserve, 1100);
+    const ready = () => { clearTimeout(fallback); queueObserve(); };
+    if (!media) { ready(); return; }
+    if ((media.tagName === 'IMG' && media.complete && media.naturalHeight) ||
+        (media.tagName === 'VIDEO' && media.readyState >= 1)) {
+      ready();
+    } else {
+      media.addEventListener('load', ready, { once: true });
+      media.addEventListener('loadedmetadata', ready, { once: true });
+      media.addEventListener('loadeddata', ready, { once: true });
+      media.addEventListener('error', ready, { once: true });
+    }
   };
 
   const buildColumns = (n) => {
@@ -518,10 +535,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let i = 0;
     for (let k = 1; k < heights.length; k++) if (heights[k] < heights[i]) i = k;
     cols[i].appendChild(card);
-    prepPortfolioReveal(card, i);
     heights[i] += CARD_EST;
 
     const media = card.querySelector('img, video');
+    prepPortfolioReveal(card, i, media);
     const correct = () => {
       if (heights !== mHeights) return;           // layout was rebuilt — ignore
       heights[i] += (card.offsetHeight + 8) - CARD_EST;

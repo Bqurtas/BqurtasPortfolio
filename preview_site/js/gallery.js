@@ -196,7 +196,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     // that otherwise shows through. Photos/posters/social are full-bleed, left dark.
     const PLATE_CATS = { book: 1, logo: 1, stationery: 1, events: 1, general: 1, other: 1 };
     const plate = /\.png(\?|$)/i.test(item.url || '') || !!PLATE_CATS[item.cat];
-    article.className = 'card card--photo' + (plate ? ' card--plate' : '');
+    article.className = 'card card--photo card--pending-media' + (plate ? ' card--plate' : '');
+    const ratioSets = {
+      book: ['2 / 3', '3 / 4'],
+      official: ['4 / 5', '1 / 1'],
+      image: ['4 / 5', '3 / 2', '1 / 1'],
+      logo: ['1 / 1', '4 / 3'],
+      tickerlogo: ['1 / 1', '4 / 3'],
+      posters: ['2 / 3', '4 / 5'],
+      social: ['1 / 1', '4 / 5'],
+      events: ['4 / 5', '16 / 9'],
+      business: ['16 / 10', '3 / 2'],
+      invoices: ['1 / 1.414', '4 / 5'],
+      flex: ['16 / 9'],
+      video: ['16 / 9'],
+      other: ['4 / 5', '1 / 1', '3 / 2'],
+      general: ['4 / 5', '1 / 1', '3 / 2'],
+    };
+    const ratios = ratioSets[item.coll] || ratioSets[item.cat] || ['4 / 5'];
+    article.style.setProperty('--card-ratio', ratios[(item.index - 1) % ratios.length]);
     const dispTag   = galTag(item.coll, item.tag);
     const dispTitle = galTitle(item.coll, item.index, item.titlePrefix || item.tag);
     article.dataset.cat   = item.cat;
@@ -213,8 +231,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const isPhone = typeof matchMedia === 'function' && matchMedia('(max-width: 700px)').matches;
     const imgSrc = (item.type !== 'video') ? window.BQ_GALLERY.thumb(item.url, isPhone ? 640 : 820) : item.url;
     const mediaHtml = item.type === 'video'
-      ? `<video muted loop playsinline preload="none" src="${item.url}" title="${dispTitle}"></video>`
-      : `<img loading="lazy" src="${imgSrc}" alt="${dispTitle}" />`;
+      ? `<video muted loop playsinline preload="metadata" src="${item.url}" title="${dispTitle}"></video>`
+      : `<img loading="eager" decoding="async" src="${imgSrc}" alt="${dispTitle}" />`;
 
     const playIcon = item.type === 'video' ? 'fa-play' : 'fa-magnifying-glass-plus';
 
@@ -231,6 +249,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     /* On error try raw.githubusercontent once (covers brand-new files that
        jsDelivr hasn't cached yet); only then drop the card. */
     const media = article.querySelector('img, video');
+    const markReady = () => article.classList.add('card--media-ready');
+    media.addEventListener('load', markReady);
+    media.addEventListener('loadedmetadata', markReady);
+    media.addEventListener('loadeddata', markReady);
+    if ((media.tagName === 'IMG' && media.complete && media.naturalHeight) ||
+        (media.tagName === 'VIDEO' && media.readyState >= 1)) markReady();
     media.addEventListener('error', () => {
       // resized phone copy failed → original full image (jsDelivr)
       if (media.src !== item.url && !media.dataset.orig) { media.dataset.orig = '1'; media.src = item.url; return; }
