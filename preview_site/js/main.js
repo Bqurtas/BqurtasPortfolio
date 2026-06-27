@@ -2,6 +2,38 @@
    Barakat Qurtas — main.js (v3)
    ========================================================= */
 
+/* ---------- CSP-safe inline styling ----------
+   The CSP has no 'unsafe-inline' in style-src, so HTML `style="…"` attributes
+   are not used anywhere. Elements that need per-element styling carry a
+   `data-css="prop:val;prop2:val2"` attribute instead, applied here via the
+   CSSOM (element.style.setProperty) — which CSP does NOT gate. Runs once for the
+   parsed DOM and watches for dynamically-rendered nodes (dashboard charts, work
+   cards, brand board, blog reader). */
+(function () {
+  const applyCss = (el) => {
+    const spec = el.getAttribute('data-css');
+    if (!spec) return;
+    spec.split(';').forEach((decl) => {
+      const i = decl.indexOf(':');
+      if (i < 0) return;
+      const prop = decl.slice(0, i).trim();
+      const val = decl.slice(i + 1).trim();
+      if (prop) { try { el.style.setProperty(prop, val); } catch (e) {} }
+    });
+  };
+  const scan = (node) => {
+    if (!node || node.nodeType !== 1) return;
+    if (node.hasAttribute('data-css')) applyCss(node);
+    if (node.querySelectorAll) node.querySelectorAll('[data-css]').forEach(applyCss);
+  };
+  scan(document.documentElement);
+  try {
+    new MutationObserver((muts) => {
+      muts.forEach((m) => m.addedNodes.forEach(scan));
+    }).observe(document.documentElement, { childList: true, subtree: true });
+  } catch (e) {}
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- THEME (dark / light) — toggle switch ---------- */
@@ -436,6 +468,30 @@ document.addEventListener('DOMContentLoaded', () => {
     return 6;
   };
 
+  let portfolioRevealObserver = null;
+  const prepPortfolioReveal = (card, colIndex) => {
+    if (!card) return;
+    card.classList.remove('portfolio-in');
+    card.classList.add('portfolio-scroll-card');
+    card.style.setProperty('--portfolio-delay', Math.min(colIndex || 0, 5) * 36 + 'ms');
+
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+      requestAnimationFrame(() => card.classList.add('portfolio-in'));
+      return;
+    }
+
+    if (!portfolioRevealObserver) {
+      portfolioRevealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('portfolio-in');
+          portfolioRevealObserver.unobserve(entry.target);
+        });
+      }, { threshold: 0.16, rootMargin: '0px 0px -8% 0px' });
+    }
+    portfolioRevealObserver.observe(card);
+  };
+
   const buildColumns = (n) => {
     if (!gridEl) return;
     gridEl.innerHTML = '';
@@ -454,6 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let i = 0;
     for (let k = 1; k < heights.length; k++) if (heights[k] < heights[i]) i = k;
     cols[i].appendChild(card);
+    prepPortfolioReveal(card, i);
     heights[i] += CARD_EST;
 
     const media = card.querySelector('img, video');
@@ -467,15 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
       media.addEventListener('loadeddata', correct, { once: true });
     }
 
-    /* reveal */
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(16px)';
-    card.style.transition = 'none';
-    requestAnimationFrame(() => {
-      card.style.transition = 'opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out)';
-      card.style.opacity = '1';
-      card.style.transform = 'none';
-    });
+    /* visual reveal is handled by .portfolio-scroll-card when the card enters view */
   };
 
   const matchingCards = () =>

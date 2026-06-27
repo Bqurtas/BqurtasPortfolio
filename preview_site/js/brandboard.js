@@ -122,7 +122,7 @@
     $('bbTyLatin').textContent = nm; $('bbTyKu').textContent = kn || 'ئاوەز';
     $('bbTyLatinName').textContent = t.latin+' · '+m.fonts.ln; $('bbTyKuName').textContent = t.kurdish+' · '+m.fonts.kn;
     const sw = $('bbSwatches'); sw.innerHTML = '';
-    pal.forEach((hex) => { const d=document.createElement('div'); d.className='bb-sw'; d.innerHTML='<b style="background:'+hex+'"></b><span>'+hex.toUpperCase()+'</span>'; sw.appendChild(d); });
+    pal.forEach((hex) => { const d=document.createElement('div'); d.className='bb-sw'; d.innerHTML='<b data-css="background:'+hex+'"></b><span>'+hex.toUpperCase()+'</span>'; sw.appendChild(d); });
     const kw = $('bbKeywords'); kw.innerHTML = '';
     t.kw[state.mood].forEach((w) => { const s=document.createElement('span'); s.className='bb-kw'; s.textContent=w; kw.appendChild(s); });
   }

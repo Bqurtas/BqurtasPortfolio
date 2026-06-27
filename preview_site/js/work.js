@@ -44,7 +44,7 @@
       const cover = q.cover
         ? '<img class="work-card-img" src="' + esc(q.cover) + '" alt="" loading="lazy">'
         : '<span class="work-card-mark">' + esc((String(q.title || '').trim()[0]) || '·') + '</span>';
-      return '<a class="work-card" href="' + esc(workBase() + '/' + (p.slug || p.id)) + '" data-id="' + esc(p.id) + '" style="--accent:' + esc(q.accent) + '">'
+      return '<a class="work-card" href="' + esc(workBase() + '/' + (p.slug || p.id)) + '" data-id="' + esc(p.id) + '" data-css="--accent:' + esc(q.accent) + '">'
         + '<span class="work-card-cover">' + cover + '</span>'
         + '<span class="work-card-meta">'
         +   '<span class="mono work-card-tag">' + esc(q.tag || '') + '</span>'
@@ -72,7 +72,7 @@
     const next = PROJECTS[(PROJECTS.indexOf(p) + 1) % PROJECTS.length];
     const nq = next ? L(next) : null;
     const swatches = q.palette.map((s) =>
-      '<div class="wc-sw"><b style="background:' + esc(s.hex) + '"></b><span class="mono">' + esc(s.name || '') + ' · ' + esc(String(s.hex || '').toUpperCase()) + '</span></div>').join('');
+      '<div class="wc-sw"><b data-css="background:' + esc(s.hex) + '"></b><span class="mono">' + esc(s.name || '') + ' · ' + esc(String(s.hex || '').toUpperCase()) + '</span></div>').join('');
     const apps = (q.gallery.length ? q.gallery : [null, null, null]).slice(0, 6).map((g, i) => {
       if (g && g.url) return '<figure class="wc-shot"><img src="' + esc(g.url) + '" alt="" loading="lazy">' + (g.caption ? '<figcaption class="mono">' + esc(g.caption) + '</figcaption>' : '') + '</figure>';
       const variants = ['wc-shot--ink', 'wc-shot--accent', 'wc-shot--paper'];
@@ -82,7 +82,7 @@
 
     viewEl.innerHTML =
       '<button class="wc-back mono" id="wcBack"><i class="fa-solid fa-arrow-left-long"></i> ' + esc(dT('work.back', 'All work')) + '</button>'
-      + '<header class="wc-hero" style="--accent:' + esc(q.accent) + '">'
+      + '<header class="wc-hero" data-css="--accent:' + esc(q.accent) + '">'
       +   (q.cover ? '<img class="wc-hero-img" src="' + esc(q.cover) + '" alt="">' : '')
       +   '<div class="wc-hero-inner">'
       +     '<span class="mono wc-hero-tag">' + esc(q.tag || '') + ' · ' + esc(p.year || '') + '</span>'
@@ -94,7 +94,7 @@
       + (q.palette.length ? '<section class="wc-block"><span class="mono wc-rh">02 — ' + esc(dT('work.palette', 'Palette')) + '</span><div class="wc-swatches">' + swatches + '</div></section>' : '')
       + (has(q.body) ? '<section class="wc-block wc-story"><span class="mono wc-rh">03 — ' + esc(dT('work.story', 'The work')) + '</span><div class="wc-body">' + paras(q.body).map((t) => '<p>' + esc(t) + '</p>').join('') + '</div></section>' : '')
       + '<section class="wc-block"><span class="mono wc-rh">04 — ' + esc(dT('work.inuse', 'In use')) + '</span><div class="wc-shots">' + apps + '</div></section>'
-      + (nq ? '<a class="wc-next" href="' + esc(workBase() + '/' + (next.slug || next.id)) + '" data-id="' + esc(next.id) + '" style="--accent:' + esc(nq.accent) + '"><span class="mono">' + esc(dT('work.next', 'Next project')) + '</span><span class="wc-next-title">' + esc(nq.title) + ' <i class="fa-solid fa-arrow-right"></i></span></a>' : '');
+      + (nq ? '<a class="wc-next" href="' + esc(workBase() + '/' + (next.slug || next.id)) + '" data-id="' + esc(next.id) + '" data-css="--accent:' + esc(nq.accent) + '"><span class="mono">' + esc(dT('work.next', 'Next project')) + '</span><span class="wc-next-title">' + esc(nq.title) + ' <i class="fa-solid fa-arrow-right"></i></span></a>' : '');
 
     indexEl.hidden = true;
     viewEl.hidden = false;

@@ -1327,6 +1327,33 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
 .card--photo:hover .card-art--photo img,
 .card--photo:hover .card-art--photo video { transform: scale(1.035); }
 
+/* Portfolio works enter as the visitor reaches them, so long scrolls feel
+   intentional instead of dumping every image into view at once. */
+#grid .card.portfolio-scroll-card{
+  opacity:0;
+  transform:translate3d(0,34px,0) scale(.988);
+  filter:saturate(.82);
+  transition:
+    opacity .72s var(--ease-out),
+    transform .86s var(--ease-out),
+    filter .86s var(--ease-out);
+  transition-delay:var(--portfolio-delay,0ms);
+  will-change:opacity, transform;
+}
+#grid .card.portfolio-scroll-card .card-art{
+  clip-path:inset(7% 0 7% 0);
+  transition-property:clip-path, transform;
+  transition-duration:.9s, .6s;
+  transition-timing-function:var(--ease-out), var(--ease-out);
+  transition-delay:var(--portfolio-delay,0ms), 0ms;
+}
+#grid .card.portfolio-scroll-card.portfolio-in{
+  opacity:1;
+  transform:none;
+  filter:saturate(1);
+}
+#grid .card.portfolio-scroll-card.portfolio-in .card-art{ clip-path:inset(0); }
+
 /* Hover overlay with meta info */
 .card-meta--ov {
   position: absolute;
@@ -4581,6 +4608,16 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 @media (prefers-reduced-motion: reduce){
   /* keep a gentle reveal even here, but drop the greyscale shift */
   .lux-gray .card-art img, .lux-gray .card-art video, .lux-gray .card-art svg{ filter:none !important; }
+  #grid .card.portfolio-scroll-card{
+    opacity:1 !important;
+    transform:none !important;
+    filter:none !important;
+    transition:none !important;
+  }
+  #grid .card.portfolio-scroll-card .card-art{
+    clip-path:inset(0) !important;
+    transition:none !important;
+  }
 }
 
 /* =========================================================
@@ -9238,3 +9275,53 @@ body::before{
     }
   }
 }
+
+/* =========================================================
+   v301 — CSP hardening helper: replaces the few inline display:none styles
+   (load-more controls) with a class so style-src needs no 'unsafe-inline'.
+   JS still shows them via inline style.display (CSSOM), which wins over this.
+   ========================================================= */
+.bq-hidden{ display:none; }
+
+/* =========================================================
+   v301 — CMS / blog-editor styles (moved out of a runtime-injected
+   <style> in enhance.js so style-src needs no 'unsafe-inline'). These
+   only render inside the secret dashboard editor. ===================== */
+.cms-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.cms-status{opacity:.6;font-size:12px}
+.cms-list{display:flex;flex-direction:column}
+.cms-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px;border-bottom:1px solid rgba(128,128,128,.18)}
+.cms-row-t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cms-row-t strong{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cms-row-t .mono{opacity:.55;font-size:11px}
+.cms-row-act{display:flex;gap:6px;flex-shrink:0}
+.cms-mini{width:34px;height:34px;border-radius:9px;border:1px solid rgba(128,128,128,.25);background:transparent;color:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s,border-color .15s}
+.cms-mini:hover{background:rgba(128,128,128,.14)}
+.cms-mini--del:hover{background:rgba(200,60,50,.16);color:#e2554a;border-color:rgba(200,60,50,.4)}
+.cms-studio{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-size:11px;opacity:.5;text-decoration:none;color:inherit}
+.cms-studio:hover{opacity:.85}
+.cms-form{display:flex;flex-direction:column;gap:14px;max-width:680px}
+.cms-field{display:flex;flex-direction:column;gap:6px}
+.cms-field>span{font-size:11px;letter-spacing:.04em;text-transform:uppercase;opacity:.6}
+.cms-field input,.cms-field textarea{width:100%;padding:11px 13px;border-radius:10px;border:1px solid rgba(128,128,128,.28);background:rgba(128,128,128,.06);color:inherit;font:inherit;font-size:14px;outline:none;transition:border-color .15s,background .15s}
+.cms-field input:focus,.cms-field textarea:focus{border-color:currentColor;background:rgba(128,128,128,.1)}
+.cms-field textarea{resize:vertical;line-height:1.65;min-height:170px}
+.cms-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end}
+.cms-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}
+.cms-cats{display:flex;flex-wrap:wrap;gap:7px}
+.cms-cat{font:inherit;font-size:12px;padding:7px 15px;border-radius:999px;border:1px solid rgba(128,128,128,.32);background:transparent;color:inherit;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.cms-cat:hover{border-color:currentColor}
+.cms-cat.is-active{background:#bd9a4e;border-color:#bd9a4e;color:#17120a;font-weight:600}
+.cms-field--color input[type=color]{height:44px;padding:4px;cursor:pointer;border-radius:10px}
+.cms-check{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:14px;user-select:none}
+.cms-check input{width:18px;height:18px;cursor:pointer;accent-color:#bd9a4e}
+.cms-cover-prev{border-radius:10px;overflow:hidden;border:1px solid rgba(128,128,128,.22);max-height:210px}
+.cms-cover-prev img{display:block;width:100%;height:auto;max-height:210px;object-fit:cover}
+.cms-cover-prev[hidden]{display:none}
+.cms-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px}
+.cms-savemsg{opacity:.75;font-size:12px}
+.cms-file{font:inherit;font-size:13px;color:inherit;cursor:pointer;padding:8px 0}
+.cms-uphint{display:block;font-size:11px;opacity:.6;margin-top:4px}
+.dash-btn--go{background:#bd9a4e;border-color:#bd9a4e;color:#17120a;font-weight:600}
+.dash-btn--go:hover{background:#ccab5f;border-color:#ccab5f}
+@media(max-width:560px){.cms-row3{grid-template-columns:1fr 1fr}.cms-form{max-width:none}}

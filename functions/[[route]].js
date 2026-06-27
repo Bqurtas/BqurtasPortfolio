@@ -133,19 +133,17 @@ export async function onRequest(context) {
   // (age ~31h), so the site appeared "old/broken" until a hard refresh. `no-store`
   // is unambiguous; the ?v-versioned CSS/JS/images keep their own long cache.
   const FRESH = 'no-store';
-  /* Per-request nonce → a strong, XSS-effective Content-Security-Policy with NO
-     'unsafe-inline' and NO 'unsafe-eval' for scripts. Every <script> in the shell
-     gets this nonce below; 'strict-dynamic' then trusts whatever those scripts
-     load (GA, Pixel, Umami…). The trailing 'https:' is a harmless fallback for
-     pre-CSP3 browsers that don't understand nonce/strict-dynamic — modern
-     browsers ignore it and honour the nonce. No 'unsafe-inline', so an injected
-     inline <script> is blocked (and the scanner is satisfied). */
+  /* Per-request nonce -> a strong, XSS-effective Content-Security-Policy with NO
+     'unsafe-inline' and NO 'unsafe-eval'. Every <script> in the shell gets this
+     nonce below; 'strict-dynamic' then trusts scripts loaded by those nonce'd
+     bootstraps. Inline styles were moved to CSS/data-css helpers, so style-src
+     can stay strict too. */
   const nonce = crypto.randomUUID().replace(/-/g, '');
   const CSP = [
     "default-src 'self'", "base-uri 'self'", "object-src 'none'",
     "frame-ancestors 'self'", "form-action 'self'", "upgrade-insecure-requests",
-    "script-src 'nonce-" + nonce + "' 'strict-dynamic' https:",
-    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+    "script-src 'nonce-" + nonce + "' 'strict-dynamic' 'self' https://cdn.jsdelivr.net",
+    "style-src 'self' https://cdn.jsdelivr.net",
     "font-src 'self' data: https://cdn.jsdelivr.net",
     "img-src 'self' data: blob: https://cdn.jsdelivr.net https://raw.githubusercontent.com https://images.weserv.nl https://*.supabase.co",
     "media-src 'self' blob: https://cdn.jsdelivr.net https://raw.githubusercontent.com",

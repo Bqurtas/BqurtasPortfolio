@@ -924,7 +924,7 @@
         <div class="dash-bars">` + Object.entries(colls).map(([k, c]) =>
         `<div class="dash-bar-row">
            <span class="dash-bar-label">${c.tag || k}</span>
-           <span class="dash-bar"><span class="dash-bar-fill" style="width:${(c.count / max * 100).toFixed(1)}%"></span></span>
+           <span class="dash-bar"><span class="dash-bar-fill" data-css="width:${(c.count / max * 100).toFixed(1)}%"></span></span>
            <span class="dash-bar-n mono">${c.count}</span>
          </div>`).join('') + `</div>`;
       let pend = null;
@@ -1113,7 +1113,7 @@
       const p = profile();
       view.innerHTML = `
         <div class="dash-prof-card">
-          <span class="dash-prof-av" style="background-image:url('${esc(p.avatar)}')"></span>
+          <span class="dash-prof-av" data-css="background-image:url('${esc(p.avatar)}')"></span>
           <div><strong>${esc(p.name)}</strong><span class="mono">${esc(p.title)}</span></div>
         </div>
         <div class="dash-set">
@@ -1140,7 +1140,7 @@
       const p = profile(); const admins = getAdmins();
       view.innerHTML = `
         <div class="dash-prof-card">
-          <span class="dash-prof-av" style="background-image:url('${esc(p.avatar)}')"></span>
+          <span class="dash-prof-av" data-css="background-image:url('${esc(p.avatar)}')"></span>
           <div><strong>${esc(p.name)}</strong><span class="mono">${DT('admYou')} · ${esc(p.title)}</span></div>
         </div>
         <div class="dash-admin-list" id="admList">${admins.length ? admins.map((a, i) => `
@@ -1470,7 +1470,7 @@
     const bars = (rows, fmt) => {
       if (!rows || !rows.length) return `<p class="dash-dim mono">${DT('vNoData')}</p>`;
       const max = Math.max(...rows.map(x => x.c), 1);
-      return rows.map(r => `<div class="dash-bar-row"><span class="dash-bar-label">${fmt(r)}</span><span class="dash-bar"><span class="dash-bar-fill" style="width:${(r.c / max * 100).toFixed(0)}%"></span></span><span class="dash-bar-n mono">${r.c}</span></div>`).join('');
+      return rows.map(r => `<div class="dash-bar-row"><span class="dash-bar-label">${fmt(r)}</span><span class="dash-bar"><span class="dash-bar-fill" data-css="width:${(r.c / max * 100).toFixed(0)}%"></span></span><span class="dash-bar-n mono">${r.c}</span></div>`).join('');
     };
 
     const renderVisitors = async () => {
@@ -1502,7 +1502,7 @@
 
       const sMax = Math.max(...(d.series || []).map(s => s.c), 1);
       const chart = (d.series || []).map(s =>
-        `<span class="viz-day" title="${s.d} · ${s.c} views"><span class="viz-day-fill" style="height:${Math.max(8, (s.c / sMax * 100)).toFixed(0)}%"></span></span>`).join('');
+        `<span class="viz-day" title="${s.d} · ${s.c} views"><span class="viz-day-fill" data-css="height:${Math.max(8, (s.c / sMax * 100)).toFixed(0)}%"></span></span>`).join('');
 
       view.innerHTML = `
         <div class="dash-cards">
@@ -1660,7 +1660,7 @@
         if (d && (d.error === 'unauthorized' || d.error === 'missing_token')) { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} prjGate(); return; }
         const rows = (d && d.projects) || [];
         $('.cms-status').textContent = rows.length ? '' : PT('empty');
-        $('#prjRows').innerHTML = rows.map(p => `<div class="cms-row"><span class="cms-row-dot" style="background:${esc(p.accent || '#bd4a2c')}"></span>
+        $('#prjRows').innerHTML = rows.map(p => `<div class="cms-row"><span class="cms-row-dot" data-css="background:${esc(p.accent || '#bd4a2c')}"></span>
           <div class="cms-row-t"><strong>${esc(p.title)}</strong><span class="mono">${esc([p.client, p.year].filter(Boolean).join(' · '))}${p.published ? '' : ' · draft'}</span></div>
           <div class="cms-row-act"><button class="dash-btn" data-edit="${p.id}"><i class="fa-solid fa-pen"></i> ${esc(PT('edit'))}</button><button class="dash-btn dash-btn--danger" data-del="${p.id}"><i class="fa-solid fa-trash"></i></button></div></div>`).join('');
         $('#prjRows').querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => prjForm(rows.find(x => String(x.id) === b.getAttribute('data-edit')) || {})));
@@ -2232,50 +2232,6 @@
 })();
 
 
-/* ---- CMS editor styles (injected here so no separate CSS file edit is needed) ---- */
-(function cmsStyles(){
-  if (document.getElementById('bq-cms-style')) return;
-  var el = document.createElement('style'); el.id = 'bq-cms-style';
-  el.textContent = `.cms-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
-.cms-status{opacity:.6;font-size:12px}
-.cms-list{display:flex;flex-direction:column}
-.cms-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px;border-bottom:1px solid rgba(128,128,128,.18)}
-.cms-row-t{display:flex;flex-direction:column;gap:3px;min-width:0}
-.cms-row-t strong{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cms-row-t .mono{opacity:.55;font-size:11px}
-.cms-row-act{display:flex;gap:6px;flex-shrink:0}
-.cms-mini{width:34px;height:34px;border-radius:9px;border:1px solid rgba(128,128,128,.25);background:transparent;color:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s,border-color .15s}
-.cms-mini:hover{background:rgba(128,128,128,.14)}
-.cms-mini--del:hover{background:rgba(200,60,50,.16);color:#e2554a;border-color:rgba(200,60,50,.4)}
-.cms-studio{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-size:11px;opacity:.5;text-decoration:none;color:inherit}
-.cms-studio:hover{opacity:.85}
-.cms-form{display:flex;flex-direction:column;gap:14px;max-width:680px}
-.cms-field{display:flex;flex-direction:column;gap:6px}
-.cms-field>span{font-size:11px;letter-spacing:.04em;text-transform:uppercase;opacity:.6}
-.cms-field input,.cms-field textarea{width:100%;padding:11px 13px;border-radius:10px;border:1px solid rgba(128,128,128,.28);background:rgba(128,128,128,.06);color:inherit;font:inherit;font-size:14px;outline:none;transition:border-color .15s,background .15s}
-.cms-field input:focus,.cms-field textarea:focus{border-color:currentColor;background:rgba(128,128,128,.1)}
-.cms-field textarea{resize:vertical;line-height:1.65;min-height:170px}
-.cms-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end}
-.cms-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}
-.cms-cats{display:flex;flex-wrap:wrap;gap:7px}
-.cms-cat{font:inherit;font-size:12px;padding:7px 15px;border-radius:999px;border:1px solid rgba(128,128,128,.32);background:transparent;color:inherit;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
-.cms-cat:hover{border-color:currentColor}
-.cms-cat.is-active{background:#bd9a4e;border-color:#bd9a4e;color:#17120a;font-weight:600}
-.cms-field--color input[type=color]{height:44px;padding:4px;cursor:pointer;border-radius:10px}
-.cms-check{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:14px;user-select:none}
-.cms-check input{width:18px;height:18px;cursor:pointer;accent-color:#bd9a4e}
-.cms-cover-prev{border-radius:10px;overflow:hidden;border:1px solid rgba(128,128,128,.22);max-height:210px}
-.cms-cover-prev img{display:block;width:100%;height:auto;max-height:210px;object-fit:cover}
-.cms-cover-prev[hidden]{display:none}
-.cms-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px}
-.cms-savemsg{opacity:.75;font-size:12px}
-.cms-file{font:inherit;font-size:13px;color:inherit;cursor:pointer;padding:8px 0}
-.cms-uphint{display:block;font-size:11px;opacity:.6;margin-top:4px}
-.dash-btn--go{background:#bd9a4e;border-color:#bd9a4e;color:#17120a;font-weight:600}
-.dash-btn--go:hover{background:#ccab5f;border-color:#ccab5f}
-@media(max-width:560px){.cms-row3{grid-template-columns:1fr 1fr}.cms-form{max-width:none}}`;
-  document.head.appendChild(el);
-})();
 
 /* =======================================================
    LATEST UPDATES — notification bell (rail + dock)
