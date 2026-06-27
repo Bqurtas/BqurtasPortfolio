@@ -26,6 +26,13 @@
   # cache is set ONLY by functions/[[route]].js (Cache-Control: no-store +
   # CDN-Cache-Control: no-store), and static files get their own rules below.
 
+# The bare root "/" maps to index.html and Cloudflare re-applies its platform
+# wildcard CORS to it specifically (every other path — /index.html, /bio,
+# /design, /css, /js — already honours the /* pin above). An exact "/" rule
+# pins the homepage too.
+/
+  Access-Control-Allow-Origin: https://bqurtas.com
+
 # Images & fonts rarely change — cache for 30 days (still not a year)
 /assets/*
   Cache-Control: public, max-age=2592000
