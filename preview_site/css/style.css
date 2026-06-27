@@ -4240,8 +4240,8 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 
 .hero-portrait{ position:absolute; top:50%; left:50%; z-index:4;
   width:clamp(138px,13.5vw,200px); aspect-ratio:1/1; border-radius:50%; overflow:hidden;
-  opacity:0; --mx:0px; --my:0px; --ps:.82;
-  transform:translate(calc(-50% + var(--mx)), calc(-50% + var(--my))) scale(var(--ps));
+  opacity:0; --mx:0px; --my:0px; --ps:.82; --hero-portrait-x:-50%; --hero-portrait-y:-50%;
+  transform:translate(calc(var(--hero-portrait-x) + var(--mx)), calc(var(--hero-portrait-y) + var(--my))) scale(var(--ps));
   transition:opacity .9s var(--ease-out), transform .55s var(--ease);
   box-shadow:0 30px 80px -28px rgba(0,0,0,.85); }
 .hero-portrait.is-in{ opacity:1; --ps:1; }
@@ -4277,6 +4277,26 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 @media (prefers-reduced-motion: reduce){
   .hero-portrait{ opacity:1; --ps:1; transition:none; }
   .hero-spark svg, .hero-scrolldown .bar::after{ animation:none; }
+}
+
+@media (min-width:821px){
+  .hero-line, .hero-name{ position:relative; z-index:2; }
+  .hero-portrait{
+    left:calc(100% + clamp(84px,7vw,136px));
+    top:52%;
+    z-index:1;
+  }
+}
+
+@media (max-width:820px){
+  .hero-line, .hero-name{ position:relative; z-index:2; }
+  .hero-portrait{
+    left:clamp(-64px,-14vw,-36px);
+    top:56%;
+    z-index:1;
+    opacity:0;
+  }
+  .hero-portrait.is-in{ opacity:.42; }
 }
 
 /* =========================================================
@@ -9302,8 +9322,12 @@ body::before{
 @media (prefers-reduced-motion: no-preference){
   .hero-portrait{ animation:heroBob 5.5s ease-in-out infinite; }
   @keyframes heroBob{
-    0%,100%{ transform:translate3d(0,0,0); }
-    50%{ transform:translate3d(0,-11px,0); }
+    0%,100%{
+      transform:translate3d(calc(var(--hero-portrait-x, -50%) + var(--mx, 0px)), calc(var(--hero-portrait-y, -50%) + var(--my, 0px)), 0) scale(var(--ps, 1));
+    }
+    50%{
+      transform:translate3d(calc(var(--hero-portrait-x, -50%) + var(--mx, 0px)), calc(var(--hero-portrait-y, -50%) + var(--my, 0px) - 11px), 0) scale(var(--ps, 1));
+    }
   }
 }
 
