@@ -1313,6 +1313,7 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
 .card-art--photo {
   position: relative;
   overflow: hidden;
+  min-height: clamp(140px, 24vw, 280px);
   display: block; line-height: 0;
 }
 .card-art--photo img {

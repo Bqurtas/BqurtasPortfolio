@@ -480,16 +480,24 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if (!portfolioRevealObserver) {
-      portfolioRevealObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add('portfolio-in');
-          portfolioRevealObserver.unobserve(entry.target);
-        });
-      }, { threshold: 0.16, rootMargin: '0px 0px -8% 0px' });
-    }
-    portfolioRevealObserver.observe(card);
+    const observeCard = () => {
+      if (!card.isConnected) return;
+      if (!portfolioRevealObserver) {
+        portfolioRevealObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('portfolio-in');
+            portfolioRevealObserver.unobserve(entry.target);
+          });
+        }, { threshold: 0.16, rootMargin: '0px 0px -8% 0px' });
+      }
+      portfolioRevealObserver.observe(card);
+    };
+
+    /* Wait until lazy media placeholders have real layout. Observing immediately
+       can mark deeper masonry cards visible while their images still measure as
+       tiny, which makes the scroll reveal fire too early. */
+    setTimeout(observeCard, 320 + Math.min(colIndex || 0, 5) * 24);
   };
 
   const buildColumns = (n) => {
