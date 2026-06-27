@@ -105,7 +105,7 @@ window.BQ_GALLERY = {
     if (!paths) {
       try {
         const ctrl  = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 6000);
+        const timer = setTimeout(() => ctrl.abort(), 3500);
         const r = await fetch(
           `https://api.github.com/repos/${this.REPO}/git/trees/${this.BRANCH}?recursive=1`,
           { signal: ctrl.signal, headers: { Accept: 'application/vnd.github+json' } });
@@ -123,7 +123,7 @@ window.BQ_GALLERY = {
          to jsDelivr's data API (no rate limit) so counts/works still stay live. */
       try {
         const ctrl2 = new AbortController();
-        const timer2 = setTimeout(() => ctrl2.abort(), 6000);
+        const timer2 = setTimeout(() => ctrl2.abort(), 3500);
         const r2 = await fetch(`https://data.jsdelivr.com/v1/packages/gh/${this.REPO}@${this.BRANCH}`, { signal: ctrl2.signal, headers: { Accept: 'application/json' } });
         clearTimeout(timer2);
         if (r2.ok) {
@@ -170,10 +170,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const grid = document.getElementById('grid');
   if (!grid) return;
 
-  /* Auto-discover real folder contents in the background. The first paint uses
-     the static counts immediately; the manifest refreshes the session cache for
-     later visits without delaying LCP. */
-  window.BQ_GALLERY.loadManifest();
+  /* Auto-discover real folder contents before building cards. This keeps each
+     48-card batch based on files that actually exist, instead of rendering stale
+     static counts and then losing cards after image errors. */
+  await window.BQ_GALLERY.loadManifest();
 
   /* Remove loading spinner */
   const loader = document.getElementById('galleryLoading');
