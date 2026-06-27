@@ -9181,7 +9181,7 @@ body::after{
    ========================================================= */
 body::before{
   display:block !important;
-  background:radial-gradient(500px circle at var(--cursor-x, 50vw) var(--cursor-y, 50vh),
-    color-mix(in srgb, var(--ink) 10%, transparent), transparent 70%) !important;
+  background:radial-gradient(480px circle at var(--cursor-x, 50vw) var(--cursor-y, 50vh),
+    color-mix(in srgb, var(--ink) 6%, transparent), transparent 72%) !important;
 }
 @media (prefers-reduced-motion: reduce){ body::before{ display:none !important; } }

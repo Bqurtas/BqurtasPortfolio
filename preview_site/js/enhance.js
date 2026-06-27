@@ -102,6 +102,29 @@
     window.addEventListener('pageshow', setAppVhSoon);          /* incl. bfcache restore */
     window.addEventListener('focus', setAppVhSoon);
     window.addEventListener('load', setAppVhSoon);
+
+    /* ---- Always (re)open at the TOP / the hero ----
+       When the browser is closed and reopened, it restores the old scroll
+       position — so the visitor lands deep in a section instead of the hero.
+       Take control of scroll restoration and reset to the very top on every
+       (re)open: fresh load, refresh, and bfcache/session restore. And when the
+       site was backgrounded for a long while and reopened (mobile "close &
+       reopen", no reload), go back to the home hero — no matter which room or
+       section they were in. */
+    if ('scrollRestoration' in history) { try { history.scrollRestoration = 'manual'; } catch (e) {} }
+    const bqToTop  = () => { try { window.scrollTo(0, 0); } catch (e) {} };
+    const bqToHero = () => { try { if (window.__bqShowRoom) window.__bqShowRoom('design'); } catch (e) {} bqToTop(); };
+    /* bfcache / session restore re-shows the page mid-scroll → snap back to the top.
+       (Fresh loads are already handled by scrollRestoration:manual + the initial
+       route, so we DON'T force-scroll them — that would fight the shared /design &
+       /panjamor links that intentionally open at their own section.) */
+    window.addEventListener('pageshow', (e) => { if (e.persisted) bqToTop(); });
+    let bqHiddenAt = 0;
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) bqHiddenAt = Date.now();
+      else if (bqHiddenAt && Date.now() - bqHiddenAt > 5 * 60 * 1000) bqToHero();   /* reopened after a long absence → home hero */
+    });
+
     /* Belt & braces: some environments (in-app browsers, extensions patching the
        scroll APIs) swallow 'scroll' events entirely. A tiny rAF watcher reads the
        REAL scroll position every frame, so the button, rail-progress and hero-snap
