@@ -158,6 +158,10 @@ export async function onRequest(context) {
     headers.set('Cache-Control', FRESH);
     headers.set('CDN-Cache-Control', 'no-store');   // Cloudflare edge: don't cache the HTML shell
     headers.set('Content-Security-Policy', CSP);
+    // env.ASSETS.fetch returns the shell with Pages' default wildcard CORS; the
+    // _headers override only applies to directly-served files, not this internal
+    // fetch — so pin it here too. The HTML shell is same-origin only; no wildcard.
+    headers.set('Access-Control-Allow-Origin', 'https://bqurtas.com');
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
   };
   const addNonce = { element(el) { el.setAttribute('nonce', nonce); } };
