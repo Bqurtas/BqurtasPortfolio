@@ -23,6 +23,15 @@
   (function splash() {
     const splash = $('#splash');
     if (!splash) return;
+    const parts = location.pathname.split('/').filter(Boolean);
+    const route = (['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'].includes(parts[0]) ? parts[1] : parts[0]) || '';
+    let splashOff = false;
+    try { splashOff = localStorage.getItem('bq_splash') === 'off'; } catch (e) {}
+    if (route || splashOff) {
+      splash.classList.add('is-done');
+      splash.style.display = 'none';
+      return;
+    }
     const fill = $('#splashFill');
     const pct  = $('#splashPct');
     const start = performance.now();

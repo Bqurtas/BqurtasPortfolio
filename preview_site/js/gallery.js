@@ -54,11 +54,17 @@ window.BQ_GALLERY = {
   },
 
   /* A lighter, on-the-fly resized WebP (via the free wsrv.nl image CDN) for
-     phone screens — keeps all 40 works but cuts the mobile image payload.
-     Desktop keeps the original full file; if the resizer ever fails, the card's
-     onerror falls back to the full image, so it can never break the gallery. */
+     gallery cards. The lightbox still uses the original file through data-full. */
   thumb(url, w) {
-    return 'https://images.weserv.nl/?url=' + url.replace(/^https?:\/\//, '') + '&w=' + w + '&output=webp&q=78';
+    return 'https://images.weserv.nl/?url=' + url.replace(/^https?:\/\//, '') + '&w=' + w + '&output=webp&q=66';
+  },
+
+  dimsFromRatio(ratio, width) {
+    const parts = String(ratio || '4 / 5').split('/');
+    const w = parseFloat(parts[0]) || 4;
+    const h = parseFloat(parts[1]) || 5;
+    const outW = width || 820;
+    return { width: outW, height: Math.max(1, Math.round(outW * h / w)) };
   },
 
   items(coll) {
@@ -164,9 +170,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const grid = document.getElementById('grid');
   if (!grid) return;
 
-  /* Auto-discover real folder contents from GitHub (silent fallback to the
-     static counts if it fails) BEFORE building, so new work shows itself. */
-  await window.BQ_GALLERY.loadManifest();
+  /* Auto-discover real folder contents in the background. The first paint uses
+     the static counts immediately; the manifest refreshes the session cache for
+     later visits without delaying LCP. */
+  window.BQ_GALLERY.loadManifest();
 
   /* Remove loading spinner */
   const loader = document.getElementById('galleryLoading');
@@ -214,7 +221,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       general: ['4 / 5', '1 / 1', '3 / 2'],
     };
     const ratios = ratioSets[item.coll] || ratioSets[item.cat] || ['4 / 5'];
-    article.style.setProperty('--card-ratio', ratios[(item.index - 1) % ratios.length]);
+    const cardRatio = ratios[(item.index - 1) % ratios.length];
+    const dims = window.BQ_GALLERY.dimsFromRatio(cardRatio, item.type === 'video' ? 1280 : 320);
+    article.style.setProperty('--card-ratio', cardRatio);
     const dispTag   = galTag(item.coll, item.tag);
     const dispTitle = galTitle(item.coll, item.index, item.titlePrefix || item.tag);
     article.dataset.cat   = item.cat;
@@ -224,15 +233,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     article.dataset.title = dispTitle;
     article.dataset.type  = item.type;
 
-    // Cards are small (≤280px) on every screen, so load a resized WebP for ALL
-    // images — phones get 640px, desktop 820px (retina-crisp). Videos and the
+    // Cards are small (<=280px) on every screen, so load a resized WebP for ALL
+    // images at 320px. Videos and the
     // zoom lightbox (data-full) still use the ORIGINAL full file, so quality is
-    // untouched where it shows big. Cuts multi-MB originals to ~30–60 KB each.
-    const isPhone = typeof matchMedia === 'function' && matchMedia('(max-width: 700px)').matches;
-    const imgSrc = (item.type !== 'video') ? window.BQ_GALLERY.thumb(item.url, isPhone ? 640 : 820) : item.url;
+    // untouched where it shows big. Cuts multi-MB originals to small thumbnails.
+    const imgSrc = (item.type !== 'video') ? window.BQ_GALLERY.thumb(item.url, 320) : item.url;
     const mediaHtml = item.type === 'video'
-      ? `<video muted loop playsinline preload="metadata" src="${item.url}" title="${dispTitle}"></video>`
-      : `<img loading="eager" decoding="async" src="${imgSrc}" alt="${dispTitle}" />`;
+      ? `<video muted loop playsinline preload="none" data-src="${item.url}" title="${dispTitle}" width="${dims.width}" height="${dims.height}"></video>`
+      : `<img loading="lazy" decoding="async" fetchpriority="low" src="${imgSrc}" alt="${dispTitle}" width="${dims.width}" height="${dims.height}" />`;
 
     const playIcon = item.type === 'video' ? 'fa-play' : 'fa-magnifying-glass-plus';
 
@@ -276,7 +284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const catCounts = {};
   ORDER.forEach(coll => {
     window.BQ_GALLERY.items(coll).forEach(it => {
-      window.BQ_ALL_CARDS.push({ el: buildCard(it), cat: it.cat });
+      window.BQ_ALL_CARDS.push({ el: buildCard(it), cat: it.cat, type: it.type, coll: it.coll });
       catCounts[it.cat] = (catCounts[it.cat] || 0) + 1;
     });
   });
@@ -296,7 +304,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       div.dataset.type  = 'image';
       div.innerHTML = `
         <div class="cert-img-wrap">
-          <img loading="lazy" src="${item.url}" data-raw="${item.rawUrl}" alt="${dispTitle}" />
+          <img loading="lazy" decoding="async" width="640" height="880" src="${item.url}" data-raw="${item.rawUrl}" alt="${dispTitle}" />
           <div class="cert-zoom"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
         </div>
         <span class="mono cert-label">${dispTitle}</span>`;
@@ -329,6 +337,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   grid.addEventListener('mouseover', e => {
     const card = e.target.closest('.card--photo');
     const vid  = card?.querySelector('video');
+    if (vid && !vid.src && vid.dataset.src) {
+      vid.src = vid.dataset.src;
+      vid.load();
+    }
     if (vid && vid.paused) vid.play().catch(() => {});
   });
   grid.addEventListener('mouseout', e => {
@@ -383,7 +395,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const all = [...wLogos, ...wLogos]; // duplicate for seamless loop
     marqueeTrack.innerHTML = all.map(src =>
       `<div class="logo-chip logo-chip--img">
-         <img src="${window.BQ_GALLERY.thumb(src, 240)}" data-full="${src}" alt="" loading="lazy" />
+         <img src="${window.BQ_GALLERY.thumb(src, 180)}" data-full="${src}" alt="" loading="lazy" decoding="async" width="180" height="135" />
        </div>`
     ).join('');
     /* resized copy failed → original full file once; only then drop the chip */
@@ -400,13 +412,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (logosGrid) {
     const CDN  = window.BQ_GALLERY.CDN_BASE;
     const idxs = [2,3,5,6,9,10,12,13];
-    logosGrid.innerHTML = idxs.map(i =>
-      `<div class="logo-mark logo-mark--img" data-full="${CDN}/TickerLogo/TickerLogo${i}.webp">
-         <img src="${CDN}/TickerLogo/TickerLogo${i}.webp" alt="Logo ${i}" loading="lazy" />
+    logosGrid.innerHTML = idxs.map(i => {
+      const src = `${CDN}/TickerLogo/TickerLogo${i}.webp`;
+      return `<div class="logo-mark logo-mark--img" data-full="${src}">
+         <img src="${window.BQ_GALLERY.thumb(src, 180)}" data-full="${src}" alt="Logo ${i}" loading="lazy" decoding="async" width="180" height="135" />
        </div>`
-    ).join('');
+    }).join('');
     logosGrid.querySelectorAll('img').forEach(img =>
-      img.addEventListener('error', () => img.closest('.logo-mark')?.remove())
+      img.addEventListener('error', () => {
+        if (img.dataset.full && img.src !== img.dataset.full) { img.src = img.dataset.full; return; }
+        img.closest('.logo-mark')?.remove();
+      })
     );
     /* lightbox for ticker logos */
     logosGrid.addEventListener('click', e => {

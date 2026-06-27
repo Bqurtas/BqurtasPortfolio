@@ -157,19 +157,53 @@
   }
   </script>
 
-  <!-- Fonts — self-hosted (no external Google Fonts dependency; faster + private) -->
-  <link rel="stylesheet" href="css/fonts.css?v=248">
-
-  <!-- jsDelivr serves Font Awesome + the gallery images — connect early -->
+  <!-- Warm external media CDNs and mark direct room routes before CSS paints. -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://images.weserv.nl" crossorigin>
+  <script>
+    (function () {
+      var parts = location.pathname.split('/').filter(Boolean);
+      var route = (['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'].indexOf(parts[0]) > -1 ? parts[1] : parts[0]) || '';
+      if (route) document.documentElement.classList.add('bq-skip-splash');
+    }());
+  </script>
+
+  <!-- Main layout CSS stays render-stable and is discovered before optional assets. -->
+  <link rel="preload" href="css/style.min.css?v=308" as="style" fetchpriority="high">
+  <link rel="stylesheet" href="css/style.min.css?v=308">
+  <link rel="preload" href="css/fonts.css?v=308" as="style" data-bq-optional-css>
+  <link rel="preload" href="vendor/fontawesome/css/all.min.css?v=308" as="style" data-bq-optional-css>
+  <noscript>
+    <link rel="stylesheet" href="css/fonts.css?v=308">
+    <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css?v=308">
+  </noscript>
+
   <!-- Supabase (blog + subscribe) and GitHub (gallery manifest) — warm the connections early -->
   <link rel="preconnect" href="https://dcnkhzrishphpismmxuu.supabase.co" crossorigin>
   <link rel="dns-prefetch" href="https://api.github.com">
 
-  <!-- Font Awesome icons — direct SRI-protected load for scanner-visible integrity. -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous" referrerpolicy="no-referrer">
-
-  <link rel="stylesheet" href="css/style.css?v=306" />
+  <script>
+    (function () {
+      var links = document.querySelectorAll('link[data-bq-optional-css]');
+      var apply = function (link) {
+        if (link.dataset.bqApplied) return;
+        link.dataset.bqApplied = '1';
+        link.rel = 'stylesheet';
+        link.removeAttribute('as');
+        link.removeAttribute('data-bq-optional-css');
+      };
+      links.forEach(function (link) {
+        link.addEventListener('load', function () {
+          apply(link);
+        }, { once: true });
+      });
+      setTimeout(function () {
+        links.forEach(function (link) {
+          if (link.rel !== 'stylesheet') apply(link);
+        });
+      }, 3500);
+    }());
+  </script>
 </head>
 <body>
 
@@ -177,7 +211,7 @@
   <div class="splash" id="splash" aria-hidden="true">
     <div class="splash-inner">
       <div class="splash-logo">
-        <img src="assets/avatar.webp" alt="Barakat Qurtas" />
+        <img src="assets/avatar.webp" alt="Barakat Qurtas" width="124" height="124" decoding="async" />
       </div>
       <span class="splash-name">Barakat Qurtas</span>
       <span class="splash-tag mono">Graphic Designer</span>
@@ -468,7 +502,7 @@
           <h1 class="hero-title">
             <span class="hero-line hero-line--1"><span class="hero-name" data-i18n="name.first">Barakat</span></span>
             <span class="hero-line hero-line--2"><span class="hero-name" data-i18n="name.last">Qurtas</span></span>
-            <span class="hero-portrait" id="heroPortrait" aria-hidden="true"><img src="assets/portrait.webp" alt="" /></span>
+            <span class="hero-portrait" id="heroPortrait" aria-hidden="true"><img src="assets/portrait.webp" alt="" width="400" height="600" loading="lazy" decoding="async" fetchpriority="low" /></span>
           </h1>
           <span class="hero-spark" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="M50 0 C54 30 70 46 100 50 C70 54 54 70 50 100 C46 70 30 54 0 50 C30 46 46 30 50 0 Z"/></svg></span>
           <p class="hero-lede" data-i18n="hero.lede">I'm Barakat Qurtas — a graphic &amp; motion designer crafting brand identities and editorial systems for over a decade.</p>
@@ -550,7 +584,7 @@
         </div>
 
         <!-- Load more -->
-        <div class="load-more-wrap bq-hidden" id="loadMoreWrap">
+        <div class="load-more-wrap is-pending" id="loadMoreWrap" aria-hidden="true">
           <div class="load-more-track">
             <span class="mono load-more-info" id="loadMoreInfo">—</span>
             <div class="load-more-bar"><div class="load-more-fill" id="loadMoreFill"></div></div>
@@ -1527,7 +1561,7 @@
 
       <div class="footer-main-v249">
         <div class="footer-signature">
-          <img class="footer-av" src="assets/avatar.webp" alt="" />
+          <img class="footer-av" src="assets/avatar.webp" alt="" width="124" height="124" loading="lazy" decoding="async" />
           <span class="footer-bq">Barakat Qurtas</span>
           <span class="footer-role">Graphic Designer</span>
           <p data-i18n="f.lead">Independent graphic designer crafting brand identity, editorial, and books from the old quarter of Hewlêr — Kurdistan, since 2014.</p>
@@ -1742,25 +1776,14 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <!-- Lenis: buttery momentum scrolling on mobile (desktop keeps native scroll-snap) -->
-  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js" integrity="sha384-eD5ubmuCcvTdCADWuSchJYE7wcj2nzNr0itbrh6w/KJyBiltSZ8w3VFRBSWu5YQ8" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-  <script>
-    window.addEventListener('load', function () {
-      /* Mobile scrolling is left to the browser's own momentum engine — natural,
-         smooth and snap-free, the way a Framer site feels. Lenis used to intercept
-         touch (syncTouch) which made it feel un-natural, so it is intentionally
-         disabled. Desktop keeps native scroll + scroll-snap. */
-      return;
-    });
-  </script>
-  <script src="js/i18n.js?v=306"></script>
-  <script src="js/chat-kb.js?v=306"></script>
-  <script src="js/main.js?v=306"></script>
-  <script src="js/gallery.js?v=306"></script>
-  <script src="js/enhance.js?v=306"></script>
-  <script src="js/brandboard.js?v=306"></script>
-  <script src="js/work.js?v=306"></script>
-  <script src="js/lux.js?v=306"></script>
-  <script src="js/motion.js?v=306"></script>
+  <script src="js/i18n.min.js?v=308"></script>
+  <script src="js/chat-kb.min.js?v=308"></script>
+  <script src="js/main.min.js?v=308"></script>
+  <script src="js/gallery.min.js?v=308"></script>
+  <script src="js/enhance.min.js?v=308"></script>
+  <script src="js/brandboard.min.js?v=308"></script>
+  <script src="js/work.min.js?v=308"></script>
+  <script src="js/lux.min.js?v=308"></script>
+  <script src="js/motion.min.js?v=308"></script>
 </body>
 </html>

@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- TABS + PAGINATION + SECTION HEADER ---------- */
   const tabs = document.querySelectorAll('.tab');
-  const PAGE_SIZE = 40;
+  const PAGE_SIZE = 12;
   let currentFilter = 'all';
   let currentShown  = 0;
 
@@ -418,6 +418,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const remaining = total - currentShown;
     const pct = total > 0 ? Math.round(currentShown / total * 100) : 100;
     wrap.style.display = total > 0 ? 'flex' : 'none';
+    wrap.classList.toggle('is-pending', total <= 0);
+    wrap.setAttribute('aria-hidden', total > 0 ? 'false' : 'true');
     if (fill) fill.style.width = pct + '%';
     const d = window.BQ_DICT || {};
     const infoT = d['lm.info'] || '{shown} / {total} — {rem} remaining';
@@ -439,7 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
     buildColumns(colCountForWidth());
     const matching = matchingCards();
     const target = Math.max(0, Math.min(n, matching.length));
-    matching.slice(0, target).forEach(e => placeCard(e.el));
+    matching.slice(0, target).forEach((e, idx) => placeCard(e.el, idx));
     currentShown = target;
     updateTabHeader(currentFilter, matching.length);
     updateLoadMore(matching.length);
@@ -469,11 +471,17 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   let portfolioRevealObserver = null;
-  const prepPortfolioReveal = (card, colIndex, media) => {
+  const prepPortfolioReveal = (card, colIndex, media, rank) => {
     if (!card) return;
     card.classList.remove('portfolio-in');
     card.classList.add('portfolio-scroll-card');
     card.style.setProperty('--portfolio-delay', Math.min(colIndex || 0, 5) * 36 + 'ms');
+
+    if (rank < PAGE_SIZE) {
+      card.style.setProperty('--portfolio-delay', '0ms');
+      card.classList.add('portfolio-in');
+      return;
+    }
 
     if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
       requestAnimationFrame(() => card.classList.add('portfolio-in'));
@@ -530,15 +538,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const placeCard = (card) => {
+  const placeCard = (card, rank) => {
     const heights = mHeights, cols = mCols;       // capture current layout refs
     let i = 0;
     for (let k = 1; k < heights.length; k++) if (heights[k] < heights[i]) i = k;
+    const media = card.querySelector('img, video');
+    if (media && media.tagName === 'IMG') {
+      if (rank < PAGE_SIZE) {
+        media.loading = 'eager';
+        media.fetchPriority = 'high';
+      } else {
+        media.loading = 'lazy';
+        media.fetchPriority = 'low';
+      }
+    }
     cols[i].appendChild(card);
     heights[i] += CARD_EST;
 
-    const media = card.querySelector('img, video');
-    prepPortfolioReveal(card, i, media);
+    prepPortfolioReveal(card, i, media, rank);
     const correct = () => {
       if (heights !== mHeights) return;           // layout was rebuilt — ignore
       heights[i] += (card.offsetHeight + 8) - CARD_EST;
@@ -552,8 +569,13 @@ document.addEventListener('DOMContentLoaded', () => {
     /* visual reveal is handled by .portfolio-scroll-card when the card enters view */
   };
 
-  const matchingCards = () =>
-    (window.BQ_ALL_CARDS || []).filter(e => currentFilter === 'all' || e.cat === currentFilter);
+  const matchingCards = () => {
+    const list = (window.BQ_ALL_CARDS || []).filter(e => currentFilter === 'all' || e.cat === currentFilter);
+    if (currentFilter !== 'all') return list;
+    const stills = [], videos = [];
+    list.forEach(e => (e.type === 'video' ? videos : stills).push(e));
+    return stills.concat(videos);
+  };
 
   const COMING_SOON = {
     en:  { t: 'Coming soon', s: 'AI-assisted posters and video — landing here shortly.' },
@@ -589,7 +611,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     const batch = matching.slice(currentShown, currentShown + PAGE_SIZE);
-    batch.forEach(e => placeCard(e.el));
+    batch.forEach((e, idx) => placeCard(e.el, currentShown + idx));
     currentShown += batch.length;
     updateTabHeader(currentFilter, matching.length);
     updateLoadMore(matching.length);
@@ -622,7 +644,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const shown = currentShown;
       buildColumns(colCountForWidth());
       currentShown = 0;
-      matchingCards().slice(0, shown).forEach(e => { placeCard(e.el); currentShown++; });
+      matchingCards().slice(0, shown).forEach((e, idx) => { placeCard(e.el, idx); currentShown++; });
       updateLoadMore(matchingCards().length);
     }, 200);
   });
@@ -638,8 +660,8 @@ document.addEventListener('DOMContentLoaded', () => {
   tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab, true)));
 
   /* The deck re-shuffles on every page load and tab switch — that stays.
-     The gallery shows exactly one batch (PAGE_SIZE = 40) at a time; the reader
-     taps "Load more" to reveal the next 40. No auto-infinite-scroll — the works
+     The gallery shows exactly one batch (PAGE_SIZE = 12) at a time; the reader
+     taps "Load more" to reveal the next batch. No auto-infinite-scroll — the works
      never all load at once, and nothing swaps under the reader as they scroll. */
 
   /* ---------- COUNT UP (statistics) ---------- */

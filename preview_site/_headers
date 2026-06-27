@@ -33,14 +33,24 @@
 /
   Access-Control-Allow-Origin: https://bqurtas.com
 
-# Images & fonts rarely change — cache for 30 days (still not a year)
+# Images & fonts are fingerprinted by file path or updated through new deploys.
 /assets/*
-  Cache-Control: public, max-age=2592000
+  Cache-Control: public, max-age=31536000, immutable
 
-# CSS/JS are ?v-versioned, so a new edit is a new URL — a 1-day cache is safe
-# and edits still show immediately (the version string busts it)
+# CSS/JS are ?v-versioned, so a new edit is a new URL.
 /css/*
-  Cache-Control: public, max-age=86400
+  Cache-Control: public, max-age=31536000, immutable
 
 /js/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/vendor/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/.well-known/security.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=86400
+
+/.well-known/mta-sts.txt
+  Content-Type: text/plain; charset=utf-8
   Cache-Control: public, max-age=86400

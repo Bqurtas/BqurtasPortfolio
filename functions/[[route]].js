@@ -142,9 +142,9 @@ export async function onRequest(context) {
   const CSP = [
     "default-src 'self'", "base-uri 'self'", "object-src 'none'",
     "frame-ancestors 'self'", "form-action 'self'", "upgrade-insecure-requests",
-    "script-src 'nonce-" + nonce + "' 'strict-dynamic' 'self' https://cdn.jsdelivr.net",
-    "style-src 'self' https://cdn.jsdelivr.net",
-    "font-src 'self' data: https://cdn.jsdelivr.net",
+    "script-src 'nonce-" + nonce + "' 'strict-dynamic' 'self'",
+    "style-src 'nonce-" + nonce + "' 'self'",
+    "font-src 'self' data:",
     "img-src 'self' data: blob: https://cdn.jsdelivr.net https://raw.githubusercontent.com https://images.weserv.nl https://*.supabase.co",
     "media-src 'self' blob: https://cdn.jsdelivr.net https://raw.githubusercontent.com",
     "connect-src 'self' https://cloud.umami.is https://api.umami.is https://gateway.umami.is https://*.supabase.co https://api.github.com https://api.web3forms.com https://cdn.jsdelivr.net https://data.jsdelivr.com https://images.weserv.nl https://raw.githubusercontent.com",
@@ -168,6 +168,7 @@ export async function onRequest(context) {
     const shell = await env.ASSETS.fetch(new URL('/index.html', url.origin));
     const out = new HTMLRewriter()
       .on('script',                           addNonce)
+      .on('style',                            addNonce)
       .on('html',                             setLangAttr(r.lang))
       .on('title',                            setText(meta.t))
       .on('meta[name="description"]',         setContent(meta.d))
