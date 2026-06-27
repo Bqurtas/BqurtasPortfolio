@@ -9145,3 +9145,29 @@ body::before{ display:none !important; }
   background-size:26px 26px !important;
   background-position:0 0 !important;
 }
+
+/* =========================================================
+   v294 — biography cards a touch bigger so the Designer room carries
+   the same visual weight as the hero / portfolio / other sections.
+   The cards are a content-height BENTO grid (governed by the
+   "#bio .bio-stack > .bio-block" rule with ID specificity + !important),
+   so the levers are PADDING + a min-height floor + the grid GAP — NOT
+   `height` (which is intentionally auto). Width stays at the standard
+   1180px column (matches the logos & service sections) for balance.
+   ========================================================= */
+@media (min-width:821px){
+  #bio .bio-stack{ gap:clamp(20px, 2.3vw, 32px) !important; }
+  #bio .bio-stack > .bio-block,
+  #bio .bio-stack > .bio-social{
+    padding:clamp(40px, 4.2vw, 60px) !important;          /* was clamp(26,3vw,42) */
+    min-height:clamp(320px, 36vh, 460px) !important;      /* a floor so every card has presence */
+    border-radius:26px !important;
+  }
+}
+@media (max-width:820px){
+  #bio .bio-stack > .bio-block,
+  #bio .bio-stack > .bio-social{
+    padding:clamp(26px, 6.5vw, 36px) !important;
+    min-height:200px !important;
+  }
+}
