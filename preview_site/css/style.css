@@ -9181,7 +9181,11 @@ body::after{
    ========================================================= */
 body::before{
   display:block !important;
-  background:radial-gradient(480px circle at var(--cursor-x, 50vw) var(--cursor-y, 50vh),
-    color-mix(in srgb, var(--ink) 6%, transparent), transparent 72%) !important;
+  /* smaller + feathered so it has NO visible circular edge — a soft halo that
+     fades out gradually (mid-stop) instead of a ring with a defined boundary */
+  background:radial-gradient(300px circle at var(--cursor-x, 50vw) var(--cursor-y, 50vh),
+    color-mix(in srgb, var(--ink) 5%, transparent) 0%,
+    color-mix(in srgb, var(--ink) 1.6%, transparent) 46%,
+    transparent 80%) !important;
 }
 @media (prefers-reduced-motion: reduce){ body::before{ display:none !important; } }
