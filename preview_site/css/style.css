@@ -9204,3 +9204,37 @@ body::before{
   -webkit-backdrop-filter:none !important;
   backdrop-filter:none !important;
 }
+
+/* =========================================================
+   v299 — soft scroll motion on the portfolio images. As each work scrolls
+   through the viewport its photo drifts gently upward: a quiet parallax that
+   makes the grid feel alive without distracting. Built on native scroll-driven
+   animation (animation-timeline:view()) so it runs on the compositor — smooth
+   on mobile AND desktop, no scroll jank. The image is scaled a touch so the
+   drift never exposes an edge inside .card-art (which already clips overflow),
+   and `transform` never reflows, so the masonry layout is untouched. Browsers
+   without scroll-driven animations just show the static image (the entrance
+   reveal still plays). Reduce Motion turns it off.
+   ========================================================= */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* The card publishes a view-progress timeline tracked against the PAGE
+       scroll. The image can't host view() itself — its nearest scroll
+       container is .card-art's clipped (overflow:hidden) box, which never
+       scrolls, so view() there is frozen at 50%. Each .card scopes its own
+       --bqcard, and its image reads that card's timeline. */
+    #grid .card { view-timeline: --bqcard block; }
+    #grid .card-art img,
+    #grid .card-art video {
+      animation: bq-soft-rise linear both;
+      animation-timeline: --bqcard;
+      animation-range: cover 0% cover 100%;
+      will-change: transform;
+      backface-visibility: hidden;
+    }
+    @keyframes bq-soft-rise {
+      from { transform: translate3d(0, 3.2%, 0) scale(1.07); }
+      to   { transform: translate3d(0, -3.2%, 0) scale(1.07); }
+    }
+  }
+}
