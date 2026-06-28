@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- TABS + PAGINATION + SECTION HEADER ---------- */
   const tabs = document.querySelectorAll('.tab');
-  const PAGE_SIZE = 48;
+  const PAGE_SIZE = 58;
   let currentFilter = 'all';
   let currentShown  = 0;
 
@@ -475,7 +475,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!card) return;
     card.classList.remove('portfolio-in');
     card.classList.add('portfolio-scroll-card');
-    card.style.setProperty('--portfolio-delay', Math.min(colIndex || 0, 5) * 36 + 'ms');
+    const batchRank = rank % PAGE_SIZE;
+    const delay = Math.min(760, batchRank * 14 + Math.min(colIndex || 0, 5) * 30);
+    card.style.setProperty('--portfolio-delay', delay + 'ms');
 
     if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
       requestAnimationFrame(() => card.classList.add('portfolio-in'));
@@ -491,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
             entry.target.classList.add('portfolio-in');
             portfolioRevealObserver.unobserve(entry.target);
           });
-        }, { threshold: 0.16, rootMargin: '0px 0px -8% 0px' });
+        }, { threshold: 0.12, rootMargin: '0px 0px -5% 0px' });
       }
       portfolioRevealObserver.observe(card);
     };
@@ -539,8 +541,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const media = card.querySelector('img, video');
     if (media && media.tagName === 'IMG') {
       if (rank < PAGE_SIZE) {
-        media.loading = rank < 18 ? 'eager' : 'lazy';
-        media.fetchPriority = rank < 12 ? 'high' : 'auto';
+        media.loading = rank < 22 ? 'eager' : 'lazy';
+        media.fetchPriority = rank < 14 ? 'high' : 'auto';
       } else {
         media.loading = 'lazy';
         media.fetchPriority = 'low';
@@ -654,7 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
   tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab, true)));
 
   /* The deck re-shuffles on every page load and tab switch — that stays.
-     The gallery shows exactly one batch (PAGE_SIZE = 48) at a time; the reader
+     The gallery shows exactly one batch (PAGE_SIZE = 58) at a time; the reader
      taps "Load more" to reveal the next batch. No auto-infinite-scroll — the works
      never all load at once, and nothing swaps under the reader as they scroll. */
 
