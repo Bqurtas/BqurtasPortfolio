@@ -1347,34 +1347,32 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
 /* Portfolio works enter as the visitor reaches them, so long scrolls feel
    intentional instead of dumping every image into view at once. */
 #grid .card.portfolio-scroll-card{
-  opacity:0;
-  transform:translate3d(0,56px,0) scale(.966);
-  filter:saturate(.72) contrast(.96) blur(7px);
+  opacity:1;
+  transform:translate3d(0,28px,0) scale(.992);
+  filter:saturate(.9) contrast(.985);
   transition:
-    opacity .92s var(--ease-out),
-    transform 1.08s var(--ease-out),
-    filter 1.08s var(--ease-out);
+    opacity .45s var(--ease-out),
+    transform 1.16s var(--ease-out),
+    filter .9s var(--ease-out);
   transition-delay:var(--portfolio-delay,0ms);
   will-change:opacity, transform, filter;
 }
 #grid .card.portfolio-scroll-card .card-art{
-  clip-path:inset(13% 4% 13% 4% round 10px);
-  transform:translate3d(0,18px,0) scale(1.035);
-  transition-property:clip-path, transform;
-  transition-duration:1.12s, 1.12s;
-  transition-timing-function:var(--ease-out), var(--ease-out);
-  transition-delay:var(--portfolio-delay,0ms), 0ms;
+  clip-path:inset(0);
+  transform:translate3d(0,12px,0);
+  transition:transform 1.18s var(--ease-out);
+  transition-delay:var(--portfolio-delay,0ms);
 }
 #grid .card.portfolio-scroll-card .card-art img,
 #grid .card.portfolio-scroll-card .card-art video,
 #grid .card.portfolio-scroll-card .card-art svg{
-  transform:scale(1.055);
+  transform:scale(1.012);
   transition:transform 1.18s var(--ease-out), filter 1.05s var(--ease-out);
 }
 #grid .card.portfolio-scroll-card.portfolio-in{
   opacity:1;
   transform:none;
-  filter:saturate(1) contrast(1) blur(0);
+  filter:saturate(1) contrast(1);
 }
 #grid .card.portfolio-scroll-card.portfolio-in .card-art{
   clip-path:inset(0);
@@ -7134,32 +7132,89 @@ html[lang] .splash-name {
 
 /* ---- OPEN cursor: restrained glass disc with a second fine ring ---- */
 .cursor-ring {
-  border-color: color-mix(in srgb, var(--ink) 52%, transparent);
+  border-color: color-mix(in srgb, var(--ink) 46%, transparent);
   mix-blend-mode: normal;
+  overflow:hidden;
 }
 .cursor-ring.is-open {
-  width: 70px;
-  height: 70px;
-  background: color-mix(in srgb, var(--bg) 82%, transparent);
-  border-color: color-mix(in srgb, var(--ink) 74%, transparent);
+  width: 86px;
+  height: 86px;
+  background:
+    radial-gradient(circle at 30% 22%, color-mix(in srgb, var(--bg) 95%, transparent) 0 20%, transparent 42%),
+    color-mix(in srgb, var(--bg) 80%, transparent);
+  border-color: color-mix(in srgb, var(--ink) 70%, transparent);
   color: var(--ink);
   box-shadow:
-    0 0 0 4px color-mix(in srgb, var(--bg) 32%, transparent),
-    0 0 0 5px color-mix(in srgb, var(--ink) 13%, transparent),
-    0 14px 38px -20px rgba(0,0,0,.5);
-  -webkit-backdrop-filter: blur(9px);
-  backdrop-filter: blur(9px);
+    inset 0 1px 0 color-mix(in srgb, var(--bg) 88%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--bg) 46%, transparent),
+    0 0 0 6px color-mix(in srgb, var(--ink) 8%, transparent),
+    0 18px 50px -24px rgba(0,0,0,.58);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
 }
+.cursor-ring::before,
+.cursor-ring::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .26s var(--ease), transform .38s var(--ease);
+}
+.cursor-ring::before{
+  inset:-1px;
+  background:conic-gradient(from 145deg,
+    transparent 0 24%,
+    color-mix(in srgb, var(--ink) 42%, transparent) 36%,
+    transparent 52% 100%);
+  animation:cursorOrbit 3.2s linear infinite;
+}
+.cursor-ring::after{
+  inset:9px;
+  border:1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  transform:scale(.78);
+}
+.cursor-ring.is-open::before{ opacity:.42; }
+.cursor-ring.is-open::after{ opacity:1; transform:scale(1); }
 .cursor-ring.is-open .cursor-ring-label {
   color: var(--ink);
-  font-size: 8px;
-  letter-spacing: .14em;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-shadow:0 1px 0 color-mix(in srgb, var(--bg) 72%, transparent);
+}
+.cursor-ring.is-open .cursor-ring-label::after{
+  content:'';
+  display:block;
+  width:18px;
+  height:1px;
+  margin:0 auto;
+  background:currentColor;
+  opacity:.6;
+  transform:scaleX(.55);
+  transform-origin:center;
+  transition:transform .28s var(--ease), opacity .28s var(--ease);
+}
+.cursor-ring.is-open:hover .cursor-ring-label::after,
+.cursor-ring.is-open .cursor-ring-label::after{
+  transform:scaleX(1);
+}
+.cursor-ring[data-cursor-action="view"]{
+  border-color:color-mix(in srgb, var(--gold) 70%, var(--ink));
+}
+.cursor-ring[data-cursor-action="talk"]{
+  width:92px;
+  height:92px;
 }
 .cursor-ring.is-hover {
   width: 46px;
   height: 46px;
   background: transparent;
 }
+@keyframes cursorOrbit{ to{ transform:rotate(360deg); } }
 
 @media (max-width:820px) {
   .footer-stage {

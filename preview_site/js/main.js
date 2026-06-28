@@ -1002,12 +1002,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (dot && ring && window.matchMedia('(pointer: fine)').matches) {
     const ringLabel = ring.querySelector('.cursor-ring-label');
     let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
+    let magnet = null;
+    let cursorTarget = null;
     document.addEventListener('mousemove', (e) => {
       mx = e.clientX; my = e.clientY;
       dot.style.left = mx + 'px';
       dot.style.top  = my + 'px';
+      syncCursorTarget(e.target);
     });
-    let magnet = null;
     const animateRing = () => {
       let tx = mx, ty = my;
       if (magnet) {
@@ -1027,35 +1029,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const MAGNET = '.rail-link, .rail-tool, .rail-chat, .theme-btn, .social-current, ' +
                    '.lang-current, .lang-opt, .social-opt, .footer-top-btn, ' +
                    '.mobile-menu-close, .to-top, .profile-card-btn, .reader-top';
-    document.body.addEventListener('mouseover', (e) => {
-      const overCard = e.target.closest(
+    function syncCursorTarget(target) {
+      if (!target || target === cursorTarget || !target.closest) return;
+      cursorTarget = target;
+      const overCard = target.closest(
         '.card, .service-trigger, .feature-card, .blog-card, .qc-card, .index-row, ' +
         '.footer-cta-btn, .footer-room-nav a, .mm-link, .tab, .software-chip, ' +
-        '#bio .bio-block, .bio-doc-btn, .work-card'
+        '#bio .bio-block, .bio-doc-btn, .work-card, .service-cta, .software-link, ' +
+        '.pencemor-hero-btn, .pitch-submit, .footer-email, .profile-card-btn'
       );
-      const overMagnet = e.target.closest(MAGNET);
-      const overZoom = e.target.closest('.cert-item');   // certificates keep the system zoom cursor
-      const overHide = e.target.closest('#railLogo, .rail-logo, .profile-card');  // no custom-cursor shape over the wordmark / profile card
-      const overMenuBtn = e.target.closest('#railMenu, .rail-menu, #menuToggle, .menu-toggle-btn');  // hamburger: NO cursor ring over it (the circle read as clutter)
-      const overLink = e.target.closest('a, button, .tab, input, select, textarea, .service, .stat, .logo-mark, .logo-chip, .index-row');
+      const overMagnet = target.closest(MAGNET);
+      const overZoom = target.closest('.cert-item');   // certificates keep the system zoom cursor
+      const overHide = target.closest('#railLogo, .rail-logo, .profile-card');  // no custom-cursor shape over the wordmark / profile card
+      const overMenuBtn = target.closest('#railMenu, .rail-menu, #menuToggle, .menu-toggle-btn');  // hamburger: NO cursor ring over it (the circle read as clutter)
+      const overLink = target.closest('a, button, .tab, input, select, textarea, .service, .stat, .logo-mark, .logo-chip, .index-row');
       magnet = (!overCard && overMagnet && !overHide) ? overMagnet : null;
       ring.classList.toggle('is-open',   !!overCard && !overZoom);
       ring.classList.toggle('is-magnet', !overCard && !!overMagnet && !overMenuBtn);
       ring.classList.toggle('is-hover',  !overCard && !overMagnet && !!overLink && !overMenuBtn);
       if (ringLabel && overCard) {
         let label = 'Open';
-        if (overCard.matches('.tab')) label = 'View';
-        else if (overCard.matches('.software-chip')) label = 'Tool';
+        if (overCard.matches('.card--photo, .work-card, .blog-card, .tab')) label = 'View';
+        else if (overCard.matches('.software-chip, .software-link')) label = 'Tool';
         else if (overCard.matches('.footer-cta-btn')) label = 'Talk';
-        else if (overCard.matches('.mm-link, .footer-room-nav a')) label = 'Go';
-        else if (overCard.matches('.service-trigger')) label = 'More';
+        else if (overCard.matches('.pitch-submit, .footer-email')) label = 'Send';
+        else if (overCard.matches('.mm-link, .footer-room-nav a, .service-cta, .pencemor-hero-btn')) label = 'Go';
+        else if (overCard.matches('.service-trigger, .feature-card, .qc-card, #bio .bio-block')) label = 'Open';
+        else if (overCard.matches('.index-row')) label = 'Preview';
         ringLabel.textContent = label;
+        ring.dataset.cursorAction = label.toLowerCase();
       } else if (ringLabel) {
         ringLabel.textContent = 'Open';
+        delete ring.dataset.cursorAction;
       }
       dot.style.opacity  = (overCard || overZoom || overHide) ? '0' : '';
       ring.style.opacity = (overZoom || overHide || overMenuBtn) ? '0' : '';   // hide the ring circle over the hamburger
-    });
+    }
+    document.body.addEventListener('mouseover', (e) => syncCursorTarget(e.target));
     document.addEventListener('mousedown', () => ring.classList.add('is-press'));
     document.addEventListener('mouseup',   () => ring.classList.remove('is-press'));
   }
