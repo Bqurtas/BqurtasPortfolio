@@ -972,8 +972,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      // safe readers — the form now shows only name/email/message; the other
-      // fields may be hidden or absent, so never assume they exist.
+      // Safe readers: optional brief fields may be hidden or absent in older cached markup.
       const val = (sel) => { const el = form.querySelector(sel); return el ? el.value.trim() : ''; };
       const chk = (sel) => { const el = form.querySelector(sel); return !!(el && el.checked); };
       const name = val('#pName');
@@ -999,6 +998,7 @@ document.addEventListener('DOMContentLoaded', () => {
         budget:  val('#pBudget'),
         timeline:val('#pTimeline'),
         hear:    val('#pHear'),
+        references: val('#pRefs'),
         nda:     chk('#pNDA'),
         at: new Date().toISOString()
       });
@@ -1015,6 +1015,7 @@ document.addEventListener('DOMContentLoaded', () => {
         budget:       val('#pBudget'),
         timeline:     val('#pTimeline'),
         heard_about:  val('#pHear'),
+        references:   val('#pRefs'),
         nda:          chk('#pNDA') ? 'Yes' : 'No'
       };
 
@@ -1038,7 +1039,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         const subject = encodeURIComponent(`Pitch — ${type} — ${name}`);
         const body = encodeURIComponent(
-          `Name: ${name}\nEmail: ${email}\nCompany: ${fields.company}\nPhone: ${fields.phone}\nProject type: ${type}\nBudget: ${fields.budget}\nTimeline: ${fields.timeline}\nHeard about: ${fields.heard_about}\nNDA: ${fields.nda}\n\n---\n${message}`
+          `Name: ${name}\nEmail: ${email}\nCompany: ${fields.company}\nPhone: ${fields.phone}\nProject type: ${type}\nBudget: ${fields.budget}\nTimeline: ${fields.timeline}\nReferences: ${fields.references}\nHeard about: ${fields.heard_about}\nNDA: ${fields.nda}\n\n---\n${message}`
         );
         window.location.href = `mailto:hello@bqurtas.com?subject=${subject}&body=${body}`;
         status.style.color = 'var(--gold)';

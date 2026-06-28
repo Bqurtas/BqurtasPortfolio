@@ -117,9 +117,8 @@
        position — so the visitor lands deep in a section instead of the hero.
        Take control of scroll restoration and reset to the very top on every
        (re)open: fresh load, refresh, and bfcache/session restore. And when the
-       site was backgrounded for a long while and reopened (mobile "close &
-       reopen", no reload), go back to the home hero — no matter which room or
-       section they were in. */
+       site was backgrounded and reopened with no reload, go back to the home
+       hero after a short desktop pause or a longer mobile pause. */
     if ('scrollRestoration' in history) { try { history.scrollRestoration = 'manual'; } catch (e) {} }
     const bqToTop  = () => { try { window.scrollTo(0, 0); } catch (e) {} };
     const bqToHero = () => {
@@ -138,7 +137,15 @@
     window.addEventListener('pageshow', (e) => { if (e.persisted) bqToHero(); });
     let bqHiddenAt = 0;
     const BQ_RESUME_RESET_MS = 900;
+    const BQ_MOBILE_RESUME_RESET_MS = 5 * 60 * 1000;
     const BQ_AWAY_KEY = 'bq_last_away_at';
+    const bqResumeDelay = () => {
+      try {
+        return window.matchMedia('(max-width: 820px)').matches ? BQ_MOBILE_RESUME_RESET_MS : BQ_RESUME_RESET_MS;
+      } catch (e) {
+        return BQ_RESUME_RESET_MS;
+      }
+    };
     const bqStoreAway = () => {
       bqHiddenAt = Date.now();
       try { sessionStorage.setItem(BQ_AWAY_KEY, String(bqHiddenAt)); } catch (e) {}
@@ -153,7 +160,7 @@
     const bqResumeHome = () => { bqClearAway(); bqToHero(); };
     const bqResumeIfAway = () => {
       const at = bqHiddenAt || bqStoredAwayAt();
-      if (at && Date.now() - at > BQ_RESUME_RESET_MS) bqResumeHome();
+      if (at && Date.now() - at > bqResumeDelay()) bqResumeHome();
       else if (at) bqClearAway();
     };
     document.addEventListener('visibilitychange', () => {

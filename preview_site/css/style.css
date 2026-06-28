@@ -1775,6 +1775,8 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
   .bio-stack > .bio-block:nth-child(12) { top: 218px; }
   .bio-stack > .bio-block:nth-child(13) { top: 230px; }
   .bio-stack > .bio-block:nth-child(14) { top: 242px; }
+  .bio-stack > .bio-block:nth-child(15) { top: 254px; }
+  .bio-stack > .bio-block:nth-child(16) { top: 266px; }
   .bio-stack > .bio-block:last-child { margin-bottom: 0; }
   /* the honours index inside a card: drop its own sticky to avoid nesting */
   .bio-stack .index-preview { position: relative; top: 0; align-self: stretch; }
@@ -1822,6 +1824,8 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
   .bio-stack > .bio-block:nth-child(12) { top: 90px; }
   .bio-stack > .bio-block:nth-child(13) { top: 96px; }
   .bio-stack > .bio-block:nth-child(14) { top: 102px; }
+  .bio-stack > .bio-block:nth-child(15) { top: 108px; }
+  .bio-stack > .bio-block:nth-child(16) { top: 114px; }
   .bio-stack > .bio-block:last-child { margin-bottom: 0; }
 }
 
@@ -1858,6 +1862,13 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
 }
 .bio-social--linkedin { --brand: #0a66c2; }
 .bio-social--behance  { --brand: #1769ff; }
+.bio-doc-card { --brand: var(--gold); }
+.bio-doc-card::before {
+  content: '\f15c';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+}
+.bio-doc-card--catalogue::before { content: '\f518'; }
 /* huge faint brand glyph fills the empty space */
 .bio-social::before {
   font-family: 'Font Awesome 6 Brands'; font-weight: 400;
@@ -1866,6 +1877,12 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
   opacity: 0.05; pointer-events: none;
   transition: opacity 0.45s var(--ease), transform 0.6s var(--ease);
 }
+.bio-social.bio-doc-card::before {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+}
+.bio-social.bio-doc-card--cv::before { content: '\f15c'; }
+.bio-social.bio-doc-card--catalogue::before { content: '\f518'; }
 .bio-social--linkedin::before { content: '\f0e1'; }
 .bio-social--behance::before  { content: '\f1b4'; }
 .bio-social:hover::before { opacity: 0.08; transform: scale(1.04) rotate(-3deg); }
@@ -4725,17 +4742,15 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 }
 
 /* =========================================================
-   v234 — Contact room: a much simpler form (name · email · message only)
+   v319 — Contact room: richer project brief fields
    ========================================================= */
-/* drop the project-type/budget and timeline/hear rows, plus company, phone & NDA */
 .pitch-form .row-2:has(#pType),
-.pitch-form .row-2:has(#pTimeline){ display:none !important; }
+.pitch-form .row-2:has(#pTimeline){ display:grid !important; }
 .pitch-form .field:has(#pCompany),
 .pitch-form .field:has(#pPhone),
-.pitch-form .field:has(#pNDA){ display:none !important; }
-/* let the name & email fields span the full width now their partner is gone */
+.pitch-form .field:has(#pNDA){ display:flex !important; }
 .pitch-form .row-2:has(#pName),
-.pitch-form .row-2:has(#pEmail){ display:block !important; }
+.pitch-form .row-2:has(#pEmail){ display:grid !important; }
 
 /* =========================================================
    v235 — Panjamor even simpler & aligned to the side + features/journal closer
@@ -7803,7 +7818,7 @@ html[lang] .splash-name {
 /* --- 3) smoother card + cover transitions (Strida-like ease) --- */
 .mm-link{ transition:background .5s cubic-bezier(.22,1,.36,1), color .4s cubic-bezier(.22,1,.36,1),
           box-shadow .5s cubic-bezier(.22,1,.36,1) !important; }
-.mm-cover{ transition:--cov-1 .65s cubic-bezier(.22,1,.36,1), --cov-2 .65s cubic-bezier(.22,1,.36,1) !important; }
+.mm-cover{ transition:background .65s cubic-bezier(.22,1,.36,1), transform .65s cubic-bezier(.22,1,.36,1) !important; }
 .mm-cover-no, .mm-cover-title, .mm-cover-note{ transition:opacity .4s var(--ease) !important; }
 .mm-figure.is-fading .mm-cover-no, .mm-figure.is-fading .mm-cover-title, .mm-figure.is-fading .mm-cover-note{ opacity:0 !important; }
 

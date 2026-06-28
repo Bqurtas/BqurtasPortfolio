@@ -170,8 +170,8 @@
   </script>
 
   <!-- Main layout CSS stays render-stable and is discovered before optional assets. -->
-  <link rel="preload" href="css/style.v318.min.css?v=318" as="style" fetchpriority="high">
-  <link rel="stylesheet" href="css/style.v318.min.css?v=318">
+  <link rel="preload" href="css/style.v319.min.css?v=319" as="style" fetchpriority="high">
+  <link rel="stylesheet" href="css/style.v319.min.css?v=319">
   <link rel="preload" href="css/fonts.css?v=310" as="style" data-bq-optional-css>
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=310">
   <noscript>
@@ -1292,20 +1292,31 @@
           </div>
           <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
         </a>
-        </div><!-- /.bio-stack -->
 
-        <div class="bio-docs">
-          <a class="bio-doc-btn" href="https://dcnkhzrishphpismmxuu.supabase.co/storage/v1/object/public/PDF/df9e89_a909ec87afa044c9aca814e2de2e553c_compressed.pdf" target="_blank" rel="noopener">
-            <i class="fa-solid fa-file-lines"></i>
-            <span class="bio-doc-text"><strong>Curriculum Vitae</strong><small>Full CV — experience &amp; skills (PDF)</small></span>
-            <i class="fa-solid fa-arrow-up-right-from-square bio-doc-go"></i>
-          </a>
-          <a class="bio-doc-btn" href="https://dcnkhzrishphpismmxuu.supabase.co/storage/v1/object/public/PDF/df9e89_fc710677a00048569ff9b0f6f86efebd_compressed.pdf" target="_blank" rel="noopener">
-            <i class="fa-solid fa-book-open"></i>
-            <span class="bio-doc-text"><strong>Catalogue</strong><small>Selected works — flip through (PDF)</small></span>
-            <i class="fa-solid fa-arrow-up-right-from-square bio-doc-go"></i>
-          </a>
-        </div>
+        <!-- CV PDF -->
+        <a class="bio-block bio-social bio-doc-card bio-doc-card--cv" data-wm="&#xf15c;" href="https://dcnkhzrishphpismmxuu.supabase.co/storage/v1/object/public/PDF/df9e89_a909ec87afa044c9aca814e2de2e553c_compressed.pdf" target="_blank" rel="noopener">
+          <span class="bio-social-mark"><i class="fa-solid fa-file-lines"></i></span>
+          <div class="bio-social-text">
+            <span class="mono bio-social-eyebrow" data-i18n="doc.cv.eye">PDF · Curriculum Vitae</span>
+            <h3 class="bio-social-title" data-i18n="doc.cv.title">Curriculum <em>Vitae</em></h3>
+            <p class="bio-social-desc" data-i18n="doc.cv.desc">Full CV — experience, skills and professional background.</p>
+            <span class="bio-social-handle mono" data-i18n="doc.cv.meta">Experience &amp; skills · PDF</span>
+          </div>
+          <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+        </a>
+
+        <!-- Catalogue PDF -->
+        <a class="bio-block bio-social bio-doc-card bio-doc-card--catalogue" data-wm="&#xf518;" href="https://dcnkhzrishphpismmxuu.supabase.co/storage/v1/object/public/PDF/df9e89_fc710677a00048569ff9b0f6f86efebd_compressed.pdf" target="_blank" rel="noopener">
+          <span class="bio-social-mark"><i class="fa-solid fa-book-open"></i></span>
+          <div class="bio-social-text">
+            <span class="mono bio-social-eyebrow" data-i18n="doc.cat.eye">PDF · Catalogue</span>
+            <h3 class="bio-social-title" data-i18n="doc.cat.title">Selected <em>Works</em></h3>
+            <p class="bio-social-desc" data-i18n="doc.cat.desc">A compact catalogue of selected work, ready to flip through.</p>
+            <span class="bio-social-handle mono" data-i18n="doc.cat.meta">Portfolio catalogue · PDF</span>
+          </div>
+          <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+        </a>
+        </div><!-- /.bio-stack -->
 
       </div>
     </section>
@@ -1458,6 +1469,11 @@
                   <option data-i18n-opt="opt.other">Other</option>
                 </select>
               </div>
+            </div>
+
+            <div class="field">
+              <label for="pRefs"><i class="fa-solid fa-link"></i> <span data-i18n="cf.refs">References / previous examples</span></label>
+              <input id="pRefs" name="references" type="url" placeholder="Links, moodboard, or previous work you like" data-i18n-ph="cf.refs.ph" />
             </div>
 
             <div class="field">
@@ -1776,11 +1792,11 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script src="js/i18n.min.js?v=308"></script>
+  <script src="js/i18n.min.js?v=309"></script>
   <script src="js/chat-kb.min.js?v=308"></script>
-  <script src="js/main.min.js?v=321"></script>
+  <script src="js/main.min.js?v=322"></script>
   <script src="js/gallery.min.js?v=310"></script>
-  <script src="js/enhance.min.js?v=319"></script>
+  <script src="js/enhance.min.js?v=320"></script>
   <script src="js/brandboard.min.js?v=308"></script>
   <script src="js/work.min.js?v=308"></script>
   <script src="js/lux.min.js?v=308"></script>
