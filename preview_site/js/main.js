@@ -367,6 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const PAGE_SIZE = 58;
   let currentFilter = 'all';
   let currentShown  = 0;
+  let correctScrollAfterGallery = false;
 
   const TAB_META = {
     all:      { title: 'All Work',        desc: 'The full catalogue — every discipline, one practice.',                  note: 'By Barakat Qurtas · Hewlêr, Kurdistan' },
@@ -388,6 +389,16 @@ document.addEventListener('DOMContentLoaded', () => {
     (window.TAB_META_I18N && window.TAB_META_I18N.en) || TAB_META;
 
   const WORKS_WORD = { en: 'works', ku: 'کار', kmr: 'kar', ar: 'عمل', fr: 'œuvres', tr: 'iş', sv: 'verk' };
+  const fallbackTabTotal = (filter) => {
+    const collections = window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS;
+    if (!collections) return 0;
+    return Object.entries(collections).reduce((sum, [key, coll]) => {
+      if (!coll || key === 'certificate') return sum;
+      const cat = coll.cat || key;
+      if (filter !== 'all' && cat !== filter) return sum;
+      return sum + ((coll.files && coll.files.length) || coll.count || 0);
+    }, 0);
+  };
   const updateTabHeader = (filter, total) => {
     const tm    = getTabMeta();
     const meta  = tm[filter] || TAB_META[filter] || tm.all;   // ai/stationery may only exist in the base TAB_META
@@ -396,16 +407,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const note  = document.getElementById('tabHeaderNote');
     const ghost = document.getElementById('tabHeaderGhost');
     if (!title) return;
-    title.classList.add('anim-out');
+    const shownTotal = total || fallbackTabTotal(filter);
+    const count = shownTotal + ' ' + (WORKS_WORD[currentLang] || WORKS_WORD.en);
+    title.textContent = meta.title;
+    if (desc)  desc.textContent  = count;
+    if (note)  note.textContent  = '';
+    if (ghost) ghost.dataset.ghost = shownTotal;
+    title.classList.remove('anim-out');
+    title.classList.add('anim-in');
+    clearTimeout(updateTabHeader._t);
+    updateTabHeader._t = setTimeout(() => {
+      title.classList.remove('anim-in');
+    }, 420);
+  };
+  const animateTabHeader = () => {
+    const title = document.getElementById('tabHeaderTitle');
+    if (!title) return;
+    title.classList.remove('anim-in', 'anim-out');
+    void title.offsetWidth;
     setTimeout(() => {
-      title.textContent = meta.title;
-      // keep it clean — just the tab name + the count of works (no long blurb), even when zero
-      if (desc)  desc.textContent  = total + ' ' + (WORKS_WORD[currentLang] || WORKS_WORD.en);
-      if (note)  note.textContent  = '';
-      if (ghost) ghost.dataset.ghost = total;
-      title.classList.remove('anim-out');
       title.classList.add('anim-in');
-    }, 160);
+    }, 20);
   };
 
   const updateLoadMore = (total) => {
@@ -448,7 +470,14 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   const scrollToGridTop = (behavior = 'smooth') => {
     const head = document.getElementById('tabHeader') || gridEl;
-    head?.scrollIntoView({ behavior, block: 'start' });
+    if (!head) return;
+    const topbar = document.querySelector('.rail');
+    const topbarH = topbar && getComputedStyle(topbar).position === 'fixed'
+      ? topbar.getBoundingClientRect().height
+      : 0;
+    const gap = window.innerWidth <= 820 ? 12 : 18;
+    const y = head.getBoundingClientRect().top + window.scrollY - topbarH - gap;
+    window.scrollTo({ top: Math.max(0, y), behavior });
   };
   window.__bqShowFewer  = () => { renderUpTo(Math.max(PAGE_SIZE, currentShown - PAGE_SIZE)); scrollToGridTop(); };
   window.__bqCollapseAll = () => { renderUpTo(PAGE_SIZE); scrollToGridTop(); };
@@ -589,6 +618,12 @@ document.addEventListener('DOMContentLoaded', () => {
     currentShown += batch.length;
     updateTabHeader(currentFilter, matching.length);
     updateLoadMore(matching.length);
+    if (reset && correctScrollAfterGallery) {
+      correctScrollAfterGallery = false;
+      setTimeout(() => scrollToGridTop('auto'), 40);
+      setTimeout(() => scrollToGridTop('auto'), 260);
+      setTimeout(() => scrollToGridTop('auto'), 700);
+    }
   };
 
   // Re-translate the tab header + load-more in place when the language flips
@@ -606,13 +641,16 @@ document.addEventListener('DOMContentLoaded', () => {
     tab.setAttribute('aria-selected', 'true');
     currentFilter = tab.dataset.filter;
     window.__bqRenderGallery(true);
+    animateTabHeader();
   };
 
   const activateTab = (tab, push) => {
+    correctScrollAfterGallery = !Array.isArray(window.BQ_ALL_CARDS) || !window.BQ_ALL_CARDS.length;
     setActiveTab(tab);
     if (push !== false) syncURL(!!push);
     requestAnimationFrame(() => scrollToGridTop(push === false ? 'auto' : 'smooth'));
     setTimeout(() => scrollToGridTop('auto'), 120);
+    setTimeout(() => scrollToGridTop('auto'), 320);
   };
 
   /* re-layout on width change (column count change) */
