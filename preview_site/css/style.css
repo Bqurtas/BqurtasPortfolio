@@ -9707,3 +9707,35 @@ body::before{
 .dash-btn--go{background:#bd9a4e;border-color:#bd9a4e;color:#17120a;font-weight:600}
 .dash-btn--go:hover{background:#ccab5f;border-color:#ccab5f}
 @media(max-width:560px){.cms-row3{grid-template-columns:1fr 1fr}.cms-form{max-width:none}}
+
+/* =========================================================
+   v322 — tiny visual tuning requested after v321:
+   mobile room swaps wait for the curtain; hero photo/name and cursor size.
+   ========================================================= */
+.cursor-ring{
+  width:32px !important;
+  height:32px !important;
+}
+.cursor-ring.is-hover{
+  width:34px !important;
+  height:34px !important;
+}
+
+@media (max-width:820px){
+  .hero-title{
+    font-size:clamp(70px,18.4vw,114px) !important;
+  }
+  :root[lang="ku"] .hero-title,
+  :root[lang="ar"] .hero-title{
+    font-size:clamp(55px,14.4vw,100px) !important;
+  }
+  .hero-portrait{
+    width:clamp(118px,32vw,168px) !important;
+  }
+}
+
+@media (max-width:520px){
+  .hero-portrait{
+    width:clamp(116px,37vw,164px) !important;
+  }
+}

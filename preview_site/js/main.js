@@ -200,6 +200,30 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   window.__bqShowRoom = showRoom;
 
+  let mobileRoomTimer = null;
+  const shouldDelayMobileRoomSwap = (id) => {
+    if (!routerReady || !id || id === document.body.dataset.room) return false;
+    try {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+      return window.matchMedia('(max-width: 820px)').matches;
+    } catch (e) {
+      return window.innerWidth <= 820;
+    }
+  };
+  const showRoomAfterMobileCurtain = (id, push) => {
+    if (!shouldDelayMobileRoomSwap(id)) {
+      showRoom(id, push);
+      return;
+    }
+    clearTimeout(mobileRoomTimer);
+    document.body.classList.add('room-transition-pending');
+    mobileRoomTimer = setTimeout(() => {
+      document.body.classList.remove('room-transition-pending');
+      showRoom(id, push);
+      mobileRoomTimer = null;
+    }, 620);
+  };
+
   /* Scroll-spy on the home / design page — the address bar reflects the section in view:
        hero (top)            → base   ( / or /<lang> )
        Panjamor studio       → /panjamor
@@ -260,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // allow language buttons to keep their own behavior — they don't have data-route
       e.preventDefault();
       if (window.__bqCloseReader) window.__bqCloseReader();   // leaving via the rail closes an open post
-      showRoom(route, true);
+      showRoomAfterMobileCurtain(route, true);
     });
   });
 
