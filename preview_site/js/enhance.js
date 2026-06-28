@@ -138,14 +138,32 @@
     window.addEventListener('pageshow', (e) => { if (e.persisted) bqToHero(); });
     let bqHiddenAt = 0;
     const BQ_RESUME_RESET_MS = 900;
-    const bqResumeHome = () => { bqHiddenAt = 0; bqToHero(); };
+    const BQ_AWAY_KEY = 'bq_last_away_at';
+    const bqStoreAway = () => {
+      bqHiddenAt = Date.now();
+      try { sessionStorage.setItem(BQ_AWAY_KEY, String(bqHiddenAt)); } catch (e) {}
+    };
+    const bqStoredAwayAt = () => {
+      try { return parseInt(sessionStorage.getItem(BQ_AWAY_KEY) || '0', 10) || 0; } catch (e) { return 0; }
+    };
+    const bqClearAway = () => {
+      bqHiddenAt = 0;
+      try { sessionStorage.removeItem(BQ_AWAY_KEY); } catch (e) {}
+    };
+    const bqResumeHome = () => { bqClearAway(); bqToHero(); };
+    const bqResumeIfAway = () => {
+      const at = bqHiddenAt || bqStoredAwayAt();
+      if (at && Date.now() - at > BQ_RESUME_RESET_MS) bqResumeHome();
+      else if (at) bqClearAway();
+    };
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) bqHiddenAt = Date.now();
-      else if (bqHiddenAt && Date.now() - bqHiddenAt > BQ_RESUME_RESET_MS) bqResumeHome();   /* reopened after leaving the browser → home hero */
+      if (document.hidden) bqStoreAway();
+      else bqResumeIfAway();   /* reopened after leaving the browser → home hero */
     });
-    window.addEventListener('focus', () => {
-      if (bqHiddenAt && Date.now() - bqHiddenAt > BQ_RESUME_RESET_MS) bqResumeHome();
-    });
+    window.addEventListener('pagehide', bqStoreAway);
+    window.addEventListener('blur', bqStoreAway);
+    window.addEventListener('focus', bqResumeIfAway);
+    window.addEventListener('pageshow', () => setTimeout(bqResumeIfAway, 60));
 
     /* Belt & braces: some environments (in-app browsers, extensions patching the
        scroll APIs) swallow 'scroll' events entirely. A tiny rAF watcher reads the

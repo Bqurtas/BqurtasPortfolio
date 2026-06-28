@@ -237,12 +237,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const pen  = document.getElementById('pencemorHero');       // Panjamor studio
       const work = document.querySelector('.section.work');       // "01 — Design Room" + grid
       const note = document.querySelector('.practice-note'); // "A short note" → back to simple
+      const postWork = document.querySelector('.service-showcase') || note;
       const y = window.scrollY + window.innerHeight * 0.38;       // a touch below the fold
       let path = base;
-      if (note && y >= __absTop(note)) {
-        path = base;                                              // closing note → footer: plain link
+      if (postWork && y >= __absTop(postWork)) {
+        path = base;                                              // below portfolio → plain home link
       } else if (work && y >= __absTop(work)) {
-        path = (currentFilter && currentFilter !== 'all') ? prefix + '/design/' + currentFilter : prefix + '/design';
+        path = prefix + '/design';                                // portfolio section → /design, even when a tab is active
       } else if (pen && y >= __absTop(pen)) {
         path = prefix + '/panjamor';
       }
@@ -475,8 +476,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const topbarH = topbar && getComputedStyle(topbar).position === 'fixed'
       ? topbar.getBoundingClientRect().height
       : 0;
-    const gap = window.innerWidth <= 820 ? 12 : 18;
-    const y = head.getBoundingClientRect().top + window.scrollY - topbarH - gap;
+    const stickyTabs = window.innerWidth <= 820 ? document.querySelector('.section.work > .tabs-wrap') : null;
+    const stickyTabsH = stickyTabs && getComputedStyle(stickyTabs).position === 'sticky'
+      ? stickyTabs.getBoundingClientRect().height
+      : 0;
+    const gap = window.innerWidth <= 820 ? 24 : 18;
+    const y = head.getBoundingClientRect().top + window.scrollY - topbarH - stickyTabsH - gap;
     window.scrollTo({ top: Math.max(0, y), behavior });
   };
   window.__bqShowFewer  = () => { renderUpTo(Math.max(PAGE_SIZE, currentShown - PAGE_SIZE)); scrollToGridTop(); };
@@ -761,9 +766,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // a shared /panjamor link lands on the studio section
     setTimeout(() => document.getElementById('pencemorHero')?.scrollIntoView({ behavior: 'auto', block: 'start' }), 60);
   } else if (startRoomRaw === 'design') {
-    // a shared /design link lands on the Design Room section, not the hero
-    // (otherwise the scroll-spy would immediately reset the URL back to "/")
-    setTimeout(() => document.querySelector('.section.work')?.scrollIntoView({ behavior: 'auto', block: 'start' }), 80);
+    // a shared /design link lands on the Design Room section, not the hero.
+    // A tab link (/design/events) lands on that tab's own title/count header.
+    setTimeout(() => {
+      if (startTab) scrollToGridTop('auto');
+      else document.querySelector('.section.work')?.scrollIntoView({ behavior: 'auto', block: 'start' });
+    }, 80);
   }
   routerReady = true;   // from here on, language switches update the URL prefix
   triggerReveals();
