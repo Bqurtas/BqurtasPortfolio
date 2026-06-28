@@ -1910,57 +1910,57 @@ Object.keys(window.I18N_EXTRA_MOTION248).forEach(function(l){ if(window.I18N[l])
 /* ===== v319 — shorter room copy + richer pitch form + PDF bio cards ===== */
 window.I18N_EXTRA_BRIEF319 = {
   en:{
-    "rh.blog.num":"№ 04 · Journal","rh.blog.title":"The <em>Journal</em>","rh.blog.sub":"Short notes on type, place and practice.","blog.label":"Journal","blog.title":"Short <em>notes</em>.","blog.lede":"Ideas from the desk, kept simple.",
-    "rh.bb.title":"Brand <em>Board</em>","rh.bb.sub":"A quick bilingual identity starter.","bb.label":"Free Tool","bb.title":"Name, type, <em>colour</em>.","bb.lede":"Build a small board, then make the real identity.",
-    "rh.work.sub":"A few identity systems, up close.","work.label":"Case Studies","work.title":"Selected <em>systems</em>.","work.lede":"Brief, mark, palette and use — kept short.",
+    "rh.blog.num":"04 · Journal","rh.blog.title":"The <em>Journal</em>","rh.blog.sub":"Short notes on type, place and practice.","blog.label":"Journal","blog.title":"Short <em>notes</em>.","blog.lede":"Ideas from the desk, kept simple.",
+    "rh.bb.num":"03 · Brand Board","rh.bb.title":"Brand <em>Board</em>","rh.bb.sub":"A quick bilingual identity starter.","bb.label":"Free Tool","bb.title":"Name, type, <em>colour</em>.","bb.lede":"Build a small board, then make the real identity.",
+    "rh.work.num":"02 · Selected Work","rh.work.sub":"A few identity systems, up close.","work.label":"Case Studies","work.title":"Selected <em>systems</em>.","work.lede":"Brief, mark, palette and use — kept short.",
     "cf.refs":"References / previous examples","cf.refs.ph":"Links, moodboard, or previous work you like",
     "doc.cv.eye":"PDF · Curriculum Vitae","doc.cv.title":"Curriculum <em>Vitae</em>","doc.cv.desc":"Full CV — experience, skills and professional background.","doc.cv.meta":"Experience & skills · PDF",
     "doc.cat.eye":"PDF · Catalogue","doc.cat.title":"Selected <em>Works</em>","doc.cat.desc":"A compact catalogue of selected work, ready to flip through.","doc.cat.meta":"Portfolio catalogue · PDF"
   },
   ku:{
-    "rh.blog.num":"№ ٠٤ · گۆڤار","rh.blog.title":"<em>گۆڤار</em>","rh.blog.sub":"تێبینی کورت لەسەر تایپ، شوێن و کار.","blog.label":"گۆڤار","blog.title":"تێبینی <em>کورت</em>.","blog.lede":"بیرۆکەی کورت لە مێزی کارەوە.",
-    "rh.bb.title":"<em>تابلۆی براند</em>","rh.bb.sub":"دەستپێکی خێرای ناسنامەی دووزمانی.","bb.label":"ئامرازی بێ بەرامبەر","bb.title":"ناو، فۆنت، <em>ڕەنگ</em>.","bb.lede":"تابلۆیەکی بچووک دروست بکە، دواتر ناسنامەی ڕاستەقینە.",
-    "rh.work.sub":"چەند سیستەمی براند، لە نزیکەوە.","work.label":"تاوتوێی پڕۆژە","work.title":"سیستەمی <em>هەڵبژێردراو</em>.","work.lede":"بریف، نیشان، پاڵێت و بەکارهێنان — بە کورتی.",
+    "rh.blog.num":"٠٤ · گۆڤار","rh.blog.title":"<em>گۆڤار</em>","rh.blog.sub":"تێبینی کورت لەسەر تایپ، شوێن و کار.","blog.label":"گۆڤار","blog.title":"تێبینی <em>کورت</em>.","blog.lede":"بیرۆکەی کورت لە مێزی کارەوە.",
+    "rh.bb.num":"٠٣ · تابلۆی براند","rh.bb.title":"<em>تابلۆی براند</em>","rh.bb.sub":"دەستپێکی خێرای ناسنامەی دووزمانی.","bb.label":"ئامرازی بێ بەرامبەر","bb.title":"ناو، فۆنت، <em>ڕەنگ</em>.","bb.lede":"تابلۆیەکی بچووک دروست بکە، دواتر ناسنامەی ڕاستەقینە.",
+    "rh.work.num":"٠٢ · کارە هەڵبژێردراوەکان","rh.work.sub":"چەند سیستەمی براند، لە نزیکەوە.","work.label":"تاوتوێی پڕۆژە","work.title":"سیستەمی <em>هەڵبژێردراو</em>.","work.lede":"بریف، نیشان، پاڵێت و بەکارهێنان — بە کورتی.",
     "cf.refs":"نموونە / کاری پێشوو","cf.refs.ph":"لینک، مودبۆرد، یان کاری پێشووت کە دەتەوێت",
     "doc.cv.eye":"PDF · سیڤی","doc.cv.title":"سیڤی <em>تەواو</em>","doc.cv.desc":"سیڤی تەواو — ئەزموون، تواناکان و پاشخانی پیشەیی.","doc.cv.meta":"ئەزموون و تواناکان · PDF",
     "doc.cat.eye":"PDF · کەتەلۆگ","doc.cat.title":"کارە <em>هەڵبژێردراوەکان</em>","doc.cat.desc":"کەتەلۆگێکی پوختی کارە هەڵبژێردراوەکان.","doc.cat.meta":"کەتەلۆگی پۆرتفۆلیۆ · PDF"
   },
   kmr:{
-    "rh.blog.num":"№ 04 · Kovar","rh.blog.title":"<em>Kovar</em>","rh.blog.sub":"Notên kurt li ser nivîs, cih û kar.","blog.label":"Kovar","blog.title":"Notên <em>kurt</em>.","blog.lede":"Ramanên ji maseyê, bi awayekî sade.",
-    "rh.bb.title":"Tabloya <em>Brandê</em>","rh.bb.sub":"Destpêkeke lez a nasnameya duzimanî.","bb.label":"Amûra Bêpere","bb.title":"Nav, tîp, <em>reng</em>.","bb.lede":"Tabloyek biçûk ava bike, paşê nasnameya rastîn çêke.",
-    "rh.work.sub":"Çend sîstemên brandê, ji nêz ve.","work.label":"Lêkolînên Rewşê","work.title":"Sîstemên <em>hilbijartî</em>.","work.lede":"Kurte, nîşan, palet û bikaranîn — bi kurtî.",
+    "rh.blog.num":"04 · Kovar","rh.blog.title":"<em>Kovar</em>","rh.blog.sub":"Notên kurt li ser nivîs, cih û kar.","blog.label":"Kovar","blog.title":"Notên <em>kurt</em>.","blog.lede":"Ramanên ji maseyê, bi awayekî sade.",
+    "rh.bb.num":"03 · Tabloya Brandê","rh.bb.title":"Tabloya <em>Brandê</em>","rh.bb.sub":"Destpêkeke lez a nasnameya duzimanî.","bb.label":"Amûra Bêpere","bb.title":"Nav, tîp, <em>reng</em>.","bb.lede":"Tabloyek biçûk ava bike, paşê nasnameya rastîn çêke.",
+    "rh.work.num":"02 · Karên Hilbijartî","rh.work.sub":"Çend sîstemên brandê, ji nêz ve.","work.label":"Lêkolînên Rewşê","work.title":"Sîstemên <em>hilbijartî</em>.","work.lede":"Kurte, nîşan, palet û bikaranîn — bi kurtî.",
     "cf.refs":"Referans / mînakên berê","cf.refs.ph":"Girêdan, moodboard, an karên berê yên tu hez dikî",
     "doc.cv.eye":"PDF · CV","doc.cv.title":"Curriculum <em>Vitae</em>","doc.cv.desc":"CVya temam — ezmûn, jêhatîbûn û paşxaneya pîşeyî.","doc.cv.meta":"Ezmûn û jêhatîbûn · PDF",
     "doc.cat.eye":"PDF · Katalog","doc.cat.title":"Karên <em>hilbijartî</em>","doc.cat.desc":"Katalogeke kurt a karên hilbijartî.","doc.cat.meta":"Kataloga portfolioyê · PDF"
   },
   ar:{
-    "rh.blog.num":"№ ٠٤ · المجلة","rh.blog.title":"<em>المجلة</em>","rh.blog.sub":"ملاحظات قصيرة عن الخط والمكان والعمل.","blog.label":"المجلة","blog.title":"ملاحظات <em>قصيرة</em>.","blog.lede":"أفكار من المكتب، بصيغة بسيطة.",
-    "rh.bb.title":"لوحة <em>العلامة</em>","rh.bb.sub":"بداية سريعة لهوية ثنائية اللغة.","bb.label":"أداة مجانية","bb.title":"اسم، خط، <em>لون</em>.","bb.lede":"أنشئ لوحة صغيرة، ثم نصنع الهوية الحقيقية.",
-    "rh.work.sub":"بعض أنظمة الهوية عن قرب.","work.label":"دراسات حالة","work.title":"أنظمة <em>مختارة</em>.","work.lede":"الموجز، العلامة، الألوان والاستخدام — باختصار.",
+    "rh.blog.num":"٠٤ · المجلة","rh.blog.title":"<em>المجلة</em>","rh.blog.sub":"ملاحظات قصيرة عن الخط والمكان والعمل.","blog.label":"المجلة","blog.title":"ملاحظات <em>قصيرة</em>.","blog.lede":"أفكار من المكتب، بصيغة بسيطة.",
+    "rh.bb.num":"٠٣ · لوحة العلامة","rh.bb.title":"لوحة <em>العلامة</em>","rh.bb.sub":"بداية سريعة لهوية ثنائية اللغة.","bb.label":"أداة مجانية","bb.title":"اسم، خط، <em>لون</em>.","bb.lede":"أنشئ لوحة صغيرة، ثم نصنع الهوية الحقيقية.",
+    "rh.work.num":"٠٢ · أعمال مختارة","rh.work.sub":"بعض أنظمة الهوية عن قرب.","work.label":"دراسات حالة","work.title":"أنظمة <em>مختارة</em>.","work.lede":"الموجز، العلامة، الألوان والاستخدام — باختصار.",
     "cf.refs":"مراجع / أمثلة سابقة","cf.refs.ph":"روابط، لوحة مزاجية، أو أعمال سابقة تعجبك",
     "doc.cv.eye":"PDF · السيرة الذاتية","doc.cv.title":"السيرة <em>الذاتية</em>","doc.cv.desc":"السيرة الكاملة — الخبرة والمهارات والخلفية المهنية.","doc.cv.meta":"الخبرة والمهارات · PDF",
     "doc.cat.eye":"PDF · الكتالوج","doc.cat.title":"أعمال <em>مختارة</em>","doc.cat.desc":"كتالوج موجز للأعمال المختارة.","doc.cat.meta":"كتالوج الأعمال · PDF"
   },
   fr:{
-    "rh.blog.num":"№ 04 · Journal","rh.blog.title":"Le <em>Journal</em>","rh.blog.sub":"Notes courtes sur le type, le lieu et la pratique.","blog.label":"Journal","blog.title":"Notes <em>courtes</em>.","blog.lede":"Des idées du bureau, simplement.",
-    "rh.bb.title":"Planche de <em>marque</em>","rh.bb.sub":"Un départ rapide pour une identité bilingue.","bb.label":"Outil gratuit","bb.title":"Nom, typo, <em>couleur</em>.","bb.lede":"Créez une petite planche, puis la vraie identité.",
-    "rh.work.sub":"Quelques systèmes d'identité, de près.","work.label":"Études de cas","work.title":"Systèmes <em>choisis</em>.","work.lede":"Brief, signe, palette et usage — en bref.",
+    "rh.blog.num":"04 · Journal","rh.blog.title":"Le <em>Journal</em>","rh.blog.sub":"Notes courtes sur le type, le lieu et la pratique.","blog.label":"Journal","blog.title":"Notes <em>courtes</em>.","blog.lede":"Des idées du bureau, simplement.",
+    "rh.bb.num":"03 · Planche de marque","rh.bb.title":"Planche de <em>marque</em>","rh.bb.sub":"Un départ rapide pour une identité bilingue.","bb.label":"Outil gratuit","bb.title":"Nom, typo, <em>couleur</em>.","bb.lede":"Créez une petite planche, puis la vraie identité.",
+    "rh.work.num":"02 · Travaux choisis","rh.work.sub":"Quelques systèmes d'identité, de près.","work.label":"Études de cas","work.title":"Systèmes <em>choisis</em>.","work.lede":"Brief, signe, palette et usage — en bref.",
     "cf.refs":"Références / exemples précédents","cf.refs.ph":"Liens, moodboard ou travaux précédents que vous aimez",
     "doc.cv.eye":"PDF · Curriculum Vitae","doc.cv.title":"Curriculum <em>Vitae</em>","doc.cv.desc":"CV complet — expérience, compétences et parcours professionnel.","doc.cv.meta":"Expérience & compétences · PDF",
     "doc.cat.eye":"PDF · Catalogue","doc.cat.title":"Travaux <em>choisis</em>","doc.cat.desc":"Un catalogue compact de travaux sélectionnés.","doc.cat.meta":"Catalogue portfolio · PDF"
   },
   tr:{
-    "rh.blog.num":"№ 04 · Dergi","rh.blog.title":"<em>Dergi</em>","rh.blog.sub":"Tip, yer ve pratik üzerine kısa notlar.","blog.label":"Dergi","blog.title":"Kısa <em>notlar</em>.","blog.lede":"Masadan sade fikirler.",
-    "rh.bb.title":"Marka <em>Panosu</em>","rh.bb.sub":"İki dilli kimlik için hızlı bir başlangıç.","bb.label":"Ücretsiz Araç","bb.title":"Ad, yazı, <em>renk</em>.","bb.lede":"Küçük bir pano oluşturun, sonra gerçek kimliği yapalım.",
-    "rh.work.sub":"Birkaç kimlik sistemi, yakından.","work.label":"Vaka Çalışmaları","work.title":"Seçilmiş <em>sistemler</em>.","work.lede":"Özet, işaret, palet ve kullanım — kısa tutuldu.",
+    "rh.blog.num":"04 · Dergi","rh.blog.title":"<em>Dergi</em>","rh.blog.sub":"Tip, yer ve pratik üzerine kısa notlar.","blog.label":"Dergi","blog.title":"Kısa <em>notlar</em>.","blog.lede":"Masadan sade fikirler.",
+    "rh.bb.num":"03 · Marka Panosu","rh.bb.title":"Marka <em>Panosu</em>","rh.bb.sub":"İki dilli kimlik için hızlı bir başlangıç.","bb.label":"Ücretsiz Araç","bb.title":"Ad, yazı, <em>renk</em>.","bb.lede":"Küçük bir pano oluşturun, sonra gerçek kimliği yapalım.",
+    "rh.work.num":"02 · Seçilmiş İşler","rh.work.sub":"Birkaç kimlik sistemi, yakından.","work.label":"Vaka Çalışmaları","work.title":"Seçilmiş <em>sistemler</em>.","work.lede":"Özet, işaret, palet ve kullanım — kısa tutuldu.",
     "cf.refs":"Referanslar / önceki örnekler","cf.refs.ph":"Linkler, moodboard veya sevdiğiniz önceki işler",
     "doc.cv.eye":"PDF · Özgeçmiş","doc.cv.title":"Curriculum <em>Vitae</em>","doc.cv.desc":"Tam CV — deneyim, beceriler ve profesyonel geçmiş.","doc.cv.meta":"Deneyim ve beceriler · PDF",
     "doc.cat.eye":"PDF · Katalog","doc.cat.title":"Seçilmiş <em>İşler</em>","doc.cat.desc":"Seçilmiş işlerden kompakt bir katalog.","doc.cat.meta":"Portföy kataloğu · PDF"
   },
   sv:{
-    "rh.blog.num":"№ 04 · Journal","rh.blog.title":"<em>Journalen</em>","rh.blog.sub":"Korta notiser om typ, plats och praktik.","blog.label":"Journal","blog.title":"Korta <em>notiser</em>.","blog.lede":"Idéer från skrivbordet, enkelt hållna.",
-    "rh.bb.title":"Varumärkes<em>tavla</em>","rh.bb.sub":"En snabb start för tvåspråkig identitet.","bb.label":"Gratis verktyg","bb.title":"Namn, typ, <em>färg</em>.","bb.lede":"Bygg en liten tavla, gör sedan den riktiga identiteten.",
-    "rh.work.sub":"Några identitetssystem, på nära håll.","work.label":"Fallstudier","work.title":"Utvalda <em>system</em>.","work.lede":"Brief, märke, palett och användning — kortfattat.",
+    "rh.blog.num":"04 · Journal","rh.blog.title":"<em>Journalen</em>","rh.blog.sub":"Korta notiser om typ, plats och praktik.","blog.label":"Journal","blog.title":"Korta <em>notiser</em>.","blog.lede":"Idéer från skrivbordet, enkelt hållna.",
+    "rh.bb.num":"03 · Varumärkestavla","rh.bb.title":"Varumärkes<em>tavla</em>","rh.bb.sub":"En snabb start för tvåspråkig identitet.","bb.label":"Gratis verktyg","bb.title":"Namn, typ, <em>färg</em>.","bb.lede":"Bygg en liten tavla, gör sedan den riktiga identiteten.",
+    "rh.work.num":"02 · Utvalda arbeten","rh.work.sub":"Några identitetssystem, på nära håll.","work.label":"Fallstudier","work.title":"Utvalda <em>system</em>.","work.lede":"Brief, märke, palett och användning — kortfattat.",
     "cf.refs":"Referenser / tidigare exempel","cf.refs.ph":"Länkar, moodboard eller tidigare arbeten du gillar",
     "doc.cv.eye":"PDF · CV","doc.cv.title":"Curriculum <em>Vitae</em>","doc.cv.desc":"Fullständig CV — erfarenhet, färdigheter och yrkesbakgrund.","doc.cv.meta":"Erfarenhet och färdigheter · PDF",
     "doc.cat.eye":"PDF · Katalog","doc.cat.title":"Utvalda <em>arbeten</em>","doc.cat.desc":"En kompakt katalog med utvalda arbeten.","doc.cat.meta":"Portföljkatalog · PDF"
