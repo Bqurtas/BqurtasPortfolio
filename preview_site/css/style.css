@@ -1348,31 +1348,30 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
    intentional instead of dumping every image into view at once. */
 #grid .card.portfolio-scroll-card{
   opacity:1;
-  transform:translate3d(0,28px,0) scale(.992);
-  filter:saturate(.9) contrast(.985);
+  transform:translate3d(0,6px,0);
+  filter:none;
   transition:
-    opacity .45s var(--ease-out),
-    transform 1.16s var(--ease-out),
-    filter .9s var(--ease-out);
+    opacity .24s var(--ease-out),
+    transform .62s var(--ease-out);
   transition-delay:var(--portfolio-delay,0ms);
-  will-change:opacity, transform, filter;
+  will-change:transform;
 }
 #grid .card.portfolio-scroll-card .card-art{
   clip-path:inset(0);
-  transform:translate3d(0,12px,0);
-  transition:transform 1.18s var(--ease-out);
+  transform:translate3d(0,3px,0);
+  transition:transform .68s var(--ease-out);
   transition-delay:var(--portfolio-delay,0ms);
 }
 #grid .card.portfolio-scroll-card .card-art img,
 #grid .card.portfolio-scroll-card .card-art video,
 #grid .card.portfolio-scroll-card .card-art svg{
-  transform:scale(1.012);
-  transition:transform 1.18s var(--ease-out), filter 1.05s var(--ease-out);
+  transform:none;
+  transition:transform .62s var(--ease-out), filter .42s var(--ease-out);
 }
 #grid .card.portfolio-scroll-card.portfolio-in{
   opacity:1;
   transform:none;
-  filter:saturate(1) contrast(1);
+  filter:none;
 }
 #grid .card.portfolio-scroll-card.portfolio-in .card-art{
   clip-path:inset(0);

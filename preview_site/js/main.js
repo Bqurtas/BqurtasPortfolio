@@ -475,9 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!card) return;
     card.classList.remove('portfolio-in');
     card.classList.add('portfolio-scroll-card');
-    const batchRank = rank % PAGE_SIZE;
-    const delay = Math.min(760, batchRank * 14 + Math.min(colIndex || 0, 5) * 30);
-    card.style.setProperty('--portfolio-delay', delay + 'ms');
+    card.style.setProperty('--portfolio-delay', '0ms');
 
     if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
       requestAnimationFrame(() => card.classList.add('portfolio-in'));
@@ -493,32 +491,12 @@ document.addEventListener('DOMContentLoaded', () => {
             entry.target.classList.add('portfolio-in');
             portfolioRevealObserver.unobserve(entry.target);
           });
-        }, { threshold: 0.12, rootMargin: '0px 0px -5% 0px' });
+        }, { threshold: 0.01, rootMargin: '0px 0px 18% 0px' });
       }
       portfolioRevealObserver.observe(card);
     };
 
-    /* Wait for the real media dimensions instead of forcing a placeholder
-       height. The masonry keeps each card's natural image size, while the
-       reveal still avoids firing before layout settles. */
-    let done = false;
-    const queueObserve = () => {
-      if (done) return;
-      done = true;
-      setTimeout(observeCard, 80 + Math.min(colIndex || 0, 5) * 24);
-    };
-    const fallback = setTimeout(queueObserve, 1100);
-    const ready = () => { clearTimeout(fallback); queueObserve(); };
-    if (!media) { ready(); return; }
-    if ((media.tagName === 'IMG' && media.complete && media.naturalHeight) ||
-        (media.tagName === 'VIDEO' && media.readyState >= 1)) {
-      ready();
-    } else {
-      media.addEventListener('load', ready, { once: true });
-      media.addEventListener('loadedmetadata', ready, { once: true });
-      media.addEventListener('loadeddata', ready, { once: true });
-      media.addEventListener('error', ready, { once: true });
-    }
+    requestAnimationFrame(observeCard);
   };
 
   const buildColumns = (n) => {
