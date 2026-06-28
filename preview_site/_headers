@@ -32,6 +32,13 @@
 # pins the homepage too.
 /
   Access-Control-Allow-Origin: https://bqurtas.com
+  Cache-Control: no-store
+  CDN-Cache-Control: no-store
+
+/site.webmanifest
+  Content-Type: application/manifest+json
+  Cache-Control: no-store
+  CDN-Cache-Control: no-store
 
 # Images & fonts are fingerprinted by file path or updated through new deploys.
 /assets/*
