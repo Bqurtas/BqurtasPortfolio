@@ -143,12 +143,15 @@
         var previewNote = document.getElementById('menuPreviewNote');
         var figure = document.getElementById('menuFigure');
         var roomLinks = Array.from(menu.querySelectorAll('.mm-link'));
+        var translated = function (key, fallback) {
+          return (key && window.BQ_DICT && window.BQ_DICT[key]) || fallback || '';
+        };
         var applyPreview = function (link) {
           var number = link.querySelector('.mm-n');
           var title = link.querySelector('.mm-link-text');
           if (previewNo && number) previewNo.textContent = number.textContent.trim() + ' / 06';
           if (previewTitle && title) previewTitle.textContent = title.textContent.trim();
-          if (previewNote) previewNote.textContent = link.dataset.menuNote || '';
+          if (previewNote) previewNote.textContent = translated(link.dataset.i18nMenuNote, link.dataset.menuNote || '');
           if (figure) figure.dataset.room = link.dataset.route || 'design';
         };
         var updatePreview = function (link) {
@@ -186,21 +189,24 @@
 
       /* ---- cursor labels reflect the action under the pointer ---- */
       var cursorLabel = document.querySelector('.cursor-ring-label');
+      var cursorText = function (key, fallback) {
+        return (window.BQ_DICT && window.BQ_DICT['cursor.' + key]) || fallback;
+      };
       var cursorTargets = [
-        ['.mm-link', 'Go'],
-        ['.tab', 'View'],
-        ['.service-trigger', 'Open'],
-        ['.footer-cta-btn', 'Talk'],
-        ['.footer-room-nav a', 'Go'],
-        ['.software-chip', 'Tool']
+        ['.mm-link', 'go', 'Go'],
+        ['.tab', 'view', 'View'],
+        ['.service-trigger', 'open', 'Open'],
+        ['.footer-cta-btn', 'talk', 'Talk'],
+        ['.footer-room-nav a', 'go', 'Go'],
+        ['.software-chip', 'tool', 'Tool']
       ];
       cursorTargets.forEach(function (pair) {
         document.querySelectorAll(pair[0]).forEach(function (el) {
           el.addEventListener('mouseenter', function () {
-            if (cursorLabel) cursorLabel.textContent = pair[1];
+            if (cursorLabel) cursorLabel.textContent = cursorText(pair[1], pair[2]);
           });
           el.addEventListener('mouseleave', function () {
-            if (cursorLabel) cursorLabel.textContent = 'Open';
+            if (cursorLabel) cursorLabel.textContent = cursorText('open', 'Open');
           });
         });
       });

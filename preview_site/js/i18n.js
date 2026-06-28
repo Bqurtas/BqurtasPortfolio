@@ -1967,3 +1967,101 @@ window.I18N_EXTRA_BRIEF319 = {
   }
 };
 Object.keys(window.I18N_EXTRA_BRIEF319).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_BRIEF319[l]); });
+
+/* ===== v320 — remove hardcoded English from visible UI labels ===== */
+window.I18N_EXTRA_LOCALIZE320 = {
+  en:{
+    "profile.role":"Graphic Designer",
+    "lang.en":"English","lang.ku":"Sorani Kurdish","lang.kmr":"Kurmanji Kurdish","lang.ar":"Arabic","lang.fr":"French","lang.tr":"Turkish","lang.sv":"Swedish",
+    "cursor.open":"Open","cursor.view":"View","cursor.go":"Go","cursor.talk":"Talk","cursor.tool":"Tool","cursor.send":"Send","cursor.preview":"Preview",
+    "menu.rooms":"Rooms / 01—06","menu.cover":"Menu Cover",
+    "menu.note.design":"Selected design and visual systems","menu.note.work":"Identity case studies, from brief to system","menu.note.brandboard":"A free bilingual identity starter","menu.note.blog":"Notes on typography, place and practice","menu.note.bio":"Experience, tools, awards and biography","menu.note.contact":"Start a clear, useful conversation",
+    "gallery.loading":"Loading gallery…","lm.more":"Load more",
+    "svc.identity.sub":"Marks & identity systems","svc.editorial.sub":"Books, posters & production","svc.campaign.sub":"Campaigns & social systems","svc.motion":"Motion, Image & AI","svc.motion.desc":"Image and motion work that extends the identity without losing its character, supported by careful AI-assisted exploration.","svc.motion.c":"AI-assisted visual development","svc.motion.sub":"Motion, image & AI craft",
+    "hero.ai":"Artificial Intelligence","hero.ai.short":"AI","tab.ai":"AI","chat.status":"Online · replies instantly"
+  },
+  ku:{
+    "profile.role":"دیزاینەری گرافیک",
+    "lang.en":"ئینگلیزی","lang.ku":"کوردیی سۆرانی","lang.kmr":"کوردیی کورمانجی","lang.ar":"عەرەبی","lang.fr":"فەرەنسی","lang.tr":"تورکی","lang.sv":"سویدی",
+    "cursor.open":"کردنەوە","cursor.view":"بینین","cursor.go":"بڕۆ","cursor.talk":"قسە","cursor.tool":"ئامراز","cursor.send":"ناردن","cursor.preview":"پێشبینین",
+    "menu.rooms":"ژوورەکان / ٠١—٠٦","menu.cover":"بەرگی مینیو",
+    "menu.note.design":"دیزاین و سیستەمی بینراوی هەڵبژێردراو","menu.note.work":"تاوتوێی ناسنامەکان، لە بریفەوە بۆ سیستەم","menu.note.brandboard":"دەستپێکی ناسنامەی دووزمانیی بێ بەرامبەر","menu.note.blog":"تێبینی لەسەر تایپۆگرافی، شوێن و کار","menu.note.bio":"ئەزموون، ئامراز، خەڵات و بایۆگرافی","menu.note.contact":"دەستپێکردنی گفتوگۆیەکی ڕوون و بەسوود",
+    "gallery.loading":"گالەری بار دەکرێت…","lm.more":"زیاتر باربکە",
+    "svc.identity.sub":"نیشان و سیستەمی ناسنامە","svc.editorial.sub":"کتێب، پۆستەر و بەرهەمهێنان","svc.campaign.sub":"کەمپەین و سیستەمی سۆشیاڵ","svc.motion":"جوڵە، وێنە و زیرەکیی دەستکرد","svc.motion.desc":"کاری وێنە و جوڵە کە ناسنامەکە فراوان دەکات بەبێ لەدەستدانی کەسایەتییەکەی، لەگەڵ تاقیکردنەوەی وریای زیرەکیی دەستکرد.","svc.motion.c":"پەرەپێدانی بینراو بە یارمەتی زیرەکیی دەستکرد","svc.motion.sub":"جوڵە، وێنە و زیرەکیی دەستکرد",
+    "hero.ai":"زیرەکیی دەستکرد","hero.ai.short":"زیرەکی","tab.ai":"زیرەکی","chat.status":"لەهێڵدایە · خێرا وەڵام دەداتەوە",
+    "f.set":"بە دوو فۆنتی تایبەت داڕێژراوە","bp.p3":"بە کۆمەڵە بەرنامەکانی ئەدۆبی کار دەکەم و چەند بڕوانامەی ماستەرکلاسم هەیە. لەگەڵ سەرۆکایەتیی هەرێمی کوردستان و پرۆتۆکۆڵی هەرێم کارم کردووە. ئامانجم فراوانکردنی کاریگەریی داهێنەرانەمە و دامەزراندنی کۆمپانیایەکی پێشەنگی بانگەشە و بڵاوکردنەوەیە.","lp.enNote":"شارەزایی سەرەتایی · خاڵی دوولینگەو ١٠ (ئایاری ٢٠٢٦)","li.title":"بەرەکات لە لینکدین","be.title":"بەرەکات لە بیهانس",
+    "doc.cv.eye":"فایل · ژیاننامەی کار","doc.cv.meta":"ئەزموون و تواناکان · فایل","doc.cat.eye":"فایل · کەتەلۆگ","doc.cat.meta":"کەتەلۆگی پۆرتفۆلیۆ · فایل"
+  },
+  kmr:{
+    "profile.role":"Sêwirmendê Grafîk",
+    "lang.en":"Îngilîzî","lang.ku":"Kurdîya Soranî","lang.kmr":"Kurdîya Kurmancî","lang.ar":"Erebî","lang.fr":"Fransî","lang.tr":"Tirkî","lang.sv":"Swêdî",
+    "cursor.open":"Veke","cursor.view":"Bibîne","cursor.go":"Biçe","cursor.talk":"Biaxive","cursor.tool":"Amûr","cursor.send":"Bişîne","cursor.preview":"Pêşdîtin",
+    "menu.rooms":"Ode / 01—06","menu.cover":"Bergê menuyê",
+    "menu.note.design":"Sêwiran û sîstemên dîtbarî yên hilbijartî","menu.note.work":"Lêkolînên nasnameyê, ji kurteyê heta sîstemê","menu.note.brandboard":"Destpêkeke bêpere ya nasnameya duzimanî","menu.note.blog":"Not li ser tîpografî, cih û kar","menu.note.bio":"Ezmûn, amûr, xelat û jiyanname","menu.note.contact":"Dest bi axaftineke zelal û bikêr bike",
+    "gallery.loading":"Galeri tê barkirin…","lm.more":"Zêdetir bar bike",
+    "svc.identity.sub":"Nîşan û sîstemên nasnameyê","svc.editorial.sub":"Pirtûk, poster û hilberîn","svc.campaign.sub":"Kampanya û sîstemên civakî","svc.motion":"Tevger, Wêne û Aqilmendiya Çêkirî","svc.motion.desc":"Karê wêne û tevgerê ku nasnameyê berfireh dike bêyî ku karaktera wê winda bike, bi lêkolîna hişmend a aqilmendiya çêkirî.","svc.motion.c":"Pêşxistina dîtbarî bi aqilmendiya çêkirî","svc.motion.sub":"Tevger, wêne û aqilmendiya çêkirî",
+    "hero.ai":"Aqilmendiya Çêkirî","hero.ai.short":"Aqil","tab.ai":"Aqil","chat.status":"Serhêl · tavilê bersiv dide"
+  },
+  ar:{
+    "profile.role":"مصمم جرافيك",
+    "lang.en":"الإنجليزية","lang.ku":"الكردية السورانية","lang.kmr":"الكردية الكرمانجية","lang.ar":"العربية","lang.fr":"الفرنسية","lang.tr":"التركية","lang.sv":"السويدية",
+    "cursor.open":"فتح","cursor.view":"عرض","cursor.go":"اذهب","cursor.talk":"تواصل","cursor.tool":"أداة","cursor.send":"إرسال","cursor.preview":"معاينة",
+    "menu.rooms":"الغرف / ٠١—٠٦","menu.cover":"غلاف القائمة",
+    "menu.note.design":"تصاميم وأنظمة بصرية مختارة","menu.note.work":"دراسات هوية من الموجز إلى النظام","menu.note.brandboard":"بداية مجانية لهوية ثنائية اللغة","menu.note.blog":"ملاحظات عن الطباعة والمكان والعمل","menu.note.bio":"الخبرة والأدوات والجوائز والسيرة","menu.note.contact":"ابدأ حواراً واضحاً ومفيداً",
+    "gallery.loading":"جاري تحميل المعرض…","lm.more":"تحميل المزيد",
+    "svc.identity.sub":"علامات وأنظمة هوية","svc.editorial.sub":"كتب وملصقات وإنتاج","svc.campaign.sub":"حملات وأنظمة تواصل","svc.motion":"الحركة والصورة والذكاء الاصطناعي","svc.motion.desc":"عمل بصري وحركي يوسع الهوية دون أن يفقد شخصيتها، مدعوماً باستكشاف مدروس بالذكاء الاصطناعي.","svc.motion.c":"تطوير بصري بمساعدة الذكاء الاصطناعي","svc.motion.sub":"حركة وصورة وذكاء اصطناعي",
+    "hero.ai":"الذكاء الاصطناعي","hero.ai.short":"ذكاء","tab.ai":"ذكاء","chat.status":"متصل · يرد فوراً",
+    "f.set":"مصمم بخطين مخصصين","cf.nda":"أحتاج اتفاقية سرية قبل مشاركة التفاصيل.","bp.p3":"أعمل بحزمة أدوبي الإبداعية وأحمل عدة شهادات ماستر كلاس. تعاونت مع رئاسة إقليم كردستان وبروتوكول الإقليم. هدفي توسيع أثري الإبداعي وتأسيس شركة رائدة في الإعلان والنشر.","lp.enNote":"إتقان أساسي · نتيجة دولينغو ١٠ (أيار ٢٠٢٦)","li.title":"بركات على لينكدإن","be.title":"بركات على بيهانس",
+    "doc.cv.eye":"ملف · السيرة الذاتية","doc.cv.meta":"الخبرة والمهارات · ملف","doc.cat.eye":"ملف · الكتالوج","doc.cat.meta":"كتالوج الأعمال · ملف"
+  },
+  fr:{
+    "profile.role":"Graphiste",
+    "lang.en":"Anglais","lang.ku":"Kurde sorani","lang.kmr":"Kurde kurmanji","lang.ar":"Arabe","lang.fr":"Français","lang.tr":"Turc","lang.sv":"Suédois",
+    "cursor.open":"Ouvrir","cursor.view":"Voir","cursor.go":"Aller","cursor.talk":"Parler","cursor.tool":"Outil","cursor.send":"Envoyer","cursor.preview":"Aperçu",
+    "menu.rooms":"Salles / 01—06","menu.cover":"Couverture du menu",
+    "menu.note.design":"Designs et systèmes visuels choisis","menu.note.work":"Études d'identité, du brief au système","menu.note.brandboard":"Un départ gratuit pour une identité bilingue","menu.note.blog":"Notes sur la typographie, le lieu et la pratique","menu.note.bio":"Expérience, outils, prix et biographie","menu.note.contact":"Commencer une conversation claire et utile",
+    "gallery.loading":"Chargement de la galerie…","lm.more":"Charger plus",
+    "svc.identity.sub":"Signes et systèmes d'identité","svc.editorial.sub":"Livres, affiches et production","svc.campaign.sub":"Campagnes et systèmes sociaux","svc.motion":"Motion, image et IA","svc.motion.desc":"L'image et le mouvement prolongent l'identité sans perdre son caractère, avec une exploration assistée par IA.","svc.motion.c":"Développement visuel assisté par IA","svc.motion.sub":"Motion, image et IA",
+    "hero.ai":"Intelligence artificielle","hero.ai.short":"IA","tab.ai":"IA","chat.status":"En ligne · répond aussitôt"
+  },
+  tr:{
+    "profile.role":"Grafik tasarımcı",
+    "lang.en":"İngilizce","lang.ku":"Sorani Kürtçe","lang.kmr":"Kurmanci Kürtçe","lang.ar":"Arapça","lang.fr":"Fransızca","lang.tr":"Türkçe","lang.sv":"İsveççe",
+    "cursor.open":"Aç","cursor.view":"Gör","cursor.go":"Git","cursor.talk":"Konuş","cursor.tool":"Araç","cursor.send":"Gönder","cursor.preview":"Önizle",
+    "menu.rooms":"Odalar / 01—06","menu.cover":"Menü kapağı",
+    "menu.note.design":"Seçilmiş tasarım ve görsel sistemler","menu.note.work":"Özetten sisteme kimlik incelemeleri","menu.note.brandboard":"Ücretsiz iki dilli kimlik başlangıcı","menu.note.blog":"Tipografi, yer ve pratik üzerine notlar","menu.note.bio":"Deneyim, araçlar, ödüller ve biyografi","menu.note.contact":"Açık ve yararlı bir konuşma başlat",
+    "gallery.loading":"Galeri yükleniyor…","lm.more":"Daha fazla yükle",
+    "svc.identity.sub":"İşaretler ve kimlik sistemleri","svc.editorial.sub":"Kitaplar, afişler ve üretim","svc.campaign.sub":"Kampanyalar ve sosyal sistemler","svc.motion":"Hareket, görsel ve yapay zeka","svc.motion.desc":"Kimliğin karakterini kaybetmeden onu genişleten görsel ve hareket çalışmaları, ölçülü yapay zeka araştırmasıyla desteklenir.","svc.motion.c":"Yapay zeka destekli görsel geliştirme","svc.motion.sub":"Hareket, görsel ve yapay zeka",
+    "hero.ai":"Yapay zeka","hero.ai.short":"YZ","tab.ai":"YZ","chat.status":"Çevrimiçi · anında yanıt verir"
+  },
+  sv:{
+    "profile.role":"Grafisk formgivare",
+    "lang.en":"Engelska","lang.ku":"Sorani-kurdiska","lang.kmr":"Kurmanji-kurdiska","lang.ar":"Arabiska","lang.fr":"Franska","lang.tr":"Turkiska","lang.sv":"Svenska",
+    "cursor.open":"Öppna","cursor.view":"Visa","cursor.go":"Gå","cursor.talk":"Prata","cursor.tool":"Verktyg","cursor.send":"Skicka","cursor.preview":"Förhandsvisa",
+    "menu.rooms":"Rum / 01—06","menu.cover":"Menyomslag",
+    "menu.note.design":"Utvalda design- och visuella system","menu.note.work":"Identitetsstudier, från brief till system","menu.note.brandboard":"En gratis start för tvåspråkig identitet","menu.note.blog":"Anteckningar om typografi, plats och praktik","menu.note.bio":"Erfarenhet, verktyg, priser och biografi","menu.note.contact":"Starta ett tydligt och nyttigt samtal",
+    "gallery.loading":"Galleriet laddas…","lm.more":"Ladda mer",
+    "svc.identity.sub":"Märken och identitetssystem","svc.editorial.sub":"Böcker, affischer och produktion","svc.campaign.sub":"Kampanjer och sociala system","svc.motion":"Rörelse, bild och artificiell intelligens","svc.motion.desc":"Bild och rörelse som utvecklar identiteten utan att förlora dess karaktär, med genomtänkt stöd av artificiell intelligens.","svc.motion.c":"Visuell utveckling med artificiell intelligens","svc.motion.sub":"Rörelse, bild och artificiell intelligens",
+    "hero.ai":"Artificiell intelligens","hero.ai.short":"Artificiell intelligens","tab.ai":"Artificiell intelligens","chat.status":"Uppkopplad · svarar direkt"
+  }
+};
+Object.keys(window.I18N_EXTRA_LOCALIZE320).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_LOCALIZE320[l]); });
+if (window.TAB_META_I18N) {
+  var BQ_AI_TAB_TITLES = { ku:'زیرەکی', kmr:'Aqil', ar:'ذكاء', fr:'IA', tr:'YZ', sv:'Artificiell intelligens' };
+  Object.keys(BQ_AI_TAB_TITLES).forEach(function(l){
+    if (window.TAB_META_I18N[l] && window.TAB_META_I18N[l].ai) window.TAB_META_I18N[l].ai.title = BQ_AI_TAB_TITLES[l];
+  });
+  if (window.TAB_META_I18N.ku && window.TAB_META_I18N.ku.image) window.TAB_META_I18N.ku.image.desc = 'دەستکاریی لایتروم، کۆمپۆزیت، و ڕیتاچی ئەدیتۆریاڵ.';
+  if (window.TAB_META_I18N.ar && window.TAB_META_I18N.ar.image) window.TAB_META_I18N.ar.image.desc = 'تحرير لايت روم والتركيب والتنقيح التحريري.';
+}
+if (window.TABCARD_I18N) {
+  var BQ_AI_CARDS = {
+    ku:{ tag:'زیرەکی · تاقیکردنەوە', desc:'پۆستەر، ڤیدیۆ و تاقیکردنەوەی بینراو بە یارمەتی زیرەکیی دەستکرد — بەمزووانە.' },
+    kmr:{ tag:'Aqil · Ezmûn', desc:'Poster, vîdyo û ezmûnên dîtbarî bi alîkariya aqilmendiya çêkirî — di demek nêz de.' },
+    ar:{ tag:'ذكاء · تجارب', desc:'ملصقات وفيديو وتجارب بصرية بمساعدة الذكاء الاصطناعي — قريباً.' },
+    fr:{ tag:'IA · Expériences', desc:'Affiches, vidéos et expériences visuelles assistées par IA — bientôt.' },
+    tr:{ tag:'YZ · Denemeler', desc:'Yapay zeka destekli afişler, videolar ve görsel denemeler — yakında.' },
+    sv:{ tag:'Artificiell intelligens · Experiment', desc:'Affischer, video och visuella experiment med artificiell intelligens — snart.' }
+  };
+  Object.keys(BQ_AI_CARDS).forEach(function(l){ if (window.TABCARD_I18N[l]) window.TABCARD_I18N[l].ai = BQ_AI_CARDS[l]; });
+}

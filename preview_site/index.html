@@ -214,7 +214,7 @@
         <img src="assets/avatar.webp" alt="Barakat Qurtas" width="124" height="124" decoding="async" />
       </div>
       <span class="splash-name">Barakat Qurtas</span>
-      <span class="splash-tag mono">Graphic Designer</span>
+      <span class="splash-tag mono" data-i18n="profile.role">Graphic Designer</span>
       <div class="splash-line"><span class="splash-line-fill" id="splashFill"></span></div>
       <span class="splash-pct mono" id="splashPct">00</span>
     </div>
@@ -224,7 +224,7 @@
 
   <!-- Custom cursor -->
   <div class="cursor-dot" id="cursorDot"></div>
-  <div class="cursor-ring" id="cursorRing"><span class="cursor-ring-label">Open</span></div>
+  <div class="cursor-ring" id="cursorRing"><span class="cursor-ring-label" data-i18n="cursor.open">Open</span></div>
 
   <!-- Grain overlay -->
   <div class="grain" aria-hidden="true"></div>
@@ -237,7 +237,7 @@
     <!-- Wordmark — hover for the profile card -->
     <a href="#" class="rail-logo" id="railLogo" data-route="design" aria-label="Barakat Qurtas, home">
       <img class="rail-logo-av" src="assets/avatar.webp" alt="" />
-      <span class="rail-logo-txt"><span class="rail-logo-name">Barakat Qurtas</span><span class="rail-logo-role">Graphic Designer</span></span>
+      <span class="rail-logo-txt"><span class="rail-logo-name">Barakat Qurtas</span><span class="rail-logo-role" data-i18n="profile.role">Graphic Designer</span></span>
       <span class="rail-room-name" id="railRoomName" data-i18n="nav.design">Design</span>
     </a>
 
@@ -311,13 +311,13 @@
         <span class="tool-tip" data-i18n="tip.lang">Language</span>
         <div class="lang-flyout" id="langFlyout" role="menu">
           <div class="lang-head mono" data-i18n="lang.select">Select your language</div>
-          <button class="lang-opt" data-lang="en" role="menuitem"><span>EN</span><small>English</small><i class="fa-solid fa-check lang-check"></i></button>
-          <button class="lang-opt" data-lang="ku" role="menuitem"><span>کو</span><small>کوردیی سۆرانی</small><i class="fa-solid fa-check lang-check"></i></button>
-          <button class="lang-opt" data-lang="kmr" role="menuitem"><span>Ku</span><small>Kurmancî</small><i class="fa-solid fa-check lang-check"></i></button>
-          <button class="lang-opt" data-lang="ar" role="menuitem"><span>ع</span><small>العربية</small><i class="fa-solid fa-check lang-check"></i></button>
-          <button class="lang-opt" data-lang="fr" role="menuitem"><span>FR</span><small>Français</small><i class="fa-solid fa-check lang-check"></i></button>
-          <button class="lang-opt" data-lang="tr" role="menuitem"><span>TR</span><small>Türkçe</small><i class="fa-solid fa-check lang-check"></i></button>
-          <button class="lang-opt" data-lang="sv" role="menuitem"><span>SV</span><small>Svenska</small><i class="fa-solid fa-check lang-check"></i></button>
+          <button class="lang-opt" data-lang="en" role="menuitem"><span>EN</span><small data-i18n="lang.en">English</small><i class="fa-solid fa-check lang-check"></i></button>
+          <button class="lang-opt" data-lang="ku" role="menuitem"><span>کو</span><small data-i18n="lang.ku">Sorani Kurdish</small><i class="fa-solid fa-check lang-check"></i></button>
+          <button class="lang-opt" data-lang="kmr" role="menuitem"><span>Ku</span><small data-i18n="lang.kmr">Kurmanji Kurdish</small><i class="fa-solid fa-check lang-check"></i></button>
+          <button class="lang-opt" data-lang="ar" role="menuitem"><span>ع</span><small data-i18n="lang.ar">Arabic</small><i class="fa-solid fa-check lang-check"></i></button>
+          <button class="lang-opt" data-lang="fr" role="menuitem"><span>FR</span><small data-i18n="lang.fr">French</small><i class="fa-solid fa-check lang-check"></i></button>
+          <button class="lang-opt" data-lang="tr" role="menuitem"><span>TR</span><small data-i18n="lang.tr">Turkish</small><i class="fa-solid fa-check lang-check"></i></button>
+          <button class="lang-opt" data-lang="sv" role="menuitem"><span>SV</span><small data-i18n="lang.sv">Swedish</small><i class="fa-solid fa-check lang-check"></i></button>
         </div>
       </div>
 
@@ -389,13 +389,13 @@
     <div class="mobilebar-pop-wrap">
       <button class="mobilebar-btn" id="langPopBtn" aria-haspopup="true" aria-expanded="false" aria-label="Language"><span id="langCurrentCodeM">EN</span></button>
       <div class="mobilebar-pop mobilebar-pop--lang" id="langPop">
-        <button class="mobile-lang" data-lang="en">EN</button>
-        <button class="mobile-lang" data-lang="ku">کوردی</button>
-        <button class="mobile-lang" data-lang="kmr">Kurmancî</button>
-        <button class="mobile-lang" data-lang="ar">عربی</button>
-        <button class="mobile-lang" data-lang="fr">Français</button>
-        <button class="mobile-lang" data-lang="tr">Türkçe</button>
-        <button class="mobile-lang" data-lang="sv">Svenska</button>
+        <button class="mobile-lang" data-lang="en" data-i18n="lang.en">English</button>
+        <button class="mobile-lang" data-lang="ku" data-i18n="lang.ku">Sorani Kurdish</button>
+        <button class="mobile-lang" data-lang="kmr" data-i18n="lang.kmr">Kurmanji Kurdish</button>
+        <button class="mobile-lang" data-lang="ar" data-i18n="lang.ar">Arabic</button>
+        <button class="mobile-lang" data-lang="fr" data-i18n="lang.fr">French</button>
+        <button class="mobile-lang" data-lang="tr" data-i18n="lang.tr">Turkish</button>
+        <button class="mobile-lang" data-lang="sv" data-i18n="lang.sv">Swedish</button>
       </div>
     </div>
 
@@ -438,17 +438,17 @@
     <div class="mobile-sheet" role="dialog" aria-modal="true" aria-label="Menu">
       <div class="mm-left">
         <div class="mm-top">
-          <a href="/" class="mm-logo" data-route="design"><img class="mm-logo-av" src="assets/avatar.webp" alt="" /><span class="mm-logo-txt"><small class="mm-logo-name">Barakat Qurtas</small><span class="mm-logo-role">Graphic Designer</span></span></a>
-          <span class="mm-top-label mono">Rooms / 01—06</span>
+          <a href="/" class="mm-logo" data-route="design"><img class="mm-logo-av" src="assets/avatar.webp" alt="" /><span class="mm-logo-txt"><small class="mm-logo-name">Barakat Qurtas</small><span class="mm-logo-role" data-i18n="profile.role">Graphic Designer</span></span></a>
+          <span class="mm-top-label mono" data-i18n="menu.rooms">Rooms / 01—06</span>
           <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <nav class="mm-nav" aria-label="Rooms">
-          <a href="/design" class="mm-link" data-route="design" data-menu-note="Selected design and visual systems" data-menu-img="assets/covers/en-design.jpg"><span class="mm-n">01</span> <span class="mm-link-text" data-i18n="nav.design">Design</span><i class="fa-solid fa-arrow-up-right"></i></a>
-          <a href="/work" class="mm-link" data-route="work" data-menu-note="Identity case studies, from brief to system" data-menu-img="assets/covers/en-official.jpg"><span class="mm-n">02</span> <span class="mm-link-text" data-i18n="nav.work">Selected Work</span><i class="fa-solid fa-arrow-up-right"></i></a>
-          <a href="/brandboard" class="mm-link" data-route="brandboard" data-menu-note="A free bilingual identity starter" data-menu-img="assets/covers/en-logo.jpg"><span class="mm-n">03</span> <span class="mm-link-text" data-i18n="nav.brandboard">The Brand Board</span><i class="fa-solid fa-arrow-up-right"></i></a>
-          <a href="/blog" class="mm-link" data-route="blog" data-menu-note="Notes on typography, place and practice" data-menu-img="assets/covers/en-blog.jpg"><span class="mm-n">04</span> <span class="mm-link-text" data-i18n="nav.blog">The Journal</span><i class="fa-solid fa-arrow-up-right"></i></a>
-          <a href="/bio" class="mm-link" data-route="bio" data-menu-note="Experience, tools, awards and biography" data-menu-img="assets/covers/en-bio.jpg"><span class="mm-n">05</span> <span class="mm-link-text" data-i18n="nav.bio">The Designer</span><i class="fa-solid fa-arrow-up-right"></i></a>
-          <a href="/contact" class="mm-link" data-route="contact" data-menu-note="Start a clear, useful conversation" data-menu-img="assets/covers/en-contact.jpg"><span class="mm-n">06</span> <span class="mm-link-text" data-i18n="nav.contact">Let's talk.</span><i class="fa-solid fa-arrow-up-right"></i></a>
+          <a href="/design" class="mm-link" data-route="design" data-i18n-menu-note="menu.note.design" data-menu-note="Selected design and visual systems" data-menu-img="assets/covers/en-design.jpg"><span class="mm-n">01</span> <span class="mm-link-text" data-i18n="nav.design">Design</span><i class="fa-solid fa-arrow-up-right"></i></a>
+          <a href="/work" class="mm-link" data-route="work" data-i18n-menu-note="menu.note.work" data-menu-note="Identity case studies, from brief to system" data-menu-img="assets/covers/en-official.jpg"><span class="mm-n">02</span> <span class="mm-link-text" data-i18n="nav.work">Selected Work</span><i class="fa-solid fa-arrow-up-right"></i></a>
+          <a href="/brandboard" class="mm-link" data-route="brandboard" data-i18n-menu-note="menu.note.brandboard" data-menu-note="A free bilingual identity starter" data-menu-img="assets/covers/en-logo.jpg"><span class="mm-n">03</span> <span class="mm-link-text" data-i18n="nav.brandboard">The Brand Board</span><i class="fa-solid fa-arrow-up-right"></i></a>
+          <a href="/blog" class="mm-link" data-route="blog" data-i18n-menu-note="menu.note.blog" data-menu-note="Notes on typography, place and practice" data-menu-img="assets/covers/en-blog.jpg"><span class="mm-n">04</span> <span class="mm-link-text" data-i18n="nav.blog">The Journal</span><i class="fa-solid fa-arrow-up-right"></i></a>
+          <a href="/bio" class="mm-link" data-route="bio" data-i18n-menu-note="menu.note.bio" data-menu-note="Experience, tools, awards and biography" data-menu-img="assets/covers/en-bio.jpg"><span class="mm-n">05</span> <span class="mm-link-text" data-i18n="nav.bio">The Designer</span><i class="fa-solid fa-arrow-up-right"></i></a>
+          <a href="/contact" class="mm-link" data-route="contact" data-i18n-menu-note="menu.note.contact" data-menu-note="Start a clear, useful conversation" data-menu-img="assets/covers/en-contact.jpg"><span class="mm-n">06</span> <span class="mm-link-text" data-i18n="nav.contact">Let's talk.</span><i class="fa-solid fa-arrow-up-right"></i></a>
         </nav>
         <div class="mm-foot">
           <a class="mm-touch" href="/contact" data-route="contact"><span data-i18n="profile.btn2">Get in touch</span> <i class="fa-solid fa-arrow-right"></i></a>
@@ -463,13 +463,13 @@
         <figure class="mm-figure" id="menuFigure" data-room="design">
           <div class="mm-cover">
             <div class="mm-cover-top">
-              <span class="mm-cover-eyebrow mono">Menu Cover</span>
+              <span class="mm-cover-eyebrow mono" data-i18n="menu.cover">Menu Cover</span>
               <span class="mm-cover-no mono" id="menuPreviewNo">01 / 06</span>
             </div>
             <div class="mm-cover-mid">
               <span class="mm-cover-mark">Barakat Qurtas</span>
               <h3 class="mm-cover-title" id="menuPreviewTitle" data-i18n="nav.design">Design</h3>
-              <p class="mm-cover-note" id="menuPreviewNote">Selected design and visual systems</p>
+              <p class="mm-cover-note" id="menuPreviewNote" data-i18n="menu.note.design">Selected design and visual systems</p>
             </div>
             <div class="mm-cover-base mono">bqurtas.com · Hewlêr</div>
           </div>
@@ -509,22 +509,22 @@
 
           <div class="hero-marquee">
             <div class="hero-marquee-track">
-              <span class="hero-disc" data-disc="Brand Identity"><i class="fa-solid fa-pen-nib"></i> Brand Identity</span><span class="hero-sep">✦</span>
-              <span class="hero-disc" data-disc="Editorial"><i class="fa-solid fa-newspaper"></i> Editorial</span><span class="hero-sep">✦</span>
-              <span class="hero-disc" data-disc="Posters"><i class="fa-solid fa-image"></i> Posters</span><span class="hero-sep">✦</span>
-              <span class="hero-disc" data-disc="Book Design"><i class="fa-solid fa-book"></i> Book Design</span><span class="hero-sep">✦</span>
-              <span class="hero-disc" data-disc="Video"><i class="fa-solid fa-video"></i> Video</span><span class="hero-sep">✦</span>
-              <span class="hero-disc" data-disc="Brand Identity"><i class="fa-solid fa-pen-nib"></i> Brand Identity</span><span class="hero-sep">✦</span>
-              <span class="hero-disc" data-disc="Editorial"><i class="fa-solid fa-newspaper"></i> Editorial</span><span class="hero-sep">✦</span>
-              <span class="hero-disc" data-disc="Posters"><i class="fa-solid fa-image"></i> Posters</span><span class="hero-sep">✦</span>
-              <span class="hero-disc" data-disc="Book Design"><i class="fa-solid fa-book"></i> Book Design</span><span class="hero-sep">✦</span>
-              <span class="hero-disc" data-disc="Video"><i class="fa-solid fa-video"></i> Video</span><span class="hero-sep">✦</span>
+              <span class="hero-disc" data-disc="Brand Identity"><i class="fa-solid fa-pen-nib"></i> <span data-i18n="disc.brand">Brand Identity</span></span><span class="hero-sep">✦</span>
+              <span class="hero-disc" data-disc="Editorial"><i class="fa-solid fa-newspaper"></i> <span data-i18n="disc.editorial">Editorial</span></span><span class="hero-sep">✦</span>
+              <span class="hero-disc" data-disc="Posters"><i class="fa-solid fa-image"></i> <span data-i18n="disc.posters">Posters</span></span><span class="hero-sep">✦</span>
+              <span class="hero-disc" data-disc="Book Design"><i class="fa-solid fa-book"></i> <span data-i18n="disc.book">Book Design</span></span><span class="hero-sep">✦</span>
+              <span class="hero-disc" data-disc="Video"><i class="fa-solid fa-video"></i> <span data-i18n="disc.video">Video</span></span><span class="hero-sep">✦</span>
+              <span class="hero-disc" data-disc="Brand Identity"><i class="fa-solid fa-pen-nib"></i> <span data-i18n="disc.brand">Brand Identity</span></span><span class="hero-sep">✦</span>
+              <span class="hero-disc" data-disc="Editorial"><i class="fa-solid fa-newspaper"></i> <span data-i18n="disc.editorial">Editorial</span></span><span class="hero-sep">✦</span>
+              <span class="hero-disc" data-disc="Posters"><i class="fa-solid fa-image"></i> <span data-i18n="disc.posters">Posters</span></span><span class="hero-sep">✦</span>
+              <span class="hero-disc" data-disc="Book Design"><i class="fa-solid fa-book"></i> <span data-i18n="disc.book">Book Design</span></span><span class="hero-sep">✦</span>
+              <span class="hero-disc" data-disc="Video"><i class="fa-solid fa-video"></i> <span data-i18n="disc.video">Video</span></span><span class="hero-sep">✦</span>
             </div>
           </div>
 
           <p class="hero-services mono">
             <span class="hero-services-main" data-i18n="hero.services">Design • Printing • Advertising</span>
-            <span class="hero-services-ai" tabindex="0"><i class="fa-solid fa-microchip"></i> <span class="hero-ai-label" data-i18n="hero.ai">Artificial Intelligence • AI</span><span class="hero-ai-short">AI</span><span class="hero-ai-future" data-i18n="hero.ai.future">Shaping the future</span></span>
+            <span class="hero-services-ai" tabindex="0"><i class="fa-solid fa-microchip"></i> <span class="hero-ai-label" data-i18n="hero.ai">Artificial Intelligence</span><span class="hero-ai-short" data-i18n="hero.ai.short">AI</span><span class="hero-ai-future" data-i18n="hero.ai.future">Shaping the future</span></span>
           </p>
         </div>
 
@@ -579,7 +579,7 @@
         <div class="grid" id="grid">
           <div class="gallery-loading" id="galleryLoading">
             <i class="fa-solid fa-circle-notch fa-spin"></i>
-            <span class="mono">Loading gallery…</span>
+            <span class="mono" data-i18n="gallery.loading">Loading gallery…</span>
           </div>
         </div>
 
@@ -595,7 +595,7 @@
               <span id="loadLessBtnText" data-i18n="lm.less">Show less</span>
             </button>
             <button class="load-more-btn" id="loadMoreBtn" type="button">
-              <span id="loadMoreBtnText">Load more</span>
+              <span id="loadMoreBtnText" data-i18n="lm.more">Load more</span>
               <i class="fa-solid fa-arrow-down"></i>
             </button>
           </div>
@@ -619,7 +619,7 @@
               <span class="service-index mono">01</span>
               <span class="service-icon"><i class="fa-solid fa-pen-nib"></i></span>
               <span class="service-name" data-i18n="svc.identity">Brand Identity &amp; Logo</span>
-              <span class="service-sub">Marks &amp; identity systems</span>
+              <span class="service-sub" data-i18n="svc.identity.sub">Marks &amp; identity systems</span>
               <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
             </button>
             <div class="service-detail">
@@ -639,7 +639,7 @@
               <span class="service-index mono">02</span>
               <span class="service-icon"><i class="fa-solid fa-book-open"></i></span>
               <span class="service-name" data-i18n="svc.editorial">Editorial &amp; Print</span>
-              <span class="service-sub">Books, posters &amp; production</span>
+              <span class="service-sub" data-i18n="svc.editorial.sub">Books, posters &amp; production</span>
               <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
             </button>
             <div class="service-detail">
@@ -659,7 +659,7 @@
               <span class="service-index mono">03</span>
               <span class="service-icon"><i class="fa-solid fa-bullhorn"></i></span>
               <span class="service-name" data-i18n="svc.campaign">Campaigns &amp; Social</span>
-              <span class="service-sub">Campaigns &amp; social systems</span>
+              <span class="service-sub" data-i18n="svc.campaign.sub">Campaigns &amp; social systems</span>
               <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
             </button>
             <div class="service-detail">
@@ -679,7 +679,7 @@
               <span class="service-index mono">04</span>
               <span class="service-icon"><i class="fa-solid fa-play"></i></span>
               <span class="service-name" data-i18n="svc.motion">Motion, Image &amp; AI</span>
-              <span class="service-sub">Motion, image &amp; AI craft</span>
+              <span class="service-sub" data-i18n="svc.motion.sub">Motion, image &amp; AI craft</span>
               <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
             </button>
             <div class="service-detail">
@@ -1792,14 +1792,14 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script src="js/i18n.min.js?v=309"></script>
+  <script src="js/i18n.min.js?v=310"></script>
   <script src="js/chat-kb.min.js?v=308"></script>
-  <script src="js/main.min.js?v=322"></script>
+  <script src="js/main.min.js?v=323"></script>
   <script src="js/gallery.min.js?v=310"></script>
   <script src="js/enhance.min.js?v=320"></script>
   <script src="js/brandboard.min.js?v=308"></script>
   <script src="js/work.min.js?v=308"></script>
   <script src="js/lux.min.js?v=308"></script>
-  <script src="js/motion.min.js?v=308"></script>
+  <script src="js/motion.min.js?v=309"></script>
 </body>
 </html>

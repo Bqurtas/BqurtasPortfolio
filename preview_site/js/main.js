@@ -1080,6 +1080,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const ring = document.getElementById('cursorRing');
   if (dot && ring && window.matchMedia('(pointer: fine)').matches) {
     const ringLabel = ring.querySelector('.cursor-ring-label');
+    const cursorText = (key, fallback) => (window.BQ_DICT && window.BQ_DICT['cursor.' + key]) || fallback;
     let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my + 12;
     let magnet = null;
     let cursorTarget = null;
@@ -1135,18 +1136,19 @@ document.addEventListener('DOMContentLoaded', () => {
       ring.classList.toggle('is-magnet', !overCard && !!overMagnet && !overMenuBtn);
       ring.classList.toggle('is-hover',  !overCard && !overMagnet && !!overLink && !overMenuBtn);
       if (ringLabel && overCard) {
-        let label = 'Open';
-        if (overCard.matches('.card--photo, .work-card, .blog-card, .tab')) label = 'View';
-        else if (overCard.matches('.software-chip, .software-link')) label = 'Tool';
-        else if (overCard.matches('.footer-cta-btn')) label = 'Talk';
-        else if (overCard.matches('.pitch-submit, .footer-email')) label = 'Send';
-        else if (overCard.matches('.mm-link, .footer-room-nav a, .service-cta, .pencemor-hero-btn')) label = 'Go';
-        else if (overCard.matches('.service-trigger, .feature-card, .qc-card, #bio .bio-block')) label = 'Open';
-        else if (overCard.matches('.index-row')) label = 'Preview';
+        let action = 'open';
+        if (overCard.matches('.card--photo, .work-card, .blog-card, .tab')) action = 'view';
+        else if (overCard.matches('.software-chip, .software-link')) action = 'tool';
+        else if (overCard.matches('.footer-cta-btn')) action = 'talk';
+        else if (overCard.matches('.pitch-submit, .footer-email')) action = 'send';
+        else if (overCard.matches('.mm-link, .footer-room-nav a, .service-cta, .pencemor-hero-btn')) action = 'go';
+        else if (overCard.matches('.service-trigger, .feature-card, .qc-card, #bio .bio-block')) action = 'open';
+        else if (overCard.matches('.index-row')) action = 'preview';
+        const label = cursorText(action, action.charAt(0).toUpperCase() + action.slice(1));
         ringLabel.textContent = label;
-        ring.dataset.cursorAction = label.toLowerCase();
+        ring.dataset.cursorAction = action;
       } else if (ringLabel) {
-        ringLabel.textContent = 'Open';
+        ringLabel.textContent = cursorText('open', 'Open');
         delete ring.dataset.cursorAction;
       }
       dot.style.opacity  = (overCard || overZoom || overHide) ? '0' : '';
