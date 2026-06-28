@@ -2357,18 +2357,33 @@
     list.querySelectorAll('.latest-item').forEach((b) => b.addEventListener('click', () => {
       close();
       const kind = b.getAttribute('data-kind');
-      const goTab = (cat) => { if (window.__bqShowRoom) window.__bqShowRoom('design'); setTimeout(() => { const tb = document.querySelector('.tab[data-filter="' + cat + '"]'); if (tb) tb.click(); const w = document.querySelector('.section.work'); if (w) w.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 130); };
+      const goRoom = (route) => {
+        if (window.__bqGoRoom) window.__bqGoRoom(route, true);
+        else if (window.__bqShowRoom) window.__bqShowRoom(route);
+      };
+      const afterRoom = (route, fn) => {
+        const wait = (document.body.dataset.room === route) ? 130 : ((Number(window.__bqRouteCurtainCoverMs) || 680) + 180);
+        goRoom(route);
+        setTimeout(fn, wait);
+      };
+      const goTab = (cat) => {
+        afterRoom('design', () => {
+          const tb = document.querySelector('.tab[data-filter="' + cat + '"]');
+          if (tb) tb.click();
+          const w = document.querySelector('.section.work');
+          if (w) w.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      };
       if (kind === 'work') {
         goTab(b.getAttribute('data-cat'));
       } else if (kind === 'pin') {
         const link = b.getAttribute('data-link') || '';
         if (/^https?:\/\//.test(link)) { window.open(link, '_blank', 'noopener'); }
         else if (link) { goTab(link); }
-        else if (window.__bqShowRoom) { window.__bqShowRoom('design'); }
+        else { goRoom('design'); }
       } else {
         const id = b.getAttribute('data-id');
-        if (window.__bqShowRoom && document.body.dataset.room !== 'blog') window.__bqShowRoom('blog');
-        setTimeout(() => { if (window.__bqOpenPostSlug) window.__bqOpenPostSlug(id); }, 80);
+        afterRoom('blog', () => { if (window.__bqOpenPostSlug) window.__bqOpenPostSlug(id); });
       }
     }));
   };

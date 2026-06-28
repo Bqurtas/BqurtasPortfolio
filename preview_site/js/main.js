@@ -211,18 +211,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
   const showRoomAfterTransitionCurtain = (id, push) => {
+    if (roomTransitionTimer) return;
     if (!shouldDelayRoomSwapForCurtain(id)) {
+      showRoom(id, push);
+      return;
+    }
+    const curtainStarted = (typeof window.__bqPlayRoomCurtain === 'function') ? window.__bqPlayRoomCurtain(id) : true;
+    if (!curtainStarted) {
       showRoom(id, push);
       return;
     }
     clearTimeout(roomTransitionTimer);
     document.body.classList.add('room-transition-pending');
+    const coverMs = Number(window.__bqRouteCurtainCoverMs) || 680;
     roomTransitionTimer = setTimeout(() => {
       document.body.classList.remove('room-transition-pending');
       showRoom(id, push);
       roomTransitionTimer = null;
-    }, 620);
+    }, coverMs);
   };
+  window.__bqGoRoom = showRoomAfterTransitionCurtain;
+  window.__bqShowRoomWithCurtain = showRoomAfterTransitionCurtain;
 
   /* Scroll-spy on the home / design page — the address bar reflects the section in view:
        hero (top)            → base   ( / or /<lang> )

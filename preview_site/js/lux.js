@@ -7,6 +7,10 @@
   'use strict';
   if (typeof IntersectionObserver === 'undefined') return;
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var curtainCoverMs = 680;
+  var curtainLeaveMs = 900;
+  var curtainDoneMs = 1660;
+  window.__bqRouteCurtainCoverMs = curtainCoverMs;
 
   /* ---- B&W → colour on the gallery cards ---- */
   var colorObs = new IntersectionObserver(function (entries) {
@@ -89,11 +93,9 @@
       contact: "Let's talk."
     };
     var busy = false;
-    document.addEventListener('click', function (ev) {
-      var link = ev.target.closest('[data-route]');
-      if (!link || busy) return;
-      var route = link.getAttribute('data-route');
-      if (route && route === document.body.dataset.room) return;   // same room → no curtain
+    var playCurtain = function (route) {
+      if (busy) return true;
+      if (route && route === document.body.dataset.room) return false;   // same room → no curtain
       var translated = document.querySelector('.mm-link[data-route="' + route + '"] .mm-link-text');
       var roomName = translated ? translated.textContent.trim() : roomFallbacks[route];
       var nameNode = curtain.querySelector('.lux-transition-room');
@@ -103,8 +105,16 @@
       busy = true;
       curtain.classList.remove('is-leaving');
       curtain.classList.add('is-active');             // sweep up to cover (room swaps underneath)
-      setTimeout(function () { curtain.classList.add('is-leaving'); }, 670);   // sweep away to reveal
-      setTimeout(function () { curtain.classList.remove('is-active', 'is-leaving'); busy = false; }, 1420);
+      setTimeout(function () { curtain.classList.add('is-leaving'); }, curtainLeaveMs);   // sweep away after the room has swapped under full cover
+      setTimeout(function () { curtain.classList.remove('is-active', 'is-leaving'); busy = false; }, curtainDoneMs);
+      return true;
+    };
+    window.__bqPlayRoomCurtain = playCurtain;
+    document.addEventListener('click', function (ev) {
+      var link = ev.target.closest('[data-route]');
+      if (!link) return;
+      var route = link.getAttribute('data-route');
+      playCurtain(route);
     }, true);
     addEventListener('pagehide', function () { curtain.classList.remove('is-active', 'is-leaving'); }, { once: true });
   }
