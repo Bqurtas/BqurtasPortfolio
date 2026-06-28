@@ -8865,12 +8865,13 @@ html .splash-name, html[lang] .splash-name,
   filter:grayscale(1) contrast(1.04) !important; border:1px solid rgba(255,255,255,.2) !important;
   flex:0 0 auto !important; display:block !important;
 }
-.mm-logo span.mm-logo-txt{ display:flex !important; flex-direction:column !important; line-height:1.06 !important; gap:2px !important; }
+.mm-logo span.mm-logo-txt{ display:flex !important; flex-direction:column !important; line-height:.94 !important; gap:0 !important; }
 .mm-logo small.mm-logo-name{ transform:none !important; display:block !important; }
 .mm-logo span.mm-logo-role{
   display:block !important;
-  font-family:'Manrope',sans-serif !important; font-size:10px !important; font-weight:600 !important;
-  letter-spacing:.15em !important; text-transform:uppercase !important; color:rgba(255,255,255,.5) !important;
+  margin-top:-1px !important;
+  font-family:'Manrope',sans-serif !important; font-size:9px !important; font-weight:600 !important;
+  letter-spacing:.12em !important; text-transform:uppercase !important; color:rgba(255,255,255,.5) !important;
 }
 :root[data-theme="light"] .mm-logo-av{ border-color:rgba(0,0,0,.18) !important; }
 :root[data-theme="light"] .mm-logo-role{ color:rgba(0,0,0,.5) !important; }
@@ -8882,11 +8883,12 @@ html .splash-name, html[lang] .splash-name,
   filter:grayscale(1) contrast(1.04) !important; border:1px solid var(--line) !important;
   flex:0 0 auto !important; display:block !important;
 }
-.rail-logo-txt{ display:flex !important; flex-direction:column !important; line-height:1.02 !important; }
+.rail-logo-txt{ display:flex !important; flex-direction:column !important; line-height:.92 !important; gap:0 !important; }
 .rail-logo-name{ transform:none !important; }   /* avatar layout centres it now */
 .rail-logo-role{
-  font-family:'Manrope',sans-serif !important; font-size:9px !important; font-weight:600 !important;
-  letter-spacing:.15em !important; text-transform:uppercase !important; color:var(--ink-muted) !important;
+  margin-top:-2px !important;
+  font-family:'Manrope',sans-serif !important; font-size:8px !important; font-weight:600 !important;
+  letter-spacing:.12em !important; text-transform:uppercase !important; color:var(--ink-muted) !important;
   white-space:nowrap !important;
 }
 @media (max-width:820px){ .rail-logo-av, .rail-logo-role{ display:none !important; } }  /* rail is hidden on mobile anyway */
@@ -9512,8 +9514,8 @@ body::before{
   box-shadow:0 0 0 1px color-mix(in srgb, var(--bg) 50%, transparent);
 }
 .cursor-ring{
-  width:28px;
-  height:28px;
+  width:30px;
+  height:30px;
   background:transparent;
   border-color:color-mix(in srgb, var(--ink) 36%, transparent);
   color:var(--ink);
@@ -9569,6 +9571,36 @@ body::before{
 .cursor-ring[data-cursor-action="talk"]{
   width:50px;
   height:50px;
+}
+
+/* Keep Font Awesome glyphs from falling back to square boxes after late typography overrides. */
+.fa,
+.fa-solid,
+.fa-regular,
+.fa-brands,
+.fas,
+.far,
+.fab{
+  font-style:normal !important;
+  font-variant:normal !important;
+  line-height:1 !important;
+  text-rendering:auto !important;
+}
+.fa,
+.fa-solid,
+.fas{
+  font-family:"Font Awesome 6 Free" !important;
+  font-weight:900 !important;
+}
+.fa-regular,
+.far{
+  font-family:"Font Awesome 6 Free" !important;
+  font-weight:400 !important;
+}
+.fa-brands,
+.fab{
+  font-family:"Font Awesome 6 Brands" !important;
+  font-weight:400 !important;
 }
 
 .hero-portrait{
