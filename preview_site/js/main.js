@@ -1005,7 +1005,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const ring = document.getElementById('cursorRing');
   if (dot && ring && window.matchMedia('(pointer: fine)').matches) {
     const ringLabel = ring.querySelector('.cursor-ring-label');
-    let mx = innerWidth/2, my = innerHeight/2, rx = mx + 12, ry = my + 8;
+    let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my + 12;
     let magnet = null;
     let cursorTarget = null;
     document.addEventListener('mousemove', (e) => {
@@ -1018,7 +1018,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const hasOpen = ring.classList.contains('is-open');
       const hasMagnet = ring.classList.contains('is-magnet');
       const hasHover = ring.classList.contains('is-hover');
-      const gap = hasOpen ? 12 : hasMagnet ? 8 : hasHover ? 9 : 6;
+      const gapY = hasOpen ? 16 : hasMagnet ? 12 : hasHover ? 11 : 8;
+      const gapX = hasOpen ? 1 : 0;
       let tx = mx, ty = my;
       if (magnet) {
         const r = magnet.getBoundingClientRect();
@@ -1027,8 +1028,8 @@ document.addEventListener('DOMContentLoaded', () => {
           ty = my + (r.top + r.height / 2 - my) * 0.32;
         }
       }
-      tx += gap;
-      ty += gap * 0.66;
+      tx += gapX;
+      ty += gapY;
       const ease = hasOpen ? 0.13 : hasMagnet ? 0.17 : 0.2;
       rx += (tx - rx) * ease;
       ry += (ty - ry) * ease;
