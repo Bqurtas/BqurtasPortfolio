@@ -9411,6 +9411,221 @@ body::before{
 }
 
 /* =========================================================
+   v315 — calmer portfolio motion, modern lag cursor, natural hero portrait.
+   The gallery no longer uses scroll-linked image transforms; those looked like
+   loading stutter in a dense masonry grid. Motion stays compositor-only and
+   intentionally quiet.
+   ========================================================= */
+#grid .card.portfolio-scroll-card{
+  opacity:1 !important;
+  transform:translate3d(0,0,0) !important;
+  filter:none !important;
+  transition:
+    border-color .32s var(--ease),
+    box-shadow .36s var(--ease),
+    transform .36s var(--ease),
+    opacity .18s ease !important;
+  transition-delay:0ms !important;
+  will-change:auto !important;
+}
+#grid .card.portfolio-scroll-card .card-art{
+  clip-path:inset(0) !important;
+  transform:translate3d(0,0,0) !important;
+  transition:transform .48s var(--ease-out) !important;
+  transition-delay:0ms !important;
+  will-change:auto !important;
+}
+#grid .card.portfolio-scroll-card .card-art img,
+#grid .card.portfolio-scroll-card .card-art video,
+#grid .card.portfolio-scroll-card .card-art svg{
+  animation:none !important;
+  transform:translate3d(0,0,0) scale(1) !important;
+  transition:
+    transform .58s var(--ease-out),
+    filter .75s cubic-bezier(.16,1,.3,1),
+    opacity .24s ease !important;
+  will-change:auto !important;
+  backface-visibility:hidden;
+}
+@media (hover:hover) and (pointer:fine){
+  #grid .card.portfolio-scroll-card:hover{ transform:translate3d(0,-2px,0) !important; }
+  #grid .card.portfolio-scroll-card:hover .card-art{ transform:translate3d(0,-2px,0) !important; }
+  #grid .card.portfolio-scroll-card:hover .card-art img,
+  #grid .card.portfolio-scroll-card:hover .card-art video,
+  #grid .card.portfolio-scroll-card:hover .card-art svg{
+    transform:translate3d(0,0,0) scale(1.018) !important;
+  }
+}
+.lux-gray .card-art img,
+.lux-gray .card-art video,
+.lux-gray .card-art svg{
+  transition:filter 1s cubic-bezier(.16,1,.3,1), transform .58s var(--ease-out) !important;
+}
+
+.cursor-dot,
+.cursor-ring{
+  mix-blend-mode:normal !important;
+  will-change:left, top, width, height, opacity, transform;
+}
+.cursor-dot{
+  width:5px !important;
+  height:5px !important;
+  background:var(--ink) !important;
+  box-shadow:0 0 0 1px color-mix(in srgb, var(--bg) 55%, transparent);
+}
+.cursor-ring{
+  width:24px;
+  height:24px;
+  color:var(--ink);
+  background:transparent;
+  border-color:color-mix(in srgb, var(--ink) 34%, transparent);
+  box-shadow:none;
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+  transition:
+    width .42s var(--ease),
+    height .42s var(--ease),
+    border-color .3s var(--ease),
+    background .3s var(--ease),
+    opacity .18s ease,
+    transform .2s var(--ease);
+}
+.cursor-ring-label{
+  opacity:0 !important;
+  visibility:hidden !important;
+  font-size:0 !important;
+}
+.cursor-ring::before{
+  content:'' !important;
+  display:block !important;
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:4px;
+  height:4px;
+  inset:auto;
+  border-radius:50%;
+  background:currentColor;
+  opacity:0;
+  transform:translate(-50%,-50%) scale(.7);
+  transition:opacity .28s var(--ease), transform .34s var(--ease);
+}
+.cursor-ring::after{ display:none !important; }
+.cursor-ring.is-open{
+  width:42px;
+  height:42px;
+  background:color-mix(in srgb, var(--bg) 42%, transparent);
+  border-color:color-mix(in srgb, var(--ink) 50%, transparent);
+  color:var(--ink);
+  box-shadow:0 16px 34px -28px rgba(0,0,0,.42);
+  -webkit-backdrop-filter:blur(5px);
+  backdrop-filter:blur(5px);
+}
+.cursor-ring.is-hover{
+  width:30px;
+  height:30px;
+  background:transparent;
+  border-color:color-mix(in srgb, var(--ink) 42%, transparent);
+}
+.cursor-ring.is-magnet{
+  width:34px;
+  height:34px;
+  background:color-mix(in srgb, var(--ink) 5%, transparent);
+  border-color:color-mix(in srgb, var(--ink) 44%, transparent);
+}
+.cursor-ring[data-cursor-action="talk"]{
+  width:46px;
+  height:46px;
+}
+.cursor-ring.is-open::before,
+.cursor-ring.is-hover::before,
+.cursor-ring.is-magnet::before{
+  opacity:.62;
+  transform:translate(-50%,-50%) scale(1);
+}
+
+.hero-portrait{
+  --ps:.9;
+  opacity:0;
+  box-shadow:0 24px 68px -30px rgba(0,0,0,.72);
+  transition:opacity .78s var(--ease-out), transform .78s var(--ease);
+}
+.hero-portrait.is-in{ opacity:1 !important; --ps:1; }
+.hero-portrait img{
+  filter:grayscale(.06) contrast(1.03) !important;
+}
+@media (min-width:821px){
+  .hero-portrait{
+    top:50%;
+    width:clamp(154px,14vw,214px);
+  }
+}
+@media (max-width:820px){
+  .hero-portrait{
+    top:50%;
+    width:clamp(124px,34vw,176px);
+    opacity:0;
+  }
+  .hero-portrait.is-in{ opacity:1 !important; }
+}
+@media (max-width:520px){
+  .hero-portrait{
+    top:49.5%;
+    width:clamp(122px,39vw,170px);
+  }
+}
+
+.reveal,
+.lux-reveal{
+  transform:translate3d(0,18px,0);
+  transition:
+    opacity .72s var(--ease-out),
+    transform .92s cubic-bezier(.16,1,.3,1);
+}
+.reveal.is-in,
+.lux-reveal.lux-in{
+  transform:translate3d(0,0,0);
+}
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  .service-panel,
+  .software-chip,
+  .qc-card,
+  .feature-card,
+  .bio-doc-btn,
+  .footer-cta-btn,
+  .load-more-btn,
+  .logo-mark--img,
+  .logo-chip--img{
+    transition:
+      transform .36s var(--ease),
+      border-color .3s var(--ease),
+      box-shadow .36s var(--ease),
+      background .3s var(--ease);
+  }
+  .service-panel:hover,
+  .software-chip:hover,
+  .qc-card:hover,
+  .feature-card:hover,
+  .bio-doc-btn:hover,
+  .footer-cta-btn:hover,
+  .load-more-btn:hover{
+    transform:translate3d(0,-3px,0);
+  }
+}
+
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    #grid .card,
+    #grid .card-art img,
+    #grid .card-art video{
+      animation:none !important;
+      animation-timeline:auto !important;
+      view-timeline:none !important;
+    }
+  }
+}
+
+/* =========================================================
    v301 — CSP hardening helper: replaces the few inline display:none styles
    (load-more controls) with a class so style-src needs no 'unsafe-inline'.
    JS still shows them via inline style.display (CSSOM), which wins over this.

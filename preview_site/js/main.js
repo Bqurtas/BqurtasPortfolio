@@ -470,33 +470,11 @@ document.addEventListener('DOMContentLoaded', () => {
     return 6;
   };
 
-  let portfolioRevealObserver = null;
   const prepPortfolioReveal = (card, colIndex, media, rank) => {
     if (!card) return;
-    card.classList.remove('portfolio-in');
     card.classList.add('portfolio-scroll-card');
+    card.classList.add('portfolio-in');
     card.style.setProperty('--portfolio-delay', '0ms');
-
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
-      requestAnimationFrame(() => card.classList.add('portfolio-in'));
-      return;
-    }
-
-    const observeCard = () => {
-      if (!card.isConnected) return;
-      if (!portfolioRevealObserver) {
-        portfolioRevealObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            entry.target.classList.add('portfolio-in');
-            portfolioRevealObserver.unobserve(entry.target);
-          });
-        }, { threshold: 0.01, rootMargin: '0px 0px 18% 0px' });
-      }
-      portfolioRevealObserver.observe(card);
-    };
-
-    requestAnimationFrame(observeCard);
   };
 
   const buildColumns = (n) => {
@@ -540,7 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
       media.addEventListener('loadeddata', correct, { once: true });
     }
 
-    /* visual reveal is handled by .portfolio-scroll-card when the card enters view */
+    /* Visual motion stays in CSS; cards remain visible so masonry never feels stuck. */
   };
 
   const matchingCards = () => {
@@ -657,7 +635,12 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- REVEAL on scroll ---------- */
   const markReveal = () => {
     /* .card visibility is handled entirely by activateTab pagination — excluded here */
-    document.querySelectorAll('.blog-card, .tl-item, .bio-card, .honor, .lang-item, .orgs li, .service, .qc-card, .stat, .logo-mark, .logo-chip')
+    document.querySelectorAll(
+      '.blog-card, .tl-item, .bio-card, .honor, .lang-item, .orgs li, .service, ' +
+      '.service-panel, .software-chip, .cert-item, .qc-card, .stat, .logo-mark, ' +
+      '.logo-chip, .profile-card, .hero-lede, .hero-spark, .load-more-wrap, ' +
+      '.footer-signature, .footer-connect-v249, .footer-cta'
+    )
       .forEach(el => el.classList.add('reveal'));
   };
   markReveal();
@@ -979,7 +962,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const ring = document.getElementById('cursorRing');
   if (dot && ring && window.matchMedia('(pointer: fine)').matches) {
     const ringLabel = ring.querySelector('.cursor-ring-label');
-    let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
+    let mx = innerWidth/2, my = innerHeight/2, rx = mx + 10, ry = my + 8;
     let magnet = null;
     let cursorTarget = null;
     document.addEventListener('mousemove', (e) => {
@@ -989,49 +972,63 @@ document.addEventListener('DOMContentLoaded', () => {
       syncCursorTarget(e.target);
     });
     const animateRing = () => {
+      const isOpen = ring.classList.contains('is-open');
+      const isMagnet = ring.classList.contains('is-magnet');
+      const isHover = ring.classList.contains('is-hover');
+      const offset = isOpen ? 15 : isMagnet ? 9 : isHover ? 11 : 7;
       let tx = mx, ty = my;
       if (magnet) {
         const r = magnet.getBoundingClientRect();
-        if (r.width) {                 // a soft magnetic pull toward the control's centre
-          tx = mx + (r.left + r.width / 2 - mx) * 0.42;
-          ty = my + (r.top + r.height / 2 - my) * 0.42;
+        if (r.width) {
+          tx = mx + (r.left + r.width / 2 - mx) * 0.28;
+          ty = my + (r.top + r.height / 2 - my) * 0.28;
         }
       }
-      rx += (tx - rx) * 0.2;
-      ry += (ty - ry) * 0.2;
+      tx += offset;
+      ty += offset * 0.7;
+      const ease = isOpen ? 0.115 : isMagnet ? 0.15 : isHover ? 0.14 : 0.18;
+      rx += (tx - rx) * ease;
+      ry += (ty - ry) * ease;
       ring.style.left = rx + 'px';
       ring.style.top  = ry + 'px';
       requestAnimationFrame(animateRing);
     };
     animateRing();
-    const MAGNET = '.rail-link, .rail-tool, .rail-chat, .theme-btn, .social-current, ' +
-                   '.lang-current, .lang-opt, .social-opt, .footer-top-btn, ' +
-                   '.mobile-menu-close, .to-top, .profile-card-btn, .reader-top';
+    const ACTION_TARGET = [
+      '.card', '.card-art', '.work-card', '.blog-card', '.feature-card',
+      '.service-trigger', '.service-cta', '.qc-card', '.index-row',
+      '.footer-cta-btn', '.footer-room-nav a', '.footer-email',
+      '.mm-link', '.tab', '.software-chip', '.software-link',
+      '#bio .bio-block', '.bio-doc-btn', '.bio-teaser-link', '.text-link',
+      '.pencemor-hero-btn', '.pitch-submit', '.profile-card-btn',
+      '#designCta', '.design-cta', '.latest-blog-all', '.feature-go',
+      '.logo-mark--img', '.logo-chip--img', '.load-more-btn', '.cert-item'
+    ].join(', ');
+    const MAGNET = [
+      '.rail-link', '.rail-tool', '.rail-chat', '.theme-btn', '.social-current',
+      '.lang-current', '.lang-opt', '.social-opt', '.footer-top-btn',
+      '.mobile-menu-close', '.to-top', '.reader-top', '#railMenu', '.rail-menu',
+      '#menuToggle', '.menu-toggle-btn', 'a', 'button'
+    ].join(', ');
     function syncCursorTarget(target) {
       if (!target || target === cursorTarget || !target.closest) return;
       cursorTarget = target;
-      const overCard = target.closest(
-        '.card, .service-trigger, .feature-card, .blog-card, .qc-card, .index-row, ' +
-        '.footer-cta-btn, .footer-room-nav a, .mm-link, .tab, .software-chip, ' +
-        '#bio .bio-block, .bio-doc-btn, .work-card, .service-cta, .software-link, ' +
-        '.pencemor-hero-btn, .pitch-submit, .footer-email, .profile-card-btn'
-      );
+      const overCard = target.closest(ACTION_TARGET);
       const overMagnet = target.closest(MAGNET);
-      const overZoom = target.closest('.cert-item');   // certificates keep the system zoom cursor
-      const overHide = target.closest('#railLogo, .rail-logo, .profile-card');  // no custom-cursor shape over the wordmark / profile card
-      const overMenuBtn = target.closest('#railMenu, .rail-menu, #menuToggle, .menu-toggle-btn');  // hamburger: NO cursor ring over it (the circle read as clutter)
+      const overZoom = target.closest('.lb-img-wrap, .reader-stage');
+      const overHide = target.closest('input, textarea, select');
       const overLink = target.closest('a, button, .tab, input, select, textarea, .service, .stat, .logo-mark, .logo-chip, .index-row');
       magnet = (!overCard && overMagnet && !overHide) ? overMagnet : null;
       ring.classList.toggle('is-open',   !!overCard && !overZoom);
-      ring.classList.toggle('is-magnet', !overCard && !!overMagnet && !overMenuBtn);
-      ring.classList.toggle('is-hover',  !overCard && !overMagnet && !!overLink && !overMenuBtn);
+      ring.classList.toggle('is-magnet', !overCard && !!overMagnet && !overHide && !overZoom);
+      ring.classList.toggle('is-hover',  !overCard && !overMagnet && !!overLink && !overHide && !overZoom);
       if (ringLabel && overCard) {
         let label = 'Open';
-        if (overCard.matches('.card--photo, .work-card, .blog-card, .tab')) label = 'View';
+        if (overCard.matches('.card, .card-art, .work-card, .blog-card, .tab, .logo-mark--img, .logo-chip--img, .cert-item')) label = 'View';
         else if (overCard.matches('.software-chip, .software-link')) label = 'Tool';
-        else if (overCard.matches('.footer-cta-btn')) label = 'Talk';
+        else if (overCard.matches('.footer-cta-btn, #designCta, .design-cta')) label = 'Talk';
         else if (overCard.matches('.pitch-submit, .footer-email')) label = 'Send';
-        else if (overCard.matches('.mm-link, .footer-room-nav a, .service-cta, .pencemor-hero-btn')) label = 'Go';
+        else if (overCard.matches('.mm-link, .footer-room-nav a, .service-cta, .pencemor-hero-btn, .latest-blog-all, .feature-go, .bio-teaser-link, .text-link, .load-more-btn')) label = 'Go';
         else if (overCard.matches('.service-trigger, .feature-card, .qc-card, #bio .bio-block')) label = 'Open';
         else if (overCard.matches('.index-row')) label = 'Preview';
         ringLabel.textContent = label;
@@ -1040,10 +1037,18 @@ document.addEventListener('DOMContentLoaded', () => {
         ringLabel.textContent = 'Open';
         delete ring.dataset.cursorAction;
       }
-      dot.style.opacity  = (overCard || overZoom || overHide) ? '0' : '';
-      ring.style.opacity = (overZoom || overHide || overMenuBtn) ? '0' : '';   // hide the ring circle over the hamburger
+      dot.style.opacity  = (overZoom || overHide) ? '0' : '1';
+      ring.style.opacity = (overZoom || overHide) ? '0' : '1';
     }
     document.body.addEventListener('mouseover', (e) => syncCursorTarget(e.target));
+    document.addEventListener('mouseleave', () => {
+      dot.style.opacity = '0';
+      ring.style.opacity = '0';
+    });
+    document.addEventListener('mouseenter', () => {
+      dot.style.opacity = '1';
+      ring.style.opacity = '1';
+    });
     document.addEventListener('mousedown', () => ring.classList.add('is-press'));
     document.addEventListener('mouseup',   () => ring.classList.remove('is-press'));
   }
