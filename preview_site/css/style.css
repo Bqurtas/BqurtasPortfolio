@@ -9512,8 +9512,8 @@ body::before{
   box-shadow:0 0 0 1px color-mix(in srgb, var(--bg) 50%, transparent);
 }
 .cursor-ring{
-  width:26px;
-  height:26px;
+  width:28px;
+  height:28px;
   background:transparent;
   border-color:color-mix(in srgb, var(--ink) 36%, transparent);
   color:var(--ink);

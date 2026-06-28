@@ -327,8 +327,10 @@
      4 · HERO — discipline cards + name portrait
      ======================================================= */
   (function heroInteract() {
-    const COL = (window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS) || {};
-    const cnt = (k) => (COL[k] && COL[k].count) || 0;
+    const collectionCount = (k) => {
+      const col = window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS && window.BQ_GALLERY.COLLECTIONS[k];
+      return (col && ((col.files && col.files.length) || col.count)) || 0;
+    };
 
     /* cursor-following preview — supports an album (3 photos) or a round portrait */
     const float = document.createElement('div');
@@ -357,15 +359,15 @@
 
     /* discipline → tab + 3-image album + meta */
     const DISC = {
-      'Brand Identity': { tab: 'logo',     count: cnt('logo') + cnt('tickerlogo'),
+      'Brand Identity': { tab: 'logo',     count: () => collectionCount('logo') + collectionCount('tickerlogo'),
         imgs: [`${CDN}/LogoDesign/Logo3.webp`, `${CDN}/LogoDesign/Logo14.webp`, `${CDN}/LogoDesign/Logo19.webp`] },
-      'Editorial':      { tab: 'official',  count: cnt('official'),
+      'Editorial':      { tab: 'official',  count: () => collectionCount('official'),
         imgs: [`${CDN}/Official/Official7.webp`, `${CDN}/Official/Official94.webp`, `${CDN}/Official/Official132.webp`] },
-      'Posters':        { tab: 'posters',   count: cnt('posters'),
+      'Posters':        { tab: 'posters',   count: () => collectionCount('posters'),
         imgs: [`${CDN}/Poster/Poster6.webp`, `${CDN}/Poster/Poster14.webp`, `${CDN}/Poster/Poster7.webp`] },
-      'Book Design':    { tab: 'book',      count: cnt('book'),
+      'Book Design':    { tab: 'book',      count: () => collectionCount('book'),
         imgs: [`${CDN}/Book/BookCover1.webp`, `${CDN}/Book/BookCover28.webp`, `${CDN}/Book/BookCover45.webp`] },
-      'Video':          { tab: 'video',     count: cnt('video'),
+      'Video':          { tab: 'video',     count: () => collectionCount('video'),
         imgs: [`${CDN}/GeneralDesign/GDesign1.webp`, `${CDN}/GeneralDesign/GDesign17.webp`, `${CDN}/GeneralDesign/GDesign40.webp`] },
     };
 
@@ -415,7 +417,8 @@
       info.imgs.forEach((src, i) => { if (album[i]) album[i].src = src; });
       hfTitle.textContent = discLabel(item.dataset.disc);
       const albumT = (window.BQ_DICT && window.BQ_DICT['float.album']) || '{n} works · click to open';
-      hfSub.textContent = albumT.replace('{n}', info.count);
+      const count = (typeof info.count === 'function') ? info.count() : info.count;
+      hfSub.textContent = albumT.replace('{n}', count);
       float.classList.remove('is-portrait');
       float.classList.add('is-shown', 'is-album');
     };
@@ -517,12 +520,20 @@
       ai:       { tag: 'AI · Experiments',        desc: 'AI-assisted posters, video, and visual experiments. Coming soon.' },
     };
 
-    /* work counts per category from the gallery config */
-    const COLL = (window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS) || {};
-    const catCount = {};
-    Object.values(COLL).forEach(c => { const k = c.cat || ''; catCount[k] = (catCount[k] || 0) + (c.count || 0); });
-    const total = Object.values(catCount).reduce((a, b) => a + b, 0);
-    const countFor = (f) => f === 'all' ? total : (catCount[f] || 0);
+    /* work counts per category from the live gallery state */
+    const countFor = (f) => {
+      try {
+        const live = window.__bqGalleryCounts && window.__bqGalleryCounts();
+        if (live) return f === 'all' ? (live.total || 0) : ((live.cats && live.cats[f]) || 0);
+      } catch (e) {}
+      const catCount = {};
+      const COLL = (window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS) || {};
+      Object.values(COLL).forEach(c => {
+        const k = c.cat || '';
+        catCount[k] = (catCount[k] || 0) + ((c.files && c.files.length) || c.count || 0);
+      });
+      return f === 'all' ? Object.values(catCount).reduce((a, b) => a + b, 0) : (catCount[f] || 0);
+    };
 
     const card = document.createElement('div');
     card.className = 'tab-card';
@@ -938,11 +949,11 @@
       return fetch(SB.url + '/functions/v1/work-upload', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SB.key, Authorization: 'Bearer ' + SB.key, 'x-edit-token': editToken() }, body: JSON.stringify(payload) }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
     };
     const WK_I18N = {
-      en:  { note:'Upload a finished design — it is auto-resized, converted to WebP and pushed to its folder on GitHub. It shows in the gallery shortly.', cat:'Category / folder', file:'Choose image (any size or format)', upload:'Publish to gallery', reading:'Preparing…', ready:'Ready — click Publish', pick:'Choose an image first.', uploading:'Publishing to GitHub…', done:'Published ✓ — it appears in the gallery shortly.', noToken:'A GitHub token isn’t set yet — add it once to turn publishing on.', connect:'Connect the editor first (Content tab).', fail:'Could not publish (works on the live site only).' },
-      ku:  { note:'دیزاینێکی تەواوکراو ئەپلۆد بکە — خۆکارانە ڕیسایز دەکرێت، دەکرێتە WebP و دەنێردرێت بۆ فۆڵدەرەکەی لە گیتهاب. بەمزووانە لە گەلەری دەردەکەوێت.', cat:'کاتگۆری / فۆڵدەر', file:'وێنە هەڵبژێرە (هەر سایز و فۆرماتێک)', upload:'بڵاوکردنەوە بۆ گەلەری', reading:'ئامادەکردن…', ready:'ئامادەیە — کلیکی بڵاوکردنەوە بکە', pick:'سەرەتا وێنەیەک هەڵبژێرە.', uploading:'بڵاو دەکرێتەوە بۆ گیتهاب…', done:'بڵاوکرایەوە ✓ — بەمزووانە لە گەلەری دەردەکەوێت.', noToken:'تۆکنی گیتهاب دانەنراوە — جارێک دایبنێ بۆ چالاککردنی بڵاوکردنەوە.', connect:'سەرەتا ئەدیتەرەکە ببەستەوە (تابی ناوەڕۆک).', fail:'نەتوانرا بڵاو بکرێتەوە (تەنیا سایتی زیندوو).' },
-      kmr: { note:'Sêwiraneke temam bar bike — bixweber tê resizekirin, li WebP tê veguhertin û li peldanka wê ya GitHub tê tomarkirin. Di demek nêz de di galerîyê de xuya dibe.', cat:'Kategorî / peldank', file:'Wêne hilbijêre (her mezinahî an format)', upload:'Belav bike li galerîyê', reading:'Tê amadekirin…', ready:'Amade ye — Belavkirinê bitikîne', pick:'Pêşî wêneyek hilbijêre.', uploading:'Li GitHub tê belavkirin…', done:'Belav bû ✓ — di demek nêz de di galerîyê de xuya dibe.', noToken:'Tokena GitHub hêj nehatiye danîn — carekê dayne.', connect:'Pêşî edîtorê girêde (tabê Naverok).', fail:'Nehat belavkirin (tenê malpera zindî).' },
-      ar:  { note:'ارفع تصميماً منتهياً — يُعاد تحجيمه تلقائياً ويُحوّل إلى WebP ثم يُرفع إلى مجلده على GitHub. يظهر في المعرض قريباً.', cat:'التصنيف / المجلد', file:'اختر صورة (أي حجم أو صيغة)', upload:'نشر في المعرض', reading:'جارٍ التحضير…', ready:'جاهز — اضغط نشر', pick:'اختر صورة أولاً.', uploading:'جارٍ النشر إلى GitHub…', done:'تم النشر ✓ — سيظهر في المعرض قريباً.', noToken:'لم يُضبط رمز GitHub بعد — أضفه مرة لتفعيل النشر.', connect:'اربط المحرر أولاً (تبويب المحتوى).', fail:'تعذّر النشر (الموقع المباشر فقط).' },
-      fr:  { note:'Téléversez un design fini — il est redimensionné, converti en WebP et poussé dans son dossier sur GitHub. Il apparaît dans la galerie sous peu.', cat:'Catégorie / dossier', file:'Choisir une image (toute taille/format)', upload:'Publier dans la galerie', reading:'Préparation…', ready:'Prêt — cliquez sur Publier', pick:'Choisissez d’abord une image.', uploading:'Publication sur GitHub…', done:'Publié ✓ — il apparaît dans la galerie sous peu.', noToken:'Le jeton GitHub n’est pas encore défini — ajoutez-le une fois.', connect:'Connectez d’abord l’éditeur (onglet Contenu).', fail:'Échec de la publication (site en ligne uniquement).' }
+      en:  { note:'Upload a finished design — it is auto-resized, converted to WebP and pushed to its folder on GitHub. It shows in the gallery shortly.', cat:'Category / folder', file:'Choose image (any size or format)', upload:'Publish to gallery', reading:'Preparing…', ready:'Ready — click Publish', pick:'Choose an image first.', uploading:'Publishing to GitHub…', done:'Published ✓ — it appears in the gallery shortly.', updating:'updating gallery counts…', updated:'gallery and tab counts updated.', propagating:'refresh once if the new file is still propagating.', noToken:'A GitHub token isn’t set yet — add it once to turn publishing on.', connect:'Connect the editor first (Content tab).', fail:'Could not publish (works on the live site only).' },
+      ku:  { note:'دیزاینێکی تەواوکراو ئەپلۆد بکە — خۆکارانە ڕیسایز دەکرێت، دەکرێتە WebP و دەنێردرێت بۆ فۆڵدەرەکەی لە گیتهاب. بەمزووانە لە گەلەری دەردەکەوێت.', cat:'کاتگۆری / فۆڵدەر', file:'وێنە هەڵبژێرە (هەر سایز و فۆرماتێک)', upload:'بڵاوکردنەوە بۆ گەلەری', reading:'ئامادەکردن…', ready:'ئامادەیە — کلیکی بڵاوکردنەوە بکە', pick:'سەرەتا وێنەیەک هەڵبژێرە.', uploading:'بڵاو دەکرێتەوە بۆ گیتهاب…', done:'بڵاوکرایەوە ✓ — بەمزووانە لە گەلەری دەردەکەوێت.', updating:'ژمارەکانی گەلەری نوێ دەکرێنەوە…', updated:'گەلەری و ژمارەی تابەکان نوێکرانەوە.', propagating:'ئەگەر فایلە نوێیەکە هێشتا بڵاو نەبووبێتەوە جارێک نوێی بکەوە.', noToken:'تۆکنی گیتهاب دانەنراوە — جارێک دایبنێ بۆ چالاککردنی بڵاوکردنەوە.', connect:'سەرەتا ئەدیتەرەکە ببەستەوە (تابی ناوەڕۆک).', fail:'نەتوانرا بڵاو بکرێتەوە (تەنیا سایتی زیندوو).' },
+      kmr: { note:'Sêwiraneke temam bar bike — bixweber tê resizekirin, li WebP tê veguhertin û li peldanka wê ya GitHub tê tomarkirin. Di demek nêz de di galerîyê de xuya dibe.', cat:'Kategorî / peldank', file:'Wêne hilbijêre (her mezinahî an format)', upload:'Belav bike li galerîyê', reading:'Tê amadekirin…', ready:'Amade ye — Belavkirinê bitikîne', pick:'Pêşî wêneyek hilbijêre.', uploading:'Li GitHub tê belavkirin…', done:'Belav bû ✓ — di demek nêz de di galerîyê de xuya dibe.', updating:'hejmarên galerîyê tên nûkirin…', updated:'galerî û hejmarên taban hatin nûkirin.', propagating:'heke pela nû hêj belav nebûbe carekê nû bike.', noToken:'Tokena GitHub hêj nehatiye danîn — carekê dayne.', connect:'Pêşî edîtorê girêde (tabê Naverok).', fail:'Nehat belavkirin (tenê malpera zindî).' },
+      ar:  { note:'ارفع تصميماً منتهياً — يُعاد تحجيمه تلقائياً ويُحوّل إلى WebP ثم يُرفع إلى مجلده على GitHub. يظهر في المعرض قريباً.', cat:'التصنيف / المجلد', file:'اختر صورة (أي حجم أو صيغة)', upload:'نشر في المعرض', reading:'جارٍ التحضير…', ready:'جاهز — اضغط نشر', pick:'اختر صورة أولاً.', uploading:'جارٍ النشر إلى GitHub…', done:'تم النشر ✓ — سيظهر في المعرض قريباً.', updating:'جارٍ تحديث أعداد المعرض…', updated:'تم تحديث المعرض وأعداد التبويبات.', propagating:'حدّث الصفحة مرة إذا كان الملف الجديد ما زال قيد الانتشار.', noToken:'لم يُضبط رمز GitHub بعد — أضفه مرة لتفعيل النشر.', connect:'اربط المحرر أولاً (تبويب المحتوى).', fail:'تعذّر النشر (الموقع المباشر فقط).' },
+      fr:  { note:'Téléversez un design fini — il est redimensionné, converti en WebP et poussé dans son dossier sur GitHub. Il apparaît dans la galerie sous peu.', cat:'Catégorie / dossier', file:'Choisir une image (toute taille/format)', upload:'Publier dans la galerie', reading:'Préparation…', ready:'Prêt — cliquez sur Publier', pick:'Choisissez d’abord une image.', uploading:'Publication sur GitHub…', done:'Publié ✓ — il apparaît dans la galerie sous peu.', updating:'mise à jour des compteurs de la galerie…', updated:'galerie et compteurs des onglets mis à jour.', propagating:'rafraîchissez une fois si le nouveau fichier se propage encore.', noToken:'Le jeton GitHub n’est pas encore défini — ajoutez-le une fois.', connect:'Connectez d’abord l’éditeur (onglet Contenu).', fail:'Échec de la publication (site en ligne uniquement).' }
     };
     const renderWorks = () => {
       const colls = collections();
@@ -987,7 +998,15 @@
         if (pend.length > 6000000) { msg.textContent = '✗ ' + (W.tooBig || 'Image is too large — please pick a smaller source image.'); return; }
         msg.textContent = W.uploading;
         wkApi({ folder: $('#wkFolder').value, dataB64: pend, ext: 'webp' }).then(d => {
-          if (d && d.ok) { try { sessionStorage.removeItem('bq_gallery_tree_v1'); } catch (e) {} msg.textContent = (W.done || 'Published ✓') + ' — reload the site to see it.'; pend = null; fileIn.value = ''; prev.hidden = true; }
+          if (d && d.ok) {
+            try { sessionStorage.removeItem('bq_gallery_tree_v1'); } catch (e) {}
+            msg.textContent = (W.done || 'Published ✓') + ' — ' + (W.updating || 'updating gallery counts…');
+            pend = null; fileIn.value = ''; prev.hidden = true;
+            const refreshed = window.__bqRefreshGalleryFromManifest ? window.__bqRefreshGalleryFromManifest() : Promise.resolve();
+            Promise.resolve(refreshed)
+              .then(() => { msg.textContent = (W.done || 'Published ✓') + ' — ' + (W.updated || 'gallery and tab counts updated.'); })
+              .catch(() => { msg.textContent = (W.done || 'Published ✓') + ' — ' + (W.propagating || 'refresh once if the new file is still propagating.'); });
+          }
           else if (d && d.error === 'no_github_token') { msg.textContent = W.noToken; }
           else if (d && (d.error === 'missing_token' || d.error === 'unauthorized')) { msg.textContent = W.connect; }
           else { msg.textContent = '✗ ' + ((d && (d.detail || d.error)) || 'failed'); }

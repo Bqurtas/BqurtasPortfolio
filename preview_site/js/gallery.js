@@ -195,6 +195,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const pfx = (t && t.title) || (c && c.title) || fb || '';
     return `${pfx} ${galDigits(String(i).padStart(2, '0'))}`;
   };
+  const ORDER = [
+    'general','official','book','image','logo','tickerlogo',
+    'posters','social','events','business','invoices','ai',
+    'flex','video','other'
+  ];
 
   const buildCard = (item) => {
     const article = document.createElement('article');
@@ -275,19 +280,58 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   /* Build every card once into a shared array — main.js masonry handles
      placement, filtering, and pagination. certificate is bio-only. */
-  const ORDER = [
-    'general','official','book','image','logo','tickerlogo',
-    'posters','social','events','business','invoices','ai',
-    'flex','video','other'
-  ];
-  window.BQ_ALL_CARDS = [];
-  const catCounts = {};
-  ORDER.forEach(coll => {
-    window.BQ_GALLERY.items(coll).forEach(it => {
-      window.BQ_ALL_CARDS.push({ el: buildCard(it), cat: it.cat, type: it.type, coll: it.coll });
-      catCounts[it.cat] = (catCounts[it.cat] || 0) + 1;
+  const fmtCount = (n) => n >= 100 ? String(n) : String(n).padStart(2, '0');
+  const computeGalleryCounts = () => {
+    const cats = {};
+    (window.BQ_ALL_CARDS || []).forEach(entry => {
+      if (!entry || !entry.cat) return;
+      cats[entry.cat] = (cats[entry.cat] || 0) + 1;
     });
-  });
+    if (!Object.keys(cats).length) {
+      Object.entries(window.BQ_GALLERY.COLLECTIONS || {}).forEach(([key, coll]) => {
+        if (!coll || key === 'certificate') return;
+        const cat = coll.cat || key;
+        cats[cat] = (cats[cat] || 0) + ((coll.files && coll.files.length) || coll.count || 0);
+      });
+    }
+    return { total: Object.values(cats).reduce((sum, n) => sum + n, 0), cats };
+  };
+  const syncGalleryCounts = () => {
+    const counts = computeGalleryCounts();
+    const setCount = (filter, n) => {
+      document.querySelectorAll(`.tab[data-filter="${filter}"]`).forEach(tab => {
+        tab.dataset.workCount = String(n);
+        const el = tab.querySelector('.tab-count');
+        if (el) el.textContent = fmtCount(n);
+      });
+    };
+    setCount('all', counts.total);
+    Object.entries(counts.cats).forEach(([cat, n]) => setCount(cat, n));
+    try { window.dispatchEvent(new CustomEvent('bq:gallery-counts', { detail: counts })); } catch (e) {}
+    return counts;
+  };
+  window.__bqGalleryCounts = computeGalleryCounts;
+  const buildGalleryCards = () => {
+    window.BQ_ALL_CARDS = [];
+    ORDER.forEach(coll => {
+      window.BQ_GALLERY.items(coll).forEach(it => {
+        window.BQ_ALL_CARDS.push({ el: buildCard(it), cat: it.cat, type: it.type, coll: it.coll });
+      });
+    });
+    return syncGalleryCounts();
+  };
+  buildGalleryCards();
+  window.__bqRefreshGalleryFromManifest = async () => {
+    try { sessionStorage.removeItem('bq_gallery_tree_v1'); } catch (e) {}
+    window.BQ_GALLERY._loaded = false;
+    window.BQ_GALLERY._ok = false;
+    await window.BQ_GALLERY.loadManifest();
+    const counts = buildGalleryCards();
+    if (window.__bqInitLightbox) window.__bqInitLightbox();
+    if (window.__bqRenderGallery) window.__bqRenderGallery(true);
+    if (window.__bqRelocalizeGallery) window.__bqRelocalizeGallery();
+    return counts;
+  };
 
   /* ── Certificate gallery in Biography room ── */
   const certGrid = document.getElementById('certGrid');
@@ -350,14 +394,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   /* Tab counts */
-  const total = window.BQ_ALL_CARDS.length;
-  const setCount = (filter, n) => {
-    const tab = document.querySelector(`.tab[data-filter="${filter}"]`);
-    const el  = tab?.querySelector('.tab-count');
-    if (el) el.textContent = n >= 100 ? n : String(n).padStart(2, '0');
-  };
-  setCount('all', total);
-  Object.entries(catCounts).forEach(([cat, n]) => setCount(cat, n));
+  syncGalleryCounts();
 
   /* Lightbox, then render the gallery via the masonry engine in main.js */
   if (window.__bqInitLightbox)  window.__bqInitLightbox();

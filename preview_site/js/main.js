@@ -391,6 +391,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const WORKS_WORD = { en: 'works', ku: 'کار', kmr: 'kar', ar: 'عمل', fr: 'œuvres', tr: 'iş', sv: 'verk' };
   const fallbackTabTotal = (filter) => {
+    try {
+      const live = window.__bqGalleryCounts && window.__bqGalleryCounts();
+      if (live) return filter === 'all' ? (live.total || 0) : ((live.cats && live.cats[filter]) || 0);
+    } catch (e) {}
     const collections = window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS;
     if (!collections) return 0;
     return Object.entries(collections).reduce((sum, [key, coll]) => {
@@ -408,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const note  = document.getElementById('tabHeaderNote');
     const ghost = document.getElementById('tabHeaderGhost');
     if (!title) return;
-    const shownTotal = total || fallbackTabTotal(filter);
+    const shownTotal = (total == null) ? fallbackTabTotal(filter) : total;
     const count = shownTotal + ' ' + (WORKS_WORD[currentLang] || WORKS_WORD.en);
     title.textContent = meta.title;
     if (desc)  desc.textContent  = count;
@@ -1081,7 +1085,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (dot && ring && window.matchMedia('(pointer: fine)').matches) {
     const ringLabel = ring.querySelector('.cursor-ring-label');
     const cursorText = (key, fallback) => (window.BQ_DICT && window.BQ_DICT['cursor.' + key]) || fallback;
-    let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my + 12;
+    let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
     let magnet = null;
     let cursorTarget = null;
     document.addEventListener('mousemove', (e) => {
@@ -1094,7 +1098,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const hasOpen = ring.classList.contains('is-open');
       const hasMagnet = ring.classList.contains('is-magnet');
       const hasHover = ring.classList.contains('is-hover');
-      const gapY = hasOpen ? 16 : hasMagnet ? 12 : hasHover ? 11 : 8;
+      const gapY = hasOpen ? 16 : hasMagnet ? 12 : hasHover ? 11 : 0;
       const gapX = hasOpen ? 1 : 0;
       let tx = mx, ty = my;
       if (magnet) {
