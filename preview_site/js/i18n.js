@@ -1714,7 +1714,7 @@ window.I18N_EXTRA_CH = {"en": {"chat.title": "Studio Assistant", "chat.status": 
 Object.keys(window.I18N_EXTRA_CH).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_CH[l]); });
 
 /* ===== hero services tagline ===== */
-window.I18N_EXTRA_HS = {"en": {"hero.services": "Design • Printing • Advertising", "hero.ai": "Artificial Intelligence • AI"}, "ku": {"hero.services": "دیزاین • چاپ • بانگەشە", "hero.ai": "زیرەکیی دەستکرد • AI"}, "kmr": {"hero.services": "Sêwiran • Çap • Reklam", "hero.ai": "Aqilmendiya Çêkirî • AI"}, "ar": {"hero.services": "تصميم • طباعة • إعلان", "hero.ai": "الذكاء الاصطناعي • AI"}, "fr": {"hero.services": "Design • Impression • Publicité", "hero.ai": "Intelligence Artificielle • IA"}};
+window.I18N_EXTRA_HS = {"en": {"hero.services": "Design • Printing • Advertising", "hero.ai": "Artificial Intelligence • AI"}, "ku": {"hero.services": "دیزاین • چاپ • بانگەشە", "hero.ai": "زیرەکیی دەستکرد"}, "kmr": {"hero.services": "Sêwiran • Çap • Reklam", "hero.ai": "Aqilmendiya Çêkirî"}, "ar": {"hero.services": "تصميم • طباعة • إعلان", "hero.ai": "الذكاء الاصطناعي"}, "fr": {"hero.services": "Design • Impression • Publicité", "hero.ai": "Intelligence Artificielle • IA"}};
 Object.keys(window.I18N_EXTRA_HS).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_HS[l]); });
 
 /* ===== blog reader share button ===== */
@@ -1730,7 +1730,7 @@ window.I18N_EXTRA_RM = {"en":{"blog.readMore":"Read more"},"ku":{"blog.readMore"
 Object.keys(window.I18N_EXTRA_RM).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_RM[l]); });
 
 /* ===== tabs: merged stationery + new AI ===== */
-window.I18N_EXTRA_TABS = {"en":{"tab.stationery":"Stationery","tab.ai":"AI"},"ku":{"tab.stationery":"نووسراو","tab.ai":"AI"},"kmr":{"tab.stationery":"Nivîsgeh","tab.ai":"AI"},"ar":{"tab.stationery":"قرطاسية","tab.ai":"AI"},"fr":{"tab.stationery":"Papeterie","tab.ai":"IA"},"tr":{"tab.stationery":"Kırtasiye","tab.ai":"AI"},"sv":{"tab.stationery":"Trycksaker","tab.ai":"AI"}};
+window.I18N_EXTRA_TABS = {"en":{"tab.stationery":"Stationery","tab.ai":"AI"},"ku":{"tab.stationery":"نووسراو","tab.ai":"زیرەکی"},"kmr":{"tab.stationery":"Nivîsgeh","tab.ai":"Aqil"},"ar":{"tab.stationery":"قرطاسية","tab.ai":"ذكاء"},"fr":{"tab.stationery":"Papeterie","tab.ai":"IA"},"tr":{"tab.stationery":"Kırtasiye","tab.ai":"YZ"},"sv":{"tab.stationery":"Trycksaker","tab.ai":"Artificiell intelligens"}};
 Object.keys(window.I18N_EXTRA_TABS).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_TABS[l]); });
 
 /* ===== floating Design-room CTA ===== */
@@ -1746,7 +1746,7 @@ window.I18N_EXTRA_LATN = {"en":{"latest.new":"new"},"ku":{"latest.new":"نوێ"}
 Object.keys(window.I18N_EXTRA_LATN).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_LATN[l]); });
 
 /* ===== tab-header titles for the merged stationery + new AI tabs ===== */
-(function(){ if(!window.TAB_META_I18N) return; var T={en:{stationery:'Stationery',ai:'AI'},ku:{stationery:'نووسراو',ai:'AI'},kmr:{stationery:'Nivîsgeh',ai:'AI'},ar:{stationery:'قرطاسية',ai:'AI'},fr:{stationery:'Papeterie',ai:'IA'},tr:{stationery:'Kırtasiye',ai:'AI'},sv:{stationery:'Trycksaker',ai:'AI'}};
+(function(){ if(!window.TAB_META_I18N) return; var T={en:{stationery:'Stationery',ai:'AI'},ku:{stationery:'نووسراو',ai:'زیرەکی'},kmr:{stationery:'Nivîsgeh',ai:'Aqil'},ar:{stationery:'قرطاسية',ai:'ذكاء'},fr:{stationery:'Papeterie',ai:'IA'},tr:{stationery:'Kırtasiye',ai:'YZ'},sv:{stationery:'Trycksaker',ai:'Artificiell intelligens'}};
 Object.keys(T).forEach(function(l){ if(window.TAB_META_I18N[l]){ window.TAB_META_I18N[l].stationery={title:T[l].stationery,desc:'',note:''}; window.TAB_META_I18N[l].ai={title:T[l].ai,desc:'',note:''}; } }); })();
 
 /* ===== share this page ===== */
@@ -1757,9 +1757,9 @@ Object.keys(window.I18N_EXTRA_SHP).forEach(function(l){ if(window.I18N[l]) Objec
 (function(){
   var T = window.TABCARD_I18N; if(!T) return;
   var add = {
-    ku:  { stationery:{tag:"کەرەستەی نووسین",desc:"کارتی بازرگانی، سەرپەڕە، پسووڵە و وەسڵ — سیستەمی بێدەنگی پشت ناسنامەیەک."}, ai:{tag:"AI · تاقیکردنەوە",desc:"پۆستەر، ڤیدیۆ و تاقیکردنەوەی بینراو بە یارمەتی AI — بەمزووانە."} },
-    kmr: { stationery:{tag:"Qirtasiye",desc:"Kartên karsaziyê, serkaxez, fatûre û meqbûz — sîstema bêdeng a li pişt brandê."}, ai:{tag:"AI · Ezmûn",desc:"Poster, vîdyo û ezmûnên dîtbarî bi alîkariya AI — di demek nêz de."} },
-    ar:  { stationery:{tag:"القرطاسية",desc:"بطاقات العمل، الترويسات، الفواتير والإيصالات — النظام الهادئ خلف الهوية."}, ai:{tag:"AI · تجارب",desc:"ملصقات وفيديو وتجارب بصرية بمساعدة الذكاء الاصطناعي — قريباً."} },
+    ku:  { stationery:{tag:"کەرەستەی نووسین",desc:"کارتی بازرگانی، سەرپەڕە، پسووڵە و وەسڵ — سیستەمی بێدەنگی پشت ناسنامەیەک."}, ai:{tag:"زیرەکی · تاقیکردنەوە",desc:"پۆستەر، ڤیدیۆ و تاقیکردنەوەی بینراو بە یارمەتی زیرەکیی دەستکرد — بەمزووانە."} },
+    kmr: { stationery:{tag:"Qirtasiye",desc:"Kartên karsaziyê, serkaxez, fatûre û meqbûz — sîstema bêdeng a li pişt brandê."}, ai:{tag:"Aqil · Ezmûn",desc:"Poster, vîdyo û ezmûnên dîtbarî bi alîkariya aqilmendiya çêkirî — di demek nêz de."} },
+    ar:  { stationery:{tag:"القرطاسية",desc:"بطاقات العمل، الترويسات، الفواتير والإيصالات — النظام الهادئ خلف الهوية."}, ai:{tag:"ذكاء · تجارب",desc:"ملصقات وفيديو وتجارب بصرية بمساعدة الذكاء الاصطناعي — قريباً."} },
     fr:  { stationery:{tag:"Papeterie",desc:"Cartes de visite, en-têtes, factures et reçus — le système discret derrière une marque."}, ai:{tag:"IA · Expériences",desc:"Affiches, vidéos et expériences visuelles assistées par IA — bientôt."} }
   };
   Object.keys(add).forEach(function(l){ if(T[l]) Object.assign(T[l], add[l]); });
@@ -1861,7 +1861,7 @@ window.I18N_EXTRA_MOTION248 = {
     "svc.identity":"ناسنامەی براند و لۆگۆ","svc.identity.desc":"نیشانەی تایبەت و سیستەمی ناسنامەی گونجاو کە لە هەموو شوێنێکدا ڕوون و یەکگرتوو دەمێنێتەوە.","svc.identity.a":"دیزاینی لۆگۆ و وۆردمارک","svc.identity.b":"سیستەمی فۆنت و ڕەنگ","svc.identity.c":"ڕێنمایی براند و نووسراو",
     "svc.editorial":"ئەدیتۆریاڵ و چاپ","svc.editorial.desc":"کارە چاپییەکان بە پلەبەندی، ڕیتم و هەستی شوێن — لە بەرگێکی تاکەوە تا بڵاوکراوەیەکی تەواو.","svc.editorial.a":"کتێب و لاپەڕەسازی","svc.editorial.b":"پۆستەر و چاپی کولتووری","svc.editorial.c":"پاکەت و بەرهەمهێنان",
     "svc.campaign":"کەمپەین و سۆشیاڵ","svc.campaign.desc":"سیستەمی کەمپەین کە لە یەکەم وێنەی سەرەکییەوە تا دوا پۆست یان ڕووداو یەکگرتوو دەمێنێتەوە.","svc.campaign.a":"کەمپەینی ڕیکلام","svc.campaign.b":"سیستەمی تۆڕە کۆمەڵایەتییەکان","svc.campaign.c":"ڕووداو و پەیوەندی گشتی",
-    "svc.motion":"مۆشن، وێنە و AI","svc.motion.desc":"کارکردن لە وێنە و جوڵە کە ناسنامەکە فراوان دەکات بەبێ لەدەستدانی کەسایەتییەکەی، لەگەڵ تاقیکردنەوەی وریای AI.","svc.motion.a":"ئیدیتی ڤیدیۆ و مۆشن","svc.motion.b":"فۆتۆگرافی و ڕیتاچ","svc.motion.c":"پەرەپێدانی بینراو بە یارمەتی AI",
+    "svc.motion":"جوڵە، وێنە و زیرەکیی دەستکرد","svc.motion.desc":"کارکردن لە وێنە و جوڵە کە ناسنامەکە فراوان دەکات بەبێ لەدەستدانی کەسایەتییەکەی، لەگەڵ تاقیکردنەوەی وریای زیرەکیی دەستکرد.","svc.motion.a":"ئیدیتی ڤیدیۆ و مۆشن","svc.motion.b":"فۆتۆگرافی و ڕیتاچ","svc.motion.c":"پەرەپێدانی بینراو بە یارمەتی زیرەکیی دەستکرد",
     "svc.cta":"گفتوگۆ لەسەر پڕۆژە","soft.eye":"ئەزموونی بەرنامەکان","soft.title":"ئەو ئامرازانەی لە پشت <em>کارەکانن</em>.","soft.link":"بینینی ئەزموونی تەواو"
   },
   kmr:{
@@ -1869,7 +1869,7 @@ window.I18N_EXTRA_MOTION248 = {
     "svc.identity":"Nasnameya Brandê & Logo","svc.identity.desc":"Nîşanên taybet û sîstemên nasnameyê yên nerm ku li hemû xalên têkiliyê zelal dimînin.","svc.identity.a":"Sêwirana logo û wordmarkê","svc.identity.b":"Sîstemên tîpografî û rengan","svc.identity.c":"Rêbername û qirtasiye",
     "svc.editorial":"Edîtoryal & Çap","svc.editorial.desc":"Karên çapkirî bi hiyerarşî, rîtm û hesteke xurt a cihê — ji bergê yekane heta weşana temam.","svc.editorial.a":"Pirtûk û rêzkirina edîtoryal","svc.editorial.b":"Poster û çapa çandî","svc.editorial.c":"Ambalaj û hilberîn",
     "svc.campaign":"Kampanya & Civakî","svc.campaign.desc":"Sîstemên kampanyayê ku ji dîtina sereke heta posta dawî an karanîna bûyerê yekgirtî dimînin.","svc.campaign.a":"Kampanyayên reklamê","svc.campaign.b":"Sîstemên medyaya civakî","svc.campaign.c":"Bûyer û ragihandina giştî",
-    "svc.motion":"Motion, Wêne & AI","svc.motion.desc":"Karê wêne û motionê ku nasnameyê berfireh dike bêyî ku karaktera wê winda bike, bi lêkolîna hişmend a AI.","svc.motion.a":"Edîta vîdyoyê û motion","svc.motion.b":"Fotografî û retouch","svc.motion.c":"Pêşxistina dîtbarî bi AI",
+    "svc.motion":"Tevger, Wêne û Aqilmendiya Çêkirî","svc.motion.desc":"Karê wêne û tevgerê ku nasnameyê berfireh dike bêyî ku karaktera wê winda bike, bi lêkolîna hişmend a aqilmendiya çêkirî.","svc.motion.a":"Edîta vîdyoyê û tevger","svc.motion.b":"Fotografî û retouch","svc.motion.c":"Pêşxistina dîtbarî bi aqilmendiya çêkirî",
     "svc.cta":"Li ser projeyekê biaxive","soft.eye":"Ezmûna nermalavê","soft.title":"Amûrên li pişt <em>karê</em>.","soft.link":"Ezmûna temam bibîne"
   },
   ar:{
@@ -1877,7 +1877,7 @@ window.I18N_EXTRA_MOTION248 = {
     "svc.identity":"هوية العلامة والشعار","svc.identity.desc":"علامات مميزة وأنظمة هوية مرنة تبقى واضحة ومتناسقة في جميع نقاط التواصل.","svc.identity.a":"تصميم الشعار والعلامة النصية","svc.identity.b":"أنظمة الخطوط والألوان","svc.identity.c":"دليل الهوية والقرطاسية",
     "svc.editorial":"التحرير والطباعة","svc.editorial.desc":"مطبوعات ذات تسلسل وإيقاع وإحساس بالمكان — من غلاف واحد إلى منشور متكامل.","svc.editorial.a":"الكتب والتخطيط التحريري","svc.editorial.b":"الملصقات والطباعة الثقافية","svc.editorial.c":"التغليف والإنتاج",
     "svc.campaign":"الحملات والتواصل","svc.campaign.desc":"أنظمة حملات متماسكة من الصورة الرئيسية الأولى إلى آخر منشور أو تطبيق للفعالية.","svc.campaign.a":"الحملات الإعلانية","svc.campaign.b":"أنظمة التواصل الاجتماعي","svc.campaign.c":"الفعاليات والتواصل العام",
-    "svc.motion":"الموشن والصورة وAI","svc.motion.desc":"عمل بصري وحركي يوسع الهوية دون أن يفقد شخصيتها، مدعوماً باستكشاف مدروس بمساعدة الذكاء الاصطناعي.","svc.motion.a":"تحرير الفيديو والموشن","svc.motion.b":"التصوير والمعالجة","svc.motion.c":"تطوير بصري بمساعدة AI",
+    "svc.motion":"الحركة والصورة والذكاء الاصطناعي","svc.motion.desc":"عمل بصري وحركي يوسع الهوية دون أن يفقد شخصيتها، مدعوماً باستكشاف مدروس بمساعدة الذكاء الاصطناعي.","svc.motion.a":"تحرير الفيديو والحركة","svc.motion.b":"التصوير والمعالجة","svc.motion.c":"تطوير بصري بمساعدة الذكاء الاصطناعي",
     "svc.cta":"ناقش مشروعاً","soft.eye":"خبرة البرامج","soft.title":"الأدوات خلف <em>العمل</em>.","soft.link":"عرض الخبرة كاملة"
   },
   fr:{
@@ -1893,7 +1893,7 @@ window.I18N_EXTRA_MOTION248 = {
     "svc.identity":"Marka Kimliği & Logo","svc.identity.desc":"Her temas noktasında açık kalan özgün işaretler ve esnek kimlik sistemleri.","svc.identity.a":"Logo ve kelime markası","svc.identity.b":"Tipografi ve renk sistemleri","svc.identity.c":"Kılavuz ve kırtasiye",
     "svc.editorial":"Editoryal & Baskı","svc.editorial.desc":"Tek bir kapaktan tam yayına kadar hiyerarşi, ritim ve yer duygusu taşıyan basılı işler.","svc.editorial.a":"Kitap ve editoryal düzen","svc.editorial.b":"Afiş ve kültürel baskı","svc.editorial.c":"Ambalaj ve üretim",
     "svc.campaign":"Kampanya & Sosyal","svc.campaign.desc":"İlk ana görselden son sosyal gönderiye veya etkinlik uygulamasına kadar tutarlı kampanya sistemleri.","svc.campaign.a":"Reklam kampanyaları","svc.campaign.b":"Sosyal medya sistemleri","svc.campaign.c":"Etkinlik ve kamusal iletişim",
-    "svc.motion":"Motion, Görsel & AI","svc.motion.desc":"Kimliğin karakterini kaybetmeden onu genişleten görsel ve hareket çalışmaları, ölçülü AI araştırmasıyla desteklenir.","svc.motion.a":"Video kurgu ve motion","svc.motion.b":"Fotoğraf ve rötuş","svc.motion.c":"AI destekli görsel geliştirme",
+    "svc.motion":"Hareket, Görsel ve Yapay Zeka","svc.motion.desc":"Kimliğin karakterini kaybetmeden onu genişleten görsel ve hareket çalışmaları, ölçülü yapay zeka araştırmasıyla desteklenir.","svc.motion.a":"Video kurgu ve hareket","svc.motion.b":"Fotoğraf ve rötuş","svc.motion.c":"Yapay zeka destekli görsel geliştirme",
     "svc.cta":"Bir projeyi konuşalım","soft.eye":"Yazılım deneyimi","soft.title":"İşin arkasındaki <em>araçlar</em>.","soft.link":"Tüm deneyimi gör"
   },
   sv:{
@@ -1901,7 +1901,7 @@ window.I18N_EXTRA_MOTION248 = {
     "svc.identity":"Varumärkesidentitet & Logo","svc.identity.desc":"Särpräglade märken och flexibla identitetssystem som förblir tydliga i varje kontaktpunkt.","svc.identity.a":"Logo & ordmärke","svc.identity.b":"Typografi- & färgsystem","svc.identity.c":"Riktlinjer & trycksaker",
     "svc.editorial":"Redaktionellt & Tryck","svc.editorial.desc":"Trycksaker med hierarki, rytm och platskänsla — från ett omslag till en hel publikation.","svc.editorial.a":"Böcker & redaktionell layout","svc.editorial.b":"Affischer & kulturtryck","svc.editorial.c":"Förpackning & produktion",
     "svc.campaign":"Kampanjer & Socialt","svc.campaign.desc":"Sammanhållna kampanjsystem från första huvudbilden till sista inlägget eller evenemanget.","svc.campaign.a":"Reklamkampanjer","svc.campaign.b":"System för sociala medier","svc.campaign.c":"Evenemang & offentlig kommunikation",
-    "svc.motion":"Motion, Bild & AI","svc.motion.desc":"Bild och rörelse som utvecklar identiteten utan att förlora dess karaktär, med genomtänkt AI-stöd.","svc.motion.a":"Videoredigering & motion","svc.motion.b":"Fotografi & retusch","svc.motion.c":"AI-stödd visuell utveckling",
+    "svc.motion":"Rörelse, Bild och Artificiell Intelligens","svc.motion.desc":"Bild och rörelse som utvecklar identiteten utan att förlora dess karaktär, med genomtänkt stöd av artificiell intelligens.","svc.motion.a":"Videoredigering & rörelse","svc.motion.b":"Fotografi & retusch","svc.motion.c":"Visuell utveckling med artificiell intelligens",
     "svc.cta":"Diskutera ett projekt","soft.eye":"Programvaruerfarenhet","soft.title":"Verktygen bakom <em>arbetet</em>.","soft.link":"Se hela erfarenheten"
   }
 };
