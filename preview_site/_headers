@@ -40,6 +40,21 @@
   Cache-Control: no-store
   CDN-Cache-Control: no-store
 
+/sitemap.xml
+  Content-Type: application/xml; charset=utf-8
+  Cache-Control: no-store
+  CDN-Cache-Control: no-store
+
+/robots.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: no-store
+  CDN-Cache-Control: no-store
+
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: no-store
+  CDN-Cache-Control: no-store
+
 # Images & fonts are fingerprinted by file path or updated through new deploys.
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
