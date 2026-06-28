@@ -200,27 +200,27 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   window.__bqShowRoom = showRoom;
 
-  let mobileRoomTimer = null;
-  const shouldDelayMobileRoomSwap = (id) => {
+  let roomTransitionTimer = null;
+  const shouldDelayRoomSwapForCurtain = (id) => {
     if (!routerReady || !id || id === document.body.dataset.room) return false;
+    if (!document.querySelector('.lux-transition')) return false;
     try {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
-      return window.matchMedia('(max-width: 820px)').matches;
+      return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     } catch (e) {
-      return window.innerWidth <= 820;
+      return true;
     }
   };
-  const showRoomAfterMobileCurtain = (id, push) => {
-    if (!shouldDelayMobileRoomSwap(id)) {
+  const showRoomAfterTransitionCurtain = (id, push) => {
+    if (!shouldDelayRoomSwapForCurtain(id)) {
       showRoom(id, push);
       return;
     }
-    clearTimeout(mobileRoomTimer);
+    clearTimeout(roomTransitionTimer);
     document.body.classList.add('room-transition-pending');
-    mobileRoomTimer = setTimeout(() => {
+    roomTransitionTimer = setTimeout(() => {
       document.body.classList.remove('room-transition-pending');
       showRoom(id, push);
-      mobileRoomTimer = null;
+      roomTransitionTimer = null;
     }, 620);
   };
 
@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // allow language buttons to keep their own behavior — they don't have data-route
       e.preventDefault();
       if (window.__bqCloseReader) window.__bqCloseReader();   // leaving via the rail closes an open post
-      showRoomAfterMobileCurtain(route, true);
+      showRoomAfterTransitionCurtain(route, true);
     });
   });
 
