@@ -446,9 +446,9 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTabHeader(currentFilter, matching.length);
     updateLoadMore(matching.length);
   };
-  const scrollToGridTop = () => {
+  const scrollToGridTop = (behavior = 'smooth') => {
     const head = document.getElementById('tabHeader') || gridEl;
-    head?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    head?.scrollIntoView({ behavior, block: 'start' });
   };
   window.__bqShowFewer  = () => { renderUpTo(Math.max(PAGE_SIZE, currentShown - PAGE_SIZE)); scrollToGridTop(); };
   window.__bqCollapseAll = () => { renderUpTo(PAGE_SIZE); scrollToGridTop(); };
@@ -599,13 +599,20 @@ document.addEventListener('DOMContentLoaded', () => {
     updateLoadMore(total);
   };
 
-  const activateTab = (tab, push) => {
+  const setActiveTab = (tab) => {
+    if (!tab) return;
     tabs.forEach(t => { t.classList.remove('is-active'); t.setAttribute('aria-selected', 'false'); });
     tab.classList.add('is-active');
     tab.setAttribute('aria-selected', 'true');
     currentFilter = tab.dataset.filter;
     window.__bqRenderGallery(true);
+  };
+
+  const activateTab = (tab, push) => {
+    setActiveTab(tab);
     if (push !== false) syncURL(!!push);
+    requestAnimationFrame(() => scrollToGridTop(push === false ? 'auto' : 'smooth'));
+    setTimeout(() => scrollToGridTop('auto'), 120);
   };
 
   /* re-layout on width change (column count change) */
@@ -637,6 +644,27 @@ document.addEventListener('DOMContentLoaded', () => {
      The gallery shows exactly one batch (PAGE_SIZE = 58) at a time; the reader
      taps "Load more" to reveal the next batch. No auto-infinite-scroll — the works
      never all load at once, and nothing swaps under the reader as they scroll. */
+
+  window.__bqResetToHomeHero = () => {
+    try { window.__bqCloseReader && window.__bqCloseReader(); } catch (e) {}
+    const all = document.querySelector('.tab[data-filter="all"]');
+    if (all && currentFilter !== 'all') setActiveTab(all);
+    showRoom('design', false);
+    const prefix = (currentLang && currentLang !== 'en') ? '/' + currentLang : '';
+    try { history.replaceState(null, '', prefix || '/'); } catch (e) {}
+    const hardTop = () => {
+      try {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        const scroller = document.scrollingElement || document.documentElement;
+        if (scroller) scroller.scrollTop = 0;
+      } catch (e) {}
+      if (window.__bqOnScroll) window.__bqOnScroll();
+    };
+    hardTop();
+    requestAnimationFrame(hardTop);
+    setTimeout(hardTop, 80);
+    setTimeout(hardTop, 280);
+  };
 
   /* ---------- COUNT UP (statistics) ---------- */
   const animateCount = (el) => {

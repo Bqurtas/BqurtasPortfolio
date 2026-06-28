@@ -122,16 +122,29 @@
        section they were in. */
     if ('scrollRestoration' in history) { try { history.scrollRestoration = 'manual'; } catch (e) {} }
     const bqToTop  = () => { try { window.scrollTo(0, 0); } catch (e) {} };
-    const bqToHero = () => { try { if (window.__bqShowRoom) window.__bqShowRoom('design'); } catch (e) {} bqToTop(); };
-    /* bfcache / session restore re-shows the page mid-scroll → snap back to the top.
-       (Fresh loads are already handled by scrollRestoration:manual + the initial
-       route, so we DON'T force-scroll them — that would fight the shared /design &
-       /panjamor links that intentionally open at their own section.) */
-    window.addEventListener('pageshow', (e) => { if (e.persisted) bqToTop(); });
+    const bqToHero = () => {
+      setAppVhSoon();
+      try {
+        if (window.__bqResetToHomeHero) window.__bqResetToHomeHero();
+        else if (window.__bqShowRoom) window.__bqShowRoom('design');
+      } catch (e) {}
+      bqToTop();
+      setTimeout(bqToTop, 80);
+      setTimeout(bqToTop, 280);
+    };
+    /* bfcache / session restore re-shows the page mid-scroll → snap back to the
+       home hero. This now resets the room and URL too, because mobile browsers
+       often restore an old section after the app was left in the background. */
+    window.addEventListener('pageshow', (e) => { if (e.persisted) bqToHero(); });
     let bqHiddenAt = 0;
+    const BQ_RESUME_RESET_MS = 900;
+    const bqResumeHome = () => { bqHiddenAt = 0; bqToHero(); };
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) bqHiddenAt = Date.now();
-      else if (bqHiddenAt && Date.now() - bqHiddenAt > 5 * 60 * 1000) bqToHero();   /* reopened after a long absence → home hero */
+      else if (bqHiddenAt && Date.now() - bqHiddenAt > BQ_RESUME_RESET_MS) bqResumeHome();   /* reopened after leaving the browser → home hero */
+    });
+    window.addEventListener('focus', () => {
+      if (bqHiddenAt && Date.now() - bqHiddenAt > BQ_RESUME_RESET_MS) bqResumeHome();
     });
 
     /* Belt & braces: some environments (in-app browsers, extensions patching the
