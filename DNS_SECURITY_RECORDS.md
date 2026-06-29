@@ -30,17 +30,20 @@ spacemail._domainkey  TXT  "v=DKIM1; k=rsa; p=<COPY_THE_SPACEMAIL_PUBLIC_KEY>"
 
 ## MTA-STS and TLS reports
 
-The repository already publishes:
+The repository already publishes the policy file content. Public scanners expect
+it on the `mta-sts` host:
 
 ```text
-https://bqurtas.com/.well-known/mta-sts.txt
+https://mta-sts.bqurtas.com/.well-known/mta-sts.txt
 ```
 
-Add these DNS TXT records:
+Add these DNS records, and make sure `mta-sts.bqurtas.com` serves the same
+`/.well-known/mta-sts.txt` file from the website/Pages project:
 
 ```dns
 _mta-sts    TXT  "v=STSv1; id=2026062701"
 _smtp._tls  TXT  "v=TLSRPTv1; rua=mailto:info@bqurtas.com"
+mta-sts     CNAME  bqurtas.com
 ```
 
 ## CAA for Cloudflare Universal SSL
@@ -72,12 +75,14 @@ clientUpdateProhibited
 
 ## Current live gaps observed
 
-As of 2026-06-27, live DNS showed:
+As of 2026-06-29, live DNS showed:
 
 ```text
 _dmarc.bqurtas.com  TXT  "v=DMARC1; p=none; rua=mailto:info@bqurtas.com"
 bqurtas.com         TXT  "v=spf1 include:spf.spacemail.com ~all"
 _mta-sts            missing
+mta-sts             missing
+_smtp._tls          missing
 CAA                 missing
 DNSSEC              not signed
 ```

@@ -16,15 +16,25 @@
   };
   const MOOD_KEYS = Object.keys(MOODS);
   const INDUSTRIES = ['cafe','fashion','tech','bookstore','studio','beauty','restaurant','other'];
+  const INDUSTRY_ICONS = {
+    cafe:'fa-mug-saucer',
+    fashion:'fa-shirt',
+    tech:'fa-microchip',
+    bookstore:'fa-book-open',
+    studio:'fa-pen-nib',
+    beauty:'fa-spa',
+    restaurant:'fa-utensils',
+    other:'fa-diamond'
+  };
 
   const TR = {
     en:{
       eyebrow:'BRAND STUDIO · FREE',title:'Build a working brand system.',intro:'Name, promise, logo direction, colour, type, voice, mockups and a launch checklist in one living board.',
       lName:'Brand name (Latin)',lKu:'Brand name (Kurdish)',lOffer:'What do you sell?',lAudience:'Who is it for?',lPromise:'Brand promise',lField:'Field',lMood:'Personality',
       shuffle:'New direction',download:'Download board',ready:'Brand readiness',readyHint:'Complete the brief fields to make the board sharper.',
-      brief:'Strategy',logo:'Logo lab',palette:'Colour system',type:'Type system',apps:'Touchpoints',voice:'Voice',check:'Launch checklist',kit:'Starter kit',
+      brief:'Strategy',logo:'Logo lab',real:'Real-world system',palette:'Colour system',type:'Type system',apps:'Touchpoints',voice:'Voice',check:'Launch checklist',kit:'Starter kit',
       latin:'Latin',kurdish:'Kurdish',made:'MADE FREE WITH BQURTAS.COM',scoreNote:'starter strength',primary:'Primary',accent:'Accent',paper:'Paper',ink:'Ink',
-      wordmark:'Wordmark',monogram:'Monogram',seal:'Seal',social:'Social',sign:'Signage',card:'Card',pack:'Pack',toneGood:'Use',toneAvoid:'Avoid',
+      wordmark:'Wordmark',monogram:'Monogram',seal:'Seal',symbol:'Symbol',pattern:'Pattern',storefront:'Storefront',story:'Story',social:'Social',sign:'Signage',card:'Card',pack:'Pack',print:'Print',launch:'Launch line',toneGood:'Use',toneAvoid:'Avoid',
       sTitle:'Keep this system',sText:'Email it to yourself and save the current direction before you talk to a designer, printer or partner.',send:'Send',sent:'Sent. Check your inbox soon.',bad:'Enter a valid email.',
       ctaTitle:'Need the real identity?',ctaText:'This board gives direction. The finished identity needs research, drawing, testing, files and rules for real use.',cta:'Start a serious brief →',
       placeholder:{offer:'specialty coffee and handmade sweets',audience:'city people who love quiet places',promise:'warm service with a memorable local feeling'},
@@ -43,9 +53,9 @@
       eyebrow:'ستۆدیۆی براند · بێ بەرامبەر',title:'سیستەمی کارای براند دروست بکە.',intro:'ناو، بەڵێن، ئاراستەی لۆگۆ، ڕەنگ، فۆنت، دەنگ، پێشبینین و لیستی دەستپێکردن لە یەک تابلۆدا.',
       lName:'ناوی براند (لاتین)',lKu:'ناوی براند (کوردی)',lOffer:'چی دەفرۆشیت؟',lAudience:'بۆ کێیە؟',lPromise:'بەڵێنی براند',lField:'بوار',lMood:'کەسایەتی',
       shuffle:'ئاراستەی نوێ',download:'داگرتنی تابلۆ',ready:'ئامادەیی براند',readyHint:'خانەکانی بریف پڕ بکەوە تا تابلۆکە وردتر بێت.',
-      brief:'ستراتیژی',logo:'لابراتواری لۆگۆ',palette:'سیستەمی ڕەنگ',type:'سیستەمی فۆنت',apps:'شوێنی بەکارهێنان',voice:'دەنگی براند',check:'لیستی دەستپێکردن',kit:'کیتی دەستپێک',
+      brief:'ستراتیژی',logo:'لابراتواری لۆگۆ',real:'سیستەمی راستەقینە',palette:'سیستەمی ڕەنگ',type:'سیستەمی فۆنت',apps:'شوێنی بەکارهێنان',voice:'دەنگی براند',check:'لیستی دەستپێکردن',kit:'کیتی دەستپێک',
       latin:'لاتین',kurdish:'کوردی',made:'بە بێ بەرامبەر دروستکرا بە BQURTAS.COM',scoreNote:'هێزی دەستپێک',primary:'سەرەکی',accent:'هاوڕەنگ',paper:'بنەما',ink:'نووسین',
-      wordmark:'وشە-نیشان',monogram:'یەکپیت',seal:'مۆر',social:'سۆشیاڵ',sign:'تابلۆ',card:'کارت',pack:'پاکەت',toneGood:'بەکاربێنە',toneAvoid:'دووربە',
+      wordmark:'وشە-نیشان',monogram:'یەکپیت',seal:'مۆر',symbol:'نیشانە',pattern:'نەخش',storefront:'ڕووی دوکان',story:'ستۆری',social:'سۆشیاڵ',sign:'تابلۆ',card:'کارت',pack:'پاکەت',print:'چاپ',launch:'هێڵی دەستپێکردن',toneGood:'بەکاربێنە',toneAvoid:'دووربە',
       sTitle:'ئەم سیستەمە بپارێزە',sText:'بۆ خۆتی بنێرە تا پێش قسەکردن لەگەڵ دیزاینەر، چاپخانە یان هاوبەش، ئاراستەکە لەدەست نەچێت.',send:'ناردن',sent:'نێردرا. بەم زووانە سندوقەکەت بپشکنە.',bad:'ئیمەیڵێکی دروست بنووسە.',
       ctaTitle:'ناسنامەی ڕاستەقینەت دەوێت؟',ctaText:'ئەم تابلۆیە ئاراستە دەدات. ناسنامەی تەواو پێویستی بە لێکۆڵینەوە، کێشان، تاقیکردنەوە، فایل و یاسای بەکارهێنان هەیە.',cta:'بریفێکی جدی بنێرە →',
       placeholder:{offer:'کافێی تایبەت و شیرینی دەستکرد',audience:'خەڵکی شار کە شوێنی ئارامیان دەوێت',promise:'خزمەتگوزاری گەرم و هەستێکی ناوخۆیی یادگار'},
@@ -64,9 +74,9 @@
       eyebrow:'استوديو علامة · مجاني',title:'ابن نظام علامة قابل للاستخدام.',intro:'الاسم، الوعد، اتجاه الشعار، اللون، الخط، الصوت، النماذج وقائمة الإطلاق في لوحة واحدة.',
       lName:'اسم العلامة (لاتيني)',lKu:'اسم العلامة (كردي)',lOffer:'ماذا تبيع؟',lAudience:'لمن؟',lPromise:'وعد العلامة',lField:'المجال',lMood:'الشخصية',
       shuffle:'اتجاه جديد',download:'تنزيل اللوحة',ready:'جاهزية العلامة',readyHint:'املأ حقول الموجز لتصبح اللوحة أدق.',
-      brief:'الاستراتيجية',logo:'مختبر الشعار',palette:'نظام الألوان',type:'نظام الخطوط',apps:'نقاط الظهور',voice:'صوت العلامة',check:'قائمة الإطلاق',kit:'حزمة البداية',
+      brief:'الاستراتيجية',logo:'مختبر الشعار',real:'نظام في الواقع',palette:'نظام الألوان',type:'نظام الخطوط',apps:'نقاط الظهور',voice:'صوت العلامة',check:'قائمة الإطلاق',kit:'حزمة البداية',
       latin:'لاتيني',kurdish:'كردي',made:'صُنع مجاناً عبر BQURTAS.COM',scoreNote:'قوة البداية',primary:'أساسي',accent:'مساند',paper:'أرضية',ink:'نص',
-      wordmark:'الشعار النصي',monogram:'الحرف',seal:'الختم',social:'اجتماعي',sign:'لافتة',card:'بطاقة',pack:'تغليف',toneGood:'استخدم',toneAvoid:'تجنب',
+      wordmark:'الشعار النصي',monogram:'الحرف',seal:'الختم',symbol:'الرمز',pattern:'النمط',storefront:'واجهة',story:'قصة',social:'اجتماعي',sign:'لافتة',card:'بطاقة',pack:'تغليف',print:'طباعة',launch:'جملة الإطلاق',toneGood:'استخدم',toneAvoid:'تجنب',
       sTitle:'احتفظ بهذا النظام',sText:'أرسله إلى بريدك واحفظ الاتجاه قبل الحديث مع مصمم أو مطبعة أو شريك.',send:'إرسال',sent:'تم الإرسال. تفقد بريدك قريباً.',bad:'أدخل بريداً صحيحاً.',
       ctaTitle:'تحتاج الهوية الحقيقية؟',ctaText:'هذه اللوحة تعطي الاتجاه. الهوية النهائية تحتاج بحثاً ورسماً واختباراً وملفات وقواعد استخدام.',cta:'أرسل موجزاً جدياً →',
       placeholder:{offer:'قهوة مختصة وحلويات يدوية',audience:'أهل المدينة الذين يحبون الأماكن الهادئة',promise:'خدمة دافئة وإحساس محلي لا ينسى'},
@@ -85,9 +95,9 @@
       eyebrow:'Studyo ya brandê · Bêpere',title:'Sîstemeke brandê ya bikêr ava bike.',intro:'Nav, soz, arasteya logo, reng, font, deng, mockup û lîsteya destpêkê di yek tabloyê de.',
       lName:'Navê brandê (Latînî)',lKu:'Navê brandê (Kurdî)',lOffer:'Tu çi difiroşî?',lAudience:'Ji bo kê ye?',lPromise:'Soza brandê',lField:'Warê kar',lMood:'Kesayetî',
       shuffle:'Arasteya nû',download:'Tabloyê daxîne',ready:'Amadetiya brandê',readyHint:'Qadên kurteyê tijî bike da tablo zelaltir bibe.',
-      brief:'Stratejî',logo:'Laboratuwara logo',palette:'Sîstema rengan',type:'Sîstema fontan',apps:'Cihên bikaranînê',voice:'Dengê brandê',check:'Lîsteya destpêkê',kit:'Kîta destpêkê',
+      brief:'Stratejî',logo:'Laboratuwara logo',real:'Sîstema rastîn',palette:'Sîstema rengan',type:'Sîstema fontan',apps:'Cihên bikaranînê',voice:'Dengê brandê',check:'Lîsteya destpêkê',kit:'Kîta destpêkê',
       latin:'Latînî',kurdish:'Kurdî',made:'BI BÊPERE BI BQURTAS.COM HATE ÇÊKIRIN',scoreNote:'hêza destpêkê',primary:'Sereke',accent:'Alîkar',paper:'Bingeh',ink:'Nivîs',
-      wordmark:'Nîşana peyvê',monogram:'Yek tîp',seal:'Mor',social:'Civakî',sign:'Tablo',card:'Kart',pack:'Pakêt',toneGood:'Bi kar bîne',toneAvoid:'Dûr bikeve',
+      wordmark:'Nîşana peyvê',monogram:'Yek tîp',seal:'Mor',symbol:'Nîşan',pattern:'Nexş',storefront:'Rûyê firoşgehê',story:'Çîrok',social:'Civakî',sign:'Tablo',card:'Kart',pack:'Pakêt',print:'Çap',launch:'Rêza destpêkê',toneGood:'Bi kar bîne',toneAvoid:'Dûr bikeve',
       sTitle:'Vê sîstemê biparêze',sText:'Ji xwe re bişîne û berî axaftina bi sêwirmend, çapxane an hevkarê re arasteyê biparêze.',send:'Bişîne',sent:'Hate şandin. Zû qutiya xwe kontrol bike.',bad:'Emailek rast binivîse.',
       ctaTitle:'Nasnameya rastîn dixwazî?',ctaText:'Ev tablo araste dide. Nasnameya dawî lêkolîn, xêzkirin, ceribandin, pel û rêbazên bikaranînê dixwaze.',cta:'Kurteyek cidî bişîne →',
       placeholder:{offer:'qehweya taybet û şîrîniya destçêkirî',audience:'mirovên bajêr ku cihên aram hez dikin',promise:'xizmeteke germ û hesteke herêmî ya bîranînê'},
@@ -106,9 +116,9 @@
       eyebrow:'Studio de marque · gratuit',title:'Construisez un système de marque utilisable.',intro:'Nom, promesse, direction logo, couleur, typographie, voix, maquettes et checklist de lancement dans une seule planche.',
       lName:'Nom de marque (latin)',lKu:'Nom de marque (kurde)',lOffer:'Que vendez-vous ?',lAudience:'Pour qui ?',lPromise:'Promesse de marque',lField:'Domaine',lMood:'Personnalité',
       shuffle:'Nouvelle direction',download:'Télécharger la planche',ready:'Préparation de marque',readyHint:'Complétez le brief pour rendre la planche plus précise.',
-      brief:'Stratégie',logo:'Laboratoire logo',palette:'Système couleur',type:'Système typographique',apps:'Points de contact',voice:'Voix',check:'Checklist de lancement',kit:'Kit de départ',
+      brief:'Stratégie',logo:'Laboratoire logo',real:'Système réel',palette:'Système couleur',type:'Système typographique',apps:'Points de contact',voice:'Voix',check:'Checklist de lancement',kit:'Kit de départ',
       latin:'Latin',kurdish:'Kurde',made:'CRÉÉ GRATUITEMENT AVEC BQURTAS.COM',scoreNote:'force de départ',primary:'Primaire',accent:'Accent',paper:'Fond',ink:'Texte',
-      wordmark:'Mot-symbole',monogram:'Monogramme',seal:'Sceau',social:'Social',sign:'Enseigne',card:'Carte',pack:'Pack',toneGood:'Utiliser',toneAvoid:'Éviter',
+      wordmark:'Mot-symbole',monogram:'Monogramme',seal:'Sceau',symbol:'Symbole',pattern:'Motif',storefront:'Façade',story:'Story',social:'Social',sign:'Enseigne',card:'Carte',pack:'Pack',print:'Print',launch:'Ligne de lancement',toneGood:'Utiliser',toneAvoid:'Éviter',
       sTitle:'Gardez ce système',sText:'Envoyez-le-vous pour conserver la direction avant de parler à un designer, imprimeur ou partenaire.',send:'Envoyer',sent:'Envoyé. Vérifiez bientôt votre boîte.',bad:'Saisissez un e-mail valide.',
       ctaTitle:'Besoin de la vraie identité ?',ctaText:'Cette planche donne une direction. L’identité finale demande recherche, dessin, tests, fichiers et règles d’usage.',cta:'Envoyer un brief sérieux →',
       placeholder:{offer:'café de spécialité et douceurs artisanales',audience:'des citadins qui aiment les lieux calmes',promise:'un service chaleureux et une sensation locale mémorable'},
@@ -127,9 +137,9 @@
       eyebrow:'Marka stüdyosu · ücretsiz',title:'Kullanılabilir bir marka sistemi kurun.',intro:'İsim, vaat, logo yönü, renk, yazı, ses, maketler ve lansman listesi tek panoda.',
       lName:'Marka adı (Latin)',lKu:'Marka adı (Kürtçe)',lOffer:'Ne satıyorsunuz?',lAudience:'Kimin için?',lPromise:'Marka vaadi',lField:'Alan',lMood:'Kişilik',
       shuffle:'Yeni yön',download:'Panoyu indir',ready:'Marka hazırlığı',readyHint:'Panoyu keskinleştirmek için brief alanlarını doldurun.',
-      brief:'Strateji',logo:'Logo laboratuvarı',palette:'Renk sistemi',type:'Yazı sistemi',apps:'Temas noktaları',voice:'Ses',check:'Lansman listesi',kit:'Başlangıç kiti',
+      brief:'Strateji',logo:'Logo laboratuvarı',real:'Gerçek dünya sistemi',palette:'Renk sistemi',type:'Yazı sistemi',apps:'Temas noktaları',voice:'Ses',check:'Lansman listesi',kit:'Başlangıç kiti',
       latin:'Latin',kurdish:'Kürtçe',made:'BQURTAS.COM İLE ÜCRETSİZ YAPILDI',scoreNote:'başlangıç gücü',primary:'Birincil',accent:'Vurgu',paper:'Zemin',ink:'Metin',
-      wordmark:'Kelime işareti',monogram:'Monogram',seal:'Mühür',social:'Sosyal',sign:'Tabela',card:'Kart',pack:'Paket',toneGood:'Kullan',toneAvoid:'Kaçın',
+      wordmark:'Kelime işareti',monogram:'Monogram',seal:'Mühür',symbol:'Sembol',pattern:'Desen',storefront:'Vitrin',story:'Hikaye',social:'Sosyal',sign:'Tabela',card:'Kart',pack:'Paket',print:'Baskı',launch:'Lansman cümlesi',toneGood:'Kullan',toneAvoid:'Kaçın',
       sTitle:'Bu sistemi sakla',sText:'Bir tasarımcı, matbaa veya ortakla konuşmadan önce yönü korumak için kendine e-postala.',send:'Gönder',sent:'Gönderildi. Yakında gelen kutunu kontrol et.',bad:'Geçerli bir e-posta gir.',
       ctaTitle:'Gerçek kimlik mi gerekiyor?',ctaText:'Bu pano yön verir. Bitmiş kimlik araştırma, çizim, test, dosyalar ve kullanım kuralları ister.',cta:'Ciddi bir brief gönder →',
       placeholder:{offer:'özel kahve ve el yapımı tatlılar',audience:'sakin yerleri seven şehir insanları',promise:'sıcak hizmet ve akılda kalan yerel his'},
@@ -148,9 +158,9 @@
       eyebrow:'Varumärkesstudio · gratis',title:'Bygg ett fungerande varumärkessystem.',intro:'Namn, löfte, logoriktning, färg, typografi, röst, mockups och lanseringslista i en levande tavla.',
       lName:'Varumärkesnamn (latin)',lKu:'Varumärkesnamn (kurdiska)',lOffer:'Vad säljer du?',lAudience:'För vem?',lPromise:'Varumärkeslöfte',lField:'Område',lMood:'Personlighet',
       shuffle:'Ny riktning',download:'Ladda ner tavlan',ready:'Varumärkesberedskap',readyHint:'Fyll i briefen för att göra tavlan skarpare.',
-      brief:'Strategi',logo:'Logolabb',palette:'Färgsystem',type:'Typsystem',apps:'Kontaktpunkter',voice:'Röst',check:'Lanseringslista',kit:'Startkit',
+      brief:'Strategi',logo:'Logolabb',real:'System i verkligheten',palette:'Färgsystem',type:'Typsystem',apps:'Kontaktpunkter',voice:'Röst',check:'Lanseringslista',kit:'Startkit',
       latin:'Latin',kurdish:'Kurdiska',made:'GJORD GRATIS MED BQURTAS.COM',scoreNote:'startstyrka',primary:'Primär',accent:'Accent',paper:'Grund',ink:'Text',
-      wordmark:'Ordmärke',monogram:'Monogram',seal:'Sigill',social:'Socialt',sign:'Skylt',card:'Kort',pack:'Pack',toneGood:'Använd',toneAvoid:'Undvik',
+      wordmark:'Ordmärke',monogram:'Monogram',seal:'Sigill',symbol:'Symbol',pattern:'Mönster',storefront:'Fasad',story:'Story',social:'Socialt',sign:'Skylt',card:'Kort',pack:'Pack',print:'Tryck',launch:'Lanseringsrad',toneGood:'Använd',toneAvoid:'Undvik',
       sTitle:'Spara systemet',sText:'Mejla det till dig själv och behåll riktningen innan du pratar med formgivare, tryckeri eller partner.',send:'Skicka',sent:'Skickat. Kolla inkorgen snart.',bad:'Ange en giltig e-post.',
       ctaTitle:'Behöver du den riktiga identiteten?',ctaText:'Tavlan ger riktning. Den färdiga identiteten kräver research, teckning, test, filer och regler för bruk.',cta:'Skicka en seriös brief →',
       placeholder:{offer:'specialkaffe och handgjorda sötsaker',audience:'stadsbor som tycker om lugna platser',promise:'varm service och en minnesvärd lokal känsla'},
@@ -195,11 +205,12 @@
   +     '<div class="bb-board" id="bbBoard">'
   +       '<section class="bb-cover">'
   +         '<div class="bb-cover-top"><span class="mono" id="bbBoardKicker"></span><span class="mono" id="bbScoreNote"></span></div>'
-  +         '<div class="bb-mark"><div class="bb-mark-latin" id="bbMarkLatin"></div><div class="bb-mark-ku" id="bbMarkKu"></div><div class="bb-mark-rule"></div></div>'
+  +         '<div class="bb-mark"><div class="bb-brand-symbol"><i id="bbSymbolIcon" class="fa-solid fa-mug-saucer"></i><span id="bbSymbolInitial"></span></div><div class="bb-mark-latin" id="bbMarkLatin"></div><div class="bb-mark-ku" id="bbMarkKu"></div><div class="bb-mark-rule"></div></div>'
   +         '<div class="bb-cover-grid"><span id="bbCoverIndustry"></span><span id="bbCoverMood"></span><span id="bbCoverTagline"></span></div>'
   +       '</section>'
   +       '<section class="bb-row bb-strategy"><div class="bb-row-h" id="bbHBrief"></div><div class="bb-strategy-grid"><div><small id="bbStrategyLabel"></small><p id="bbPositioning"></p></div><div><small id="bbInsightLabel"></small><p id="bbIndustryInsight"></p></div></div></section>'
-  +       '<section class="bb-row"><div class="bb-row-h" id="bbHLogo"></div><div class="bb-logo-lab"><div class="bb-logo-card word"><small id="bbWordmarkLabel"></small><b id="bbLogoWord"></b></div><div class="bb-logo-card mono"><small id="bbMonoLabel"></small><b id="bbLogoMono"></b></div><div class="bb-logo-card seal"><small id="bbSealLabel"></small><b id="bbLogoSeal"></b><span id="bbLogoSealKu"></span></div></div></section>'
+  +       '<section class="bb-row"><div class="bb-row-h" id="bbHLogo"></div><div class="bb-logo-lab"><div class="bb-logo-card word"><small id="bbWordmarkLabel"></small><b id="bbLogoWord"></b></div><div class="bb-logo-card mono"><small id="bbMonoLabel"></small><i id="bbLogoIcon" class="fa-solid fa-mug-saucer"></i><b id="bbLogoMono"></b></div><div class="bb-logo-card seal"><small id="bbSealLabel"></small><b id="bbLogoSeal"></b><span id="bbLogoSealKu"></span></div></div></section>'
+  +       '<section class="bb-row"><div class="bb-row-h" id="bbHReal"></div><div class="bb-real-grid"><div class="bb-real bb-storefront"><small id="bbStorefrontLabel"></small><div class="bb-store-awning"></div><div class="bb-store-sign"><i id="bbStoreIcon" class="fa-solid fa-mug-saucer"></i><span id="bbStoreName"></span></div><div class="bb-store-window"><b id="bbStoreTagline"></b><em id="bbStoreOffer"></em></div></div><div class="bb-real bb-story"><small id="bbStoryLabel"></small><div class="bb-phone-top"><span id="bbStoryAvatar"></span><b id="bbStoryName"></b></div><div class="bb-story-card"><i id="bbStoryIcon" class="fa-solid fa-mug-saucer"></i><strong id="bbStoryLine"></strong></div><div class="bb-story-bars"><span></span><span></span><span></span></div></div><div class="bb-real bb-package"><small id="bbPackageLabel"></small><div class="bb-pouch"><span id="bbPackIcon"></span><b id="bbPackName"></b><em id="bbPackLine"></em></div></div><div class="bb-real bb-print"><small id="bbPrintLabel"></small><div class="bb-print-card"><b id="bbPrintName"></b><span id="bbPrintMeta"></span></div><div class="bb-sticker"><i id="bbStickerIcon" class="fa-solid fa-mug-saucer"></i><span id="bbStickerInitial"></span></div></div></div></section>'
   +       '<section class="bb-row"><div class="bb-row-h" id="bbHPalette"></div><div class="bb-swatches" id="bbSwatches"></div></section>'
   +       '<section class="bb-row"><div class="bb-row-h" id="bbHType"></div><div class="bb-types"><div class="bb-type"><small id="bbTyLatinName"></small><div class="bb-type-latin" id="bbTyLatin"></div><p id="bbTyLatinUse"></p></div><div class="bb-type"><small id="bbTyKuName"></small><div class="bb-type-ku" id="bbTyKu"></div><p id="bbTyKuUse"></p></div></div></section>'
   +       '<section class="bb-row"><div class="bb-row-h" id="bbHApps"></div><div class="bb-apps"><div class="bb-app sign"><span id="bbAppSign"></span></div><div class="bb-app card"><span id="bbAppCard"></span><em id="bbAppCardSub"></em></div><div class="bb-app social"><span id="bbAppAva"></span></div><div class="bb-app pack"><span id="bbAppPack"></span></div></div></section>'
@@ -232,6 +243,10 @@
     return (chars[0] || 'B').toLocaleUpperCase();
   }
   function setText(id, text){ const el = $(id); if (el) el.textContent = text; }
+  function setIcon(id, icon){
+    const el = $(id);
+    if (el) el.className = 'fa-solid ' + icon;
+  }
   function list(id, items, cls){
     const el = $(id);
     el.innerHTML = '';
@@ -280,9 +295,10 @@
     $('bbOffer').placeholder = t.placeholder.offer; $('bbAudience').placeholder = t.placeholder.audience; $('bbPromise').placeholder = t.placeholder.promise;
     if (!$('bbName').value) $('bbName').value = d.name;
     if (!$('bbKu').value) $('bbKu').value = d.ku;
-    setText('bbHBrief', t.brief); setText('bbHLogo', t.logo); setText('bbHPalette', t.palette); setText('bbHType', t.type); setText('bbHApps', t.apps);
+    setText('bbHBrief', t.brief); setText('bbHLogo', t.logo); setText('bbHReal', t.real); setText('bbHPalette', t.palette); setText('bbHType', t.type); setText('bbHApps', t.apps);
     setText('bbHVoice', t.voice); setText('bbHCheck', t.check); setText('bbHKit', t.kit);
-    setText('bbStrategyLabel', t.brief); setText('bbInsightLabel', t.inds[state.industry]); setText('bbWordmarkLabel', t.wordmark); setText('bbMonoLabel', t.monogram); setText('bbSealLabel', t.seal);
+    setText('bbStrategyLabel', t.brief); setText('bbInsightLabel', t.inds[state.industry]); setText('bbWordmarkLabel', t.wordmark); setText('bbMonoLabel', t.symbol); setText('bbSealLabel', t.seal);
+    setText('bbStorefrontLabel', t.storefront); setText('bbStoryLabel', t.story); setText('bbPackageLabel', t.pack); setText('bbPrintLabel', t.print);
     setText('bbToneGood', t.toneGood); setText('bbToneAvoid', t.toneAvoid);
     setText('bbMade', t.made); setText('bbSTitle', t.sTitle); setText('bbSText', t.sText); setText('bbEmailBtn', t.send);
     setText('bbCtaTitle', t.ctaTitle); setText('bbCtaText', t.ctaText); setText('bbCtaLink', t.cta);
@@ -357,8 +373,12 @@
     const promise = val('bbPromise', t.placeholder.promise);
     const industry = t.inds[state.industry] || t.inds.other;
     const tagline = t.tagline[state.industry] || t.tagline.other;
+    const initial = firstChar(name);
+    const icon = INDUSTRY_ICONS[state.industry] || INDUSTRY_ICONS.other;
 
     setText('bbBoardKicker', t.eyebrow);
+    setIcon('bbSymbolIcon', icon);
+    setText('bbSymbolInitial', initial);
     setText('bbMarkLatin', name);
     setText('bbMarkKu', ku);
     $('bbMarkKu').style.display = ku ? 'block' : 'none';
@@ -370,9 +390,25 @@
     setText('bbIndustryInsight', t.insight[state.industry] || t.insight.other);
 
     setText('bbLogoWord', name);
-    setText('bbLogoMono', firstChar(name));
-    setText('bbLogoSeal', firstChar(name));
+    setIcon('bbLogoIcon', icon);
+    setText('bbLogoMono', initial);
+    setText('bbLogoSeal', initial);
     setText('bbLogoSealKu', ku || name);
+    setIcon('bbStoreIcon', icon);
+    setIcon('bbStoryIcon', icon);
+    setIcon('bbStickerIcon', icon);
+    setText('bbStoreName', name);
+    setText('bbStoreTagline', tagline);
+    setText('bbStoreOffer', offer);
+    setText('bbStoryAvatar', initial);
+    setText('bbStoryName', name);
+    setText('bbStoryLine', promise);
+    setText('bbPackIcon', initial);
+    setText('bbPackName', ku || name);
+    setText('bbPackLine', tagline);
+    setText('bbPrintName', name);
+    setText('bbPrintMeta', industry + ' · ' + t.moods[state.mood]);
+    setText('bbStickerInitial', initial);
     setText('bbTyLatin', name + ' Aa Bb Cc');
     setText('bbTyKu', ku || 'ئاوەز');
     setText('bbTyLatinName', t.latin + ' · ' + m.fonts.ln);
@@ -383,7 +419,7 @@
     setText('bbAppSign', name);
     setText('bbAppCard', name);
     setText('bbAppCardSub', industry);
-    setText('bbAppAva', firstChar(name));
+    setText('bbAppAva', initial);
     setText('bbAppPack', ku || name);
 
     renderSwatches(pal);
