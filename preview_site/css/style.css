@@ -9709,16 +9709,36 @@ body::before{
 @media(max-width:560px){.cms-row3{grid-template-columns:1fr 1fr}.cms-form{max-width:none}}
 
 /* =========================================================
-   v322 — tiny visual tuning requested after v321:
-   mobile room swaps wait for the curtain; hero photo/name and cursor size.
+   v323 — cursor size balance: visible but still calm.
    ========================================================= */
+.cursor-dot{
+  width:6px !important;
+  height:6px !important;
+}
 .cursor-ring{
-  width:32px !important;
-  height:32px !important;
+  width:36px !important;
+  height:36px !important;
 }
 .cursor-ring.is-hover{
-  width:34px !important;
-  height:34px !important;
+  width:40px !important;
+  height:40px !important;
+}
+.cursor-ring.is-magnet{
+  width:44px !important;
+  height:44px !important;
+}
+.cursor-ring.is-open{
+  width:56px !important;
+  height:56px !important;
+}
+.cursor-ring[data-cursor-action="talk"],
+.cursor-ring[data-cursor-action="send"]{
+  width:60px !important;
+  height:60px !important;
+}
+.cursor-ring.is-open .cursor-ring-label{
+  font-size:8px !important;
+  letter-spacing:.12em !important;
 }
 
 @media (max-width:820px){
