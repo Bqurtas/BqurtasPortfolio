@@ -90,6 +90,10 @@ const setLangAttr = (v) => ({ element(el) { el.setAttribute('lang', v); } });
 export async function onRequest(context) {
   const { request, env, next } = context;
   const url = new URL(request.url);
+  if (url.hostname === 'www.bqurtas.com') {
+    url.hostname = 'bqurtas.com';
+    return Response.redirect(url.toString(), 301);
+  }
   const r = resolve(url.pathname);
   if (!r) return next();
   if (!env || !env.ASSETS) return next();
