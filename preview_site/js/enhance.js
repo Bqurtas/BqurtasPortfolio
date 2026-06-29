@@ -1168,7 +1168,7 @@
           }).catch(() => { m.textContent = S.edFail; });
       });
     };
-    const esc = (s) => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+    const esc = (s) => String(s || '').replace(/[<>&"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
 
     /* ---- Shared pager for dashboard lists (Content, Latest, Leads…) ----
        When a list grows past DASH_PER items it splits into pages. Returns the
@@ -1728,10 +1728,22 @@
       kmr: { gate:'Birêvebirina lêkolînên rewşê', note:'Ji bo zêdekirin û guhertinê tokena xwe binivîse.', conn:'Girêde', tokPh:'Tokena guhertinê', newBtn:'Lêkolîna nû', edit:'Biguhere', del:'Jê bibe', delAsk:'Ev proje bi temamî were jêbirin?', back:'Hemû proje', loading:'Tê barkirin…', empty:'Hêj lêkolîn tune — ya yekem zêde bike.', fTitle:'Sernavê projeyê', fClient:'Mişterî', fYear:'Sal', fRole:'Rol / qad', fTag:'Kategorî', fAccent:'Rengê sereke', fCover:'Wêneyê bergê', fSummary:'Kurte (paragrafek xurt)', fBody:'Çîrok (paragrafan bi rêzeke vala veqetîne)', fPalette:'Palet — her rêz yek, mînak  Clay #BD4A2C', fGallery:'Wêneyên bikaranînê', fPub:'Weşandî — li ser malperê xuya ye', save:'Biweşîne', update:'Nûve bike', translating:'Ji bo hemû zimanan tê wergerandin…', saving:'Tê tomarkirin…', saved:'Hat tomarkirin ✓', err:'Negihîşt xizmetê (li ser malpera zindî dixebite).', needTitle:'Ji kerema xwe sernavekê zêde bike.', uploading:'Tê barkirin…', add:'Zêde bike', remove:'Rake' },
       fr: { gate:'Gérer les études de cas', note:"Saisissez votre jeton d'édition pour ajouter et modifier.", conn:'Connecter', tokPh:"Jeton d'édition", newBtn:'Nouvelle étude de cas', edit:'Modifier', del:'Supprimer', delAsk:'Supprimer définitivement ce projet ?', back:'Tous les projets', loading:'Chargement…', empty:'Aucune étude de cas — ajoutez la première.', fTitle:'Titre du projet', fClient:'Client', fYear:'Année', fRole:'Rôle / périmètre', fTag:'Catégorie', fAccent:'Couleur d’accent', fCover:'Image de couverture', fSummary:'Le brief (un paragraphe fort)', fBody:'Le récit (séparez les paragraphes par une ligne vide)', fPalette:'Palette — une par ligne, ex.  Clay #BD4A2C', fGallery:'Images en usage', fPub:'Publié — visible sur le site', save:'Publier', update:'Mettre à jour', translating:'Traduction dans toutes les langues…', saving:'Enregistrement…', saved:'Enregistré ✓', err:'Service inaccessible (fonctionne sur le site en ligne).', needTitle:'Veuillez ajouter un titre.', uploading:'Téléversement…', add:'Ajouter', remove:'Retirer' }
     };
+    const PR_EXTRA = {
+      en:  { fCoverUrl:'Or paste a cover image URL', fGalleryUrl:'Add one image URL', pick:'Pick real images from the portfolio', pickNote:'Choose from the live gallery, then use the image as the cover or add it to this case study.', pickCat:'Gallery category', pickLoad:'Show images', useCover:'Cover', useImage:'Add', galleryCount:'{n} images', noImage:'No image yet', preview:'Preview' },
+      ku:  { fCoverUrl:'یان بەستەری وێنەی سەرەکی دابنێ', fGalleryUrl:'بەستەری یەک وێنە زیاد بکە', pick:'وێنەی راستەقینە لە پۆرتفۆلیۆ هەڵبژێرە', pickNote:'لە گەلەریی زیندوو هەڵبژێرە، پاشان وێنەکە بکە بە وێنەی سەرەکی یان زیادیکە بۆ ئەم تاوتوێیە.', pickCat:'کەتەگۆریی گەلەری', pickLoad:'نیشاندانی وێنەکان', useCover:'سەرەکی', useImage:'زیادکردن', galleryCount:'{n} وێنە', noImage:'هێشتا وێنە نییە', preview:'پێشبینین' },
+      ar:  { fCoverUrl:'أو ألصق رابط صورة الغلاف', fGalleryUrl:'أضف رابط صورة واحدة', pick:'اختر صوراً حقيقية من الأعمال', pickNote:'اختر من المعرض الحي، ثم اجعل الصورة غلافاً أو أضفها إلى دراسة الحالة.', pickCat:'تصنيف المعرض', pickLoad:'عرض الصور', useCover:'غلاف', useImage:'إضافة', galleryCount:'{n} صور', noImage:'لا صورة بعد', preview:'معاينة' },
+      kmr: { fCoverUrl:'An girêdana wêneyê bergê lê zêde bike', fGalleryUrl:'Girêdana wêneyekê zêde bike', pick:'Wêneyên rastîn ji portfolioyê hilbijêre', pickNote:'Ji galerîya zindî hilbijêre, paşê wêneyê wek bergê bikar bîne an li vê lêkolînê zêde bike.', pickCat:'Kategorîya galerîyê', pickLoad:'Wêneyan nîşan bide', useCover:'Berg', useImage:'Zêde bike', galleryCount:'{n} wêne', noImage:'Hêj wêne tune', preview:'Pêşdîtin' },
+      fr:  { fCoverUrl:"Ou collez l'URL d'une image de couverture", fGalleryUrl:"Ajouter l'URL d'une image", pick:'Choisir de vraies images du portfolio', pickNote:"Choisissez depuis la galerie en ligne, puis utilisez l'image comme couverture ou ajoutez-la à cette étude.", pickCat:'Catégorie de galerie', pickLoad:'Afficher les images', useCover:'Couverture', useImage:'Ajouter', galleryCount:'{n} images', noImage:'Aucune image', preview:'Aperçu' }
+    };
+    Object.keys(PR_EXTRA).forEach(l => Object.assign(PR_I18N[l] || PR_I18N.en, PR_EXTRA[l]));
     const PT = (k) => (PR_I18N[curLang()] || PR_I18N.en)[k] || PR_I18N.en[k] || k;
     const prjApi = (payload) => { const SB = window.BQ_SUPA || {}; return fetch(SB.url + '/functions/v1/projects-admin', { method:'POST', headers:{ 'Content-Type':'application/json', apikey:SB.key, Authorization:'Bearer ' + SB.key, 'x-edit-token':editToken() }, body:JSON.stringify(payload) }).then(r => r.json().catch(() => ({ error:'bad_response' }))); };
     const parsePalette = (txt) => String(txt || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => { const m = l.match(/(#[0-9a-fA-F]{3,8})\s*$/); const hex = m ? m[1] : ''; const name = (m ? l.slice(0, m.index) : l).replace(/[,:\s]+$/, '').trim(); return hex ? { name: name || hex, hex } : null; }).filter(Boolean);
     const paletteToText = (arr) => (Array.isArray(arr) ? arr : []).map(s => (s.name ? s.name + ' ' : '') + (s.hex || '')).join('\n');
+    const projectGallery = (p) => (Array.isArray(p.gallery) ? p.gallery : []).map(x => typeof x === 'string' ? { url:x } : x).filter(x => x && x.url);
+    const projectThumb = (p) => p.cover || (projectGallery(p)[0] && projectGallery(p)[0].url) || '';
+    const galleryCountLabel = (n) => String(PT('galleryCount')).replace('{n}', n);
+    const pickThumb = (url, w) => (window.BQ_GALLERY && window.BQ_GALLERY.thumb && /^https?:\/\//.test(url)) ? window.BQ_GALLERY.thumb(url, w || 220) : url;
     const buildProjectI18n = async (p, onProgress) => {
       const langs = Object.keys(TR_LANGS), i18n = {}; const pick = (t, b) => (t && t.trim()) ? t : (b || '');
       for (let k = 0; k < langs.length; k++) {
@@ -1754,16 +1766,22 @@
         if (d && (d.error === 'unauthorized' || d.error === 'missing_token')) { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} prjGate(); return; }
         const rows = (d && d.projects) || [];
         $('.cms-status').textContent = rows.length ? '' : PT('empty');
-        $('#prjRows').innerHTML = rows.map(p => `<div class="cms-row"><span class="cms-row-dot" data-css="background:${esc(p.accent || '#bd4a2c')}"></span>
-          <div class="cms-row-t"><strong>${esc(p.title)}</strong><span class="mono">${esc([p.client, p.year].filter(Boolean).join(' · '))}${p.published ? '' : ' · draft'}</span></div>
-          <div class="cms-row-act"><button class="dash-btn" data-edit="${p.id}"><i class="fa-solid fa-pen"></i> ${esc(PT('edit'))}</button><button class="dash-btn dash-btn--danger" data-del="${p.id}"><i class="fa-solid fa-trash"></i></button></div></div>`).join('');
+        $('#prjRows').innerHTML = rows.map(p => {
+          const thumb = projectThumb(p);
+          const galN = projectGallery(p).length + (p.cover ? 1 : 0);
+          return `<div class="cms-row cms-row--project"><span class="cms-row-thumb" data-css="--accent:${esc(p.accent || '#bd4a2c')}">${thumb ? `<img src="${esc(pickThumb(thumb, 180))}" alt="">` : `<i class="fa-solid fa-image"></i>`}</span>
+          <div class="cms-row-t"><strong>${esc(p.title)}</strong><span class="mono">${esc([p.client, p.year].filter(Boolean).join(' · '))}${p.published ? '' : ' · draft'}</span><span class="mono cms-row-meta"><span class="cms-row-dot" data-css="background:${esc(p.accent || '#bd4a2c')}"></span>${galN ? esc(galleryCountLabel(galN)) : esc(PT('noImage'))}</span></div>
+          <div class="cms-row-act"><button class="dash-btn" data-edit="${p.id}"><i class="fa-solid fa-pen"></i> ${esc(PT('edit'))}</button><button class="dash-btn dash-btn--danger" data-del="${p.id}"><i class="fa-solid fa-trash"></i></button></div></div>`;
+        }).join('');
         $('#prjRows').querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => prjForm(rows.find(x => String(x.id) === b.getAttribute('data-edit')) || {})));
         $('#prjRows').querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm(PT('delAsk'))) return; prjApi({ action:'delete', id: Number(b.getAttribute('data-del')) }).then(() => { if (window.__bqReloadWork) window.__bqReloadWork(); prjList(); }); }));
       }).catch(() => { $('.cms-status').textContent = PT('err'); });
     };
     const prjForm = (p) => {
-      let gal = Array.isArray(p.gallery) ? p.gallery.slice() : [];
+      let gal = projectGallery(p).slice();
       const drawGal = () => { const g = $('#prjGalList'); if (!g) return; g.innerHTML = gal.map((x, i) => `<span class="cms-gal"><img src="${esc(x.url)}" alt=""><button type="button" data-rm="${i}" aria-label="remove">×</button></span>`).join(''); g.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => { gal.splice(Number(b.getAttribute('data-rm')), 1); drawGal(); })); };
+      const C = (window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS) || {};
+      const pickOpts = Object.keys(C).filter(k => C[k].folder && C[k].ext !== 'mp4').map(k => `<option value="${esc(k)}">${esc(C[k].title || C[k].tag || k)}</option>`).join('');
       view.innerHTML = `<form id="prjForm" class="cms-form">
         <div class="cms-head"><button class="dash-btn" type="button" id="prjBack"><i class="fa-solid fa-arrow-left"></i> ${esc(PT('back'))}</button></div>
         <div class="dash-grid-2">
@@ -1775,20 +1793,46 @@
           <label class="dash-field"><span class="mono">${esc(PT('fAccent'))}</span><input id="pf_accent" type="color" value="${esc(p.accent || '#bd4a2c')}" class="cms-color"></label>
         </div>
         <label class="dash-field"><span class="mono">${esc(PT('fCover'))}</span><input id="pf_coverfile" type="file" accept="image/*" class="cms-file"><span class="dash-note mono" id="pf_upmsg"></span></label>
+        <label class="dash-field"><span class="mono">${esc(PT('fCoverUrl'))}</span><input id="pf_cover_url" type="url" value="${esc(p.cover || '')}" placeholder="https://…"></label>
         <figure class="cms-cover-prev" id="pf_prev"${p.cover ? '' : ' hidden'}><img src="${esc(p.cover || '')}" alt=""></figure>
         <input type="hidden" id="pf_cover" value="${esc(p.cover || '')}">
         <label class="dash-field"><span class="mono">${esc(PT('fSummary'))}</span><textarea id="pf_summary" rows="3">${esc(p.summary || '')}</textarea></label>
         <label class="dash-field"><span class="mono">${esc(PT('fBody'))}</span><textarea id="pf_body" rows="9">${esc(p.body || '')}</textarea></label>
         <label class="dash-field"><span class="mono">${esc(PT('fPalette'))}</span><textarea id="pf_palette" rows="4" placeholder="Clay #BD4A2C">${esc(paletteToText(p.palette))}</textarea></label>
         <label class="dash-field"><span class="mono">${esc(PT('fGallery'))}</span><input id="pf_galfile" type="file" accept="image/*" multiple class="cms-file"><span class="dash-note mono" id="pf_galmsg"></span></label>
+        <div class="dash-field"><span class="mono">${esc(PT('fGalleryUrl'))}</span><div class="cms-url-row"><input id="pf_galurl" type="url" placeholder="https://…"><button type="button" class="dash-btn" id="pf_addgal">${esc(PT('add'))}</button></div></div>
         <div class="cms-gal-list" id="prjGalList"></div>
+        <div class="cms-pick">
+          <div class="cms-pick-head">
+            <div><strong>${esc(PT('pick'))}</strong><span class="mono">${esc(PT('pickNote'))}</span></div>
+            <div class="cms-pick-controls"><label class="dash-field"><span class="mono">${esc(PT('pickCat'))}</span><select id="prjPickColl">${pickOpts}</select></label><button type="button" class="dash-btn" id="prjPickLoad"><i class="fa-solid fa-images"></i> ${esc(PT('pickLoad'))}</button></div>
+          </div>
+          <div class="cms-pick-grid" id="prjPickGrid"></div>
+        </div>
         <label class="cms-check"><input type="checkbox" id="pf_pub"${p.published ? ' checked' : ''}> <span>${esc(PT('fPub'))}</span></label>
         <div class="cms-head"><button type="submit" class="dash-btn dash-btn--go" id="pf_save"><i class="fa-solid fa-paper-plane"></i> ${p.id ? esc(PT('update')) : esc(PT('save'))}</button><span class="dash-note mono" id="pf_msg"></span></div>
       </form>`;
       drawGal();
       $('#prjBack').addEventListener('click', prjList);
-      $('#pf_coverfile').addEventListener('change', async (ev) => { const f = ev.target.files && ev.target.files[0]; if (!f) return; const um = $('#pf_upmsg'); um.textContent = PT('uploading'); try { const b64 = await cmsResize(f, 1600, 0.82); const d = await prjApi({ action:'upload', filename:f.name, contentType:'image/webp', dataB64:b64 }); if (d && d.ok && d.url) { $('#pf_cover').value = d.url; const pr = $('#pf_prev'); pr.hidden = false; pr.querySelector('img').src = d.url; um.textContent = '✓'; } else um.textContent = '✗'; } catch (e) { um.textContent = '✗'; } });
+      const setCover = (url) => { $('#pf_cover').value = url || ''; $('#pf_cover_url').value = url || ''; const pr = $('#pf_prev'); pr.hidden = !url; if (url) pr.querySelector('img').src = url; };
+      $('#pf_cover_url').addEventListener('change', (ev) => setCover(ev.target.value.trim()));
+      $('#pf_coverfile').addEventListener('change', async (ev) => { const f = ev.target.files && ev.target.files[0]; if (!f) return; const um = $('#pf_upmsg'); um.textContent = PT('uploading'); try { const b64 = await cmsResize(f, 1600, 0.82); const d = await prjApi({ action:'upload', filename:f.name, contentType:'image/webp', dataB64:b64 }); if (d && d.ok && d.url) { setCover(d.url); um.textContent = '✓'; } else um.textContent = '✗'; } catch (e) { um.textContent = '✗'; } });
       $('#pf_galfile').addEventListener('change', async (ev) => { const files = [...(ev.target.files || [])]; const gm = $('#pf_galmsg'); for (const f of files) { gm.textContent = PT('uploading'); try { const b64 = await cmsResize(f, 1600, 0.82); const d = await prjApi({ action:'upload', filename:f.name, contentType:'image/webp', dataB64:b64 }); if (d && d.ok && d.url) gal.push({ url:d.url }); } catch (e) {} } gm.textContent = '✓'; ev.target.value = ''; drawGal(); });
+      $('#pf_addgal').addEventListener('click', () => { const inp = $('#pf_galurl'); const url = inp.value.trim(); if (!url) return; gal.push({ url }); inp.value = ''; drawGal(); });
+      const drawPick = async () => {
+        const grid = $('#prjPickGrid'), coll = $('#prjPickColl').value;
+        if (!grid || !window.BQ_GALLERY || !coll) return;
+        grid.innerHTML = `<p class="dash-note mono">${esc(PT('loading'))}</p>`;
+        try { await window.BQ_GALLERY.loadManifest(); } catch (e) {}
+        const items = window.BQ_GALLERY.items(coll).filter(it => it.type !== 'video').slice(0, 36);
+        grid.innerHTML = items.map((it) => `<figure class="cms-pick-card" data-url="${esc(it.url)}"><img src="${esc(pickThumb(it.url, 220))}" alt="" loading="lazy"><figcaption><span class="mono">${esc(it.title || '')}</span><button type="button" data-act="cover">${esc(PT('useCover'))}</button><button type="button" data-act="add">${esc(PT('useImage'))}</button></figcaption></figure>`).join('');
+      };
+      $('#prjPickLoad')?.addEventListener('click', drawPick);
+      $('#prjPickGrid')?.addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-act]'); if (!b) return;
+        const card = b.closest('.cms-pick-card'), url = card && card.dataset.url; if (!url) return;
+        if (b.dataset.act === 'cover') setCover(url); else { gal.push({ url }); drawGal(); }
+      });
       $('#prjForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const msg = $('#pf_msg'); const title = $('#pf_title').value.trim();

@@ -2112,3 +2112,15 @@ if (window.TABCARD_I18N) {
   };
   Object.keys(BQ_AI_CARDS).forEach(function(l){ if (window.TABCARD_I18N[l]) window.TABCARD_I18N[l].ai = BQ_AI_CARDS[l]; });
 }
+
+/* ===== v328 — richer Selected Work labels ===== */
+window.I18N_EXTRA_WORK328 = {
+  en:{ "work.cover":"Cover","work.media":"{n} visuals","work.open":"Open case","work.role":"Role","work.year":"Year","work.type":"Type","work.nomedia":"The project details are being prepared." },
+  ku:{ "work.cover":"وێنەی سەرەکی","work.media":"{n} وێنە","work.open":"کردنەوەی تاوتوێ","work.role":"ڕۆڵ","work.year":"ساڵ","work.type":"جۆر","work.nomedia":"وردەکارییەکانی پڕۆژەکە ئامادە دەکرێن." },
+  kmr:{ "work.cover":"Wêneyê bergê","work.media":"{n} wêne","work.open":"Lêkolînê veke","work.role":"Rol","work.year":"Sal","work.type":"Cure","work.nomedia":"Hûrgiliyên projeyê tên amadekirin." },
+  ar:{ "work.cover":"الغلاف","work.media":"{n} صور","work.open":"فتح الدراسة","work.role":"الدور","work.year":"السنة","work.type":"النوع","work.nomedia":"يجري إعداد تفاصيل المشروع." },
+  fr:{ "work.cover":"Couverture","work.media":"{n} images","work.open":"Ouvrir l'étude","work.role":"Rôle","work.year":"Année","work.type":"Type","work.nomedia":"Les détails du projet sont en préparation." },
+  tr:{ "work.cover":"Kapak","work.media":"{n} görsel","work.open":"Vakayı aç","work.role":"Rol","work.year":"Yıl","work.type":"Tür","work.nomedia":"Proje detayları hazırlanıyor." },
+  sv:{ "work.cover":"Omslag","work.media":"{n} bilder","work.open":"Öppna studie","work.role":"Roll","work.year":"År","work.type":"Typ","work.nomedia":"Projektdetaljerna förbereds." }
+};
+Object.keys(window.I18N_EXTRA_WORK328).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_WORK328[l]); });

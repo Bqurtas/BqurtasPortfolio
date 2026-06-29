@@ -34,6 +34,32 @@
     };
   };
 
+  const mediaOf = (p) => {
+    const q = L(p);
+    const out = [];
+    const seen = {};
+    const add = (m, caption) => {
+      const url = typeof m === 'string' ? m : (m && m.url);
+      if (!url || seen[url]) return;
+      seen[url] = 1;
+      out.push({ url, caption: (typeof m === 'object' && m && m.caption) || caption || '' });
+    };
+    add(q.cover, dT('work.cover', 'Cover'));
+    q.gallery.forEach((g) => add(g, ''));
+    return out;
+  };
+
+  const excerpt = (s, n) => {
+    const txt = String(s || '').replace(/\s+/g, ' ').trim();
+    if (!txt) return '';
+    return txt.length > n ? txt.slice(0, Math.max(0, n - 1)).trim() + '…' : txt;
+  };
+
+  const mediaLabel = (n) => {
+    const t = dT('work.media', '{n} visuals');
+    return t.replace('{n}', n);
+  };
+
   function renderIndex() {
     if (!PROJECTS.length) {
       indexEl.innerHTML = '<p class="work-empty mono">' + esc(dT('work.empty', 'Case studies are on their way.')) + '</p>';
@@ -41,15 +67,20 @@
     }
     indexEl.innerHTML = PROJECTS.map((p) => {
       const q = L(p);
-      const cover = q.cover
-        ? '<img class="work-card-img" src="' + esc(q.cover) + '" alt="" loading="lazy">'
-        : '<span class="work-card-mark">' + esc((String(q.title || '').trim()[0]) || '·') + '</span>';
+      const media = mediaOf(p);
+      const cover = media.length
+        ? '<img class="work-card-img" src="' + esc(media[0].url) + '" alt="" loading="lazy"><span class="work-card-count mono">' + esc(mediaLabel(media.length)) + '</span>'
+        : '<span class="work-card-mark">' + esc((String(q.title || '').trim()[0]) || '·') + '</span><span class="work-card-board"><b></b><b></b><b></b></span>';
+      const sw = q.palette.slice(0, 5).map((s) => '<b data-css="background:' + esc(s.hex || s) + '"></b>').join('');
+      const summary = excerpt(q.summary || q.body, 130);
       return '<a class="work-card" href="' + esc(workBase() + '/' + (p.slug || p.id)) + '" data-id="' + esc(p.id) + '" data-css="--accent:' + esc(q.accent) + '">'
         + '<span class="work-card-cover">' + cover + '</span>'
         + '<span class="work-card-meta">'
-        +   '<span class="mono work-card-tag">' + esc(q.tag || '') + '</span>'
+        +   '<span class="mono work-card-tag">' + esc(q.tag || '') + (sw ? '<span class="work-card-swatches">' + sw + '</span>' : '') + '</span>'
         +   '<span class="work-card-title">' + esc(q.title) + '</span>'
+        +   (summary ? '<span class="work-card-desc">' + esc(summary) + '</span>' : '')
         +   '<span class="mono work-card-sub">' + esc([q.client, p.year].filter(Boolean).join(' · ')) + '</span>'
+        +   '<span class="work-card-go mono">' + esc(dT('work.open', 'Open case')) + ' <i class="fa-solid fa-arrow-right"></i></span>'
         + '</span></a>';
     }).join('');
     indexEl.querySelectorAll('.work-card').forEach((c) => c.addEventListener('click', (e) => {
@@ -71,9 +102,16 @@
     const q = L(p);
     const next = PROJECTS[(PROJECTS.indexOf(p) + 1) % PROJECTS.length];
     const nq = next ? L(next) : null;
+    const media = mediaOf(p);
+    const facts = [
+      q.client ? [dT('work.client', 'Client'), q.client] : null,
+      q.role ? [dT('work.role', 'Role'), q.role] : null,
+      p.year ? [dT('work.year', 'Year'), p.year] : null,
+      q.tag ? [dT('work.type', 'Type'), q.tag] : null
+    ].filter(Boolean).map((f) => '<span class="wc-fact"><small class="mono">' + esc(f[0]) + '</small><b>' + esc(f[1]) + '</b></span>').join('');
     const swatches = q.palette.map((s) =>
       '<div class="wc-sw"><b data-css="background:' + esc(s.hex) + '"></b><span class="mono">' + esc(s.name || '') + ' · ' + esc(String(s.hex || '').toUpperCase()) + '</span></div>').join('');
-    const apps = (q.gallery.length ? q.gallery : [null, null, null]).slice(0, 6).map((g, i) => {
+    const apps = (media.length ? media : [null, null, null]).slice(0, 8).map((g, i) => {
       if (g && g.url) return '<figure class="wc-shot"><img src="' + esc(g.url) + '" alt="" loading="lazy">' + (g.caption ? '<figcaption class="mono">' + esc(g.caption) + '</figcaption>' : '') + '</figure>';
       const variants = ['wc-shot--ink', 'wc-shot--accent', 'wc-shot--paper'];
       const letter = (String(q.title || '').trim()[0]) || '·';
@@ -83,17 +121,17 @@
     viewEl.innerHTML =
       '<button class="wc-back mono" id="wcBack"><i class="fa-solid fa-arrow-left-long"></i> ' + esc(dT('work.back', 'All work')) + '</button>'
       + '<header class="wc-hero" data-css="--accent:' + esc(q.accent) + '">'
-      +   (q.cover ? '<img class="wc-hero-img" src="' + esc(q.cover) + '" alt="">' : '')
+      +   (media[0] ? '<img class="wc-hero-img" src="' + esc(media[0].url) + '" alt="">' : '')
       +   '<div class="wc-hero-inner">'
       +     '<span class="mono wc-hero-tag">' + esc(q.tag || '') + ' · ' + esc(p.year || '') + '</span>'
       +     '<h2 class="wc-hero-title">' + esc(q.title) + '</h2>'
       +     '<span class="mono wc-hero-meta">' + esc([q.client ? (dT('work.client', 'Client') + ': ' + q.client) : '', q.role].filter(Boolean).join('  ·  ')) + '</span>'
       +   '</div>'
       + '</header>'
-      + (has(q.summary) ? '<section class="wc-brief"><span class="mono wc-rh">01 — ' + esc(dT('work.brief', 'The brief')) + '</span><p>' + esc(q.summary) + '</p></section>' : '')
+      + '<section class="wc-brief wc-case-grid"><div><span class="mono wc-rh">01 — ' + esc(dT('work.brief', 'The brief')) + '</span>' + (has(q.summary) ? '<p>' + esc(q.summary) + '</p>' : '<p>' + esc(dT('work.nomedia', 'The project details are being prepared.')) + '</p>') + '</div>' + (facts ? '<aside class="wc-facts">' + facts + '</aside>' : '') + '</section>'
       + (q.palette.length ? '<section class="wc-block"><span class="mono wc-rh">02 — ' + esc(dT('work.palette', 'Palette')) + '</span><div class="wc-swatches">' + swatches + '</div></section>' : '')
       + (has(q.body) ? '<section class="wc-block wc-story"><span class="mono wc-rh">03 — ' + esc(dT('work.story', 'The work')) + '</span><div class="wc-body">' + paras(q.body).map((t) => '<p>' + esc(t) + '</p>').join('') + '</div></section>' : '')
-      + '<section class="wc-block"><span class="mono wc-rh">04 — ' + esc(dT('work.inuse', 'In use')) + '</span><div class="wc-shots">' + apps + '</div></section>'
+      + '<section class="wc-block"><span class="mono wc-rh">04 — ' + esc(dT('work.inuse', 'In use')) + '</span><div class="wc-shots wc-shots--rich">' + apps + '</div></section>'
       + (nq ? '<a class="wc-next" href="' + esc(workBase() + '/' + (next.slug || next.id)) + '" data-id="' + esc(next.id) + '" data-css="--accent:' + esc(nq.accent) + '"><span class="mono">' + esc(dT('work.next', 'Next project')) + '</span><span class="wc-next-title">' + esc(nq.title) + ' <i class="fa-solid fa-arrow-right"></i></span></a>' : '');
 
     indexEl.hidden = true;
