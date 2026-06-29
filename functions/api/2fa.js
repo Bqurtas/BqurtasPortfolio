@@ -61,7 +61,7 @@ function emailRecipient(env, choice) {
   return {
     key,
     email: key === 'backup' ? backup : primary,
-    formKey: key === 'backup' && env.WEB3FORMS_BACKUP_KEY ? env.WEB3FORMS_BACKUP_KEY : (env.WEB3FORMS_KEY || '6396c177-b988-43d0-ac42-5c398151cde9')
+    formKey: key === 'backup' && env.WEB3FORMS_BACKUP_KEY ? env.WEB3FORMS_BACKUP_KEY : (env.WEB3FORMS_KEY || 'cd575d52-8847-4286-af53-efa296c04686')
   };
 }
 
