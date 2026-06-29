@@ -2046,6 +2046,53 @@ window.I18N_EXTRA_LOCALIZE320 = {
   }
 };
 Object.keys(window.I18N_EXTRA_LOCALIZE320).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_LOCALIZE320[l]); });
+
+/* ===== v324 — richer Brand Board room copy ===== */
+window.I18N_EXTRA_BRANDBOARD324 = {
+  en:{
+    "rh.bb.sub":"A full starter studio for name, logo direction, colour, type, voice and launch rules.",
+    "bb.label":"Brand Studio","bb.title":"Build a <em>brand system</em>.","bb.lede":"Shape a working board for your business: name, promise, logo direction, palette, type, voice, mockups and launch checklist.",
+    "d.bb.eye":"Brand Studio","d.bb.title":"Build a brand system.","d.bb.sub":"A richer board for business owners: logo direction, colours, fonts, voice, mockups and launch rules.","d.bb.go":"Open the studio",
+    "menu.note.brandboard":"Branding studio with logo, colour, type and launch direction"
+  },
+  ku:{
+    "rh.bb.sub":"ستۆدیۆیەکی دەستپێکی تەواو بۆ ناو، ئاراستەی لۆگۆ، ڕەنگ، فۆنت، دەنگ و یاسای دەستپێکردن.",
+    "bb.label":"ستۆدیۆی براند","bb.title":"سیستەمی <em>براند</em> دروست بکە.","bb.lede":"تابلۆیەکی کارا بۆ پیشەکەت: ناو، بەڵێن، ئاراستەی لۆگۆ، پاڵێت، فۆنت، دەنگ، پێشبینین و لیستی دەستپێکردن.",
+    "d.bb.eye":"ستۆدیۆی براند","d.bb.title":"سیستەمی براند دروست بکە.","d.bb.sub":"تابلۆیەکی دەوڵەمەندتر بۆ خاوەن پیشەکان: ئاراستەی لۆگۆ، ڕەنگ، فۆنت، دەنگ، پێشبینین و یاسای دەستپێکردن.","d.bb.go":"کردنەوەی ستۆدیۆ",
+    "menu.note.brandboard":"ستۆدیۆی براندینگ لەگەڵ لۆگۆ، ڕەنگ، فۆنت و ئاراستەی دەستپێکردن"
+  },
+  kmr:{
+    "rh.bb.sub":"Studyo yekî tevahî yê destpêkê ji bo nav, arasteya logo, reng, font, deng û rêbazên destpêkê.",
+    "bb.label":"Studyo ya Brandê","bb.title":"Sîstema <em>brandê</em> ava bike.","bb.lede":"Tabloyek karbar ji bo karê te: nav, soz, arasteya logo, palet, font, deng, mockup û lîsteya destpêkê.",
+    "d.bb.eye":"Studyo ya Brandê","d.bb.title":"Sîstema brandê ava bike.","d.bb.sub":"Tabloyek dewlemendtir ji bo xwediyên kar: arasteya logo, reng, font, deng, mockup û rêbazên destpêkê.","d.bb.go":"Studyo veke",
+    "menu.note.brandboard":"Studyo ya brandingê bi logo, reng, font û arasteya destpêkê"
+  },
+  ar:{
+    "rh.bb.sub":"استوديو بداية كامل للاسم، اتجاه الشعار، اللون، الخط، الصوت وقواعد الإطلاق.",
+    "bb.label":"استوديو العلامة","bb.title":"ابن <em>نظام علامة</em>.","bb.lede":"لوحة عملية لعملك: الاسم، الوعد، اتجاه الشعار، الألوان، الخط، الصوت، النماذج وقائمة الإطلاق.",
+    "d.bb.eye":"استوديو العلامة","d.bb.title":"ابن نظام علامة.","d.bb.sub":"لوحة أغنى لأصحاب الأعمال: اتجاه الشعار، الألوان، الخطوط، الصوت، النماذج وقواعد الإطلاق.","d.bb.go":"افتح الاستوديو",
+    "menu.note.brandboard":"استوديو للعلامة مع الشعار واللون والخط واتجاه الإطلاق"
+  },
+  fr:{
+    "rh.bb.sub":"Un studio de départ complet pour nom, direction logo, couleur, typo, voix et règles de lancement.",
+    "bb.label":"Studio de marque","bb.title":"Construisez un <em>système de marque</em>.","bb.lede":"Une planche utile pour votre activité : nom, promesse, direction logo, palette, typo, voix, maquettes et checklist.",
+    "d.bb.eye":"Studio de marque","d.bb.title":"Construisez un système de marque.","d.bb.sub":"Une planche plus riche pour les entrepreneurs : logo, couleurs, polices, voix, maquettes et règles de lancement.","d.bb.go":"Ouvrir le studio",
+    "menu.note.brandboard":"Studio de marque avec logo, couleur, typo et direction de lancement"
+  },
+  tr:{
+    "rh.bb.sub":"İsim, logo yönü, renk, yazı, ses ve lansman kuralları için tam bir başlangıç stüdyosu.",
+    "bb.label":"Marka Stüdyosu","bb.title":"Bir <em>marka sistemi</em> kurun.","bb.lede":"İşiniz için çalışan pano: isim, vaat, logo yönü, palet, yazı, ses, maketler ve lansman listesi.",
+    "d.bb.eye":"Marka Stüdyosu","d.bb.title":"Bir marka sistemi kurun.","d.bb.sub":"İş sahipleri için daha zengin pano: logo yönü, renkler, yazılar, ses, maketler ve lansman kuralları.","d.bb.go":"Stüdyoyu aç",
+    "menu.note.brandboard":"Logo, renk, yazı ve lansman yönü olan marka stüdyosu"
+  },
+  sv:{
+    "rh.bb.sub":"En komplett startstudio för namn, logoriktning, färg, typografi, röst och lanseringsregler.",
+    "bb.label":"Varumärkesstudio","bb.title":"Bygg ett <em>varumärkessystem</em>.","bb.lede":"En fungerande tavla för din verksamhet: namn, löfte, logoriktning, palett, typografi, röst, mockups och checklista.",
+    "d.bb.eye":"Varumärkesstudio","d.bb.title":"Bygg ett varumärkessystem.","d.bb.sub":"En rikare tavla för företagare: logoriktning, färger, typsnitt, röst, mockups och lanseringsregler.","d.bb.go":"Öppna studion",
+    "menu.note.brandboard":"Varumärkesstudio med logo, färg, typografi och lanseringsriktning"
+  }
+};
+Object.keys(window.I18N_EXTRA_BRANDBOARD324).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_BRANDBOARD324[l]); });
 if (window.TAB_META_I18N) {
   var BQ_AI_TAB_TITLES = { ku:'زیرەکی', kmr:'Aqil', ar:'ذكاء', fr:'IA', tr:'YZ', sv:'Artificiell intelligens' };
   Object.keys(BQ_AI_TAB_TITLES).forEach(function(l){
