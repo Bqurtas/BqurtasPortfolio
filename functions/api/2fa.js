@@ -1,7 +1,9 @@
 /* Two-factor login for the studio console. Two ways to turn it on:
 
    FREE — emailed code (recommended, no app needed):
-     Variables → TWOFA_EMAIL = hello@bqurtas.com. A 6-digit code is emailed there
+     Default recipient is hello@bqurtas.com. Optional backup recipient is selected
+     by the dashboard without exposing the address in the UI. For a separate
+     Web3Forms inbox, set WEB3FORMS_BACKUP_KEY to an access key for that inbox.
      using the SAME free Web3Forms key the contact form already uses (no new
      service, no secret). Needs the D1 binding (DB). Optional: WEB3FORMS_KEY to
      override the key.
@@ -52,6 +54,16 @@ async function totpValid(secret, code) {
 
 async function ensure(DB) { await DB.prepare('CREATE TABLE IF NOT EXISTS twofa (id TEXT PRIMARY KEY, code TEXT, exp INTEGER, tries INTEGER DEFAULT 0)').run(); }
 async function sha(s) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+function emailRecipient(env, choice) {
+  const key = String(choice || 'primary').toLowerCase() === 'backup' ? 'backup' : 'primary';
+  const primary = String(env.TWOFA_EMAIL_PRIMARY || 'Hello@bqurtas.com').trim();
+  const backup = String(env.TWOFA_EMAIL_BACKUP || env.TWOFA_BACKUP_EMAIL || 'Bqurtas@gmail.com').trim();
+  return {
+    key,
+    email: key === 'backup' ? backup : primary,
+    formKey: key === 'backup' && env.WEB3FORMS_BACKUP_KEY ? env.WEB3FORMS_BACKUP_KEY : (env.WEB3FORMS_KEY || '6396c177-b988-43d0-ac42-5c398151cde9')
+  };
+}
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -60,7 +72,7 @@ export async function onRequestPost(context) {
   if (String(body.pin || '') !== String(env.DASH_PIN || '107502')) return json({ ok: false, error: 'bad-pin' }, 401);
 
   const hasTOTP = !!env.TOTP_SECRET;
-  const hasEmail = !!env.TWOFA_EMAIL;   // set TWOFA_EMAIL=hello@bqurtas.com → emailed codes (free)
+  const hasEmail = String(env.TWOFA_EMAIL_DISABLED || '').trim() !== '1';
   const hasInfobip = env.INFOBIP_API_KEY && env.INFOBIP_BASE_URL && env.INFOBIP_FROM;
   const hasTwilio = env.TWILIO_SID && env.TWILIO_TOKEN && env.TWILIO_FROM;
   const hasSMS = hasInfobip || hasTwilio;
@@ -76,20 +88,27 @@ export async function onRequestPost(context) {
     const id = crypto.randomUUID();
     await env.DB.prepare('INSERT INTO twofa (id,code,exp,tries) VALUES (?,?,?,0)').bind(id, await sha(code), Date.now() + 5 * 60 * 1000).run();
 
-    /* EMAIL (free) — reuses the same Web3Forms key the contact form uses, which
-       delivers to hello@bqurtas.com. Only TWOFA_EMAIL needs to be set. */
+    /* EMAIL (free) — addresses are chosen server-side, so the dashboard can show
+       "Primary" / "Backup" without exposing the real inboxes in the UI. */
     if (hasEmail) {
-      const KEY = env.WEB3FORMS_KEY || '6396c177-b988-43d0-ac42-5c398151cde9';
+      const recipient = emailRecipient(env, body.recipient);
       let er;
       try {
         er = await fetch('https://api.web3forms.com/submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ access_key: KEY, subject: 'Pencemor Studio — login code ' + code, from_name: 'Pencemor Studio', email: env.TWOFA_EMAIL, message: 'Your studio login code is ' + code + '.\n\nIt expires in 5 minutes. If this wasn’t you, you can ignore this email.' })
+          body: JSON.stringify({
+            access_key: recipient.formKey,
+            subject: 'Pencemor Studio — login code ' + code,
+            from_name: 'Pencemor Studio',
+            email: recipient.email,
+            replyto: recipient.email,
+            message: 'Your studio login code is ' + code + '.\n\nIt expires in 5 minutes. If this wasn’t you, you can ignore this email.'
+          })
         });
       } catch (e) { return json({ ok: false, error: 'email-failed' }); }
       if (!er.ok) { const ed = await er.text(); return json({ ok: false, error: 'email-failed', detail: ed.slice(0, 160) }); }
-      return json({ ok: true, id, via: 'email' });
+      return json({ ok: true, id, via: 'email', recipient: recipient.key });
     }
 
     const to = env.OWNER_PHONE || '+9647517884985';

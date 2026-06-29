@@ -795,7 +795,7 @@
     /* ---- Dashboard translations (follows the site language) ---- */
     const DASH_I18N = {
       en: { overview:'Overview', visitors:'Visitors', works:'Works', latest:'Latest', leads:'Leads', profile:'Profile', settings:'Settings', content:'Content', cases:'Projects', assistant:'Assistant',
-        gateTitle:'Enter access code', gatePrivate:'This console is private.', gatePh:'Access code', unlock:'Unlock', wrong:'✗ Wrong access code.', twoTitle:'Enter the SMS code', twoNote:'We texted a 6-digit code to your phone.', twoPh:'6-digit code', twoWrong:'✗ Wrong or expired code.', twoSending:'Sending code…', twoSetupBtn:'Set up 2FA (authenticator)', twoSetup1:'1) In Cloudflare set TOTP_SECRET to this (then Retry deployment):', twoSetup2:'2) Add the same key to Google Authenticator (manual entry: "Pencemor Studio"). Tap the key to copy.', twoSetupLink:'open in app',
+        gateTitle:'Enter access code', gatePrivate:'This console is private.', gatePh:'Access code', unlock:'Unlock', wrong:'✗ Wrong access code.', twoTitle:'Enter the email code', twoNote:'A 6-digit code was emailed to the selected inbox. Check spam too.', twoChoose:'Send code to', twoPrimary:'Primary inbox', twoBackup:'Backup inbox', twoPh:'6-digit code', twoWrong:'✗ Wrong or expired code.', twoSending:'Sending code…', twoSetupBtn:'Set up 2FA (authenticator)', twoSetup1:'1) In Cloudflare set TOTP_SECRET to this (then Retry deployment):', twoSetup2:'2) Add the same key to Google Authenticator (manual entry: "Pencemor Studio"). Tap the key to copy.', twoSetupLink:'open in app',
         oTotal:'Total works', oColl:'Collections', oLeads:'Leads stored', oLangs:'Languages', oBlogs:'Blog posts', oAdmins:'Admins', oWelcome:'Welcome back — your studio console is private to you; data lives in this browser.',
         lEmpty:'No leads yet. Pitches from the Contact form appear here.', lClear:'Clear all leads', lConfirm:'Delete all stored leads?',
         pName:'Name', pTitle:'Title / role', pAvatar:'Avatar URL', pSave:'Save profile', pSaved:'✓ Saved', pNote:'Adding more admins needs a backend login system — that arrives with the content manager. For now this profile is yours, kept privately in this browser.',
@@ -804,7 +804,7 @@
         tAi:'AI', tLang:'Language', tTheme:'Theme', tAddAdmin:'Add admin', tLogout:'Log out', tClose:'Close',
         admYou:'Owner', admName:'Name', admEmail:'Email', admRole:'Role', admAdd:'Add admin', admEmpty:'No additional admins yet.', admRemove:'Remove', admNote:'Shared login across devices needs the backend login system; for now these admins are saved privately in this browser.', logoutAsk:'Log out of the console?' },
       ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', latest:'نوێترین', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن', content:'ناوەڕۆک', cases:'پڕۆژەکان', assistant:'یاریدەدەر',
-        gateTitle:'کۆدی چوونەژوورەوە بنووسە', gatePrivate:'ئەم کۆنسۆڵە تایبەتە.', gatePh:'کۆدی چوونەژوورەوە', unlock:'کردنەوە', wrong:'✗ کۆدەکە هەڵەیە.', twoTitle:'کۆدی SMS بنووسە', twoNote:'کۆدێکی ٦ ژمارەیی نێردرا بۆ مۆبایلەکەت.', twoPh:'کۆدی ٦ ژمارەیی', twoWrong:'✗ کۆد هەڵەیە یان بەسەرچووە.', twoSending:'ناردنی کۆد…', twoSetupBtn:'ڕێکخستنی 2FA (ئەپی ئۆتێنتیکەیتەر)', twoSetup1:'١) لە Cloudflare، TOTP_SECRET بکە بەمە (پاشان Retry deployment):', twoSetup2:'٢) هەمان کلیل بخە ناو Google Authenticator (داخڵکردنی دەستی: «Pencemor Studio»). کلیک لە کلیلەکە بکە بۆ کۆپی.', twoSetupLink:'لە ئەپ بیکەرەوە',
+        gateTitle:'کۆدی چوونەژوورەوە بنووسە', gatePrivate:'ئەم کۆنسۆڵە تایبەتە.', gatePh:'کۆدی چوونەژوورەوە', unlock:'کردنەوە', wrong:'✗ کۆدەکە هەڵەیە.', twoTitle:'کۆدی ئیمێڵ بنووسە', twoNote:'کۆدێکی ٦ ژمارەیی بۆ سندووقی هەڵبژێردراو نێردرا. سپامیش بپشکنە.', twoChoose:'کۆد بنێرە بۆ', twoPrimary:'سندووقی سەرەکی', twoBackup:'سندووقی یەدەک', twoPh:'کۆدی ٦ ژمارەیی', twoWrong:'✗ کۆد هەڵەیە یان بەسەرچووە.', twoSending:'ناردنی کۆد…', twoSetupBtn:'ڕێکخستنی 2FA (ئەپی ئۆتێنتیکەیتەر)', twoSetup1:'١) لە Cloudflare، TOTP_SECRET بکە بەمە (پاشان Retry deployment):', twoSetup2:'٢) هەمان کلیل بخە ناو Google Authenticator (داخڵکردنی دەستی: «Pencemor Studio»). کلیک لە کلیلەکە بکە بۆ کۆپی.', twoSetupLink:'لە ئەپ بیکەرەوە',
         oTotal:'کۆی کارەکان', oColl:'کۆکراوەکان', oLeads:'داواکاری هەڵگیراو', oLangs:'زمانەکان', oBlogs:'بابەتی بلۆگ', oAdmins:'بەڕێوەبەران', oWelcome:'بەخێربێیتەوە — کۆنسۆڵی ستۆدیۆ تەنها بۆ تۆیە؛ زانیارییەکان لەم وێبگەڕەدا دەمێننەوە.',
         lEmpty:'هێشتا داواکاری نییە. پرۆژەکانی فۆڕمی پەیوەندی لێرە دەردەکەون.', lClear:'سڕینەوەی هەموو داواکارییەکان', lConfirm:'هەموو داواکارییە هەڵگیراوەکان بسڕێتەوە؟',
         pName:'ناو', pTitle:'پلە / ڕۆڵ', pAvatar:'بەستەری وێنە', pSave:'پاشەکەوتکردنی پرۆفایل', pSaved:'✓ پاشەکەوتکرا', pNote:'زیادکردنی ئەدمینی زیاتر پێویستی بە سیستەمی چوونەژوورەوەی سێرڤەر هەیە — لەگەڵ بەڕێوەبەری ناوەڕۆکدا دێت. ئێستا ئەم پرۆفایلە هی تۆیە، بە تایبەتی لەم وێبگەڕەدا پارێزراوە.',
@@ -813,7 +813,7 @@
         tAi:'AI', tLang:'زمان', tTheme:'ڕووکار', tAddAdmin:'زیادکردنی ئەدمین', tLogout:'چوونەدەرەوە', tClose:'داخستن',
         admYou:'خاوەن', admName:'ناو', admEmail:'ئیمەیل', admRole:'ڕۆڵ', admAdd:'زیادکردنی ئەدمین', admEmpty:'هێشتا ئەدمینی زیاتر نییە.', admRemove:'لابردن', admNote:'چوونەژوورەوەی هاوبەش لەنێوان ئامێرەکان پێویستی بە سیستەمی سێرڤەرە؛ ئێستا ئەم ئەدمینانە بە تایبەتی لەم وێبگەڕەدا هەڵگیراون.', logoutAsk:'لە کۆنسۆڵ بچیتە دەرەوە؟' },
       ar: { overview:'نظرة عامة', visitors:'الزوار', works:'الأعمال', leads:'الطلبات', profile:'الملف', settings:'الإعدادات', content:'المحتوى', cases:'المشاريع', assistant:'المساعد',
-        gateTitle:'أدخل رمز الدخول', gatePrivate:'هذه اللوحة خاصة.', gatePh:'رمز الدخول', unlock:'فتح', wrong:'✗ رمز خاطئ.', twoTitle:'أدخل رمز الرسالة', twoNote:'أرسلنا رمزاً من ٦ أرقام إلى هاتفك.', twoPh:'رمز من ٦ أرقام', twoWrong:'✗ رمز خاطئ أو منتهٍ.', twoSending:'جار إرسال الرمز…', twoSetupBtn:'إعداد 2FA (تطبيق المصادقة)', twoSetup1:'١) في Cloudflare اضبط TOTP_SECRET على هذا (ثم Retry deployment):', twoSetup2:'٢) أضف نفس المفتاح إلى Google Authenticator (إدخال يدوي: «Pencemor Studio»). انقر المفتاح للنسخ.', twoSetupLink:'افتح في التطبيق',
+        gateTitle:'أدخل رمز الدخول', gatePrivate:'هذه اللوحة خاصة.', gatePh:'رمز الدخول', unlock:'فتح', wrong:'✗ رمز خاطئ.', twoTitle:'أدخل رمز البريد', twoNote:'تم إرسال رمز من ٦ أرقام إلى الصندوق المختار. افحص البريد المزعج أيضاً.', twoChoose:'أرسل الرمز إلى', twoPrimary:'الصندوق الأساسي', twoBackup:'الصندوق الاحتياطي', twoPh:'رمز من ٦ أرقام', twoWrong:'✗ رمز خاطئ أو منتهٍ.', twoSending:'جار إرسال الرمز…', twoSetupBtn:'إعداد 2FA (تطبيق المصادقة)', twoSetup1:'١) في Cloudflare اضبط TOTP_SECRET على هذا (ثم Retry deployment):', twoSetup2:'٢) أضف نفس المفتاح إلى Google Authenticator (إدخال يدوي: «Pencemor Studio»). انقر المفتاح للنسخ.', twoSetupLink:'افتح في التطبيق',
         oTotal:'إجمالي الأعمال', oColl:'المجموعات', oLeads:'الطلبات المحفوظة', oLangs:'اللغات', oWelcome:'أهلاً بعودتك — لوحة الاستوديو خاصة بك؛ البيانات تبقى في هذا المتصفح.',
         lEmpty:'لا طلبات بعد. تظهر هنا مشاريع نموذج التواصل.', lClear:'مسح كل الطلبات', lConfirm:'حذف كل الطلبات المحفوظة؟',
         pName:'الاسم', pTitle:'اللقب / الدور', pAvatar:'رابط الصورة', pSave:'حفظ الملف', pSaved:'✓ تم الحفظ', pNote:'إضافة مزيد من المشرفين تتطلب نظام تسجيل دخول خلفي — يأتي مع مدير المحتوى. حالياً هذا الملف خاص بك، محفوظ في هذا المتصفح.',
@@ -822,7 +822,7 @@
         tAi:'AI', tLang:'اللغة', tTheme:'المظهر', tAddAdmin:'إضافة مشرف', tLogout:'تسجيل الخروج', tClose:'إغلاق',
         admYou:'المالك', admName:'الاسم', admEmail:'البريد', admRole:'الدور', admAdd:'إضافة مشرف', admEmpty:'لا مشرفين إضافيين بعد.', admRemove:'إزالة', admNote:'تسجيل الدخول المشترك بين الأجهزة يحتاج نظام الخادم؛ حالياً هؤلاء المشرفون محفوظون في هذا المتصفح فقط.', logoutAsk:'تسجيل الخروج من اللوحة؟' },
       kmr: { overview:'Giştî', visitors:'Mêvan', works:'Kar', leads:'Daxwaz', profile:'Profîl', settings:'Mîheng', content:'Naverok', cases:'Proje', assistant:'Alîkar',
-        gateTitle:'Koda gihiştinê binivîse', gatePrivate:'Ev konsol taybet e.', gatePh:'Koda gihiştinê', unlock:'Veke', wrong:'✗ Koda çewt.', twoTitle:'Koda SMSê binivîse', twoNote:'Me koda 6-hejmarî şand telefona te.', twoPh:'Koda 6-hejmarî', twoWrong:'✗ Koda çewt an qediyayî.', twoSending:'Kod tê şandin…', twoSetupBtn:'Sazkirina 2FA (sepana erêkirinê)', twoSetup1:'1) Li Cloudflare TOTP_SECRET wiha saz bike (paşê Retry deployment):', twoSetup2:'2) Heman mifte têxe Google Authenticator (têketina destî: "Pencemor Studio"). Li mifte bitikîne ji bo kopî.', twoSetupLink:'di sepanê de veke',
+        gateTitle:'Koda gihiştinê binivîse', gatePrivate:'Ev konsol taybet e.', gatePh:'Koda gihiştinê', unlock:'Veke', wrong:'✗ Koda çewt.', twoTitle:'Koda e-nameyê binivîse', twoNote:'Koda 6-hejmarî ji qutiya hilbijartî re hate şandin. Spam jî kontrol bike.', twoChoose:'Kodê bişîne bo', twoPrimary:'Qutiya sereke', twoBackup:'Qutiya piştgir', twoPh:'Koda 6-hejmarî', twoWrong:'✗ Koda çewt an qediyayî.', twoSending:'Kod tê şandin…', twoSetupBtn:'Sazkirina 2FA (sepana erêkirinê)', twoSetup1:'1) Li Cloudflare TOTP_SECRET wiha saz bike (paşê Retry deployment):', twoSetup2:'2) Heman mifte têxe Google Authenticator (têketina destî: "Pencemor Studio"). Li mifte bitikîne ji bo kopî.', twoSetupLink:'di sepanê de veke',
         oTotal:'Tevahiya karan', oColl:'Berhevok', oLeads:'Daxwazên tomarkirî', oLangs:'Ziman', oWelcome:'Bi xêr hatî — konsola studyoyê taybet e ji te re; dane di vê gerokê de dimînin.',
         lEmpty:'Hêj daxwaz tune. Pêşniyarên forma têkiliyê li vir xuya dibin.', lClear:'Hemû daxwazan paqij bike', lConfirm:'Hemû daxwazên tomarkirî werin jêbirin?',
         pName:'Nav', pTitle:'Sernav / rol', pAvatar:'Girêdana wêneyê', pSave:'Profîlê tomar bike', pSaved:'✓ Tomar bû', pNote:'Zêdekirina admînên din pêdivî bi sîstema têketinê ya backend heye — ew bi rêveberê naverokê re tê. Niha ev profîl ya te ye, bi taybetî di vê gerokê de tê parastin.',
@@ -831,7 +831,7 @@
         tAi:'AI', tLang:'Ziman', tTheme:'Tema', tAddAdmin:'Admîn zêde bike', tLogout:'Derkeve', tClose:'Bigire',
         admYou:'Xwedî', admName:'Nav', admEmail:'E-name', admRole:'Rol', admAdd:'Admîn zêde bike', admEmpty:'Hêj admînên din tune.', admRemove:'Rake', admNote:'Têketina hevpar a di navbera amûran de pêdivî bi sîstema backend heye; niha ev admîn bi taybetî di vê gerokê de tên parastin.', logoutAsk:'Ji konsolê derkevî?' },
       fr: { overview:'Aperçu', visitors:'Visiteurs', works:'Travaux', leads:'Demandes', profile:'Profil', settings:'Réglages', content:'Contenu', cases:'Projets', assistant:'Assistant',
-        gateTitle:"Entrez le code d'accès", gatePrivate:'Cette console est privée.', gatePh:"Code d'accès", unlock:'Déverrouiller', wrong:'✗ Code incorrect.', twoTitle:'Entrez le code SMS', twoNote:'Un code à 6 chiffres a été envoyé à votre téléphone.', twoPh:'Code à 6 chiffres', twoWrong:'✗ Code incorrect ou expiré.', twoSending:'Envoi du code…', twoSetupBtn:'Configurer la 2FA (authentification)', twoSetup1:'1) Dans Cloudflare, définissez TOTP_SECRET sur ceci (puis Retry deployment) :', twoSetup2:'2) Ajoutez la même clé à Google Authenticator (saisie manuelle : « Pencemor Studio »). Cliquez la clé pour copier.', twoSetupLink:'ouvrir dans l’app',
+        gateTitle:"Entrez le code d'accès", gatePrivate:'Cette console est privée.', gatePh:"Code d'accès", unlock:'Déverrouiller', wrong:'✗ Code incorrect.', twoTitle:'Entrez le code e-mail', twoNote:'Un code à 6 chiffres a été envoyé à la boîte choisie. Vérifiez aussi les spams.', twoChoose:'Envoyer le code à', twoPrimary:'Boîte principale', twoBackup:'Boîte de secours', twoPh:'Code à 6 chiffres', twoWrong:'✗ Code incorrect ou expiré.', twoSending:'Envoi du code…', twoSetupBtn:'Configurer la 2FA (authentification)', twoSetup1:'1) Dans Cloudflare, définissez TOTP_SECRET sur ceci (puis Retry deployment) :', twoSetup2:'2) Ajoutez la même clé à Google Authenticator (saisie manuelle : « Pencemor Studio »). Cliquez la clé pour copier.', twoSetupLink:'ouvrir dans l’app',
         oTotal:'Total des travaux', oColl:'Collections', oLeads:'Demandes enregistrées', oLangs:'Langues', oWelcome:'Bon retour — votre console studio est privée ; les données restent dans ce navigateur.',
         lEmpty:'Aucune demande pour l’instant. Les projets du formulaire de contact apparaissent ici.', lClear:'Effacer toutes les demandes', lConfirm:'Supprimer toutes les demandes enregistrées ?',
         pName:'Nom', pTitle:'Titre / rôle', pAvatar:"URL de l'avatar", pSave:'Enregistrer le profil', pSaved:'✓ Enregistré', pNote:'Ajouter d’autres admins nécessite un système de connexion backend — il arrive avec le gestionnaire de contenu. Pour l’instant ce profil est le vôtre, gardé dans ce navigateur.',
@@ -850,6 +850,32 @@
     const DT = (k) => (DASH_I18N[curLang()][k] ?? DASH_I18N.en[k] ?? k);
     const LANG_LABELS = { en: 'English', ku: 'کوردیی سۆرانی', kmr: 'Kurmancî', ar: 'العربية', fr: 'Français', tr: 'Türkçe', sv: 'Svenska' };
     const curSiteLang = () => document.documentElement.getAttribute('lang') || document.documentElement.dataset.lang || 'en';
+    const selected2FARecipient = () => $('#dash2faChoice input[name="dashCodeTarget"]:checked')?.value || 'primary';
+    const ensure2FAChoice = () => {
+      const form = $('#dashLoginForm');
+      if (!form) return;
+      const current = selected2FARecipient();
+      let box = $('#dash2faChoice');
+      if (!box) {
+        box = document.createElement('div');
+        box.className = 'dash-code-choice';
+        box.id = 'dash2faChoice';
+        form.insertAdjacentElement('afterend', box);
+      }
+      box.hidden = !!twoFAId;
+      box.innerHTML = `
+        <span class="mono">${DT('twoChoose')}</span>
+        <div class="dash-code-options" role="radiogroup" aria-label="${DT('twoChoose')}">
+          <label class="dash-code-option">
+            <input type="radio" name="dashCodeTarget" value="primary" ${current === 'backup' ? '' : 'checked'}>
+            <span><i class="fa-solid fa-inbox"></i> ${DT('twoPrimary')}</span>
+          </label>
+          <label class="dash-code-option">
+            <input type="radio" name="dashCodeTarget" value="backup" ${current === 'backup' ? 'checked' : ''}>
+            <span><i class="fa-solid fa-shield-halved"></i> ${DT('twoBackup')}</span>
+          </label>
+        </div>`;
+    };
     const localizeChrome = () => {
       $$('.dash-tab').forEach(t => { const ic = t.querySelector('i'); t.innerHTML = (ic ? ic.outerHTML + ' ' : '') + DT(t.dataset.dash); });
       const g = $('#dashGate'); if (g) {
@@ -857,6 +883,7 @@
         const p = g.querySelector('p.mono'); if (p) p.textContent = DT('gatePrivate');
         const k = $('#dashKey'); if (k) k.placeholder = DT('gatePh');
         const b = g.querySelector('button[type="submit"]'); if (b) b.innerHTML = DT('unlock') + ' <i class="fa-solid fa-arrow-right"></i>';
+        ensure2FAChoice();
       }
       // sidebar tool labels + language indicator
       const tl = (id, k) => { const b = $(id); const s = b && b.querySelector('span'); if (s) s.textContent = DT(k); };
@@ -897,7 +924,8 @@
     const enter2FA = () => {
       const g = $('#dashGate'); if (!g) return;
       const h = g.querySelector('h3'); if (h) h.textContent = DT('twoTitle');
-      const p = g.querySelector('p.mono'); if (p) p.textContent = (twoFAVia === 'email') ? 'کۆدی ٦ ژمارەیی نێردرا بۆ ئیمێڵەکەت / A 6-digit code was emailed to you (check spam too).' : DT('twoNote');
+      const p = g.querySelector('p.mono'); if (p) p.textContent = DT('twoNote');
+      ensure2FAChoice();
       const k = $('#dashKey'); if (k) { k.value = ''; k.placeholder = DT('twoPh'); setTimeout(() => k.focus(), 50); }
       hint.textContent = '';
     };
@@ -914,7 +942,7 @@
       // step 1 — the access code
       if (val === currentPin()) {
         hint.textContent = DT('twoSending');
-        fetch('/api/2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: KEY, action: 'send' }) })
+        fetch('/api/2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: KEY, action: 'send', recipient: selected2FARecipient() }) })
           .then(r => r.json()).then(d => { if (d.ok && d.id) { twoFAId = d.id; twoFAVia = d.via || null; enter2FA(); } else { doUnlock(); } })  // not-configured / offline → PIN-only
           .catch(() => doUnlock());
       } else {

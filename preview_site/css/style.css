@@ -3466,6 +3466,16 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
 .dash-login input { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 12px 20px; font-size: 14px; color: var(--ink); outline: none; min-width: 200px; }
 .dash-login input:focus { border-color: var(--gold); }
 .dash-login button { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; background: var(--gold-bright); color: var(--bg); border-radius: 999px; font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; }
+.dash-code-choice { width: min(390px, 100%); margin-top: 2px; display: flex; flex-direction: column; gap: 9px; }
+.dash-code-choice > .mono { font-size: 9px; letter-spacing: 0.14em; color: var(--ink-muted); text-transform: uppercase; }
+.dash-code-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dash-code-option { cursor: pointer; }
+.dash-code-option input { position: absolute; opacity: 0; pointer-events: none; }
+.dash-code-option span { min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 999px; background: color-mix(in srgb, var(--ink) 3%, transparent); color: var(--ink-muted); font-size: 12px; font-weight: 650; transition: border-color 0.22s var(--ease), background 0.22s var(--ease), color 0.22s var(--ease), transform 0.22s var(--ease); }
+.dash-code-option i { font-size: 12px; color: currentColor; }
+.dash-code-option:hover span { border-color: color-mix(in srgb, var(--gold) 55%, var(--line)); color: var(--ink); transform: translateY(-1px); }
+.dash-code-option input:checked + span { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.dash-code-choice[hidden] { display: none !important; }
 .dash-hint { color: var(--ember) !important; font-size: 11px; min-height: 14px; }
 
 .dash-main { flex: 1; display: flex; min-height: 0; }
