@@ -10006,7 +10006,8 @@ body::before{
    v328 — Selected Work and Projects dashboard: real-image case studies.
    ========================================================= */
 .work-index{
-  grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)) !important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),300px)) !important;
+  justify-content:center !important;
   gap:clamp(14px,2vw,22px) !important;
   max-width:980px !important;
 }
