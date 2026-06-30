@@ -131,12 +131,10 @@
       setTimeout(bqToTop, 80);
       setTimeout(bqToTop, 280);
     };
-    /* bfcache / session restore re-shows the page mid-scroll → snap back to the
-       home hero. This now resets the room and URL too, because mobile browsers
-       often restore an old section after the app was left in the background. */
-    window.addEventListener('pageshow', (e) => { if (e.persisted) bqToHero(); });
+    /* bfcache / session restore can re-show an old scroll position. Do not snap
+       immediately; the same five-minute away timer below decides when to reset. */
     let bqHiddenAt = 0;
-    const BQ_RESUME_RESET_MS = 900;
+    const BQ_RESUME_RESET_MS = 5 * 60 * 1000;
     const BQ_MOBILE_RESUME_RESET_MS = 5 * 60 * 1000;
     const BQ_AWAY_KEY = 'bq_last_away_at';
     const bqResumeDelay = () => {
@@ -359,7 +357,7 @@
 
     /* discipline → tab + 3-image album + meta */
     const DISC = {
-      'Brand Identity': { tab: 'logo',     count: () => collectionCount('logo') + collectionCount('tickerlogo'),
+      'Brand Identity': { tab: 'logo',     count: () => collectionCount('logo'),
         imgs: [`${CDN}/LogoDesign/Logo3.webp`, `${CDN}/LogoDesign/Logo14.webp`, `${CDN}/LogoDesign/Logo19.webp`] },
       'Editorial':      { tab: 'official',  count: () => collectionCount('official'),
         imgs: [`${CDN}/Official/Official7.webp`, `${CDN}/Official/Official94.webp`, `${CDN}/Official/Official132.webp`] },

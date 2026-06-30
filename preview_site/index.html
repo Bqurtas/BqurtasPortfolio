@@ -172,8 +172,8 @@
   </script>
 
   <!-- Main layout CSS stays render-stable and is discovered before optional assets. -->
-  <link rel="preload" href="css/style.v325.min.css?v=329" as="style" fetchpriority="high">
-  <link rel="stylesheet" href="css/style.v325.min.css?v=329">
+  <link rel="preload" href="css/style.v325.min.css?v=330" as="style" fetchpriority="high">
+  <link rel="stylesheet" href="css/style.v325.min.css?v=330">
   <link rel="preload" href="css/fonts.css?v=310" as="style" data-bq-optional-css>
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=310">
   <noscript>
@@ -1544,6 +1544,16 @@
 
       <div class="section">
         <div id="workIndex" class="work-index"></div>
+        <nav class="blog-pager work-pager" id="workPager" aria-label="Selected work pages">
+          <button class="blog-pager-arrow" id="workPrev" aria-label="Previous work page"><i class="fa-solid fa-arrow-left-long"></i></button>
+          <div class="blog-pager-pages" id="workPages"></div>
+          <button class="blog-pager-arrow" id="workNext" aria-label="Next work page"><i class="fa-solid fa-arrow-right-long"></i></button>
+          <form class="blog-pager-go" id="workGoForm">
+            <label class="mono" for="workGoInput" data-i18n="blog.goto">Go to</label>
+            <input type="number" id="workGoInput" min="1" inputmode="numeric" placeholder="#" />
+            <button type="submit" aria-label="Go to work page" data-i18n="blog.go">Go</button>
+          </form>
+        </nav>
         <div id="workView" class="work-view" hidden></div>
       </div>
     </section>
@@ -1778,13 +1788,13 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script src="js/i18n.min.js?v=314"></script>
+  <script src="js/i18n.min.js?v=315"></script>
   <script src="js/chat-kb.min.js?v=308"></script>
-  <script src="js/main.min.js?v=327"></script>
-  <script src="js/gallery.min.js?v=311"></script>
-  <script src="js/enhance.min.js?v=324"></script>
+  <script src="js/main.min.js?v=329"></script>
+  <script src="js/gallery.min.js?v=312"></script>
+  <script src="js/enhance.min.js?v=326"></script>
   <script src="js/brandboard.min.js?v=310"></script>
-  <script src="js/work.min.js?v=309"></script>
+  <script src="js/work.min.js?v=311"></script>
   <script src="js/lux.min.js?v=309"></script>
   <script src="js/motion.min.js?v=309"></script>
 </body>

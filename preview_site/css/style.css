@@ -10007,7 +10007,7 @@ body::before{
    ========================================================= */
 .work-index{
   grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),300px)) !important;
-  justify-content:center !important;
+  justify-content:start !important;
   gap:clamp(14px,2vw,22px) !important;
   max-width:980px !important;
 }

@@ -1791,13 +1791,13 @@ Object.keys(window.I18N_EXTRA_WORK).forEach(function(l){ if(window.I18N[l]) Obje
 
 /* ===== Menu relabel — evocative room names (Design · Selected Work · The Brand Board · The Journal · The Designer · Let's talk.) ===== */
 window.I18N_EXTRA_NAV = {
- en:{"nav.blog":"The Journal","nav.bio":"The Designer","nav.contact":"Let's talk.","nav.brandboard":"The Brand Board"},
- ku:{"nav.blog":"گۆڤارەکە","nav.bio":"دیزاینەرەکە","nav.contact":"با قسە بکەین","nav.brandboard":"تابلۆی براند"},
- ar:{"nav.blog":"المجلة","nav.bio":"المصمم","nav.contact":"لنتحدث","nav.brandboard":"لوحة العلامة"},
- kmr:{"nav.blog":"Kovar","nav.bio":"Sêwirmend","nav.contact":"Em biaxivin","nav.brandboard":"Tabloya Brandê"},
- fr:{"nav.blog":"Le Journal","nav.bio":"Le Designer","nav.contact":"Parlons.","nav.brandboard":"La planche de marque"},
- tr:{"nav.blog":"Dergi","nav.bio":"Tasarımcı","nav.contact":"Konuşalım.","nav.brandboard":"Marka Panosu"},
- sv:{"nav.blog":"Tidningen","nav.bio":"Designern","nav.contact":"Låt oss prata.","nav.brandboard":"Varumärkestavlan"}
+ en:{"nav.work":"Selected Work","nav.blog":"The Journal","nav.bio":"The Designer","nav.contact":"Let's talk.","nav.brandboard":"The Brand Board"},
+ ku:{"nav.work":"کارە هەڵبژێردراوەکان","nav.blog":"گۆڤارەکە","nav.bio":"دیزاینەرەکە","nav.contact":"با قسە بکەین","nav.brandboard":"تابلۆی براند"},
+ ar:{"nav.work":"أعمال مختارة","nav.blog":"المجلة","nav.bio":"المصمم","nav.contact":"لنتحدث","nav.brandboard":"لوحة العلامة"},
+ kmr:{"nav.work":"Karên Hilbijartî","nav.blog":"Kovar","nav.bio":"Sêwirmend","nav.contact":"Em biaxivin","nav.brandboard":"Tabloya Brandê"},
+ fr:{"nav.work":"Travaux choisis","nav.blog":"Le Journal","nav.bio":"Le Designer","nav.contact":"Parlons.","nav.brandboard":"La planche de marque"},
+ tr:{"nav.work":"Seçilmiş İşler","nav.blog":"Dergi","nav.bio":"Tasarımcı","nav.contact":"Konuşalım.","nav.brandboard":"Marka Panosu"},
+ sv:{"nav.work":"Utvalda arbeten","nav.blog":"Tidningen","nav.bio":"Designern","nav.contact":"Låt oss prata.","nav.brandboard":"Varumärkestavlan"}
 };
 Object.keys(window.I18N_EXTRA_NAV).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_NAV[l]); });
 

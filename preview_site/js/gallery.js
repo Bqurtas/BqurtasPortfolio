@@ -22,7 +22,8 @@ window.BQ_GALLERY = {
     posters:     { folder: 'Poster',        prefix: 'Poster',      ext: 'webp', count: 18,  cat: 'posters',     tag: 'Poster',        icon: 'fa-image',          title: 'Poster' },
     social:      { folder: 'SocialMedia',   prefix: 'SMedia',      ext: 'webp', count: 19,  cat: 'social',      tag: 'Social',        icon: 'fa-hashtag',        title: 'Social Media' },
     logo:        { folder: 'LogoDesign',    prefix: 'Logo',        ext: 'webp', count: 28,  cat: 'logo',        tag: 'Logo',          icon: 'fa-pen-nib',        title: 'Logo' },
-    tickerlogo:  { folder: 'TickerLogo',    prefix: 'TickerLogo',  ext: 'webp', count: 13,  cat: 'logo',        tag: 'Logo',          icon: 'fa-pen-nib',        title: 'Ticker Logo' },
+    tickerlogo:  { folder: 'TickerLogo',    prefix: 'TickerLogo',  ext: 'webp', count: 8,   cat: 'tickerlogo',  tag: 'Logo',          icon: 'fa-pen-nib',        title: 'Ticker Logo',
+                   files: ['TickerLogo2.webp','TickerLogo3.webp','TickerLogo5.webp','TickerLogo6.webp','TickerLogo9.webp','TickerLogo10.webp','TickerLogo12.webp','TickerLogo13.webp'] },
     events:      { folder: 'EventandCon',   prefix: 'Event',       ext: 'webp', count: 16,  cat: 'events',      tag: 'Events',        icon: 'fa-calendar-day',   title: 'Event' },
     business:    { folder: 'Businesscard',  prefix: 'Bcard',       ext: 'webp', count: 11,  cat: 'stationery',  tag: 'Business Card', icon: 'fa-id-card',        title: 'Business Card' },
     invoices:    { folder: 'Invoice',       prefix: 'Invoice',     ext: 'webp', count: 12,  cat: 'stationery',  tag: 'Invoice',       icon: 'fa-file-invoice',   title: 'Invoice' },
@@ -196,7 +197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return `${pfx} ${galDigits(String(i).padStart(2, '0'))}`;
   };
   const ORDER = [
-    'general','official','book','image','logo','tickerlogo',
+    'general','official','book','image','logo',
     'posters','social','events','business','invoices','ai',
     'flex','video','other'
   ];
@@ -447,17 +448,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   /* ── TickerLogo: real images in Designed by hand grid ── */
   const logosGrid = document.querySelector('.logos-grid');
   if (logosGrid) {
-    const CDN  = window.BQ_GALLERY.CDN_BASE;
-    const idxs = [2,3,5,6,9,10,12,13];
-    logosGrid.innerHTML = idxs.map(i => {
-      const src = `${CDN}/TickerLogo/TickerLogo${i}.webp`;
+    const logos = window.BQ_GALLERY.items('tickerlogo');
+    logosGrid.innerHTML = logos.map((item, idx) => {
+      const src = item.url;
       return `<div class="logo-mark logo-mark--img" data-full="${src}">
-         <img src="${window.BQ_GALLERY.thumb(src, 180)}" data-full="${src}" alt="Logo ${i}" loading="lazy" decoding="async" width="180" height="135" />
+         <img src="${window.BQ_GALLERY.thumb(src, 180)}" data-full="${src}" data-raw="${item.rawUrl}" alt="Logo ${idx + 1}" loading="lazy" decoding="async" width="180" height="135" />
        </div>`
     }).join('');
     logosGrid.querySelectorAll('img').forEach(img =>
       img.addEventListener('error', () => {
         if (img.dataset.full && img.src !== img.dataset.full) { img.src = img.dataset.full; return; }
+        if (img.dataset.raw && img.src !== img.dataset.raw) { img.src = img.dataset.raw; return; }
         img.closest('.logo-mark')?.remove();
       })
     );

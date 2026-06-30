@@ -171,8 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       path = prefix + '/' + room;
     }
-    // a deep blog-post URL (/blog/<slug>) is owned by the reader — leave it intact on passive syncs
-    if (room === 'blog' && !push && /\/blog\/[^/]+/.test(location.pathname)) return;
+    // deep post/case URLs are owned by their readers — leave them intact on passive syncs
+    if (!push && ((room === 'blog' && /\/blog\/[^/]+/.test(location.pathname)) || (room === 'work' && /\/work\/[^/]+/.test(location.pathname)))) return;
     if ((location.pathname.replace(/\/+$/, '') || '/') === path) return;
     try {
       if (push) history.pushState(null, '', path);
@@ -293,6 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // allow language buttons to keep their own behavior — they don't have data-route
       e.preventDefault();
       if (window.__bqCloseReader) window.__bqCloseReader();   // leaving via the rail closes an open post
+      if (window.__bqCloseWorkCase) window.__bqCloseWorkCase();   // leaving via the rail closes an open case study
       showRoomAfterTransitionCurtain(route, true);
     });
   });
@@ -727,6 +728,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.__bqResetToHomeHero = () => {
     try { window.__bqCloseReader && window.__bqCloseReader(); } catch (e) {}
+    try { window.__bqCloseWorkCase && window.__bqCloseWorkCase(); } catch (e) {}
     const all = document.querySelector('.tab[data-filter="all"]');
     if (all && currentFilter !== 'all') setActiveTab(all);
     showRoom('design', false);
