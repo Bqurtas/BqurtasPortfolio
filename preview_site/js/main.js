@@ -86,7 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
     brandboard: 'nav.brandboard',
     blog: 'nav.blog',
     bio: 'nav.bio',
-    contact: 'nav.contact'
+    contact: 'nav.contact',
+    panjamor: 'nav.panjamor'
   };
   const roomLabelFallbacks = {
     design: 'Design',
@@ -94,7 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
     brandboard: 'The Brand Board',
     blog: 'The Journal',
     bio: 'The Designer',
-    contact: "Let's talk."
+    contact: "Let's talk.",
+    panjamor: 'Panjamor'
   };
   const setRoomChrome = (room) => {
     const key = roomLabelKeys[room] || roomLabelKeys.design;
@@ -146,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- ROUTER (room switcher + deep-links) ---------- */
   const rooms = document.querySelectorAll('.room');
   const routeLinks = document.querySelectorAll('[data-route]');
-  const validRooms = ['design','work','brandboard','blog','bio','contact'];
+  const validRooms = ['design','work','brandboard','blog','bio','contact','panjamor'];
 
   let triggerReveals = () => {};
   let moveUnderline  = () => {};
@@ -235,7 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* Scroll-spy on the home / design page — the address bar reflects the section in view:
        hero (top)            → base   ( / or /<lang> )
-       Panjamor studio       → /panjamor
        "Design Room" + works → /design   ( /design/<tab> when a tab is active )
        closing note → footer → base again (simple link)
      Each becomes a real shareable link (with its own cover). Other rooms keep their URL.
@@ -267,7 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (document.body.dataset.room !== 'design') return;
       const prefix = (currentLang && currentLang !== 'en') ? '/' + currentLang : '';
       const base = prefix || '/';
-      const pen  = document.getElementById('pencemorHero');       // Panjamor studio
       const work = document.querySelector('.section.work');       // "01 — Design Room" + grid
       const note = document.querySelector('.practice-note'); // "A short note" → back to simple
       const postWork = document.querySelector('.service-showcase') || note;
@@ -277,8 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
         path = base;                                              // below portfolio → plain home link
       } else if (work && y >= __absTop(work)) {
         path = prefix + '/design';                                // portfolio section → /design, even when a tab is active
-      } else if (pen && y >= __absTop(pen)) {
-        path = prefix + '/panjamor';
       }
       const cur  = (location.pathname.replace(/\/+$/, '') || '/');
       const want = (path.replace(/\/+$/, '') || '/');
@@ -301,7 +299,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Browser back/forward + pasted deep-links
   window.addEventListener('popstate', () => {
     const { room, tab } = parseRoute();
-    const r = validRooms.includes(room) ? room : 'design';
+    const normalizedRoom = room === 'pencemor' ? 'panjamor' : room;
+    const r = validRooms.includes(normalizedRoom) ? normalizedRoom : 'design';
     if (document.body.dataset.room !== r) showRoom(r, false);
     if (r === 'design') {
       const want = tab || 'all';
@@ -309,9 +308,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const t = document.querySelector(`.tab[data-filter="${want}"]`);
         if (t) activateTab(t, false);
       }
-    }
-    if (room === 'panjamor' || room === 'pencemor') {
-      requestAnimationFrame(() => document.getElementById('pencemorHero')?.scrollIntoView({ behavior: 'auto', block: 'start' }));
     }
   });
 
@@ -767,7 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- REVEAL on scroll ---------- */
   const markReveal = () => {
     /* .card visibility is handled entirely by activateTab pagination — excluded here */
-    document.querySelectorAll('.blog-card, .tl-item, .bio-card, .honor, .lang-item, .orgs li, .service, .qc-card, .stat, .logo-mark, .logo-chip')
+    document.querySelectorAll('.blog-card, .tl-item, .bio-card, .honor, .lang-item, .orgs li, .service, .qc-card, .stat, .logo-mark, .logo-chip, .studio-card, .studio-step, .studio-proof-item, .pj-cta-section')
       .forEach(el => el.classList.add('reveal'));
   };
   markReveal();
@@ -795,16 +791,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // initial route — restore room AND the Design tab from the URL path/hash
   const { room: startRoomRaw, tab: startTab } = parseRoute();
-  const startRoom = validRooms.includes(startRoomRaw) ? startRoomRaw : 'design';
+  const normalizedStartRoom = startRoomRaw === 'pencemor' ? 'panjamor' : startRoomRaw;
+  const startRoom = validRooms.includes(normalizedStartRoom) ? normalizedStartRoom : 'design';
   showRoom(startRoom);
   if (startRoom === 'design' && startTab) {
     const t0 = document.querySelector(`.tab[data-filter="${startTab}"]`);
     if (t0) activateTab(t0);
   }
-  if (startRoomRaw === 'panjamor' || startRoomRaw === 'pencemor') {
-    // a shared /panjamor link lands on the studio section
-    setTimeout(() => document.getElementById('pencemorHero')?.scrollIntoView({ behavior: 'auto', block: 'start' }), 60);
-  } else if (startRoomRaw === 'design') {
+  if (normalizedStartRoom === 'design') {
     // a shared /design link lands on the Design Room section, not the hero.
     // A tab link (/design/events) lands on that tab's own title/count header.
     setTimeout(() => {
@@ -1163,7 +1157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '.card, .service-trigger, .feature-card, .blog-card, .qc-card, .index-row, ' +
         '.footer-cta-btn, .footer-room-nav a, .mm-link, .tab, .software-chip, ' +
         '#bio .bio-block, .bio-doc-btn, .work-card, .service-cta, .software-link, ' +
-        '.pencemor-hero-btn, .pitch-submit, .footer-email, .profile-card-btn'
+        '.pencemor-hero-btn, .pj-room-btn, .studio-card, .studio-step, .pitch-submit, .footer-email, .profile-card-btn'
       );
       const overMagnet = target.closest(MAGNET);
       const overZoom = target.closest('.cert-item');   // certificates keep the system zoom cursor
@@ -1178,10 +1172,10 @@ document.addEventListener('DOMContentLoaded', () => {
         let action = 'open';
         if (overCard.matches('.card--photo, .work-card, .blog-card, .tab')) action = 'view';
         else if (overCard.matches('.software-chip, .software-link')) action = 'tool';
-        else if (overCard.matches('.footer-cta-btn')) action = 'talk';
+        else if (overCard.matches('.footer-cta-btn, .pj-room-btn')) action = 'talk';
         else if (overCard.matches('.pitch-submit, .footer-email')) action = 'send';
         else if (overCard.matches('.mm-link, .footer-room-nav a, .service-cta, .pencemor-hero-btn')) action = 'go';
-        else if (overCard.matches('.service-trigger, .feature-card, .qc-card, #bio .bio-block')) action = 'open';
+        else if (overCard.matches('.service-trigger, .feature-card, .qc-card, #bio .bio-block, .studio-card, .studio-step')) action = 'open';
         else if (overCard.matches('.index-row')) action = 'preview';
         const label = cursorText(action, action.charAt(0).toUpperCase() + action.slice(1));
         ringLabel.textContent = label;

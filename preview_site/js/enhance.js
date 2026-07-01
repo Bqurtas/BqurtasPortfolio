@@ -248,13 +248,16 @@
       blog:    { n: '04', name: 'The Journal', tag: 'Journal', count: '6 essays',
                  desc: 'Short notes from the desk on typography, place, and the slow craft of design.',
                  icon: 'fa-feather-pointed' },
-      bio:     { n: '05', name: 'The Designer', tag: 'About', count: '2014 — now',
-                 desc: 'A decade of practice in Hewlêr — experience, education, awards & languages.',
-                 icon: 'fa-user-pen' },
-      contact: { n: '06', name: "Let's talk.", tag: 'Enquiries', count: 'Replies in 48h',
-                 desc: 'Pitch a project in one careful letter. Available for select commissions.',
-                 icon: 'fa-paper-plane' },
-    };
+	      bio:     { n: '05', name: 'The Designer', tag: 'About', count: '2014 — now',
+	                 desc: 'A decade of practice in Hewlêr — experience, education, awards & languages.',
+	                 icon: 'fa-user-pen' },
+	      contact: { n: '06', name: "Let's talk.", tag: 'Enquiries', count: 'Replies in 48h',
+	                 desc: 'Pitch a project in one careful letter. Available for select commissions.',
+	                 icon: 'fa-paper-plane' },
+	      panjamor: { n: '07', name: 'Panjamor', tag: 'Studio', count: 'Brand + print',
+	                 desc: 'An office studio for identity, print, launch material and owner-ready handover.',
+	                 icon: 'fa-fingerprint' },
+	    };
 
     const card = document.createElement('div');
     card.className = 'rail-card';

@@ -50,7 +50,8 @@
     /* ---- reveal choreography ---- */
     var revealItems = Array.from(document.querySelectorAll(
       '[data-motion], .latest-blog-grid .blog-card, #contact .qc-card, #contact .pitch-wrap, ' +
-      '.bio-doc-btn, .footer-stage-copy, .footer-main-v249 > *, .practice-note .software-head'
+      '.bio-doc-btn, .footer-stage-copy, .footer-main-v249 > *, .practice-note .software-head, ' +
+      '.pj-room-mark, .studio-card, .studio-step, .studio-proof-item, .pj-cta-section'
     ));
     revealItems.forEach(function (el, index) {
       el.classList.add('motion-reveal');
@@ -91,7 +92,7 @@
       /* ---- magnetic controls (uses the independent `translate` property) ---- */
       var magnetic = document.querySelectorAll(
         '.rail-menu, #railChat, #railLatest, #themeToggle, .social-current, .lang-current, ' +
-        '.pencemor-hero-btn, .pitch-submit, .service-cta, .software-link, .bio-doc-btn, ' +
+        '.pencemor-hero-btn, .pj-room-btn, .pitch-submit, .service-cta, .software-link, .bio-doc-btn, ' +
         '.footer-cta-btn, .footer-email, .footer-top-btn'
       );
       magnetic.forEach(function (el) {
@@ -106,7 +107,7 @@
       });
 
       /* ---- restrained card tilt ---- */
-      document.querySelectorAll('.feature-card, .latest-blog-grid .blog-card, .work-card').forEach(function (card) {
+      document.querySelectorAll('.feature-card, .latest-blog-grid .blog-card, .work-card, .studio-card, .studio-step').forEach(function (card) {
         card.classList.add('motion-tilt');
         card.addEventListener('pointermove', function (event) {
           var rect = card.getBoundingClientRect();
@@ -149,7 +150,7 @@
         var applyPreview = function (link) {
           var number = link.querySelector('.mm-n');
           var title = link.querySelector('.mm-link-text');
-          if (previewNo && number) previewNo.textContent = number.textContent.trim() + ' / 06';
+          if (previewNo && number) previewNo.textContent = number.textContent.trim() + ' / ' + String(roomLinks.length).padStart(2, '0');
           if (previewTitle && title) previewTitle.textContent = title.textContent.trim();
           if (previewNote) previewNote.textContent = translated(link.dataset.i18nMenuNote, link.dataset.menuNote || '');
           if (figure) figure.dataset.room = link.dataset.route || 'design';
@@ -197,6 +198,7 @@
         ['.tab', 'view', 'View'],
         ['.service-trigger', 'open', 'Open'],
         ['.footer-cta-btn', 'talk', 'Talk'],
+        ['.pj-room-btn', 'talk', 'Talk'],
         ['.footer-room-nav a', 'go', 'Go'],
         ['.software-chip', 'tool', 'Tool']
       ];
@@ -215,7 +217,7 @@
     /* ---- slow section-title drift gives long pages a soft depth cue ---- */
     if (!reduce) {
       var driftItems = Array.from(document.querySelectorAll(
-        '.service-showcase-title, .bio-teaser-title, .software-title, .latest-blog-title, .room-hero-title'
+        '.service-showcase-title, .bio-teaser-title, .software-title, .latest-blog-title, .room-hero-title, .pj-room-title'
       ));
       var driftFrame = 0;
       var updateDrift = function () {
