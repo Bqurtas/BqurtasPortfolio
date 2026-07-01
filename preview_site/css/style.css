@@ -11160,3 +11160,17 @@ body::before{
     gap:10px;
   }
 }
+
+/* =========================================================
+   v326 — Panjamor room tidy: menu card green->white; return button clear of
+   the fixed top bar + no frosted pill; remove the wide hollow ghost logo.
+   ========================================================= */
+.mm-link[data-route="panjamor"]:hover,
+.mm-link[data-route="panjamor"].is-active{ background:#f4f3f0 !important; }
+.pencemor-room-hero .pj-return,
+.pencemor-room-hero .room-hero-return{
+  top:clamp(94px,12vh,116px) !important;
+  background:none !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+}
+.pj-logo-ghost{ display:none !important; }
