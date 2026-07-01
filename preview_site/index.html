@@ -175,9 +175,9 @@
   </script>
 
   <!-- Main layout CSS stays render-stable and is discovered before optional assets. -->
-  <link rel="preload" href="css/style.v325.min.css?v=334" as="style" fetchpriority="high">
+  <link rel="preload" href="css/style.v325.min.css?v=335" as="style" fetchpriority="high">
   <link rel="preload" href="/assets/panjamor-logo.webp" as="image">
-  <link rel="stylesheet" href="css/style.v325.min.css?v=334">
+  <link rel="stylesheet" href="css/style.v325.min.css?v=335">
   <link rel="preload" href="css/fonts.css?v=310" as="style" data-bq-optional-css>
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=311">
   <noscript>
@@ -903,109 +903,37 @@
          PANJAMOR ROOM — independent brand, print and launch studio.
          ============================================================ -->
     <section class="room is-hidden" id="panjamor" data-room="panjamor">
-      <div class="pencemor-room-hero pj-snap-panel">
+      <div class="pencemor-room-hero pj-snap-panel pj-hero-v2">
         <a class="room-hero-return pj-return" href="/design" data-route="design" aria-label="Return to start"><i class="fa-solid fa-arrow-left-long"></i> <span data-i18n="rh.return">Return to start</span></a>
-        <img class="pj-logo-ghost" src="assets/panjamor-logo.webp" alt="" aria-hidden="true" width="800" height="800" decoding="async" />
-        <div class="pj-room-mark" aria-hidden="true">
-          <img src="assets/panjamor-logo.webp" alt="" width="220" height="220" decoding="async" />
-        </div>
+        <div class="pj2-aura" aria-hidden="true"></div>
+        <div class="pj2-ring" aria-hidden="true"></div>
         <div class="pj-room-hero-copy">
-          <span class="mono pj-room-kicker">02 — Office Studio</span>
+          <span class="mono pj-room-kicker"><span class="pj2-live" aria-hidden="true"></span> 02 — Office Studio</span>
           <h2 class="pj-room-title" data-i18n="pj.room.eye">Panjamor Office Studio</h2>
           <p class="pj-room-lead" data-i18n="pj.room.title">Brand, print and launch systems with a real fingerprint.</p>
           <p class="pj-room-sub" data-i18n="pj.room.sub">A studio for business owners who need a name, logo direction, colours, type, printed matter and launch material to feel like one living system.</p>
+          <div class="pj2-chips">
+            <span class="pj2-chip" data-i18n="pj.s1.t">Identity direction</span>
+            <span class="pj2-chip" data-i18n="pj.s2.t">Print system</span>
+            <span class="pj2-chip" data-i18n="pj.s3.t">Launch kit</span>
+            <span class="pj2-chip" data-i18n="pj.s4.t">Owner handover</span>
+          </div>
           <div class="pj-room-actions">
             <a href="/contact" data-route="contact" class="pj-room-btn pj-room-btn--primary"><span data-i18n="pj.room.primary">Start a project</span><i class="fa-solid fa-arrow-right"></i></a>
             <a href="/design" data-route="design" class="pj-room-btn"><span data-i18n="pj.room.secondary">See the portfolio</span><i class="fa-solid fa-compass-drafting"></i></a>
           </div>
         </div>
-      </div>
-
-      <div class="section pj-system-section pj-snap-panel">
-        <header class="section-head pj-section-head">
-          <span class="section-num mono"><i class="fa-solid fa-fingerprint"></i> &nbsp; <span data-i18n="pj.services.eye">Studio scope</span></span>
-          <h2 class="section-title" data-i18n="pj.services.title">Everything a small brand needs to look <em>ready</em>.</h2>
-          <p class="section-lede" data-i18n="pj.services.sub">Not only a logo. Panjamor connects strategy, visual identity, print, social launch and production details so the brand can leave the studio already usable.</p>
-        </header>
-
-        <div class="pj-system-card">
-          <div class="pj-service-grid">
-            <article class="studio-card" data-motion>
-              <span class="studio-card-num mono">01</span>
-              <i class="fa-solid fa-pen-nib"></i>
-              <h3 data-i18n="pj.s1.t">Identity direction</h3>
-              <p data-i18n="pj.s1.d">Name checks, logo direction, Kurdish and Latin lockups, colour palette, type pairing and a clean mini-guide.</p>
-            </article>
-            <article class="studio-card" data-motion>
-              <span class="studio-card-num mono">02</span>
-              <i class="fa-solid fa-print"></i>
-              <h3 data-i18n="pj.s2.t">Print system</h3>
-              <p data-i18n="pj.s2.d">Business cards, letterheads, invoices, packaging notes, signage and production-ready files.</p>
-            </article>
-            <article class="studio-card" data-motion>
-              <span class="studio-card-num mono">03</span>
-              <i class="fa-solid fa-bullhorn"></i>
-              <h3 data-i18n="pj.s3.t">Launch kit</h3>
-              <p data-i18n="pj.s3.d">Opening posts, campaign visuals, profile assets, poster direction and clear wording for the first announcement.</p>
-            </article>
-            <article class="studio-card" data-motion>
-              <span class="studio-card-num mono">04</span>
-              <i class="fa-solid fa-list-check"></i>
-              <h3 data-i18n="pj.s4.t">Owner handover</h3>
-              <p data-i18n="pj.s4.d">A tidy folder, export rules, usage notes and a checklist so the business can keep using the brand correctly.</p>
-            </article>
-          </div>
-
-          <div class="pj-process-strip">
-            <div class="pj-process-copy">
-              <span class="section-num mono"><i class="fa-solid fa-route"></i> &nbsp; <span data-i18n="pj.process.eye">Process</span></span>
-              <h3 data-i18n="pj.process.title">From first talk to files in hand.</h3>
-            </div>
-            <div class="pj-process-grid">
-              <article class="studio-step">
-                <span class="mono">01</span>
-                <h3 data-i18n="pj.p1.t">Listen</h3>
-                <p data-i18n="pj.p1.d">The business, audience, budget and deadline are written down before drawing begins.</p>
-              </article>
-              <article class="studio-step">
-                <span class="mono">02</span>
-                <h3 data-i18n="pj.p2.t">Draw</h3>
-                <p data-i18n="pj.p2.d">The mark, type, colour and layout system are explored by hand and refined on screen.</p>
-              </article>
-              <article class="studio-step">
-                <span class="mono">03</span>
-                <h3 data-i18n="pj.p3.t">Test</h3>
-                <p data-i18n="pj.p3.d">The identity is tested on real cards, posts, signs, labels and documents.</p>
-              </article>
-              <article class="studio-step">
-                <span class="mono">04</span>
-                <h3 data-i18n="pj.p4.t">Deliver</h3>
-                <p data-i18n="pj.p4.d">Final files, print-ready exports and simple rules are handed over in one clear package.</p>
-              </article>
-            </div>
-          </div>
-
-          <div class="pj-proof-panel">
-            <div class="pj-proof-copy">
-              <span class="section-num mono"><i class="fa-solid fa-certificate"></i> &nbsp; <span data-i18n="pj.proof.eye">The fingerprint</span></span>
-              <h3 data-i18n="pj.proof.title">A brand should feel real before it goes public.</h3>
-              <p data-i18n="pj.proof.sub">The final board is built around real use: shop signs, invoices, social images, print material and the first customer touchpoints.</p>
-            </div>
-            <div class="pj-proof-list">
-              <div class="studio-proof-item"><i class="fa-solid fa-layer-group"></i><span data-i18n="pj.proof.a">Bilingual identity files</span></div>
-              <div class="studio-proof-item"><i class="fa-solid fa-file-export"></i><span data-i18n="pj.proof.b">Print and social exports</span></div>
-              <div class="studio-proof-item"><i class="fa-solid fa-box-archive"></i><span data-i18n="pj.proof.c">Clean owner handover</span></div>
-            </div>
+        <div class="pj-room-mark" aria-hidden="true">
+          <span class="pj2-mark-glow" aria-hidden="true"></span>
+          <img src="assets/panjamor-logo.webp" alt="" width="220" height="220" decoding="async" />
+        </div>
+        <div class="pj2-marquee" aria-hidden="true">
+          <div class="pj2-marquee-track">
+            <span>Panjamor</span><em>✦</em><span>Brand</span><em>✦</em><span>Print</span><em>✦</em><span>Launch</span><em>✦</em><span>Panjamor</span><em>✦</em><span>Brand</span><em>✦</em><span>Print</span><em>✦</em><span>Launch</span><em>✦</em><span>Panjamor</span><em>✦</em><span>Brand</span><em>✦</em><span>Print</span><em>✦</em><span>Launch</span><em>✦</em><span>Panjamor</span><em>✦</em><span>Brand</span><em>✦</em><span>Print</span><em>✦</em><span>Launch</span><em>✦</em>
           </div>
         </div>
       </div>
 
-      <div class="section pj-cta-section pj-snap-panel">
-        <span class="mono" data-i18n="pj.cta.eye">Ready when the idea is serious</span>
-        <h2 data-i18n="pj.cta.title">Bring the project. Panjamor will shape the system.</h2>
-        <p data-i18n="pj.cta.sub">Send the business name, field, budget, deadline and any references. The reply will be practical, not vague.</p>
-        <a href="/contact" data-route="contact" class="pj-room-btn pj-room-btn--primary"><span data-i18n="pj.cta.btn">Write the brief</span><i class="fa-solid fa-paper-plane"></i></a>
-      </div>
     </section>
 
     <!-- ============================================================
