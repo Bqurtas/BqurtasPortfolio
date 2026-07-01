@@ -493,3 +493,99 @@
     border-color:var(--ink) !important;
   }
 }
+
+/* =========================================================
+   v331 — per request:
+   1) DESKTOP nav -> a small, icons-only glass dock at the BOTTOM CENTRE:
+      the hamburger now lives inside it (moved into .rail in the HTML),
+      the name/avatar block is gone, panels flip to open upward.
+   2) The home-hero wordmark is set in Liana (the signature font), simply.
+   3) MOBILE: the room heroes return to content height (v330 made every
+      hero full-viewport, which reopened the big empty bands).
+   4) The Return pill is explicitly round everywhere.
+   ========================================================= */
+@media (min-width:821px){
+  :root{ --topbar-h:24px; }          /* nothing fixed on top anymore */
+  html{ scroll-padding-top:24px !important; }
+
+  .rail{
+    top:auto !important; bottom:16px !important;
+    left:50% !important; right:auto !important;
+    transform:translateX(-50%);
+    width:auto !important; height:52px !important;
+    justify-content:center !important; gap:2px;
+    padding:0 14px !important;
+  }
+  [dir="rtl"] .rail{ left:50% !important; right:auto !important; padding:0 14px !important; }
+  .rail-logo{ display:none !important; }
+
+  /* hamburger: a plain sibling of the tool icons, first in the row */
+  .rail-menu{
+    position:static !important; order:-1;
+    width:auto !important; height:100% !important;
+    padding:0 12px 0 6px !important; margin:0 !important;
+    background:none !important; border:none !important; border-radius:0 !important;
+    box-shadow:none !important;
+    -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+    transform:none !important;
+  }
+  [dir="rtl"] .rail-menu{ padding:0 6px 0 12px !important; }
+  .rail-menu .rail-tip{ display:none !important; }
+
+  /* panels open UPWARD from the bottom dock */
+  .latest-panel, .chat{
+    top:auto !important; bottom:80px !important;
+    right:max(24px, calc(50vw - 320px)) !important; left:auto !important;
+    transform-origin:bottom right !important;
+  }
+  [dir="rtl"] .latest-panel, [dir="rtl"] .chat{
+    left:max(24px, calc(50vw - 320px)) !important; right:auto !important;
+    transform-origin:bottom left !important;
+  }
+  .profile-card{ display:none !important; }   /* its hover trigger (the logo) is gone */
+
+  /* no top bar -> the Return pill sits at the natural top edge */
+  .pencemor-room-hero .pj-return,
+  .pencemor-room-hero .room-hero-return{ top:26px !important; }
+}
+
+/* ---- 2) the hero wordmark in the signature font, simply ---- */
+.hero-title .hero-name{
+  font-family:'Liana','Fraunces',serif !important;
+  font-weight:400 !important;
+  font-style:normal !important;
+  letter-spacing:0 !important;
+  font-size:.9em;
+  line-height:1.12;
+}
+
+/* ---- 3) mobile: room heroes back to content height (kill the empty bands) ---- */
+@media (max-width:820px){
+  .room-hero, .pencemor-hero{
+    min-height:auto !important;
+    padding-top:clamp(44px,7vh,72px) !important;
+    padding-bottom:clamp(48px,8vh,76px) !important;
+    justify-content:flex-start !important;
+  }
+  .room-hero-scroll{ position:static !important; margin-top:22px; bottom:auto !important; }
+}
+
+/* ---- 4) Return pill: explicitly round everywhere ---- */
+.room-hero-return, .pj-return{
+  border-radius:999px !important;
+  border:1px solid color-mix(in srgb, var(--ink) 18%, transparent) !important;
+}
+
+/* v331b — hero wordmark in Liana for the Latin-script languages (the build
+   pins Fraunces per-lang with !important; Arabic-script langs keep Fraunces
+   since Liana has no Arabic glyphs). */
+:root[lang="en"] .hero-title .hero-name,
+:root[lang="fr"] .hero-title .hero-name,
+:root[lang="kmr"] .hero-title .hero-name,
+:root[lang="tr"] .hero-title .hero-name,
+:root[lang="sv"] .hero-title .hero-name{
+  font-family:'Liana','Fraunces',serif !important;
+  font-weight:400 !important;
+  font-style:normal !important;
+  letter-spacing:0 !important;
+}

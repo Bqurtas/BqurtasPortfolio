@@ -175,9 +175,9 @@
   </script>
 
   <!-- Main layout CSS stays render-stable and is discovered before optional assets. -->
-  <link rel="preload" href="css/style.v325.min.css?v=338" as="style" fetchpriority="high">
+  <link rel="preload" href="css/style.v325.min.css?v=339" as="style" fetchpriority="high">
   <link rel="preload" href="/assets/panjamor-logo.webp" as="image">
-  <link rel="stylesheet" href="css/style.v325.min.css?v=338">
+  <link rel="stylesheet" href="css/style.v325.min.css?v=339">
   <link rel="preload" href="css/fonts.css?v=310" as="style" data-bq-optional-css>
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=311">
   <noscript>
@@ -366,15 +366,13 @@
       <span class="rail-dot" aria-hidden="true"></span>
       <span class="rail-status-text" data-i18n="krg">Hewlêr · KRG</span>
     </div>
+    <!-- MENU — the hamburger lives INSIDE the bar (bottom dock on desktop);
+         hidden on mobile (the bottom bar has its own trigger). -->
+    <button class="rail-menu" id="railMenu" aria-label="Open menu">
+      <span class="rail-menu-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="rail-tip"><span class="rail-tip-text" data-i18n="tip.menu">Menu</span></span>
+    </button>
   </aside>
-
-  <!-- MENU — vertical tab on the screen edge (desktop); opens the full-screen overlay.
-       Lives outside .rail so its position:fixed anchors to the viewport, not the
-       backdrop-filtered bar. Hidden on mobile (the bottom bar has its own trigger). -->
-  <button class="rail-menu" id="railMenu" aria-label="Open menu">
-    <span class="rail-menu-bars" aria-hidden="true"><i></i><i></i><i></i></span>
-    <span class="rail-tip"><span class="rail-tip-text" data-i18n="tip.menu">Menu</span></span>
-  </button>
 
   <!-- Profile card (hover the Bq logo) -->
   <div class="profile-card" id="profileCard" aria-hidden="true">
