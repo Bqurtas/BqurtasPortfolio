@@ -82,21 +82,21 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   const roomLabelKeys = {
     design: 'nav.design',
+    panjamor: 'nav.panjamor',
+    blog: 'nav.blog',
     work: 'nav.work',
     brandboard: 'nav.brandboard',
-    blog: 'nav.blog',
     bio: 'nav.bio',
-    contact: 'nav.contact',
-    panjamor: 'nav.panjamor'
+    contact: 'nav.contact'
   };
   const roomLabelFallbacks = {
     design: 'Design',
+    panjamor: 'Panjamor',
+    blog: 'The Journal',
     work: 'Selected Work',
     brandboard: 'The Brand Board',
-    blog: 'The Journal',
     bio: 'The Designer',
-    contact: "Let's talk.",
-    panjamor: 'Panjamor'
+    contact: "Let's talk."
   };
   const setRoomChrome = (room) => {
     const key = roomLabelKeys[room] || roomLabelKeys.design;
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- ROUTER (room switcher + deep-links) ---------- */
   const rooms = document.querySelectorAll('.room');
   const routeLinks = document.querySelectorAll('[data-route]');
-  const validRooms = ['design','work','brandboard','blog','bio','contact','panjamor'];
+  const validRooms = ['design','panjamor','blog','work','brandboard','bio','contact'];
 
   let triggerReveals = () => {};
   let moveUnderline  = () => {};
@@ -189,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     window.scrollTo({ top: 0, behavior: 'auto' });
     document.body.dataset.room = id;
+    document.documentElement.dataset.room = id;
     setRoomChrome(id);
     document.querySelectorAll('.reveal').forEach(el => el.classList.remove('is-in'));
     requestAnimationFrame(() => triggerReveals());
@@ -407,7 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
     image:    { title: 'Photography',     desc: 'Lightroom editing, composites, and editorial retouching.',               note: 'Erbil & Kurdistan Region · 2018—Now' },
     logo:     { title: 'Logos',           desc: 'Marks, wordmarks, and visual identities — a decade of drawn signs.',    note: '2014—2025 · Various clients' },
     posters:  { title: 'Posters',         desc: 'Cultural, political, and typographic poster series.',                   note: 'Series · Erbil & Kurdistan Region' },
-    social:   { title: 'Social Media',    desc: 'Instagram grids, campaigns, and digital storytelling.',                 note: '2023—Now · Various brands' },
+    social:   { title: 'Social M',        desc: 'Instagram grids, campaigns, and digital storytelling.',                 note: '2023—Now · Various brands' },
     events:   { title: 'Events',          desc: 'Ceremony materials, banners, and event identity design.',                note: 'Conferences & cultural events · KRG' },
     stationery: { title: 'Stationery',    desc: 'Business cards, letterheads, invoices, and receipts.',                  note: '' },
     ai:         { title: 'AI',            desc: 'AI-assisted posters, video, and experiments.',                          note: '' },

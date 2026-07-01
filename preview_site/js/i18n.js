@@ -69,7 +69,7 @@ window.I18N = {
     'cf.message.ph': 'A short brief — what is the project, who is it for, what does success look like?',
     'cf.nda': 'I need an NDA before sharing details.', 'cf.choose': 'Choose one…',
     'qc.location': 'Location', 'qc.inquiry': 'Inquiry', 'qc.call': 'Call Direct', 'qc.designer': 'Designer', 'f.loc': 'Erbil — Kurdistan, Iraq', 'lm.load': 'Load {n} more', 'lm.info': '{shown} / {total} — {rem} remaining',
-    'tab.all': 'General', 'tab.official': 'Official', 'tab.posters': 'Posters', 'tab.social': 'Social',
+    'tab.all': 'General', 'tab.official': 'Official', 'tab.posters': 'Posters', 'tab.social': 'Social M',
     'tab.logo': 'Logo', 'tab.book': 'Book', 'tab.events': 'Events', 'tab.business': 'Business',
     'tab.invoices': 'Invoices', 'tab.image': 'Image', 'tab.video': 'Video', 'tab.other': 'Other',
     'tab.certificate': 'Certificate', 'tab.flex': 'Flex'
@@ -858,7 +858,7 @@ window.TAB_META_I18N = {
     image:    { title: 'Photography',    desc: 'Lightroom editing, composites, and editorial retouching.',             note: 'Erbil & Kurdistan Region · 2018—Now' },
     logo:     { title: 'Logos',          desc: 'Marks, wordmarks, and visual identities — a decade of drawn signs.',   note: '2014—2025 · Various clients' },
     posters:  { title: 'Posters',        desc: 'Cultural, political, and typographic poster series.',                  note: 'Series · Erbil & Kurdistan Region' },
-    social:   { title: 'Social Media',   desc: 'Instagram grids, campaigns, and digital storytelling.',                note: '2023—Now · Various brands' },
+    social:   { title: 'Social M',       desc: 'Instagram grids, campaigns, and digital storytelling.',                note: '2023—Now · Various brands' },
     events:   { title: 'Events',         desc: 'Ceremony materials, banners, and event identity design.',              note: 'Conferences & cultural events · KRG' },
     business: { title: 'Business Cards', desc: 'Personal and client stationery — both sides of the conversation.',     note: '2024 · Print-ready' },
     invoices: { title: 'Invoices',       desc: 'Stationery systems — letterhead, invoice, and receipt.',               note: '2024 · Various clients' },
@@ -2128,7 +2128,7 @@ Object.keys(window.I18N_EXTRA_WORK328).forEach(function(l){ if(window.I18N[l]) O
 /* ===== v332 — Panjamor as an independent studio room ===== */
 window.I18N_EXTRA_PANJAMOR332 = {
   en:{
-    "nav.panjamor":"Panjamor","menu.rooms":"Rooms / 01—07","menu.note.panjamor":"Brand, print and launch studio","meta.title.panjamor":"Panjamor Studio — Barakat Qurtas",
+    "nav.panjamor":"Panjamor","menu.rooms":"Rooms / 01—07","menu.note.panjamor":"Brand, print and launch studio","meta.title.panjamor":"Panjamor Office Studio — Barakat Qurtas",
     "pj.open":"Open studio","pj.room.eye":"Panjamor Office Studio","pj.room.title":"Brand, print and launch systems with a real fingerprint.","pj.room.sub":"A studio for business owners who need a name, logo direction, colours, type, printed matter and launch material to feel like one living system.","pj.room.primary":"Start a project","pj.room.secondary":"See the portfolio",
     "pj.services.eye":"Studio scope","pj.services.title":"Everything a small brand needs to look <em>ready</em>.","pj.services.sub":"Not only a logo. Panjamor connects strategy, visual identity, print, social launch and production details so the brand can leave the studio already usable.",
     "pj.s1.t":"Identity direction","pj.s1.d":"Name checks, logo direction, Kurdish and Latin lockups, colour palette, type pairing and a clean mini-guide.","pj.s2.t":"Print system","pj.s2.d":"Business cards, letterheads, invoices, packaging notes, signage and production-ready files.","pj.s3.t":"Launch kit","pj.s3.d":"Opening posts, campaign visuals, profile assets, poster direction and clear wording for the first announcement.","pj.s4.t":"Owner handover","pj.s4.d":"A tidy folder, export rules, usage notes and a checklist so the business can keep using the brand correctly.",
@@ -2137,7 +2137,7 @@ window.I18N_EXTRA_PANJAMOR332 = {
     "pj.cta.eye":"Ready when the idea is serious","pj.cta.title":"Bring the project. Panjamor will shape the system.","pj.cta.sub":"Send the business name, field, budget, deadline and any references. The reply will be practical, not vague.","pj.cta.btn":"Write the brief"
   },
   ku:{
-    "nav.panjamor":"پەنجەمۆر","menu.rooms":"ژوورەکان / ٠١—٠٧","menu.note.panjamor":"ستۆدیۆی براند، چاپ و دەستپێکردن","meta.title.panjamor":"ستۆدیۆی پەنجەمۆر — بەرەکات قورتاس",
+    "nav.panjamor":"پەنجەمۆر","menu.rooms":"ژوورەکان / ٠١—٠٧","menu.note.panjamor":"ستۆدیۆی براند، چاپ و دەستپێکردن","meta.title.panjamor":"ستۆدیۆی ئۆفیسی پەنجەمۆر — بەرەکات قورتاس",
     "pj.open":"کردنەوەی ستۆدیۆ","pj.room.eye":"ستۆدیۆی ئۆفیسی پەنجەمۆر","pj.room.title":"سیستەمی براند، چاپ و دەستپێکردن بە پەنجەمۆری ڕاستەقینە.","pj.room.sub":"ستۆدیۆیەک بۆ خاوەن پیشەکان کە پێویستیان بە ناو، ئاراستەی لۆگۆ، ڕەنگ، فۆنت، چاپەمەنی و کەرەستەی دەستپێکردنە هەموویان وەک یەک سیستەمی زیندوو کار بکەن.","pj.room.primary":"دەستپێکردنی پڕۆژە","pj.room.secondary":"بینینی پۆرتفۆلیۆ",
     "pj.services.eye":"سنووری ستۆدیۆ","pj.services.title":"هەموو ئەوەی براندێکی بچووک پێویستی پێیەتی تا <em>ئامادە</em> بێت.","pj.services.sub":"تەنیا لۆگۆ نییە. پەنجەمۆر ستراتیژی، ناسنامەی بینراو، چاپ، دەستپێکردنی سۆشیاڵ و وردەکاریی بەرهەمهێنان پێکەوە دەبەستێت تا براندەکە لە ستۆدیۆوە کارپێکراو بێتە دەرەوە.",
     "pj.s1.t":"ئاراستەی ناسنامە","pj.s1.d":"پشکنینی ناو، ئاراستەی لۆگۆ، لاکەپی کوردی و لاتین، پاڵێتی ڕەنگ، جووتی فۆنت و ڕێبەری بچووک.","pj.s2.t":"سیستەمی چاپ","pj.s2.d":"کارتی بازرگانی، سەرپەڕە، پسووڵە، تێبینی پاکێج، تابلو و فایلە ئامادەکانی چاپ.","pj.s3.t":"کیتی دەستپێکردن","pj.s3.d":"پۆستی کردنەوە، وێنەی کەمپەین، ئاسێتی پڕۆفایل، ئاراستەی پۆستەر و دەقی ڕوونی ڕاگەیاندنی یەکەم.","pj.s4.t":"ڕادەستکردن بە خاوەن کار","pj.s4.d":"فۆڵدەری پاک، یاسای هەناردەکردن، تێبینی بەکارهێنان و لیستی پشکنین تا پیشەکە بتوانێت بە ڕاستی بەکاری بهێنێت.",
@@ -2146,7 +2146,7 @@ window.I18N_EXTRA_PANJAMOR332 = {
     "pj.cta.eye":"کاتێک بیرۆکەکە جددییە","pj.cta.title":"پڕۆژەکە بهێنە. پەنجەمۆر سیستەمەکە دەشێوێنێت.","pj.cta.sub":"ناوی پیشەکە، بواری کار، بودجە، کاتی تەواوبوون و هەر نموونەیەک هەیە بنێرە. وەڵامەکە کرداری دەبێت، نە ناڕوون.","pj.cta.btn":"نووسینی بریف"
   },
   kmr:{
-    "nav.panjamor":"Panjamor","menu.rooms":"Ode / 01—07","menu.note.panjamor":"Studyo ya brand, çap û destpêkê","meta.title.panjamor":"Studyo ya Panjamor — Barakat Qurtas",
+    "nav.panjamor":"Panjamor","menu.rooms":"Ode / 01—07","menu.note.panjamor":"Studyo ya brand, çap û destpêkê","meta.title.panjamor":"Studyo Ofîsa Panjamor — Barakat Qurtas",
     "pj.open":"Studyo veke","pj.room.eye":"Studyo Ofîsa Panjamor","pj.room.title":"Sîstemên brand, çap û destpêkê bi mora rastîn.","pj.room.sub":"Studyoyek ji bo xwediyên kar ku nav, arasteya logo, reng, font, materyalên çapê û materyalên destpêkê dixwazin wek sîstemeke zindî bixebitin.","pj.room.primary":"Projeyê dest pê bike","pj.room.secondary":"Portfolyo bibîne",
     "pj.services.eye":"Qada studyoyê","pj.services.title":"Her tiştê ku brandeke biçûk hewce dike da ku <em>amade</em> xuya bike.","pj.services.sub":"Ne tenê logo. Panjamor stratejî, nasnameya dîtbarî, çap, destpêka civakî û hûrgiliyên hilberînê girê dide da brand amade derkeve.",
     "pj.s1.t":"Arasteya nasnameyê","pj.s1.d":"Kontrola nav, arasteya logo, kilîtên kurdî û latînî, paleta reng, cotê font û rêbereke paqij.","pj.s2.t":"Sîstema çapê","pj.s2.d":"Kartên karsaziyê, serkaxez, fatûre, notên pakêtê, nîşan û pelên amade yên çapê.","pj.s3.t":"Kîta destpêkê","pj.s3.d":"Postên vekirinê, wêneyên kampanyayê, assetên profîlê, arasteya posterê û nivîsa zelal a ragihandina yekem.","pj.s4.t":"Radestkirina xwediyê kar","pj.s4.d":"Peldankeke rêk, rêbazên eksportê, notên bikaranînê û lîsteya kontrolê da kar brandê rast bi kar bîne.",
@@ -2155,7 +2155,7 @@ window.I18N_EXTRA_PANJAMOR332 = {
     "pj.cta.eye":"Dema fikir cidî be","pj.cta.title":"Projeyê bîne. Panjamor sîstemê ava dike.","pj.cta.sub":"Navê kar, qada xebatê, budce, dem û referansên heyî bişîne. Bersiv dê pratîk be, ne nezelal.","pj.cta.btn":"Kurteyê binivîse"
   },
   ar:{
-    "nav.panjamor":"بنجمور","menu.rooms":"الغرف / ٠١—٠٧","menu.note.panjamor":"استوديو للعلامة والطباعة والإطلاق","meta.title.panjamor":"استوديو بنجمور — بركات قرطاس",
+    "nav.panjamor":"بنجمور","menu.rooms":"الغرف / ٠١—٠٧","menu.note.panjamor":"استوديو للعلامة والطباعة والإطلاق","meta.title.panjamor":"استوديو مكتب بنجمور — بركات قرطاس",
     "pj.open":"افتح الاستوديو","pj.room.eye":"استوديو مكتب بنجمور","pj.room.title":"أنظمة علامة وطباعة وإطلاق ببصمة حقيقية.","pj.room.sub":"استوديو لأصحاب الأعمال الذين يحتاجون إلى اسم، اتجاه شعار، ألوان، خطوط، مواد مطبوعة ومواد إطلاق تبدو كنظام واحد حي.","pj.room.primary":"ابدأ مشروعاً","pj.room.secondary":"شاهد الأعمال",
     "pj.services.eye":"نطاق الاستوديو","pj.services.title":"كل ما تحتاجه العلامة الصغيرة لتبدو <em>جاهزة</em>.","pj.services.sub":"ليس شعاراً فقط. بنجمور يربط الاستراتيجية والهوية البصرية والطباعة وإطلاق التواصل وتفاصيل الإنتاج كي تخرج العلامة قابلة للاستخدام.",
     "pj.s1.t":"اتجاه الهوية","pj.s1.d":"فحص الاسم، اتجاه الشعار، صيغ كردية ولاتينية، لوحة ألوان، تناغم خطوط ودليل صغير واضح.","pj.s2.t":"نظام الطباعة","pj.s2.d":"بطاقات عمل، ترويسات، فواتير، ملاحظات تغليف، لافتات وملفات جاهزة للطباعة.","pj.s3.t":"عدة الإطلاق","pj.s3.d":"منشورات الافتتاح، مرئيات الحملة، عناصر الحسابات، اتجاه الملصق ونص واضح لأول إعلان.","pj.s4.t":"تسليم المالك","pj.s4.d":"مجلد مرتب، قواعد تصدير، ملاحظات استخدام وقائمة تحقق ليستمر العمل في استخدام العلامة بشكل صحيح.",
@@ -2164,7 +2164,7 @@ window.I18N_EXTRA_PANJAMOR332 = {
     "pj.cta.eye":"عندما تكون الفكرة جدية","pj.cta.title":"أحضر المشروع. بنجمور يصوغ النظام.","pj.cta.sub":"أرسل اسم العمل، المجال، الميزانية، الموعد وأي مراجع. سيكون الرد عملياً لا غامضاً.","pj.cta.btn":"اكتب الموجز"
   },
   fr:{
-    "nav.panjamor":"Panjamor","menu.rooms":"Salles / 01—07","menu.note.panjamor":"Studio de marque, print et lancement","meta.title.panjamor":"Studio Panjamor — Barakat Qurtas",
+    "nav.panjamor":"Panjamor","menu.rooms":"Salles / 01—07","menu.note.panjamor":"Studio de marque, print et lancement","meta.title.panjamor":"Studio bureau Panjamor — Barakat Qurtas",
     "pj.open":"Ouvrir le studio","pj.room.eye":"Studio bureau Panjamor","pj.room.title":"Systèmes de marque, d'impression et de lancement avec une vraie empreinte.","pj.room.sub":"Un studio pour entrepreneurs qui ont besoin d'un nom, d'une direction logo, de couleurs, de typographies, d'imprimés et de supports de lancement comme un seul système vivant.","pj.room.primary":"Lancer un projet","pj.room.secondary":"Voir le portfolio",
     "pj.services.eye":"Portée du studio","pj.services.title":"Tout ce qu'une petite marque doit avoir pour paraître <em>prête</em>.","pj.services.sub":"Pas seulement un logo. Panjamor relie stratégie, identité visuelle, print, lancement social et détails de production pour livrer une marque déjà utilisable.",
     "pj.s1.t":"Direction d'identité","pj.s1.d":"Vérification du nom, direction logo, versions kurde et latine, palette, duo typographique et mini-guide clair.","pj.s2.t":"Système imprimé","pj.s2.d":"Cartes, en-têtes, factures, notes packaging, signalétique et fichiers prêts pour production.","pj.s3.t":"Kit de lancement","pj.s3.d":"Posts d'ouverture, visuels de campagne, assets de profil, direction affiche et texte clair pour la première annonce.","pj.s4.t":"Remise au propriétaire","pj.s4.d":"Un dossier propre, règles d'export, notes d'usage et checklist pour utiliser la marque correctement.",
@@ -2173,7 +2173,7 @@ window.I18N_EXTRA_PANJAMOR332 = {
     "pj.cta.eye":"Quand l'idée est sérieuse","pj.cta.title":"Apportez le projet. Panjamor façonne le système.","pj.cta.sub":"Envoyez le nom, le domaine, le budget, le délai et vos références. La réponse sera pratique, pas vague.","pj.cta.btn":"Écrire le brief"
   },
   tr:{
-    "nav.panjamor":"Panjamor","menu.rooms":"Odalar / 01—07","menu.note.panjamor":"Marka, baskı ve lansman stüdyosu","meta.title.panjamor":"Panjamor Stüdyosu — Barakat Qurtas",
+    "nav.panjamor":"Panjamor","menu.rooms":"Odalar / 01—07","menu.note.panjamor":"Marka, baskı ve lansman stüdyosu","meta.title.panjamor":"Panjamor Ofis Stüdyosu — Barakat Qurtas",
     "pj.open":"Stüdyoyu aç","pj.room.eye":"Panjamor Ofis Stüdyosu","pj.room.title":"Gerçek bir iz taşıyan marka, baskı ve lansman sistemleri.","pj.room.sub":"İsim, logo yönü, renk, yazı, basılı işler ve lansman malzemelerini tek yaşayan sistem gibi isteyen iş sahipleri için stüdyo.","pj.room.primary":"Proje başlat","pj.room.secondary":"Portföyü gör",
     "pj.services.eye":"Stüdyo kapsamı","pj.services.title":"Küçük bir markanın <em>hazır</em> görünmesi için gereken her şey.","pj.services.sub":"Sadece logo değil. Panjamor strateji, görsel kimlik, baskı, sosyal lansman ve üretim detaylarını bağlar; marka stüdyodan kullanılabilir çıkar.",
     "pj.s1.t":"Kimlik yönü","pj.s1.d":"İsim kontrolü, logo yönü, Kürtçe ve Latin kilitler, renk paleti, yazı eşleşmesi ve temiz mini kılavuz.","pj.s2.t":"Baskı sistemi","pj.s2.d":"Kartvizit, antetli kağıt, fatura, ambalaj notu, tabela ve baskıya hazır dosyalar.","pj.s3.t":"Lansman kiti","pj.s3.d":"Açılış gönderileri, kampanya görselleri, profil öğeleri, afiş yönü ve ilk duyuru metni.","pj.s4.t":"Sahibe teslim","pj.s4.d":"Düzenli klasör, dışa aktarım kuralları, kullanım notları ve markayı doğru kullanmak için kontrol listesi.",
@@ -2182,7 +2182,7 @@ window.I18N_EXTRA_PANJAMOR332 = {
     "pj.cta.eye":"Fikir ciddi olduğunda hazır","pj.cta.title":"Projeyi getirin. Panjamor sistemi şekillendirir.","pj.cta.sub":"İş adını, alanı, bütçeyi, tarihi ve referansları gönderin. Yanıt pratik olacak, belirsiz değil.","pj.cta.btn":"Özeti yaz"
   },
   sv:{
-    "nav.panjamor":"Panjamor","menu.rooms":"Rum / 01—07","menu.note.panjamor":"Studio för varumärke, tryck och lansering","meta.title.panjamor":"Panjamor Studio — Barakat Qurtas",
+    "nav.panjamor":"Panjamor","menu.rooms":"Rum / 01—07","menu.note.panjamor":"Studio för varumärke, tryck och lansering","meta.title.panjamor":"Panjamor kontorsstudio — Barakat Qurtas",
     "pj.open":"Öppna studion","pj.room.eye":"Panjamor kontorsstudio","pj.room.title":"Varumärkes-, tryck- och lanseringssystem med ett verkligt avtryck.","pj.room.sub":"En studio för företagare som behöver namn, logoriktning, färg, typografi, trycksaker och lanseringsmaterial som ett sammanhållet levande system.","pj.room.primary":"Starta projekt","pj.room.secondary":"Se portfolion",
     "pj.services.eye":"Studions omfattning","pj.services.title":"Allt en liten varumärkesidé behöver för att kännas <em>klar</em>.","pj.services.sub":"Inte bara en logo. Panjamor kopplar strategi, visuell identitet, tryck, social lansering och produktionsdetaljer så varumärket lämnar studion användbart.",
     "pj.s1.t":"Identitetsriktning","pj.s1.d":"Namnkontroll, logoriktning, kurdiska och latinska låsningar, färgpalett, typsnittspar och tydlig miniguide.","pj.s2.t":"Trycksystem","pj.s2.d":"Visitkort, brevhuvud, fakturor, förpackningsnoter, skyltning och produktionsklara filer.","pj.s3.t":"Lanseringskit","pj.s3.d":"Öppningsinlägg, kampanjbilder, profilmaterial, affischriktning och tydlig text för första tillkännagivandet.","pj.s4.t":"Överlämning","pj.s4.d":"En ren mapp, exportregler, användningsnoter och checklista så verksamheten kan använda märket korrekt.",

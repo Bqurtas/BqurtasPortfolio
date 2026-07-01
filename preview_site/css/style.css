@@ -14,6 +14,334 @@
   font-display: optional;
 }
 
+/* =========================================================
+   v333 — Panjamor office-studio hero, logo system, menu order
+          polish, mobile footer simplification and softer snap.
+   ========================================================= */
+html[data-room="panjamor"]{
+  scroll-snap-type:y proximity !important;
+  scroll-padding-top:0 !important;
+}
+#panjamor .pj-snap-panel{
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+}
+.pencemor-aside{
+  position:relative;
+  overflow:hidden;
+}
+.pencemor-aside::before{
+  content:"";
+  position:absolute;
+  right:-18px;
+  top:-26px;
+  width:148px;
+  aspect-ratio:1;
+  background:url("../assets/panjamor-logo.webp") center/contain no-repeat;
+  opacity:.055;
+  filter:grayscale(1) contrast(1.1);
+  pointer-events:none;
+}
+[dir="rtl"] .pencemor-aside::before{
+  right:auto;
+  left:-18px;
+}
+.pencemor-card-logo{
+  width:clamp(42px,5.2vw,66px);
+  height:auto;
+  object-fit:contain;
+  margin:0 0 16px;
+  opacity:.78;
+  filter:grayscale(1) contrast(1.08);
+}
+.pencemor-room-hero{
+  grid-template-columns:minmax(0,1fr) minmax(210px,.52fr) !important;
+  gap:clamp(32px,6vw,84px) !important;
+  padding-top:clamp(86px,9vh,118px) !important;
+  background:
+    radial-gradient(circle at 78% 46%, color-mix(in srgb,var(--pj-paper) 10%,transparent), transparent 34%),
+    linear-gradient(115deg, color-mix(in srgb,var(--pj-deep) 92%,var(--bg)) 0%, var(--bg) 58%, color-mix(in srgb,var(--pj-rust) 10%,var(--bg)) 100%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.032) 0 1px, transparent 1px 72px) !important;
+}
+.pencemor-room-hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg, transparent 0 49%, color-mix(in srgb,var(--line) 42%,transparent) 49% 50%, transparent 50%),
+    repeating-linear-gradient(0deg, transparent 0 34px, color-mix(in srgb,var(--line) 20%,transparent) 34px 35px);
+  opacity:.34;
+  pointer-events:none;
+}
+.pencemor-room-hero .pj-return{
+  top:clamp(22px,3vw,36px) !important;
+  left:var(--pad-x) !important;
+  z-index:5;
+  background:color-mix(in srgb,var(--bg) 82%,transparent);
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+}
+[dir="rtl"] .pencemor-room-hero .pj-return{
+  left:auto !important;
+  right:var(--pad-x) !important;
+}
+.pj-logo-ghost{
+  position:absolute;
+  right:clamp(-170px,-9vw,-80px);
+  top:50%;
+  width:clamp(420px,48vw,720px);
+  transform:translateY(-50%) rotate(-7deg);
+  opacity:.055;
+  filter:grayscale(1) brightness(1.35) contrast(.88);
+  mix-blend-mode:screen;
+  pointer-events:none;
+}
+[dir="rtl"] .pj-logo-ghost{
+  right:auto;
+  left:clamp(-170px,-9vw,-80px);
+  transform:translateY(-50%) rotate(7deg);
+}
+.pj-room-hero-copy{
+  grid-column:1;
+  grid-row:1;
+  align-self:center;
+  z-index:2;
+}
+.pj-room-mark{
+  grid-column:2;
+  grid-row:1;
+  justify-self:center !important;
+  width:clamp(190px,26vw,360px) !important;
+  border-radius:28px !important;
+  border:1px solid color-mix(in srgb,var(--pj-paper) 20%,transparent) !important;
+  background:
+    radial-gradient(circle at 50% 30%, color-mix(in srgb,var(--pj-paper) 9%,transparent), transparent 58%),
+    color-mix(in srgb,var(--surface) 78%,transparent) !important;
+  box-shadow:0 44px 110px -70px rgba(0,0,0,.9) !important;
+  padding:clamp(22px,3.6vw,44px);
+}
+.pj-room-mark img{
+  width:100%;
+  height:auto;
+  object-fit:contain;
+  opacity:.9;
+  filter:grayscale(1) contrast(1.06);
+}
+.pj-room-kicker{
+  letter-spacing:.13em !important;
+}
+.pj-room-title{
+  max-width:12.5ch !important;
+  font-size:clamp(54px,8.8vw,126px) !important;
+  line-height:.86 !important;
+}
+.pj-room-lead{
+  margin:clamp(18px,2.6vw,28px) 0 0;
+  max-width:680px;
+  font-family:'Fraunces',serif;
+  font-size:clamp(24px,3.1vw,46px);
+  line-height:1.08;
+  color:var(--ink);
+}
+.pj-room-sub{
+  max-width:720px !important;
+}
+.pj-system-section{
+  max-width:1280px !important;
+  min-height:100svh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:clamp(24px,4vw,44px);
+}
+.pj-system-card{
+  position:relative;
+  display:grid;
+  gap:clamp(18px,2vw,26px);
+  padding:clamp(16px,2.4vw,30px);
+  border:1px solid var(--line);
+  border-radius:24px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb,var(--surface) 88%,transparent), color-mix(in srgb,var(--bg-2) 62%,transparent)),
+    repeating-linear-gradient(90deg, transparent 0 38px, color-mix(in srgb,var(--line) 22%,transparent) 38px 39px);
+  box-shadow:0 34px 90px -78px rgba(0,0,0,.78);
+}
+.pj-system-card::before{
+  content:"";
+  position:absolute;
+  right:clamp(18px,3vw,42px);
+  top:clamp(14px,2vw,28px);
+  width:clamp(120px,15vw,220px);
+  aspect-ratio:1;
+  background:url("../assets/panjamor-logo.webp") center/contain no-repeat;
+  opacity:.04;
+  filter:grayscale(1);
+  pointer-events:none;
+}
+[dir="rtl"] .pj-system-card::before{
+  right:auto;
+  left:clamp(18px,3vw,42px);
+}
+.pj-system-section .pj-service-grid{
+  margin-top:0 !important;
+}
+.pj-process-strip{
+  display:grid;
+  grid-template-columns:minmax(220px,.56fr) minmax(0,1.44fr);
+  gap:clamp(18px,2.4vw,30px);
+  align-items:stretch;
+}
+.pj-process-copy,
+.pj-proof-copy{
+  padding:clamp(18px,2.2vw,28px);
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:color-mix(in srgb,var(--bg) 68%,transparent);
+}
+.pj-process-copy h3,
+.pj-proof-copy h3{
+  margin:12px 0 0;
+  font-family:'Fraunces',serif;
+  font-size:clamp(28px,3vw,52px);
+  line-height:1;
+  font-weight:500;
+}
+.pj-proof-copy p{
+  margin:14px 0 0;
+  color:var(--ink-soft);
+  line-height:1.62;
+}
+.pj-proof-panel{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(260px,.72fr);
+  gap:clamp(16px,2vw,26px);
+}
+.studio-card,
+.studio-step{
+  border-radius:16px !important;
+}
+.pj-system-section .studio-card,
+.pj-system-section .studio-step{
+  min-height:clamp(176px,18vw,240px) !important;
+  background:color-mix(in srgb,var(--bg) 58%,transparent) !important;
+}
+.pj-system-section .studio-card i{
+  margin:clamp(18px,2.6vw,30px) 0 18px !important;
+}
+.pj-system-section .studio-step{
+  padding:clamp(18px,1.8vw,24px) !important;
+}
+.pj-system-section .studio-step p,
+.pj-system-section .studio-card p{
+  font-size:14px;
+}
+.pj-cta-section{
+  scroll-snap-align:start;
+}
+.mobile-menu .mm-link{
+  padding-block:clamp(11px,2.2vh,17px) !important;
+}
+.mobile-menu .mm-link .mm-link-text{
+  font-size:clamp(25px,5.4vw,40px) !important;
+}
+.mobile-menu .mm-link .mm-n{
+  font-size:clamp(14px,3.1vw,21px) !important;
+}
+.mobile-menu .mm-link::after{
+  font-size:10px !important;
+}
+.mobile-menu .mm-top-label{
+  font-size:10px !important;
+}
+@media (prefers-reduced-motion:no-preference){
+  .pj-logo-ghost{
+    animation:pjLogoFloat 12s ease-in-out infinite;
+  }
+  .pj-room-mark img{
+    animation:pjLogoBreath 7s ease-in-out infinite;
+  }
+}
+@keyframes pjLogoFloat{
+  0%,100%{ transform:translateY(-50%) rotate(-7deg) scale(1); }
+  50%{ transform:translateY(-52%) rotate(-4deg) scale(1.025); }
+}
+@keyframes pjLogoBreath{
+  0%,100%{ transform:translate3d(0,0,0) scale(1); opacity:.86; }
+  50%{ transform:translate3d(0,-4px,0) scale(1.018); opacity:.96; }
+}
+@media (max-width:980px){
+  .pencemor-room-hero{
+    grid-template-columns:1fr !important;
+    align-content:start !important;
+  }
+  .pj-room-hero-copy,
+  .pj-room-mark{
+    grid-column:1;
+    grid-row:auto;
+  }
+  .pj-room-mark{
+    justify-self:start !important;
+    width:clamp(132px,34vw,210px) !important;
+    padding:18px;
+  }
+  .pj-logo-ghost{
+    width:clamp(320px,74vw,560px);
+    right:-160px;
+    top:36%;
+  }
+  .pj-process-strip,
+  .pj-proof-panel{
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width:640px){
+  html[data-room="panjamor"]{
+    scroll-snap-type:y proximity !important;
+  }
+  .pencemor-card-logo{
+    width:48px;
+    margin-bottom:12px;
+  }
+  .pencemor-room-hero{
+    padding-top:72px !important;
+    padding-bottom:calc(96px + env(safe-area-inset-bottom)) !important;
+  }
+  .pencemor-room-hero .pj-return{
+    top:16px !important;
+    min-height:38px;
+    padding:8px 12px !important;
+  }
+  .pj-room-title{
+    font-size:clamp(42px,13vw,62px) !important;
+    max-width:10.5ch !important;
+  }
+  .pj-room-lead{
+    font-size:clamp(20px,6.1vw,30px);
+  }
+  .pj-room-mark{
+    width:clamp(112px,31vw,154px) !important;
+    border-radius:20px !important;
+  }
+  .pj-system-section{
+    min-height:auto;
+    justify-content:flex-start;
+  }
+  .pj-system-card{
+    padding:14px;
+    border-radius:18px;
+  }
+  .pj-process-copy,
+  .pj-proof-copy{
+    padding:16px;
+  }
+  .pj-proof-list .studio-proof-item{
+    min-height:58px;
+  }
+  .footer-room-nav .footer-column-label{
+    display:none !important;
+  }
+}
+
 /* ---------- Reset ---------- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
