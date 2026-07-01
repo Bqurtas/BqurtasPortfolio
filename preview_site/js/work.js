@@ -16,6 +16,9 @@
   const goForm  = document.getElementById('workGoForm');
   const goInput = document.getElementById('workGoInput');
   if (!indexEl || !viewEl) return;
+  viewEl.setAttribute('role', 'dialog');
+  viewEl.setAttribute('aria-modal', 'true');
+  viewEl.setAttribute('aria-hidden', 'true');
 
   const SB = () => window.BQ_SUPA || { url:'https://dcnkhzrishphpismmxuu.supabase.co', key:'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };
   const lang = () => document.documentElement.getAttribute('lang') || document.documentElement.dataset.lang || 'en';
@@ -189,6 +192,10 @@
     indexEl.hidden = true;
     if (pagerEl) pagerEl.hidden = true;
     viewEl.hidden = false;
+    viewEl.classList.add('is-open');
+    viewEl.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => viewEl.scrollTo({ top: 0, left: 0, behavior: 'auto' }));
     $('#wcBack', viewEl).addEventListener('click', () => {
       if (history.state && history.state.bqWork && history.length > 1) history.back();
       else closeCase(true);
@@ -198,12 +205,17 @@
     if (!fromPop) {
       try { history.pushState({ bqWork: slugOf(p) }, '', workBase() + '/' + slugOf(p)); } catch (e) {}
     }
-    const head = room.querySelector('.section-head');
-    if (head) head.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!viewEl.classList.contains('is-open')) {
+      const head = room.querySelector('.section-head');
+      if (head) head.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   function closeCase(updateUrl) {
     current = null;
+    viewEl.classList.remove('is-open');
+    viewEl.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
     viewEl.hidden = true;
     indexEl.hidden = false;
     renderPager();
@@ -239,6 +251,9 @@
   load();
   window.__bqReloadWork = load;
   window.__bqCloseWorkCase = () => { if (current) closeCase(false); };
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && current && viewEl.classList.contains('is-open')) closeCase(true);
+  });
   window.addEventListener('popstate', () => {
     const slug = slugFromUrl();
     if (slug) {

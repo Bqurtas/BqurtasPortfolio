@@ -82,6 +82,70 @@ function localizedUrl(lang, r) {
   return SITE + (suffix || '/');
 }
 
+const xmlEsc = (v) => String(v == null ? '' : v)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;');
+
+function workCaseSitemapBlocks(projects) {
+  const langs = ['en', ...LANGS];
+  const seen = new Set();
+  const clean = (slug) => String(slug || '').trim().replace(/^\/+|\/+$/g, '');
+  const altLinks = (slug) => langs.map((lang) => {
+    const href = localizedUrl(lang, { key: 'work', slug });
+    const hreflang = BCP47[lang] || lang;
+    return '    <xhtml:link rel="alternate" hreflang="' + xmlEsc(hreflang) + '" href="' + xmlEsc(href) + '" />';
+  }).concat('    <xhtml:link rel="alternate" hreflang="x-default" href="' + xmlEsc(localizedUrl('en', { key: 'work', slug })) + '" />').join('\n');
+
+  return projects.map((p) => {
+    const slug = clean(p && p.slug);
+    if (!slug || seen.has(slug)) return '';
+    seen.add(slug);
+    const lastmod = String((p.updated_at || p.created_at || '')).slice(0, 10) || '2026-07-01';
+    return langs.map((lang) => {
+      const loc = localizedUrl(lang, { key: 'work', slug });
+      return [
+        '  <url>',
+        '    <loc>' + xmlEsc(loc) + '</loc>',
+        '    <lastmod>' + xmlEsc(lastmod) + '</lastmod>',
+        '    <changefreq>monthly</changefreq>',
+        '    <priority>0.8</priority>',
+        altLinks(slug),
+        '  </url>'
+      ].join('\n');
+    }).join('\n');
+  }).filter(Boolean).join('\n');
+}
+
+async function serveSitemap(url, env, next) {
+  if (!env || !env.ASSETS) return next();
+  const base = await env.ASSETS.fetch(new URL('/sitemap.xml', url.origin));
+  let body = await base.text();
+  try {
+    const res = await fetch(SUPA + '/rest/v1/projects?select=slug,updated_at,created_at&published=eq.true&order=pos.asc,created_at.desc', {
+      headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY }
+    });
+    if (res.ok) {
+      const projects = await res.json();
+      const missing = (Array.isArray(projects) ? projects : []).filter((p) => {
+        const slug = String(p && p.slug || '').trim().replace(/^\/+|\/+$/g, '');
+        return slug && !body.includes('<loc>' + SITE + '/work/' + slug + '</loc>');
+      });
+      const blocks = workCaseSitemapBlocks(missing);
+      if (blocks) {
+        body = body.replace(/\s*<\/urlset>\s*$/i, '\n' + blocks + '\n</urlset>\n');
+      }
+    }
+  } catch (e) {}
+  const headers = new Headers(base.headers);
+  headers.set('Content-Type', 'application/xml; charset=UTF-8');
+  headers.set('Cache-Control', 'no-store');
+  headers.set('CDN-Cache-Control', 'no-store');
+  headers.set('X-Content-Type-Options', 'nosniff');
+  return new Response(body, { status: 200, headers });
+}
+
 const setContent = (v) => ({ element(el) { el.setAttribute('content', v); } });
 const setHref    = (v) => ({ element(el) { el.setAttribute('href', v); } });
 const setText    = (v) => ({ element(el) { el.setInnerContent(v); } });
@@ -94,6 +158,7 @@ export async function onRequest(context) {
     url.hostname = 'bqurtas.com';
     return Response.redirect(url.toString(), 301);
   }
+  if (url.pathname === '/sitemap.xml') return serveSitemap(url, env, next);
   const r = resolve(url.pathname);
   if (!r) return next();
   if (!env || !env.ASSETS) return next();
