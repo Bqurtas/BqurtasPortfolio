@@ -172,3 +172,6 @@
     if (!raf){ target = window.scrollY; cur = target; }
   }, { passive:true });
 })();
+
+/* ---- flip the print-gated FontAwesome stylesheet live (non-blocking icons) ---- */
+(function(){ var f=document.getElementById('faCss'); if(f) f.media='all'; })();

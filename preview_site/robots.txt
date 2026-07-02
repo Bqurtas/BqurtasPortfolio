@@ -18,4 +18,3 @@ User-agent: Google-Extended
 Allow: /
 
 Sitemap: https://bqurtas.com/sitemap.xml
-LLMs: https://bqurtas.com/llms.txt
