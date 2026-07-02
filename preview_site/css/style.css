@@ -12470,3 +12470,70 @@ body::before{
   -webkit-backdrop-filter:blur(24px) saturate(1.5);
   backdrop-filter:blur(24px) saturate(1.5);
 }
+
+/* =========================================================
+   v343 — per request:
+   1) What I do: the VISIBLE (open) service is WHITE, not black — the active
+      row and the detail card become cream panels with dark text (like the
+      menu's white active card)
+   2) the drawn hairlines around the glass shapes are removed — the glass
+      reads through blur + shadow alone
+   ========================================================= */
+
+/* --- 1) the open service goes white --- */
+.service-panel.is-active .service-trigger{
+  background:#f4f3f0 !important;
+  border-radius:16px !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  border-color:transparent !important;
+}
+.service-panel.is-active .service-trigger .service-name{ color:#1c1b19 !important; }
+.service-panel.is-active .service-trigger .service-sub{ color:#6a675f !important; }
+.service-panel.is-active .service-trigger .service-num{ color:#8a877e !important; }
+.service-panel.is-active .service-icon{ background:#1c1b19 !important; color:#f4f3f0 !important; border-color:#1c1b19 !important; }
+.service-panel.is-active .service-toggle{ background:#1c1b19 !important; color:#f4f3f0 !important; border-color:#1c1b19 !important; }
+.service-panel.is-active{ border-bottom-color:transparent !important; }
+
+.service-detail-inner{
+  background:#f4f3f0 !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  border:none !important;
+  box-shadow:0 34px 80px -34px rgba(0,0,0,.6) !important;
+}
+.service-detail-inner *{ color:#23221f !important; }
+.service-detail-inner .mono{ color:#57544c !important; }
+
+/* --- 2) no drawn lines around the shapes --- */
+.feature-card, .qc-card, .cookie-card,
+.latest-blog-grid .blog-card, .blog-card,
+#bio .bio-stack > .bio-block, #bio .bio-stack > .bio-social,
+.pitch-wrap, .work-card, .bb-app,
+.practice-note .software-experience, .pencemor-aside,
+.practice-note .stats .stat, .software-chip, .tl-card,
+.pj2-chip, .load-more-btn, .load-collapse-btn,
+.tabs .tab, .tab-card, .mm-figure, .mobile-menu-close,
+.room-hero-return, .pj-return,
+.pencemor-hero-btn--ghost, .pencemor-hero-btn--studio,
+.mm-link[data-route]:hover, .mm-link[data-route].is-active, .mm-link:hover, .mm-link.is-active{
+  border-color:transparent !important;
+}
+.feature-card:hover, .blog-card:hover, .work-card:hover, .qc-card:hover,
+#bio .bio-stack > .bio-block:hover, #bio .bio-stack > .bio-social:hover,
+.tabs .tab:hover, .pj2-chip:hover{
+  border-color:transparent !important;
+}
+
+/* v343b — win the specificity fights: the open service row (a stronger old
+   rule kept it dark), the detail card's inner text colours, and the feature
+   cards' hairline (set via .room .feature-card). */
+#design .service-showcase .service-panel.is-active .service-trigger{
+  background:#f4f3f0 !important;
+  border-radius:16px !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+}
+#design .service-showcase .service-panel.is-active .service-trigger .service-name{ color:#1c1b19 !important; }
+#design .service-showcase .service-panel.is-active .service-trigger .service-sub{ color:#6a675f !important; }
+#design .service-showcase .service-panel.is-active .service-trigger .service-num{ color:#8a877e !important; }
+#design .service-detail-inner *{ color:#23221f !important; }
+#design .service-detail-inner .mono{ color:#57544c !important; }
+.room .feature-card, .room .feature-card:hover{ border-color:transparent !important; }
