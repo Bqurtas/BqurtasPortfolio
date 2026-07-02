@@ -1115,3 +1115,65 @@
   [dir="rtl"] .tabs .tab .tab-label{ left:auto !important; right:calc(100% + 12px) !important; }
   .tab-card{ display:none !important; }
 }
+
+/* =========================================================
+   v339 — the FULL GLASS pass (Framer-grade), per request:
+   1) the circle tabs go properly glass, exactly like the dock
+   2) the hover tab-cards return — glassed
+   3) every major shape on the site turns glass: room feature cards,
+      contact quick-cards, chips, load-more controls, cookie card
+   ========================================================= */
+@media (min-width:821px){
+  /* 1 — glass circles */
+  .tabs .tab{
+    background:color-mix(in srgb, var(--bg) 62%, transparent) !important;
+    -webkit-backdrop-filter:blur(18px) saturate(1.6) !important;
+    backdrop-filter:blur(18px) saturate(1.6) !important;
+    border:1px solid color-mix(in srgb, var(--ink) 13%, transparent) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 14px 34px -24px rgba(0,0,0,.5) !important;
+  }
+  .tabs .tab.is-active{
+    background:var(--ink) !important; border-color:var(--ink) !important;
+    -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  }
+  .tabs .tab .tab-label{
+    -webkit-backdrop-filter:blur(14px) saturate(1.4);
+    backdrop-filter:blur(14px) saturate(1.4);
+    box-shadow:0 16px 38px -18px rgba(0,0,0,.55) !important;
+  }
+
+  /* 2 — the hover preview card returns, glassed */
+  .tab-card{
+    display:block !important;
+    background:color-mix(in srgb, var(--bg) 68%, transparent) !important;
+    -webkit-backdrop-filter:blur(22px) saturate(1.6) !important;
+    backdrop-filter:blur(22px) saturate(1.6) !important;
+    border:1px solid color-mix(in srgb, var(--ink) 12%, transparent) !important;
+    border-radius:18px !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 30px 70px -30px rgba(0,0,0,.55) !important;
+  }
+}
+
+/* 3 — glass across the site's shapes (both breakpoints) */
+.feature-card, .qc-card, .cookie-card, .load-more-track{
+  background:color-mix(in srgb, var(--bg) 58%, transparent) !important;
+  -webkit-backdrop-filter:blur(20px) saturate(1.5);
+  backdrop-filter:blur(20px) saturate(1.5);
+  border:1px solid color-mix(in srgb, var(--ink) 11%, transparent) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 26px 60px -34px rgba(0,0,0,.5) !important;
+}
+.feature-card:hover, .qc-card:hover{
+  border-color:color-mix(in srgb, var(--ink) 30%, transparent) !important;
+}
+.load-more-btn, .load-collapse-btn{
+  background:color-mix(in srgb, var(--bg) 62%, transparent) !important;
+  -webkit-backdrop-filter:blur(16px) saturate(1.4);
+  backdrop-filter:blur(16px) saturate(1.4);
+  border:1px solid color-mix(in srgb, var(--ink) 14%, transparent) !important;
+  border-radius:999px !important;
+}
+.pj2-chip{
+  background:color-mix(in srgb, var(--bg) 55%, transparent) !important;
+  -webkit-backdrop-filter:blur(14px) saturate(1.4);
+  backdrop-filter:blur(14px) saturate(1.4);
+}
