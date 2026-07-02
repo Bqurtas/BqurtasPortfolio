@@ -133,3 +133,42 @@
     mq.addEventListener('mouseleave', function () { rate(1); });
   })();
 })();
+
+/* ---- soft lerp scroll (desktop, fine pointers) — the slow, buttery Framer
+   feel. Wheel input feeds a target; a rAF loop eases toward it (factor .09).
+   Panels with their own scrollboxes keep native wheel. ---- */
+(function(){
+  if (!matchMedia('(min-width:821px) and (pointer:fine)').matches) return;
+  var target = 0, cur = 0, raf = null, active = false;
+  var EASE = 0.09;
+  /* the stylesheet pins scroll-behavior:smooth !important, which would smooth
+     every frame of the lerp into treacle — inline important wins the cascade;
+     explicit behavior:'smooth' calls elsewhere still animate. */
+  document.documentElement.style.setProperty('scroll-behavior','auto','important');
+  function maxY(){ return Math.max(0, (document.scrollingElement || document.documentElement).scrollHeight - innerHeight); }
+  function loop(){
+    cur += (target - cur) * EASE;
+    if (Math.abs(target - cur) < 0.5){
+      cur = target;
+      window.scrollTo({ top: cur, behavior: 'auto' });
+      raf = null; active = false; return;
+    }
+    window.scrollTo({ top: cur, behavior: 'auto' });
+    raf = requestAnimationFrame(loop);
+  }
+  addEventListener('wheel', function(e){
+    if (e.ctrlKey || e.metaKey) return;                       /* pinch-zoom */
+    if (e.target && e.target.closest &&
+        e.target.closest('.chat, .latest-panel, .mobile-menu, textarea, select, .bb-mount, .reader, .lb, [data-native-scroll]')) return;
+    e.preventDefault();
+    var d = e.deltaY;
+    if (e.deltaMode === 1) d *= 16; else if (e.deltaMode === 2) d *= innerHeight;
+    if (!active){ cur = window.scrollY; target = cur; active = true; }
+    target = Math.max(0, Math.min(maxY(), target + d));
+    if (!raf) raf = requestAnimationFrame(loop);
+  }, { passive:false });
+  /* stay in sync when scrolling happens by other means (keys, glide, anchors) */
+  addEventListener('scroll', function(){
+    if (!raf){ target = window.scrollY; cur = target; }
+  }, { passive:true });
+})();

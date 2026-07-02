@@ -860,3 +860,190 @@
     scroll-snap-stop:always !important;
   }
 }
+
+/* =========================================================
+   v335 — the cinematic pass:
+   1) the dock goes properly GLASS (much more see-through, deeper blur)
+      and the hairline divider next to the hamburger is gone
+   2) the go-up button sits level with the dock
+   3) desktop snap scroll REMOVED (a JS lerp in lux.js gives the slow,
+      soft, buttery Framer scroll instead)
+   4) less white space at the footer's end (desktop)
+   5) cinematic drifting lines behind the hero (Framer-style)
+   6) perf: below-fold sections render lazily (content-visibility)
+   ========================================================= */
+@media (min-width:821px){
+  /* 1 */
+  .rail{
+    background:color-mix(in srgb, var(--bg) 52%, transparent) !important;
+    -webkit-backdrop-filter:blur(28px) saturate(1.8) !important;
+    backdrop-filter:blur(28px) saturate(1.8) !important;
+  }
+  .rail-menu{
+    border-right:none !important; border-left:none !important;
+    margin:0 !important; padding:0 12px 0 6px !important;
+  }
+  [dir="rtl"] .rail-menu{ padding:0 6px 0 12px !important; }
+
+  /* 2 — dock: bottom 16 + 58 tall → centre 45px; 50px button → bottom 20 */
+  .to-top{ bottom:20px !important; right:24px !important; }
+
+  /* 3 — hard snap off; lux.js takes over with a soft lerp */
+  html{ scroll-snap-type:none !important; }
+  .hero, .bio-teaser, .service-showcase, .logos-section, .practice-note, .footer,
+  .room-hero, .pencemor-hero, .pencemor-room-hero{
+    scroll-snap-align:none !important;
+    scroll-snap-stop:normal !important;
+  }
+
+  /* 4 */
+  .footer{ padding-bottom:60px !important; }
+}
+
+/* 5 — cinematic lines drifting behind the hero */
+.hero-lines{ position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+.hero-lines i{
+  position:absolute; top:-14%; bottom:-14%; width:1px;
+  background:linear-gradient(180deg,
+    transparent,
+    color-mix(in srgb, var(--ink) 26%, transparent) 32%,
+    color-mix(in srgb, var(--ink) 9%, transparent) 62%,
+    transparent);
+  animation:bqHeroLine 10s ease-in-out infinite alternate;
+  will-change:transform, opacity;
+}
+.hero-lines i:nth-child(1){ left:11%; animation-duration:12s; }
+.hero-lines i:nth-child(2){ left:25%; animation-duration:9.5s; animation-delay:-3s; }
+.hero-lines i:nth-child(3){ left:40%; animation-duration:13s; animation-delay:-6s; }
+.hero-lines i:nth-child(4){ left:60%; animation-duration:10.5s; animation-delay:-2s; }
+.hero-lines i:nth-child(5){ left:76%; animation-duration:14s; animation-delay:-8s; }
+.hero-lines i:nth-child(6){ left:90%; animation-duration:11s; animation-delay:-5s; }
+@keyframes bqHeroLine{
+  from{ transform:translateY(-3.5%); opacity:.45; }
+  to  { transform:translateY(3.5%);  opacity:1; }
+}
+
+/* 6 — below-fold sections paint lazily */
+.logos-section, .service-showcase, .practice-note, .bio-teaser{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 760px;
+}
+
+/* v335b — the docked CTA must never wrap */
+.design-cta, .design-cta span{ white-space:nowrap !important; }
+
+/* =========================================================
+   v336 — per request:
+   1) hero stripped clean: no drifting lines, no marquee, no film-grain —
+      one seamless colour with the rest of the site
+   2) the "Let's work together" CTA is PERMANENT in the dock
+   3) desktop tabs become a chain of round pills (like mobile) instead of
+      the classic sidebar list
+   ========================================================= */
+/* 1 */
+.hero-lines, .bq-hero-marquee{ display:none !important; }
+.hero::before{ display:none !important; }
+.hero{ background:transparent !important; }
+
+@media (min-width:821px){
+  /* 2 — always there, in every room */
+  .design-cta{ display:inline-flex !important; opacity:1 !important; pointer-events:auto !important; }
+
+  /* 3 — tabs: a flowing chain of round pills above the grid */
+  .section.work{ display:block !important; }
+  .section.work > .tabs-wrap{
+    position:static !important; width:auto !important; max-width:none !important;
+    margin:0 0 28px !important;
+  }
+  .tabs{
+    display:flex !important; flex-direction:row !important; flex-wrap:wrap !important;
+    gap:10px !important; position:static !important;
+    background:none !important; border:none !important; box-shadow:none !important;
+    padding:0 !important; max-height:none !important; overflow:visible !important;
+  }
+  .tabs-row{ display:contents !important; }
+  .tabs .tab{
+    flex-direction:row !important; gap:9px !important; width:auto !important;
+    padding:11px 18px !important;
+    border-radius:999px !important;
+    border:1px solid color-mix(in srgb, var(--ink) 14%, transparent) !important;
+    background:color-mix(in srgb, var(--ink) 4%, transparent) !important;
+    font-size:13.5px !important;
+    transition:background .25s var(--ease), color .25s var(--ease), border-color .25s var(--ease), transform .25s var(--ease) !important;
+  }
+  .tabs .tab:hover{ transform:translateY(-2px); border-color:color-mix(in srgb, var(--ink) 34%, transparent) !important; }
+  .tabs .tab i{ font-size:15px !important; }
+  .tabs .tab::after{ display:none !important; }
+  .tabs .tab.is-active{ background:var(--ink) !important; color:var(--bg) !important; border-color:var(--ink) !important; }
+  .tabs .tab.is-active i{ color:var(--bg) !important; }
+  .tab-card{ display:none !important; }
+}
+
+/* =========================================================
+   v337 — the cinematic abstract behind the hero (the Framer reference uses
+   a looping 3D video; this is the same mood in pure CSS — an obsidian dome
+   rising at the hero's lower edge, a bloom that breathes behind its crown,
+   and a slow light sweep across its shoulder). Dark theme leads; light
+   theme gets a whisper of it. All compositor animations (opacity/transform).
+   ========================================================= */
+.hero-abstract{
+  position:absolute; left:50%; bottom:-46%;
+  transform:translateX(-50%);
+  width:min(78vw,1040px); aspect-ratio:1.9/1;
+  z-index:1; pointer-events:none;
+}
+/* the breathing bloom behind the crown */
+.hero-abstract::before{
+  content:''; position:absolute; inset:-26% -14%;
+  background:radial-gradient(46% 52% at 50% 26%,
+    rgba(255,255,255,.14), rgba(255,255,255,.045) 46%, transparent 72%);
+  filter:blur(34px);
+  animation:bqBloom 8.5s ease-in-out infinite alternate;
+}
+/* the obsidian dome */
+.hero-abstract::after{
+  content:''; position:absolute; inset:0;
+  border-radius:52% 52% 0 0 / 104% 104% 0 0;
+  background:
+    radial-gradient(120% 105% at 50% 120%,
+      #050505 52%, #0b0b0b 66%, #161616 78%, #232323 87%, #3a3a3a 96%, #565656 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.20),
+    inset 0 14px 34px -18px rgba(255,255,255,.16),
+    0 -30px 90px -40px rgba(255,255,255,.08);
+  overflow:hidden;
+}
+/* the slow light sweep across the shoulder */
+.hero-abstract i{
+  position:absolute; top:0; bottom:38%; left:-30%; width:34%;
+  border-radius:inherit; z-index:2;
+  background:linear-gradient(100deg, transparent,
+    rgba(255,255,255,.075) 46%, rgba(255,255,255,.11) 52%, rgba(255,255,255,.075) 58%,
+    transparent);
+  filter:blur(10px);
+  animation:bqSweep 12s ease-in-out infinite;
+}
+@keyframes bqBloom{
+  from{ opacity:.55; transform:scale(.96); }
+  to  { opacity:1;   transform:scale(1.05); }
+}
+@keyframes bqSweep{
+  0%, 12%{ transform:translateX(0); }
+  55%, 100%{ transform:translateX(460%); }
+}
+/* light theme: the same shape as a quiet shadow-relief */
+:root[data-theme="light"] .hero-abstract{ opacity:.5; }
+:root[data-theme="light"] .hero-abstract::before{
+  background:radial-gradient(46% 52% at 50% 26%,
+    rgba(0,0,0,.10), rgba(0,0,0,.03) 46%, transparent 72%);
+}
+:root[data-theme="light"] .hero-abstract::after{
+  background:
+    radial-gradient(120% 105% at 50% 120%,
+      #d9d7d2 52%, #dedcd7 66%, #e5e3de 78%, #edebe6 88%, #f2f0eb 97%);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.8), 0 -26px 70px -40px rgba(0,0,0,.18);
+}
+/* mobile: smaller + lower so text keeps priority */
+@media (max-width:820px){
+  .hero-abstract{ width:130vw; bottom:-30%; }
+}

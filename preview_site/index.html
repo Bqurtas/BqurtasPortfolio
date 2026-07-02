@@ -175,9 +175,10 @@
   </script>
 
   <!-- Main layout CSS stays render-stable and is discovered before optional assets. -->
-  <link rel="preload" href="css/style.v325.min.css?v=342" as="style" fetchpriority="high">
+  <link rel="preload" href="css/style.v325.min.css?v=344" as="style" fetchpriority="high">
   <link rel="preload" href="/assets/panjamor-logo.webp" as="image">
-  <link rel="stylesheet" href="css/style.v325.min.css?v=342">
+  <link rel="preload" href="assets/fonts/Liana.otf" as="font" type="font/otf" crossorigin>
+  <link rel="stylesheet" href="css/style.v325.min.css?v=344">
   <link rel="preload" href="css/fonts.css?v=310" as="style" data-bq-optional-css>
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=311">
   <noscript>
@@ -548,15 +549,12 @@
           </p>
         </div>
 
-        <div class="hero-scrolldown" aria-hidden="true"><span class="bar"></span><span class="mono" data-i18n="hero.scroll">Scroll</span></div>
+        <!-- cinematic abstract: an obsidian dome with a breathing bloom and a
+             slow light sweep, rising behind the hero's lower edge -->
+        <div class="hero-abstract" aria-hidden="true"><i></i></div>
 
-        <!-- serif marquee ribbon along the hero's bottom edge — the text
-             drifts continuously beneath the centred dock (Panjamor-style) -->
-        <div class="pj2-marquee bq-hero-marquee" aria-hidden="true">
-          <div class="pj2-marquee-track">
-            <span>Barakat Qurtas</span><em>✦</em><span>Branding</span><em>✦</em><span>Editorial</span><em>✦</em><span>Posters</span><em>✦</em><span>Motion</span><em>✦</em><span>Barakat Qurtas</span><em>✦</em><span>Branding</span><em>✦</em><span>Editorial</span><em>✦</em><span>Posters</span><em>✦</em><span>Motion</span><em>✦</em><span>Barakat Qurtas</span><em>✦</em><span>Branding</span><em>✦</em><span>Editorial</span><em>✦</em><span>Posters</span><em>✦</em><span>Motion</span><em>✦</em><span>Barakat Qurtas</span><em>✦</em><span>Branding</span><em>✦</em><span>Editorial</span><em>✦</em><span>Posters</span><em>✦</em><span>Motion</span><em>✦</em>
-          </div>
-        </div>
+        <div class="hero-scrolldown" aria-hidden="true"><span class="bar"></span><span class="mono" data-i18n="hero.scroll">Scroll</span></div>
+      </div>
       </div>
 
       <!-- Portfolio -->
@@ -1848,14 +1846,14 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script src="js/i18n.min.js?v=317"></script>
-  <script src="js/chat-kb.min.js?v=308"></script>
-  <script src="js/main.min.js?v=331"></script>
-  <script src="js/gallery.min.js?v=312"></script>
-  <script src="js/enhance.min.js?v=328"></script>
-  <script src="js/brandboard.min.js?v=310"></script>
-  <script src="js/work.min.js?v=312"></script>
-  <script src="js/lux.min.js?v=309"></script>
-  <script src="js/motion.min.js?v=310"></script>
+  <script defer src="js/i18n.min.js?v=317"></script>
+  <script defer src="js/chat-kb.min.js?v=308"></script>
+  <script defer src="js/main.min.js?v=331"></script>
+  <script defer src="js/gallery.min.js?v=312"></script>
+  <script defer src="js/enhance.min.js?v=328"></script>
+  <script defer src="js/brandboard.min.js?v=310"></script>
+  <script defer src="js/work.min.js?v=312"></script>
+  <script defer src="js/lux.min.js?v=345"></script>
+  <script defer src="js/motion.min.js?v=310"></script>
 </body>
 </html>
