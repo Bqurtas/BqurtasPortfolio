@@ -12419,3 +12419,54 @@ body::before{
 #bio .bio-stack > .bio-block:hover, #bio .bio-stack > .bio-social:hover{
   border-color:color-mix(in srgb, var(--ink) 28%, transparent) !important;
 }
+
+/* =========================================================
+   v342 — per request:
+   1) the two hero name lines (Barakat / Qurtas) sit closer together
+   2) What I do: the ACTIVE (visible) row keeps a clean WHITE line
+   3) the MENU goes glass (rows, cover figure, close) + the last room
+      shapes (return pills, reader, settings sheet)
+   ========================================================= */
+
+/* --- 1) tighter signature --- */
+.hero-title{ line-height:.92 !important; }
+.hero-title .hero-name{ line-height:1.04 !important; }
+.hero-line + .hero-line{ margin-top:-.12em; }
+
+/* --- 2) the visible service keeps a white line --- */
+.service-panel.is-active{ border-bottom:1px solid #fff !important; }
+:root[data-theme="light"] .service-panel.is-active{ border-bottom-color:var(--ink) !important; }
+
+/* --- 3) menu glass --- */
+.mm-link[data-route]:hover, .mm-link[data-route].is-active,
+.mm-link:hover, .mm-link.is-active{
+  background:color-mix(in srgb, var(--ink) 8%, transparent) !important;
+  -webkit-backdrop-filter:blur(16px) saturate(1.4);
+  backdrop-filter:blur(16px) saturate(1.4);
+  border:1px solid color-mix(in srgb, var(--ink) 13%, transparent) !important;
+  border-radius:16px !important;
+}
+.mm-link:hover .mm-link-text, .mm-link.is-active .mm-link-text,
+.mm-link:focus-visible .mm-link-text{ color:var(--ink) !important; }
+.mm-link:hover .mm-n, .mm-link.is-active .mm-n{ color:color-mix(in srgb, var(--ink) 55%, transparent) !important; }
+.mm-figure{
+  background:color-mix(in srgb, var(--ink) 6%, transparent) !important;
+  border:1px solid color-mix(in srgb, var(--ink) 12%, transparent) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 30px 70px -34px rgba(0,0,0,.6) !important;
+}
+.mobile-menu-close{
+  background:color-mix(in srgb, var(--ink) 7%, transparent) !important;
+  border:1px solid color-mix(in srgb, var(--ink) 14%, transparent) !important;
+}
+
+/* --- 3b) the last room shapes --- */
+.room-hero-return, .pj-return{
+  background:color-mix(in srgb, var(--bg) 55%, transparent) !important;
+  -webkit-backdrop-filter:blur(14px) saturate(1.4);
+  backdrop-filter:blur(14px) saturate(1.4);
+}
+.reader, .mobile-sheet{
+  background:color-mix(in srgb, var(--bg) 88%, transparent) !important;
+  -webkit-backdrop-filter:blur(24px) saturate(1.5);
+  backdrop-filter:blur(24px) saturate(1.5);
+}
