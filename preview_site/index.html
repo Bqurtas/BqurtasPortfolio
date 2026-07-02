@@ -175,10 +175,11 @@
   </script>
 
   <!-- Main layout CSS stays render-stable and is discovered before optional assets. -->
-  <link rel="preload" href="css/style.v325.min.css?v=353" as="style" fetchpriority="high">
+  <link rel="preload" href="css/style.v325.min.css?v=354" as="style" fetchpriority="high">
   <link rel="preload" href="/assets/panjamor-logo.webp" as="image">
   <link rel="preload" href="assets/fonts/Liana.otf" as="font" type="font/otf" crossorigin>
-  <link rel="stylesheet" href="css/style.v325.min.css?v=353">
+  <link rel="preload" href="assets/portrait.webp" as="image" fetchpriority="high">
+  <link rel="stylesheet" href="css/style.v325.min.css?v=354">
   <link rel="preload" href="css/fonts.css?v=310" as="style" data-bq-optional-css>
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=311" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=311"></noscript>
@@ -524,7 +525,7 @@
           <h1 class="hero-title">
             <span class="hero-line hero-line--1"><span class="hero-name" data-i18n="name.first">Barakat</span></span>
             <span class="hero-line hero-line--2"><span class="hero-name" data-i18n="name.last">Qurtas</span></span>
-            <span class="hero-portrait" id="heroPortrait" aria-hidden="true"><img src="assets/portrait.webp" alt="" width="400" height="600" loading="lazy" decoding="async" fetchpriority="low" /></span>
+            <span class="hero-portrait" id="heroPortrait" aria-hidden="true"><img src="assets/portrait.webp" alt="" width="400" height="600" loading="eager" decoding="async" fetchpriority="high" /></span>
           </h1>
           <span class="hero-spark" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="M50 0 C54 30 70 46 100 50 C70 54 54 70 50 100 C46 70 30 54 0 50 C30 46 46 30 50 0 Z"/></svg></span>
           <p class="hero-lede" data-i18n="hero.lede">I'm Barakat Qurtas — a graphic &amp; motion designer crafting brand identities and editorial systems for over a decade.</p>
@@ -1854,7 +1855,7 @@
   <script defer src="js/enhance.min.js?v=328"></script>
   <script defer src="js/brandboard.min.js?v=310"></script>
   <script defer src="js/work.min.js?v=312"></script>
-  <script defer src="js/lux.min.js?v=347"></script>
+  <script defer src="js/lux.min.js?v=348"></script>
   <script defer src="js/motion.min.js?v=310"></script>
 </body>
 </html>

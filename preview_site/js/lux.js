@@ -186,3 +186,21 @@
 
 /* ---- flip the print-gated FontAwesome stylesheet live (non-blocking icons) ---- */
 (function(){ var f=document.getElementById('faCss'); if(f) f.media='all'; })();
+
+/* ---- the hover tab-card is a LINK: it stays while hovered and a click
+   activates the tab it previews ---- */
+(function(){
+  var last = null;
+  document.addEventListener('mouseover', function(e){
+    if (!e.target || !e.target.closest) return;
+    var t = e.target.closest('.tabs .tab');
+    if (t) last = t;
+    var c = e.target.closest('.tab-card');
+    if (c) c.classList.add('is-shown');
+  }, true);
+  document.addEventListener('click', function(e){
+    if (!e.target || !e.target.closest) return;
+    var c = e.target.closest('.tab-card');
+    if (c && last){ c.classList.remove('is-shown'); last.click(); }
+  }, true);
+})();

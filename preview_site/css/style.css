@@ -12554,3 +12554,69 @@ body::before{
 .mm-link.is-active .mm-link-text{ color:#161616 !important; }
 .mm-link.is-active .mm-n{ color:#8a877e !important; }
 .mm-link.is-active i{ color:#161616 !important; }
+
+/* =========================================================
+   v345 — per request:
+   1) the hero loses the big name AND the kicker line — the portrait becomes
+      the centrepiece (bobbing gently) over the obsidian dome
+   2) the hover tab-cards become clickable links into their tab
+   3) every line above/below the Submit-your-project block is gone
+      (incl. the #contact quick-card hairlines that outranked v343)
+   4) motion for most sections: heads rise as they enter (scroll-driven),
+      card groups stagger, the spark floats
+   ========================================================= */
+
+/* --- 1) hero recomposition --- */
+.hero-line{ display:none !important; }   /* the two name lines (the portrait lives inside .hero-title) */
+.hero-eyebrow{ display:none !important; }
+.hero-title{ margin:0 !important; }
+.hero-portrait{
+  position:static !important;
+  display:block !important;
+  transform:none !important;
+  width:clamp(190px,20vw,264px) !important;
+  margin:0 auto 6px !important;
+  opacity:1 !important;
+  animation:bqBob 7s ease-in-out infinite;
+  box-shadow:0 44px 100px -42px rgba(0,0,0,.85);
+}
+@keyframes bqBob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-9px); } }
+.hero-abstract{ bottom:-40% !important; width:min(84vw,1120px) !important; }
+@media (max-width:820px){
+  .hero-portrait{ width:min(52vw,220px) !important; }
+  .hero-abstract{ bottom:-26% !important; width:140vw !important; }
+}
+
+/* --- 2) tab-cards are links now --- */
+.tab-card{ cursor:pointer !important; }
+.tab-card.is-shown{ pointer-events:auto !important; }
+.tab-card:hover{ opacity:1 !important; pointer-events:auto !important; }
+
+/* --- 3) contact: no lines around the pitch block, none on the quick cards --- */
+#contact .section-head, #contact .pitch-head{ border:none !important; }
+#contact .section::before, #contact .section::after{ display:none !important; }
+#contact .qc-card, #contact .qc-card:hover{ border-color:transparent !important; }
+.pitch-form fieldset, .pitch-form hr{ border:none !important; }
+
+/* --- 4) motion for most sections --- */
+@supports (animation-timeline: view()){
+  .section-head{ view-timeline:--bqhead block; }
+  .section-head .section-title,
+  .section-head .section-num,
+  .section-head .section-lede{
+    animation:bqHeadRise linear both;
+    animation-timeline:--bqhead;
+    animation-range:entry 0% cover 32%;
+  }
+  @keyframes bqHeadRise{
+    from{ opacity:.001; transform:translateY(30px); }
+    to  { opacity:1; transform:none; }
+  }
+}
+.room-features .feature-card:nth-child(2){ transition-delay:.1s; }
+.room-features .feature-card:nth-child(3){ transition-delay:.2s; }
+.qc-grid .qc-card:nth-child(2){ transition-delay:.1s; }
+.qc-grid .qc-card:nth-child(3){ transition-delay:.2s; }
+.latest-blog-grid .blog-card:nth-child(2){ transition-delay:.12s; }
+.latest-blog-grid .blog-card:nth-child(3){ transition-delay:.24s; }
+.hero-spark{ display:inline-block; animation:bqBob 5.5s ease-in-out infinite; }
