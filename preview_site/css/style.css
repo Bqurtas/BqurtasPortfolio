@@ -11953,3 +11953,72 @@ body::before{
 @media (min-width:821px) and (max-height:760px){
   .hero-portrait{ width:clamp(96px, 17vh, 130px) !important; }
 }
+
+/* =========================================================
+   v334 — four changes:
+   1) the hero scroll cue joins the FLOW (it can never overlap the sub again)
+   2) the "Let's work together" CTA docks in the MIDDLE of the bottom bar
+   3) the design hero gets the Panjamor-style serif marquee, drifting
+      beneath the centred dock
+   4) desktop scrolling snaps HARD everywhere — except inside the portfolio,
+      which stays soft and free
+   ========================================================= */
+@media (min-width:821px){
+  /* ---- 1) cue in flow, once and for all ---- */
+  .hero{ flex-direction:column !important; }
+  .hero-scrolldown{
+    position:static !important;
+    transform:none !important;
+    left:auto !important; bottom:auto !important;
+    margin:36px auto 0 !important;
+  }
+
+  /* ---- 2) the CTA lives in the middle of the dock ---- */
+  .design-cta{
+    position:static !important;
+    transform:none !important;
+    left:auto !important; bottom:auto !important;
+    order:1;                                     /* menu(-1) | CTA | tools(2) */
+    display:none;
+    align-items:center !important; gap:9px !important;
+    height:40px !important; padding:0 18px !important; margin:0 4px !important;
+    border-radius:999px !important;
+    font-size:13px !important;
+    box-shadow:none !important;
+    opacity:1 !important; pointer-events:auto !important;
+  }
+  .design-cta.is-shown{ display:inline-flex !important; }
+  .rail-tools{ order:2; }
+
+  /* ---- 4) hard snap everywhere, soft portfolio ---- */
+  html{ scroll-snap-type:y mandatory !important; }
+  .hero, .bio-teaser, .service-showcase, .logos-section, .practice-note, .footer,
+  .room-hero, .pencemor-hero, .pencemor-room-hero{
+    scroll-snap-align:start;
+    scroll-snap-stop:always;
+  }
+  .section.work, .section.work *{ scroll-snap-align:none !important; }
+}
+
+/* ---- 1b) short screens keep the cue hidden (no room for jewellery) ---- */
+@media (min-width:821px) and (max-height:760px){
+  .hero-scrolldown{ display:none !important; }
+}
+
+/* v334b — cascade repair for the snap system: older rules pinned
+   #design > .section.work to snap-start (1-2-0 !important) and various
+   sections to none !important. Re-assert LAST with matching specificity:
+   HARD snap on the big panels, the portfolio fully free. */
+@media (min-width:821px){
+  #design > .section.work,
+  .section.work,
+  .section.work *{
+    scroll-snap-align:none !important;
+    scroll-snap-stop:normal !important;
+  }
+  .hero, .bio-teaser, .service-showcase, .logos-section, .practice-note, .footer,
+  .room-hero, .pencemor-hero, .pencemor-room-hero{
+    scroll-snap-align:start !important;
+    scroll-snap-stop:always !important;
+  }
+}

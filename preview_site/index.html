@@ -175,9 +175,9 @@
   </script>
 
   <!-- Main layout CSS stays render-stable and is discovered before optional assets. -->
-  <link rel="preload" href="css/style.v325.min.css?v=341" as="style" fetchpriority="high">
+  <link rel="preload" href="css/style.v325.min.css?v=342" as="style" fetchpriority="high">
   <link rel="preload" href="/assets/panjamor-logo.webp" as="image">
-  <link rel="stylesheet" href="css/style.v325.min.css?v=341">
+  <link rel="stylesheet" href="css/style.v325.min.css?v=342">
   <link rel="preload" href="css/fonts.css?v=310" as="style" data-bq-optional-css>
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=311">
   <noscript>
@@ -372,6 +372,14 @@
       <span class="rail-menu-bars" aria-hidden="true"><i></i><i></i><i></i></span>
       <span class="rail-tip"><span class="rail-tip-text" data-i18n="tip.menu">Menu</span></span>
     </button>
+
+    <!-- Floating CTA — sits in the MIDDLE of the dock on desktop
+         (JS shows it only in the design room via .is-shown) -->
+    <a href="/contact" class="design-cta" id="designCta" data-route="contact">
+      <span class="design-cta-dot" aria-hidden="true"></span>
+      <span data-i18n="cta.float">Let's work together</span>
+      <i class="fa-solid fa-arrow-right"></i>
+    </a>
   </aside>
 
   <!-- Profile card (hover the Bq logo) -->
@@ -541,6 +549,14 @@
         </div>
 
         <div class="hero-scrolldown" aria-hidden="true"><span class="bar"></span><span class="mono" data-i18n="hero.scroll">Scroll</span></div>
+
+        <!-- serif marquee ribbon along the hero's bottom edge — the text
+             drifts continuously beneath the centred dock (Panjamor-style) -->
+        <div class="pj2-marquee bq-hero-marquee" aria-hidden="true">
+          <div class="pj2-marquee-track">
+            <span>Barakat Qurtas</span><em>✦</em><span>Branding</span><em>✦</em><span>Editorial</span><em>✦</em><span>Posters</span><em>✦</em><span>Motion</span><em>✦</em><span>Barakat Qurtas</span><em>✦</em><span>Branding</span><em>✦</em><span>Editorial</span><em>✦</em><span>Posters</span><em>✦</em><span>Motion</span><em>✦</em><span>Barakat Qurtas</span><em>✦</em><span>Branding</span><em>✦</em><span>Editorial</span><em>✦</em><span>Posters</span><em>✦</em><span>Motion</span><em>✦</em><span>Barakat Qurtas</span><em>✦</em><span>Branding</span><em>✦</em><span>Editorial</span><em>✦</em><span>Posters</span><em>✦</em><span>Motion</span><em>✦</em>
+          </div>
+        </div>
       </div>
 
       <!-- Portfolio -->
@@ -1669,12 +1685,6 @@
   </button>
 
   <!-- Floating CTA — appears while browsing the Design room, invites an enquiry -->
-  <a href="/contact" class="design-cta" id="designCta" data-route="contact">
-    <span class="design-cta-dot" aria-hidden="true"></span>
-    <span data-i18n="cta.float">Let's work together</span>
-    <i class="fa-solid fa-arrow-right"></i>
-  </a>
-
   <!-- ===== COOKIE NOTICE (auto-dismisses after 30s of no interaction) ===== -->
   <div class="cookie-card" id="cookieCard" role="dialog" aria-label="Cookies" aria-hidden="true">
     <span class="cookie-card-ic" aria-hidden="true"><i class="fa-solid fa-cookie-bite"></i></span>
