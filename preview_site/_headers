@@ -84,3 +84,10 @@
 /.well-known/mta-sts.txt
   Content-Type: text/plain; charset=utf-8
   Cache-Control: public, max-age=86400
+
+# robots/llms must never linger stale at the edge (an old cached copy kept
+# failing Lighthouse's robots.txt audit after the fix deployed)
+/robots.txt
+  Cache-Control: public, max-age=120
+/llms.txt
+  Cache-Control: public, max-age=120
