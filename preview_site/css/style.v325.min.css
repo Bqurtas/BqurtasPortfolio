@@ -1205,3 +1205,55 @@
   border-radius:0 !important;
   padding:0 !important;
 }
+
+/* =========================================================
+   v341 — the UNIVERSAL glass pass: every remaining shape adopts the new
+   glass language (translucent body over the dot grid, backdrop blur,
+   hairline, inner top highlight, deep soft shadow). Sections: What I do,
+   A short note, the Panjamor aside, Selected Work / Brand Studio cards,
+   Latest from the blog — and the shapes inside every room (bio bento,
+   journal cards, contact form + quick cards, selected-work cases,
+   brand-board app). Each keeps its own radius.
+   ========================================================= */
+
+/* --- the big card surfaces --- */
+.service-detail-inner,
+.practice-note .software-experience,
+.pencemor-aside,
+.room .feature-card, .feature-card,
+.latest-blog-grid .blog-card, .blog-card,
+#bio .bio-stack > .bio-block, #bio .bio-stack > .bio-social,
+.pitch-wrap,
+.work-card,
+.bb-app{
+  background:color-mix(in srgb, var(--bg) 58%, transparent) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(1.5);
+  backdrop-filter:blur(18px) saturate(1.5);
+  border:1px solid color-mix(in srgb, var(--ink) 11%, transparent) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 26px 60px -34px rgba(0,0,0,.5) !important;
+}
+
+/* --- the small shapes: chips, stats, timeline cards, service rows --- */
+.practice-note .stats .stat,
+.software-chip,
+.tl-card,
+.service-showcase .service-panel.is-active .service-trigger{
+  background:color-mix(in srgb, var(--bg) 55%, transparent) !important;
+  -webkit-backdrop-filter:blur(12px) saturate(1.4);
+  backdrop-filter:blur(12px) saturate(1.4);
+  border:1px solid color-mix(in srgb, var(--ink) 10%, transparent) !important;
+}
+
+/* --- Panjamor aside buttons: ghost + studio go glass; primary stays solid --- */
+.pencemor-hero-btn--ghost, .pencemor-hero-btn--studio{
+  background:color-mix(in srgb, var(--bg) 55%, transparent) !important;
+  -webkit-backdrop-filter:blur(14px) saturate(1.4);
+  backdrop-filter:blur(14px) saturate(1.4);
+  border:1px solid color-mix(in srgb, var(--ink) 16%, transparent) !important;
+}
+
+/* hover: the hairline wakes up (same language as the tabs/dock) */
+.feature-card:hover, .blog-card:hover, .work-card:hover,
+#bio .bio-stack > .bio-block:hover, #bio .bio-stack > .bio-social:hover{
+  border-color:color-mix(in srgb, var(--ink) 28%, transparent) !important;
+}
