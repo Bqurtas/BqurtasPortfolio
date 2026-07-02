@@ -135,37 +135,48 @@
 })();
 
 /* ---- soft lerp scroll (desktop, fine pointers) — the slow, buttery Framer
-   feel. Wheel input feeds a target; a rAF loop eases toward it (factor .09).
-   Panels with their own scrollboxes keep native wheel. ---- */
+   feel, FAIL-OPEN: any error or stall instantly returns native scrolling. ---- */
 (function(){
   if (!matchMedia('(min-width:821px) and (pointer:fine)').matches) return;
-  var target = 0, cur = 0, raf = null, active = false;
+  var target = 0, cur = 0, raf = null, active = false, dead = false;
+  var lastMove = 0, lastY = -1;
   var EASE = 0.09;
-  /* the stylesheet pins scroll-behavior:smooth !important, which would smooth
-     every frame of the lerp into treacle — inline important wins the cascade;
-     explicit behavior:'smooth' calls elsewhere still animate. */
   document.documentElement.style.setProperty('scroll-behavior','auto','important');
   function maxY(){ return Math.max(0, (document.scrollingElement || document.documentElement).scrollHeight - innerHeight); }
   function loop(){
-    cur += (target - cur) * EASE;
-    if (Math.abs(target - cur) < 0.5){
-      cur = target;
+    try{
+      cur += (target - cur) * EASE;
+      if (Math.abs(target - cur) < 0.5){
+        cur = target;
+        window.scrollTo({ top: cur, behavior: 'auto' });
+        raf = null; active = false; return;
+      }
       window.scrollTo({ top: cur, behavior: 'auto' });
-      raf = null; active = false; return;
-    }
-    window.scrollTo({ top: cur, behavior: 'auto' });
-    raf = requestAnimationFrame(loop);
+      /* watchdog: if the page position refuses to move while we hold the wheel,
+         hand scrolling back to the browser for good */
+      var y = window.scrollY;
+      if (y !== lastY){ lastY = y; lastMove = performance.now(); }
+      else if (performance.now() - lastMove > 600 && Math.abs(target - cur) > 4){
+        dead = true; raf = null; active = false; return;
+      }
+      raf = requestAnimationFrame(loop);
+    }catch(err){ dead = true; raf = null; active = false; }
   }
   addEventListener('wheel', function(e){
-    if (e.ctrlKey || e.metaKey) return;                       /* pinch-zoom */
-    if (e.target && e.target.closest &&
-        e.target.closest('.chat, .latest-panel, .mobile-menu, textarea, select, .bb-mount, .reader, .lb, [data-native-scroll]')) return;
-    e.preventDefault();
-    var d = e.deltaY;
-    if (e.deltaMode === 1) d *= 16; else if (e.deltaMode === 2) d *= innerHeight;
-    if (!active){ cur = window.scrollY; target = cur; active = true; }
-    target = Math.max(0, Math.min(maxY(), target + d));
-    if (!raf) raf = requestAnimationFrame(loop);
+    try{
+      if (dead) return;
+      if (e.ctrlKey || e.metaKey || e.shiftKey) return;              /* zoom / horizontal */
+      if (document.body.classList.contains('menu-open')) return;    /* overlay owns input */
+      var t = e.target;
+      if (t && t.closest && t.closest('.chat, .latest-panel, .mobile-menu, .mm-right, textarea, select, .bb-mount, .reader, .lb, .mobile-sheet, [data-native-scroll]')) return;
+      var d = e.deltaY;
+      if (e.deltaMode === 1) d *= 16; else if (e.deltaMode === 2) d *= innerHeight;
+      if (!isFinite(d) || d === 0) return;
+      e.preventDefault();
+      if (!active){ cur = window.scrollY; target = cur; active = true; lastY = -1; lastMove = performance.now(); }
+      target = Math.max(0, Math.min(maxY(), target + d));
+      if (!raf) raf = requestAnimationFrame(loop);
+    }catch(err){ dead = true; }
   }, { passive:false });
   /* stay in sync when scrolling happens by other means (keys, glide, anchors) */
   addEventListener('scroll', function(){

@@ -3,13 +3,13 @@
 Independent Kurdish graphic designer in Hewler, Kurdistan Region of Iraq.
 
 Primary pages:
-- https://bqurtas.com/design — portfolio by discipline.
-- https://bqurtas.com/panjamor — Panjamor Office Studio: brand, print and launch systems for business owners.
-- https://bqurtas.com/work — selected brand identity case studies.
-- https://bqurtas.com/brandboard — bilingual identity starter.
-- https://bqurtas.com/blog — journal notes on typography, place and design practice.
-- https://bqurtas.com/bio — biography, experience and skills.
-- https://bqurtas.com/contact — project enquiries.
+- [Design portfolio](https://bqurtas.com/design) — portfolio by discipline.
+- [Panjamor Office Studio](https://bqurtas.com/panjamor) — brand, print and launch systems for business owners.
+- [Selected work](https://bqurtas.com/work) — brand identity case studies.
+- [Brand Board](https://bqurtas.com/brandboard) — bilingual identity starter.
+- [The Journal](https://bqurtas.com/blog) — notes on typography, place and design practice.
+- [Biography](https://bqurtas.com/bio) — biography, experience and skills.
+- [Contact](https://bqurtas.com/contact) — project enquiries.
 
 Panjamor Office Studio:
 Panjamor is a focused studio room for name checks, logo direction, Kurdish and Latin lockups, colour palettes, type pairing, printed matter, social launch kits, production-ready exports and owner handover.
@@ -18,4 +18,5 @@ Languages:
 The site is available in English, Sorani Kurdish, Kurmanci Kurdish, Arabic, French, Turkish and Swedish.
 
 Contact:
-https://bqurtas.com/contact
+- [Project enquiries](https://bqurtas.com/contact)
+- [hello@bqurtas.com](mailto:hello@bqurtas.com)

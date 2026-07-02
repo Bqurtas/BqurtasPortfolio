@@ -1177,3 +1177,31 @@
   -webkit-backdrop-filter:blur(14px) saturate(1.4);
   backdrop-filter:blur(14px) saturate(1.4);
 }
+
+/* =========================================================
+   v340 — per request:
+   1) the general panel BEHIND the circle tabs is gone (the build re-adds it
+      with a higher-specificity rule; match it) — only the clean circles stay
+   2) the frame around the load-more counter (116/691) is gone — plain text
+      and a bare progress line
+   ========================================================= */
+@media (min-width:821px){
+  .section.work .tabs, .tabs-wrap .tabs, .tabs{
+    background:none !important;
+    border:none !important;
+    box-shadow:none !important;
+    border-radius:0 !important;
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+    padding:0 !important;
+  }
+}
+.load-more-wrap .load-more-track, .load-more-track{
+  background:none !important;
+  border:none !important;
+  box-shadow:none !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+  border-radius:0 !important;
+  padding:0 !important;
+}
