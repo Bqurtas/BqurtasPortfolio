@@ -249,6 +249,13 @@ export async function onRequest(context) {
     // _headers override only applies to directly-served files, not this internal
     // fetch — so pin it here too. The HTML shell is same-origin only; no wildcard.
     headers.set('Access-Control-Allow-Origin', 'https://bqurtas.com');
+    // The zone's "Cache Everything" cache rule ignores no-store and was pinning
+    // the HTML shell at the edge for its whole TTL — visitors kept getting a
+    // build that was several deploys old. A response that sets a cookie is not
+    // edge-cached (the rule doesn't ignore Set-Cookie), so this harmless,
+    // short-lived technical cookie guarantees every HTML request reaches this
+    // function and deploys show up instantly.
+    headers.append('Set-Cookie', 'bq_fresh=1; Path=/; Max-Age=60; SameSite=Lax; Secure');
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
   };
   const addNonce = { element(el) { el.setAttribute('nonce', nonce); } };
