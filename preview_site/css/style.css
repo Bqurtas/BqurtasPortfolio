@@ -12537,3 +12537,20 @@ body::before{
 #design .service-detail-inner *{ color:#23221f !important; }
 #design .service-detail-inner .mono{ color:#57544c !important; }
 .room .feature-card, .room .feature-card:hover{ border-color:transparent !important; }
+
+/* =========================================================
+   v344 — per request:
+   1) no lines above/below the Submit-your-project block (belt: the mail
+      pill underline + any section divider in the contact room)
+   2) the CURRENT room's row in the menu is WHITE again (hover stays glass)
+   ========================================================= */
+.pitch-mail{ border-color:transparent !important; }
+#contact .section{ border-top:none !important; border-bottom:none !important; }
+
+.mm-link.is-active, .mm-link[data-route].is-active{
+  background:#f4f3f0 !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+}
+.mm-link.is-active .mm-link-text{ color:#161616 !important; }
+.mm-link.is-active .mm-n{ color:#8a877e !important; }
+.mm-link.is-active i{ color:#161616 !important; }
