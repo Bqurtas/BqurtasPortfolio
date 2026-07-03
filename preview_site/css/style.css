@@ -12620,3 +12620,60 @@ body::before{
 .latest-blog-grid .blog-card:nth-child(2){ transition-delay:.12s; }
 .latest-blog-grid .blog-card:nth-child(3){ transition-delay:.24s; }
 .hero-spark{ display:inline-block; animation:bqBob 5.5s ease-in-out infinite; }
+
+/* =========================================================
+   v347 — kill the mobile CLS + my name under my photo (Liana) + soft motion
+   ---------------------------------------------------------
+   CLS root cause: the homepage hero is vertically centred, and its
+   min-height used --app-vh / 100dvh. On phones the URL bar hides after load,
+   --app-vh changes, the hero re-centres, and the centred portrait jumps
+   (~0.42 CLS, 100% attributed to #heroPortrait). Fix: pin the hero to the
+   STABLE small-viewport unit (svh never changes on bar show/hide).
+   ========================================================= */
+@media (max-width:820px){
+  .hero{
+    height:calc(100svh - var(--dock-h)) !important;
+    min-height:calc(100svh - var(--dock-h)) !important;
+  }
+}
+
+/* the portrait box is reserved from first paint; soft float is transform-only
+   (composited → can never cause layout shift). This also restores the gentle
+   motion the owner asked for. */
+.hero-portrait{
+  transform:none;
+  animation:bqFloatY 7s ease-in-out infinite !important;
+  will-change:transform;
+}
+@keyframes bqFloatY{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-10px); } }
+
+/* --- my name, my font, under my photo --- */
+.hero-sign{
+  display:flex; justify-content:center; align-items:baseline; gap:.24em;
+  flex-wrap:wrap;
+  margin:16px auto 0;
+  font-family:'Fraunces',serif;          /* ku/ar keep Fraunces (Liana has no Arabic glyphs) */
+  font-weight:500;
+  font-size:clamp(40px,8.6vw,88px);
+  line-height:1.06;
+  min-height:1.06em;                     /* reserve the line → font load can't shift it */
+  color:var(--ink);
+  overflow:visible;
+  animation:heroEnter .9s var(--ease) .5s both;   /* transform+opacity → no CLS */
+}
+/* Latin-script languages get the signature font */
+:root[lang="en"] .hero-sign, :root[lang="fr"] .hero-sign,
+:root[lang="kmr"] .hero-sign, :root[lang="tr"] .hero-sign,
+:root[lang="sv"] .hero-sign{
+  font-family:'Liana','Fraunces',serif;
+  font-weight:400;
+  font-size:clamp(46px,10vw,104px);
+  letter-spacing:.01em;
+}
+.hero-sign .hero-sign-last{ font-style:italic; }
+:root[lang="en"] .hero-sign .hero-sign-last, :root[lang="fr"] .hero-sign .hero-sign-last,
+:root[lang="kmr"] .hero-sign .hero-sign-last, :root[lang="tr"] .hero-sign .hero-sign-last,
+:root[lang="sv"] .hero-sign .hero-sign-last{ font-style:normal; }
+@media (max-width:820px){
+  .hero-sign{ margin-top:12px; }
+}
