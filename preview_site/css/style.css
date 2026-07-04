@@ -9312,7 +9312,7 @@ html .splash-name, html[lang] .splash-name,
 .splash-line-fill{ display:block !important; height:100% !important; width:0%; background:var(--ink) !important; }
 .splash-pct{ display:none !important; }
 /* when loading finishes, the whole splash lifts up to reveal the site */
-.splash{ transition:transform .32s cubic-bezier(.7,0,.2,1), opacity .28s ease !important; }
+.splash{ transition:transform .6s cubic-bezier(.7,0,.2,1), opacity .5s ease !important; }
 .splash.is-done{ transform:translateY(-100%) !important; opacity:1 !important; }
 .splash.is-done .splash-inner{ opacity:1 !important; transform:none !important; }
 
