@@ -177,10 +177,10 @@
   <!-- Main layout CSS is render-blocking again: making it non-blocking made the
        hero re-lay-out when the full CSS applied after first paint, a flaky ~1.0
        CLS spike on the hero. Render-blocking guarantees CLS 0. -->
-  <link rel="preload" href="css/style.v325.min.css?v=369" as="style" fetchpriority="high">
+  <link rel="preload" href="css/style.v325.min.css?v=370" as="style" fetchpriority="high">
   <link rel="preload" href="assets/portrait.webp" as="image" fetchpriority="high">
   <link rel="preload" href="assets/fonts/Liana.otf" as="font" type="font/otf" crossorigin>
-  <link rel="stylesheet" href="css/style.v325.min.css?v=369">
+  <link rel="stylesheet" href="css/style.v325.min.css?v=370">
   <link rel="preload" href="css/fonts.css?v=310" as="style" data-bq-optional-css>
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=313" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=313"></noscript>
@@ -1866,9 +1866,9 @@
   <script defer src="js/work.min.js?v=312"></script>
   <script defer src="js/lux.min.js?v=348"></script>
   <script defer src="js/motion.min.js?v=310"></script>
-  <!-- Always land cleanly on the hero: the go-up button and every re-entry
-       (reload / bfcache / returning to the tab after leaving) reset to the
-       home hero and hard-scroll to 0, defeating any smooth/lerp/snap residue. -->
+  <!-- Scroll authority. The go-up button scrolls to the top of the CURRENT
+       room — it must NOT switch rooms. Only a genuine re-entry (reload /
+       bfcache) resets to the home hero. -->
   <script>
     (function () {
       try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}
@@ -1877,23 +1877,24 @@
         var el = document.scrollingElement || document.documentElement;
         try { el.scrollTop = 0; } catch (e) {}
       }
-      function toHero() {
-        try {
-          if (typeof window.__bqResetToHomeHero === 'function') window.__bqResetToHomeHero();
-          else if (typeof window.__bqShowRoom === 'function') window.__bqShowRoom('design');
-        } catch (e) {}
+      function hardTopRepeated() {
         hardTop();
         requestAnimationFrame(hardTop);
         setTimeout(hardTop, 60);
         setTimeout(hardTop, 240);
       }
-      // the go-up button → full hero, every time
+      // the go-up button → top of the room you're already in (no room switch)
       document.addEventListener('click', function (e) {
-        if (e.target && e.target.closest && e.target.closest('#toTop, .to-top')) toHero();
+        if (e.target && e.target.closest && e.target.closest('#toTop, .to-top')) hardTopRepeated();
       }, true);
-      // first paint + bfcache restore → top
+      // first paint + bfcache restore → top of the home hero
       window.addEventListener('load', hardTop);
-      window.addEventListener('pageshow', function (e) { if (e.persisted) toHero(); else hardTop(); });
+      window.addEventListener('pageshow', function (e) {
+        if (e.persisted) {
+          try { if (typeof window.__bqResetToHomeHero === 'function') window.__bqResetToHomeHero(); } catch (er) {}
+        }
+        hardTopRepeated();
+      });
     }());
   </script>
 </body>

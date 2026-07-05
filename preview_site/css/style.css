@@ -12797,3 +12797,15 @@ body{ scroll-snap-type:none !important; }
   .tabs .tab.is-active{ background:var(--ink) !important; border-color:var(--ink) !important; }
   .tabs .tab.is-active i{ color:var(--bg) !important; }
 }
+
+/* =========================================================
+   v355 — the hero portrait keeps its gentle float even under Reduce Motion
+   (the owner's device runs RM; this motion is soft/decorative, not vestibular),
+   and this is the authoritative portrait animation (beats the old heroBob that
+   assumed an absolutely-positioned portrait).
+   ========================================================= */
+.hero-portrait{ animation:bqSoftFloat 8s ease-in-out infinite !important; will-change:transform; }
+@media (prefers-reduced-motion:reduce){
+  .hero-portrait{ animation:bqSoftFloat 8s ease-in-out infinite !important; }
+}
+@keyframes bqSoftFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-9px); } }
