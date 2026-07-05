@@ -1541,3 +1541,8 @@ body{ scroll-snap-type:none !important; }
 @media (max-width:820px){
   .hero{ min-height:calc(100svh - var(--dock-h)) !important; height:calc(100svh - var(--dock-h)) !important; }
 }
+
+/* v351b — the bio-teaser link failed color-contrast in dark (gold-on-dark).
+   Give it readable ink text + a soft hairline; hover keeps the gold accent. */
+:root[data-theme="dark"] .bio-teaser-link{ color:var(--ink) !important; border-color:color-mix(in srgb, var(--ink) 34%, transparent) !important; }
+:root[data-theme="dark"] .bio-teaser-link:hover{ color:var(--bg) !important; background:var(--ink) !important; border-color:var(--ink) !important; }
