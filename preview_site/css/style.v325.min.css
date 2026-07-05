@@ -1547,3 +1547,35 @@ body{ scroll-snap-type:none !important; }
 :root[data-theme="dark"] .bio-teaser-link{ color:var(--ink) !important; border-color:color-mix(in srgb, var(--ink) 34%, transparent) !important; }
 :root[data-theme="dark"] .bio-teaser-link:hover{ color:var(--bg) !important; background:var(--ink) !important; border-color:var(--ink) !important; }
 
+
+/* =========================================================
+   v353 — unify the mobile toolbar with the desktop dock: borderless glass,
+   and the permanent "Let's work together" CTA in the bar (like desktop).
+   The bar flexes; the CTA label shrinks/hides on the narrowest phones so the
+   six round tools never overflow.
+   ========================================================= */
+@media (max-width:820px){
+  .mobilebar{
+    border:none !important;                 /* match the desktop dock's borderless glass */
+    justify-content:center !important;
+    gap:6px !important;
+  }
+  .mobilebar-cta{
+    display:inline-flex !important; align-items:center; gap:8px;
+    flex:0 1 auto; min-width:0;
+    height:40px; padding:0 14px;
+    border-radius:999px;
+    background:var(--ink); color:var(--bg);
+    font-size:12.5px; letter-spacing:.01em; white-space:nowrap;
+    overflow:hidden;
+  }
+  .mobilebar-cta .design-cta-dot{ background:#39d98a; box-shadow:0 0 0 3px color-mix(in srgb,#39d98a 30%, transparent); }
+  .mobilebar-cta .fa-arrow-right{ font-size:11px; }
+  .mobilebar-cta-txt{ overflow:hidden; text-overflow:ellipsis; }
+  /* narrowest phones: drop the label, keep the CTA as a compact dot+arrow pill */
+  @media (max-width:400px){
+    .mobilebar-cta-txt{ display:none; }
+    .mobilebar-cta{ padding:0 12px; gap:6px; }
+    .mobilebar{ gap:5px !important; }
+  }
+}
