@@ -1572,10 +1572,14 @@ body{ scroll-snap-type:none !important; }
   .mobilebar-cta .design-cta-dot{ background:#39d98a; box-shadow:0 0 0 3px color-mix(in srgb,#39d98a 30%, transparent); }
   .mobilebar-cta .fa-arrow-right{ font-size:11px; }
   .mobilebar-cta-txt{ overflow:hidden; text-overflow:ellipsis; }
-  /* narrowest phones: drop the label, keep the CTA as a compact dot+arrow pill */
-  @media (max-width:400px){
+  /* Phone bars are packed (six round tools) — the full label only fits on
+     wide phones/tablets. Below that the CTA stays as a clean compact pill in
+     the SAME desktop style (ink pill, green dot, arrow) — never a clipped label. */
+  @media (max-width:479px){
     .mobilebar-cta-txt{ display:none; }
-    .mobilebar-cta{ padding:0 12px; gap:6px; }
-    .mobilebar{ gap:5px !important; }
+    .mobilebar-cta{ width:44px; padding:0; justify-content:center; gap:0; }
+    .mobilebar-cta .design-cta-dot{ display:none; }
+    .mobilebar-cta .fa-arrow-right{ font-size:14px; }
+    .mobilebar{ gap:6px !important; }
   }
 }
