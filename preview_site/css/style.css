@@ -12809,3 +12809,19 @@ body{ scroll-snap-type:none !important; }
   .hero-portrait{ animation:bqSoftFloat 8s ease-in-out infinite !important; }
 }
 @keyframes bqSoftFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-9px); } }
+
+/* =========================================================
+   v356 — tighter vertical rhythm on the homepage. Snap-scroll is gone, so the
+   old 120/100px section bands read as dead empty space. ~35% less air between
+   sections (scoped to the home room + its named sections; other rooms keep
+   their own spacing).
+   ========================================================= */
+#design .section{ padding-top:78px; padding-bottom:60px; }
+.service-showcase, .practice-note{ padding-top:70px !important; padding-bottom:52px !important; }
+.bio-teaser, .logos-section{ padding-top:52px !important; padding-bottom:52px !important; }
+.hero{ padding-bottom:84px !important; }
+@media (max-width:820px){
+  #design .section{ padding-top:46px; padding-bottom:40px; }
+  .service-showcase, .practice-note{ padding-top:44px !important; padding-bottom:36px !important; }
+  .bio-teaser, .logos-section{ padding-top:38px !important; padding-bottom:38px !important; }
+}
