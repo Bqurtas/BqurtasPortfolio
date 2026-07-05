@@ -12708,3 +12708,6 @@ body{ scroll-snap-type:none !important; }
    Give it readable ink text + a soft hairline; hover keeps the gold accent. */
 :root[data-theme="dark"] .bio-teaser-link{ color:var(--ink) !important; border-color:color-mix(in srgb, var(--ink) 34%, transparent) !important; }
 :root[data-theme="dark"] .bio-teaser-link:hover{ color:var(--bg) !important; background:var(--ink) !important; border-color:var(--ink) !important; }
+
+/* v352-DIAG — temporarily disable the splash to isolate the PSI-throttle CLS */
+.splash{ display:none !important; }
