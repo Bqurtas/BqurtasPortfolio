@@ -1680,3 +1680,31 @@ body{ scroll-snap-type:none !important; }
   display:inline !important; visibility:visible !important; opacity:1 !important;
   font-size:8px !important; color:transparent !important;
 }
+
+/* =========================================================
+   v358 — the hero portrait float made clearly visible (9px/8s was
+   imperceptible) — a gentle up/down of 16px over 6s. Authoritative over every
+   earlier rule, and it runs even under Reduce Motion (owner's device).
+   ========================================================= */
+.hero-portrait{ animation:bqPortraitFloat 6s ease-in-out infinite !important; }
+@media (prefers-reduced-motion:reduce){
+  .hero-portrait{ animation:bqPortraitFloat 6s ease-in-out infinite !important; }
+}
+@keyframes bqPortraitFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-16px); } }
+
+/* =========================================================
+   v359 — the mobile dock now matches the desktop dock EXACTLY (glass shape):
+   same 58px height, the 1px ink hairline, the inset top highlight + soft drop
+   shadow, and the 16px lift. (Previously it had no border and a plain dark
+   shadow — the visible "not the same glass" difference.)
+   ========================================================= */
+@media (max-width:820px){
+  .mobilebar{
+    height:58px !important;
+    border:1px solid color-mix(in srgb, var(--ink) 11%, transparent) !important;
+    box-shadow:rgba(255,255,255,0.09) 0 1px 0 0 inset, rgba(0,0,0,0.6) 0 26px 60px -30px !important;
+    bottom:16px !important;
+    padding:0 16px !important;
+    gap:6px !important;
+  }
+}
