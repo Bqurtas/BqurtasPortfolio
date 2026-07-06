@@ -1874,14 +1874,28 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/chat-kb.min.js?v=308"></script>
   <script defer src="js/main.min.js?v=331"></script>
   <script defer src="js/gallery.min.js?v=312"></script>
   <script defer src="js/enhance.min.js?v=333"></script>
-  <script defer src="js/brandboard.min.js?v=310"></script>
-  <script defer src="js/work.min.js?v=312"></script>
   <script defer src="js/lux.min.js?v=348"></script>
   <script defer src="js/motion.min.js?v=310"></script>
+  <!-- The chatbot KB, and the Selected-Work + Brand-Board room modules, are not
+       needed for first paint: their DOM is already static in the page, they only
+       wire it up. Load them off the critical path — on first interaction or when
+       the main thread goes idle — so their ~78KB parse leaves the TBT window. -->
+  <script>
+    (function () {
+      var extra = ['js/chat-kb.min.js?v=308', 'js/work.min.js?v=312', 'js/brandboard.min.js?v=310'];
+      var done = false;
+      function load() {
+        if (done) return; done = true;
+        extra.forEach(function (src) { var s = document.createElement('script'); s.src = src; s.defer = true; document.body.appendChild(s); });
+      }
+      ['pointerdown', 'keydown', 'touchstart'].forEach(function (e) { window.addEventListener(e, load, { once: true, passive: true }); });
+      if ('requestIdleCallback' in window) requestIdleCallback(load, { timeout: 1800 });
+      else window.addEventListener('load', function () { setTimeout(load, 400); });
+    }());
+  </script>
   <!-- Scroll authority. The go-up button scrolls to the top of the CURRENT
        room — it must NOT switch rooms. Only a genuine re-entry (reload /
        bfcache) resets to the home hero. -->
