@@ -11,7 +11,7 @@
        url('../assets/fonts/Liana.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 
 /* =========================================================
@@ -12870,3 +12870,11 @@ body{ scroll-snap-type:none !important; }
     gap:6px !important;
   }
 }
+
+/* =========================================================
+   v360 — the Liana signature is the LCP element; its heroEnter entrance kept
+   it opacity:0 for 0.5s + fade, delaying LCP to ~2.4s. Render it immediately
+   (no entrance delay) so it paints with FCP. The portrait keeps floating; the
+   hero still has motion (spark, portrait). This is the LCP fix for desktop 100.
+   ========================================================= */
+.hero-sign{ animation:none !important; opacity:1 !important; transform:none !important; }
