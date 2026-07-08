@@ -12925,3 +12925,15 @@ body{ scroll-snap-type:none !important; }
   .mobilebar .mobilebar-btn i{ font-size:15px !important; }
   .mobilebar .theme-btn i{ font-size:16px !important; }
 }
+
+/* v362 — the '01 — Design Room' heading peeked under the floating dock while
+   on the hero. The mobile hero now fills the FULL live viewport (no dock
+   subtraction), pushing the next section entirely below the fold; the dome
+   crest just glides under the glass dock, and the scroll cue (positioned
+   dock+22 above the hero bottom) still clears the dock. */
+@media (max-width:820px){
+  .hero{ min-height:100dvh !important; }
+  @supports not (height:100dvh){
+    .hero{ min-height:100vh !important; }
+  }
+}
