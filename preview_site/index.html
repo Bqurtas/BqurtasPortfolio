@@ -177,10 +177,10 @@
   <!-- Main layout CSS is render-blocking again: making it non-blocking made the
        hero re-lay-out when the full CSS applied after first paint, a flaky ~1.0
        CLS spike on the hero. Render-blocking guarantees CLS 0. -->
-  <link rel="preload" href="css/style.v325.min.css?v=376" as="style" fetchpriority="high">
+  <link rel="preload" href="css/style.v325.min.css?v=377" as="style" fetchpriority="high">
   <link rel="preload" href="assets/portrait.webp?v=2" as="image" fetchpriority="high">
   <link rel="preload" href="assets/fonts/Liana.otf" as="font" type="font/otf" crossorigin fetchpriority="high">
-  <link rel="stylesheet" href="css/style.v325.min.css?v=376">
+  <link rel="stylesheet" href="css/style.v325.min.css?v=377">
   <link rel="preload" href="css/fonts.css?v=310" as="style" data-bq-optional-css>
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315"></noscript>
@@ -1875,8 +1875,8 @@
     }catch(e){}})();
   </script>
   <script defer src="js/main.min.js?v=331"></script>
-  <script defer src="js/gallery.min.js?v=312"></script>
-  <script defer src="js/enhance.min.js?v=334"></script>
+  <script defer src="js/gallery.min.js?v=313"></script>
+  <script defer src="js/enhance.min.js?v=335"></script>
   <script defer src="js/lux.min.js?v=348"></script>
   <script defer src="js/motion.min.js?v=310"></script>
   <!-- The chatbot KB, and the Selected-Work + Brand-Board room modules, are not
@@ -1903,7 +1903,10 @@
     (function () {
       try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}
       function hardTop() {
-        try { window.scrollTo(0, 0); } catch (e) {}
+        // behavior:'auto' forces an INSTANT jump even where the stylesheet sets
+        // scroll-behavior:smooth (mobile) — a smooth glide to top could be
+        // cancelled by a stray touch and strand the page mid-scroll.
+        try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch (e) { try { window.scrollTo(0, 0); } catch (e2) {} }
         var el = document.scrollingElement || document.documentElement;
         try { el.scrollTop = 0; } catch (e) {}
       }
@@ -1912,10 +1915,11 @@
         requestAnimationFrame(hardTop);
         setTimeout(hardTop, 60);
         setTimeout(hardTop, 240);
+        setTimeout(hardTop, 600);
       }
-      // the go-up button → top of the room you're already in (no room switch)
+      // any go-up control → top of the room you're already in (no room switch)
       document.addEventListener('click', function (e) {
-        if (e.target && e.target.closest && e.target.closest('#toTop, .to-top')) hardTopRepeated();
+        if (e.target && e.target.closest && e.target.closest('#toTop, .to-top, .footer-top-btn')) hardTopRepeated();
       }, true);
       // first paint + bfcache restore → top of the home hero
       window.addEventListener('load', hardTop);

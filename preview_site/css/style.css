@@ -12573,7 +12573,11 @@ body::before{
 .hero-portrait{
   position:static !important;
   display:block !important;
-  transform:none !important;
+  /* transform must NOT be !important — an important transform beats the float
+     animation's keyframes (the portrait froze). Neutralize the base translate
+     via its own custom properties instead. */
+  --hero-portrait-x:0px; --hero-portrait-y:0px; --mx:0px; --my:0px; --ps:1;
+  transform:none;
   width:clamp(190px,20vw,264px) !important;
   margin:0 auto 6px !important;
   opacity:1 !important;

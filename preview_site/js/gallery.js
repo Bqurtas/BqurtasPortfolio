@@ -321,7 +321,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     return syncGalleryCounts();
   };
-  buildGalleryCards();
+  /* Boot build is CHUNKED: the one-shot 691-card build was a 230ms long task
+     (the last desktop TBT cost). First 120 build synchronously (covers page-1
+     render + immediate filters); the rest build in <50ms chunks off the task
+     queue, then counts sync once at the end. The dashboard refresh path below
+     still uses the synchronous buildGalleryCards(). */
+  (() => {
+    window.BQ_ALL_CARDS = [];
+    const queue = [];
+    ORDER.forEach(coll => { window.BQ_GALLERY.items(coll).forEach(it => queue.push(it)); });
+    let i = 0;
+    const build = (m) => {
+      const end = Math.min(queue.length, i + m);
+      for (; i < end; i++) {
+        const it = queue[i];
+        window.BQ_ALL_CARDS.push({ el: buildCard(it), cat: it.cat, type: it.type, coll: it.coll });
+      }
+    };
+    build(120);
+    const step = () => {
+      if (i < queue.length) { build(100); setTimeout(step, 0); }
+      else {
+        syncGalleryCounts();
+        try { window.dispatchEvent(new CustomEvent('bq:gallery-built')); } catch (e) {}
+      }
+    };
+    setTimeout(step, 0);
+  })();
   window.__bqRefreshGalleryFromManifest = async () => {
     try { sessionStorage.removeItem('bq_gallery_tree_v1'); } catch (e) {}
     window.BQ_GALLERY._loaded = false;
