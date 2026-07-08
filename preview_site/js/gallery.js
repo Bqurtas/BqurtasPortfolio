@@ -57,6 +57,14 @@ window.BQ_GALLERY = {
   /* A lighter, on-the-fly resized WebP (via the free wsrv.nl image CDN) for
      gallery cards. The lightbox still uses the original file through data-full. */
   thumb(url, w) {
+    /* Grid thumbnails are pre-generated FIRST-PARTY files under assets/thumbs/
+       (320px WebP) — no third-party image proxy in the load path (a weserv.nl
+       timeout was logging a console error and failing Best Practices). Any
+       repo image without a local thumb falls back to weserv via the global
+       error listener below. */
+    const base = url.indexOf(this.RAW_BASE) === 0 ? this.RAW_BASE
+               : (url.indexOf(this.CDN_BASE) === 0 ? this.CDN_BASE : null);
+    if (base) return 'assets/thumbs/' + url.slice(base.length + 1);
     return 'https://images.weserv.nl/?url=' + url.replace(/^https?:\/\//, '') + '&w=' + w + '&output=webp&q=66';
   },
 
@@ -498,3 +506,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 });
+
+
+/* A repo image added after the last thumbnail build has no local thumb yet —
+   swap the broken grid image to the weserv proxy once. */
+document.addEventListener('error', function (ev) {
+  var img = ev.target;
+  if (!img || img.tagName !== 'IMG' || img.dataset.wsvTried) return;
+  if ((img.getAttribute('src') || '').indexOf('assets/thumbs/') !== 0) return;
+  var card = img.closest ? img.closest('article') : null;
+  var full = card && card.dataset.full;
+  if (!full) return;
+  img.dataset.wsvTried = '1';
+  img.src = 'https://images.weserv.nl/?url=' + full.replace(/^https?:\/\//, '') + '&w=320&output=webp&q=66';
+}, true);
