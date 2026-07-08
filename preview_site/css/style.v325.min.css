@@ -1720,3 +1720,46 @@ body{ scroll-snap-type:none !important; }
    hero still has motion (spark, portrait). This is the LCP fix for desktop 100.
    ========================================================= */
 .hero-sign{ animation:none !important; opacity:1 !important; transform:none !important; }
+
+/* =========================================================
+   v361 — mobile == desktop, the last visible differences:
+   1) FULL-SCREEN HERO on phones: svh height left a gap when the browser bar
+      collapsed (the next section peeked in after go-up / room return).
+      min-height now tracks the LIVE viewport (dvh) — pure CSS, no JS var.
+   2) The mobile CTA becomes the desktop's ink pill (compact: dot + arrow).
+   3) Dock buttons: exact desktop metrics — 44px circles, 15px icons.
+   ========================================================= */
+@media (max-width:820px){
+  .hero{
+    height:auto !important;
+    min-height:calc(100dvh - var(--dock-h)) !important;
+  }
+  @supports not (height:100dvh){
+    .hero{ min-height:calc(100vh - var(--dock-h)) !important; }
+  }
+
+  /* 2 — the CTA is the desktop ink pill, compact */
+  .mobilebar-cta{
+    width:auto !important; height:40px !important;
+    padding:0 15px !important; gap:9px !important;
+    border-radius:999px !important;
+    background:var(--ink) !important; color:var(--bg) !important;
+    display:inline-flex !important; align-items:center !important; justify-content:center !important;
+    box-shadow:0 10px 26px -12px rgba(0,0,0,.5);
+  }
+  .mobilebar-cta .fa-arrow-right{ font-size:13px !important; color:var(--bg) !important; }
+  .mobilebar-cta .design-cta-dot{
+    display:block !important; position:static !important;
+    width:8px !important; height:8px !important; border-radius:50% !important;
+    background:#5fbf6a !important; box-shadow:none !important; flex-shrink:0;
+  }
+
+  /* 3 — buttons: exact desktop metrics */
+  .mobilebar .mobilebar-btn{
+    width:44px !important; height:44px !important;
+    border-radius:50% !important; background:transparent !important;
+    color:var(--ink) !important; font-size:15px !important;
+  }
+  .mobilebar .mobilebar-btn i{ font-size:15px !important; }
+  .mobilebar .theme-btn i{ font-size:16px !important; }
+}
