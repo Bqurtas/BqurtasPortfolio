@@ -443,7 +443,7 @@
     /* name → round portrait — only over the actual letters */
     $$('.hero-name').forEach(name => {
       name.addEventListener('mouseenter', () => {
-        portraitImg.src = 'assets/portrait.webp';
+        portraitImg.src = 'assets/portrait.webp?v=2';
         hfTitle.textContent = 'Barakat Qurtas';
         hfSub.textContent = (window.BQ_DICT && window.BQ_DICT['float.designer']) || 'Designer · Hewlêr';
         float.classList.remove('is-album');

@@ -37,7 +37,7 @@ html[data-room="panjamor"]{
   top:-26px;
   width:148px;
   aspect-ratio:1;
-  background:url("../assets/panjamor-logo.webp") center/contain no-repeat;
+  background:url("../assets/panjamor-logo.webp?v=2") center/contain no-repeat;
   opacity:.055;
   filter:grayscale(1) contrast(1.1);
   pointer-events:none;
@@ -173,7 +173,7 @@ html[data-room="panjamor"]{
   top:clamp(14px,2vw,28px);
   width:clamp(120px,15vw,220px);
   aspect-ratio:1;
-  background:url("../assets/panjamor-logo.webp") center/contain no-repeat;
+  background:url("../assets/panjamor-logo.webp?v=2") center/contain no-repeat;
   opacity:.04;
   filter:grayscale(1);
   pointer-events:none;

@@ -177,10 +177,10 @@
   <!-- Main layout CSS is render-blocking again: making it non-blocking made the
        hero re-lay-out when the full CSS applied after first paint, a flaky ~1.0
        CLS spike on the hero. Render-blocking guarantees CLS 0. -->
-  <link rel="preload" href="css/style.v325.min.css?v=375" as="style" fetchpriority="high">
-  <link rel="preload" href="assets/portrait.webp" as="image" fetchpriority="high">
+  <link rel="preload" href="css/style.v325.min.css?v=376" as="style" fetchpriority="high">
+  <link rel="preload" href="assets/portrait.webp?v=2" as="image" fetchpriority="high">
   <link rel="preload" href="assets/fonts/Liana.otf" as="font" type="font/otf" crossorigin fetchpriority="high">
-  <link rel="stylesheet" href="css/style.v325.min.css?v=375">
+  <link rel="stylesheet" href="css/style.v325.min.css?v=376">
   <link rel="preload" href="css/fonts.css?v=310" as="style" data-bq-optional-css>
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=313" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=313"></noscript>
@@ -471,7 +471,7 @@
         </div>
         <nav class="mm-nav" aria-label="Rooms">
           <a href="/design" class="mm-link" data-route="design" data-i18n-menu-note="menu.note.design" data-menu-note="Selected design and visual systems" data-menu-img="assets/covers/en-design.jpg"><span class="mm-n">01</span> <span class="mm-link-text" data-i18n="nav.design">Design</span><i class="fa-solid fa-arrow-up-right"></i></a>
-          <a href="/panjamor" class="mm-link" data-route="panjamor" data-i18n-menu-note="menu.note.panjamor" data-menu-note="Brand, print and launch studio" data-menu-img="assets/panjamor-logo.webp"><span class="mm-n">02</span> <span class="mm-link-text" data-i18n="nav.panjamor">Panjamor</span><i class="fa-solid fa-arrow-up-right"></i></a>
+          <a href="/panjamor" class="mm-link" data-route="panjamor" data-i18n-menu-note="menu.note.panjamor" data-menu-note="Brand, print and launch studio" data-menu-img="assets/panjamor-logo.webp?v=2"><span class="mm-n">02</span> <span class="mm-link-text" data-i18n="nav.panjamor">Panjamor</span><i class="fa-solid fa-arrow-up-right"></i></a>
           <a href="/blog" class="mm-link" data-route="blog" data-i18n-menu-note="menu.note.blog" data-menu-note="Notes on typography, place and practice" data-menu-img="assets/covers/en-blog.jpg"><span class="mm-n">03</span> <span class="mm-link-text" data-i18n="nav.blog">The Journal</span><i class="fa-solid fa-arrow-up-right"></i></a>
           <a href="/work" class="mm-link" data-route="work" data-i18n-menu-note="menu.note.work" data-menu-note="Identity case studies, from brief to system" data-menu-img="assets/covers/en-official.jpg"><span class="mm-n">04</span> <span class="mm-link-text" data-i18n="nav.work">Selected Work</span><i class="fa-solid fa-arrow-up-right"></i></a>
           <a href="/brandboard" class="mm-link" data-route="brandboard" data-i18n-menu-note="menu.note.brandboard" data-menu-note="A free bilingual identity starter" data-menu-img="assets/covers/en-logo.jpg"><span class="mm-n">05</span> <span class="mm-link-text" data-i18n="nav.brandboard">The Brand Board</span><i class="fa-solid fa-arrow-up-right"></i></a>
@@ -530,7 +530,7 @@
           <h1 class="hero-title">
             <span class="hero-line hero-line--1"><span class="hero-name" data-i18n="name.first">Barakat</span></span>
             <span class="hero-line hero-line--2"><span class="hero-name" data-i18n="name.last">Qurtas</span></span>
-            <span class="hero-portrait" id="heroPortrait" aria-hidden="true"><img src="assets/portrait.webp" alt="" width="400" height="600" loading="eager" decoding="async" fetchpriority="high" /></span>
+            <span class="hero-portrait" id="heroPortrait" aria-hidden="true"><img src="assets/portrait.webp?v=2" alt="" width="400" height="600" loading="eager" decoding="async" fetchpriority="high" /></span>
           </h1>
           <div class="hero-sign">
             <span class="hero-sign-first" data-i18n="name.first">Barakat</span>
@@ -867,7 +867,7 @@
       <div class="section room-features">
         <!-- Panjamor studio — now sits beside the two feature cards -->
         <div class="pencemor-aside" id="pencemorHero">
-          <img class="pencemor-card-logo" src="assets/panjamor-logo.webp" alt="" width="72" height="72" loading="lazy" decoding="async" />
+          <img class="pencemor-card-logo" src="assets/panjamor-logo-sm.webp" alt="" width="72" height="72" loading="lazy" decoding="async" />
           <span class="mono pencemor-hero-eyebrow" data-i18n="pj.eyebrow">Design Studio</span>
           <h2 class="pencemor-hero-name" data-i18n="pj.name">Panjamor</h2>
           <p class="pencemor-hero-tag" data-i18n="pj.tag">While our fingerprint sits your work atop, let your <em>every worry stop</em>.</p>
@@ -948,7 +948,7 @@
         </div>
         <div class="pj-room-mark" aria-hidden="true">
           <span class="pj2-mark-glow" aria-hidden="true"></span>
-          <img src="assets/panjamor-logo.webp" alt="" width="220" height="220" decoding="async" />
+          <img src="assets/panjamor-logo.webp?v=2" alt="" width="220" height="220" loading="lazy" decoding="async" />
         </div>
         <div class="pj2-marquee" aria-hidden="true">
           <div class="pj2-marquee-track">
@@ -1876,7 +1876,7 @@
   </script>
   <script defer src="js/main.min.js?v=331"></script>
   <script defer src="js/gallery.min.js?v=312"></script>
-  <script defer src="js/enhance.min.js?v=333"></script>
+  <script defer src="js/enhance.min.js?v=334"></script>
   <script defer src="js/lux.min.js?v=348"></script>
   <script defer src="js/motion.min.js?v=310"></script>
   <!-- The chatbot KB, and the Selected-Work + Brand-Board room modules, are not
