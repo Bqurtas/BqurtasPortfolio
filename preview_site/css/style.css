@@ -12959,3 +12959,19 @@ html, body{ overflow-x:clip !important; }
   /* the first section after the hero starts below the dock band (16+58+buffer) */
   #design .hero + .section{ padding-top:96px !important; }
 }
+
+/* =========================================================
+   v364 — per request:
+   1) the two vertical hairlines on either side of the splash are gone —
+      the splash is clean and simple
+   2) the cookie box floats CENTRED just above the dock, desktop & mobile
+   ========================================================= */
+.splash::before, .splash::after{ content:none !important; display:none !important; }
+
+.cookie-card, [dir="rtl"] .cookie-card{
+  left:50% !important; right:auto !important;
+  bottom:calc(var(--dock-h, 64px) + 26px) !important;
+  transform:translate(-50%, 14px) !important;
+  width:min(420px, calc(100vw - 32px)) !important;
+}
+.cookie-card.is-shown{ transform:translate(-50%, 0) !important; }
