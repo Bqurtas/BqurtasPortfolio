@@ -338,15 +338,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.BQ_ALL_CARDS = [];
     const queue = [];
     ORDER.forEach(coll => { window.BQ_GALLERY.items(coll).forEach(it => queue.push(it)); });
+    /* ALL entries exist from the first frame (cheap placeholder <article>s), so
+       anything reading counts at DOMContentLoaded sees the full catalogue —
+       the one-batch version briefly reported 120 works. Only the els are
+       filled in chunks. */
+    /* Keep LOCAL references: the global array gets SHUFFLED after boot, so
+       index-based assignment would attach els to the wrong entries. Object
+       refs survive any reordering of window.BQ_ALL_CARDS. */
+    const entries = queue.map(it => ({ el: document.createElement('article'), cat: it.cat, type: it.type, coll: it.coll }));
+    entries.forEach(o => window.BQ_ALL_CARDS.push(o));
     let i = 0;
     const build = (m) => {
       const end = Math.min(queue.length, i + m);
-      for (; i < end; i++) {
-        const it = queue[i];
-        window.BQ_ALL_CARDS.push({ el: buildCard(it), cat: it.cat, type: it.type, coll: it.coll });
-      }
+      for (; i < end; i++) entries[i].el = buildCard(queue[i]);
     };
     build(120);
+    syncGalleryCounts();
     const step = () => {
       if (i < queue.length) { build(100); setTimeout(step, 0); }
       else {

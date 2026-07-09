@@ -1775,3 +1775,25 @@ body{ scroll-snap-type:none !important; }
     .hero{ min-height:100vh !important; }
   }
 }
+
+/* =========================================================
+   v363 — three corrections from the owner's phone:
+   1) No sideways scroll anywhere: overflow-x is CLIPPED at the root (clip,
+      not hidden — clip doesn't break position:sticky). Some wide decorative
+      element (the 140vw dome) could drag iOS into a horizontal pan.
+   2) v362 (full-dvh hero) is REVERTED — it added an ugly empty band above
+      the portrait. The hero returns to (100dvh - dock), the composition the
+      owner approved.
+   3) Instead, the '01 — Design Room' heading itself steps DOWN just enough
+      to clear the floating dock band, exactly as requested.
+   ========================================================= */
+html, body{ overflow-x:clip !important; }
+
+@media (max-width:820px){
+  .hero{ min-height:calc(100dvh - var(--dock-h)) !important; }
+  @supports not (height:100dvh){
+    .hero{ min-height:calc(100vh - var(--dock-h)) !important; }
+  }
+  /* the first section after the hero starts below the dock band (16+58+buffer) */
+  #design .hero + .section{ padding-top:96px !important; }
+}
