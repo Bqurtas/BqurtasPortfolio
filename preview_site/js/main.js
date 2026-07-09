@@ -396,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- TABS + PAGINATION + SECTION HEADER ---------- */
   const tabs = document.querySelectorAll('.tab');
-  const PAGE_SIZE = 58;
+  const PAGE_SIZE = 75;
   let currentFilter = 'all';
   let currentShown  = 0;
   let correctScrollAfterGallery = false;
@@ -719,7 +719,7 @@ document.addEventListener('DOMContentLoaded', () => {
   tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab, true)));
 
   /* The deck re-shuffles on every page load and tab switch — that stays.
-     The gallery shows exactly one batch (PAGE_SIZE = 58) at a time; the reader
+     The gallery shows exactly one batch (PAGE_SIZE = 75) at a time; the reader
      taps "Load more" to reveal the next batch. No auto-infinite-scroll — the works
      never all load at once, and nothing swaps under the reader as they scroll. */
 
