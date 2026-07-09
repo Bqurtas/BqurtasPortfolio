@@ -350,7 +350,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     let i = 0;
     const build = (m) => {
       const end = Math.min(queue.length, i + m);
-      for (; i < end; i++) entries[i].el = buildCard(queue[i]);
+      for (; i < end; i++) {
+        /* The initial render can append a placeholder BEFORE its real card is
+           built (the boot shuffle pulls late-queue entries into page one) —
+           swap it in the DOM too, carrying over any classes the renderer or
+           reveal observers added to the placeholder. */
+        const old = entries[i].el;
+        const built = buildCard(queue[i]);
+        if (old && old.className) built.className += ' ' + old.className;
+        entries[i].el = built;
+        if (old && old.parentNode) old.replaceWith(built);
+      }
     };
     build(120);
     syncGalleryCounts();
