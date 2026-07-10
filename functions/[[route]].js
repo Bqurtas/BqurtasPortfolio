@@ -119,6 +119,36 @@ function workCaseSitemapBlocks(projects) {
   }).filter(Boolean).join('\n');
 }
 
+function blogPostSitemapBlocks(posts) {
+  // Mirrors workCaseSitemapBlocks for /blog/<id> — so posts published later
+  // through the dashboard appear in the sitemap automatically.
+  const langs = ['en', ...LANGS];
+  const seen = new Set();
+  const altLinks = (id) => langs.map((lang) => {
+    const href = localizedUrl(lang, { key: 'blogpost', slug: id });
+    const hreflang = BCP47[lang] || lang;
+    return '    <xhtml:link rel="alternate" hreflang="' + xmlEsc(hreflang) + '" href="' + xmlEsc(href) + '" />';
+  }).concat('    <xhtml:link rel="alternate" hreflang="x-default" href="' + xmlEsc(localizedUrl('en', { key: 'blogpost', slug: id })) + '" />').join('\n');
+  return posts.map((p) => {
+    const id = String(p && p.id != null ? p.id : '').trim();
+    if (!id || seen.has(id)) return '';
+    seen.add(id);
+    const lastmod = String((p.updated_at || p.created_at || '')).slice(0, 10) || '2026-07-01';
+    return langs.map((lang) => {
+      const loc = localizedUrl(lang, { key: 'blogpost', slug: id });
+      return [
+        '  <url>',
+        '    <loc>' + xmlEsc(loc) + '</loc>',
+        '    <lastmod>' + xmlEsc(lastmod) + '</lastmod>',
+        '    <changefreq>monthly</changefreq>',
+        '    <priority>0.7</priority>',
+        altLinks(id),
+        '  </url>'
+      ].join('\n');
+    }).join('\n');
+  }).filter(Boolean).join('\n');
+}
+
 async function serveSitemap(url, env, next) {
   if (!env || !env.ASSETS) return next();
   const base = await env.ASSETS.fetch(new URL('/sitemap.xml', url.origin));
@@ -134,6 +164,22 @@ async function serveSitemap(url, env, next) {
         return slug && !body.includes('<loc>' + SITE + '/work/' + slug + '</loc>');
       });
       const blocks = workCaseSitemapBlocks(missing);
+      if (blocks) {
+        body = body.replace(/\s*<\/urlset>\s*$/i, '\n' + blocks + '\n</urlset>\n');
+      }
+    }
+  } catch (e) {}
+  try {
+    const res = await fetch(SUPA + '/rest/v1/posts?select=id,updated_at,created_at&published=eq.true&order=created_at.desc', {
+      headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY }
+    });
+    if (res.ok) {
+      const posts = await res.json();
+      const missing = (Array.isArray(posts) ? posts : []).filter((p) => {
+        const id = String(p && p.id != null ? p.id : '').trim();
+        return id && !body.includes('<loc>' + SITE + '/blog/' + id + '</loc>');
+      });
+      const blocks = blogPostSitemapBlocks(missing);
       if (blocks) {
         body = body.replace(/\s*<\/urlset>\s*$/i, '\n' + blocks + '\n</urlset>\n');
       }

@@ -204,3 +204,15 @@
     if (c && last){ c.classList.remove('is-shown'); last.click(); }
   }, true);
 })();
+
+/* ---- desktop: once a portfolio tab is clicked, the room intro folds away so
+   only the tab title + numbers lead the view ---- */
+(function () {
+  if (!matchMedia('(min-width:821px)').matches) return;
+  document.addEventListener('click', function (e) {
+    var t = e.target && e.target.closest && e.target.closest('.tabs .tab');
+    if (!t) return;
+    var sec = t.closest('.section');
+    if (sec) sec.classList.add('bq-tabs-engaged');
+  }, true);
+})();
