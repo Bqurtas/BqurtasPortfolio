@@ -13062,3 +13062,33 @@ html[lang] .splash-name,
     pointer-events:none;
   }
 }
+
+/* =========================================================
+   v368 — three follow-ups from the owner:
+   1) mobile: less air at the top of the footer stage
+   2) mobile: the go-up button and the chat/notification panels hug the dock
+      (they floated too far above it)
+   3) desktop: the room intro ("01 — Design Room / A small catalogue…") is
+      RESTORED — never removed. Switching tabs now simply scrolls the view to
+      the tab header, leaving the intro above the fold; scrolling back up
+      reveals it. The v366 fold is retired.
+   ========================================================= */
+@media (max-width:820px){
+  /* 1 */
+  .footer-stage{ padding-top:26px !important; }
+
+  /* 2 */
+  .to-top{ bottom:82px !important; right:14px !important; }
+  .latest-panel, .chat{ bottom:82px !important; }
+}
+
+/* 3 — the intro lives again (kill the fold unconditionally) */
+.section.work > .section-head{
+  max-height:none !important; overflow:visible !important;
+  opacity:1 !important; pointer-events:auto !important;
+}
+.section.work.bq-tabs-engaged > .section-head{
+  max-height:none !important; opacity:1 !important;
+  margin-top:revert !important; margin-bottom:revert !important;
+  padding-top:revert !important; padding-bottom:revert !important;
+}

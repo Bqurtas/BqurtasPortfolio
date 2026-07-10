@@ -205,14 +205,20 @@
   }, true);
 })();
 
-/* ---- desktop: once a portfolio tab is clicked, the room intro folds away so
-   only the tab title + numbers lead the view ---- */
+/* ---- desktop: switching tabs scrolls the view to the tab header, so the
+   room intro stays in the page (revealed on scroll-up) but doesn't sit above
+   the freshly chosen tab ---- */
 (function () {
   if (!matchMedia('(min-width:821px)').matches) return;
   document.addEventListener('click', function (e) {
     var t = e.target && e.target.closest && e.target.closest('.tabs .tab');
     if (!t) return;
     var sec = t.closest('.section');
-    if (sec) sec.classList.add('bq-tabs-engaged');
+    var head = sec && (sec.querySelector('.tab-header') || sec.querySelector('#grid'));
+    if (!head) return;
+    setTimeout(function () {
+      var y = window.scrollY + head.getBoundingClientRect().top - 18;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+    }, 60);
   }, true);
 })();
