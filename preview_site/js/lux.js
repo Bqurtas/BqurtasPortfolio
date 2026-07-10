@@ -205,20 +205,27 @@
   }, true);
 })();
 
-/* ---- desktop: switching tabs scrolls the view to the tab header, so the
-   room intro stays in the page (revealed on scroll-up) but doesn't sit above
-   the freshly chosen tab ---- */
+/* ---- desktop: switching tabs scrolls the view JUST past the room intro
+   (its bottom edge meets the viewport top), so "01 — Design Room / A small
+   catalogue…" — the lede line included — sits fully under the scroll and the
+   tab header leads. Scrolling up still reveals the intro. ---- */
 (function () {
   if (!matchMedia('(min-width:821px)').matches) return;
   document.addEventListener('click', function (e) {
     var t = e.target && e.target.closest && e.target.closest('.tabs .tab');
     if (!t) return;
     var sec = t.closest('.section');
-    var head = sec && (sec.querySelector('.tab-header') || sec.querySelector('#grid'));
-    if (!head) return;
+    if (!sec) return;
     setTimeout(function () {
-      var y = window.scrollY + head.getBoundingClientRect().top - 18;
+      var intro = sec.querySelector('.section-head');
+      var header = sec.querySelector('.tab-header') || sec.querySelector('#grid');
+      var y;
+      if (intro && intro.offsetHeight > 0) {
+        y = window.scrollY + intro.getBoundingClientRect().bottom + 2;
+      } else if (header) {
+        y = window.scrollY + header.getBoundingClientRect().top - 8;
+      } else { return; }
       window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
-    }, 60);
+    }, 250);
   }, true);
 })();
