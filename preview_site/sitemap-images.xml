@@ -3,6 +3,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://bqurtas.com/design</loc>
+    <lastmod>2026-07-11</lastmod>
     <image:image>
       <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/GeneralDesign/GDesign1.webp</image:loc>
       <image:title>Design — Barakat Qurtas</image:title>
@@ -343,6 +344,10 @@
       <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/GeneralDesign/GeneralDesign-1781170131534-19ic.webp</image:loc>
       <image:title>Design — Barakat Qurtas</image:title>
     </image:image>
+  </url>
+  <url>
+    <loc>https://bqurtas.com/design/book</loc>
+    <lastmod>2026-07-11</lastmod>
     <image:image>
       <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Book/BookCover1.webp</image:loc>
       <image:title>Book Cover — Barakat Qurtas</image:title>
@@ -739,6 +744,918 @@
       <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Book/BookCover99.webp</image:loc>
       <image:title>Book Cover — Barakat Qurtas</image:title>
     </image:image>
+  </url>
+  <url>
+    <loc>https://bqurtas.com/design/business</loc>
+    <lastmod>2026-07-11</lastmod>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard1.webp</image:loc>
+      <image:title>Business Card — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard10.webp</image:loc>
+      <image:title>Business Card — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard11.webp</image:loc>
+      <image:title>Business Card — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard2.webp</image:loc>
+      <image:title>Business Card — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard3.webp</image:loc>
+      <image:title>Business Card — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard4.webp</image:loc>
+      <image:title>Business Card — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard5.webp</image:loc>
+      <image:title>Business Card — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard6.webp</image:loc>
+      <image:title>Business Card — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard7.webp</image:loc>
+      <image:title>Business Card — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard8.webp</image:loc>
+      <image:title>Business Card — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard9.webp</image:loc>
+      <image:title>Business Card — Barakat Qurtas</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://bqurtas.com/design/events</loc>
+    <lastmod>2026-07-11</lastmod>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event1.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event10.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event11.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event12.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event13.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event14.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event15.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event16.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event2.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event3.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event4.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event5.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event6.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event7.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event8.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event9.webp</image:loc>
+      <image:title>Event — Barakat Qurtas</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://bqurtas.com/design/image</loc>
+    <lastmod>2026-07-11</lastmod>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo1.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo10.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo100.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo101.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo102.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo103.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo104.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo105.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo106.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo107.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo108.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo109.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo11.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo110.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo111.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo112.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo113.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo114.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo115.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo116.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo117.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo118.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo119.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo12.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo120.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo121.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo122.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo123.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo124.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo125.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo126.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo127.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo128.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo129.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo13.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo130.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo131.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo132.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo133.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo134.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo135.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo136.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo137.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo138.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo139.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo14.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo140.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo141.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo142.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo143.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo144.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo145.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo146.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo147.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo15.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo16.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo17.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo18.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo19.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo2.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo20.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo21.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo22.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo23.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo24.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo25.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo26.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo27.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo28.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo29.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo3.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo30.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo31.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo32.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo33.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo34.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo35.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo36.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo37.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo38.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo39.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo4.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo40.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo41.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo42.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo43.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo44.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo45.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo46.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo47.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo48.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo49.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo5.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo50.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo51.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo52.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo53.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo54.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo55.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo56.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo57.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo58.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo59.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo6.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo60.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo61.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo62.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo63.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo64.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo65.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo66.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo67.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo68.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo69.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo7.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo70.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo71.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo72.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo73.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo74.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo75.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo76.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo77.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo78.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo79.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo8.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo80.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo81.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo82.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo83.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo84.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo85.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo86.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo87.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo88.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo89.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo9.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo90.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo91.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo92.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo93.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo94.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo95.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo96.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo97.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo98.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo99.webp</image:loc>
+      <image:title>Photo — Barakat Qurtas</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://bqurtas.com/design/invoices</loc>
+    <lastmod>2026-07-11</lastmod>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice1.webp</image:loc>
+      <image:title>Invoice — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice10.webp</image:loc>
+      <image:title>Invoice — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice11.webp</image:loc>
+      <image:title>Invoice — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice12.webp</image:loc>
+      <image:title>Invoice — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice2.webp</image:loc>
+      <image:title>Invoice — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice3.webp</image:loc>
+      <image:title>Invoice — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice4.webp</image:loc>
+      <image:title>Invoice — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice5.webp</image:loc>
+      <image:title>Invoice — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice6.webp</image:loc>
+      <image:title>Invoice — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice7.webp</image:loc>
+      <image:title>Invoice — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice8.webp</image:loc>
+      <image:title>Invoice — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice9.webp</image:loc>
+      <image:title>Invoice — Barakat Qurtas</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://bqurtas.com/design/logo</loc>
+    <lastmod>2026-07-11</lastmod>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo1.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo10.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo11.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo12.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo13.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo14.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo15.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo16.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo17.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo18.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo19.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo2.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo20.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo21.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo22.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo23.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo24.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo25.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo26.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo27.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo28.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo3.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo4.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo5.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo6.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo7.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo8.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo9.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo10.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo12.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo13.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo2.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo3.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo5.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo6.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo9.webp</image:loc>
+      <image:title>Logo — Barakat Qurtas</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://bqurtas.com/design/official</loc>
+    <lastmod>2026-07-11</lastmod>
     <image:image>
       <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Official/Official1.webp</image:loc>
       <image:title>Official — Barakat Qurtas</image:title>
@@ -1411,1042 +2328,10 @@
       <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Official/Official99.webp</image:loc>
       <image:title>Official — Barakat Qurtas</image:title>
     </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster1.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster10.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster11.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster12.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster13.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster14.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster15.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster16.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster17.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster18.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster2.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster3.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster4.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster5.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster6.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster7.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster8.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster9.webp</image:loc>
-      <image:title>Poster — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia1.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia10.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia11.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia12.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia13.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia14.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia15.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia16.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia17.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia18.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia19.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia2.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia3.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia4.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia5.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia6.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia7.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia8.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia9.webp</image:loc>
-      <image:title>Social Media — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo1.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo10.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo11.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo12.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo13.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo14.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo15.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo16.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo17.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo18.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo19.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo2.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo20.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo21.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo22.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo23.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo24.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo25.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo26.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo27.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo28.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo3.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo4.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo5.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo6.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo7.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo8.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/LogoDesign/Logo9.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo10.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo12.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo13.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo2.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo3.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo5.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo6.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/TickerLogo/TickerLogo9.webp</image:loc>
-      <image:title>Logo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event1.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event10.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event11.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event12.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event13.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event14.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event15.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event16.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event2.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event3.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event4.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event5.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event6.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event7.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event8.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/EventandCon/Event9.webp</image:loc>
-      <image:title>Event — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard1.webp</image:loc>
-      <image:title>Business Card — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard10.webp</image:loc>
-      <image:title>Business Card — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard11.webp</image:loc>
-      <image:title>Business Card — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard2.webp</image:loc>
-      <image:title>Business Card — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard3.webp</image:loc>
-      <image:title>Business Card — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard4.webp</image:loc>
-      <image:title>Business Card — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard5.webp</image:loc>
-      <image:title>Business Card — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard6.webp</image:loc>
-      <image:title>Business Card — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard7.webp</image:loc>
-      <image:title>Business Card — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard8.webp</image:loc>
-      <image:title>Business Card — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard9.webp</image:loc>
-      <image:title>Business Card — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice1.webp</image:loc>
-      <image:title>Invoice — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice10.webp</image:loc>
-      <image:title>Invoice — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice11.webp</image:loc>
-      <image:title>Invoice — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice12.webp</image:loc>
-      <image:title>Invoice — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice2.webp</image:loc>
-      <image:title>Invoice — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice3.webp</image:loc>
-      <image:title>Invoice — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice4.webp</image:loc>
-      <image:title>Invoice — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice5.webp</image:loc>
-      <image:title>Invoice — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice6.webp</image:loc>
-      <image:title>Invoice — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice7.webp</image:loc>
-      <image:title>Invoice — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice8.webp</image:loc>
-      <image:title>Invoice — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice9.webp</image:loc>
-      <image:title>Invoice — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo1.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo10.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo100.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo101.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo102.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo103.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo104.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo105.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo106.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo107.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo108.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo109.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo11.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo110.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo111.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo112.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo113.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo114.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo115.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo116.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo117.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo118.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo119.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo12.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo120.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo121.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo122.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo123.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo124.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo125.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo126.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo127.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo128.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo129.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo13.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo130.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo131.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo132.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo133.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo134.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo135.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo136.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo137.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo138.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo139.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo14.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo140.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo141.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo142.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo143.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo144.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo145.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo146.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo147.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo15.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo16.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo17.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo18.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo19.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo2.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo20.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo21.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo22.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo23.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo24.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo25.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo26.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo27.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo28.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo29.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo3.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo30.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo31.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo32.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo33.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo34.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo35.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo36.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo37.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo38.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo39.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo4.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo40.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo41.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo42.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo43.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo44.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo45.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo46.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo47.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo48.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo49.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo5.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo50.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo51.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo52.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo53.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo54.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo55.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo56.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo57.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo58.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo59.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo6.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo60.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo61.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo62.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo63.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo64.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo65.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo66.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo67.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo68.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo69.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo7.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo70.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo71.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo72.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo73.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo74.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo75.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo76.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo77.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo78.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo79.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo8.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo80.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo81.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo82.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo83.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo84.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo85.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo86.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo87.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo88.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo89.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo9.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo90.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo91.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo92.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo93.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo94.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo95.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo96.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo97.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo98.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Photos/Photo99.webp</image:loc>
-      <image:title>Photo — Barakat Qurtas</image:title>
-    </image:image>
+  </url>
+  <url>
+    <loc>https://bqurtas.com/design/other</loc>
+    <lastmod>2026-07-11</lastmod>
     <image:image>
       <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Other/Other1.webp</image:loc>
       <image:title>Design Work — Barakat Qurtas</image:title>
@@ -2742,6 +2627,162 @@
     <image:image>
       <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Flex/Flex9.webp</image:loc>
       <image:title>Flex Banner — Barakat Qurtas</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://bqurtas.com/design/posters</loc>
+    <lastmod>2026-07-11</lastmod>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster1.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster10.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster11.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster12.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster13.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster14.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster15.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster16.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster17.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster18.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster2.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster3.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster4.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster5.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster6.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster7.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster8.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Poster/Poster9.webp</image:loc>
+      <image:title>Poster — Barakat Qurtas</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://bqurtas.com/design/social</loc>
+    <lastmod>2026-07-11</lastmod>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia1.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia10.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia11.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia12.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia13.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia14.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia15.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia16.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia17.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia18.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia19.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia2.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia3.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia4.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia5.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia6.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia7.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia8.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia9.webp</image:loc>
+      <image:title>Social Media — Barakat Qurtas</image:title>
     </image:image>
   </url>
 </urlset>

@@ -168,7 +168,7 @@
       if (e.ctrlKey || e.metaKey || e.shiftKey) return;              /* zoom / horizontal */
       if (document.body.classList.contains('menu-open')) return;    /* overlay owns input */
       var t = e.target;
-      if (t && t.closest && t.closest('.chat, .latest-panel, .mobile-menu, .mm-right, textarea, select, .bb-mount, .reader, .lb, .mobile-sheet, [data-native-scroll]')) return;
+      if (t && t.closest && t.closest('.chat, .latest-panel, .mobile-menu, .mm-right, textarea, select, .bb-mount, .reader, .lb, .mobile-sheet, .dash, [data-native-scroll]')) return;
       var d = e.deltaY;
       if (e.deltaMode === 1) d *= 16; else if (e.deltaMode === 2) d *= innerHeight;
       if (!isFinite(d) || d === 0) return;
@@ -219,13 +219,24 @@
     setTimeout(function () {
       var intro = sec.querySelector('.section-head');
       var header = sec.querySelector('.tab-header') || sec.querySelector('#grid');
-      var y;
-      if (intro && intro.offsetHeight > 0) {
-        y = window.scrollY + intro.getBoundingClientRect().bottom + 2;
-      } else if (header) {
-        y = window.scrollY + header.getBoundingClientRect().top - 8;
-      } else { return; }
+      var target = function () {
+        if (intro && intro.offsetHeight > 0) return window.scrollY + intro.getBoundingClientRect().bottom + 2;
+        if (header) return window.scrollY + header.getBoundingClientRect().top - 8;
+        return null;
+      };
+      var y = target();
+      if (y == null) return;
       window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      /* the grid re-renders and images size in behind the smooth scroll —
+         re-assert the landing twice so the intro NEVER peeks back in */
+      [900, 1500].forEach(function (t) {
+        setTimeout(function () {
+          var y2 = target();
+          if (y2 != null && Math.abs(window.scrollY - Math.max(0, y2)) > 8) {
+            window.scrollTo({ top: Math.max(0, y2), behavior: 'auto' });
+          }
+        }, t);
+      });
     }, 250);
   }, true);
 })();
