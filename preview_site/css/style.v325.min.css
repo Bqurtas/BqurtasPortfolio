@@ -2056,3 +2056,41 @@ html:has(.dash.is-open){ overflow:hidden !important; }
    resurrect it (border-image paints over border-color) */
 .service-panel.is-active{ border-image: none !important; border-bottom-color: transparent !important; }
 .pencemor-room-hero{ border-image: var(--melt-soft) 1; }
+
+/* =========================================================
+   v376 — the dome melts on EVERY side.
+   v373's linear mask only dissolved the dome's bottom; its left/right
+   box edges (and top corners) still cut hard against the page. One
+   radial mask centred on the crown now lets the whole shape breathe
+   out in all directions — the crown and its light rim stay full-bodied,
+   the body dissolves before it can ever meet a straight edge.
+   ========================================================= */
+@media (max-width:820px){
+  .hero-abstract{
+    -webkit-mask-image: radial-gradient(ellipse 72% 88% at 50% 16%,
+      #000 48%, rgba(0,0,0,.38) 70%, transparent 93%);
+    mask-image: radial-gradient(ellipse 72% 88% at 50% 16%,
+      #000 48%, rgba(0,0,0,.38) 70%, transparent 93%);
+  }
+}
+
+/* =========================================================
+   v377 — the dome's melt moves onto its own body.
+   Masking the .hero-abstract CONTAINER guillotined the blurred bloom
+   at the box top — a hard horizontal line across the page. The mask
+   now lives on the dome body (::after) and the light sweep (i) only;
+   the bloom (::before) is naturally soft and needs no mask at all.
+   ========================================================= */
+@media (max-width:820px){
+  .hero-abstract{
+    -webkit-mask-image:none !important;
+    mask-image:none !important;
+  }
+  .hero-abstract::after,
+  .hero-abstract i{
+    -webkit-mask-image: radial-gradient(ellipse 76% 92% at 50% 12%,
+      #000 46%, rgba(0,0,0,.35) 68%, transparent 92%);
+    mask-image: radial-gradient(ellipse 76% 92% at 50% 12%,
+      #000 46%, rgba(0,0,0,.35) 68%, transparent 92%);
+  }
+}
