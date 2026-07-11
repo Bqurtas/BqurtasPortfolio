@@ -216,6 +216,12 @@
     if (!t) return;
     var sec = t.closest('.section');
     if (!sec) return;
+    /* silence the lede INSTANTLY — it must never flash during the transition */
+    var head0 = sec.querySelector('.section-head');
+    if (head0) {
+      head0.classList.add('bq-lede-quiet');
+      setTimeout(function () { head0.classList.remove('bq-lede-quiet'); }, 1800);
+    }
     setTimeout(function () {
       var intro = sec.querySelector('.section-head');
       var header = sec.querySelector('.tab-header') || sec.querySelector('#grid');

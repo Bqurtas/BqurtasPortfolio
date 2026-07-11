@@ -1930,3 +1930,21 @@ html[lang] .splash-name,
   margin-top:revert !important; margin-bottom:revert !important;
   padding-top:revert !important; padding-bottom:revert !important;
 }
+
+/* =========================================================
+   v370 — dashboard scroll hardening + the lede never flashes on tab switch
+   1) while the dashboard is open the page behind it is locked, dashboard
+      surfaces get contained momentum scrolling (mobile), and the mobile
+      tab menu itself scrolls when taller than the screen
+   2) switching portfolio tabs silences the intro lede INSTANTLY (lux adds
+      .bq-lede-quiet before scrolling) so "A small catalogue…" can never
+      flash past — the title element stays; scroll-up still reveals it after
+      the landing settles
+   ========================================================= */
+html:has(.dash.is-open){ overflow:hidden !important; }
+.dash-view, .dash-side-nav, .dash-tabs{ overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+@media (max-width:820px){
+  .dash-tabs.is-menu-open{ overflow-y:auto; max-height:calc(100dvh - 58px); }
+}
+.section.work > .section-head.bq-lede-quiet .section-lede,
+.section.work > .section-head.bq-lede-quiet p{ visibility:hidden !important; }
