@@ -215,6 +215,18 @@ export async function onRequest(context) {
     return Response.redirect(url.toString(), 301);
   }
   if (url.pathname === '/sitemap.xml') return serveSitemap(url, env, next);
+  // The image sitemap is a static file, but the CDN edge kept serving stale
+  // HITs after deploys (Google would read an old copy). Serve it through the
+  // function with no-store — freshness over speed, same policy as sitemap.xml.
+  if (url.pathname === '/sitemap-images.xml' && env && env.ASSETS) {
+    const r = await env.ASSETS.fetch(new URL('/sitemap-images.xml', url.origin));
+    const h = new Headers(r.headers);
+    h.set('Content-Type', 'application/xml; charset=UTF-8');
+    h.set('Cache-Control', 'no-store');
+    h.set('CDN-Cache-Control', 'no-store');
+    h.set('X-Content-Type-Options', 'nosniff');
+    return new Response(r.body, { status: 200, headers: h });
+  }
   const r = resolve(url.pathname);
   if (!r) return next();
   if (!env || !env.ASSETS) return next();
