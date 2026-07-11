@@ -1989,3 +1989,47 @@ html:has(.dash.is-open){ overflow:hidden !important; }
     mask-image:linear-gradient(to bottom, #000 52%, rgba(0,0,0,.4) 74%, transparent 90%);
   }
 }
+
+/* =========================================================
+   v374 — every hairline melts into the background.
+   The dissolve the Panjamor room already wears, carried through the
+   whole house: a rule that breathes out at both ends instead of
+   slamming into the page edge. Decorative dividers only — interactive
+   underlines (form fields, hover links) keep their solid affordance.
+   ========================================================= */
+:root{
+  --melt: linear-gradient(90deg, transparent, var(--line) 22%, var(--line) 78%, transparent);
+  --melt-soft: linear-gradient(90deg, transparent, var(--line-soft) 24%, var(--line-soft) 76%, transparent);
+  --melt-paper: linear-gradient(90deg, transparent, rgba(255,255,255,.13) 22%, rgba(255,255,255,.13) 78%, transparent);
+}
+
+/* bordered dividers → the border itself becomes the fade */
+.footer,
+.bio-teaser, .logos-section, .latest-blog,
+.logo-marquee, .hero-marquee,
+.tabs-row, .tab-header, .lang-head,
+.index-list, .index-row, .index-inline,
+.bio-block-title,
+.tools-typing,
+.chat-input,
+.reader-meta, .reader-engage, .reader-more,
+.footer-stage,
+.dash-head, .dash-side-id, .dash-side-tools{
+  border-image: var(--melt) 1;
+}
+.pencemor-hero{ border-image: var(--melt-soft) 1; }
+
+/* the footer re-scopes --line to its cream palette, so --melt resolves
+   correctly there; only rows on dark photo cards need explicit paper light */
+.footer-connect-v249 a{ border-image: var(--melt) 1; }
+.blog-card-foot{ border-image: var(--melt-paper) 1; }
+
+/* painted 1px lines → painted fades */
+.room-hero::after{ background: var(--melt-soft); }
+.load-more-bar{ background: var(--melt); }
+.index-card-rule{ background: var(--melt-paper); }
+
+/* the hero scroll cue's track breathes out at both ends too */
+.hero-scrolldown .bar{
+  background: linear-gradient(180deg, transparent, var(--line) 35%, var(--line) 65%, transparent);
+}
