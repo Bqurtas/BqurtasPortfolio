@@ -13195,3 +13195,26 @@ html:has(.dash.is-open){ overflow:hidden !important; }
 .hero-scrolldown .bar{
   background: linear-gradient(180deg, transparent, var(--line) 35%, var(--line) 65%, transparent);
 }
+
+/* =========================================================
+   v375 — the melt reaches every last hairline (workflow sweep).
+   Services band + accordion, practice-note + tool tickers, blog reader
+   bar, chat/notification sheet chrome, mobile-menu rows, the Panjamor
+   bands, and the footer bottom rule the first pass missed.
+   ========================================================= */
+.service-showcase, .service-accordion,
+.service-detail-inner ul, .service-detail-inner li,
+.practice-note, .practice-note .software-experience,
+.software-line,
+.footer-v249 .footer-bottom,
+.reader-bar,
+.latest-panel-head, .chat-head, .latest-item,
+.mm-link, .mm-foot,
+.pj-cta-section, .pj2-marquee{
+  border-image: var(--melt) 1;
+}
+.service-panel{ border-image: var(--melt) 1; }
+/* the open panel's divider disappears by design — border-image must not
+   resurrect it (border-image paints over border-color) */
+.service-panel.is-active{ border-image: none !important; border-bottom-color: transparent !important; }
+.pencemor-room-hero{ border-image: var(--melt-soft) 1; }
