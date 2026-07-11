@@ -13256,3 +13256,21 @@ html:has(.dash.is-open){ overflow:hidden !important; }
       #000 46%, rgba(0,0,0,.35) 68%, transparent 92%);
   }
 }
+
+/* =========================================================
+   v379 — the desktop dome melts too. One universal treatment:
+   the radial mask (v377, mobile-only) now dissolves the dome's body
+   and light sweep on EVERY breakpoint — sides, corners and base all
+   breathe out into the page; the crown and its rim stay full-bodied.
+   ========================================================= */
+.hero-abstract{
+  -webkit-mask-image:none !important;
+  mask-image:none !important;
+}
+.hero-abstract::after,
+.hero-abstract i{
+  -webkit-mask-image: radial-gradient(ellipse 76% 92% at 50% 12%,
+    #000 46%, rgba(0,0,0,.35) 68%, transparent 92%);
+  mask-image: radial-gradient(ellipse 76% 92% at 50% 12%,
+    #000 46%, rgba(0,0,0,.35) 68%, transparent 92%);
+}
