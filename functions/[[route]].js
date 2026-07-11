@@ -218,7 +218,7 @@ export async function onRequest(context) {
   // The image sitemap is a static file, but the CDN edge kept serving stale
   // HITs after deploys (Google would read an old copy). Serve it through the
   // function with no-store — freshness over speed, same policy as sitemap.xml.
-  if ((url.pathname === '/sitemap-images.xml' || url.pathname === '/sitemap-media.xml') && env && env.ASSETS) {
+  if ((url.pathname === '/sitemap-images.xml' || url.pathname === '/sitemap-media.xml' || url.pathname === '/sitemap-gallery.xml') && env && env.ASSETS) {
     const r = await env.ASSETS.fetch(new URL('/sitemap-images.xml', url.origin));
     const h = new Headers(r.headers);
     h.set('Content-Type', 'application/xml; charset=UTF-8');
