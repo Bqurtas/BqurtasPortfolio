@@ -13274,3 +13274,23 @@ html:has(.dash.is-open){ overflow:hidden !important; }
   mask-image: radial-gradient(ellipse 76% 92% at 50% 12%,
     #000 46%, rgba(0,0,0,.35) 68%, transparent 92%);
 }
+
+/* =========================================================
+   v381 — the DESKTOP dome dissolves at the sides too.
+   Mobile's dome is wider than the viewport, so its left/right edges
+   sit off-screen and never showed a seam. The desktop dome is
+   narrower than the viewport — its shoulders were on-screen and the
+   v379 mask (centred near the crown) left them hard. A mask centred
+   lower, with a tighter opaque core and an earlier falloff, melts the
+   whole silhouette — sides, shoulders and base — into the page while
+   the crown keeps its lit rim. Desktop only; mobile is unchanged.
+   ========================================================= */
+@media (min-width:821px){
+  .hero-abstract::after,
+  .hero-abstract i{
+    -webkit-mask-image: radial-gradient(54% 78% at 50% 32%,
+      #000 22%, rgba(0,0,0,.28) 54%, transparent 80%) !important;
+    mask-image: radial-gradient(54% 78% at 50% 32%,
+      #000 22%, rgba(0,0,0,.28) 54%, transparent 80%) !important;
+  }
+}
