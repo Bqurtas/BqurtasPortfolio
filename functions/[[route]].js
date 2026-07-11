@@ -201,6 +201,15 @@ const setLangAttr = (v) => ({ element(el) { el.setAttribute('lang', v); } });
 export async function onRequest(context) {
   const { request, env, next } = context;
   const url = new URL(request.url);
+  // Google Search Console ownership token — served from the function because
+  // Pages' pretty-URL normalisation 308-redirects any static *.html path,
+  // and Google's verifier requires a plain 200 at the exact URL.
+  if (url.pathname === '/googlece435b444cb43243.html') {
+    return new Response('google-site-verification: googlece435b444cb43243.html', {
+      status: 200,
+      headers: { 'Content-Type': 'text/html; charset=UTF-8', 'Cache-Control': 'no-store' }
+    });
+  }
   if (url.hostname === 'www.bqurtas.com') {
     url.hostname = 'bqurtas.com';
     return Response.redirect(url.toString(), 301);
