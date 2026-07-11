@@ -511,7 +511,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const topbarH = topbar && getComputedStyle(topbar).position === 'fixed'
       ? topbar.getBoundingClientRect().height
       : 0;
-    const stickyTabs = window.innerWidth <= 820 ? document.querySelector('.section.work > .tabs-wrap') : null;
+    /* the sticky tab circles sit BELOW the intro in the document — the offset
+       is only needed when falling back to the tab header (they'd cover it) */
+    const targetIsIntro = head.classList && head.classList.contains('section-head');
+    const stickyTabs = (!targetIsIntro && window.innerWidth <= 820) ? document.querySelector('.section.work > .tabs-wrap') : null;
     const stickyTabsH = stickyTabs && getComputedStyle(stickyTabs).position === 'sticky'
       ? stickyTabs.getBoundingClientRect().height
       : 0;
@@ -688,10 +691,11 @@ document.addEventListener('DOMContentLoaded', () => {
     correctScrollAfterGallery = !Array.isArray(window.BQ_ALL_CARDS) || !window.BQ_ALL_CARDS.length;
     setActiveTab(tab);
     if (push !== false) syncURL(!!push);
-    /* ONE clean movement: a single smooth glide to the room intro. The intro's
-       document position is stable (nothing above it changes on a tab switch),
-       so no timed corrections are needed — they were the ugly ping-pong. */
+    /* ONE clean movement: a single smooth glide to the room intro, plus one
+       silent correction after the glide settles — same target, so it is
+       invisible unless a late layout shift nudged the landing. */
     requestAnimationFrame(() => scrollToGridTop(push === false ? 'auto' : 'smooth'));
+    setTimeout(() => scrollToGridTop('auto'), 650);
   };
 
   /* re-layout on width change (column count change) */
