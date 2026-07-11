@@ -225,7 +225,10 @@
       };
       var y = target();
       if (y == null) return;
-      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      /* mobile: land INSTANTLY — a smooth glide gets cut short by the thumb
+         and strands the view half-way up the hero dome */
+      var glide = matchMedia('(min-width:821px)').matches;
+      window.scrollTo({ top: Math.max(0, y), behavior: glide ? 'smooth' : 'auto' });
       /* the grid re-renders behind the smooth scroll — keep re-asserting the
          landing (up to 4s) until the visitor takes over */
       var userTook = false;
@@ -233,7 +236,7 @@
       ['wheel', 'touchstart', 'keydown'].forEach(function (ev) {
         addEventListener(ev, takeover, { passive: true, once: true });
       });
-      [900, 1500, 2400, 4000].forEach(function (t2) {
+      [450, 900, 1500, 2400, 4000].forEach(function (t2) {
         setTimeout(function () {
           if (userTook) return;
           var y2 = target();

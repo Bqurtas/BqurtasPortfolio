@@ -13136,3 +13136,18 @@ html:has(.dash.is-open){ overflow:hidden !important; }
     padding-bottom:calc(80px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
+
+/* =========================================================
+   v373 — the mobile dome dissolves into the page.
+   The obsidian dome (.hero-abstract) extends past the hero and used to
+   END on a hard rectangular edge — a harsh black cut right above the
+   design-room intro. On mobile its lower body now fades out through a
+   mask, so the shape melts into whatever background sits beneath it
+   (dark and light themes alike). Desktop keeps its full-bodied dome.
+   ========================================================= */
+@media (max-width:820px){
+  .hero-abstract{
+    -webkit-mask-image:linear-gradient(to bottom, #000 52%, rgba(0,0,0,.4) 74%, transparent 90%);
+    mask-image:linear-gradient(to bottom, #000 52%, rgba(0,0,0,.4) 74%, transparent 90%);
+  }
+}
