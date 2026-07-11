@@ -205,59 +205,42 @@
   }, true);
 })();
 
-/* ---- desktop: switching tabs scrolls the view JUST past the room intro
-   (its bottom edge meets the viewport top), so "01 — Design Room / A small
-   catalogue…" — the lede line included — sits fully under the scroll and the
-   tab header leads. Scrolling up still reveals the intro. ---- */
+/* ---- switching tabs (mobile AND desktop) presents the room intro
+   FIRST-CLASS: the view lands at the top of "01 — Design Room / A small
+   catalogue…" so the whole intro, the tab title and the counts read
+   together as one composed page. ---- */
 (function () {
-  if (!matchMedia('(min-width:821px)').matches) return;
   document.addEventListener('click', function (e) {
     var t = e.target && e.target.closest && e.target.closest('.tabs .tab');
     if (!t) return;
     var sec = t.closest('.section');
     if (!sec) return;
-    /* silence the lede INSTANTLY — and keep it silent until the visitor
-       deliberately scrolls back up towards the intro (a timer can lose to
-       slow image loads shifting the landing) */
-    var head0 = sec.querySelector('.section-head');
-    if (head0) {
-      head0.classList.add('bq-lede-quiet');
-      var unquiet = function () {
-        var r = head0.getBoundingClientRect();
-        if (r.bottom > innerHeight * 0.35) {   // intro pulled well into view
-          head0.classList.remove('bq-lede-quiet');
-          removeEventListener('scroll', unquiet);
-        }
-      };
-      addEventListener('scroll', unquiet, { passive: true });
-    }
     setTimeout(function () {
       var intro = sec.querySelector('.section-head');
       var header = sec.querySelector('.tab-header') || sec.querySelector('#grid');
       var target = function () {
-        if (intro && intro.offsetHeight > 0) return window.scrollY + intro.getBoundingClientRect().bottom + 2;
-        if (header) return window.scrollY + header.getBoundingClientRect().top - 8;
-        return null;
+        var el = (intro && intro.offsetHeight > 0) ? intro : header;
+        if (!el) return null;
+        return window.scrollY + el.getBoundingClientRect().top - 18;
       };
       var y = target();
       if (y == null) return;
       window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
-      /* the grid re-renders and images size in behind the smooth scroll —
-         keep re-asserting the landing (up to 4s) until the visitor takes
-         over, so the intro NEVER peeks back in on slow connections */
+      /* the grid re-renders behind the smooth scroll — keep re-asserting the
+         landing (up to 4s) until the visitor takes over */
       var userTook = false;
       var takeover = function () { userTook = true; };
       ['wheel', 'touchstart', 'keydown'].forEach(function (ev) {
         addEventListener(ev, takeover, { passive: true, once: true });
       });
-      [900, 1500, 2400, 4000].forEach(function (t) {
+      [900, 1500, 2400, 4000].forEach(function (t2) {
         setTimeout(function () {
           if (userTook) return;
           var y2 = target();
           if (y2 != null && Math.abs(window.scrollY - Math.max(0, y2)) > 8) {
             window.scrollTo({ top: Math.max(0, y2), behavior: 'auto' });
           }
-        }, t);
+        }, t2);
       });
     }, 250);
   }, true);
