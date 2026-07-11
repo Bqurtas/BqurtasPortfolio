@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateLoadMore(matching.length);
   };
   const scrollToGridTop = (behavior = 'smooth') => {
-    const head = document.getElementById('tabHeader') || gridEl;
+    const head = document.querySelector('.section.work > .section-head') || document.getElementById('tabHeader') || gridEl;
     if (!head) return;
     const topbar = document.querySelector('.rail');
     const topbarH = topbar && getComputedStyle(topbar).position === 'fixed'
@@ -688,9 +688,10 @@ document.addEventListener('DOMContentLoaded', () => {
     correctScrollAfterGallery = !Array.isArray(window.BQ_ALL_CARDS) || !window.BQ_ALL_CARDS.length;
     setActiveTab(tab);
     if (push !== false) syncURL(!!push);
+    /* ONE clean movement: a single smooth glide to the room intro. The intro's
+       document position is stable (nothing above it changes on a tab switch),
+       so no timed corrections are needed — they were the ugly ping-pong. */
     requestAnimationFrame(() => scrollToGridTop(push === false ? 'auto' : 'smooth'));
-    setTimeout(() => scrollToGridTop('auto'), 120);
-    setTimeout(() => scrollToGridTop('auto'), 320);
   };
 
   /* re-layout on width change (column count change) */

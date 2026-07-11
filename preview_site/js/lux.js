@@ -205,46 +205,4 @@
   }, true);
 })();
 
-/* ---- switching tabs (mobile AND desktop) presents the room intro
-   FIRST-CLASS: the view lands at the top of "01 — Design Room / A small
-   catalogue…" so the whole intro, the tab title and the counts read
-   together as one composed page. ---- */
-(function () {
-  document.addEventListener('click', function (e) {
-    var t = e.target && e.target.closest && e.target.closest('.tabs .tab');
-    if (!t) return;
-    var sec = t.closest('.section');
-    if (!sec) return;
-    setTimeout(function () {
-      var intro = sec.querySelector('.section-head');
-      var header = sec.querySelector('.tab-header') || sec.querySelector('#grid');
-      var target = function () {
-        var el = (intro && intro.offsetHeight > 0) ? intro : header;
-        if (!el) return null;
-        return window.scrollY + el.getBoundingClientRect().top - 18;
-      };
-      var y = target();
-      if (y == null) return;
-      /* mobile: land INSTANTLY — a smooth glide gets cut short by the thumb
-         and strands the view half-way up the hero dome */
-      var glide = matchMedia('(min-width:821px)').matches;
-      window.scrollTo({ top: Math.max(0, y), behavior: glide ? 'smooth' : 'auto' });
-      /* the grid re-renders behind the smooth scroll — keep re-asserting the
-         landing (up to 4s) until the visitor takes over */
-      var userTook = false;
-      var takeover = function () { userTook = true; };
-      ['wheel', 'touchstart', 'keydown'].forEach(function (ev) {
-        addEventListener(ev, takeover, { passive: true, once: true });
-      });
-      [450, 900, 1500, 2400, 4000].forEach(function (t2) {
-        setTimeout(function () {
-          if (userTook) return;
-          var y2 = target();
-          if (y2 != null && Math.abs(window.scrollY - Math.max(0, y2)) > 8) {
-            window.scrollTo({ top: Math.max(0, y2), behavior: 'auto' });
-          }
-        }, t2);
-      });
-    }, 250);
-  }, true);
-})();
+/* (the tab-switch landing now lives in main.js — one scroll system, no fights) */
