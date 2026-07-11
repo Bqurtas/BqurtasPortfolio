@@ -1948,3 +1948,29 @@ html:has(.dash.is-open){ overflow:hidden !important; }
 }
 .section.work > .section-head.bq-lede-quiet .section-lede,
 .section.work > .section-head.bq-lede-quiet p{ visibility:hidden !important; }
+
+/* =========================================================
+   v371 — iPhone safe-area alignment: the dock pill sits at
+   calc(12px + env(safe-area-inset-bottom)) with height 64, so anything
+   anchored with a bare pixel bottom drifts on phones with a home
+   indicator (env ≈ 20–34px): the go-up button and the chat/notification
+   sheets overlapped the dock, the hero scroll cue slid UNDER it, and the
+   footer's end padding over-cleared. Everything now tracks env().
+   ========================================================= */
+@media (max-width:820px){
+  .to-top{
+    bottom:calc(84px + env(safe-area-inset-bottom, 0px)) !important;
+    right:14px !important;
+  }
+  .latest-panel, .chat{
+    bottom:calc(84px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .hero-scrolldown{
+    /* the hero's own height already subtracts --dock-h (which carries env),
+       so a flat offset here lands the cue 10px clear of the dock pill */
+    bottom:22px !important;
+  }
+  .footer{
+    padding-bottom:calc(80px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}

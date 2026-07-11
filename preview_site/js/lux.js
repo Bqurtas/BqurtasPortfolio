@@ -216,11 +216,20 @@
     if (!t) return;
     var sec = t.closest('.section');
     if (!sec) return;
-    /* silence the lede INSTANTLY — it must never flash during the transition */
+    /* silence the lede INSTANTLY — and keep it silent until the visitor
+       deliberately scrolls back up towards the intro (a timer can lose to
+       slow image loads shifting the landing) */
     var head0 = sec.querySelector('.section-head');
     if (head0) {
       head0.classList.add('bq-lede-quiet');
-      setTimeout(function () { head0.classList.remove('bq-lede-quiet'); }, 1800);
+      var unquiet = function () {
+        var r = head0.getBoundingClientRect();
+        if (r.bottom > innerHeight * 0.35) {   // intro pulled well into view
+          head0.classList.remove('bq-lede-quiet');
+          removeEventListener('scroll', unquiet);
+        }
+      };
+      addEventListener('scroll', unquiet, { passive: true });
     }
     setTimeout(function () {
       var intro = sec.querySelector('.section-head');
@@ -234,9 +243,16 @@
       if (y == null) return;
       window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
       /* the grid re-renders and images size in behind the smooth scroll —
-         re-assert the landing twice so the intro NEVER peeks back in */
-      [900, 1500].forEach(function (t) {
+         keep re-asserting the landing (up to 4s) until the visitor takes
+         over, so the intro NEVER peeks back in on slow connections */
+      var userTook = false;
+      var takeover = function () { userTook = true; };
+      ['wheel', 'touchstart', 'keydown'].forEach(function (ev) {
+        addEventListener(ev, takeover, { passive: true, once: true });
+      });
+      [900, 1500, 2400, 4000].forEach(function (t) {
         setTimeout(function () {
+          if (userTook) return;
           var y2 = target();
           if (y2 != null && Math.abs(window.scrollY - Math.max(0, y2)) > 8) {
             window.scrollTo({ top: Math.max(0, y2), behavior: 'auto' });
