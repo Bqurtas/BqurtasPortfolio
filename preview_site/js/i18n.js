@@ -83,7 +83,7 @@ window.__loadI18nMore = function(cb) {
   if (window.__i18nMoreLoading) { window.__i18nMoreCbs.push(cb); return; }
   window.__i18nMoreLoading = true; window.__i18nMoreCbs = [cb];
   var sc = document.createElement('script');
-  sc.src = 'js/i18n-more.min.js?v=2'; sc.async = false;
+  sc.src = 'js/i18n-more.min.js?v=3'; sc.async = false;
   sc.onload = function () { window.__i18nMoreLoaded = true; window.__i18nMoreCbs.forEach(function (f) { f && f(); }); window.__i18nMoreCbs = []; };
   document.head.appendChild(sc);
 };
