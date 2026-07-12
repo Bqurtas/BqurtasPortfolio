@@ -344,7 +344,7 @@
       <div class="hf-meta">
         <span class="hf-title"></span>
         <span class="hf-sub mono"></span>
-        <span class="hf-go mono">View section <i class="fa-solid fa-arrow-right"></i></span>
+        <span class="hf-go mono">${(window.BQ_DICT&&window.BQ_DICT["foot.view"])||"View section"} <i class="fa-solid fa-arrow-right"></i></span>
       </div>`;
     document.body.appendChild(float);
     const album = $$('.hf-a', float);

@@ -439,7 +439,13 @@ Object.assign(window.I18N, {
     "pj.cta.eye":"Fikir ciddiyse hazırız",
     "pj.cta.title":"Projeyi getirin. Panjamor sistemi şekillendirsin.",
     "pj.cta.sub":"İşletme adını, alanını, bütçeyi, teslim tarihini ve varsa referansları gönderin. Yanıt muğlak değil, pratik olacak.",
-    "pj.cta.btn":"Brief'i yazın"
+    "pj.cta.btn":"Brief'i yazın",
+    "footer.backtop":"Başa dön",
+    "pj.kicker":"02 — Ofis Stüdyosu",
+    "pj.mq.brand":"Marka",
+    "pj.mq.print":"Baskı",
+    "pj.mq.launch":"Lansman",
+    "foot.view":"Bölümü gör"
   },
   "sv": {
     "dir":"ltr",
@@ -880,7 +886,13 @@ Object.assign(window.I18N, {
     "pj.cta.eye":"Redo när idén är seriös",
     "pj.cta.title":"Ta med projektet. Panjamor formar systemet.",
     "pj.cta.sub":"Skicka verksamhetens namn, bransch, budget, deadline och eventuella referenser. Svaret blir praktiskt, inte vagt.",
-    "pj.cta.btn":"Skriv briefen"
+    "pj.cta.btn":"Skriv briefen",
+    "footer.backtop":"Till toppen",
+    "pj.kicker":"02 — Kontorsstudio",
+    "pj.mq.brand":"Varumärke",
+    "pj.mq.print":"Tryck",
+    "pj.mq.launch":"Lansering",
+    "foot.view":"Visa avsnitt"
   },
   "ku": {
     "dir":"rtl",
@@ -1321,7 +1333,13 @@ Object.assign(window.I18N, {
     "pj.cta.eye":"ئامادەم کاتێک بیرۆکەکە جددی بێت",
     "pj.cta.title":"پڕۆژەکە بهێنە. پەنجەمۆر سیستەمەکە شێوە دەکات.",
     "pj.cta.sub":"ناوی بزنس، بوار، بودجە، کاتی کۆتایی و هەر سەرچاوەیەک بنێرە. وەڵامەکە کرداری دەبێت، نەک ناڕوون.",
-    "pj.cta.btn":"بریفەکە بنووسە"
+    "pj.cta.btn":"بریفەکە بنووسە",
+    "footer.backtop":"گەڕانەوە بۆ سەرەوە",
+    "pj.kicker":"٠٢ — ستۆدیۆی ئۆفیس",
+    "pj.mq.brand":"براند",
+    "pj.mq.print":"چاپ",
+    "pj.mq.launch":"دەستپێکردن",
+    "foot.view":"بینینی بەش"
   },
   "kmr": {
     "dir":"ltr",
@@ -1762,7 +1780,13 @@ Object.assign(window.I18N, {
     "pj.cta.eye":"Amade dema raman cidî be",
     "pj.cta.title":"Projeyê bîne. Panjamor dê sîstemê şekil bide.",
     "pj.cta.sub":"Navê kar, qad, budce, dema dawî û her çavkaniyekê bişîne. Bersiv dê pratîk be, ne nezelal.",
-    "pj.cta.btn":"Kurteyê binivîse"
+    "pj.cta.btn":"Kurteyê binivîse",
+    "footer.backtop":"Vegere jor",
+    "pj.kicker":"02 — Studyoya Ofîsê",
+    "pj.mq.brand":"Brand",
+    "pj.mq.print":"Çap",
+    "pj.mq.launch":"Destpêk",
+    "foot.view":"Beşê bibîne"
   },
   "ar": {
     "dir":"rtl",
@@ -2203,7 +2227,13 @@ Object.assign(window.I18N, {
     "pj.cta.eye":"جاهز حين تكون الفكرة جادّة",
     "pj.cta.title":"أحضر المشروع. بنجمور سيشكّل النظام.",
     "pj.cta.sub":"أرسل اسم العمل والمجال والميزانية والموعد وأي مراجع. سيكون الردّ عمليًّا لا مبهمًا.",
-    "pj.cta.btn":"اكتب الموجز"
+    "pj.cta.btn":"اكتب الموجز",
+    "footer.backtop":"العودة إلى الأعلى",
+    "pj.kicker":"٠٢ — استوديو المكتب",
+    "pj.mq.brand":"علامة",
+    "pj.mq.print":"طباعة",
+    "pj.mq.launch":"إطلاق",
+    "foot.view":"عرض القسم"
   },
   "fr": {
     "dir":"ltr",
@@ -2644,6 +2674,12 @@ Object.assign(window.I18N, {
     "pj.cta.eye":"Prêt dès que l'idée est sérieuse",
     "pj.cta.title":"Apportez le projet. Panjamor en façonnera le système.",
     "pj.cta.sub":"Envoyez le nom de l'entreprise, le domaine, le budget, le délai et vos références. La réponse sera concrète, pas vague.",
-    "pj.cta.btn":"Rédiger le brief"
+    "pj.cta.btn":"Rédiger le brief",
+    "footer.backtop":"Retour en haut",
+    "pj.kicker":"02 — Studio de bureau",
+    "pj.mq.brand":"Marque",
+    "pj.mq.print":"Impression",
+    "pj.mq.launch":"Lancement",
+    "foot.view":"Voir la section"
   }
 });
