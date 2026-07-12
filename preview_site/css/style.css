@@ -13294,3 +13294,32 @@ html:has(.dash.is-open){ overflow:hidden !important; }
       #000 22%, rgba(0,0,0,.28) 54%, transparent 80%) !important;
   }
 }
+
+/* =========================================================
+   v394 — hero call-to-action: a quiet invitation into the work.
+   Theme-adaptive outline pill (reads on the dark dome and on the light
+   room alike), renders immediately (no entrance delay → no LCP impact),
+   sits in the hero flow so it never shifts the signature (no CLS).
+   ========================================================= */
+.hero-cta{
+  display:inline-flex; align-items:center; gap:12px;
+  margin-top:30px; padding:14px 28px;
+  background:transparent; color:var(--ink);
+  border:1px solid color-mix(in srgb, var(--ink) 55%, transparent);
+  border-radius:999px;
+  font-family:'JetBrains Mono','Noto Kufi Arabic',monospace;
+  font-size:12px; letter-spacing:.16em; text-transform:uppercase;
+  text-decoration:none; cursor:pointer;
+  transition:background .35s var(--ease), color .35s var(--ease),
+             gap .3s var(--ease), border-color .35s var(--ease);
+  -webkit-tap-highlight-color:transparent;
+}
+.hero-cta:hover, .hero-cta:focus-visible{
+  background:var(--ink); color:var(--bg);
+  border-color:var(--ink); gap:16px; outline:none;
+}
+.hero-cta i{ font-size:11px; transition:transform .3s var(--ease); }
+.hero-cta:hover i, .hero-cta:focus-visible i{ transform:translateY(3px); }
+@media (max-width:820px){
+  .hero-cta{ margin-top:24px; padding:13px 24px; font-size:11px; letter-spacing:.14em; }
+}

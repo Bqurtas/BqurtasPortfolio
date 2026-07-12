@@ -83,7 +83,7 @@ window.__loadI18nMore = function(cb) {
   if (window.__i18nMoreLoading) { window.__i18nMoreCbs.push(cb); return; }
   window.__i18nMoreLoading = true; window.__i18nMoreCbs = [cb];
   var sc = document.createElement('script');
-  sc.src = 'js/i18n-more.min.js?v=4'; sc.async = false;
+  sc.src = 'js/i18n-more.min.js?v=5'; sc.async = false;
   sc.onload = function () { window.__i18nMoreLoaded = true; window.__i18nMoreCbs.forEach(function (f) { f && f(); }); window.__i18nMoreCbs = []; };
   document.head.appendChild(sc);
 };
@@ -1482,3 +1482,5 @@ Object.keys(window.ROOMCARD_PANJAMOR332).forEach(function(l){
 });
 
 Object.assign(window.I18N.en,{"footer.backtop":"Back to top","pj.kicker":"02 — Office Studio","pj.mq.brand":"Brand","pj.mq.print":"Print","pj.mq.launch":"Launch","foot.view":"View section"});
+
+Object.assign(window.I18N.en,{"hero.cta":"View the work"});

@@ -445,7 +445,8 @@ Object.assign(window.I18N, {
     "pj.mq.brand":"Marka",
     "pj.mq.print":"Baskı",
     "pj.mq.launch":"Lansman",
-    "foot.view":"Bölümü gör"
+    "foot.view":"Bölümü gör",
+    "hero.cta":"İşleri gör"
   },
   "sv": {
     "dir":"ltr",
@@ -892,7 +893,8 @@ Object.assign(window.I18N, {
     "pj.mq.brand":"Varumärke",
     "pj.mq.print":"Tryck",
     "pj.mq.launch":"Lansering",
-    "foot.view":"Visa avsnitt"
+    "foot.view":"Visa avsnitt",
+    "hero.cta":"Se arbetet"
   },
   "ku": {
     "dir":"rtl",
@@ -1339,7 +1341,8 @@ Object.assign(window.I18N, {
     "pj.mq.brand":"براند",
     "pj.mq.print":"چاپ",
     "pj.mq.launch":"دەستپێکردن",
-    "foot.view":"بینینی بەش"
+    "foot.view":"بینینی بەش",
+    "hero.cta":"بینینی کارەکان"
   },
   "kmr": {
     "dir":"ltr",
@@ -1786,7 +1789,8 @@ Object.assign(window.I18N, {
     "pj.mq.brand":"Brand",
     "pj.mq.print":"Çap",
     "pj.mq.launch":"Destpêk",
-    "foot.view":"Beşê bibîne"
+    "foot.view":"Beşê bibîne",
+    "hero.cta":"Xebatê bibîne"
   },
   "ar": {
     "dir":"rtl",
@@ -2233,7 +2237,8 @@ Object.assign(window.I18N, {
     "pj.mq.brand":"علامة",
     "pj.mq.print":"طباعة",
     "pj.mq.launch":"إطلاق",
-    "foot.view":"عرض القسم"
+    "foot.view":"عرض القسم",
+    "hero.cta":"شاهد الأعمال"
   },
   "fr": {
     "dir":"ltr",
@@ -2680,6 +2685,7 @@ Object.assign(window.I18N, {
     "pj.mq.brand":"Marque",
     "pj.mq.print":"Impression",
     "pj.mq.launch":"Lancement",
-    "foot.view":"Voir la section"
+    "foot.view":"Voir la section",
+    "hero.cta":"Voir les travaux"
   }
 });

@@ -177,10 +177,10 @@
   <!-- Main layout CSS is render-blocking again: making it non-blocking made the
        hero re-lay-out when the full CSS applied after first paint, a flaky ~1.0
        CLS spike on the hero. Render-blocking guarantees CLS 0. -->
-  <link rel="preload" href="css/style.v325.min.css?v=393" as="style" fetchpriority="high">
+  <link rel="preload" href="css/style.v325.min.css?v=394" as="style" fetchpriority="high">
   <link rel="preload" href="assets/portrait.webp?v=2" as="image" fetchpriority="high">
   <link rel="preload" href="assets/fonts/Liana.otf" as="font" type="font/otf" crossorigin fetchpriority="high">
-  <link rel="stylesheet" href="css/style.v325.min.css?v=393">
+  <link rel="stylesheet" href="css/style.v325.min.css?v=394">
   <link rel="preload" href="css/fonts.css?v=310" as="style" data-bq-optional-css>
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315"></noscript>
@@ -558,6 +558,11 @@
             <span class="hero-services-main" data-i18n="hero.services">Design • Printing • Advertising</span>
             <span class="hero-services-ai" tabindex="0"><i class="fa-solid fa-microchip"></i> <span class="hero-ai-label" data-i18n="hero.ai">Artificial Intelligence</span><span class="hero-ai-short" data-i18n="hero.ai.short">AI</span><span class="hero-ai-future" data-i18n="hero.ai.future">Shaping the future</span></span>
           </p>
+
+          <a class="hero-cta" href="#grid" data-hero-cta role="button">
+            <span data-i18n="hero.cta">View the work</span>
+            <i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
+          </a>
         </div>
 
         <!-- cinematic abstract: an obsidian dome with a breathing bloom and a
@@ -1857,7 +1862,7 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script defer src="js/i18n.min.js?v=321"></script>
+  <script defer src="js/i18n.min.js?v=322"></script>
   <!-- Non-English visitors need the extra dictionaries before first render;
        English (the default + PSI) never loads them, keeping the parse light. -->
   <script>
@@ -1920,6 +1925,16 @@
       // any go-up control → top of the room you're already in (no room switch)
       document.addEventListener('click', function (e) {
         if (e.target && e.target.closest && e.target.closest('#toTop, .to-top, .footer-top-btn')) hardTopRepeated();
+      }, true);
+      // hero CTA → glide down to the work gallery (same room, no route change)
+      document.addEventListener('click', function (e) {
+        var b = e.target && e.target.closest && e.target.closest('[data-hero-cta]');
+        if (!b) return;
+        e.preventDefault();
+        var work = document.querySelector('#design .section.work') || document.getElementById('grid');
+        if (!work) return;
+        var y = window.scrollY + work.getBoundingClientRect().top - 14;
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
       }, true);
       // first paint + bfcache restore → top of the home hero
       window.addEventListener('load', hardTop);
