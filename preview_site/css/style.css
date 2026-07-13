@@ -13478,3 +13478,30 @@ html:has(.dash.is-open){ overflow:hidden !important; }
 @media (max-width:820px){
   .hero-cta{ margin-top:28px; padding:13px 26px; font-size:13px; }
 }
+
+/* =========================================================
+   v400 — hero CTA goes black. Owner: drop the green dot, make it a black
+   pill (not white). A deep warm near-black with light text and a hairline
+   so it reads on the dark dome and pops on the light room; premium shadow,
+   soft lift, a light gloss sweep. Overrides v399's filled-light pill.
+   ========================================================= */
+.hero-cta{
+  background:#17161a; color:#f4f3f0;
+  border:1px solid rgba(244,243,240,.20);
+  box-shadow:0 20px 48px -18px rgba(0,0,0,.6),
+             inset 0 1px 0 rgba(255,255,255,.07);
+}
+.hero-cta:hover, .hero-cta:focus-visible{
+  background:#1d1c21; color:#fff;
+  border-color:rgba(244,243,240,.34);
+  box-shadow:0 30px 64px -20px rgba(0,0,0,.72),
+             inset 0 1px 0 rgba(255,255,255,.1);
+}
+.hero-cta .hero-cta-dot{ display:none !important; }   /* green dot removed */
+.hero-cta i{ color:#f4f3f0; }
+.hero-cta:hover i, .hero-cta:focus-visible i{ color:#fff; }
+/* light gloss sweep on the dark pill */
+.hero-cta::before{
+  background:linear-gradient(115deg, transparent 34%,
+    rgba(255,255,255,.09) 50%, transparent 66%);
+}
