@@ -13531,3 +13531,14 @@ html:has(.dash.is-open){ overflow:hidden !important; }
 }
 .hero-cta i{ color:var(--ink); }
 .hero-cta:hover i, .hero-cta:focus-visible i{ color:var(--ink); }
+
+/* =========================================================
+   v402 — the hero CTA no longer sits on the dome.
+   Desktop only: the obsidian dome drops a touch lower and the CTA lifts a
+   touch, opening a clean dark band between the button and the dome crest.
+   (Mobile spacing already reads clean.)
+   ========================================================= */
+@media (min-width:821px){
+  .hero-abstract{ bottom:-54% !important; }
+  .hero-cta{ margin-top:22px; }
+}

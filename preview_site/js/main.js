@@ -1289,6 +1289,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cue.setAttribute('role', 'button');
     cue.setAttribute('tabindex', '0');
     cue.removeAttribute('aria-hidden');
+    cue.setAttribute('aria-label', (window.BQ_DICT && window.BQ_DICT['hero.scroll']) || 'Scroll down');
     cue.addEventListener('click', () => glide(cue));
     cue.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); glide(cue); } });
   });
