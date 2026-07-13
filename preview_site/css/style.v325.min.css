@@ -2138,3 +2138,8 @@ html:has(.dash.is-open){ overflow:hidden !important; }
 .hero-cta i{font-size:11px;transition:transform .3s var(--ease)}
 .hero-cta:hover i,.hero-cta:focus-visible i{transform:translateY(3px)}
 @media (max-width:820px){.hero-cta{margin-top:24px;padding:13px 24px;font-size:11px;letter-spacing:.14em}}
+
+.hero-scrolldown .mouse{width:24px;height:40px;box-sizing:border-box;border:2px solid color-mix(in srgb, var(--ink) 48%, transparent);border-radius:13px;position:relative}
+.hero-scrolldown .mouse-wheel{position:absolute;left:50%;top:7px;width:3.5px;height:8px;border-radius:2px;background:var(--ink);transform:translateX(-50%);animation:heroMouse 1.8s ease-in-out infinite}
+@keyframes heroMouse{0%{opacity:0;transform:translate(-50%,0)}22%{opacity:1}70%{opacity:1;transform:translate(-50%,12px)}100%{opacity:0;transform:translate(-50%,12px)}}
+@media (max-width:820px){.hero-scrolldown .mouse{width:22px;height:36px;border-radius:12px}.hero-scrolldown .mouse-wheel{top:6px;height:7px}}
