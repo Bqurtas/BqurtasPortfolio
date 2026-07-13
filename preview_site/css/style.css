@@ -13505,3 +13505,29 @@ html:has(.dash.is-open){ overflow:hidden !important; }
   background:linear-gradient(115deg, transparent 34%,
     rgba(255,255,255,.09) 50%, transparent 66%);
 }
+
+/* =========================================================
+   v401 — hero CTA wears the site's own signature glass.
+   The exact dock recipe: the site's black (var(--bg) at 52%) behind
+   blur(28) saturate(1.8), an ink hairline, theme-adaptive text. Glassy
+   obsidian over the dome in dark, glassy cream in the light room —
+   one glass language across the whole house. Overrides v400's solid black.
+   ========================================================= */
+.hero-cta{
+  background:color-mix(in srgb, var(--bg) 52%, transparent);
+  color:var(--ink);
+  border:1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+  -webkit-backdrop-filter:blur(28px) saturate(1.8);
+  backdrop-filter:blur(28px) saturate(1.8);
+  box-shadow:0 24px 50px -22px rgba(0,0,0,.6),
+             inset 0 1px 0 rgba(255,255,255,.08);
+}
+.hero-cta:hover, .hero-cta:focus-visible{
+  background:color-mix(in srgb, var(--bg) 68%, transparent);
+  color:var(--ink);
+  border-color:color-mix(in srgb, var(--ink) 26%, transparent);
+  box-shadow:0 32px 64px -24px rgba(0,0,0,.7),
+             inset 0 1px 0 rgba(255,255,255,.12);
+}
+.hero-cta i{ color:var(--ink); }
+.hero-cta:hover i, .hero-cta:focus-visible i{ color:var(--ink); }
