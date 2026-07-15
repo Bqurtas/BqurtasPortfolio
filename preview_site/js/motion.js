@@ -78,17 +78,6 @@
     addEventListener('scroll', setScrolled, { passive: true });
 
     if (fine && !reduce) {
-      /* ---- quiet page-wide cursor light ---- */
-      var cursorFrame = 0;
-      addEventListener('pointermove', function (event) {
-        if (cursorFrame) return;
-        cursorFrame = requestAnimationFrame(function () {
-          cursorFrame = 0;
-          document.documentElement.style.setProperty('--cursor-x', event.clientX + 'px');
-          document.documentElement.style.setProperty('--cursor-y', event.clientY + 'px');
-        });
-      }, { passive: true });
-
       /* ---- magnetic controls (uses the independent `translate` property) ---- */
       var magnetic = document.querySelectorAll(
         '.rail-menu, #railChat, #railLatest, #themeToggle, .social-current, .lang-current, ' +
@@ -188,30 +177,6 @@
         });
       });
 
-      /* ---- cursor labels reflect the action under the pointer ---- */
-      var cursorLabel = document.querySelector('.cursor-ring-label');
-      var cursorText = function (key, fallback) {
-        return (window.BQ_DICT && window.BQ_DICT['cursor.' + key]) || fallback;
-      };
-      var cursorTargets = [
-        ['.mm-link', 'go', 'Go'],
-        ['.tab', 'view', 'View'],
-        ['.service-trigger', 'open', 'Open'],
-        ['.footer-cta-btn', 'talk', 'Talk'],
-        ['.pj-room-btn', 'talk', 'Talk'],
-        ['.footer-room-nav a', 'go', 'Go'],
-        ['.software-chip', 'tool', 'Tool']
-      ];
-      cursorTargets.forEach(function (pair) {
-        document.querySelectorAll(pair[0]).forEach(function (el) {
-          el.addEventListener('mouseenter', function () {
-            if (cursorLabel) cursorLabel.textContent = cursorText(pair[1], pair[2]);
-          });
-          el.addEventListener('mouseleave', function () {
-            if (cursorLabel) cursorLabel.textContent = cursorText('open', 'Open');
-          });
-        });
-      });
     }
 
     /* ---- slow section-title drift gives long pages a soft depth cue ---- */

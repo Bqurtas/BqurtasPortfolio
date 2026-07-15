@@ -88,6 +88,10 @@ window.BQ_GALLERY = {
       out.push({ coll, cat, index: i, type,
         url:    this.url(coll, i),
         rawUrl: this.rawUrl(coll, i),
+        width:  c.dimensions && c.dimensions[fname || `${c.prefix}${i}.${c.ext}`]
+                  ? c.dimensions[fname || `${c.prefix}${i}.${c.ext}`].width : 0,
+        height: c.dimensions && c.dimensions[fname || `${c.prefix}${i}.${c.ext}`]
+                  ? c.dimensions[fname || `${c.prefix}${i}.${c.ext}`].height : 0,
         title:  `${c.title} ${String(i).padStart(2, '0')}`,
         titlePrefix: c.title,
         tag: c.tag, icon: c.icon,
@@ -96,73 +100,43 @@ window.BQ_GALLERY = {
     return out;
   },
 
-  /* ── Auto-discover real folder contents from GitHub ───────────────────
-     ONE call to the Git Trees API lists the whole repo, so dropping any
-     image/video into a folder makes it appear on the site with NO code
-     change and NO required filename pattern. Result is cached briefly per
-     session; on any failure (offline / API rate-limit) it silently keeps
-     the static counts above, so the gallery can never break. */
+  /* ── First-party gallery manifest ─────────────────────────────────────
+     The manifest is generated with the exact dimensions of every thumbnail
+     and video. That lets the browser reserve each pin's final height before
+     it loads, eliminating masonry jumps without an external GitHub API call. */
   async loadManifest() {
     if (this._loaded) return this._ok;
     this._loaded = true;
-    const KEY = 'bq_gallery_tree_v1', TTL = 5 * 60 * 1000;   // 5-min freshness
-    let paths = null;
     try {
-      const hit = JSON.parse(sessionStorage.getItem(KEY) || 'null');
-      if (hit && Array.isArray(hit.paths) && (Date.now() - hit.t) < TTL) paths = hit.paths;
-    } catch (e) {}
-    if (!paths) {
-      try {
-        const ctrl  = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 3500);
-        const r = await fetch(
-          `https://api.github.com/repos/${this.REPO}/git/trees/${this.BRANCH}?recursive=1`,
-          { signal: ctrl.signal, headers: { Accept: 'application/vnd.github+json' } });
-        clearTimeout(timer);
-        if (r.ok) {
-          const j = await r.json();
-          if (j && Array.isArray(j.tree))
-            paths = j.tree.filter(n => n.type === 'blob').map(n => n.path);
-          if (paths) { try { sessionStorage.setItem(KEY, JSON.stringify({ t: Date.now(), paths })); } catch (e) {} }
-        }
-      } catch (e) {}
+      const response = await fetch('assets/gallery-manifest.json?v=403', { cache: 'force-cache' });
+      if (!response.ok) throw new Error('gallery manifest unavailable');
+      const manifest = await response.json();
+      const records = [...(manifest.images || []), ...(manifest.videos || [])];
+      const byFolder = {};
+      records.forEach((record) => {
+        if (!record || !record.path || !record.width || !record.height) return;
+        const slash = record.path.indexOf('/');
+        if (slash < 0 || record.path.indexOf('/', slash + 1) >= 0) return;
+        const folder = record.path.slice(0, slash);
+        const file = record.path.slice(slash + 1);
+        (byFolder[folder] || (byFolder[folder] = [])).push({
+          file,
+          width: record.width,
+          height: record.height,
+        });
+      });
+      for (const key of Object.keys(this.COLLECTIONS)) {
+        const collection = this.COLLECTIONS[key];
+        const list = byFolder[collection.folder];
+        if (!list || !list.length) continue;
+        collection.files = list.map((record) => record.file);
+        collection.dimensions = Object.fromEntries(list.map((record) => [record.file, record]));
+        collection.count = collection.files.length;
+      }
+      return (this._ok = true);
+    } catch (e) {
+      return (this._ok = false);
     }
-    if (!paths) {
-      /* GitHub's tree API is rate-limited (60/hr) — if it was throttled, fall back
-         to jsDelivr's data API (no rate limit) so counts/works still stay live. */
-      try {
-        const ctrl2 = new AbortController();
-        const timer2 = setTimeout(() => ctrl2.abort(), 3500);
-        const r2 = await fetch(`https://data.jsdelivr.com/v1/packages/gh/${this.REPO}@${this.BRANCH}`, { signal: ctrl2.signal, headers: { Accept: 'application/json' } });
-        clearTimeout(timer2);
-        if (r2.ok) {
-          const j2 = await r2.json();
-          const out = [];
-          (function walk(nodes, pre) { for (const n of (nodes || [])) { if (n.type === 'directory') walk(n.files, pre + n.name + '/'); else if (n.name) out.push(pre + n.name); } })(j2.files, '');
-          if (out.length) { paths = out; try { sessionStorage.setItem(KEY, JSON.stringify({ t: Date.now(), paths })); } catch (e) {} }
-        }
-      } catch (e) {}
-    }
-    if (!paths) return (this._ok = false);
-
-    const IMG = /\.(webp|jpe?g|png|gif|avif|svg)$/i;
-    const VID = /\.(mp4|webm|mov)$/i;
-    const byFolder = {};
-    for (const p of paths) {
-      const slash = p.indexOf('/');
-      if (slash < 0) continue;
-      const folder = p.slice(0, slash);
-      const file   = p.slice(slash + 1);
-      if (file.indexOf('/') >= 0) continue;            // direct children only
-      if (!IMG.test(file) && !VID.test(file)) continue;
-      (byFolder[folder] || (byFolder[folder] = [])).push(file);
-    }
-    const nat = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
-    for (const k of Object.keys(this.COLLECTIONS)) {
-      const c = this.COLLECTIONS[k], list = byFolder[c.folder];
-      if (list && list.length) { c.files = list.sort(nat); c.count = c.files.length; }
-    }
-    return (this._ok = true);
   },
 
   all() {
@@ -218,25 +192,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const PLATE_CATS = { book: 1, logo: 1, stationery: 1, events: 1, general: 1, other: 1 };
     const plate = /\.png(\?|$)/i.test(item.url || '') || !!PLATE_CATS[item.cat];
     article.className = 'card card--photo card--pending-media' + (plate ? ' card--plate' : '');
-    const ratioSets = {
-      book: ['2 / 3', '3 / 4'],
-      official: ['4 / 5', '1 / 1'],
-      image: ['4 / 5', '3 / 2', '1 / 1'],
-      logo: ['1 / 1', '4 / 3'],
-      tickerlogo: ['1 / 1', '4 / 3'],
-      posters: ['2 / 3', '4 / 5'],
-      social: ['1 / 1', '4 / 5'],
-      events: ['4 / 5', '16 / 9'],
-      business: ['16 / 10', '3 / 2'],
-      invoices: ['1 / 1.414', '4 / 5'],
-      flex: ['16 / 9'],
-      video: ['16 / 9'],
-      other: ['4 / 5', '1 / 1', '3 / 2'],
-      general: ['4 / 5', '1 / 1', '3 / 2'],
-    };
-    const ratios = ratioSets[item.coll] || ratioSets[item.cat] || ['4 / 5'];
-    const cardRatio = ratios[(item.index - 1) % ratios.length];
-    const dims = window.BQ_GALLERY.dimsFromRatio(cardRatio, item.type === 'video' ? 1280 : 320);
+    const fallbackRatio = item.type === 'video' ? '16 / 9' : '4 / 5';
+    const dims = item.width && item.height
+      ? { width: item.width, height: item.height }
+      : window.BQ_GALLERY.dimsFromRatio(fallbackRatio, item.type === 'video' ? 1280 : 320);
+    const cardRatio = `${dims.width} / ${dims.height}`;
     article.style.setProperty('--card-ratio', cardRatio);
     const dispTag   = galTag(item.coll, item.tag);
     const dispTitle = galTitle(item.coll, item.index, item.titlePrefix || item.tag);
@@ -256,16 +216,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       ? `<video muted loop playsinline preload="none" data-src="${item.url}" title="${dispTitle}" width="${dims.width}" height="${dims.height}"></video>`
       : `<img loading="lazy" decoding="async" fetchpriority="low" src="${imgSrc}" alt="${dispTitle}" width="${dims.width}" height="${dims.height}" />`;
 
-    const playIcon = item.type === 'video' ? 'fa-play' : 'fa-magnifying-glass-plus';
-
     article.innerHTML = `
-      <div class="card-art card-art--photo">
-        ${mediaHtml}
-        <div class="card-meta card-meta--ov">
-          <span class="mono card-tag"><i class="fa-solid ${item.icon}"></i> ${dispTag}</span>
-          <h3 class="card-title">${dispTitle}</h3>
-          <span class="card-zoom-icon"><i class="fa-solid ${playIcon}"></i></span>
-        </div>
+      <button class="card-open" type="button" aria-label="View ${dispTitle}">
+        <span class="card-art card-art--photo">
+          ${mediaHtml}
+          <span class="card-hover-shade" aria-hidden="true"></span>
+        </span>
+      </button>
+      <div class="card-caption">
+        <h3 class="card-title">${dispTitle}</h3>
+        <span class="card-tag">${dispTag}</span>
       </div>`;
 
     /* On error try raw.githubusercontent once (covers brand-new files that
@@ -320,61 +280,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     return counts;
   };
   window.__bqGalleryCounts = computeGalleryCounts;
-  const buildGalleryCards = () => {
-    window.BQ_ALL_CARDS = [];
+  window.__bqBuildGalleryCard = buildCard;
+  const galleryEntries = () => {
+    const entries = [];
     ORDER.forEach(coll => {
-      window.BQ_GALLERY.items(coll).forEach(it => {
-        window.BQ_ALL_CARDS.push({ el: buildCard(it), cat: it.cat, type: it.type, coll: it.coll });
+      window.BQ_GALLERY.items(coll).forEach(item => {
+        entries.push({ el: null, item, cat: item.cat, type: item.type, coll: item.coll });
       });
     });
+    return entries;
+  };
+  const buildGalleryCards = () => {
+    window.BQ_ALL_CARDS = galleryEntries();
     return syncGalleryCounts();
   };
-  /* Boot build is CHUNKED: the one-shot 691-card build was a 230ms long task
-     (the last desktop TBT cost). First 120 build synchronously (covers page-1
-     render + immediate filters); the rest build in <50ms chunks off the task
-     queue, then counts sync once at the end. The dashboard refresh path below
-     still uses the synchronous buildGalleryCards(). */
+  /* Keep the full catalogue as light data records. Cards become DOM only when
+     a visible batch needs them, which avoids hundreds of off-screen nodes and
+     long tasks while preserving filters, counts and the complete catalogue. */
   (() => {
-    window.BQ_ALL_CARDS = [];
-    const queue = [];
-    ORDER.forEach(coll => { window.BQ_GALLERY.items(coll).forEach(it => queue.push(it)); });
-    /* ALL entries exist from the first frame (cheap placeholder <article>s), so
-       anything reading counts at DOMContentLoaded sees the full catalogue —
-       the one-batch version briefly reported 120 works. Only the els are
-       filled in chunks. */
-    /* Keep LOCAL references: the global array gets SHUFFLED after boot, so
-       index-based assignment would attach els to the wrong entries. Object
-       refs survive any reordering of window.BQ_ALL_CARDS. */
-    const entries = queue.map(it => ({ el: document.createElement('article'), cat: it.cat, type: it.type, coll: it.coll }));
-    entries.forEach(o => window.BQ_ALL_CARDS.push(o));
-    let i = 0;
-    const build = (m) => {
-      const end = Math.min(queue.length, i + m);
-      for (; i < end; i++) {
-        /* The initial render can append a placeholder BEFORE its real card is
-           built (the boot shuffle pulls late-queue entries into page one) —
-           swap it in the DOM too, carrying over any classes the renderer or
-           reveal observers added to the placeholder. */
-        const old = entries[i].el;
-        const built = buildCard(queue[i]);
-        if (old && old.className) built.className += ' ' + old.className;
-        entries[i].el = built;
-        if (old && old.parentNode) old.replaceWith(built);
-      }
-    };
-    build(120);
+    window.BQ_ALL_CARDS = galleryEntries();
     syncGalleryCounts();
-    const step = () => {
-      if (i < queue.length) { build(100); setTimeout(step, 0); }
-      else {
-        syncGalleryCounts();
-        try { window.dispatchEvent(new CustomEvent('bq:gallery-built')); } catch (e) {}
-      }
-    };
-    setTimeout(step, 0);
+    try { window.dispatchEvent(new CustomEvent('bq:gallery-built')); } catch (e) {}
   })();
   window.__bqRefreshGalleryFromManifest = async () => {
-    try { sessionStorage.removeItem('bq_gallery_tree_v1'); } catch (e) {}
     window.BQ_GALLERY._loaded = false;
     window.BQ_GALLERY._ok = false;
     await window.BQ_GALLERY.loadManifest();
@@ -400,7 +328,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       div.dataset.type  = 'image';
       div.innerHTML = `
         <div class="cert-img-wrap">
-          <img loading="lazy" decoding="async" width="640" height="880" src="${item.url}" data-raw="${item.rawUrl}" alt="${dispTitle}" />
+          <img loading="lazy" decoding="async" width="${item.width || 640}" height="${item.height || 880}" src="${window.BQ_GALLERY.thumb(item.url, 320)}" data-full="${item.url}" data-raw="${item.rawUrl}" alt="${dispTitle}" />
           <div class="cert-zoom"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
         </div>
         <span class="mono cert-label">${dispTitle}</span>`;
@@ -411,6 +339,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     /* error fallback for cert images: raw.githubusercontent once, then drop */
     certGrid.querySelectorAll('img').forEach(img => {
       img.addEventListener('error', () => {
+        if (img.dataset.full && !img.dataset.orig) { img.dataset.orig = '1'; img.src = img.dataset.full; return; }
         const raw = img.dataset.raw;
         if (raw && !img.dataset.fb) { img.dataset.fb = '1'; img.src = raw; return; }
         img.closest('.cert-item')?.remove();
@@ -460,8 +389,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const title = galTitle(coll, card.dataset.idx, '');
       card.dataset.title = title;
       const tg = card.querySelector('.card-tag');
-      if (tg) { const ic = tg.querySelector('i'); const cls = ic ? ic.className : ''; tg.innerHTML = `<i class="${cls}"></i> ${galTag(coll, '')}`; }
+      if (tg) tg.textContent = galTag(coll, '');
       const tt = card.querySelector('.card-title'); if (tt) tt.textContent = title;
+      const open = card.querySelector('.card-open'); if (open) open.setAttribute('aria-label', `View ${title}`);
       const media = card.querySelector('img, video');
       if (media) { if (media.tagName === 'IMG') media.alt = title; else media.title = title; }
     });

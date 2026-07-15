@@ -18,44 +18,6 @@
   };
 
   /* =======================================================
-     1 · SPLASH
-     ======================================================= */
-  (function splash() {
-    const splash = $('#splash');
-    if (!splash) return;
-    const parts = location.pathname.split('/').filter(Boolean);
-    const route = (['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'].includes(parts[0]) ? parts[1] : parts[0]) || '';
-    let splashOff = false;
-    try { splashOff = localStorage.getItem('bq_splash') === 'off'; } catch (e) {}
-    if (route || splashOff) {
-      splash.classList.add('is-done');
-      splash.style.display = 'none';
-      return;
-    }
-    const fill = $('#splashFill');
-    const pct  = $('#splashPct');
-    const start = performance.now();
-    const DUR = 1100;   // a single, smooth sweep 0 → 100
-
-    const tick = (now) => {
-      const t = Math.min((now - start) / DUR, 1);
-      const v = Math.round((1 - Math.pow(1 - t, 2)) * 100);
-      if (fill) fill.style.width = v + '%';
-      if (pct)  pct.textContent = String(v).padStart(2, '0');
-      if (t < 1) requestAnimationFrame(tick);
-      else finish();
-    };
-    const finish = () => {
-      if (fill) fill.style.width = '100%';
-      if (pct)  pct.textContent = '100';
-      splash.classList.add('is-done');
-      setTimeout(() => { splash.style.display = 'none'; }, 1100);
-    };
-    requestAnimationFrame(tick);
-    splash.addEventListener('click', () => { splash.classList.add('is-done'); setTimeout(() => splash.style.display = 'none', 900); });
-  })();
-
-  /* =======================================================
      2 · SCROLL PROGRESS + GO TO TOP
      ======================================================= */
   (function scrollProgress() {

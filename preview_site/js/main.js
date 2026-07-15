@@ -396,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- TABS + PAGINATION + SECTION HEADER ---------- */
   const tabs = document.querySelectorAll('.tab');
-  const PAGE_SIZE = 75;
+  const PAGE_SIZE = 24;
   let currentFilter = 'all';
   let currentShown  = 0;
   let correctScrollAfterGallery = false;
@@ -499,7 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
     buildColumns(colCountForWidth());
     const matching = matchingCards();
     const target = Math.max(0, Math.min(n, matching.length));
-    matching.slice(0, target).forEach((e, idx) => placeCard(e.el, idx));
+    matching.slice(0, target).forEach((entry, idx) => placeCard(entry, idx));
     currentShown = target;
     updateTabHeader(currentFilter, matching.length);
     updateLoadMore(matching.length);
@@ -531,14 +531,16 @@ document.addEventListener('DOMContentLoaded', () => {
      always appends BELOW — the viewer scrolls down, never back up. */
   const gridEl = document.getElementById('grid');
   let mCols = [];      // column DOM elements
-  let mHeights = [];   // tracked pixel heights (estimate + correction)
-  const CARD_EST = 340;
+  let mHeights = [];   // tracked heights from exact manifest aspect ratios
+  const CARD_GAP = 16;
+  const CAPTION_EST = 48;
 
   const colCountForWidth = () => {
     const w = window.innerWidth;
     if (w <= 560)  return 2;
     if (w <= 820)  return 3;
     if (w <= 1100) return 4;
+    if (w <= 1450) return 5;
     return 6;
   };
 
@@ -584,35 +586,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const placeCard = (card, rank) => {
+  const placeCard = (entry, rank) => {
+    let card = entry && entry.el;
+    if (!card && entry && entry.item && window.__bqBuildGalleryCard) {
+      card = window.__bqBuildGalleryCard(entry.item);
+      entry.el = card;
+    }
+    if (!card) return;
     const heights = mHeights, cols = mCols;       // capture current layout refs
     let i = 0;
     for (let k = 1; k < heights.length; k++) if (heights[k] < heights[i]) i = k;
     const media = card.querySelector('img, video');
     if (media && media.tagName === 'IMG') {
-      if (rank < PAGE_SIZE) {
-        media.loading = rank < 22 ? 'eager' : 'lazy';
-        media.fetchPriority = rank < 14 ? 'high' : 'auto';
-      } else {
-        media.loading = 'lazy';
-        media.fetchPriority = 'low';
-      }
+      media.loading = 'lazy';
+      media.fetchPriority = 'low';
     }
     cols[i].appendChild(card);
-    heights[i] += CARD_EST;
+    const source = entry.item || {};
+    const mediaWidth = Number(source.width) || Number(media && media.getAttribute('width')) || 4;
+    const mediaHeight = Number(source.height) || Number(media && media.getAttribute('height')) || 5;
+    const gridWidth = gridEl.clientWidth || window.innerWidth;
+    const colWidth = Math.max(1, (gridWidth - CARD_GAP * Math.max(0, cols.length - 1)) / Math.max(1, cols.length));
+    heights[i] += Math.round(colWidth * mediaHeight / mediaWidth) + CAPTION_EST + CARD_GAP;
 
     prepPortfolioReveal(card, i, media, rank);
-    const correct = () => {
-      if (heights !== mHeights) return;           // layout was rebuilt — ignore
-      heights[i] += (card.offsetHeight + 8) - CARD_EST;
-    };
-    if (media) {
-      if (media.complete && media.naturalHeight) correct();
-      else media.addEventListener('load', correct, { once: true });
-      media.addEventListener('loadeddata', correct, { once: true });
-    }
-
-    /* visual reveal is handled by .portfolio-scroll-card when the card enters view */
   };
 
   const matchingCards = () => {
@@ -632,12 +629,21 @@ document.addEventListener('DOMContentLoaded', () => {
     tr:  { t: 'Yakında', s: 'AI destekli afişler ve video — çok yakında burada.' },
     sv:  { t: 'Kommer snart', s: 'AI-stödda affischer och video — landar här snart.' },
   };
-  /* shuffle the master deck so every visit / tab-switch surfaces a fresh set of
-     works at the top; the order then stays stable all the way through Load-more. */
+  /* Mix disciplines once with a deterministic seed. The opening pins stay
+     visually varied without making image weight and audit results random. */
   const shuffleAllCards = () => {
     const a = window.BQ_ALL_CARDS;
-    if (!Array.isArray(a)) return;
-    for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; const t = a[i]; a[i] = a[j]; a[j] = t; }
+    if (!Array.isArray(a) || a.__bqShuffled) return;
+    let seed = 0x0b047a5;
+    const random = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 4294967296;
+    };
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      const t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    Object.defineProperty(a, '__bqShuffled', { value: true });
   };
   /* render the gallery. reset=true rebuilds columns (tab switch / resize). */
   window.__bqRenderGallery = (reset) => {
@@ -657,7 +663,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     const batch = matching.slice(currentShown, currentShown + PAGE_SIZE);
-    batch.forEach((e, idx) => placeCard(e.el, currentShown + idx));
+    batch.forEach((entry, idx) => placeCard(entry, currentShown + idx));
     currentShown += batch.length;
     updateTabHeader(currentFilter, matching.length);
     updateLoadMore(matching.length);
@@ -708,7 +714,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const shown = currentShown;
       buildColumns(colCountForWidth());
       currentShown = 0;
-      matchingCards().slice(0, shown).forEach((e, idx) => { placeCard(e.el, idx); currentShown++; });
+      matchingCards().slice(0, shown).forEach((entry, idx) => { placeCard(entry, idx); currentShown++; });
       updateLoadMore(matchingCards().length);
     }, 200);
   });
@@ -724,7 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
   tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab, true)));
 
   /* The deck re-shuffles on every page load and tab switch — that stays.
-     The gallery shows exactly one batch (PAGE_SIZE = 75) at a time; the reader
+     The gallery shows one compact batch (PAGE_SIZE = 24) at a time; the reader
      taps "Load more" to reveal the next batch. No auto-infinite-scroll — the works
      never all load at once, and nothing swaps under the reader as they scroll. */
 
@@ -1114,89 +1120,6 @@ document.addEventListener('DOMContentLoaded', () => {
     hoverProfileCard.addEventListener('mouseleave', hideProfileCard);
   }
 
-  /* ---------- Custom Cursor ---------- */
-  const dot = document.getElementById('cursorDot');
-  const ring = document.getElementById('cursorRing');
-  if (dot && ring && window.matchMedia('(pointer: fine)').matches) {
-    const ringLabel = ring.querySelector('.cursor-ring-label');
-    const cursorText = (key, fallback) => (window.BQ_DICT && window.BQ_DICT['cursor.' + key]) || fallback;
-    let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
-    let magnet = null;
-    let cursorTarget = null;
-    document.addEventListener('mousemove', (e) => {
-      mx = e.clientX; my = e.clientY;
-      dot.style.left = mx + 'px';
-      dot.style.top  = my + 'px';
-      syncCursorTarget(e.target);
-    });
-    const animateRing = () => {
-      const hasOpen = ring.classList.contains('is-open');
-      const hasMagnet = ring.classList.contains('is-magnet');
-      const hasHover = ring.classList.contains('is-hover');
-      const gapY = hasOpen ? 16 : hasMagnet ? 12 : hasHover ? 11 : 0;
-      const gapX = hasOpen ? 1 : 0;
-      let tx = mx, ty = my;
-      if (magnet) {
-        const r = magnet.getBoundingClientRect();
-        if (r.width) {                 // a soft magnetic pull toward the control's centre
-          tx = mx + (r.left + r.width / 2 - mx) * 0.32;
-          ty = my + (r.top + r.height / 2 - my) * 0.32;
-        }
-      }
-      tx += gapX;
-      ty += gapY;
-      const ease = hasOpen ? 0.13 : hasMagnet ? 0.17 : 0.2;
-      rx += (tx - rx) * ease;
-      ry += (ty - ry) * ease;
-      ring.style.left = rx + 'px';
-      ring.style.top  = ry + 'px';
-      requestAnimationFrame(animateRing);
-    };
-    animateRing();
-    const MAGNET = '.rail-link, .rail-tool, .rail-chat, .theme-btn, .social-current, ' +
-                   '.lang-current, .lang-opt, .social-opt, .footer-top-btn, ' +
-                   '.mobile-menu-close, .to-top, .profile-card-btn, .reader-top';
-    function syncCursorTarget(target) {
-      if (!target || target === cursorTarget || !target.closest) return;
-      cursorTarget = target;
-      const overCard = target.closest(
-        '.card, .service-trigger, .feature-card, .blog-card, .qc-card, .index-row, ' +
-        '.footer-cta-btn, .footer-room-nav a, .mm-link, .tab, .software-chip, ' +
-        '#bio .bio-block, .bio-doc-btn, .work-card, .service-cta, .software-link, ' +
-        '.pencemor-hero-btn, .pj-room-btn, .studio-card, .studio-step, .pitch-submit, .footer-email, .profile-card-btn'
-      );
-      const overMagnet = target.closest(MAGNET);
-      const overZoom = target.closest('.cert-item');   // certificates keep the system zoom cursor
-      const overHide = target.closest('#railLogo, .rail-logo, .profile-card');  // no custom-cursor shape over the wordmark / profile card
-      const overMenuBtn = target.closest('#railMenu, .rail-menu, #menuToggle, .menu-toggle-btn');  // hamburger: NO cursor ring over it (the circle read as clutter)
-      const overLink = target.closest('a, button, .tab, input, select, textarea, .service, .stat, .logo-mark, .logo-chip, .index-row');
-      magnet = (!overCard && overMagnet && !overHide) ? overMagnet : null;
-      ring.classList.toggle('is-open',   !!overCard && !overZoom);
-      ring.classList.toggle('is-magnet', !overCard && !!overMagnet && !overMenuBtn);
-      ring.classList.toggle('is-hover',  !overCard && !overMagnet && !!overLink && !overMenuBtn);
-      if (ringLabel && overCard) {
-        let action = 'open';
-        if (overCard.matches('.card--photo, .work-card, .blog-card, .tab')) action = 'view';
-        else if (overCard.matches('.software-chip, .software-link')) action = 'tool';
-        else if (overCard.matches('.footer-cta-btn, .pj-room-btn')) action = 'talk';
-        else if (overCard.matches('.pitch-submit, .footer-email')) action = 'send';
-        else if (overCard.matches('.mm-link, .footer-room-nav a, .service-cta, .pencemor-hero-btn')) action = 'go';
-        else if (overCard.matches('.service-trigger, .feature-card, .qc-card, #bio .bio-block, .studio-card, .studio-step')) action = 'open';
-        else if (overCard.matches('.index-row')) action = 'preview';
-        const label = cursorText(action, action.charAt(0).toUpperCase() + action.slice(1));
-        ringLabel.textContent = label;
-        ring.dataset.cursorAction = action;
-      } else if (ringLabel) {
-        ringLabel.textContent = cursorText('open', 'Open');
-        delete ring.dataset.cursorAction;
-      }
-      dot.style.opacity  = (overCard || overZoom || overHide) ? '0' : '';
-      ring.style.opacity = (overZoom || overHide || overMenuBtn) ? '0' : '';   // hide the ring circle over the hamburger
-    }
-    document.body.addEventListener('mouseover', (e) => syncCursorTarget(e.target));
-    document.addEventListener('mousedown', () => ring.classList.add('is-press'));
-    document.addEventListener('mouseup',   () => ring.classList.remove('is-press'));
-  }
 });
 
 /* =========================================================

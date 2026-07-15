@@ -360,7 +360,10 @@ export async function onRequest(context) {
   } catch (e) {
     try {
       const shell = await env.ASSETS.fetch(new URL('/index.html', url.origin));
-      return withFresh(new HTMLRewriter().on('script', addNonce).transform(shell));
+      return withFresh(new HTMLRewriter()
+        .on('script', addNonce)
+        .on('style', addNonce)
+        .transform(shell));
     } catch (_) { return next(); }
   }
 }
