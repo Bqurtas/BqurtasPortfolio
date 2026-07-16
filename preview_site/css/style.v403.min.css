@@ -110,53 +110,25 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible{
 #grid .card:focus-within .card-zoom-icon{ opacity:0 !important; }
 #grid .card *{ transition-property:opacity !important; }
 
+
+
 /* =========================================================
-   v410 — stillness everywhere + the first Kurdish-modern layer.
-   1) SITE-WIDE hover freeze on every image card: the 3D tilt system
-      (.motion-tilt — the real source of the lift the owner kept seeing:
-      translateY(-6px) + rotateX/Y on blog/work/studio cards) is now inert,
-      as are the cover-zooms in the journal and reader. Only light effects
-      (shine, borders) may respond to the pointer — geometry never moves.
-   2) Kurdish echoes: on wide screens, the great section heads carry a
-      ghosted Kurdish word — the site speaks its two scripts at once.
-      (Hidden on ku/ar pages where the whole page is already Kurdish/Arabic.)
-   3) Cinematic room changes: View Transitions cross-fade + drift.
+   v412 — ONE JOB: pointer hover NEVER moves any image or card, anywhere.
+   Geometry, transitions and animations on cards are hard-frozen.
    ========================================================= */
-
-/* -- 1) geometry never moves on hover -- */
-.motion-tilt, .motion-tilt:hover{ transform:none !important; }
-.blog-card:hover, .index-card--blog:hover, .reader-more-card:hover,
-.work-card:hover, .studio-card:hover, .studio-step:hover,
-.latest-blog-grid .blog-card:hover{ transform:none !important; }
-.index-card--blog:hover .blog-card-cover img,
-.reader-more-card:hover .rm-img img,
-.blog-card:hover img{ transform:none !important; scale:none !important; }
-
-/* -- 2) Kurdish echoes on the great heads (LTR pages, wide screens) -- */
-@media (min-width:821px){
-  :root:not([lang="ku"]):not([lang="ar"]) .section.work .section-head,
-  :root:not([lang="ku"]):not([lang="ar"]) .logos-head,
-  :root:not([lang="ku"]):not([lang="ar"]) .latest-blog-head,
-  :root:not([lang="ku"]):not([lang="ar"]) .footer-stage{ position:relative; }
-  :root:not([lang="ku"]):not([lang="ar"]) .section.work .section-head::after,
-  :root:not([lang="ku"]):not([lang="ar"]) .logos-head::after,
-  :root:not([lang="ku"]):not([lang="ar"]) .latest-blog-head::after,
-  :root:not([lang="ku"]):not([lang="ar"]) .footer-stage::after{
-    position:absolute; top:-10px; right:8px;
-    font-family:'Noto Naskh Arabic','Noto Kufi Arabic',serif;
-    font-size:clamp(44px,5.5vw,84px); line-height:1;
-    color:var(--ink); opacity:.055; pointer-events:none; z-index:0;
+@media (hover:hover){
+  article.card, article.card *,
+  #grid .card, #grid .card *,
+  .blog-card, .blog-card *,
+  .work-card, .work-card *,
+  .index-card--blog, .index-card--blog *,
+  .reader-more-card, .reader-more-card *,
+  .studio-card, .studio-card *, .studio-step, .studio-step *,
+  .motion-tilt, .motion-tilt *{
+    transform:none !important;
+    translate:none !important;
+    scale:none !important;
+    rotate:none !important;
+    transition-property:opacity, color, background-color, border-color !important;
   }
-  :root:not([lang="ku"]):not([lang="ar"]) .section.work .section-head::after{ content:'دیزاین'; }
-  :root:not([lang="ku"]):not([lang="ar"]) .logos-head::after{ content:'هاوکاری'; }
-  :root:not([lang="ku"]):not([lang="ar"]) .latest-blog-head::after{ content:'گۆڤار'; }
-  :root:not([lang="ku"]):not([lang="ar"]) .footer-stage::after{ content:'با پێکەوە'; top:26px; }
 }
-
-/* -- 3) cinematic room transitions -- */
-@media (prefers-reduced-motion: no-preference){
-  ::view-transition-old(root){ animation:bqVTOut .38s var(--ease) both; }
-  ::view-transition-new(root){ animation:bqVTIn .5s var(--ease) both; }
-}
-@keyframes bqVTOut{ to{ opacity:0; transform:translateY(-12px) scale(.996); } }
-@keyframes bqVTIn{ from{ opacity:0; transform:translateY(16px) scale(1.004); } }

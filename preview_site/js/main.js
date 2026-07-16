@@ -183,13 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const showRoom = (id, push) => {
-    const __apply = () => __applyRoom(id, push);
-    if (document.startViewTransition && document.body.dataset.room !== id
-        && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      document.startViewTransition(__apply);
-    } else { __apply(); }
-  };
-  const __applyRoom = (id, push) => {
     rooms.forEach(r => r.classList.toggle('is-hidden', r.id !== id));
     document.querySelectorAll('.rail-link, .mobile-link, .mm-link').forEach(l => {
       l.classList.toggle('is-active', l.dataset.route === id);
