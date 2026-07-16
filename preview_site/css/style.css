@@ -1619,8 +1619,8 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
   transition: transform 0.6s var(--ease-out);
 }
 .card-art svg { width: 100%; height: 100%; transition: transform 0.8s var(--ease-out); }
-.card:hover .card-art svg { transform: scale(1.04); }
-.card:hover .card-art { transform: translateY(-4px); }
+.card:hover .card-art svg { }
+.card:hover .card-art { }
 /* transparent design works (logos, book covers, stationery…) blend into the
    site background instead of the dark block showing through — no white box */
 .card--plate .card-art { background: var(--bg); }
@@ -1711,7 +1711,7 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
 #grid .card.portfolio-scroll-card.portfolio-in .card-art svg{ transform:scale(1); }
 #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art img,
 #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art video,
-#grid .card.portfolio-scroll-card.portfolio-in:hover .card-art svg{ transform:scale(1.035); }
+#grid .card.portfolio-scroll-card.portfolio-in:hover .card-art svg{}
 
 /* Hover overlay with meta info */
 .card-meta--ov {
