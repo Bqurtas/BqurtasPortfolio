@@ -14082,21 +14082,31 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible{
       no sideways scrolling.
    ========================================================= */
 @media (min-width:821px){
-  .hero-scrolldown{ bottom:clamp(76px, 11vh, 118px) !important; }
+  /* Keeps the mouse exactly midway between the CTA's bottom edge and the
+     viewport bottom at any window height (CTA bottom ≈ 0.56·vh + 224px,
+     mouse is 40px tall → midpoint offset = 22vh − 132px). */
+  .hero-scrolldown{
+    bottom:clamp(24px, calc(22vh - 132px), 150px) !important;
+    bottom:clamp(24px, calc(22svh - 132px), 150px) !important;
+  }
 }
 @media (max-width:820px){
   .hero-scrolldown{ bottom:calc(var(--dock-h) + 4px) !important; }
-  .tabs{
+  .section.work .tabs{
     display:grid !important;
     grid-template-columns:repeat(6, max-content) !important;
     justify-content:center !important;
     justify-items:center !important;
     gap:12px 10px !important;
     width:100% !important;
+    min-width:0 !important;
     overflow:visible !important;
   }
-  .tabs-wrap{ overflow:visible !important; }
+  .section.work > .tabs-wrap{
+    overflow:visible !important;
+    scroll-snap-type:none !important;
+  }
 }
 @media (max-width:409px){
-  .tabs .tab{ width:48px !important; height:48px !important; min-width:48px !important; min-height:48px !important; }
+  .section.work .tabs .tab{ width:48px !important; height:48px !important; min-width:48px !important; min-height:48px !important; }
 }
