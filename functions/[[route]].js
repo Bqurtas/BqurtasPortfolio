@@ -60,6 +60,16 @@ const HOME_SEO = {
 };
 Object.keys(HOME_SEO).forEach((lang) => { if (OG[lang]) OG[lang].home = HOME_SEO[lang]; });
 
+const HOME_KEYWORDS = {
+  en: 'graphic designer Erbil, graphic designer Kurdistan, Kurdish graphic designer, graphic designer Iraq, logo designer Erbil, branding Kurdistan, motion designer Iraq, Barakat Qurtas, Bqurtas',
+  ku: 'دیزاینەری گرافیک لە هەولێر, دیزاینەری گرافیک کوردستان, گرافیک دیزاینەر عێراق, دیزاینی لۆگۆ هەولێر, بەرەکات قورتاس, بەرکەت قورتاس',
+  kmr: 'sêwirmendê grafîk Hewlêr, sêwirana grafîk Kurdistan, logo Hewlêr, Barakat Qurtas, Bqurtas',
+  ar: 'مصمم جرافيك أربيل, مصمم جرافيك كردستان, مصمم جرافيك العراق, تصميم شعار أربيل, هوية بصرية كردستان, بركات قرطاس',
+  tr: 'Erbil grafik tasarımcı, Kürdistan grafik tasarımcı, Irak grafik tasarım, Erbil logo tasarımı, Barakat Qurtas',
+  fr: 'graphiste Erbil, graphiste Kurdistan, identité visuelle Irak, création logo Erbil, Barakat Qurtas',
+  sv: 'grafisk designer Erbil, grafisk designer Kurdistan, varumärkesidentitet Irak, Barakat Qurtas'
+};
+
 // The most important local proof/FAQ copy is also rendered at the edge for the
 // requested Kurdish, Arabic and Turkish routes; it is not dependent on hydration.
 const SERVER_LOCAL_SEO = {
@@ -409,6 +419,8 @@ export async function onRequest(context) {
       .on('link[data-alt-lang="x-default"]',   setHref(localizedUrl('en', r)))
       .on('head', { element(el) { if (postJsonLd) el.append(postJsonLd, { html: true }); } });
     const serverCopy = r.key === 'home' ? SERVER_LOCAL_SEO[r.lang] : null;
+    const homeKeywords = r.key === 'home' ? (HOME_KEYWORDS[r.lang] || HOME_KEYWORDS.en) : null;
+    if (homeKeywords) rewriter.on('meta[name="keywords"]', setContent(homeKeywords));
     if (serverCopy) Object.entries(serverCopy).forEach(([key, value]) => {
       rewriter.on('[data-local-seo="' + key + '"]', setText(value));
     });

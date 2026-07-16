@@ -14312,3 +14312,31 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible{
   .local-seo-fact{ min-height:205px; border-radius:19px; }
   .local-faq{ margin-top:72px; }
 }
+
+/* =========================================================
+   v417 — biography proof + local expertise are one authored section.
+   The reading order is note/stats → local proof/FAQ → tools.
+   ========================================================= */
+.practice-note > .bio-teaser{ order:1 !important; }
+.practice-note > .local-seo{
+  order:2 !important;
+  width:auto;
+  margin:0 var(--pad-x);
+  padding:clamp(62px, 8vw, 108px) 0 clamp(82px, 10vw, 132px);
+  border-top:1px solid var(--line);
+  content-visibility:visible;
+  contain:none;
+}
+.practice-note > .software-experience{ order:3 !important; }
+.practice-note .bio-teaser{
+  padding-bottom:clamp(58px, 7vw, 90px) !important;
+}
+.practice-note .local-seo-facts{ margin-top:clamp(48px, 6vw, 84px); }
+.practice-note .local-faq{ margin-top:clamp(68px, 8vw, 108px); }
+@media (max-width:560px){
+  .practice-note > .local-seo{
+    width:auto;
+    margin:0 20px;
+    padding:58px 0 88px;
+  }
+}
