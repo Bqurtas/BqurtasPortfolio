@@ -194,8 +194,8 @@
   <link rel="preload" href="assets/portrait.webp?v=2" as="image" fetchpriority="high">
   <link rel="preload" href="assets/fonts/Liana.otf" as="font" type="font/otf" crossorigin fetchpriority="high">
 
-  <!-- Critical mobile + desktop shell/hero CSS is generated from the final
-       v403 cascade. The pending gate keeps every non-critical room/overlay out
+  <!-- Critical mobile + desktop shell/hero CSS is generated from the stable
+       cascade. The pending gate keeps every non-critical room/overlay out
        of layout, so the async full sheet cannot cause FOUC or a hero reflow. -->
   <style id="bqCriticalCss">
     html.bq-css-pending body > :not(.grain):not(.rail):not(.mobilebar):not(.main){display:none!important}
@@ -209,8 +209,8 @@
     html.bq-css-error .room,html.bq-css-timeout .room{display:none!important}
     html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="panjamor"] #panjamor,html.bq-css-timeout[data-room="panjamor"] #panjamor,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="work"] #work,html.bq-css-timeout[data-room="work"] #work,html.bq-css-error[data-room="brandboard"] #brandboard,html.bq-css-timeout[data-room="brandboard"] #brandboard,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
   </style>
-  <link rel="preload" href="css/style.v403.min.css?v=405" as="style" fetchpriority="low" id="bqFullCss">
-  <noscript><link rel="stylesheet" href="css/style.v403.min.css?v=405"></noscript>
+  <link rel="preload" href="css/style.v403.min.css?v=407" as="style" fetchpriority="low" id="bqFullCss">
+  <noscript><link rel="stylesheet" href="css/style.v403.min.css?v=407"></noscript>
   <script>
     (function () {
       var root = document.documentElement;
@@ -650,7 +650,7 @@
           </a>
         </div>
 
-        
+        <div class="hero-scrolldown" aria-hidden="true"><span class="mouse"><span class="mouse-wheel"></span></span></div>
       </div>
       </div>
 
