@@ -21,9 +21,9 @@
   # conflicting CSP header on the HTML responses.
   # NOTE: no Cache-Control here on purpose. Cloudflare _headers CONCATENATES every
   # matching rule's same-named header, so a Cache-Control on /* would be merged
-  # into /css, /js and /assets (e.g. "no-store, max-age=86400") and the most
+  # into /css, /js and /assets (e.g. "no-cache, max-age=86400") and the most
   # restrictive directive would win — killing their cache. So the HTML shell's
-  # cache is set ONLY by functions/[[route]].js (Cache-Control: no-store +
+  # cache is set ONLY by functions/[[route]].js (browser revalidation +
   # CDN-Cache-Control: no-store), and static files get their own rules below.
 
 # The bare root "/" maps to index.html and Cloudflare re-applies its platform
@@ -32,7 +32,7 @@
 # pins the homepage too.
 /
   Access-Control-Allow-Origin: https://bqurtas.com
-  Cache-Control: no-store
+  Cache-Control: private, no-cache, max-age=0, must-revalidate
   CDN-Cache-Control: no-store
 
 /site.webmanifest
