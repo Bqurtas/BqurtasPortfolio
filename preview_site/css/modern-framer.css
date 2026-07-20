@@ -802,3 +802,70 @@ body.menu-open .mobilebar {
     transform: none !important;
   }
 }
+
+/* =========================================================
+   v25 — Fixed rounded viewport frame
+
+   The whole site sits inside one pinned, rounded window. Content scrolls
+   beneath the frame and is masked at every edge, so the shape holds at the
+   top AND ends rounded at the bottom of the screen. A pure overlay: layout,
+   native scrolling and Lighthouse behaviour stay untouched.
+   ========================================================= */
+
+:root {
+  --bq-frame-gap: clamp(10px, 1.5vw, 22px);
+  --bq-frame-r: clamp(20px, 3vw, 44px);
+  --bq-frame-bed: #060607;
+  --bq-frame-line: rgba(255, 255, 255, .14);
+}
+
+:root[data-theme="light"] {
+  --bq-frame-bed: #14130f;
+  --bq-frame-line: rgba(255, 255, 255, .22);
+}
+
+/* Overscroll rubber-banding shows the frame bed, not raw page colour. */
+html {
+  background: var(--bq-frame-bed);
+}
+
+.bq-frame {
+  position: fixed;
+  top: calc(var(--bq-frame-gap) + env(safe-area-inset-top, 0px));
+  right: calc(var(--bq-frame-gap) + env(safe-area-inset-right, 0px));
+  bottom: calc(var(--bq-frame-gap) + env(safe-area-inset-bottom, 0px));
+  left: calc(var(--bq-frame-gap) + env(safe-area-inset-left, 0px));
+  z-index: 950;
+  pointer-events: none;
+  border-radius: var(--bq-frame-r);
+  /* hairline ring, then the bed that masks whatever scrolls past the corners */
+  box-shadow:
+    0 0 0 1px var(--bq-frame-line),
+    0 0 0 200vmax var(--bq-frame-bed);
+  transition: opacity .3s ease;
+}
+
+/* The stage menu owns the full viewport while open. */
+body.menu-open .bq-frame,
+body.menu-revealed .bq-frame {
+  opacity: 0;
+}
+
+/* Floating chrome steps inside the window so it never crosses the frame line. */
+.rail {
+  bottom: calc(var(--bq-frame-gap) + 10px) !important;
+}
+
+.mobilebar {
+  bottom: calc(var(--bq-frame-gap) + 10px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+.to-top {
+  right: calc(var(--bq-frame-gap) + 16px) !important;
+  bottom: calc(var(--bq-frame-gap) + 16px) !important;
+}
+
+[dir="rtl"] .to-top {
+  right: auto !important;
+  left: calc(var(--bq-frame-gap) + 16px) !important;
+}

@@ -230,7 +230,7 @@
        cascade. The pending gate keeps every non-critical room/overlay out
        of layout, so the async full sheet cannot cause FOUC or a hero reflow. -->
   <style id="bqCriticalCss">
-    html.bq-css-pending body > :not(.grain):not(.rail):not(.mobilebar):not(.bq-page-stage){display:none!important}
+    html.bq-css-pending body > :not(.grain):not(.rail):not(.mobilebar):not(.bq-page-stage):not(.bq-frame){display:none!important}
     html.bq-css-pending .main > :not(#design),html.bq-css-pending #design > :not(.hero){display:none!important}
     html.bq-css-pending .rail-tip,html.bq-css-pending .tool-tip,html.bq-css-pending .rail-action-label,html.bq-css-pending .lang-flyout,html.bq-css-pending .social-flyout,html.bq-css-pending .mobilebar-pop{display:none!important}
     html.bq-css-pending.bq-direct-route body{visibility:hidden!important}
@@ -243,7 +243,7 @@
     html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="panjamor"] #panjamor,html.bq-css-timeout[data-room="panjamor"] #panjamor,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="work"] #work,html.bq-css-timeout[data-room="work"] #work,html.bq-css-error[data-room="brandboard"] #brandboard,html.bq-css-timeout[data-room="brandboard"] #brandboard,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
   </style>
   <link data-href="css/style.v417.min.css" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=24">
+  <link rel="stylesheet" href="css/modern-framer.css?v=25">
   <noscript><link rel="stylesheet" href="css/style.v417.min.css"></noscript>
   <script>
     (function () {
@@ -372,6 +372,9 @@
 
   <!-- Grain overlay -->
   <div class="grain" aria-hidden="true"></div>
+
+  <!-- Fixed rounded viewport frame — content scrolls inside it, never past it -->
+  <div class="bq-frame" aria-hidden="true"></div>
 
   <!-- ===== SIDE RAIL ===== -->
   <aside class="rail" aria-label="Primary navigation">
@@ -2077,7 +2080,7 @@
   </script>
   <script defer src="js/lux.min.js?v=358"></script>
   <script defer src="js/motion.min.js?v=403"></script>
-  <script defer src="js/menu-stage.js?v=1"></script>
+  <script defer src="js/menu-stage.js?v=2"></script>
   <!-- The chatbot KB, and the Selected-Work + Brand-Board room modules, are not
        needed for first paint: their DOM is already static in the page, they only
        wire it up. Load only the module a visitor actually opens. -->

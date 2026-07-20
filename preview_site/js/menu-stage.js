@@ -123,10 +123,14 @@
 
     function preserveClosingFrame() {
       if (!closing || finishing) return;
+      /* Every write here re-fires the MutationObserver below, so each one must
+         be guarded — an unconditional write loops the observer forever and
+         hard-freezes the page. */
       if (!menu.classList.contains('is-open')) menu.classList.add('is-open');
       if (!menu.classList.contains('is-closing')) menu.classList.add('is-closing');
-      body.classList.add('menu-open', 'menu-closing');
-      body.style.overflow = 'hidden';
+      if (!body.classList.contains('menu-open')) body.classList.add('menu-open');
+      if (!body.classList.contains('menu-closing')) body.classList.add('menu-closing');
+      if (body.style.overflow !== 'hidden') body.style.overflow = 'hidden';
     }
 
     function finishClose(token) {
