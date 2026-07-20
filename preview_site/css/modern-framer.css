@@ -1,4 +1,5 @@
-/* Original dark visual system with the approved curved Design Room transition. */
+/* Final presentation layer: native scrolling, a static curved work panel,
+   and one precise centre line for the full-screen menu. */
 :root {
   --bq-accent: #3b3b3b;
   --bq-accent-soft: #5b5b5b;
@@ -21,14 +22,15 @@
   box-shadow: 0 0 0 4px rgba(57, 217, 138, .18) !important;
 }
 
+/* The hero returns to normal document flow. A sticky hero behind a tall,
+   blurred catalogue caused a delayed, layered scroll on desktop. */
 #design > .hero {
-  position: sticky !important;
-  top: 0;
+  position: relative !important;
+  top: auto !important;
   z-index: 1;
 }
 
-/* End the pinned-hero scene at the biography note. From this point onward,
-   opaque content owns the canvas so the hero cannot bleed through again. */
+/* From the biography note onward, opaque content owns the canvas. */
 #design > .practice-note,
 #design > .practice-note ~ * {
   position: relative;
@@ -41,7 +43,67 @@
   box-shadow: 0 -34px 90px -68px rgba(0, 0, 0, .92);
 }
 
-/* Keep the original menu styling; only remove the requested extra content. */
+/* Retired rooms stay out of both the page and navigation. */
+#panjamor,
+#work,
+#brandboard,
+[data-route="panjamor"],
+[data-route="work"],
+[data-route="brandboard"] {
+  display: none !important;
+}
+
+/* Portfolio: one static curved hand-off from the hero. The surface is opaque
+   enough to avoid a full-height backdrop-filter repaint while scrolling. */
+#design > .section.work {
+  position: relative;
+  z-index: 6;
+  width: calc(100% - clamp(20px, 2.5vw, 42px));
+  margin-inline: auto !important;
+  margin-top: clamp(-52px, -4.5vh, -34px) !important;
+  padding-top: clamp(72px, 8vw, 112px) !important;
+  border-radius: clamp(30px, 4.5vw, 64px) clamp(30px, 4.5vw, 64px) 0 0 !important;
+  isolation: isolate;
+  overflow: clip;
+}
+
+#design > .section.work::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 0;
+  height: 1px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, var(--line), transparent);
+  pointer-events: none;
+}
+
+#design > .section.work > * {
+  position: relative;
+  z-index: 1;
+}
+
+:root[data-theme="dark"] #design > .section.work {
+  background:
+    radial-gradient(circle at 88% 0%, rgba(255, 255, 255, .055), transparent 28rem),
+    #101010 !important;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-bottom: 0;
+  box-shadow:
+    0 -28px 78px -50px rgba(0, 0, 0, .9),
+    inset 0 1px rgba(255, 255, 255, .045);
+}
+
+:root[data-theme="light"] #design > .section.work {
+  background:
+    radial-gradient(circle at 90% 0%, rgba(39, 39, 87, .055), transparent 26rem),
+    #f4f3f0 !important;
+  border: 1px solid rgba(39, 39, 87, .12);
+  border-bottom: 0;
+  box-shadow: 0 -24px 64px -50px rgba(39, 39, 87, .24);
+}
+
+/* Menu: keep only the requested identity, four rooms and contact action. */
 .mobile-menu .mm-right,
 .mobile-menu .mm-top-label,
 .mobile-menu .mm-link .mm-n,
@@ -57,7 +119,6 @@
 
 .mobile-menu .mm-left,
 .mobile-menu .mm-top,
-.mobile-menu .mm-nav,
 .mobile-menu .mm-foot,
 .mobile-menu .mm-socs {
   align-items: center !important;
@@ -65,38 +126,125 @@
 }
 
 .mobile-menu .mm-top {
+  position: relative !important;
+  width: 100% !important;
   justify-content: center !important;
 }
 
+/* The name itself—not the avatar/name combination—sits on the menu centre
+   line. The portrait remains a quiet signature just before it. */
 .mobile-menu .mm-logo {
+  position: relative !important;
+  width: max-content !important;
+  min-height: 46px;
   margin-inline: auto !important;
+  padding: 0 !important;
+  gap: 0 !important;
   justify-content: center !important;
 }
 
-.mobile-menu .mobile-menu-close {
+.mobile-menu .mm-logo-av {
   position: absolute !important;
-  inset-inline-end: clamp(24px, 4vw, 48px) !important;
-  top: clamp(24px, 4vw, 48px) !important;
+  top: 50%;
+  right: calc(100% + 12px);
+  transform: translateY(-50%);
+}
+
+.mobile-menu .mm-logo-txt {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  text-align: start !important;
+}
+
+.mobile-menu .mm-logo-name,
+.mobile-menu .mm-logo-role {
+  width: auto !important;
+  text-align: start !important;
+}
+
+.mobile-menu .mm-logo-name {
+  order: 0 !important;
+}
+
+.mobile-menu .mm-logo span.mm-logo-role {
+  order: 1 !important;
+  margin: 3px 0 0 !important;
+}
+
+/* Reset the inherited two-column menu rows so every visible label shares the
+   same exact centre axis as the name and contact action. */
+.mobile-menu .mm-nav {
+  width: min(100%, 880px) !important;
+  margin-inline: auto !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+  text-align: center !important;
 }
 
 .mobile-menu .mm-link,
 .mobile-menu .mm-link.is-active,
 .mobile-menu .mm-link[data-route].is-active {
+  display: flex !important;
+  grid-template-columns: none !important;
+  width: 100% !important;
+  padding-inline: clamp(14px, 1.6vw, 22px) !important;
+  align-items: center !important;
   justify-content: center !important;
   text-align: center !important;
 }
 
 .mobile-menu .mm-link .mm-link-text {
-  width: 100%;
+  width: auto !important;
   text-align: center !important;
+  transform: none !important;
+}
+
+.mobile-menu .mm-link:hover .mm-link-text,
+.mobile-menu .mm-link:focus-visible .mm-link-text,
+.mobile-menu .mm-link.is-active .mm-link-text,
+.mobile-menu .mm-link[data-route].is-active .mm-link-text {
+  transform: none !important;
 }
 
 .mobile-menu .mm-foot {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
   justify-content: center !important;
+  width: min(100%, 880px) !important;
+  max-width: 880px !important;
+  margin-inline: auto !important;
+  align-self: center !important;
 }
 
 .mobile-menu .mm-touch {
+  align-self: center !important;
   margin-inline: auto !important;
+}
+
+.mobile-menu .mm-socs {
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+/* A physical left edge is intentional in both LTR and RTL menu layouts. */
+.mobile-menu .mobile-menu-close,
+[dir="rtl"] .mobile-menu .mobile-menu-close {
+  position: absolute !important;
+  inset-inline: auto !important;
+  left: 0 !important;
+  right: auto !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.mobile-menu.is-open .mobile-menu-close {
+  transform: translateY(-50%) !important;
+}
+
+.mobile-menu .mobile-menu-close:hover {
+  transform: translateY(-50%) rotate(90deg) !important;
 }
 
 .section-num i,
@@ -109,203 +257,22 @@
   outline-offset: 4px;
 }
 
-#panjamor,
-#work,
-#brandboard,
-[data-route="panjamor"],
-[data-route="work"],
-[data-route="brandboard"] {
-  display: none !important;
-}
-
-#design > .section.work {
-  position: relative;
-  z-index: 6;
-  width: calc(100% - clamp(20px, 2.5vw, 42px));
-  margin-inline: auto !important;
-  margin-top: clamp(-58px, -5vh, -34px) !important;
-  padding-top: clamp(72px, 8vw, 112px) !important;
-  border-radius: clamp(30px, 4.5vw, 64px) clamp(30px, 4.5vw, 64px) 0 0 !important;
-  isolation: isolate;
-  overflow: clip;
-  transform: translateZ(0);
-}
-
-#design > .section.work::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 1px;
-  border-radius: inherit;
-  background: linear-gradient(90deg, transparent, var(--line), transparent);
-  pointer-events: none;
-}
-
-:root[data-theme="dark"] #design > .section.work {
-  background:
-    radial-gradient(circle at 88% 2%, rgba(255,255,255,.055), transparent 26rem),
-    rgba(15, 15, 15, .76) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(1.25);
-  backdrop-filter: blur(30px) saturate(1.25);
-  border: 1px solid rgba(255,255,255,.11);
-  border-bottom: 0;
-  box-shadow:
-    0 -34px 90px -48px rgba(0,0,0,.9),
-    0 40px 90px -64px rgba(0,0,0,.85),
-    inset 0 1px rgba(255,255,255,.055);
-}
-
-:root[data-theme="light"] #design > .section.work {
-  background:
-    radial-gradient(circle at 90% 0%, rgba(39, 39, 87, .07), transparent 24rem),
-    #f4f3f0 !important;
-  border-top: 1px solid rgba(39, 39, 87, .14);
-}
-
 @media (max-width: 820px) {
   #design > .section.work {
     width: calc(100% - 12px);
     margin-top: -28px !important;
     padding-top: 52px !important;
     border-radius: 28px 28px 0 0 !important;
-    box-shadow: 0 -24px 64px -38px rgba(0, 0, 0, .82);
+    box-shadow: 0 -24px 64px -42px rgba(0, 0, 0, .82);
+  }
+
+  .mobile-menu .mm-nav {
+    width: 100% !important;
   }
 }
 
-/* Final menu alignment: quiet, centered and deliberately balanced. */
-.mobile-menu .mm-top {
-  position: relative !important;
-  width: 100% !important;
-}
-
-.mobile-menu .mobile-menu-close {
-  inset-inline-start: 0 !important;
-  inset-inline-end: auto !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-}
-
-.mobile-menu.is-open .mobile-menu-close {
-  transform: translateY(-50%) !important;
-}
-
-.mobile-menu .mm-logo-txt {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-end !important;
-  text-align: right !important;
-}
-
-.mobile-menu .mm-logo-name,
-.mobile-menu .mm-logo-role {
-  width: 100% !important;
-  text-align: right !important;
-}
-
-.mobile-menu .mm-foot {
-  position: relative !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  width: 100% !important;
-}
-
-.mobile-menu .mm-touch {
-  align-self: center !important;
-}
-
-.mobile-menu .mm-socs {
-  justify-content: center !important;
-  width: 100% !important;
-}
-
-/* The work-room shell stays framed while the catalogue scrolls through it. */
-#design > .section.work {
-  --work-shell-top: clamp(14px, 2.2vh, 28px);
-  --work-shell-pad: clamp(72px, 8vw, 112px);
-  padding-top: var(--work-shell-pad) !important;
-  overflow: clip !important;
-  border-radius: clamp(30px, 4.5vw, 64px) !important;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-}
-
-#design > .section.work::before {
-  display: none !important;
-}
-
-.work-sticky-shape {
-  position: sticky;
-  top: var(--work-shell-top);
-  z-index: 0;
-  width: 100%;
-  height: calc(100vh - (var(--work-shell-top) * 2));
-  min-height: 420px;
-  margin-top: calc(-1 * var(--work-shell-pad));
-  margin-bottom: calc((-100vh + (var(--work-shell-top) * 2)) + var(--work-shell-pad));
-  border-radius: clamp(30px, 4.5vw, 64px) !important;
-  pointer-events: none;
-  transform: translateZ(0);
-}
-
-#design > .section.work > :not(.work-sticky-shape) {
-  position: relative;
-  z-index: 1;
-}
-
-:root[data-theme="dark"] .work-sticky-shape {
-  background:
-    radial-gradient(circle at 88% 2%, rgba(255,255,255,.055), transparent 26rem),
-    rgba(15, 15, 15, .88);
-  border: 1px solid rgba(255,255,255,.11);
-  box-shadow:
-    0 -34px 90px -48px rgba(0,0,0,.9),
-    0 34px 90px -58px rgba(0,0,0,.85),
-    inset 0 1px rgba(255,255,255,.055);
-  -webkit-backdrop-filter: blur(30px) saturate(1.25);
-  backdrop-filter: blur(30px) saturate(1.25);
-}
-
-:root[data-theme="light"] .work-sticky-shape {
-  background:
-    radial-gradient(circle at 90% 0%, rgba(39,39,87,.07), transparent 24rem),
-    rgba(244,243,240,.94);
-  border: 1px solid rgba(39,39,87,.14);
-}
-
-/* Menu details: a physical left close control and role before the name. */
-.mobile-menu .mobile-menu-close {
-  left: 0 !important;
-  right: auto !important;
-  inset-inline-start: 0 !important;
-  inset-inline-end: auto !important;
-}
-
-[dir="rtl"] .mobile-menu .mobile-menu-close {
-  left: 0 !important;
-  right: auto !important;
-  inset-inline-start: auto !important;
-  inset-inline-end: 0 !important;
-}
-
-.mobile-menu .mm-logo-role {
-  order: -1 !important;
-  margin: 0 0 3px !important;
-}
-
-.mobile-menu .mm-logo-name {
-  order: 0 !important;
-}
-
-@media (max-width: 820px) {
-  #design > .section.work {
-    --work-shell-top: 6px;
-    --work-shell-pad: 52px;
-    border-radius: 28px !important;
-  }
-
-  .work-sticky-shape {
-    border-radius: 28px !important;
+@media (max-width: 360px) {
+  .mobile-menu .mm-logo-av {
+    display: none !important;
   }
 }

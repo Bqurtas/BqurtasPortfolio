@@ -72,22 +72,18 @@
     curtain.setAttribute('aria-hidden', 'true');
     curtain.innerHTML =
       '<span class="lux-transition-room">Design</span>' +
-      '<span class="lux-transition-no">01 / 06</span>' +
+      '<span class="lux-transition-no">01 / 04</span>' +
       '<span class="lux-transition-line"></span>';
     document.body.appendChild(curtain);
 
     var roomNumbers = {
-      design: '01 / 06',
-      work: '02 / 06',
-      brandboard: '03 / 06',
-      blog: '04 / 06',
-      bio: '05 / 06',
-      contact: '06 / 06'
+      design: '01 / 04',
+      blog: '02 / 04',
+      bio: '03 / 04',
+      contact: '04 / 04'
     };
     var roomFallbacks = {
       design: 'Design',
-      work: 'Selected Work',
-      brandboard: 'The Brand Board',
       blog: 'The Journal',
       bio: 'The Designer',
       contact: "Let's talk."
@@ -134,55 +130,8 @@
   })();
 })();
 
-/* ---- soft lerp scroll (desktop, fine pointers) — the slow, buttery Framer
-   feel, FAIL-OPEN: any error or stall instantly returns native scrolling. ---- */
-(function(){
-  if (!matchMedia('(min-width:821px) and (pointer:fine)').matches) return;
-  var target = 0, cur = 0, raf = null, active = false, dead = false;
-  var lastMove = 0, lastY = -1;
-  var EASE = 0.09;
-  document.documentElement.style.setProperty('scroll-behavior','auto','important');
-  function maxY(){ return Math.max(0, (document.scrollingElement || document.documentElement).scrollHeight - innerHeight); }
-  function loop(){
-    try{
-      cur += (target - cur) * EASE;
-      if (Math.abs(target - cur) < 0.5){
-        cur = target;
-        window.scrollTo({ top: cur, behavior: 'auto' });
-        raf = null; active = false; return;
-      }
-      window.scrollTo({ top: cur, behavior: 'auto' });
-      /* watchdog: if the page position refuses to move while we hold the wheel,
-         hand scrolling back to the browser for good */
-      var y = window.scrollY;
-      if (y !== lastY){ lastY = y; lastMove = performance.now(); }
-      else if (performance.now() - lastMove > 600 && Math.abs(target - cur) > 4){
-        dead = true; raf = null; active = false; return;
-      }
-      raf = requestAnimationFrame(loop);
-    }catch(err){ dead = true; raf = null; active = false; }
-  }
-  addEventListener('wheel', function(e){
-    try{
-      if (dead) return;
-      if (e.ctrlKey || e.metaKey || e.shiftKey) return;              /* zoom / horizontal */
-      if (document.body.classList.contains('menu-open')) return;    /* overlay owns input */
-      var t = e.target;
-      if (t && t.closest && t.closest('.chat, .latest-panel, .mobile-menu, .mm-right, textarea, select, .bb-mount, .reader, .lb, .mobile-sheet, .dash, [data-native-scroll]')) return;
-      var d = e.deltaY;
-      if (e.deltaMode === 1) d *= 16; else if (e.deltaMode === 2) d *= innerHeight;
-      if (!isFinite(d) || d === 0) return;
-      e.preventDefault();
-      if (!active){ cur = window.scrollY; target = cur; active = true; lastY = -1; lastMove = performance.now(); }
-      target = Math.max(0, Math.min(maxY(), target + d));
-      if (!raf) raf = requestAnimationFrame(loop);
-    }catch(err){ dead = true; }
-  }, { passive:false });
-  /* stay in sync when scrolling happens by other means (keys, glide, anchors) */
-  addEventListener('scroll', function(){
-    if (!raf){ target = window.scrollY; cur = target; }
-  }, { passive:true });
-})();
+/* Scrolling intentionally stays native. Trackpads, wheel momentum, keyboard
+   navigation and the hero anchor now share the browser's own scroll model. */
 
 /* ---- flip the print-gated FontAwesome stylesheet live (non-blocking icons) ---- */
 (function(){ var f=document.getElementById('faCss'); if(f) f.media='all'; })();
