@@ -96,6 +96,21 @@
         window.innerHeight
       );
       body.style.setProperty('--bq-menu-scroll-shift', (-savedScrollY) + 'px');
+      /* The home hero is position:sticky. Inside the fixed stage the sticky
+         offset is lost, so freeze the hero at the displacement it had at the
+         moment the menu opened — otherwise the page-card snapshot draws it at
+         its flow position and the composition jumps. */
+      var hero = document.querySelector('#design > .hero');
+      if (hero && hero.offsetParent !== null) {
+        var natural = 0;
+        var node = hero;
+        while (node && node !== body) {
+          natural += node.offsetTop;
+          node = node.offsetParent;
+        }
+        var stuckShift = hero.getBoundingClientRect().top + savedScrollY - natural;
+        body.style.setProperty('--bq-hero-shift', stuckShift + 'px');
+      }
       body.style.height = documentHeight + 'px';
       body.style.overflow = 'hidden';
     }
@@ -104,6 +119,7 @@
       body.style.overflow = savedBodyOverflow;
       body.style.height = savedBodyHeight;
       body.style.removeProperty('--bq-menu-scroll-shift');
+      body.style.removeProperty('--bq-hero-shift');
       if (restoreScroll) window.scrollTo({ top: savedScrollY, left: 0, behavior: 'auto' });
     }
 

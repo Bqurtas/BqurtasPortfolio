@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <base href="/" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#14100b" />
+  <meta name="theme-color" content="#f4f3f0" />
 
   <!-- Umami analytics (auto-tracks SPA navigation) — SELF-HOSTED so it's a
        same-origin script (no SRI needed → full Subresource-Integrity pass).
@@ -210,6 +210,12 @@
       root.classList.add('bq-css-pending');
       if (route) root.classList.add('bq-direct-route');
       try {
+        /* one-time migration: light is the site default now; visitors keep
+           any theme they choose AFTER this flip */
+        if (!localStorage.getItem('bq_light_v1')) {
+          localStorage.setItem('bq_light_v1', '1');
+          localStorage.setItem('bq_theme3', 'light');
+        }
         var savedTheme = localStorage.getItem('bq_theme3');
         if (savedTheme === 'light' || savedTheme === 'dark') root.dataset.theme = savedTheme;
       } catch (e) {}
@@ -243,7 +249,7 @@
     html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="panjamor"] #panjamor,html.bq-css-timeout[data-room="panjamor"] #panjamor,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="work"] #work,html.bq-css-timeout[data-room="work"] #work,html.bq-css-error[data-room="brandboard"] #brandboard,html.bq-css-timeout[data-room="brandboard"] #brandboard,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
   </style>
   <link data-href="css/style.v417.min.css" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=25">
+  <link rel="stylesheet" href="css/modern-framer.css?v=27">
   <noscript><link rel="stylesheet" href="css/style.v417.min.css"></noscript>
   <script>
     (function () {
@@ -1809,35 +1815,13 @@
           <img class="footer-av" src="assets/avatar.webp" alt="" width="124" height="124" loading="lazy" decoding="async" />
           <span class="footer-bq">Barakat Qurtas</span>
           <span class="footer-role" data-i18n="profile.role">Graphic Designer</span>
-          <p data-i18n="f.lead">Independent graphic designer crafting brand identity, editorial, and books from the old quarter of Hewlêr — Kurdistan, since 2014.</p>
           <!--email_off--><a class="footer-email" href="mailto:hello@bqurtas.com">hello@bqurtas.com <i class="fa-solid fa-arrow-up-right"></i></a><!--/email_off-->
-        </div>
-
-        <nav class="footer-room-nav" aria-label="Footer">
-          <span class="footer-column-label mono" data-i18n="f.explore">Explore</span>
-          <a href="/design" data-route="design"><small>01</small><span data-i18n="nav.design">Design</span><i class="fa-solid fa-arrow-right"></i></a>
-          <a href="/panjamor" data-route="panjamor"><small>02</small><span data-i18n="nav.panjamor">Panjamor</span><i class="fa-solid fa-arrow-right"></i></a>
-          <a href="/blog" data-route="blog"><small>02</small><span data-i18n="nav.blog">The Journal</span><i class="fa-solid fa-arrow-right"></i></a>
-          <a href="/work" data-route="work"><small>04</small><span data-i18n="nav.work">Selected Work</span><i class="fa-solid fa-arrow-right"></i></a>
-          <a href="/brandboard" data-route="brandboard"><small>05</small><span data-i18n="nav.brandboard">The Brand Board</span><i class="fa-solid fa-arrow-right"></i></a>
-          <a href="/bio" data-route="bio"><small>03</small><span data-i18n="nav.bio">The Designer</span><i class="fa-solid fa-arrow-right"></i></a>
-          <a href="/contact" data-route="contact"><small>04</small><span data-i18n="nav.contact">Let's talk.</span><i class="fa-solid fa-arrow-right"></i></a>
-        </nav>
-
-        <div class="footer-connect-v249">
-          <span class="footer-column-label mono" data-i18n="f.connect">Connect</span>
-          <a href="https://instagram.com/bqurtas" target="_blank" rel="noopener"><span>Instagram</span><i class="fa-brands fa-instagram"></i></a>
-          <a href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener"><span>LinkedIn</span><i class="fa-brands fa-linkedin-in"></i></a>
-          <a href="https://www.behance.net/bqurtas" target="_blank" rel="noopener"><span>Behance</span><i class="fa-brands fa-behance"></i></a>
-          <a href="https://wa.me/9647517884985" target="_blank" rel="noopener"><span>WhatsApp</span><i class="fa-brands fa-whatsapp"></i></a>
-          <a href="https://share.google/67XybyFvgDmQXvogA" target="_blank" rel="noopener"><span data-i18n="f.loc">Erbil — Kurdistan, Iraq</span><i class="fa-solid fa-location-dot"></i></a>
         </div>
       </div>
 
       <div class="footer-bottom mono">
         <span>© 2026 <span data-i18n="name.full">Barakat Qurtas</span></span>
         <button type="button" class="footer-top-btn" data-footer-top><span data-i18n="footer.backtop">Back to top</span><i class="fa-solid fa-arrow-up"></i></button>
-        <span data-i18n="f.set">Set in Fraunces &amp; Manrope</span>
       </div>
     </footer>
 
@@ -2035,7 +2019,7 @@
     }catch(e){}})();
   </script>
   <script defer src="js/main.v416.min.js"></script>
-  <script defer src="js/revert-theme.js?v=1"></script>
+  <script defer src="js/revert-theme.js?v=2"></script>
   <script defer src="js/gallery.min.js?v=403"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2080,7 +2064,7 @@
   </script>
   <script defer src="js/lux.min.js?v=358"></script>
   <script defer src="js/motion.min.js?v=403"></script>
-  <script defer src="js/menu-stage.js?v=2"></script>
+  <script defer src="js/menu-stage.js?v=3"></script>
   <!-- The chatbot KB, and the Selected-Work + Brand-Board room modules, are not
        needed for first paint: their DOM is already static in the page, they only
        wire it up. Load only the module a visitor actually opens. -->
