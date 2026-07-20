@@ -230,7 +230,7 @@
        cascade. The pending gate keeps every non-critical room/overlay out
        of layout, so the async full sheet cannot cause FOUC or a hero reflow. -->
   <style id="bqCriticalCss">
-    html.bq-css-pending body > :not(.grain):not(.rail):not(.mobilebar):not(.main){display:none!important}
+    html.bq-css-pending body > :not(.grain):not(.rail):not(.mobilebar):not(.bq-page-stage){display:none!important}
     html.bq-css-pending .main > :not(#design),html.bq-css-pending #design > :not(.hero){display:none!important}
     html.bq-css-pending .rail-tip,html.bq-css-pending .tool-tip,html.bq-css-pending .rail-action-label,html.bq-css-pending .lang-flyout,html.bq-css-pending .social-flyout,html.bq-css-pending .mobilebar-pop{display:none!important}
     html.bq-css-pending.bq-direct-route body{visibility:hidden!important}
@@ -243,7 +243,7 @@
     html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="panjamor"] #panjamor,html.bq-css-timeout[data-room="panjamor"] #panjamor,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="work"] #work,html.bq-css-timeout[data-room="work"] #work,html.bq-css-error[data-room="brandboard"] #brandboard,html.bq-css-timeout[data-room="brandboard"] #brandboard,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
   </style>
   <link data-href="css/style.v417.min.css" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=23">
+  <link rel="stylesheet" href="css/modern-framer.css?v=24">
   <noscript><link rel="stylesheet" href="css/style.v417.min.css"></noscript>
   <script>
     (function () {
@@ -506,7 +506,7 @@
     </div>
     <!-- MENU — the hamburger lives INSIDE the bar (bottom dock on desktop);
          hidden on mobile (the bottom bar has its own trigger). -->
-    <button class="rail-menu" id="railMenu" aria-label="Open menu">
+    <button class="rail-menu" id="railMenu" aria-label="Open menu" aria-controls="mobileMenu" aria-expanded="false">
       <span class="rail-menu-bars" aria-hidden="true"><i></i><i></i><i></i></span>
       <span class="rail-tip"><span class="rail-tip-text" data-i18n="tip.menu">Menu</span></span>
     </button>
@@ -535,7 +535,7 @@
 
   <!-- ===== MOBILE BOTTOM BAR ===== -->
   <nav class="mobilebar" aria-label="Toolbar">
-    <button class="mobilebar-btn menu-toggle-btn" id="menuToggle" aria-label="Menu">
+    <button class="mobilebar-btn menu-toggle-btn" id="menuToggle" aria-label="Open menu" aria-controls="mobileMenu" aria-expanded="false">
       <svg class="menu-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M4 7h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         <path d="M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -595,9 +595,9 @@
     <div class="latest-panel-list" id="latestList"></div>
   </section>
 
-  <!-- Mobile menu — bottom sheet -->
-  <div class="mobile-menu" id="mobileMenu" aria-label="Menu">
-    <div class="mobile-sheet" role="dialog" aria-modal="true" aria-label="Menu">
+  <!-- Full-screen stage menu -->
+  <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menu" aria-hidden="true">
+    <div class="mobile-sheet">
       <div class="mm-left">
         <div class="mm-top">
           <a href="/" class="mm-logo" data-route="design"><img class="mm-logo-av" src="assets/avatar.webp" alt="" /><span class="mm-logo-txt"><small class="mm-logo-name">Barakat Qurtas</small><span class="mm-logo-role" data-i18n="profile.role">Graphic Designer</span></span></a>
@@ -641,6 +641,8 @@
     </div>
   </div>
 
+  <!-- The visible site becomes the moving editorial card while the menu opens. -->
+  <div class="bq-page-stage" id="bqPageStage">
   <!-- ===== MAIN ===== -->
   <main class="main" id="top">
 
@@ -1837,6 +1839,7 @@
     </footer>
 
   </main>
+  </div>
 
   <!-- ===== GO TO TOP ===== -->
   <button class="to-top" id="toTop" aria-label="Back to top">
@@ -2074,6 +2077,7 @@
   </script>
   <script defer src="js/lux.min.js?v=358"></script>
   <script defer src="js/motion.min.js?v=403"></script>
+  <script defer src="js/menu-stage.js?v=1"></script>
   <!-- The chatbot KB, and the Selected-Work + Brand-Board room modules, are not
        needed for first paint: their DOM is already static in the page, they only
        wire it up. Load only the module a visitor actually opens. -->
