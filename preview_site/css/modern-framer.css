@@ -1,0 +1,311 @@
+/* Original dark visual system with the approved curved Design Room transition. */
+:root {
+  --bq-accent: #3b3b3b;
+  --bq-accent-soft: #5b5b5b;
+  --bq-accent-light: #8b8b8b;
+}
+
+::selection {
+  background: var(--bq-accent);
+  color: #fff;
+}
+
+.rail-dot {
+  background: var(--bq-accent-light) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--bq-accent-light) 18%, transparent) !important;
+}
+
+.design-cta-dot,
+.mobilebar-cta .design-cta-dot {
+  background: #39d98a !important;
+  box-shadow: 0 0 0 4px rgba(57, 217, 138, .18) !important;
+}
+
+#design > .hero {
+  position: sticky !important;
+  top: 0;
+  z-index: 1;
+}
+
+/* End the pinned-hero scene at the biography note. From this point onward,
+   opaque content owns the canvas so the hero cannot bleed through again. */
+#design > .practice-note,
+#design > .practice-note ~ * {
+  position: relative;
+  z-index: 8;
+  background: var(--bg) !important;
+  isolation: isolate;
+}
+
+#design > .practice-note {
+  box-shadow: 0 -34px 90px -68px rgba(0, 0, 0, .92);
+}
+
+/* Keep the original menu styling; only remove the requested extra content. */
+.mobile-menu .mm-right,
+.mobile-menu .mm-top-label,
+.mobile-menu .mm-link .mm-n,
+.mobile-menu .mm-link > i,
+.mobile-menu .mm-link::before,
+.mobile-menu .mm-link::after {
+  display: none !important;
+}
+
+.mobile-menu .mobile-sheet {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.mobile-menu .mm-left,
+.mobile-menu .mm-top,
+.mobile-menu .mm-nav,
+.mobile-menu .mm-foot,
+.mobile-menu .mm-socs {
+  align-items: center !important;
+  text-align: center !important;
+}
+
+.mobile-menu .mm-top {
+  justify-content: center !important;
+}
+
+.mobile-menu .mm-logo {
+  margin-inline: auto !important;
+  justify-content: center !important;
+}
+
+.mobile-menu .mobile-menu-close {
+  position: absolute !important;
+  inset-inline-end: clamp(24px, 4vw, 48px) !important;
+  top: clamp(24px, 4vw, 48px) !important;
+}
+
+.mobile-menu .mm-link,
+.mobile-menu .mm-link.is-active,
+.mobile-menu .mm-link[data-route].is-active {
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.mobile-menu .mm-link .mm-link-text {
+  width: 100%;
+  text-align: center !important;
+}
+
+.mobile-menu .mm-foot {
+  justify-content: center !important;
+}
+
+.mobile-menu .mm-touch {
+  margin-inline: auto !important;
+}
+
+.section-num i,
+.hero-services-ai i {
+  color: var(--ink-soft) !important;
+}
+
+:focus-visible {
+  outline: 2px solid var(--bq-accent-light) !important;
+  outline-offset: 4px;
+}
+
+#panjamor,
+#work,
+#brandboard,
+[data-route="panjamor"],
+[data-route="work"],
+[data-route="brandboard"] {
+  display: none !important;
+}
+
+#design > .section.work {
+  position: relative;
+  z-index: 6;
+  width: calc(100% - clamp(20px, 2.5vw, 42px));
+  margin-inline: auto !important;
+  margin-top: clamp(-58px, -5vh, -34px) !important;
+  padding-top: clamp(72px, 8vw, 112px) !important;
+  border-radius: clamp(30px, 4.5vw, 64px) clamp(30px, 4.5vw, 64px) 0 0 !important;
+  isolation: isolate;
+  overflow: clip;
+  transform: translateZ(0);
+}
+
+#design > .section.work::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, var(--line), transparent);
+  pointer-events: none;
+}
+
+:root[data-theme="dark"] #design > .section.work {
+  background:
+    radial-gradient(circle at 88% 2%, rgba(255,255,255,.055), transparent 26rem),
+    rgba(15, 15, 15, .76) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(1.25);
+  backdrop-filter: blur(30px) saturate(1.25);
+  border: 1px solid rgba(255,255,255,.11);
+  border-bottom: 0;
+  box-shadow:
+    0 -34px 90px -48px rgba(0,0,0,.9),
+    0 40px 90px -64px rgba(0,0,0,.85),
+    inset 0 1px rgba(255,255,255,.055);
+}
+
+:root[data-theme="light"] #design > .section.work {
+  background:
+    radial-gradient(circle at 90% 0%, rgba(39, 39, 87, .07), transparent 24rem),
+    #f4f3f0 !important;
+  border-top: 1px solid rgba(39, 39, 87, .14);
+}
+
+@media (max-width: 820px) {
+  #design > .section.work {
+    width: calc(100% - 12px);
+    margin-top: -28px !important;
+    padding-top: 52px !important;
+    border-radius: 28px 28px 0 0 !important;
+    box-shadow: 0 -24px 64px -38px rgba(0, 0, 0, .82);
+  }
+}
+
+/* Final menu alignment: quiet, centered and deliberately balanced. */
+.mobile-menu .mm-top {
+  position: relative !important;
+  width: 100% !important;
+}
+
+.mobile-menu .mobile-menu-close {
+  inset-inline-start: 0 !important;
+  inset-inline-end: auto !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.mobile-menu.is-open .mobile-menu-close {
+  transform: translateY(-50%) !important;
+}
+
+.mobile-menu .mm-logo-txt {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  text-align: right !important;
+}
+
+.mobile-menu .mm-logo-name,
+.mobile-menu .mm-logo-role {
+  width: 100% !important;
+  text-align: right !important;
+}
+
+.mobile-menu .mm-foot {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+.mobile-menu .mm-touch {
+  align-self: center !important;
+}
+
+.mobile-menu .mm-socs {
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+/* The work-room shell stays framed while the catalogue scrolls through it. */
+#design > .section.work {
+  --work-shell-top: clamp(14px, 2.2vh, 28px);
+  --work-shell-pad: clamp(72px, 8vw, 112px);
+  padding-top: var(--work-shell-pad) !important;
+  overflow: clip !important;
+  border-radius: clamp(30px, 4.5vw, 64px) !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+#design > .section.work::before {
+  display: none !important;
+}
+
+.work-sticky-shape {
+  position: sticky;
+  top: var(--work-shell-top);
+  z-index: 0;
+  width: 100%;
+  height: calc(100vh - (var(--work-shell-top) * 2));
+  min-height: 420px;
+  margin-top: calc(-1 * var(--work-shell-pad));
+  margin-bottom: calc((-100vh + (var(--work-shell-top) * 2)) + var(--work-shell-pad));
+  border-radius: clamp(30px, 4.5vw, 64px) !important;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
+#design > .section.work > :not(.work-sticky-shape) {
+  position: relative;
+  z-index: 1;
+}
+
+:root[data-theme="dark"] .work-sticky-shape {
+  background:
+    radial-gradient(circle at 88% 2%, rgba(255,255,255,.055), transparent 26rem),
+    rgba(15, 15, 15, .88);
+  border: 1px solid rgba(255,255,255,.11);
+  box-shadow:
+    0 -34px 90px -48px rgba(0,0,0,.9),
+    0 34px 90px -58px rgba(0,0,0,.85),
+    inset 0 1px rgba(255,255,255,.055);
+  -webkit-backdrop-filter: blur(30px) saturate(1.25);
+  backdrop-filter: blur(30px) saturate(1.25);
+}
+
+:root[data-theme="light"] .work-sticky-shape {
+  background:
+    radial-gradient(circle at 90% 0%, rgba(39,39,87,.07), transparent 24rem),
+    rgba(244,243,240,.94);
+  border: 1px solid rgba(39,39,87,.14);
+}
+
+/* Menu details: a physical left close control and role before the name. */
+.mobile-menu .mobile-menu-close {
+  left: 0 !important;
+  right: auto !important;
+  inset-inline-start: 0 !important;
+  inset-inline-end: auto !important;
+}
+
+[dir="rtl"] .mobile-menu .mobile-menu-close {
+  left: 0 !important;
+  right: auto !important;
+  inset-inline-start: auto !important;
+  inset-inline-end: 0 !important;
+}
+
+.mobile-menu .mm-logo-role {
+  order: -1 !important;
+  margin: 0 0 3px !important;
+}
+
+.mobile-menu .mm-logo-name {
+  order: 0 !important;
+}
+
+@media (max-width: 820px) {
+  #design > .section.work {
+    --work-shell-top: 6px;
+    --work-shell-pad: 52px;
+    border-radius: 28px !important;
+  }
+
+  .work-sticky-shape {
+    border-radius: 28px !important;
+  }
+}

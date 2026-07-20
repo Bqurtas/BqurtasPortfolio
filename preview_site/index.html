@@ -21,7 +21,7 @@
        Conversions API Gateway (capig.datah04.com). Removed for visitor privacy. -->
 
   <!-- Primary SEO -->
-  <title>Graphic Designer in Erbil, Kurdistan | Barakat Qurtas</title>
+  <title>Barakat Qurtas — Graphic &amp; Motion Designer in Erbil, Kurdistan</title>
   <meta name="description" content="Barakat Qurtas is a Kurdish graphic designer in Erbil, Kurdistan, Iraq, specialising in brand identity, logos, editorial, print, motion and advertising." />
   <meta name="keywords" content="Barakat Qurtas, Bqurtas, graphic designer Erbil, graphic designer Kurdistan, graphic designer Iraq, Kurdish graphic designer, branding Erbil, logo designer Erbil, motion designer Iraq, بەرەکات قورتاس, بەرکەت قورتاس, دیزاینەری گرافیک لە هەولێر, گرافیک دیزاینەر کوردستان, مصمم جرافيك أربيل, مصمم جرافيك كردستان, Erbil grafik tasarımcı, Kürdistan grafik tasarımcı, Panjamor, پەنجەمۆر" />
   <meta name="author" content="Barakat Qurtas" />
@@ -56,7 +56,7 @@
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Barakat Qurtas" />
-  <meta property="og:title" content="Graphic Designer in Erbil, Kurdistan | Barakat Qurtas" />
+  <meta property="og:title" content="Barakat Qurtas — Graphic &amp; Motion Designer in Erbil, Kurdistan" />
   <meta property="og:description" content="Kurdish graphic designer in Erbil, Kurdistan, Iraq — brand identity, logos, editorial, print, motion and advertising." />
   <meta property="og:image" content="https://bqurtas.com/assets/covers/en-home.jpg?v=3" />
   <meta property="og:image:type" content="image/jpeg" />
@@ -74,7 +74,7 @@
 
   <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Graphic Designer in Erbil, Kurdistan | Barakat Qurtas" />
+  <meta name="twitter:title" content="Barakat Qurtas — Graphic &amp; Motion Designer in Erbil, Kurdistan" />
   <meta name="twitter:description" content="Kurdish graphic designer in Erbil, Kurdistan, Iraq — brand identity, logos, editorial, print, motion and advertising." />
   <meta name="twitter:image" content="https://bqurtas.com/assets/covers/en-home.jpg?v=3" />
   <meta name="twitter:creator" content="@bqurtas" />
@@ -99,7 +99,7 @@
         "url": "https://bqurtas.com/",
         "name": "Barakat Qurtas — Graphic Designer in Erbil, Kurdistan",
         "description": "The official portfolio and profile of Kurdish graphic and motion designer Barakat Qurtas in Erbil, Kurdistan Region of Iraq.",
-        "dateModified": "2026-07-17",
+        "dateModified": "2026-07-19",
         "inLanguage": "en",
         "isPartOf": { "@id": "https://bqurtas.com/#website" },
         "mainEntity": { "@id": "https://bqurtas.com/#person" },
@@ -128,12 +128,9 @@
         "knowsAbout": ["Graphic design in Erbil", "Graphic design in Kurdistan", "Panjamor Office Studio", "Brand Identity", "Editorial Design", "Logo Design", "Book Cover Design", "Poster Design", "Advertising", "Video Editing", "Motion Graphics"]
       },
       { "@type": "SiteNavigationElement", "position": 1, "name": "Design", "url": "https://bqurtas.com/design" },
-      { "@type": "SiteNavigationElement", "position": 2, "name": "Panjamor Office Studio", "url": "https://bqurtas.com/panjamor" },
-      { "@type": "SiteNavigationElement", "position": 3, "name": "The Journal", "url": "https://bqurtas.com/blog" },
-      { "@type": "SiteNavigationElement", "position": 4, "name": "Selected Work", "url": "https://bqurtas.com/work" },
-      { "@type": "SiteNavigationElement", "position": 5, "name": "The Brand Board", "url": "https://bqurtas.com/brandboard" },
-      { "@type": "SiteNavigationElement", "position": 6, "name": "The Designer", "url": "https://bqurtas.com/bio" },
-      { "@type": "SiteNavigationElement", "position": 7, "name": "Let's talk.", "url": "https://bqurtas.com/contact" },
+      { "@type": "SiteNavigationElement", "position": 2, "name": "The Journal", "url": "https://bqurtas.com/blog" },
+      { "@type": "SiteNavigationElement", "position": 3, "name": "The Designer", "url": "https://bqurtas.com/bio" },
+      { "@type": "SiteNavigationElement", "position": 4, "name": "Let's talk.", "url": "https://bqurtas.com/contact" },
       {
         "@type": "ProfessionalService",
         "@id": "https://bqurtas.com/#service",
@@ -197,9 +194,13 @@
     (function () {
       var root = document.documentElement;
       var langs = ['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];
-      var rooms = ['design', 'panjamor', 'blog', 'work', 'brandboard', 'bio', 'contact'];
+      var rooms = ['design', 'blog', 'bio', 'contact'];
       var parts = location.pathname.split('/').filter(Boolean);
       var lang = langs.indexOf(parts[0]) > -1 ? parts.shift() : 'en';
+      if (['panjamor', 'work', 'brandboard'].indexOf(parts[0]) > -1) {
+        try { history.replaceState(null, '', lang === 'en' ? '/' : '/' + lang); } catch (e) {}
+        parts = [];
+      }
       var route = rooms.indexOf(parts[0]) > -1 ? parts[0] : '';
       root.lang = lang;
       root.dir = (lang === 'ku' || lang === 'ar') ? 'rtl' : 'ltr';
@@ -213,6 +214,13 @@
         if (savedTheme === 'light' || savedTheme === 'dark') root.dataset.theme = savedTheme;
       } catch (e) {}
     }());
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('#panjamor, #work, #brandboard, [data-route="panjamor"], [data-route="work"], [data-route="brandboard"]').forEach(function (el) {
+        el.remove();
+      });
+    }, { once: true });
   </script>
 
   <link rel="preload" href="assets/portrait.webp?v=2" as="image" fetchpriority="high">
@@ -235,6 +243,7 @@
     html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="panjamor"] #panjamor,html.bq-css-timeout[data-room="panjamor"] #panjamor,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="work"] #work,html.bq-css-timeout[data-room="work"] #work,html.bq-css-error[data-room="brandboard"] #brandboard,html.bq-css-timeout[data-room="brandboard"] #brandboard,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
   </style>
   <link data-href="css/style.v417.min.css" id="bqFullCss">
+  <link rel="stylesheet" href="css/modern-framer.css?v=22">
   <noscript><link rel="stylesheet" href="css/style.v417.min.css"></noscript>
   <script>
     (function () {
@@ -394,7 +403,7 @@
       <a href="/blog" class="rail-link" data-route="blog" aria-label="The Journal">
         <i class="fa-solid fa-feather-pointed rail-icon"></i>
         <span class="rail-tip">
-          <span class="rail-tip-num">03</span>
+          <span class="rail-tip-num">02</span>
           <span class="rail-tip-text" data-i18n="nav.blog">The Journal</span>
         </span>
       </a>
@@ -415,14 +424,14 @@
       <a href="/bio" class="rail-link" data-route="bio" aria-label="The Designer">
         <i class="fa-solid fa-user-pen rail-icon"></i>
         <span class="rail-tip">
-          <span class="rail-tip-num">06</span>
+          <span class="rail-tip-num">03</span>
           <span class="rail-tip-text" data-i18n="nav.bio">The Designer</span>
         </span>
       </a>
       <a href="/contact" class="rail-link" data-route="contact" aria-label="Let's talk">
         <i class="fa-solid fa-paper-plane rail-icon"></i>
         <span class="rail-tip">
-          <span class="rail-tip-num">07</span>
+          <span class="rail-tip-num">04</span>
           <span class="rail-tip-text" data-i18n="nav.contact">Let's talk.</span>
         </span>
       </a>
@@ -592,17 +601,17 @@
       <div class="mm-left">
         <div class="mm-top">
           <a href="/" class="mm-logo" data-route="design"><img class="mm-logo-av" src="assets/avatar.webp" alt="" /><span class="mm-logo-txt"><small class="mm-logo-name">Barakat Qurtas</small><span class="mm-logo-role" data-i18n="profile.role">Graphic Designer</span></span></a>
-          <span class="mm-top-label mono" data-i18n="menu.rooms">Rooms / 01—07</span>
+          <span class="mm-top-label mono">Rooms / 01—04</span>
           <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <nav class="mm-nav" aria-label="Rooms">
           <a href="/design" class="mm-link" data-route="design" data-i18n-menu-note="menu.note.design" data-menu-note="Selected design and visual systems" data-menu-img="assets/covers/en-design.jpg"><span class="mm-n">01</span> <span class="mm-link-text" data-i18n="nav.design">Design</span><i class="fa-solid fa-arrow-up-right"></i></a>
           <a href="/panjamor" class="mm-link" data-route="panjamor" data-i18n-menu-note="menu.note.panjamor" data-menu-note="Brand, print and launch studio" data-menu-img="assets/panjamor-logo.webp?v=2"><span class="mm-n">02</span> <span class="mm-link-text" data-i18n="nav.panjamor">Panjamor</span><i class="fa-solid fa-arrow-up-right"></i></a>
-          <a href="/blog" class="mm-link" data-route="blog" data-i18n-menu-note="menu.note.blog" data-menu-note="Notes on typography, place and practice" data-menu-img="assets/covers/en-blog.jpg"><span class="mm-n">03</span> <span class="mm-link-text" data-i18n="nav.blog">The Journal</span><i class="fa-solid fa-arrow-up-right"></i></a>
+          <a href="/blog" class="mm-link" data-route="blog" data-i18n-menu-note="menu.note.blog" data-menu-note="Notes on typography, place and practice" data-menu-img="assets/covers/en-blog.jpg"><span class="mm-n">02</span> <span class="mm-link-text" data-i18n="nav.blog">The Journal</span><i class="fa-solid fa-arrow-up-right"></i></a>
           <a href="/work" class="mm-link" data-route="work" data-i18n-menu-note="menu.note.work" data-menu-note="Identity case studies, from brief to system" data-menu-img="assets/covers/en-official.jpg"><span class="mm-n">04</span> <span class="mm-link-text" data-i18n="nav.work">Selected Work</span><i class="fa-solid fa-arrow-up-right"></i></a>
           <a href="/brandboard" class="mm-link" data-route="brandboard" data-i18n-menu-note="menu.note.brandboard" data-menu-note="A free bilingual identity starter" data-menu-img="assets/covers/en-logo.jpg"><span class="mm-n">05</span> <span class="mm-link-text" data-i18n="nav.brandboard">The Brand Board</span><i class="fa-solid fa-arrow-up-right"></i></a>
-          <a href="/bio" class="mm-link" data-route="bio" data-i18n-menu-note="menu.note.bio" data-menu-note="Experience, tools, awards and biography" data-menu-img="assets/covers/en-bio.jpg"><span class="mm-n">06</span> <span class="mm-link-text" data-i18n="nav.bio">The Designer</span><i class="fa-solid fa-arrow-up-right"></i></a>
-          <a href="/contact" class="mm-link" data-route="contact" data-i18n-menu-note="menu.note.contact" data-menu-note="Start a clear, useful conversation" data-menu-img="assets/covers/en-contact.jpg"><span class="mm-n">07</span> <span class="mm-link-text" data-i18n="nav.contact">Let's talk.</span><i class="fa-solid fa-arrow-up-right"></i></a>
+          <a href="/bio" class="mm-link" data-route="bio" data-i18n-menu-note="menu.note.bio" data-menu-note="Experience, tools, awards and biography" data-menu-img="assets/covers/en-bio.jpg"><span class="mm-n">03</span> <span class="mm-link-text" data-i18n="nav.bio">The Designer</span><i class="fa-solid fa-arrow-up-right"></i></a>
+          <a href="/contact" class="mm-link" data-route="contact" data-i18n-menu-note="menu.note.contact" data-menu-note="Start a clear, useful conversation" data-menu-img="assets/covers/en-contact.jpg"><span class="mm-n">04</span> <span class="mm-link-text" data-i18n="nav.contact">Let's talk.</span><i class="fa-solid fa-arrow-up-right"></i></a>
         </nav>
         <div class="mm-foot">
           <a class="mm-touch" href="/contact" data-route="contact"><span data-i18n="profile.btn2">Get in touch</span> <i class="fa-solid fa-arrow-right"></i></a>
@@ -618,7 +627,7 @@
           <div class="mm-cover">
             <div class="mm-cover-top">
               <span class="mm-cover-eyebrow mono" data-i18n="menu.cover">Menu Cover</span>
-              <span class="mm-cover-no mono" id="menuPreviewNo">01 / 07</span>
+              <span class="mm-cover-no mono" id="menuPreviewNo">01 / 04</span>
             </div>
             <div class="mm-cover-mid">
               <span class="mm-cover-mark">Barakat Qurtas</span>
@@ -695,6 +704,7 @@
       </div>
       <!-- Portfolio -->
       <div class="section work">
+        <div class="work-sticky-shape" aria-hidden="true"></div>
         <header class="section-head">
           <span class="section-num mono"><i class="fa-solid fa-compass-drafting"></i> &nbsp; 01 — <span data-i18n="design.label">Design Room</span></span>
           <h2 class="section-title" data-i18n="design.title">A small catalogue of <em>printed</em> &amp; pixel things.</h2>
@@ -1803,11 +1813,11 @@
           <span class="footer-column-label mono" data-i18n="f.explore">Explore</span>
           <a href="/design" data-route="design"><small>01</small><span data-i18n="nav.design">Design</span><i class="fa-solid fa-arrow-right"></i></a>
           <a href="/panjamor" data-route="panjamor"><small>02</small><span data-i18n="nav.panjamor">Panjamor</span><i class="fa-solid fa-arrow-right"></i></a>
-          <a href="/blog" data-route="blog"><small>03</small><span data-i18n="nav.blog">The Journal</span><i class="fa-solid fa-arrow-right"></i></a>
+          <a href="/blog" data-route="blog"><small>02</small><span data-i18n="nav.blog">The Journal</span><i class="fa-solid fa-arrow-right"></i></a>
           <a href="/work" data-route="work"><small>04</small><span data-i18n="nav.work">Selected Work</span><i class="fa-solid fa-arrow-right"></i></a>
           <a href="/brandboard" data-route="brandboard"><small>05</small><span data-i18n="nav.brandboard">The Brand Board</span><i class="fa-solid fa-arrow-right"></i></a>
-          <a href="/bio" data-route="bio"><small>06</small><span data-i18n="nav.bio">The Designer</span><i class="fa-solid fa-arrow-right"></i></a>
-          <a href="/contact" data-route="contact"><small>07</small><span data-i18n="nav.contact">Let's talk.</span><i class="fa-solid fa-arrow-right"></i></a>
+          <a href="/bio" data-route="bio"><small>03</small><span data-i18n="nav.bio">The Designer</span><i class="fa-solid fa-arrow-right"></i></a>
+          <a href="/contact" data-route="contact"><small>04</small><span data-i18n="nav.contact">Let's talk.</span><i class="fa-solid fa-arrow-right"></i></a>
         </nav>
 
         <div class="footer-connect-v249">
@@ -2020,6 +2030,7 @@
     }catch(e){}})();
   </script>
   <script defer src="js/main.v416.min.js"></script>
+  <script defer src="js/revert-theme.js?v=1"></script>
   <script defer src="js/gallery.min.js?v=403"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs

@@ -23,9 +23,6 @@ available in Kurdish, English and Arabic.
 
 Primary pages:
 - [Design portfolio](https://bqurtas.com/design) — portfolio by discipline.
-- [Panjamor Office Studio](https://bqurtas.com/panjamor) — brand, print and launch systems for business owners.
-- [Selected work](https://bqurtas.com/work) — brand identity case studies.
-- [Brand Board](https://bqurtas.com/brandboard) — bilingual identity starter.
 - [The Journal](https://bqurtas.com/blog) — notes on typography, place and design practice.
 - [Biography](https://bqurtas.com/bio) — biography, experience and skills.
 - [Contact](https://bqurtas.com/contact) — project enquiries.
