@@ -501,13 +501,12 @@ body.menu-revealed .bq-page-stage {
   transform: scale(.76) translate3d(min(-31vw, -430px), -2vh, 0);
 }
 
-/* The floating toolbar stays available over the open menu, lifted above the
-   menu bed — the same bar (its hamburger) is how you close the menu again. */
+/* The floating dock is hidden while the menu is open — the close pill (×) is
+   how you dismiss it, so the bar should not sit over the menu curtain. */
 body.menu-open .rail,
 body.menu-open .mobilebar {
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  z-index: 1300 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
   transition: opacity .2s ease !important;
 }
 
@@ -990,7 +989,7 @@ body *:not(.bq-frame) {
    sits centred on the seam between the shown room and the menu index.
    ========================================================= */
 :root {
-  --bq-menu-bed: #e8e6df;
+  --bq-menu-bed: #f4f3f0;   /* exactly the site's paper — the card's border keeps it legible */
 }
 :root[data-theme="dark"] {
   --bq-menu-bed: #101011;
@@ -1068,14 +1067,14 @@ html:has(body.menu-open) {
 }
 #mobileMenu .mm-link.is-active .mm-link-text,
 #mobileMenu .mm-link[data-route].is-active .mm-link-text {
-  color: #2f9152 !important;
+  color: #b45c3c !important;   /* the site's warm terracotta accent — fits the paper palette */
   font-weight: 640 !important;
 }
 #mobileMenu .mm-link.is-active .mm-link-text::after,
 #mobileMenu .mm-link[data-route].is-active .mm-link-text::after {
   transform: scaleX(1) !important;
   transform-origin: left center !important;
-  background: #2f9152 !important;
+  background: #b45c3c !important;
 }
 
 /* The live page-card stays on screen, a shade lighter than the bed with a crisp
