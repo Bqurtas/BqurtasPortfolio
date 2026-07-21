@@ -26,9 +26,12 @@
    the opaque portfolio card (and every sheet after it) slides up over it.
    The work catalogue is fully opaque now, so the old desktop repaint stall
    from a translucent panel over a sticky hero no longer applies. */
+/* The hero scrolls WITH the page (not pinned). A sticky hero stayed put while
+   the portfolio card slid up through it, so the card's top edge sliced across
+   the hero's name/lede — read as a "cut". In normal flow the card sits in the
+   hero's bottom margin and the two move together, so nothing is sliced. */
 #design > .hero {
-  position: sticky !important;
-  top: 0 !important;
+  position: relative !important;
   z-index: 0 !important;
 }
 
@@ -154,9 +157,9 @@ body.menu-open .bq-page-stage #design > .hero {
    the dot texture, and keep the layout untouched — plain and quiet.
    ========================================================= */
 :root[data-theme="light"] .footer.footer-v249 {
-  --bg: #ffffff;
-  --surface: #f2f0ea;
-  --card-bg: #ffffff;
+  --bg: #f4f3f0;
+  --surface: #eae9e5;
+  --card-bg: #f4f3f0;
   --ink: #17110c;
   --ink-2: #2a2620;
   --ink-soft: #5f5c55;
@@ -167,7 +170,7 @@ body.menu-open .bq-page-stage #design > .hero {
   --gold-ink: #17110c;
   --ember: #17110c;
   color-scheme: light;
-  background-color: #ffffff !important;
+  background-color: #f4f3f0 !important;   /* match the site's paper, not pure white */
   background-image: none !important;
   color: var(--ink) !important;
   border-top: 1px solid var(--line) !important;
@@ -915,7 +918,10 @@ html {
   right: calc(var(--bq-frame-gap) + env(safe-area-inset-right, 0px));
   bottom: calc(var(--bq-frame-gap) + env(safe-area-inset-bottom, 0px));
   left: calc(var(--bq-frame-gap) + env(safe-area-inset-left, 0px));
-  z-index: 950;
+  /* Above the menu bed (1220) so the rounded frame stays wrapped around the menu
+     too; still below the floating dock (1300). Transparent + pointer-events:none,
+     so it never blocks content or clicks. */
+  z-index: 1250;
   pointer-events: none;
   border-radius: var(--bq-frame-r);
   /* Hairline ring + a bed band that masks the gap and corners. The spread only
@@ -928,11 +934,8 @@ html {
   transition: opacity .3s ease;
 }
 
-/* The stage menu owns the full viewport while open. */
-body.menu-open .bq-frame,
-body.menu-revealed .bq-frame {
-  opacity: 0;
-}
+/* The rounded frame stays wrapped around the menu too (it no longer hides on
+   open), matching the framed website. */
 
 /* Floating chrome steps inside the window so it never crosses the frame line. */
 .rail {
@@ -1023,6 +1026,23 @@ body.menu-revealed #mobileMenu.mobile-menu {
   backdrop-filter: none !important;
 }
 
+/* While the menu is open the page-card is fixed but the body keeps its locked
+   full height, which left the root scrollbar showing behind the menu. Clip it. */
+html:has(body.menu-open) {
+  overflow: hidden !important;
+}
+
+/* A CLOSED menu must never catch clicks. Its "Get in touch" foot link kept
+   pointer-events and sat at the bottom-right, overlapping the back-to-top
+   control — so tapping "go up" hijacked to the contact room. Force the whole
+   closed menu inert. (.is-open stays interactive; the close animation keeps
+   .is-open until it finishes, so it isn't cut short.) */
+#mobileMenu.mobile-menu:not(.is-open),
+#mobileMenu.mobile-menu:not(.is-open) * {
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 /* Every label, link and icon in the index reads on the light bed. */
 #mobileMenu .mm-top,
 #mobileMenu .mm-logo,
@@ -1037,6 +1057,27 @@ body.menu-revealed #mobileMenu.mobile-menu {
   color: var(--ink) !important;
 }
 
+/* The current room stays in the index (it's no longer held hidden) and is
+   marked in the site's accent green, so you can see which room you're in. */
+#mobileMenu.is-ready .mm-link.is-active,
+#mobileMenu.is-ready .mm-link[data-route].is-active,
+#mobileMenu.is-open .mm-link.is-active,
+#mobileMenu.is-open .mm-link[data-route].is-active {
+  opacity: 1 !important;
+  transform: none !important;
+}
+#mobileMenu .mm-link.is-active .mm-link-text,
+#mobileMenu .mm-link[data-route].is-active .mm-link-text {
+  color: #2f9152 !important;
+  font-weight: 640 !important;
+}
+#mobileMenu .mm-link.is-active .mm-link-text::after,
+#mobileMenu .mm-link[data-route].is-active .mm-link-text::after {
+  transform: scaleX(1) !important;
+  transform-origin: left center !important;
+  background: #2f9152 !important;
+}
+
 /* The live page-card stays on screen, a shade lighter than the bed with a crisp
    edge, so the shown room is unmistakable — no shadow required. */
 body.menu-revealed .bq-page-stage {
@@ -1048,13 +1089,23 @@ body.menu-revealed .bq-page-stage {
   border-color: rgba(255, 255, 255, .16) !important;
 }
 
-/* Close control: a dark pill centred on the seam (the menu index's inner edge),
-   half over the shown room and half over the menu. */
+/* The index column is allowed to overflow so the close pill can straddle the
+   seam without being clipped (.mm-left used to clip its outer half). The menu
+   is a fitted composition, so nothing else spills. */
+#mobileMenu .mm-left {
+  overflow: visible !important;
+}
+
+/* Close control: a dark pill centred on the seam (the index's inner edge = its
+   left: 0), half over the shown room and half over the menu. It's absolute
+   (fixed would anchor to .mm-left's own transform, not the viewport). */
 #mobileMenu .mobile-menu-close,
 [dir="rtl"] #mobileMenu .mobile-menu-close {
-  left: 0 !important;   /* the index's inner edge = the seam (close lives inside .mm-left) */
+  position: absolute !important;
+  left: 0 !important;   /* the seam = .mm-left's inner edge */
   right: auto !important;
   top: 50% !important;
+  z-index: 1240 !important;
   background: var(--ink) !important;
   color: var(--bg) !important;
   transform: translate(-50%, -50%) scale(.55) !important;
@@ -1092,7 +1143,7 @@ body.menu-revealed .bq-page-stage {
   }
   #mobileMenu .mobile-menu-close,
   [dir="rtl"] #mobileMenu .mobile-menu-close {
-    left: 0 !important;
+    left: 0 !important;   /* the seam = .mm-left's inner edge (the 50/50 split) */
     top: 50% !important;
     transform: translate(-50%, -50%) scale(.6) !important;
   }
