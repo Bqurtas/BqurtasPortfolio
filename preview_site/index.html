@@ -249,7 +249,7 @@
     html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="panjamor"] #panjamor,html.bq-css-timeout[data-room="panjamor"] #panjamor,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="work"] #work,html.bq-css-timeout[data-room="work"] #work,html.bq-css-error[data-room="brandboard"] #brandboard,html.bq-css-timeout[data-room="brandboard"] #brandboard,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
   </style>
   <link data-href="css/style.v417.min.css" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=27">
+  <link rel="stylesheet" href="css/modern-framer.css?v=28">
   <noscript><link rel="stylesheet" href="css/style.v417.min.css"></noscript>
   <script>
     (function () {
@@ -310,6 +310,11 @@
           } else {
             setTimeout(apply, 900);
           }
+          /* Background/inactive tabs throttle rAF, so the callbacks above may
+             never fire and the full sheet would never load (breaking layout and
+             scroll). This timer guarantees apply() runs regardless; the `applied`
+             guard makes the double-call a no-op on foreground loads. */
+          setTimeout(apply, 1400);
           return;
         }
         if (window.requestAnimationFrame) {
@@ -915,57 +920,7 @@
         </div>
       </div>
 
-      <!-- ===== LOCAL EXPERTISE + ANSWERS — merged with the biography proof ===== -->
-      <section class="local-seo" aria-labelledby="localSeoTitle">
-        <div class="local-seo-intro">
-          <span class="section-num mono"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> &nbsp; <span data-i18n="local.eye" data-local-seo="eye">Erbil · Kurdistan · Iraq</span></span>
-          <h2 class="local-seo-title" id="localSeoTitle" data-i18n="local.title" data-local-seo="title">A Kurdish graphic designer for brands that need to be remembered.</h2>
-          <p class="local-seo-lede" data-i18n="local.lede" data-local-seo="lede">Barakat Qurtas is an independent graphic and motion designer based in Erbil (Hewlêr), Kurdistan Region of Iraq. He builds clear brand identities, logos, editorial systems, printed matter, campaigns and motion work for clients in Kurdistan, across Iraq and internationally.</p>
-        </div>
-
-        <div class="local-seo-facts" aria-label="Service area and expertise">
-          <article class="local-seo-fact">
-            <span class="local-seo-fact-n mono">01</span>
-            <h3 data-i18n="local.area.title" data-local-seo="area.title">Based in Erbil, working everywhere</h3>
-            <p data-i18n="local.area.body" data-local-seo="area.body">Local knowledge for Hewlêr and Kurdistan, with remote collaboration across Iraq, the Middle East and beyond.</p>
-          </article>
-          <article class="local-seo-fact">
-            <span class="local-seo-fact-n mono">02</span>
-            <h3 data-i18n="local.services.title" data-local-seo="services.title">Identity, print and motion</h3>
-            <p data-i18n="local.services.body" data-local-seo="services.body">Logo and brand identity design, editorial and book design, posters, advertising, social campaigns, photography, video and motion graphics.</p>
-          </article>
-          <article class="local-seo-fact">
-            <span class="local-seo-fact-n mono">03</span>
-            <h3 data-i18n="local.languages.title" data-local-seo="languages.title">Kurdish, Arabic and English</h3>
-            <p data-i18n="local.languages.body" data-local-seo="languages.body">Bilingual and multilingual design that respects Kurdish, Arabic and Latin scripts instead of treating one as an afterthought.</p>
-          </article>
-        </div>
-
-        <div class="local-faq">
-          <div class="local-faq-head">
-            <span class="mono" data-i18n="local.faq.eye" data-local-seo="faq.eye">Common questions</span>
-            <h3 data-i18n="local.faq.title" data-local-seo="faq.title">Looking for a graphic designer in Erbil?</h3>
-          </div>
-          <div class="local-faq-list">
-            <details>
-              <summary data-i18n="local.q1" data-local-seo="q1">Who is Barakat Qurtas?</summary>
-              <p data-i18n="local.a1" data-local-seo="a1">Barakat Qurtas is a Kurdish graphic and motion designer in Erbil with more than a decade of experience and over 1,000 completed works since 2014.</p>
-            </details>
-            <details>
-              <summary data-i18n="local.q2" data-local-seo="q2">What graphic design services are available?</summary>
-              <p data-i18n="local.a2" data-local-seo="a2">Brand identity, logo design, books and editorial layouts, posters, print production, advertising campaigns, social media, photography, video editing and motion graphics.</p>
-            </details>
-            <details>
-              <summary data-i18n="local.q3" data-local-seo="q3">Do you work outside Erbil and Kurdistan?</summary>
-              <p data-i18n="local.a3" data-local-seo="a3">Yes. Projects are available throughout Kurdistan and Iraq, with remote collaboration for clients across the Middle East and worldwide.</p>
-            </details>
-            <details>
-              <summary data-i18n="local.q4" data-local-seo="q4">How can I hire Barakat Qurtas?</summary>
-              <p><span data-i18n="local.a4" data-local-seo="a4">Send the project type, goals, timeline and budget through the contact page. Serious enquiries receive a reply within 48 hours.</span> <a href="/contact" data-route="contact"><span data-i18n="local.contact" data-local-seo="contact">Start a project</span> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></p>
-            </details>
-          </div>
-        </div>
-      </section>
+      <!-- Local-expertise/FAQ block removed by request (kept structured data in <head>). -->
 
       <div class="software-experience">
         <div class="software-lines" aria-label="Software and tools">
@@ -1812,7 +1767,6 @@
 
       <div class="footer-main-v249">
         <div class="footer-signature">
-          <img class="footer-av" src="assets/avatar.webp" alt="" width="124" height="124" loading="lazy" decoding="async" />
           <span class="footer-bq">Barakat Qurtas</span>
           <span class="footer-role" data-i18n="profile.role">Graphic Designer</span>
           <!--email_off--><a class="footer-email" href="mailto:hello@bqurtas.com">hello@bqurtas.com <i class="fa-solid fa-arrow-up-right"></i></a><!--/email_off-->
