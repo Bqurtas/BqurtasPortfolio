@@ -1383,3 +1383,44 @@ body.menu-revealed .bq-page-stage {
   z-index: 2147483000 !important;
   pointer-events: none !important;
 }
+
+/* =========================================================
+   v34 — The framed window is removed, by request.
+
+   No black bed, no ring: the paper runs edge to edge like an ordinary page,
+   and content scrolls under the top of the viewport on its own. The frame
+   variables collapse to zero so the floating chrome, which used to step
+   inside the frame line, no longer carries that offset — they get their own
+   comfortable inset instead.
+   ========================================================= */
+:root {
+  --bq-frame-gap: 0px;
+  --bq-frame-r: 0px;
+}
+
+/* Overscroll rubber-banding shows the paper now, not the old bed. */
+html {
+  background: var(--bg) !important;
+}
+
+.bq-frame {
+  display: none !important;
+}
+
+.rail {
+  bottom: 20px !important;
+}
+
+.mobilebar {
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+.to-top {
+  right: 20px !important;
+  bottom: calc(var(--dock-h, 64px) + 26px) !important;
+}
+
+[dir="rtl"] .to-top {
+  right: auto !important;
+  left: 20px !important;
+}
