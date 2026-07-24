@@ -27,9 +27,6 @@ Primary pages:
 - [Biography](https://bqurtas.com/bio) — biography, experience and skills.
 - [Contact](https://bqurtas.com/contact) — project enquiries.
 
-Panjamor Office Studio:
-Panjamor is a focused studio room for name checks, logo direction, Kurdish and Latin lockups, colour palettes, type pairing, printed matter, social launch kits, production-ready exports and owner handover.
-
 Languages:
 The site is available in English, Sorani Kurdish, Kurmanci Kurdish, Arabic, French, Turkish and Swedish.
 
@@ -38,7 +35,9 @@ Localized homepages:
 - [کوردی سۆرانی](https://bqurtas.com/ku)
 - [Kurmancî](https://bqurtas.com/kmr)
 - [العربية](https://bqurtas.com/ar)
+- [Français](https://bqurtas.com/fr)
 - [Türkçe](https://bqurtas.com/tr)
+- [Svenska](https://bqurtas.com/sv)
 
 Contact:
 - [Project enquiries](https://bqurtas.com/contact)

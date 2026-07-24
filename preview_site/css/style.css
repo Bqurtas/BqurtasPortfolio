@@ -11,7 +11,7 @@
        url('../assets/fonts/Liana.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
-  font-display: optional;
+  font-display: swap;
 }
 
 /* =========================================================
@@ -4812,12 +4812,12 @@ html[dir="rtl"] .feature-eye, html[dir="rtl"] .feature-go { letter-spacing: 0; }
 @font-face{
   font-family:'Bebas Neue';
   src:url('../assets/fonts/BebasNeue.woff2') format('woff2');
-  font-weight:400; font-style:normal; font-display:optional;
+  font-weight:400; font-style:normal; font-display:swap;
 }
 @font-face{   /* fatter display face for the hero name */
   font-family:'Anton';
   src:url('../assets/fonts/Anton.woff2') format('woff2');
-  font-weight:400; font-style:normal; font-display:optional;
+  font-weight:400; font-style:normal; font-display:swap;
 }
 .hero{ background:var(--bg); color:var(--ink); text-align:center; }   /* follows the theme now */
 .hero .hero-letterbox{ display:none; }

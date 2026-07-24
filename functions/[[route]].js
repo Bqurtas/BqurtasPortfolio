@@ -16,26 +16,8 @@ const SITE = 'https://bqurtas.com';
 const SUPA = 'https://dcnkhzrishphpismmxuu.supabase.co';             // blog posts live here
 const SUPA_KEY = 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3';   // publishable (read-only, safe in client)
 const LANGS = ['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];                 // en = no prefix
-const ROOMS = ['panjamor', 'blog', 'work', 'brandboard', 'bio', 'contact'];
-const WORK_OG = {
-  en:{t:'Selected Work — brand-identity case studies | Barakat Qurtas',d:'A closer look at brand systems by Barakat Qurtas — the brief, the marks, the palette and the system in use. Bilingual identity for Kurdistan and beyond.'},
-  ku:{t:'کارە هەڵبژێردراوەکان — تاوتوێی پڕۆژەی ناسنامە | بەرەکات قورتاس',d:'سەیرێکی نزیکتر بۆ سیستەمی براندەکانی بەرەکات قورتاس — بریف، مارک، پاڵێت و سیستەم لە بەکارهێنان. ناسنامەی دووزمانی بۆ کوردستان و دەرەوەی.'},
-  ar:{t:'أعمال مختارة — دراسات حالة لهويات العلامات | بركات قرطاس',d:'نظرة أقرب على أنظمة العلامات لبركات قرطاس — الموجز والعلامات والألوان والنظام في الاستخدام. هوية ثنائية اللغة لكردستان وخارجها.'},
-  kmr:{t:'Karên Hilbijartî — lêkolînên rewşê yên nasnameyê | Barakat Qurtas',d:'Nêrînek nêztir li sîstemên brandê yên Barakat Qurtas — kurte, nîşan, palet û sîstem di bikaranînê de.'},
-  fr:{t:'Travaux choisis — études de cas d’identité de marque | Barakat Qurtas',d:'Un regard de plus près sur les systèmes de marque de Barakat Qurtas — le brief, les marques, la palette et le système en usage.'},
-  tr:{t:'Seçilmiş İşler — marka kimliği vaka çalışmaları | Barakat Qurtas',d:'Barakat Qurtas’ın marka sistemlerine daha yakından bir bakış — özet, işaretler, palet ve kullanımdaki sistem.'},
-  sv:{t:'Utvalda arbeten — fallstudier i varumärkesidentitet | Barakat Qurtas',d:'En närmare titt på Barakat Qurtas varumärkessystem — briefen, märkena, paletten och systemet i bruk.'}
-};
-const BB_OG = {
-  en:{t:'Brand Board — a free bilingual identity starter | Barakat Qurtas',d:'Generate a free brand board — your name in Kurdish and Latin, with a palette and type pairing. Then build the real thing with Barakat Qurtas.'},
-  ku:{t:'تابلۆی براند — دەستپێکی ناسنامەی بێ بەرامبەر | بەرەکات قورتاس',d:'تابلۆیەکی براندی بێ بەرامبەر دروست بکە — ناوەکەت بە کوردی و لاتین، لەگەڵ پاڵێت و جووتی فۆنت. دواتر هی ڕاستەقینە لەگەڵ بەرەکات قورتاس دروست بکە.'},
-  ar:{t:'لوحة العلامة — بداية هوية مجانية | بركات قرطاس',d:'أنشئ لوحة علامة مجانية — اسمك بالكردية واللاتينية، مع لوحة ألوان وتناغم خطوط. ثم اصنع الحقيقية مع بركات قرطاس.'},
-  kmr:{t:'Tabloya Brandê — destpêkek nasnameyê ya bêpere | Barakat Qurtas',d:'Tabloyek brandê ya bêpere çêbike — navê te bi kurdî û latînî, bi palet û cotê fontan. Paşê ya rastîn bi Barakat Qurtas ava bike.'},
-  fr:{t:'Planche de marque — un départ d’identité gratuit | Barakat Qurtas',d:'Générez une planche de marque gratuite — votre nom en kurde et en latin, avec palette et duo de polices. Puis créez la vraie avec Barakat Qurtas.'},
-  tr:{t:'Marka Panosu — ücretsiz iki dilli kimlik başlangıcı | Barakat Qurtas',d:'Ücretsiz bir marka panosu oluşturun — adınız Kürtçe ve Latin alfabesinde, palet ve yazı tipi eşleşmesiyle. Sonra gerçeğini Barakat Qurtas ile yapın.'},
-  sv:{t:'Varumärkestavla — en gratis tvåspråkig identitetsstart | Barakat Qurtas',d:'Skapa en gratis varumärkestavla — ditt namn på kurdiska och latin, med palett och typsnittspar. Bygg sedan den riktiga med Barakat Qurtas.'}
-};
-const TABS  = ['logo','official','book','posters','social','ai','events','stationery','image','video','other','business','invoices'];
+const ROOMS = ['blog', 'bio', 'contact'];
+const TABS  = ['logo','official','book','posters','social','ai','events','stationery','image','video','other'];
 const LOCALE = { en:'en_US', ku:'ckb_IQ', kmr:'kmr_TR', ar:'ar_IQ', fr:'fr_FR', tr:'tr_TR', sv:'sv_SE' };
 // The author's name written in each language's own script — so AI engines and
 // Google read & recognise him correctly per language on every blog post.
@@ -120,14 +102,13 @@ function resolve(pathname) {
   if (first === '') return { lang, key: 'home', canon: SITE + (prefix || '/') };   // the hero / landing
   if (first === 'design') {
     const tab = seg[1];
-    if (tab && TABS.includes(tab)) return { lang, key: tab, canon: SITE + prefix + '/design/' + tab };
-    return { lang, key: 'design', canon: SITE + prefix + '/design' };   // the All Work room — its own cover
+    if (!tab && seg.length === 1) return { lang, key: 'design', canon: SITE + prefix + '/design' };
+    if (seg.length === 2 && TABS.includes(tab)) return { lang, key: tab, canon: SITE + prefix + '/design/' + tab };
+    return null;
   }
-  if (first === 'panjamor' || first === 'pencemor') return { lang, key: 'panjamor', canon: SITE + prefix + '/panjamor' };
-  if (first === 'blog' && seg[1]) return { lang, key: 'blogpost', slug: seg[1], canon: SITE + prefix + '/blog/' + seg[1] };
-  if (first === 'work' && seg[1]) return { lang, key: 'work', slug: seg[1], canon: SITE + prefix + '/work/' + seg[1] };
-  if (ROOMS.includes(first)) return { lang, key: first, canon: SITE + prefix + '/' + first };
-  return null;   // unknown → let Pages handle (404 / SPA fallback)
+  if (first === 'blog' && seg.length === 2 && /^\d+$/.test(seg[1])) return { lang, key: 'blogpost', slug: seg[1], canon: SITE + prefix + '/blog/' + seg[1] };
+  if (seg.length === 1 && ROOMS.includes(first)) return { lang, key: first, canon: SITE + prefix + '/' + first };
+  return null;
 }
 
 function routePath(r) {
@@ -135,10 +116,46 @@ function routePath(r) {
   if (r.key === 'design') return '/design';
   if (TABS.includes(r.key)) return '/design/' + r.key;
   if (r.key === 'blogpost') return '/blog/' + r.slug;
-  if (r.key === 'work' && r.slug) return '/work/' + r.slug;
-  if (r.key === 'panjamor') return '/panjamor';
   if (ROOMS.includes(r.key)) return '/' + r.key;
   return '/';
+}
+
+function retiredRedirectPath(pathname) {
+  let seg = pathname.replace(/^\/+|\/+$/g, '').split('/');
+  let lang = 'en';
+  if (LANGS.includes(seg[0])) { lang = seg[0]; seg = seg.slice(1); }
+  const prefix = LANG_PREFIX[lang] || '';
+  const first = seg[0] || '';
+  if (first === 'work') return prefix + '/design';
+  if (seg.length === 1 && ['panjamor', 'pencemor', 'brandboard'].includes(first)) return prefix + '/contact';
+  if (seg.length === 2 && first === 'design' && ['business', 'invoices'].includes(seg[1])) {
+    return prefix + '/design/stationery';
+  }
+  return '';
+}
+
+function isPassthroughPath(pathname, request) {
+  if (/^\/(?:api|assets|css|js|vendor|\.well-known)(?:\/|$)/i.test(pathname)) return true;
+  if (['/index.html', '/404.html', '/favicon.ico', '/llms.txt', '/robots.txt', '/security.txt', '/site.webmanifest', '/sitemap-images.xml'].includes(pathname)) return true;
+  const acceptsHtml = /(?:^|,)\s*text\/html(?:\s*;|\s*,|$)/i.test(request.headers.get('Accept') || '');
+  return !acceptsHtml && /\.[a-z0-9]{2,10}$/i.test(pathname);
+}
+
+async function serveNotFound(request, url, env) {
+  const headers = new Headers({
+    'Content-Type': 'text/html; charset=UTF-8',
+    'Cache-Control': 'no-store',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Robots-Tag': 'noindex, nofollow'
+  });
+  if (request.method === 'HEAD') return new Response(null, { status: 404, headers });
+  if (env && env.ASSETS) {
+    try {
+      const page = await env.ASSETS.fetch(new URL('/404.html', url.origin));
+      return new Response(page.body, { status: 404, headers });
+    } catch (e) {}
+  }
+  return new Response('<!doctype html><title>Not found</title><h1>404 — Not found</h1>', { status: 404, headers });
 }
 
 function localizedUrl(lang, r) {
@@ -154,39 +171,8 @@ const xmlEsc = (v) => String(v == null ? '' : v)
   .replace(/>/g, '&gt;')
   .replace(/"/g, '&quot;');
 
-function workCaseSitemapBlocks(projects) {
-  const langs = ['en', ...LANGS];
-  const seen = new Set();
-  const clean = (slug) => String(slug || '').trim().replace(/^\/+|\/+$/g, '');
-  const altLinks = (slug) => langs.map((lang) => {
-    const href = localizedUrl(lang, { key: 'work', slug });
-    const hreflang = BCP47[lang] || lang;
-    return '    <xhtml:link rel="alternate" hreflang="' + xmlEsc(hreflang) + '" href="' + xmlEsc(href) + '" />';
-  }).concat('    <xhtml:link rel="alternate" hreflang="x-default" href="' + xmlEsc(localizedUrl('en', { key: 'work', slug })) + '" />').join('\n');
-
-  return projects.map((p) => {
-    const slug = clean(p && p.slug);
-    if (!slug || seen.has(slug)) return '';
-    seen.add(slug);
-    const lastmod = String((p.updated_at || p.created_at || '')).slice(0, 10) || '2026-07-01';
-    return langs.map((lang) => {
-      const loc = localizedUrl(lang, { key: 'work', slug });
-      return [
-        '  <url>',
-        '    <loc>' + xmlEsc(loc) + '</loc>',
-        '    <lastmod>' + xmlEsc(lastmod) + '</lastmod>',
-        '    <changefreq>monthly</changefreq>',
-        '    <priority>0.8</priority>',
-        altLinks(slug),
-        '  </url>'
-      ].join('\n');
-    }).join('\n');
-  }).filter(Boolean).join('\n');
-}
-
 function blogPostSitemapBlocks(posts) {
-  // Mirrors workCaseSitemapBlocks for /blog/<id> — so posts published later
-  // through the dashboard appear in the sitemap automatically.
+  // Posts published later through the dashboard appear automatically.
   const langs = ['en', ...LANGS];
   const seen = new Set();
   const altLinks = (id) => langs.map((lang) => {
@@ -219,22 +205,6 @@ async function serveSitemap(url, env, next) {
   const base = await env.ASSETS.fetch(new URL('/sitemap.xml', url.origin));
   let body = await base.text();
   try {
-    const res = await fetch(SUPA + '/rest/v1/projects?select=slug,updated_at,created_at&published=eq.true&order=pos.asc,created_at.desc', {
-      headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY }
-    });
-    if (res.ok) {
-      const projects = await res.json();
-      const missing = (Array.isArray(projects) ? projects : []).filter((p) => {
-        const slug = String(p && p.slug || '').trim().replace(/^\/+|\/+$/g, '');
-        return slug && !body.includes('<loc>' + SITE + '/work/' + slug + '</loc>');
-      });
-      const blocks = workCaseSitemapBlocks(missing);
-      if (blocks) {
-        body = body.replace(/\s*<\/urlset>\s*$/i, '\n' + blocks + '\n</urlset>\n');
-      }
-    }
-  } catch (e) {}
-  try {
     const res = await fetch(SUPA + '/rest/v1/posts?select=id,updated_at,created_at&published=eq.true&order=created_at.desc', {
       headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY }
     });
@@ -261,7 +231,7 @@ async function serveSitemap(url, env, next) {
 const setContent = (v) => ({ element(el) { el.setAttribute('content', v); } });
 const setHref    = (v) => ({ element(el) { el.setAttribute('href', v); } });
 const setText    = (v) => ({ element(el) { el.setInnerContent(v); } });
-const setLangAttr = (v) => ({ element(el) { el.setAttribute('lang', v); } });
+const setLangAttr = (v) => ({ element(el) { el.setAttribute('lang', BCP47[v] || v); } });
 
 export async function onRequest(context) {
   const { request, env, next } = context;
@@ -292,8 +262,16 @@ export async function onRequest(context) {
     h.set('X-Content-Type-Options', 'nosniff');
     return new Response(r.body, { status: 200, headers: h });
   }
+  const redirectPath = retiredRedirectPath(url.pathname);
+  if (redirectPath) {
+    url.pathname = redirectPath;
+    return Response.redirect(url.toString(), 301);
+  }
   const r = resolve(url.pathname);
-  if (!r) return next();
+  if (!r) {
+    if (isPassthroughPath(url.pathname, request)) return next();
+    return serveNotFound(request, url, env);
+  }
   if (!env || !env.ASSETS) return next();
 
   let meta, img, imgType = 'image/jpeg';
@@ -337,12 +315,6 @@ export async function onRequest(context) {
       meta = (OG[r.lang] && OG[r.lang].blog) || OG.en.blog;
       img  = SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=3';
     }
-  } else if (r.key === 'brandboard') {
-    meta = BB_OG[r.lang] || BB_OG.en;
-    img  = SITE + '/assets/covers/' + r.lang + '-design.jpg?v=3';
-  } else if (r.key === 'work') {
-    meta = WORK_OG[r.lang] || WORK_OG.en;
-    img  = SITE + '/assets/covers/' + r.lang + '-design.jpg?v=3';
   } else {
     meta = (OG[r.lang] && OG[r.lang][r.key]) || OG.en[r.key] || OG.en.home;
     img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=3';
@@ -418,6 +390,12 @@ export async function onRequest(context) {
       .on('link[data-alt-lang="sv"]',          setHref(localizedUrl('sv', r)))
       .on('link[data-alt-lang="x-default"]',   setHref(localizedUrl('en', r)))
       .on('head', { element(el) { if (postJsonLd) el.append(postJsonLd, { html: true }); } });
+    const activeRoom = r.key === 'blogpost' ? 'blog' : r.key;
+    if (ROOMS.includes(activeRoom)) {
+      rewriter.on('#' + activeRoom + ' .room-hero-title', {
+        element(el) { el.setAttribute('role', 'heading'); el.setAttribute('aria-level', '1'); }
+      });
+    }
     const serverCopy = r.key === 'home' ? SERVER_LOCAL_SEO[r.lang] : null;
     const homeKeywords = r.key === 'home' ? (HOME_KEYWORDS[r.lang] || HOME_KEYWORDS.en) : null;
     if (homeKeywords) rewriter.on('meta[name="keywords"]', setContent(homeKeywords));

@@ -59,9 +59,10 @@
   Cache-Control: no-store
   CDN-Cache-Control: no-store
 
-# Images & fonts are fingerprinted by file path or updated through new deploys.
+# Many portfolio images keep stable filenames between releases, so revalidate
+# them daily instead of pinning an old visual in a visitor's cache for a year.
 /assets/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
 # CSS/JS are ?v-versioned, so a new edit is a new URL.
 /css/*

@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // untouched where it shows big. Cuts multi-MB originals to small thumbnails.
     const imgSrc = (item.type !== 'video') ? window.BQ_GALLERY.thumb(item.url, 320) : item.url;
     const mediaHtml = item.type === 'video'
-      ? `<video muted loop playsinline preload="none" data-src="${item.url}" title="${dispTitle}" width="${dims.width}" height="${dims.height}"></video>`
+      ? `<video muted loop playsinline preload="none" poster="assets/covers/en-video.jpg" data-src="${item.url}" title="${dispTitle}" width="${dims.width}" height="${dims.height}"></video>`
       : `<img loading="lazy" decoding="async" fetchpriority="low" src="${imgSrc}" alt="${dispTitle}" width="${dims.width}" height="${dims.height}" />`;
 
     article.innerHTML = `
@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     media.addEventListener('loadedmetadata', markReady);
     media.addEventListener('loadeddata', markReady);
     if ((media.tagName === 'IMG' && media.complete && media.naturalHeight) ||
-        (media.tagName === 'VIDEO' && media.readyState >= 1)) markReady();
+        media.tagName === 'VIDEO') markReady();
     media.addEventListener('error', () => {
       // resized phone copy failed → original full image (jsDelivr)
       if (media.src !== item.url && !media.dataset.orig) { media.dataset.orig = '1'; media.src = item.url; return; }
