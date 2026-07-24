@@ -1296,3 +1296,53 @@ body.menu-revealed .bq-page-stage {
     scroll-behavior: auto !important;
   }
 }
+
+/* =========================================================
+   v31 — Identity removed from the menu curtain and the footer.
+   The name, avatar and menu-cover signature are gone from the
+   markup, so the email is now the footer's headline: it takes
+   the size the signature used to carry.
+   ========================================================= */
+
+/* The menu top row is just the label and the close button now. */
+#mobileMenu .mm-top {
+  justify-content: space-between !important;
+}
+
+/* Email as the footer headline. It is a single unbreakable-ish
+   string, so it must be allowed to wrap on narrow phones rather
+   than push the footer into a horizontal scroll. */
+.footer-v249 .footer-signature .footer-email,
+.footer-signature .footer-email,
+.footer-email {
+  font-size: clamp(28px, 4.2vw, 54px) !important;
+  font-weight: 500 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.015em !important;
+  justify-content: center !important;
+  gap: 14px !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+  margin-top: 10px !important;
+}
+.footer-email i {
+  font-size: 0.42em !important;
+}
+
+/* The role now sits above the email as a small eyebrow. */
+.footer-v249 .footer-signature .footer-role,
+.footer-signature .footer-role {
+  font-size: clamp(12px, 1.3vw, 14px) !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  opacity: .6 !important;
+}
+
+@media (max-width: 760px) {
+  .footer-v249 .footer-signature .footer-email,
+  .footer-signature .footer-email,
+  .footer-email {
+    font-size: clamp(21px, 6.4vw, 34px) !important;
+    gap: 10px !important;
+  }
+}
