@@ -1370,8 +1370,14 @@ body.menu-revealed .bq-page-stage {
   border-bottom-width: calc(var(--bq-frame-gap) + env(safe-area-inset-bottom, 0px)) !important;
   border-left-width: calc(var(--bq-frame-gap) + env(safe-area-inset-left, 0px)) !important;
   border-radius: calc(var(--bq-frame-r) + var(--bq-frame-gap)) !important;
-  /* Hairline sits just inside the bed, following the inner radius. */
-  box-shadow: inset 0 0 0 1px var(--bq-frame-line) !important;
+  /* Hairline sits just inside the bed, following the inner radius. The second
+     shadow fills the four screen corners: the border box is the viewport and
+     its outer edge is rounded, so without it the paper background of <body>
+     showed through as four pale wedges on the bed. The spread only has to
+     cover the corner arc, so it stays small and cheap to paint. */
+  box-shadow:
+    inset 0 0 0 1px var(--bq-frame-line),
+    0 0 0 calc(var(--bq-frame-r) + var(--bq-frame-gap)) var(--bq-frame-bed) !important;
   /* Above the reader (100001) and the dashboard (100000): nothing may cross
      the window edge. Harmless, because the frame never takes pointer events. */
   z-index: 2147483000 !important;
