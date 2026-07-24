@@ -132,20 +132,36 @@
     window.addEventListener('focus', bqResumeIfAway);
     window.addEventListener('pageshow', () => setTimeout(bqResumeIfAway, 60));
 
-    /* Belt & braces: some environments (in-app browsers, extensions patching the
-       scroll APIs) swallow 'scroll' events entirely. A tiny rAF watcher reads the
-       REAL scroll position every frame, so the button, rail-progress and hero-snap
-       can never go blind — on any device. */
-    let lastWatchY = -1;
-    (function watchScroll() {
+    /* Some in-app browsers swallow 'scroll' events while their toolbar moves.
+       Sample during short interaction bursts instead of running a permanent
+       requestAnimationFrame loop for the entire lifetime of the page. */
+    let lastWatchY = -1, scrollWatchFrame = 0, scrollWatchUntil = 0;
+    const sampleScroll = (now) => {
       const y = window.scrollY || (document.scrollingElement || document.documentElement).scrollTop || 0;
       if (y !== lastWatchY) {
         lastWatchY = y;
         onScroll();
         if (window.__bqQueueSnap) window.__bqQueueSnap();
       }
-      requestAnimationFrame(watchScroll);
-    })();
+      if (!document.hidden && now < scrollWatchUntil) scrollWatchFrame = requestAnimationFrame(sampleScroll);
+      else scrollWatchFrame = 0;
+    };
+    const watchScrollBriefly = (ms) => {
+      scrollWatchUntil = Math.max(scrollWatchUntil, performance.now() + (ms || 700));
+      if (!scrollWatchFrame && !document.hidden) scrollWatchFrame = requestAnimationFrame(sampleScroll);
+    };
+    window.addEventListener('touchstart', () => watchScrollBriefly(1400), { passive: true });
+    window.addEventListener('pointerdown', () => watchScrollBriefly(900), { passive: true });
+    window.addEventListener('wheel', () => watchScrollBriefly(900), { passive: true });
+    window.addEventListener('scroll', () => watchScrollBriefly(320), { passive: true });
+    window.addEventListener('keydown', (e) => {
+      if (['PageUp', 'PageDown', 'Home', 'End', ' ', 'ArrowUp', 'ArrowDown'].includes(e.key)) watchScrollBriefly(900);
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) watchScrollBriefly(700);
+      else if (scrollWatchFrame) { cancelAnimationFrame(scrollWatchFrame); scrollWatchFrame = 0; }
+    });
+    watchScrollBriefly(700);
 
     /* rAF glide — bulletproof on iOS, where native smooth scrollTo is sometimes
        ignored right after touch momentum. Eases to the target, then hard-sets it. */
@@ -749,8 +765,6 @@
   (function dashboard() {
     const dash = $('#dash');
     if (!dash) return;
-    const KEY = '107502';                   // server PIN (matches Cloudflare DASH_PIN) — always sent to the 2FA call
-    const currentPin = () => { try { return localStorage.getItem('bq_dash_pin') || KEY; } catch (e) { return KEY; } };  // what you type to open (changeable, saved per device)
     const gate = $('#dashGate'), main = $('#dashMain'), view = $('#dashView');
     const hint = $('#dashHint');
     let unlocked = sessionStorage.getItem('bq_dash_ok') === '1';
@@ -858,13 +872,24 @@
       if (mc && act) mc.textContent = DT(act.dataset.dash);
     };
 
+    let twoFAId = null, twoFAPin = '', twoFAClearTimer = 0;
+    const clearTwoFA = () => {
+      twoFAId = null;
+      twoFAPin = '';
+      clearTimeout(twoFAClearTimer);
+      twoFAClearTimer = 0;
+    };
     const openDash = () => {
       dash.classList.add('is-open');
       dash.setAttribute('aria-hidden', 'false');
       localizeChrome();
       if (unlocked) showConsole(); else { dash.classList.remove('is-full'); gate.hidden = false; main.hidden = true; setTimeout(() => $('#dashKey')?.focus(), 200); }
     };
-    const closeDash = () => { dash.classList.remove('is-open'); dash.setAttribute('aria-hidden', 'true'); };
+    const closeDash = () => {
+      clearTwoFA();
+      dash.classList.remove('is-open');
+      dash.setAttribute('aria-hidden', 'true');
+    };
 
     /* triggers: URL hash #studio, or Ctrl/Cmd+Shift+B, or 5 quick clicks on rail logo */
     if (location.hash === '#studio') setTimeout(openDash, 0);   // defer: showConsole is defined later in this IIFE
@@ -882,8 +907,12 @@
     $('#dashClose')?.addEventListener('click', closeDash);
     dash.addEventListener('click', (e) => { if (e.target === dash) closeDash(); });
 
-    let twoFAId = null, twoFAVia = null;
-    const doUnlock = () => { unlocked = true; sessionStorage.setItem('bq_dash_ok', '1'); twoFAId = null; showConsole(); };
+    const doUnlock = () => {
+      unlocked = true;
+      sessionStorage.setItem('bq_dash_ok', '1');
+      clearTwoFA();
+      showConsole();
+    };
     const enter2FA = () => {
       const g = $('#dashGate'); if (!g) return;
       const h = g.querySelector('h3'); if (h) h.textContent = DT('twoTitle');
@@ -897,21 +926,49 @@
       const val = $('#dashKey').value.trim();
       // step 2 — verifying the SMS code
       if (twoFAId) {
-        fetch('/api/2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: KEY, action: 'verify', id: twoFAId, code: val }) })
-          .then(r => r.json()).then(d => { if (d.ok) doUnlock(); else { hint.textContent = DT('twoWrong'); $('#dashKey').value = ''; } })
+        if (!twoFAPin) {
+          clearTwoFA();
+          hint.textContent = DT('wrong');
+          $('#dashKey').value = '';
+          localizeChrome();
+          return;
+        }
+        fetch('/api/2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: twoFAPin, action: 'verify', id: twoFAId, code: val }) })
+          .then(r => r.json()).then(d => {
+            if (d.ok) { doUnlock(); return; }
+            hint.textContent = DT('twoWrong');
+            $('#dashKey').value = '';
+            if (['expired', 'too-many', 'bad-pin', 'not-configured'].includes(d.error)) {
+              clearTwoFA();
+              localizeChrome();
+            }
+          })
           .catch(() => { hint.textContent = DT('twoWrong'); });
         return;
       }
       // step 1 — the access code
-      if (val === currentPin()) {
-        hint.textContent = DT('twoSending');
-        fetch('/api/2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: KEY, action: 'send', recipient: selected2FARecipient() }) })
-          .then(r => r.json()).then(d => { if (d.ok && d.id) { twoFAId = d.id; twoFAVia = d.via || null; enter2FA(); } else { doUnlock(); } })  // not-configured / offline → PIN-only
-          .catch(() => doUnlock());
-      } else {
-        hint.textContent = DT('wrong');
-        $('#dashKey').value = '';
-      }
+      if (!val) { hint.textContent = DT('wrong'); return; }
+      hint.textContent = DT('twoSending');
+      $('#dashKey').value = '';
+      fetch('/api/2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: val, action: 'send', recipient: selected2FARecipient() }) })
+        .then(r => r.json()).then(d => {
+          if (d.ok && d.id) {
+            clearTwoFA();
+            twoFAPin = val; // memory-only, cleared on success, expiry, logout, or close
+            twoFAId = d.id;
+            twoFAClearTimer = setTimeout(() => {
+              clearTwoFA();
+              localizeChrome();
+              hint.textContent = DT('twoWrong');
+              const key = $('#dashKey'); if (key) key.value = '';
+            }, 5 * 60 * 1000);
+            enter2FA();
+            return;
+          }
+          clearTwoFA();
+          hint.textContent = DT(d.error === 'bad-pin' ? 'wrong' : 'twoWrong');
+        })
+        .catch(() => { clearTwoFA(); hint.textContent = DT('twoWrong'); });
     });
 
     const getLeads = () => { try { return JSON.parse(localStorage.getItem('bq_pitches') || '[]'); } catch (e) { return []; } };
@@ -1051,11 +1108,11 @@
       pager.wire(view);
     };
     const SET_I18N = {
-      en:  { twoH:'Two-factor (2FA)', pinH:'Dashboard password (PIN)', pinNote:'The code you type to open this console. The 2FA email code is the real lock — this is just the first step. Saved on this device.', pinNew:'New PIN', pinBtn:'Change PIN', edH:'Editor password', edNote:'The publish key for your works and blog. Connect the editor first (Content tab), then change it here. A strong one is safest.', edNew:'New editor password', edBtn:'Change', edGen:'Strong', min4:'✗ Use at least 4 characters', pinDone:'✓ PIN changed (saved on this device).', edConnect:'✗ Connect the editor first (Content tab)', edDone:'✓ Changed & reconnected.', edWrong:'✗ Current editor password is wrong', edFail:'✗ Failed (works on the live site only)' },
-      ku:  { twoH:'دوو-فاکتۆری (2FA)', pinH:'پاسۆردی داشبۆرد (PIN)', pinNote:'ئەو کۆدەی بۆ کردنەوەی کۆنسۆڵ دەینووسیت. کۆدی ئیمێڵی 2FA پاراستنی ڕاستەقینەیە — ئەمە تەنیا هەنگاوی یەکەمە. لەسەر ئەم ئامێرە هەڵدەگیرێت.', pinNew:'PINـی نوێ', pinBtn:'گۆڕینی PIN', edH:'پاسۆردی ئەدیتەر', edNote:'کلیلی بڵاوکردنی ئیش و بلۆگ. سەرەتا ئەدیتەر ببەستەوە (تابی ناوەڕۆک)، پاشان لێرە بیگۆڕە. بەهێز سەلامەتترە.', edNew:'پاسۆردی ئەدیتەری نوێ', edBtn:'گۆڕین', edGen:'بەهێز', min4:'✗ لانیکەم ٤ پیت', pinDone:'✓ PIN گۆڕدرا (لەسەر ئەم ئامێرە).', edConnect:'✗ سەرەتا ئەدیتەر ببەستەوە (تابی ناوەڕۆک)', edDone:'✓ گۆڕدرا و دووبارە بەستراوەوە.', edWrong:'✗ پاسۆردی ئەدیتەری ئێستا هەڵەیە', edFail:'✗ نەکرا (تەنیا سایتی زیندوو)' },
-      ar:  { twoH:'المصادقة الثنائية (2FA)', pinH:'كلمة مرور اللوحة (PIN)', pinNote:'الرمز الذي تكتبه لفتح هذه اللوحة. رمز 2FA بالبريد هو القفل الحقيقي — هذه مجرد الخطوة الأولى. يُحفظ على هذا الجهاز.', pinNew:'PIN جديد', pinBtn:'تغيير PIN', edH:'كلمة مرور المحرر', edNote:'مفتاح نشر أعمالك ومدوّنتك. اربط المحرر أولاً (تبويب المحتوى) ثم غيّره هنا. الأقوى أأمن.', edNew:'كلمة مرور محرر جديدة', edBtn:'تغيير', edGen:'قوية', min4:'✗ استخدم ٤ أحرف على الأقل', pinDone:'✓ تم تغيير PIN (على هذا الجهاز).', edConnect:'✗ اربط المحرر أولاً (تبويب المحتوى)', edDone:'✓ تم التغيير وإعادة الربط.', edWrong:'✗ كلمة مرور المحرر الحالية خاطئة', edFail:'✗ فشل (الموقع المباشر فقط)' },
-      kmr: { twoH:'Du-faktorî (2FA)', pinH:'Şîfreya panelê (PIN)', pinNote:'Koda ku tu dinivîsî da vê konsolê vekî. Koda 2FA ya e-nameyê kilîta rastîn e — ev tenê gava yekem e. Li vê amûrê tê tomarkirin.', pinNew:'PIN nû', pinBtn:'PIN biguhêre', edH:'Şîfreya edîtorê', edNote:'Mifteya weşandina karên te û blogê. Pêşî edîtorê girêde (tabê Naverok), paşê li vir biguhêre. Ya bihêz ewletir e.', edNew:'Şîfreya edîtorê ya nû', edBtn:'Biguhêre', edGen:'Bihêz', min4:'✗ Bi kêmî 4 tîp', pinDone:'✓ PIN hate guhertin (li vê amûrê).', edConnect:'✗ Pêşî edîtorê girêde (tabê Naverok)', edDone:'✓ Hate guhertin û ji nû ve girêdan.', edWrong:'✗ Şîfreya edîtorê ya niha çewt e', edFail:'✗ Neserketî (tenê malpera zindî)' },
-      fr:  { twoH:'Double authentification (2FA)', pinH:'Mot de passe du tableau (PIN)', pinNote:'Le code que vous saisissez pour ouvrir cette console. Le code 2FA par e-mail est le vrai verrou — ceci n’est que la première étape. Enregistré sur cet appareil.', pinNew:'Nouveau PIN', pinBtn:'Changer le PIN', edH:'Mot de passe éditeur', edNote:'La clé de publication de vos travaux et blog. Connectez d’abord l’éditeur (onglet Contenu), puis changez-la ici. Une forte est plus sûre.', edNew:'Nouveau mot de passe éditeur', edBtn:'Changer', edGen:'Fort', min4:'✗ Au moins 4 caractères', pinDone:'✓ PIN changé (sur cet appareil).', edConnect:'✗ Connectez d’abord l’éditeur (onglet Contenu)', edDone:'✓ Changé et reconnecté.', edWrong:'✗ Mot de passe éditeur actuel incorrect', edFail:'✗ Échec (site en ligne uniquement)' }
+      en:  { twoH:'Two-factor (2FA)', edH:'Editor password', edNote:'The publish key for your works and blog. Connect the editor first (Content tab), then change it here. A strong one is safest.', edNew:'New editor password', edBtn:'Change', edGen:'Strong', min4:'✗ Use at least 4 characters', edConnect:'✗ Connect the editor first (Content tab)', edDone:'✓ Changed & reconnected.', edWrong:'✗ Current editor password is wrong', edFail:'✗ Failed (works on the live site only)' },
+      ku:  { twoH:'دوو-فاکتۆری (2FA)', edH:'پاسۆردی ئەدیتەر', edNote:'کلیلی بڵاوکردنی ئیش و بلۆگ. سەرەتا ئەدیتەر ببەستەوە (تابی ناوەڕۆک)، پاشان لێرە بیگۆڕە. بەهێز سەلامەتترە.', edNew:'پاسۆردی ئەدیتەری نوێ', edBtn:'گۆڕین', edGen:'بەهێز', min4:'✗ لانیکەم ٤ پیت', edConnect:'✗ سەرەتا ئەدیتەر ببەستەوە (تابی ناوەڕۆک)', edDone:'✓ گۆڕدرا و دووبارە بەستراوەوە.', edWrong:'✗ پاسۆردی ئەدیتەری ئێستا هەڵەیە', edFail:'✗ نەکرا (تەنیا سایتی زیندوو)' },
+      ar:  { twoH:'المصادقة الثنائية (2FA)', edH:'كلمة مرور المحرر', edNote:'مفتاح نشر أعمالك ومدوّنتك. اربط المحرر أولاً (تبويب المحتوى) ثم غيّره هنا. الأقوى أأمن.', edNew:'كلمة مرور محرر جديدة', edBtn:'تغيير', edGen:'قوية', min4:'✗ استخدم ٤ أحرف على الأقل', edConnect:'✗ اربط المحرر أولاً (تبويب المحتوى)', edDone:'✓ تم التغيير وإعادة الربط.', edWrong:'✗ كلمة مرور المحرر الحالية خاطئة', edFail:'✗ فشل (الموقع المباشر فقط)' },
+      kmr: { twoH:'Du-faktorî (2FA)', edH:'Şîfreya edîtorê', edNote:'Mifteya weşandina karên te û blogê. Pêşî edîtorê girêde (tabê Naverok), paşê li vir biguhêre. Ya bihêz ewletir e.', edNew:'Şîfreya edîtorê ya nû', edBtn:'Biguhêre', edGen:'Bihêz', min4:'✗ Bi kêmî 4 tîp', edConnect:'✗ Pêşî edîtorê girêde (tabê Naverok)', edDone:'✓ Hate guhertin û ji nû ve girêdan.', edWrong:'✗ Şîfreya edîtorê ya niha çewt e', edFail:'✗ Neserketî (tenê malpera zindî)' },
+      fr:  { twoH:'Double authentification (2FA)', edH:'Mot de passe éditeur', edNote:'La clé de publication de vos travaux et blog. Connectez d’abord l’éditeur (onglet Contenu), puis changez-la ici. Une forte est plus sûre.', edNew:'Nouveau mot de passe éditeur', edBtn:'Changer', edGen:'Fort', min4:'✗ Au moins 4 caractères', edConnect:'✗ Connectez d’abord l’éditeur (onglet Contenu)', edDone:'✓ Changé et reconnecté.', edWrong:'✗ Mot de passe éditeur actuel incorrect', edFail:'✗ Échec (site en ligne uniquement)' }
     };
     const renderSettings = () => {
       const S = SET_I18N[curLang()] || SET_I18N.en;
@@ -1072,13 +1129,6 @@
           <div class="dash-box-h"><i class="fa-solid fa-shield-halved"></i> ${S.twoH}</div>
           <button class="dash-btn" id="gen2fa"><i class="fa-solid fa-shield-halved"></i> ${DT('twoSetupBtn')}</button>
           <div id="twofaOut" hidden></div>
-        </div>
-        <div class="dash-box">
-          <div class="dash-box-h"><i class="fa-solid fa-lock"></i> ${S.pinH}</div>
-          <p class="dash-note mono">${S.pinNote}</p>
-          <label class="dash-field"><span class="mono">${S.pinNew}</span><input id="setNewPin" type="text" autocomplete="off" spellcheck="false"></label>
-          <button class="dash-btn dash-btn--go" id="setPinBtn"><i class="fa-solid fa-lock"></i> ${S.pinBtn}</button>
-          <span class="dash-note mono" id="setPinMsg"></span>
         </div>
         <div class="dash-box">
           <div class="dash-box-h"><i class="fa-solid fa-key"></i> ${S.edH}</div>
@@ -1104,14 +1154,9 @@
           <p class="dash-note mono">${DT('twoSetup2')}</p><a class="dash-note mono" href="${uri}">otpauth://… (${DT('twoSetupLink')})</a>`;
         const c = $('#twoSec'); c.addEventListener('click', () => { try { navigator.clipboard.writeText(sec); c.classList.add('copied'); } catch (e) {} });
       });
-      // ---- Change the dashboard PIN (this device) + the editor (publish) password — you type them, never me ----
+      // The dashboard PIN is server-managed through Cloudflare's DASH_PIN secret.
+      // Only the separate editor publishing password is changeable from this UI.
       const SBset = window.BQ_SUPA || {};
-      $('#setPinBtn')?.addEventListener('click', () => {
-        const m = $('#setPinMsg'); const np = ($('#setNewPin').value || '').trim();
-        if (np.length < 4) { m.textContent = S.min4; return; }
-        try { localStorage.setItem('bq_dash_pin', np); } catch (e) {}
-        m.textContent = S.pinDone; $('#setNewPin').value = '';
-      });
       $('#setTokGen')?.addEventListener('click', () => {
         const A = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
         const r = crypto.getRandomValues(new Uint8Array(22)); let s = 'bqedit_';
@@ -1856,6 +1901,7 @@
     $('#dashLogout')?.addEventListener('click', () => {
       if (!confirm(DT('logoutAsk'))) return;
       unlocked = false;
+      clearTwoFA();
       try { sessionStorage.removeItem('bq_dash_ok'); } catch (e) {}
       dash.classList.remove('is-full'); main.hidden = true; gate.hidden = false;
       closeDash();

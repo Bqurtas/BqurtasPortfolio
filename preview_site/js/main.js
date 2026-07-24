@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- ROUTER (room switcher + deep-links) ---------- */
   const rooms = document.querySelectorAll('.room');
   const routeLinks = document.querySelectorAll('[data-route]');
-  const validRooms = ['design','panjamor','blog','work','brandboard','bio','contact'];
+  const validRooms = ['design','blog','bio','contact'];
 
   let triggerReveals = () => {};
   let moveUnderline  = () => {};
@@ -186,6 +186,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const showRoom = (id, push) => {
     rooms.forEach(r => r.classList.toggle('is-hidden', r.id !== id));
+    rooms.forEach(r => {
+      const title = r.querySelector('.room-hero-title');
+      if (!title) return;
+      if (r.id === id) {
+        title.setAttribute('role', 'heading');
+        title.setAttribute('aria-level', '1');
+      } else {
+        title.removeAttribute('role');
+        title.removeAttribute('aria-level');
+      }
+    });
     document.querySelectorAll('.rail-link, .mobile-link, .mm-link').forEach(l => {
       l.classList.toggle('is-active', l.dataset.route === id);
     });
@@ -687,9 +698,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const setActiveTab = (tab) => {
     if (!tab) return;
-    tabs.forEach(t => { t.classList.remove('is-active'); t.setAttribute('aria-selected', 'false'); });
+    tabs.forEach(t => {
+      t.classList.remove('is-active');
+      t.setAttribute('aria-selected', 'false');
+      t.setAttribute('tabindex', '-1');
+    });
     tab.classList.add('is-active');
     tab.setAttribute('aria-selected', 'true');
+    tab.setAttribute('tabindex', '0');
+    if (gridEl) gridEl.setAttribute('aria-labelledby', tab.id);
     currentFilter = tab.dataset.filter;
     window.__bqRenderGallery(true);
     animateTabHeader();
@@ -729,7 +746,23 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('loadLessBtn')?.addEventListener('click', () => window.__bqShowFewer());
   document.getElementById('loadCollapseBtn')?.addEventListener('click', () => window.__bqCollapseAll());
 
-  tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab, true)));
+  tabs.forEach((tab, index) => {
+    tab.id = tab.id || `portfolio-tab-${tab.dataset.filter || index}`;
+    tab.setAttribute('aria-controls', 'grid');
+    tab.setAttribute('tabindex', tab.classList.contains('is-active') ? '0' : '-1');
+    tab.addEventListener('click', () => activateTab(tab, true));
+    tab.addEventListener('keydown', (event) => {
+      let next = index;
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % tabs.length;
+      else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index - 1 + tabs.length) % tabs.length;
+      else if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = tabs.length - 1;
+      else return;
+      event.preventDefault();
+      tabs[next].focus();
+      activateTab(tabs[next], true);
+    });
+  });
 
   /* The deck re-shuffles on every page load and tab switch — that stays.
      The gallery shows one compact batch (PAGE_SIZE = 24) at a time; the reader
@@ -805,7 +838,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // initial route — restore room AND the Design tab from the URL path/hash
   const { room: startRoomRaw, tab: startTab } = parseRoute();
-  const normalizedStartRoom = startRoomRaw === 'pencemor' ? 'panjamor' : startRoomRaw;
+  const normalizedStartRoom = startRoomRaw;
   const startRoom = validRooms.includes(normalizedStartRoom) ? normalizedStartRoom : 'design';
   showRoom(startRoom);
   if (startRoom === 'design' && startTab) {
@@ -832,6 +865,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const overlay = document.createElement('div');
     overlay.id = 'lbOverlay';
     overlay.className = 'lb-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'Portfolio preview');
     overlay.innerHTML = `
       <div class="lb-img-wrap" id="lbWrap">
         <button class="lb-close" id="lbClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
@@ -844,7 +880,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const wrap      = document.getElementById('lbWrap');
     const lbCaption = document.getElementById('lbCaption');
-    let pool = [], cur = 0, lbMedia = null;
+    let pool = [], cur = 0, lbMedia = null, lastFocus = null;
 
     const getPool = () => Array.from(document.querySelectorAll('#grid .card--photo:not(.is-hidden)'));
 
@@ -858,6 +894,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const show = (idx) => {
       pool = getPool();
+      if (!pool.length) return;
+      if (!overlay.classList.contains('is-open')) lastFocus = document.activeElement;
       cur  = ((idx % pool.length) + pool.length) % pool.length;
       const card = pool[cur];
       const src  = card.dataset.full || '';
@@ -870,6 +908,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lbMedia = document.createElement('video');
         lbMedia.controls = true;
         lbMedia.autoplay  = true;
+        lbMedia.playsInline = true;
         lbMedia.src = src;
       } else {
         lbMedia = document.createElement('img');
@@ -882,12 +921,15 @@ document.addEventListener('DOMContentLoaded', () => {
       lbCaption.textContent = title;
       overlay.classList.add('is-open');
       document.body.style.overflow = 'hidden';
+      requestAnimationFrame(() => document.getElementById('lbClose')?.focus());
     };
 
     const close = () => {
       overlay.classList.remove('is-open');
       document.body.style.overflow = '';
       clearMedia();
+      if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
+      lastFocus = null;
     };
 
     document.getElementById('lbClose').addEventListener('click', close);
@@ -899,6 +941,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.key === 'Escape')     close();
       if (e.key === 'ArrowLeft')  show(cur - 1);
       if (e.key === 'ArrowRight') show(cur + 1);
+      if (e.key === 'Tab') {
+        const focusable = Array.from(overlay.querySelectorAll('button:not([disabled]), video[controls]'));
+        if (!focusable.length) return;
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
     });
 
     document.addEventListener('click', (e) => {
@@ -911,6 +960,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* Allow external callers (e.g. cert gallery) to open lightbox with a custom pool */
     window.__bqOpenLightboxPool = (items, startIdx) => {
+      if (!Array.isArray(items) || !items.length) return;
+      if (!overlay.classList.contains('is-open')) lastFocus = document.activeElement;
       pool = items;
       cur  = ((startIdx % items.length) + items.length) % items.length;
       clearMedia();
@@ -924,6 +975,7 @@ document.addEventListener('DOMContentLoaded', () => {
       lbCaption.textContent = item.title || '';
       overlay.classList.add('is-open');
       document.body.style.overflow = 'hidden';
+      requestAnimationFrame(() => document.getElementById('lbClose')?.focus());
       /* override show for this pool so arrows navigate within it */
       const localShow = (i) => {
         cur = ((i % pool.length) + pool.length) % pool.length;
@@ -1036,21 +1088,6 @@ document.addEventListener('DOMContentLoaded', () => {
         status.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Please enter a valid email address.';
         return;
       }
-      const submissions = JSON.parse(localStorage.getItem('bq_pitches') || '[]');
-      submissions.push({
-        id: Date.now(),
-        name, email, type, message,
-        company: val('#pCompany'),
-        phone:   val('#pPhone'),
-        budget:  val('#pBudget'),
-        timeline:val('#pTimeline'),
-        hear:    val('#pHear'),
-        references: val('#pRefs'),
-        nda:     chk('#pNDA'),
-        at: new Date().toISOString()
-      });
-      try { localStorage.setItem('bq_pitches', JSON.stringify(submissions)); } catch(e){}
-
       // Reliable delivery: paste a free Web3Forms access key (web3forms.com, tied
       // to hello@bqurtas.com) below and every pitch is auto-emailed to you. Until
       // then it falls back to opening a prefilled mail in the visitor's mail app.
@@ -1164,12 +1201,16 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!pill) return;
   // TAP / CLICK toggles on EVERY device — the reliable primary path (works on a
   // phone tap whether or not the browser falsely reports hover capability).
-  pill.addEventListener('click', function (e) { e.stopPropagation(); pill.classList.toggle('is-open'); });
-  document.addEventListener('click', function (e) { if (!pill.contains(e.target)) pill.classList.remove('is-open'); });
+  var setOpen = function (open) {
+    pill.classList.toggle('is-open', open);
+    pill.setAttribute('aria-expanded', String(open));
+  };
+  pill.addEventListener('click', function (e) { e.stopPropagation(); setOpen(!pill.classList.contains('is-open')); });
+  document.addEventListener('click', function (e) { if (!pill.contains(e.target)) setOpen(false); });
   // Desktop bonus: also reveal while the real mouse hovers.
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    pill.addEventListener('mouseenter', function () { pill.classList.add('is-open'); });
-    pill.addEventListener('mouseleave', function () { pill.classList.remove('is-open'); });
+    pill.addEventListener('mouseenter', function () { setOpen(true); });
+    pill.addEventListener('mouseleave', function () { setOpen(false); });
   }
 })();
 

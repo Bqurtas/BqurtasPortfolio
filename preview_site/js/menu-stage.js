@@ -1,7 +1,7 @@
 /* Bqurtas stage menu
    The live page becomes a quiet moving card while the menu is revealed below.
    This file owns menu timing and accessibility; the room router remains in
-   main.v416.min.js. */
+   the built main bundle. */
 (function () {
   'use strict';
 
@@ -254,7 +254,7 @@
       }, true);
     });
 
-    /* main.v416 still contains an obsolete bottom-sheet drag handler. Stop
+    /* the built main bundle still contains an obsolete bottom-sheet drag handler. Stop
        those listener calls without cancelling native scrolling or link taps. */
     var legacySheet = menu.querySelector('.mobile-sheet');
     if (legacySheet) {

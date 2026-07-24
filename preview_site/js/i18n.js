@@ -3,8 +3,8 @@
    Languages: Sorani Kurdish (ku) · Kurmanci (kmr) · Arabic (ar) · English (en) · Français (fr)
    ========================================================= */
 
-window.I18N = {
-  en: {
+window.I18N = window.I18N || {};
+window.I18N.en = Object.assign(window.I18N.en || {}, {
     dir: 'ltr',
     'lang.select': 'Select your language',
     'blog.all': 'All',
@@ -73,9 +73,7 @@ window.I18N = {
     'tab.logo': 'Logo', 'tab.book': 'Book', 'tab.events': 'Events', 'tab.business': 'Business',
     'tab.invoices': 'Invoices', 'tab.image': 'Image', 'tab.video': 'Video', 'tab.other': 'Other',
     'tab.certificate': 'Certificate', 'tab.flex': 'Flex'
-  },
-
-};
+});
 
 /* ===== v416 — local-search landing copy (human-readable + AI-readable) ===== */
 window.BQ_LOCAL_SEO_I18N = {
@@ -130,31 +128,47 @@ window.BQ_LOCAL_SEO_I18N = {
   }
 };
 
-window.__i18nMoreLoaded = false;
+window.__i18nMoreLoaded = Boolean(window.__i18nMoreLoaded);
+window.__i18nMoreCbs = Array.isArray(window.__i18nMoreCbs) ? window.__i18nMoreCbs : [];
 window.__loadI18nMore = function(cb) {
   if (window.__i18nMoreLoaded) { cb && cb(); return; }
   if (window.__i18nMoreLoading) { window.__i18nMoreCbs.push(cb); return; }
   window.__i18nMoreLoading = true; window.__i18nMoreCbs = [cb];
   var sc = document.createElement('script');
-  sc.src = 'js/i18n-more.min.js?v=5'; sc.async = false;
-  sc.onload = function () { window.__i18nMoreLoaded = true; window.__i18nMoreCbs.forEach(function (f) { f && f(); }); window.__i18nMoreCbs = []; };
+  sc.src = 'js/i18n-more.min.js?v=420'; sc.async = false;
+  sc.onload = function () {
+    window.__i18nMoreLoaded = true;
+    window.__i18nMoreLoading = false;
+    var callbacks = window.__i18nMoreCbs.slice();
+    window.__i18nMoreCbs = [];
+    callbacks.forEach(function (f) { f && f(); });
+  };
+  sc.onerror = function () {
+    window.__i18nMoreLoading = false;
+    window.__i18nMoreCbs = [];
+  };
   document.head.appendChild(sc);
 };
 window.applyLang = function(lang) {
-  // the non-English dictionaries live in i18n-more.min.js — load on demand, then re-apply
-  if (lang && lang !== 'en' && !window.I18N[lang] && !window.__i18nMoreLoaded) {
-    // hold the requested language in its OWN binding: the callback below runs
-    // long after `lang` is reassigned to 'en', and a closure over the parameter
-    // would re-apply English instead of the language the visitor asked for.
-    const want = lang;
-    window.__loadI18nMore(function () { window.applyLang(want); });
-    lang = 'en';   // paint English immediately; the real language re-applies once loaded
+  const requestedLang = lang || 'en';
+  let activeLang = requestedLang;
+  let waitingForDictionary = false;
+  // The non-English dictionaries live in i18n-more.min.js — load on demand, then
+  // re-apply. `requestedLang` must stay a SEPARATE binding from `activeLang`:
+  // an earlier version closed over the reassigned parameter, so the callback
+  // re-applied English and every language switch / localized deep link silently
+  // stayed in English. Never collapse these two back into one variable.
+  if (requestedLang !== 'en' && !window.I18N[requestedLang] && !window.__i18nMoreLoaded) {
+    waitingForDictionary = true;
+    window.__loadI18nMore(function () { window.applyLang(requestedLang); });
+    activeLang = 'en';   // paint English immediately; the requested language re-applies once loaded
   }
   // merge over English so any untranslated key gracefully falls back to en
-  const dict = Object.assign({}, window.I18N.en, window.I18N[lang] || window.I18N.en, window.BQ_LOCAL_SEO_I18N[lang] || window.BQ_LOCAL_SEO_I18N.en);
-  document.documentElement.lang = lang;
+  const dict = Object.assign({}, window.I18N.en, window.I18N[activeLang] || window.I18N.en, window.BQ_LOCAL_SEO_I18N[activeLang] || window.BQ_LOCAL_SEO_I18N.en);
+  const documentLang = { ku: 'ckb', kb: 'ku', kmr: 'ku', en: 'en', ar: 'ar', fr: 'fr', sv: 'sv', tr: 'tr' }[activeLang] || activeLang;
+  document.documentElement.lang = documentLang;
   document.documentElement.dir = dict.dir;
-  document.documentElement.dataset.lang = lang;
+  document.documentElement.dataset.lang = activeLang;
 
   /* text content */
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -174,9 +188,11 @@ window.applyLang = function(lang) {
 
   /* expose for dynamic strings + let the app re-localise (tab header, title…) */
   window.BQ_DICT = dict;
-  if (typeof window.__bqOnLang === 'function') { try { window.__bqOnLang(lang, dict); } catch (e) {} }
+  if (typeof window.__bqOnLang === 'function') { try { window.__bqOnLang(activeLang, dict); } catch (e) {} }
 
-  try { localStorage.setItem('bq_lang', lang); } catch(e){}
+  if (!waitingForDictionary) {
+    try { localStorage.setItem('bq_lang', requestedLang); } catch(e){}
+  }
 };
 
 

@@ -1178,3 +1178,121 @@ body.menu-revealed .bq-page-stage {
   justify-content: center !important;
   font-size: clamp(19px, 1.9vw, 24px) !important;
 }
+
+/* =========================================================
+   v30 — release hardening: narrow phones, media previews,
+   language typography, and reduced-motion guarantees.
+   ========================================================= */
+.lb-img-wrap {
+  width: min(92vw, 1200px) !important;
+  height: min(88dvh, 920px) !important;
+  max-width: 92vw !important;
+  max-height: 88dvh !important;
+  padding: 50px 58px 54px !important;
+}
+.lb-img-wrap > img,
+.lb-img-wrap > video {
+  display: block !important;
+  max-width: 100% !important;
+  max-height: calc(88dvh - 104px) !important;
+  object-fit: contain !important;
+  border-radius: 10px !important;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .58) !important;
+}
+.lb-close {
+  top: 8px !important;
+  right: 8px !important;
+}
+.lb-caption {
+  bottom: 15px !important;
+  left: 52px !important;
+  right: 52px !important;
+}
+
+:root[data-lang="ku"] body {
+  font-family: "Noto Naskh Arabic", Manrope, sans-serif;
+}
+:root[data-lang="ku"] .hero-sign,
+:root[data-lang="ku"] .hero-name,
+:root[data-lang="ku"] .local-faq-head h3,
+:root[data-lang="ku"] .local-seo-fact h3,
+:root[data-lang="ku"] .local-seo-title {
+  font-family: "Noto Kufi Arabic", "Noto Naskh Arabic", sans-serif !important;
+  letter-spacing: 0 !important;
+  line-height: 1.35 !important;
+}
+
+@media (max-width: 820px) {
+  .cookie-card,
+  [dir="rtl"] .cookie-card {
+    left: 12px !important;
+    right: 12px !important;
+    bottom: calc(var(--dock-h, 64px) + 26px) !important;
+    width: auto !important;
+    max-width: none !important;
+    transform: translateY(14px) !important;
+  }
+  .cookie-card.is-shown,
+  [dir="rtl"] .cookie-card.is-shown {
+    transform: translateY(0) !important;
+  }
+  .lb-img-wrap {
+    width: calc(100vw - 20px) !important;
+    height: calc(100dvh - 28px) !important;
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100dvh - 28px) !important;
+    padding: 48px 38px 56px !important;
+  }
+  .lb-img-wrap > img,
+  .lb-img-wrap > video {
+    max-height: calc(100dvh - 132px) !important;
+  }
+  .lb-caption {
+    left: 38px !important;
+    right: 38px !important;
+  }
+}
+
+@media (max-width: 374px) {
+  .mobilebar {
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    padding-inline: 10px !important;
+    justify-content: space-between !important;
+    gap: 2px !important;
+  }
+  .mobilebar-social-wrap,
+  #railLatestM {
+    display: none !important;
+  }
+  .mobilebar .mobilebar-btn,
+  .mobilebar .mobilebar-cta {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    flex: 0 0 42px !important;
+  }
+  .section.work .tabs {
+    grid-template-columns: repeat(4, 48px) !important;
+    justify-content: center !important;
+    gap: 10px !important;
+  }
+  .section.work .tabs .tab {
+    width: 48px !important;
+    min-width: 48px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-portrait,
+  .hero-spark,
+  .hero-marquee-track,
+  .hero-scrolldown .mouse-wheel {
+    animation: none !important;
+    transform: none !important;
+  }
+  html {
+    scroll-behavior: auto !important;
+  }
+}

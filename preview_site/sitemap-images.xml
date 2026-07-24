@@ -1111,7 +1111,7 @@
     </image:image>
   </url>
   <url>
-    <loc>https://bqurtas.com/design/business</loc>
+    <loc>https://bqurtas.com/design/stationery</loc>
     <lastmod>2026-07-19</lastmod>
     <image:image>
       <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Businesscard/Bcard1.webp</image:loc>
@@ -1991,10 +1991,6 @@
       <image:title>Photography &amp; Retouching by Barakat Qurtas</image:title>
       <image:caption>Photography &amp; Retouching — Barakat Qurtas, Kurdish graphic designer in Erbil, Kurdistan</image:caption>
     </image:image>
-  </url>
-  <url>
-    <loc>https://bqurtas.com/design/invoices</loc>
-    <lastmod>2026-07-19</lastmod>
     <image:image>
       <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Invoice/Invoice1.webp</image:loc>
       <image:title>Invoice &amp; Stationery Design by Barakat Qurtas</image:title>
@@ -3649,20 +3645,6 @@
       <image:loc>https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/SocialMedia/SMedia9.webp</image:loc>
       <image:title>Social Media Design by Barakat Qurtas</image:title>
       <image:caption>Social Media Design — Barakat Qurtas, Kurdish graphic designer in Erbil, Kurdistan</image:caption>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://bqurtas.com/panjamor</loc>
-    <lastmod>2026-07-19</lastmod>
-    <image:image>
-      <image:loc>https://bqurtas.com/assets/panjamor-logo.webp</image:loc>
-      <image:title>Panjamor Office Studio — Barakat Qurtas</image:title>
-      <image:caption>Barakat Qurtas — Kurdish graphic &amp; motion designer, Erbil (Hewlêr), Kurdistan</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://bqurtas.com/assets/pencemor.webp</image:loc>
-      <image:title>Panjamor fingerprint mark — Barakat Qurtas</image:title>
-      <image:caption>Barakat Qurtas — Kurdish graphic &amp; motion designer, Erbil (Hewlêr), Kurdistan</image:caption>
     </image:image>
   </url>
 </urlset>
