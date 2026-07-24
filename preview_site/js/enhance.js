@@ -1895,6 +1895,15 @@
     const AUTHOR = 'Barakat Qurtas';
     const hl = window.__bqHighlightTitle || ((s) => s);
 
+    /* A post without a cover must not leave src="" / src="undefined" behind:
+       an empty src re-requests the page itself and "undefined" 404s, and both
+       paint a broken-image frame. Drop the attribute and hide the element. */
+    const setCover = (img, src) => {
+      if (!img) return;
+      if (src) { img.src = src; img.hidden = false; }
+      else { img.removeAttribute('src'); img.hidden = true; }
+    };
+
     /* every note. Add more here and pagination grows automatically. */
     const P = (num, tag, date, read, accent, img, title, sub, body) =>
       ({ num, tag, date, read, accent, img: IMG(img), title, sub, body });
@@ -1943,7 +1952,7 @@
       if (els.ghost) els.ghost.textContent = p.num;
       if (p.accent) els.card.style.background = p.accent;
       setTimeout(() => {
-        if (els.img)  els.img.src = q.img;
+        if (els.img)  setCover(els.img, q.img);
         if (els.tag)  els.tag.textContent = q.tag;
         if (els.title) els.title.innerHTML = hl(q.title);
         if (els.sub)  els.sub.textContent = q.sub;
@@ -2114,7 +2123,7 @@
       curPostObj = p;
       curSlug = p.slug || slugify(p.title);
       const q = L(p);
-      if (rd.img) { rd.img.src = q.img; rd.img.alt = q.title; }
+      if (rd.img) { setCover(rd.img, q.img); rd.img.alt = q.title; }
       if (rd.tag) rd.tag.textContent = q.tag;
       if (rd.title) rd.title.innerHTML = q.title;
       if (rd.date) rd.date.textContent = (q.date || '').toUpperCase();

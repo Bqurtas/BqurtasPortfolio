@@ -143,7 +143,11 @@ window.__loadI18nMore = function(cb) {
 window.applyLang = function(lang) {
   // the non-English dictionaries live in i18n-more.min.js — load on demand, then re-apply
   if (lang && lang !== 'en' && !window.I18N[lang] && !window.__i18nMoreLoaded) {
-    window.__loadI18nMore(function () { window.applyLang(lang); });
+    // hold the requested language in its OWN binding: the callback below runs
+    // long after `lang` is reassigned to 'en', and a closure over the parameter
+    // would re-apply English instead of the language the visitor asked for.
+    const want = lang;
+    window.__loadI18nMore(function () { window.applyLang(want); });
     lang = 'en';   // paint English immediately; the real language re-applies once loaded
   }
   // merge over English so any untranslated key gracefully falls back to en

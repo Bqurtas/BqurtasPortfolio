@@ -1111,7 +1111,7 @@
           <div class="index-preview" aria-hidden="true">
             <article class="index-card index-card--blog" id="blogCard">
               <div class="blog-card-cover">
-                <img id="bcImg" src="" alt="" />
+                <img id="bcImg" alt="" />
                 <span class="mono blog-card-tag" id="bcTag">Editorial</span>
               </div>
               <div class="blog-card-body">
@@ -1912,7 +1912,7 @@
             <span class="reader-meta-dot" aria-hidden="true">·</span>
             <span class="mono reader-read" id="rdRead"></span>
           </div>
-          <figure class="reader-cover"><img id="rdImg" src="" alt="" /></figure>
+          <figure class="reader-cover"><img id="rdImg" alt="" /></figure>
           <p class="reader-highlight" id="rdHighlight"></p>
           <div class="reader-text" id="rdText"></div>
 
@@ -1955,7 +1955,7 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script defer src="js/i18n.v416.min.js"></script>
+  <script defer src="js/i18n.v419.min.js"></script>
   <!-- Non-English visitors need the extra dictionaries before first render;
        English (the default + PSI) never loads them, keeping the parse light. -->
   <script>
@@ -1966,7 +1966,7 @@
       var lang=u||saved;
       if(lang && lang!=='en'){
         window.__i18nMoreLoading=true; window.__i18nMoreCbs=window.__i18nMoreCbs||[];
-        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=1'; s.async=false;
+        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=5'; s.async=false;
         s.onload=function(){window.__i18nMoreLoaded=true;(window.__i18nMoreCbs||[]).forEach(function(f){f&&f();});window.__i18nMoreCbs=[];};
         document.head.appendChild(s);
       }
@@ -1993,7 +1993,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.min.js?v=416';
+        s.src = 'js/enhance.min.js?v=419';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
