@@ -897,15 +897,15 @@ body.menu-open .mobilebar {
 :root {
   --bq-frame-gap: clamp(10px, 1.5vw, 22px);
   --bq-frame-r: clamp(20px, 3vw, 44px);
-  /* The bed is no longer black. It is a soft mat one step off the page so the
-     page reads as a single light card sitting on it — no black shape behind. */
-  --bq-frame-bed: #0c0c0d;
-  --bq-frame-line: rgba(255, 255, 255, .05);
+  /* The mat around the page is black, so the light page reads as a single card
+     framed by a dark surround. */
+  --bq-frame-bed: #060607;
+  --bq-frame-line: rgba(255, 255, 255, .14);
 }
 
 :root[data-theme="light"] {
-  --bq-frame-bed: #e5e1da;
-  --bq-frame-line: rgba(0, 0, 0, .06);
+  --bq-frame-bed: #14130f;
+  --bq-frame-line: rgba(255, 255, 255, .22);
 }
 
 /* Overscroll rubber-banding shows the frame bed, not raw page colour. */
@@ -1379,7 +1379,6 @@ body.menu-revealed .bq-page-stage {
      as pale wedges on the mat). The spread only has to cover the corner arc. */
   box-shadow:
     inset 0 0 0 1px var(--bq-frame-line),
-    inset 0 0 24px rgba(0, 0, 0, .045),
     0 0 0 calc(var(--bq-frame-r) + var(--bq-frame-gap)) var(--bq-frame-bed) !important;
   /* Above the reader (100001) and the dashboard (100000) so nothing crosses the
      window edge. A moderate value + its own compositing layer (translateZ) is
@@ -1398,3 +1397,17 @@ body.menu-revealed .bq-page-stage {
    bed + the rounded inner cut. Content is clipped inside it on scroll and the
    four screen corners stay filled (no paper wedge). Nothing else changes.
    ========================================================= */
+
+/* =========================================================
+   v37 — Portfolio rises over a pinned hero.
+
+   The hero stays put while the portfolio card scrolls up and slides over it,
+   instead of both moving together. The work card is already an opaque, rounded
+   card that overlaps the hero's base (negative margin, z-index 6), so pinning
+   the hero is the only missing piece: the card now rises over it cleanly.
+   ========================================================= */
+#design > .hero {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1 !important;               /* under the work card (z 6) so it is covered, not sliced */
+}
