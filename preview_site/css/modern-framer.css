@@ -897,13 +897,15 @@ body.menu-open .mobilebar {
 :root {
   --bq-frame-gap: clamp(10px, 1.5vw, 22px);
   --bq-frame-r: clamp(20px, 3vw, 44px);
-  --bq-frame-bed: #060607;
-  --bq-frame-line: rgba(255, 255, 255, .14);
+  /* The bed is no longer black. It is a soft mat one step off the page so the
+     page reads as a single light card sitting on it — no black shape behind. */
+  --bq-frame-bed: #0c0c0d;
+  --bq-frame-line: rgba(255, 255, 255, .05);
 }
 
 :root[data-theme="light"] {
-  --bq-frame-bed: #14130f;
-  --bq-frame-line: rgba(255, 255, 255, .22);
+  --bq-frame-bed: #e5e1da;
+  --bq-frame-line: rgba(0, 0, 0, .06);
 }
 
 /* Overscroll rubber-banding shows the frame bed, not raw page colour. */
@@ -1370,17 +1372,21 @@ body.menu-revealed .bq-page-stage {
   border-bottom-width: calc(var(--bq-frame-gap) + env(safe-area-inset-bottom, 0px)) !important;
   border-left-width: calc(var(--bq-frame-gap) + env(safe-area-inset-left, 0px)) !important;
   border-radius: calc(var(--bq-frame-r) + var(--bq-frame-gap)) !important;
-  /* Hairline sits just inside the bed, following the inner radius. The second
-     shadow fills the four screen corners: the border box is the viewport and
-     its outer edge is rounded, so without it the paper background of <body>
-     showed through as four pale wedges on the bed. The spread only has to
-     cover the corner arc, so it stays small and cheap to paint. */
+  /* Hairline just inside the mat, following the inner radius; a soft inset
+     vignette lifts the light page off the mat so it reads as one card; and the
+     spread fills the four screen corners (the border box is the viewport and
+     its outer edge is rounded, so without it the page colour would show through
+     as pale wedges on the mat). The spread only has to cover the corner arc. */
   box-shadow:
     inset 0 0 0 1px var(--bq-frame-line),
+    inset 0 0 24px rgba(0, 0, 0, .045),
     0 0 0 calc(var(--bq-frame-r) + var(--bq-frame-gap)) var(--bq-frame-bed) !important;
-  /* Above the reader (100001) and the dashboard (100000): nothing may cross
-     the window edge. Harmless, because the frame never takes pointer events. */
-  z-index: 2147483000 !important;
+  /* Above the reader (100001) and the dashboard (100000) so nothing crosses the
+     window edge. A moderate value + its own compositing layer (translateZ) is
+     what makes Safari actually paint the mat over the scrolling page — with a
+     near-INT_MAX z-index and no layer, Safari let content ride over the frame. */
+  z-index: 2000000 !important;
+  transform: translateZ(0) !important;
   pointer-events: none !important;
 }
 
