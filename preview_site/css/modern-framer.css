@@ -1528,3 +1528,27 @@ body.menu-revealed .bq-page-stage {
     font-size: clamp(26px, 10vw, 60px) !important;
   }
 }
+
+/* =========================================================
+   v41 — Room hover greys, chat + notify panels hug the dock.
+   ========================================================= */
+
+/* Hovering a room now tints it the same graphite grey as the active room,
+   instead of staying the default off-white. */
+#mobileMenu .mm-link:hover .mm-link-text,
+#mobileMenu .mm-link:focus-visible .mm-link-text {
+  color: #b5b5b5 !important;
+}
+
+/* The chat and notification panels used to float with their bottom edge just
+   kissing the dock. They now drop lower so they overlap the pill and read as
+   anchored to it, and the dock is lifted above them (id-specificity beats the
+   class rules that set 84px) so the panels tuck BEHIND the pill instead of
+   covering its buttons. Both panels share the value, so they stay aligned. */
+.rail {
+  z-index: 840 !important;
+}
+#chat,
+#latestPanel {
+  bottom: calc(var(--dock-h, 64px) + 4px) !important;
+}
