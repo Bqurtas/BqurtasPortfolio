@@ -1377,8 +1377,11 @@ body.menu-revealed .bq-page-stage {
      spread fills the four screen corners (the border box is the viewport and
      its outer edge is rounded, so without it the page colour would show through
      as pale wedges on the mat). The spread only has to cover the corner arc. */
+  /* No inner hairline: the light page meets the mat directly, so the black
+     reads as one flat backdrop rather than an outlined frame shape. The spread
+     is the only layer — it fills the four screen corners the rounded outer edge
+     would otherwise leave showing the page colour. */
   box-shadow:
-    inset 0 0 0 1px var(--bq-frame-line),
     0 0 0 calc(var(--bq-frame-r) + var(--bq-frame-gap)) var(--bq-frame-bed) !important;
   /* Above the reader (100001) and the dashboard (100000) so nothing crosses the
      window edge. A moderate value + its own compositing layer (translateZ) is
@@ -1410,4 +1413,31 @@ body.menu-revealed .bq-page-stage {
   position: sticky !important;
   top: 0 !important;
   z-index: 1 !important;               /* under the work card (z 6) so it is covered, not sliced */
+}
+
+/* =========================================================
+   v38 — The dot grid covers the whole page, not just the cards.
+
+   The ambient dots used to live only on the work card and the sheets after it;
+   the hero and the plain canvas were flat paper. The dot grid now sits on the
+   page stage itself (the canvas every room and section rides on) and the hero
+   goes transparent so the canvas shows through it. Sections keep their own
+   matching grid, so the texture is continuous from the very top of the page.
+   ========================================================= */
+.bq-page-stage {
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, .05) 1px, transparent 1.4px) 0 0 / 26px 26px,
+    var(--bg) !important;
+}
+
+:root[data-theme="light"] .bq-page-stage {
+  background:
+    radial-gradient(circle, rgba(0, 0, 0, .05) 1px, transparent 1.4px) 0 0 / 26px 26px,
+    var(--bg) !important;
+}
+
+/* The hero is the pinned backdrop; letting the canvas (with its dots) show
+   through it makes the grid continuous behind the name and portrait too. */
+#design > .hero {
+  background: transparent !important;
 }
