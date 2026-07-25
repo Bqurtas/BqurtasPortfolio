@@ -1441,3 +1441,33 @@ body.menu-revealed .bq-page-stage {
 #design > .hero {
   background: transparent !important;
 }
+
+/* =========================================================
+   v39 — Flat black backdrop, no corner seam.
+
+   The border + border-radius build gave the black a rounded OUTER edge, and
+   the corner-fill spread that squared it left a faint seam at each screen
+   corner — the black read as an outlined shape. This rebuilds the frame as a
+   single rounded window punched out of one flat fill: a rounded-rect pseudo
+   (the window) casts a solid, blur-free shadow outward, so the black is one
+   continuous surface with square screen corners and no internal line. The
+   spread's own outer edge sits off-screen, so nothing of it is ever visible.
+   ========================================================= */
+.bq-frame {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.bq-frame::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--bq-frame-gap) + env(safe-area-inset-top, 0px));
+  right: calc(var(--bq-frame-gap) + env(safe-area-inset-right, 0px));
+  bottom: calc(var(--bq-frame-gap) + env(safe-area-inset-bottom, 0px));
+  left: calc(var(--bq-frame-gap) + env(safe-area-inset-left, 0px));
+  border-radius: var(--bq-frame-r);
+  box-shadow: 0 0 0 calc(var(--bq-frame-r) + var(--bq-frame-gap) + 60px) var(--bq-frame-bed);
+}
