@@ -1471,3 +1471,60 @@ body.menu-revealed .bq-page-stage {
   border-radius: var(--bq-frame-r);
   box-shadow: 0 0 0 calc(var(--bq-frame-r) + var(--bq-frame-gap) + 60px) var(--bq-frame-bed);
 }
+
+/* =========================================================
+   v40 — Menu foot under the rooms; grey accent; role gone; big email.
+   ========================================================= */
+
+/* Get in touch + the social links sit directly beneath the room list. The nav
+   no longer grows to fill the panel and the foot drops its auto margins, so the
+   two groups pack together and the whole block is centred by the panel's own
+   justify-content — no more stranded foot at the bottom edge. */
+#mobileMenu .mm-nav {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+}
+#mobileMenu .mm-foot {
+  flex: 0 0 auto !important;
+  margin: clamp(26px, 3.4vh, 40px) 0 0 0 !important;
+}
+
+/* The active room is graphite grey, not terracotta. */
+#mobileMenu .mm-link.is-active .mm-link-text,
+#mobileMenu .mm-link[data-route].is-active .mm-link-text {
+  color: #b5b5b5 !important;
+}
+#mobileMenu .mm-link.is-active .mm-link-text::after,
+#mobileMenu .mm-link[data-route].is-active .mm-link-text::after {
+  background: #b5b5b5 !important;
+}
+
+/* Hover never flips to white — it settles on grey. */
+#mobileMenu .mm-touch:hover,
+#mobileMenu .mm-touch:focus-visible {
+  border-color: #b5b5b5 !important;
+  background: #b5b5b5 !important;
+  color: #101011 !important;
+}
+#mobileMenu .mm-socs a:hover,
+#mobileMenu .mm-socs a:focus-visible {
+  color: #c9c9c9 !important;
+}
+
+/* The role line is gone from the footer, so the email is the whole voice —
+   large and filling the width. overflow-wrap keeps the long address from
+   forcing a horizontal scroll on narrow screens. */
+.footer-v249 .footer-signature .footer-email,
+.footer-signature .footer-email,
+.footer-email {
+  font-size: clamp(34px, 9.6vw, 120px) !important;
+  margin-top: 0 !important;
+  width: 100% !important;
+}
+@media (max-width: 760px) {
+  .footer-v249 .footer-signature .footer-email,
+  .footer-signature .footer-email,
+  .footer-email {
+    font-size: clamp(26px, 10vw, 60px) !important;
+  }
+}
