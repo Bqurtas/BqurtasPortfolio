@@ -27,6 +27,13 @@
   <meta name="author" content="Barakat Qurtas" />
   <meta name="application-name" content="Barakat Qurtas" />
   <meta name="apple-mobile-web-app-title" content="Barakat Qurtas" />
+  <!-- PWA: launch full-screen (no browser chrome) once added to the Home Screen.
+       iOS Safari only honours the apple- prefixed flag; mobile-web-app-capable is
+       the modern cross-browser equivalent. Together with site.webmanifest below,
+       the site installs as a standalone app on both iOS and Android. -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta name="geo.region" content="IQ-AR" />
   <meta name="geo.placename" content="Erbil, Kurdistan Region, Iraq" />
@@ -249,7 +256,7 @@
     html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="panjamor"] #panjamor,html.bq-css-timeout[data-room="panjamor"] #panjamor,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="work"] #work,html.bq-css-timeout[data-room="work"] #work,html.bq-css-error[data-room="brandboard"] #brandboard,html.bq-css-timeout[data-room="brandboard"] #brandboard,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
   </style>
   <link data-href="css/style.v417.min.css" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=41">
+  <link rel="stylesheet" href="css/modern-framer.css?v=42">
   <noscript><link rel="stylesheet" href="css/style.v417.min.css"></noscript>
   <script>
     (function () {

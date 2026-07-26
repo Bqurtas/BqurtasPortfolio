@@ -1552,3 +1552,20 @@ body.menu-revealed .bq-page-stage {
 #latestPanel {
   bottom: calc(var(--dock-h, 64px) + 4px) !important;
 }
+
+/* Mobile portfolio filters were a TRANSPARENT sticky bar (only the chips had a
+   background). As the gallery scrolled, the big "All Work" title, the ghost
+   "691" and the artwork showed straight THROUGH the gaps and the 60%-opaque
+   chips — so the pinned tabs read as sitting *behind* the images instead of on
+   top of them. Give the sticky bar its own frosted-glass band (matching the
+   chips' liquid-glass look) so it cleanly covers whatever scrolls under it and
+   the filters stay clearly above the work. */
+@media (max-width:820px){
+  .section.work > .tabs-wrap{
+    background:color-mix(in srgb, var(--bg) 84%, transparent) !important;
+    -webkit-backdrop-filter:blur(20px) saturate(1.6) !important;
+    backdrop-filter:blur(20px) saturate(1.6) !important;
+    padding:10px 0 8px !important;
+    box-shadow:0 10px 22px -20px rgba(0,0,0,.45) !important;
+  }
+}
