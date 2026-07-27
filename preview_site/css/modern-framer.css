@@ -1591,3 +1591,26 @@ body.menu-revealed .bq-page-stage {
     box-shadow:0 10px 22px -20px rgba(0,0,0,.45) !important;
   }
 }
+
+/* ============================================================================
+   Times New Roman house style (pairs with the @font-face remap in fonts.css).
+   - Upright everywhere: italics are dropped so the page reads as one even hand.
+   - Bold is kept only for the headings that anchor the hierarchy; everything
+     else stays Regular.
+   - The brand signature (Liana) is the logo — it keeps its font and stays
+     Regular even when it sits inside a heading.
+   ============================================================================ */
+body, body * { font-style: normal !important; }
+
+h1, h2, h3,
+.section-title, .tab-header-title, .dash-card-n, .dash-side-meta strong {
+  font-weight: 700 !important;
+}
+
+.hero-title, .hero-name, .hero-sign,
+.splash-name, .profile-card-name,
+.rail-logo-name, .mm-logo-name, .mm-logo-name *,
+.mobile-menu-name, .footer-bq, .pencemor-hero-name,
+.bio-phil-sign, .hero-float.is-portrait .hf-title {
+  font-weight: 400 !important;
+}

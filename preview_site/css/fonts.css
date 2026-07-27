@@ -448,3 +448,20 @@
   src: url(/assets/fonts/RrQKbpV-9Dd1b1OAGA6M9PkyDuVBeN2GHV0.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
+/* ============================================================================
+   ONE TYPEFACE — Times New Roman  (2026-07-28)
+   Every Latin face the site uses (Fraunces, Manrope, JetBrains Mono) is remapped
+   here to the platform's Times New Roman, so all existing rules render in one
+   face without editing a single usage. The brand signature (Liana), the Arabic
+   Noto faces and the icon fonts keep their own @font-face untouched. These come
+   AFTER the originals, so for every weight they win and the Google woff2 files
+   stop downloading. Weight < 600 → Regular, ≥ 600 → Bold. Where Times New Roman
+   is not installed it falls back to the platform serif.
+   ============================================================================ */
+@font-face { font-family:'Fraunces';        src: local('Times New Roman'), local('TimesNewRomanPSMT');            font-weight: 1 599;   font-style: normal; font-display: swap; }
+@font-face { font-family:'Fraunces';        src: local('Times New Roman Bold'), local('TimesNewRomanPS-BoldMT');  font-weight: 600 1000; font-style: normal; font-display: swap; }
+@font-face { font-family:'Manrope';         src: local('Times New Roman'), local('TimesNewRomanPSMT');            font-weight: 1 599;   font-style: normal; font-display: swap; }
+@font-face { font-family:'Manrope';         src: local('Times New Roman Bold'), local('TimesNewRomanPS-BoldMT');  font-weight: 600 1000; font-style: normal; font-display: swap; }
+@font-face { font-family:'JetBrains Mono';  src: local('Times New Roman'), local('TimesNewRomanPSMT');            font-weight: 1 599;   font-style: normal; font-display: swap; }
+@font-face { font-family:'JetBrains Mono';  src: local('Times New Roman Bold'), local('TimesNewRomanPS-BoldMT');  font-weight: 600 1000; font-style: normal; font-display: swap; }
