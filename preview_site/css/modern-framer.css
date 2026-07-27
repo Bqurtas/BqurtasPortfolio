@@ -1410,17 +1410,31 @@ body.menu-revealed .bq-page-stage {
    the hero is the only missing piece: the card now rises over it cleanly.
    ========================================================= */
 #design > .hero {
-  /* v37 pinned this hero (position: sticky) so the work card rose over a fixed
-     backdrop. But Safari promotes a sticky element to its own compositing layer
-     and then paints it ABOVE the opaque sheets that were meant to cover it — so
-     the portrait + "Barakat Qurtas" signature bled through the work grid and
-     every later section (stats, marquee…) as you scrolled (reported 2026-07-26).
-     No z-index on the covering sheets can win against a composited sticky layer,
-     so the hero no longer pins: it scrolls with the page. The work card still
-     rises over the hero's base through its own negative margin + z-index 6, so
-     the first-screen effect is unchanged, and nothing can leak downward now. */
-  position: relative !important;
-  z-index: 1 !important;               /* under the work card (z 6) so the seam is covered */
+  /* The hero is pinned so the work card (and every sheet after it) rises over it
+     like a card. Safari composites a sticky element onto its own GPU layer and
+     then paints it ABOVE plain, non-composited content — so the portrait +
+     signature bled through the covering sheets on Safari even though their
+     z-index is higher. The fix is NOT to drop the pin (which loses the effect)
+     but to put the covering sheets on their own compositing layer too — see the
+     translateZ rule below — so the GPU honours their z-index and covers it. */
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1 !important;               /* under the work card (z 6) so it is covered, not sliced */
+}
+
+/* Every sheet after the hero must both be opaque (set above) AND live on its own
+   compositing layer, or Safari paints the composited sticky hero on top of it.
+   translateZ(0) promotes each sheet so the compositor orders them by z-index. */
+#design > .section {
+  transform: translateZ(0);
+}
+
+/* Hard guarantee (belt-and-suspenders with the compositing fix above): once the
+   work card has fully covered the hero, hero-pin.js flags it and we hide it.
+   A hidden layer cannot bleed through anything, on any engine. visibility keeps
+   its sticky flow space, so nothing shifts. */
+#design > .hero.is-hero-covered {
+  visibility: hidden !important;
 }
 
 /* =========================================================
