@@ -6,23 +6,31 @@
   <meta name="robots" content="noindex" />
   <title>Page not found — Barakat Qurtas</title>
   <link rel="icon" type="image/webp" href="/assets/logo.webp" />
-  <link rel="stylesheet" href="/css/fonts.css?v=418">
+  <link rel="preload" href="/assets/fonts/Liana.otf" as="font" type="font/otf" crossorigin>
+  <link rel="stylesheet" href="/css/fonts.css?v=420">
   <style>
+    @font-face {
+      font-family: 'Liana';
+      src: url('/assets/fonts/Liana.otf') format('opentype'), url('/assets/fonts/Liana.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       min-height: 100vh; min-height: 100svh; display: flex; align-items: center; justify-content: center;
       background: #f4f3f0; color: #232220; text-align: center; padding: 24px;
-      font-family: 'JetBrains Mono', monospace; -webkit-font-smoothing: antialiased;
+      font-family: 'Noto Kufi Arabic', sans-serif; -webkit-font-smoothing: antialiased;
     }
     .wrap { max-width: 480px; }
-    .mark { font-family: 'Fraunces', serif; font-style: italic; font-weight: 600; font-size: 30px; display: inline-block; margin-bottom: 40px; letter-spacing: -0.01em; }
+    .mark { font-family: 'Liana', 'Noto Kufi Arabic', sans-serif; font-style: normal; font-weight: 400; font-size: 30px; display: inline-block; margin-bottom: 40px; letter-spacing: -0.01em; }
     .eyebrow { font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: #9a988f; margin-bottom: 14px; }
     .num {
-      font-family: 'Fraunces', serif; font-weight: 500; font-style: italic;
+      font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 500; font-style: normal;
       font-size: clamp(110px, 24vw, 220px); line-height: 0.84; color: #232220; letter-spacing: -0.03em;
     }
     .num span { color: #b8b6b0; }
-    h1 { font-family: 'Fraunces', serif; font-weight: 500; font-size: clamp(22px, 4vw, 28px); margin: 22px 0 12px; letter-spacing: -0.01em; }
+    h1 { font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 500; font-size: clamp(22px, 4vw, 28px); margin: 22px 0 12px; letter-spacing: -0.01em; }
     p { font-size: 12px; letter-spacing: 0.05em; color: #7a7870; line-height: 1.8; margin-bottom: 34px; }
     a {
       display: inline-flex; align-items: center; gap: 12px;

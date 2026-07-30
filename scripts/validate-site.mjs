@@ -31,7 +31,15 @@ for (const file of ['sitemap.xml', 'sitemap-images.xml']) {
   if (!/^<\?xml[\s\S]*<urlset\b[\s\S]*<\/urlset>\s*$/i.test(xml)) failures.push(`${file} is not a complete urlset`);
 }
 
-for (const forbidden of ['107502', 'bq_dash_pin', 'i18n-more.min.js?v=1', 'i18n-more.min.js?v=5', 'i18n-more.min.js?v=418']) {
+for (const forbidden of [
+  '107502',
+  'bq_dash_pin',
+  'i18n-more.min.js?v=1',
+  'i18n-more.min.js?v=5',
+  'i18n-more.min.js?v=418',
+  'js/menu-stage.js',
+  'js/hero-pin.js'
+]) {
   if (html.includes(forbidden)) failures.push(`index.html contains retired token: ${forbidden}`);
 }
 

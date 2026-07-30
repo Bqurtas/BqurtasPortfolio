@@ -131,16 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Mobile language button cycles open the mobile menu
-  const langToggleM = document.getElementById('langToggleM');
-  langToggleM?.addEventListener('click', () => {
-    const m = document.getElementById('mobileMenu');
-    m?.classList.toggle('is-open');
-    const nowOpen = !!m && m.classList.contains('is-open');
-    document.body.classList.toggle('menu-open', nowOpen);   // keep body in sync — it hides .to-top
-    if (nowOpen && window.__bqExclusive) window.__bqExclusive('menu');
-  });
-
   // Initial language: ALWAYS English by default — only a /lang prefix in the
   // URL (a shared localized link) switches it. Switching in-session updates
   // the URL, so a reload keeps the chosen language without defaulting to it.
@@ -208,9 +198,12 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(() => triggerReveals());
     syncURL(push);
     setDocTitle();
-    document.getElementById('mobileMenu')?.classList.remove('is-open');
-    document.body.classList.remove('menu-open');   // body.menu-open force-hides .to-top — if it lingers, the button never comes back
-    document.body.style.overflow = '';
+    if (window.__bqPanels && window.__bqPanels.menu) window.__bqPanels.menu();
+    else {
+      document.getElementById('mobileMenu')?.classList.remove('is-open', 'is-ready', 'is-closing');
+      document.body.classList.remove('menu-open');
+      document.body.style.overflow = '';
+    }
     if (window.__bqToggleCta) window.__bqToggleCta();
     requestAnimationFrame(() => { if (window.__bqOnScroll) window.__bqOnScroll(); });   // refresh the back-to-top button on every room change
   };
@@ -327,52 +320,106 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- MOBILE MENU (full-screen overlay) ---------- */
   const menuBtn = document.getElementById('menuToggle');
+  const railMenuBtn = document.getElementById('railMenu');
   const mobileMenu = document.getElementById('mobileMenu');
-  const setMenu = (open) => {
+  const menuCloseBtn = document.getElementById('mobileMenuClose');
+  const menuTriggers = [menuBtn, railMenuBtn].filter(Boolean);
+  let lastMenuTrigger = null;
+  let menuFrame = 0;
+
+  const syncMenuA11y = (open) => {
+    mobileMenu?.setAttribute('aria-hidden', String(!open));
+    menuTriggers.forEach((trigger) => {
+      trigger.setAttribute('aria-expanded', String(open));
+      trigger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    });
+  };
+
+  const setMenu = (open, trigger) => {
+    if (!mobileMenu) return;
     if (open && window.__bqExclusive) window.__bqExclusive('menu');   // opening the menu closes chat/Latest/popovers
-    mobileMenu?.classList.toggle('is-open', open);
+    cancelAnimationFrame(menuFrame);
+    const wasOpen = mobileMenu.classList.contains('is-open') || mobileMenu.classList.contains('is-ready');
+    if (!open && !wasOpen) {
+      mobileMenu.classList.remove('is-open', 'is-ready', 'is-closing');
+      document.body.classList.remove('menu-open');
+      document.body.style.overflow = '';
+      syncMenuA11y(false);
+      return;
+    }
+    if (open) {
+      lastMenuTrigger = trigger || document.activeElement;
+      mobileMenu.classList.remove('is-closing');
+      mobileMenu.classList.add('is-open');
+      menuFrame = requestAnimationFrame(() => {
+        mobileMenu.classList.add('is-ready');
+        try { menuCloseBtn?.focus({ preventScroll: true }); } catch (e) { menuCloseBtn?.focus(); }
+      });
+    } else {
+      mobileMenu.classList.remove('is-ready', 'is-open');
+      mobileMenu.classList.add('is-closing');
+      window.setTimeout(() => mobileMenu.classList.remove('is-closing'), 220);
+      if (lastMenuTrigger && document.contains(lastMenuTrigger)) {
+        try { lastMenuTrigger.focus({ preventScroll: true }); } catch (e) { lastMenuTrigger.focus(); }
+      }
+      lastMenuTrigger = null;
+    }
     document.body.classList.toggle('menu-open', open);
     document.body.style.overflow = open ? 'hidden' : '';
+    syncMenuA11y(open);
   };
   window.__bqPanels = window.__bqPanels || {};
   window.__bqPanels.menu = () => setMenu(false);
-  menuBtn?.addEventListener('click', () => setMenu(!mobileMenu?.classList.contains('is-open')));
-  document.getElementById('railMenu')?.addEventListener('click', () => setMenu(!mobileMenu?.classList.contains('is-open')));
-  document.getElementById('mobileMenuClose')?.addEventListener('click', () => setMenu(false));
+  menuBtn?.addEventListener('click', (event) => setMenu(!mobileMenu?.classList.contains('is-open'), event.currentTarget));
+  railMenuBtn?.addEventListener('click', (event) => setMenu(!mobileMenu?.classList.contains('is-open'), event.currentTarget));
+  menuCloseBtn?.addEventListener('click', () => setMenu(false));
   mobileMenu?.addEventListener('click', (e) => { if (e.target === mobileMenu) setMenu(false); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+  document.addEventListener('keydown', (e) => {
+    if (!mobileMenu?.classList.contains('is-open')) return;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      setMenu(false);
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    const focusable = Array.from(mobileMenu.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+      .filter((el) => !el.hidden && el.getClientRects().length);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
   mobileMenu?.querySelectorAll('.mm-link, .mm-touch, .mm-logo').forEach((a) => a.addEventListener('click', () => setMenu(false)));
 
   document.querySelector('[data-footer-top]')?.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  /* Drag the sheet (grab the handle / top) downward to dismiss it. */
-  const sheet = mobileMenu?.querySelector('.mobile-sheet');
-  if (sheet) {
-    let startY = null, dy = 0, dragging = false;
-    const onDown = (y) => { if (sheet.scrollTop > 4) return; startY = y; dy = 0; dragging = true; sheet.style.transition = 'none'; };
-    const onMove = (y) => {
-      if (!dragging || startY === null) return;
-      dy = y - startY;
-      if (dy < 0) dy = 0;                       // only downward
-      sheet.style.transform = `translateY(${dy}px)`;
-    };
-    const onUp = () => {
-      if (!dragging) return;
-      dragging = false; startY = null;
-      sheet.style.transition = '';
-      sheet.style.transform = '';
-      if (dy > 90) setMenu(false);              // far enough → close
-    };
-    sheet.addEventListener('touchstart', (e) => onDown(e.touches[0].clientY), { passive: true });
-    sheet.addEventListener('touchmove',  (e) => { onMove(e.touches[0].clientY); }, { passive: true });
-    sheet.addEventListener('touchend', onUp);
-    // pointer (trackpad / mouse) drag too
-    sheet.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'touch') onDown(e.clientY); });
-    window.addEventListener('pointermove', (e) => { if (dragging && e.pointerType !== 'touch') onMove(e.clientY); });
-    window.addEventListener('pointerup', () => { if (dragging) onUp(); });
-  }
+  /* Instagram-style dock response: shrink slightly while moving down, restore
+     immediately on upward intent. One rAF + a deadband keeps the scroll path
+     compositor-only and avoids class thrashing on touch momentum. */
+  let dockLastY = Math.max(0, window.scrollY);
+  let dockTicking = false;
+  const updateDock = () => {
+    const y = Math.max(0, window.scrollY);
+    const delta = y - dockLastY;
+    if (y < 36 || delta < -5) document.body.classList.remove('nav-compact');
+    else if (y > 96 && delta > 5) document.body.classList.add('nav-compact');
+    if (Math.abs(delta) > 5) dockLastY = y;
+    dockTicking = false;
+  };
+  window.addEventListener('scroll', () => {
+    if (dockTicking) return;
+    dockTicking = true;
+    requestAnimationFrame(updateDock);
+  }, { passive: true });
+  window.addEventListener('pageshow', updateDock);
 
   /* ---------- MOBILE BOTTOM-BAR POPUPS (language · socials) ----------
      Every floating panel (chat · Latest · menu · these popovers) is EXCLUSIVE:

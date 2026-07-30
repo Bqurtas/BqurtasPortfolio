@@ -238,6 +238,7 @@
 
   <link rel="preload" href="assets/portrait.webp?v=2" as="image" fetchpriority="high">
   <link rel="preload" href="assets/fonts/Liana.otf" as="font" type="font/otf" crossorigin fetchpriority="high">
+  <link rel="preload" href="assets/fonts/CSRk4ydQnPyaDxEXLFF6LZVLKrodrOMFFg.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Critical mobile + desktop shell/hero CSS is generated from the stable
        cascade. The pending gate keeps every non-critical room/overlay out
@@ -255,8 +256,8 @@
     html.bq-css-error .room,html.bq-css-timeout .room{display:none!important}
     html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="panjamor"] #panjamor,html.bq-css-timeout[data-room="panjamor"] #panjamor,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="work"] #work,html.bq-css-timeout[data-room="work"] #work,html.bq-css-error[data-room="brandboard"] #brandboard,html.bq-css-timeout[data-room="brandboard"] #brandboard,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
   </style>
-  <link data-href="css/style.v417.min.css" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=45">
+  <link rel="preload" as="style" href="css/style.v417.min.css?v=421" data-href="css/style.v417.min.css?v=421" fetchpriority="high" id="bqFullCss">
+  <link rel="stylesheet" href="css/modern-framer.css?v=46">
   <noscript><link rel="stylesheet" href="css/style.v417.min.css"></noscript>
   <script>
     (function () {
@@ -307,21 +308,18 @@
       var scheduleApply = function () {
         if (applied || scheduled) return;
         scheduled = true;
-        /* The homepage has a complete inline shell. Let its first paint and LCP
-           land before parsing the large multi-room stylesheet. Direct routes
-           still receive the full sheet immediately because their room is gated. */
+        /* The homepage has a complete inline shell, while the full sheet starts
+           downloading above as a preload. Promote it immediately after the
+           first paint so the interface is stable before a visitor can scroll. */
         if (root.dataset.initialRoute === 'home') {
-          var afterFirstPaint = function () { setTimeout(apply, 900); };
+          var afterFirstPaint = function () { apply(); };
           if (window.requestAnimationFrame) {
             requestAnimationFrame(function () { requestAnimationFrame(afterFirstPaint); });
           } else {
-            setTimeout(apply, 900);
+            setTimeout(apply, 0);
           }
-          /* Background/inactive tabs throttle rAF, so the callbacks above may
-             never fire and the full sheet would never load (breaking layout and
-             scroll). This timer guarantees apply() runs regardless; the `applied`
-             guard makes the double-call a no-op on foreground loads. */
-          setTimeout(apply, 1400);
+          /* Background tabs throttle rAF; the guard keeps this fallback harmless. */
+          setTimeout(apply, 450);
           return;
         }
         if (window.requestAnimationFrame) {
@@ -353,7 +351,7 @@
       window.__bqApplyFullCss = apply;
     }());
   </script>
-  <link rel="stylesheet" href="css/fonts.css?v=419">
+  <link rel="stylesheet" href="css/fonts.css?v=420">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315"></noscript>
 
@@ -1935,7 +1933,7 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js"></script>
+  <script defer src="js/main.v420.min.js?v=421"></script>
   <script defer src="js/revert-theme.js?v=2"></script>
   <script defer src="js/gallery.v420.min.js"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
@@ -1962,17 +1960,22 @@
           document.documentElement.classList.add('bq-enhanced');
           while (ready.length) { try { ready.shift()(); } catch (e) {} }
         };
+        s.onerror = function () {
+          loading = false;
+          ready.length = 0;
+          document.documentElement.classList.add('bq-enhance-error');
+          s.remove();
+        };
         document.body.appendChild(s);
       }
       window.__bqLoadEnhance = loadEnhance;
       var direct = route();
       if (direct !== 'home' && direct !== 'design') loadEnhance();
+      else if ('requestIdleCallback' in window) requestIdleCallback(function () { loadEnhance(); }, { timeout: 3200 });
+      else setTimeout(function () { loadEnhance(); }, 2400);
       if (location.hash === '#studio') loadEnhance();
-      ['pointerover','pointerdown','touchstart','wheel','scroll','keydown'].forEach(function (type) {
-        window.addEventListener(type, function () { loadEnhance(); }, { once: true, passive: type !== 'keydown' });
-      });
       document.addEventListener('click', function (e) {
-        var b = e.target && e.target.closest && e.target.closest('#railLatest, #railLatestM');
+        var b = e.target && e.target.closest && e.target.closest('#railLatest, #railLatestM, #railChat, #railChatM');
         if (!b || loaded) return;
         e.preventDefault(); e.stopImmediatePropagation();
         loadEnhance(function () { b.click(); });
@@ -1981,8 +1984,6 @@
   </script>
   <script defer src="js/lux.min.js?v=358"></script>
   <script defer src="js/motion.min.js?v=403"></script>
-  <script defer src="js/menu-stage.js?v=3"></script>
-  <script defer src="js/hero-pin.js?v=1"></script>
   <!-- The chatbot knowledge base is loaded only when a visitor shows intent. -->
   <script>
     (function () {

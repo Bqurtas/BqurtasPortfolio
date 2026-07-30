@@ -1593,24 +1593,443 @@ body.menu-revealed .bq-page-stage {
 }
 
 /* ============================================================================
-   Times New Roman house style (pairs with the @font-face remap in fonts.css).
-   - Upright everywhere: italics are dropped so the page reads as one even hand.
-   - Bold is kept only for the headings that anchor the hierarchy; everything
-     else stays Regular.
-   - The brand signature (Liana) is the logo — it keeps its font and stays
-     Regular even when it sits inside a heading.
+   v42 — reliability, one type system, and quieter chrome.
+
+   Noto Kufi Arabic carries Latin, extended Latin, Kurdish and Arabic, so one
+   locally-hosted family can now serve every language without a flash between
+   unrelated faces. Font Awesome is excluded and the Liana wordmark remains the
+   one intentional exception.
    ============================================================================ */
-body, body * { font-style: normal !important; }
+body,
+body :where(*:not(i):not([class^="fa-"]):not([class*=" fa-"])) {
+  font-family: "Noto Kufi Arabic", system-ui, sans-serif !important;
+  font-style: normal !important;
+}
 
 h1, h2, h3,
 .section-title, .tab-header-title, .dash-card-n, .dash-side-meta strong {
-  font-weight: 700 !important;
+  font-weight: 600 !important;
 }
 
-.hero-title, .hero-name, .hero-sign,
-.splash-name, .profile-card-name,
-.rail-logo-name, .mm-logo-name, .mm-logo-name *,
-.mobile-menu-name, .footer-bq, .pencemor-hero-name,
-.bio-phil-sign, .hero-float.is-portrait .hf-title {
+:root[lang] .hero-title .hero-name,
+:root[lang] .hero-name,
+:root[lang] .hero-name *,
+:root[lang] .hero-sign,
+:root[lang] .hero-sign *,
+:root[lang] .splash-name,
+:root[lang] .splash-name *,
+:root[lang] .profile-card-name,
+:root[lang] .rail-logo-name,
+:root[lang] .mm-logo-name,
+:root[lang] .mm-logo-name *,
+:root[lang] .mobile-menu-name,
+:root[lang] .footer-bq,
+:root[lang] .pencemor-hero-name,
+:root[lang] .bio-phil-sign,
+:root[lang] .hero-float.is-portrait .hf-title {
+  font-family: Liana, "Noto Kufi Arabic", sans-serif !important;
   font-weight: 400 !important;
+  font-style: normal !important;
+}
+
+/* The full-screen hero used to be a sticky, permanently composited backdrop.
+   That combination could stall Safari and in-app browsers while the large work
+   sheet crossed it. Keep the same curved hand-off, but let both surfaces travel
+   in normal document flow. */
+#design > .hero,
+#design > .hero.is-hero-covered {
+  position: relative !important;
+  top: auto !important;
+  z-index: 0 !important;
+  visibility: visible !important;
+}
+
+#design > .section {
+  transform: none !important;
+}
+
+/* A little more softness in both the outer page window and the work hand-off. */
+:root {
+  --bq-frame-r: clamp(30px, 4.2vw, 62px);
+}
+
+#design > .section.work {
+  border-radius: clamp(40px, 5.4vw, 76px) clamp(40px, 5.4vw, 76px) 0 0 !important;
+}
+
+/* One lightweight menu controller now owns the overlay. The page stays in
+   normal flow underneath it, avoiding the old fixed-stage + MutationObserver
+   feedback loop that could leave scrolling locked. */
+body.menu-open .bq-page-stage,
+body.menu-revealed .bq-page-stage,
+body.menu-closing .bq-page-stage {
+  position: relative !important;
+  inset: auto !important;
+  z-index: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow: visible !important;
+  border-radius: 0 !important;
+  transform: none !important;
+}
+
+body.menu-open .bq-page-stage .main,
+body.menu-revealed .bq-page-stage .main,
+body.menu-closing .bq-page-stage .main {
+  transform: none !important;
+}
+
+#mobileMenu.mobile-menu {
+  z-index: 1500 !important;
+}
+
+#mobileMenu .mobile-sheet {
+  pointer-events: auto !important;
+}
+
+#mobileMenu .mm-left {
+  inset: 0 !important;
+  width: 100% !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+
+#mobileMenu .mobile-menu-close,
+[dir="rtl"] #mobileMenu .mobile-menu-close {
+  position: absolute !important;
+  top: max(18px, env(safe-area-inset-top, 0px)) !important;
+  right: max(18px, env(safe-area-inset-right, 0px)) !important;
+  left: auto !important;
+  transform: scale(.72) !important;
+}
+
+[dir="rtl"] #mobileMenu .mobile-menu-close {
+  right: auto !important;
+  left: max(18px, env(safe-area-inset-left, 0px)) !important;
+}
+
+#mobileMenu.is-ready .mobile-menu-close,
+[dir="rtl"] #mobileMenu.is-ready .mobile-menu-close {
+  transform: scale(1) !important;
+}
+
+#mobileMenu .mobile-menu-close:hover,
+#mobileMenu .mobile-menu-close:focus-visible,
+[dir="rtl"] #mobileMenu .mobile-menu-close:hover,
+[dir="rtl"] #mobileMenu .mobile-menu-close:focus-visible {
+  transform: scale(1.06) rotate(90deg) !important;
+}
+
+/* The dock uses a nearly opaque surface instead of a live blur. This keeps the
+   same glass-like calm while removing a full-width repaint on every scroll. */
+.rail,
+.mobilebar {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  background: color-mix(in srgb, var(--bg) 96%, transparent) !important;
+  transform-origin: center bottom;
+  transition:
+    transform .3s cubic-bezier(.22, 1, .36, 1),
+    opacity .2s ease,
+    background-color .25s ease !important;
+}
+
+@media (min-width: 821px) {
+  .rail {
+    transform: translateX(-50%) scale(1) !important;
+  }
+
+  body.nav-compact:not(.menu-open) .rail {
+    transform: translateX(-50%) scale(.92) !important;
+  }
+}
+
+@media (max-width: 820px) {
+  :root {
+    --bq-frame-r: 32px;
+  }
+
+  #design > .section.work {
+    border-radius: 34px 34px 0 0 !important;
+  }
+
+  .mobilebar {
+    transform: scale(1) translateY(0) !important;
+  }
+
+  body.nav-compact:not(.menu-open) .mobilebar {
+    transform: scale(.92) translateY(2px) !important;
+  }
+
+  /* The filter bar is a real layer above the gallery. The ID selector is
+     deliberate: it beats the generic child z-index that previously let later
+     image cards paint over these controls. */
+  #design > .section.work > .tabs-wrap {
+    position: sticky !important;
+    top: calc(var(--bq-frame-gap) + env(safe-area-inset-top, 0px)) !important;
+    z-index: 120 !important;
+    isolation: isolate;
+    background: var(--bg) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border-bottom: 1px solid var(--line-soft);
+    box-shadow: none !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+  }
+
+  #design .section.work .tabs .tab {
+    background: var(--bg-2) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
+
+  #design .section.work .tabs .tab.is-active {
+    background: var(--ink) !important;
+  }
+}
+
+/* Clean, compact footer: one invitation, one address, one quiet utility row. */
+.footer.footer-v249 {
+  --bg: #0d0d0f;
+  --surface: #17171a;
+  --ink: #f4f3ef;
+  --ink-2: #e0ded8;
+  --ink-soft: #b8b5ad;
+  --ink-muted: #88857f;
+  --line: rgba(244, 243, 239, .16);
+  --line-soft: rgba(244, 243, 239, .09);
+  width: calc(100% - (clamp(12px, 2vw, 28px) * 2)) !important;
+  margin: clamp(18px, 3vw, 36px) clamp(12px, 2vw, 28px) 96px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid var(--line) !important;
+  border-radius: clamp(30px, 4vw, 54px) !important;
+  background: #0d0d0f !important;
+  background-image: none !important;
+  color: var(--ink) !important;
+}
+
+.footer.footer-v249::before {
+  display: none !important;
+  content: none !important;
+}
+
+.footer.footer-v249 .footer-stage {
+  min-height: 0 !important;
+  padding: clamp(44px, 6vw, 82px) clamp(24px, 6vw, 88px) !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: end !important;
+  gap: clamp(28px, 6vw, 86px) !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.footer.footer-v249 .footer-kicker {
+  margin: 0 0 18px !important;
+  color: var(--ink-muted) !important;
+  font-size: 11px !important;
+  letter-spacing: .08em !important;
+  text-transform: none !important;
+}
+
+.footer.footer-v249 .footer-live-dot {
+  width: 7px !important;
+  height: 7px !important;
+  background: #65c884 !important;
+  animation: none !important;
+}
+
+.footer.footer-v249 .footer-cta-title {
+  max-width: 760px !important;
+  margin: 0 !important;
+  color: var(--ink) !important;
+  font-size: clamp(32px, 5vw, 64px) !important;
+  font-weight: 500 !important;
+  line-height: 1.12 !important;
+  letter-spacing: -.035em !important;
+}
+
+.footer.footer-v249 .footer-cta-title em {
+  color: var(--ink-soft) !important;
+}
+
+.footer.footer-v249 .footer-cta-btn {
+  width: auto !important;
+  min-width: 190px !important;
+  aspect-ratio: auto !important;
+  min-height: 48px !important;
+  padding: 12px 18px !important;
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 22px !important;
+  border: 1px solid color-mix(in srgb, var(--ink) 52%, transparent) !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: var(--ink) !important;
+  font-size: 13px !important;
+  transform: none !important;
+}
+
+.footer.footer-v249 .footer-cta-btn i {
+  align-self: auto !important;
+  font-size: 13px !important;
+}
+
+.footer.footer-v249 .footer-cta-btn:hover,
+.footer.footer-v249 .footer-cta-btn:focus-visible {
+  border-color: var(--ink) !important;
+  background: var(--ink) !important;
+  color: var(--bg) !important;
+  transform: none !important;
+}
+
+.footer.footer-v249 .footer-main-v249 {
+  display: block !important;
+  padding: clamp(30px, 4vw, 52px) clamp(24px, 6vw, 88px) !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.footer.footer-v249 .footer-signature {
+  display: block !important;
+  min-width: 0 !important;
+}
+
+.footer.footer-v249 .footer-email {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  border: 0 !important;
+  color: var(--ink) !important;
+  font-size: clamp(22px, 3.4vw, 42px) !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -.025em !important;
+  overflow-wrap: anywhere !important;
+}
+
+.footer.footer-v249 .footer-email i {
+  flex: 0 0 auto;
+  font-size: .48em !important;
+}
+
+.footer.footer-v249 .footer-bottom {
+  padding: 18px clamp(24px, 6vw, 88px) 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  border: 0 !important;
+  color: var(--ink-muted) !important;
+  font-size: 10px !important;
+}
+
+.footer.footer-v249 .footer-top-btn {
+  color: var(--ink-muted) !important;
+}
+
+.footer.footer-v249 .footer-top-btn:hover,
+.footer.footer-v249 .footer-top-btn:focus-visible {
+  color: var(--ink) !important;
+}
+
+@media (max-width: 760px) {
+  .footer.footer-v249 {
+    width: calc(100% - 20px) !important;
+    margin: 18px 10px calc(var(--dock-h, 64px) + 28px) !important;
+    border-radius: 32px !important;
+  }
+
+  .footer.footer-v249 .footer-stage {
+    padding: 38px 22px 34px !important;
+    grid-template-columns: 1fr !important;
+    align-items: start !important;
+    gap: 28px !important;
+  }
+
+  .footer.footer-v249 .footer-cta-title {
+    font-size: clamp(30px, 9vw, 44px) !important;
+    letter-spacing: -.025em !important;
+  }
+
+  .footer.footer-v249 .footer-cta-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .footer.footer-v249 .footer-main-v249 {
+    padding: 28px 22px !important;
+  }
+
+  .footer.footer-v249 .footer-email {
+    font-size: clamp(20px, 6.7vw, 30px) !important;
+  }
+
+  .footer.footer-v249 .footer-bottom {
+    padding: 17px 22px 20px !important;
+    align-items: center !important;
+    flex-direction: row !important;
+    text-align: start !important;
+  }
+
+  .footer.footer-v249 .footer-bottom > * {
+    width: auto !important;
+    justify-content: initial !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.nav-compact .rail {
+    transform: translateX(-50%) scale(1) !important;
+  }
+
+  body.nav-compact .mobilebar {
+    transform: none !important;
+  }
+}
+
+/* Theme-qualified selectors beat the older light-footer compatibility layer. */
+:root[data-theme] .footer.footer-v249 {
+  --bg: #0d0d0f;
+  --surface: #17171a;
+  --ink: #f4f3ef;
+  --ink-2: #e0ded8;
+  --ink-soft: #b8b5ad;
+  --ink-muted: #88857f;
+  --line: rgba(244, 243, 239, .16);
+  --line-soft: rgba(244, 243, 239, .09);
+  color-scheme: dark;
+  background: #0d0d0f !important;
+  background-image: none !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-cta-title,
+:root[data-theme] .footer.footer-v249 .footer-email {
+  color: var(--ink) !important;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-cta-title em {
+  color: var(--ink-soft) !important;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-cta-btn {
+  color: var(--ink) !important;
+  border-color: color-mix(in srgb, var(--ink) 52%, transparent) !important;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-cta-btn:hover,
+:root[data-theme] .footer.footer-v249 .footer-cta-btn:focus-visible {
+  color: var(--bg) !important;
+  background: var(--ink) !important;
+  border-color: var(--ink) !important;
 }
