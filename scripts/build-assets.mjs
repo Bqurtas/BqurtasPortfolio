@@ -5,7 +5,8 @@ const bundles = [
   ['preview_site/js/main.js', 'preview_site/js/main.v420.min.js'],
   ['preview_site/js/gallery.js', 'preview_site/js/gallery.v420.min.js'],
   ['preview_site/js/i18n.js', 'preview_site/js/i18n.v420.min.js'],
-  ['preview_site/js/enhance.js', 'preview_site/js/enhance.v420.min.js']
+  ['preview_site/js/enhance.js', 'preview_site/js/enhance.v420.min.js'],
+  ['preview_site/js/motion.js', 'preview_site/js/motion.min.js']
 ];
 
 for (const [input, output] of bundles) {

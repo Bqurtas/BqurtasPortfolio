@@ -257,7 +257,7 @@
     html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="panjamor"] #panjamor,html.bq-css-timeout[data-room="panjamor"] #panjamor,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="work"] #work,html.bq-css-timeout[data-room="work"] #work,html.bq-css-error[data-room="brandboard"] #brandboard,html.bq-css-timeout[data-room="brandboard"] #brandboard,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
   </style>
   <link rel="preload" as="style" href="css/style.v417.min.css?v=421" data-href="css/style.v417.min.css?v=421" fetchpriority="high" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=46">
+  <link rel="stylesheet" href="css/modern-framer.css?v=47">
   <noscript><link rel="stylesheet" href="css/style.v417.min.css"></noscript>
   <script>
     (function () {
@@ -1707,27 +1707,27 @@
     </section>
 
     <!-- ===== FOOTER ===== -->
-    <footer class="footer footer-v249">
+    <footer class="footer footer-v249" aria-labelledby="footerCtaTitle">
       <div class="footer-stage">
         <div class="footer-stage-copy">
-          <span class="footer-kicker mono"><span class="footer-live-dot"></span><span data-i18n="f.avail">Available for select commissions</span></span>
-          <h3 class="footer-cta-title" data-i18n="f.cta.title">Let's make something <em>quietly</em> good together.</h3>
+          <span class="footer-kicker mono"><span class="footer-live-dot" aria-hidden="true"></span><span data-i18n="f.avail">Available for select commissions</span></span>
+          <h2 class="footer-cta-title" id="footerCtaTitle" data-i18n="f.cta.title">Let's make something <em>quietly</em> good together.</h2>
         </div>
         <a href="/contact" class="footer-cta-btn" data-route="contact">
           <span data-i18n="f.cta.btn">Start a conversation</span>
-          <i class="fa-solid fa-arrow-up-right"></i>
+          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
         </a>
       </div>
 
       <div class="footer-main-v249">
         <div class="footer-signature">
-          <!--email_off--><a class="footer-email" href="mailto:hello@bqurtas.com">hello@bqurtas.com <i class="fa-solid fa-arrow-up-right"></i></a><!--/email_off-->
+          <!--email_off--><a class="footer-email" href="mailto:hello@bqurtas.com">hello@bqurtas.com <i class="fa-solid fa-arrow-up-right" aria-hidden="true"></i></a><!--/email_off-->
         </div>
       </div>
 
       <div class="footer-bottom mono">
         <span>© 2026 <span data-i18n="name.full">Barakat Qurtas</span></span>
-        <button type="button" class="footer-top-btn" data-footer-top><span data-i18n="footer.backtop">Back to top</span><i class="fa-solid fa-arrow-up"></i></button>
+        <button type="button" class="footer-top-btn" data-footer-top><span data-i18n="footer.backtop">Back to top</span><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
       </div>
     </footer>
 
@@ -1933,7 +1933,7 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=421"></script>
+  <script defer src="js/main.v420.min.js?v=423"></script>
   <script defer src="js/revert-theme.js?v=2"></script>
   <script defer src="js/gallery.v420.min.js"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
@@ -1971,11 +1971,22 @@
       window.__bqLoadEnhance = loadEnhance;
       var direct = route();
       if (direct !== 'home' && direct !== 'design') loadEnhance();
-      else if ('requestIdleCallback' in window) requestIdleCallback(function () { loadEnhance(); }, { timeout: 3200 });
-      else setTimeout(function () { loadEnhance(); }, 2400);
       if (location.hash === '#studio') loadEnhance();
+      var intentSelector = [
+        '#railLatest', '#railLatestM', '#railChat', '#railChatM',
+        '[data-route="blog"]', '[data-route="bio"]', '[data-route="contact"]'
+      ].join(',');
+      function intentTarget(e) {
+        return e.target && e.target.closest && e.target.closest(intentSelector);
+      }
+      function warmEnhance(e) {
+        if (!loaded && intentTarget(e)) loadEnhance();
+      }
+      document.addEventListener('pointerover', warmEnhance, { capture: true, passive: true });
+      document.addEventListener('focusin', warmEnhance, true);
+      document.addEventListener('touchstart', warmEnhance, { capture: true, passive: true });
       document.addEventListener('click', function (e) {
-        var b = e.target && e.target.closest && e.target.closest('#railLatest, #railLatestM, #railChat, #railChatM');
+        var b = intentTarget(e);
         if (!b || loaded) return;
         e.preventDefault(); e.stopImmediatePropagation();
         loadEnhance(function () { b.click(); });
@@ -1983,7 +1994,7 @@
     }());
   </script>
   <script defer src="js/lux.min.js?v=358"></script>
-  <script defer src="js/motion.min.js?v=403"></script>
+  <script defer src="js/motion.min.js?v=404"></script>
   <!-- The chatbot knowledge base is loaded only when a visitor shows intent. -->
   <script>
     (function () {

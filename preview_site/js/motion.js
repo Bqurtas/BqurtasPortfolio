@@ -30,7 +30,6 @@
       if (!trigger) return;
       trigger.addEventListener('click', function () { activate(panel); });
       trigger.addEventListener('focus', function () { activate(panel); });
-      if (fine) panel.addEventListener('mouseenter', function () { activate(panel); });
     });
 
     /* ---- software lines keep moving; hover only lowers their speed ---- */
@@ -114,16 +113,6 @@
           card.style.setProperty('--shine-y', '50%');
         });
       });
-
-      /* ---- service-section spotlight ---- */
-      var serviceSection = document.querySelector('.service-showcase');
-      if (serviceSection) {
-        serviceSection.addEventListener('pointermove', function (event) {
-          var rect = serviceSection.getBoundingClientRect();
-          serviceSection.style.setProperty('--spot-x', event.clientX - rect.left + 'px');
-          serviceSection.style.setProperty('--spot-y', event.clientY - rect.top + 'px');
-        });
-      }
 
       /* ---- menu preview follows room focus / hover ---- */
       var menu = document.getElementById('mobileMenu');

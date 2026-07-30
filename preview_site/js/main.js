@@ -255,6 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const designCta = document.getElementById('designCta');
   const toggleCta = () => {
     if (!designCta) return;
+    if (window.innerWidth <= 820) { designCta.classList.remove('is-shown'); return; }
     if (document.body.dataset.room !== 'design') { designCta.classList.remove('is-shown'); return; }
     const work = document.querySelector('.section.work');     // the "01 — Design Room" section
     const note = document.querySelector('.practice-note');
@@ -267,8 +268,16 @@ document.addEventListener('DOMContentLoaded', () => {
     designCta.classList.toggle('is-shown', inDesign && beforeEnd);
   };
   window.__bqToggleCta = toggleCta;
+  let ctaFrame = 0;
+  const queueCta = () => {
+    if (ctaFrame) return;
+    ctaFrame = requestAnimationFrame(() => {
+      ctaFrame = 0;
+      toggleCta();
+    });
+  };
   window.addEventListener('scroll', () => {
-    toggleCta();
+    queueCta();
     if (document.body.dataset.room !== 'design') return;
     clearTimeout(__urlResetT);
     __urlResetT = setTimeout(() => {
@@ -290,6 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (cur !== want) { try { history.replaceState(null, '', path); } catch (e) {} }
     }, 180);
   }, { passive: true });
+  window.addEventListener('resize', queueCta, { passive: true });
 
   routeLinks.forEach(a => {
     a.addEventListener('click', (e) => {
@@ -1285,39 +1295,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 
-/* ---- Hero (dark) — gentle cursor parallax on the portrait + light nav over it ---- */
-(function () {
-  const hero = document.querySelector('.hero');
-  const portrait = document.getElementById('heroPortrait');
-  if (portrait) {
-    setTimeout(() => portrait.classList.add('is-in'), 850);
-    if (window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
-      let raf = 0;
-      window.addEventListener('mousemove', (e) => {
-        if (raf) return;
-        raf = requestAnimationFrame(() => {
-          raf = 0;
-          const mx = (e.clientX / window.innerWidth - 0.5) * 22;
-          const my = (e.clientY / window.innerHeight - 0.5) * 22;
-          portrait.style.setProperty('--mx', mx.toFixed(1) + 'px');
-          portrait.style.setProperty('--my', my.toFixed(1) + 'px');
-        });
-      }, { passive: true });
-    }
-  }
-  if (hero) {
-    const updNav = () => {
-      // hero is a dark island only inside the Design room; light nav while its
-      // bottom is still well within the viewport.
-      const onDesign = (document.body.dataset.room || 'design') === 'design';
-      const r = hero.getBoundingClientRect();
-      document.body.classList.toggle('nav-on-dark', onDesign && r.bottom > 140);
-    };
-    updNav();
-    window.addEventListener('scroll', updNav, { passive: true });
-    window.addEventListener('resize', updNav);
-    window.addEventListener('hashchange', () => setTimeout(updNav, 60));
-    window.addEventListener('popstate', () => setTimeout(updNav, 60));
-    document.addEventListener('click', (e) => { if (e.target.closest('[data-route]')) setTimeout(updNav, 90); });
-  }
-})();
+/* ---- Hero — reliable static portrait, with no scroll-linked style work ---- */
+document.getElementById('heroPortrait')?.classList.add('is-in');
