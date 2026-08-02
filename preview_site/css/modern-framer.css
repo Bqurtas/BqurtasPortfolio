@@ -2614,93 +2614,86 @@ body.menu-closing .bq-page-stage .main {
   letter-spacing: .08em !important;
 }
 
-/* ---- VOXO-inspired closing scene, rebuilt in BQ's black identity ---- */
-:root[data-theme="light"] .footer.footer-v249 {
-  --bq-footer-from: #ffffff;
+/* ---- VOXO closing scene, translated directly into BQ's black identity ----
+   VOXO changes the page colour before the footer reaches the viewport. JS
+   drives these two custom properties from the footer's live scroll position. */
+:root {
+  --bq-footer-progress: 0;
+  --bq-footer-mix: 0%;
 }
 
-:root[data-theme="dark"] .footer.footer-v249 {
-  --bq-footer-from: #101011;
+:root[data-theme="light"] .bq-page-stage {
+  background: color-mix(in srgb, #050506 var(--bq-footer-mix), #fbfbfa) !important;
+}
+
+:root[data-theme="dark"] .bq-page-stage {
+  background: color-mix(in srgb, #050506 var(--bq-footer-mix), #0f0f10) !important;
+}
+
+:root[data-theme="light"] #design > .section.latest-blog {
+  --ink: color-mix(in srgb, #f7f7f4 var(--bq-footer-mix), #0b0b0c);
+  --ink-2: color-mix(in srgb, #e8e8e5 var(--bq-footer-mix), #202022);
+  --ink-soft: color-mix(in srgb, #bdbdb8 var(--bq-footer-mix), #454548);
+  --ink-muted: color-mix(in srgb, #92928d var(--bq-footer-mix), #68686b);
+  --line: color-mix(in srgb, rgba(255, 255, 255, .18) var(--bq-footer-mix), rgba(0, 0, 0, .13));
+  background: color-mix(in srgb, #050506 var(--bq-footer-mix), #ffffff) !important;
+}
+
+:root[data-theme="dark"] #design > .section.latest-blog {
+  background: color-mix(in srgb, #050506 var(--bq-footer-mix), #101011) !important;
+}
+
+body.footer-arriving #design > .section.latest-blog {
+  box-shadow: none !important;
+}
+
+/* VOXO leaves the closing wordmark unobstructed. The BQ dock quietly clears
+   once the footer has taken over, then returns as soon as the user scrolls up. */
+body.footer-entered .rail,
+body.footer-entered .mobilebar {
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 :root[data-theme] .footer.footer-v249 {
-  --bq-footer-black: #070708;
-  --bq-footer-fade: clamp(360px, 38vw, 580px);
   position: relative !important;
   isolation: isolate;
-  min-height: 100svh;
+  min-height: 0 !important;
   overflow: clip !important;
-  background-color: var(--bq-footer-black) !important;
-  background-image:
-    linear-gradient(
-      180deg,
-      var(--bq-footer-from) 0%,
-      color-mix(in srgb, var(--bq-footer-from) 97%, var(--bq-footer-black)) 10%,
-      color-mix(in srgb, var(--bq-footer-from) 90%, var(--bq-footer-black)) 22%,
-      color-mix(in srgb, var(--bq-footer-from) 74%, var(--bq-footer-black)) 38%,
-      color-mix(in srgb, var(--bq-footer-from) 52%, var(--bq-footer-black)) 55%,
-      color-mix(in srgb, var(--bq-footer-from) 30%, var(--bq-footer-black)) 70%,
-      color-mix(in srgb, var(--bq-footer-from) 12%, var(--bq-footer-black)) 86%,
-      var(--bq-footer-black) 100%
-    ) !important;
-  background-size: 100% var(--bq-footer-fade) !important;
-  background-repeat: no-repeat !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: #f7f7f4 !important;
+  background: #050506 !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="light"] .footer.footer-v249 {
+  background: color-mix(in srgb, #050506 var(--bq-footer-mix), #fbfbfa) !important;
+}
+
+:root[data-theme="dark"] .footer.footer-v249 {
+  background: color-mix(in srgb, #050506 var(--bq-footer-mix), #0f0f10) !important;
 }
 
 :root[data-theme] .footer.footer-v249::before {
-  content: "" !important;
-  display: block !important;
-  position: absolute;
-  inset: 0 0 auto;
-  z-index: 0;
-  height: calc(var(--bq-footer-fade) + 220px);
-  pointer-events: none;
-  background:
-    radial-gradient(70% 52% at 50% 58%, rgba(255, 255, 255, .075), transparent 68%);
-}
-
-:root[data-theme] .footer.footer-v249 > * {
-  position: relative;
-  z-index: 1;
+  display: none !important;
 }
 
 :root[data-theme] .footer.footer-v249 .footer-stage {
-  width: min(1440px, 100%) !important;
-  padding:
-    calc(var(--bq-footer-fade) + clamp(40px, 5vw, 74px))
-    clamp(28px, 5vw, 76px)
-    clamp(72px, 9vw, 132px) !important;
-  border: 0 !important;
-}
-
-:root[data-theme] .footer.footer-v249 .footer-kicker {
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  text-transform: uppercase;
-  letter-spacing: .12em !important;
-}
-
-:root[data-theme] .footer.footer-v249 .footer-cta-title {
-  max-width: 980px !important;
-  font-size: clamp(44px, 7.2vw, 104px) !important;
-  font-weight: 620 !important;
-  line-height: .98 !important;
-  letter-spacing: -.055em !important;
-}
-
-:root[data-theme] .footer.footer-v249 .footer-cta-btn {
-  min-width: 228px !important;
-  min-height: 58px !important;
-  border-radius: 999px !important;
+  display: none !important;
 }
 
 :root[data-theme] .footer.footer-v249 .footer-main-v249.footer-contact-grid {
-  width: min(1440px, 100%) !important;
+  width: 100% !important;
+  max-width: none !important;
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: clamp(54px, 7vw, 104px) clamp(72px, 10vw, 170px) !important;
-  padding: clamp(60px, 8vw, 118px) clamp(28px, 5vw, 76px) clamp(84px, 10vw, 148px) !important;
+  gap: clamp(54px, 7.5vh, 66px) clamp(110px, 12vw, 190px) !important;
+  margin: 0 !important;
+  padding:
+    clamp(200px, 30vh, 220px)
+    clamp(40px, 4.7vw, 72px)
+    clamp(112px, 17vh, 132px) !important;
   border: 0 !important;
 }
 
@@ -2709,24 +2702,24 @@ body.menu-closing .bq-page-stage .main {
   min-width: 0;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
+  gap: 8px;
 }
 
 .footer-contact-label {
-  color: var(--ink-muted) !important;
-  font-size: 10px !important;
-  font-weight: 650 !important;
-  letter-spacing: .14em !important;
+  color: #f7f7f4 !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  letter-spacing: .015em !important;
   text-transform: uppercase;
 }
 
 .footer-contact-value,
 .footer-social-links a {
-  color: var(--ink) !important;
-  font-size: clamp(20px, 2.4vw, 36px) !important;
-  font-weight: 450 !important;
-  line-height: 1.2;
-  letter-spacing: -.03em !important;
+  color: #f7f7f4 !important;
+  font-size: clamp(24px, 2.15vw, 31px) !important;
+  font-weight: 400 !important;
+  line-height: 1.16;
+  letter-spacing: -.035em !important;
 }
 
 .footer-contact-value[href],
@@ -2759,27 +2752,23 @@ body.menu-closing .bq-page-stage .main {
 .footer-social-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px clamp(18px, 2.2vw, 34px);
+  gap: 8px clamp(18px, 2vw, 30px);
 }
 
 .footer-wordmark {
-  width: 100%;
+  width: 113.64%;
   margin: 0;
-  padding: 0 clamp(12px, 2vw, 28px);
-  overflow: hidden;
+  padding: 0 clamp(40px, 4.7vw, 72px) 24px;
+  overflow: visible;
   color: #f7f7f4;
-  font-size: clamp(118px, 22vw, 360px);
+  font-size: clamp(180px, 27.5vw, 410px);
   font-weight: 750 !important;
-  line-height: .72;
-  letter-spacing: -.09em !important;
-  text-align: center;
+  line-height: .74;
+  letter-spacing: -.085em !important;
+  text-align: left;
   white-space: nowrap;
-}
-
-:root[data-theme] .footer.footer-v249 .footer-bottom {
-  width: min(1440px, 100%) !important;
-  padding: 26px clamp(28px, 5vw, 76px) 46px !important;
-  border-top-color: rgba(255, 255, 255, .13) !important;
+  transform: scaleX(.88);
+  transform-origin: left bottom;
 }
 
 /* Existing motion observer now reveals the footer in quiet layers. */
@@ -2825,42 +2814,26 @@ body.menu-closing .bq-page-stage .main {
     font-size: clamp(30px, 10vw, 44px) !important;
   }
 
-  :root[data-theme] .footer.footer-v249 {
-    --bq-footer-fade: clamp(260px, 78vw, 360px);
-  }
-
-  :root[data-theme] .footer.footer-v249 .footer-stage {
-    padding:
-      calc(var(--bq-footer-fade) + 32px)
-      22px
-      72px !important;
-  }
-
-  :root[data-theme] .footer.footer-v249 .footer-cta-title {
-    font-size: clamp(38px, 11vw, 58px) !important;
-    letter-spacing: -.045em !important;
-  }
-
   :root[data-theme] .footer.footer-v249 .footer-main-v249.footer-contact-grid {
     grid-template-columns: minmax(0, 1fr) !important;
-    gap: 44px !important;
-    padding: 56px 22px 86px !important;
+    gap: 38px !important;
+    padding: 82px 24px 52px !important;
   }
 
   .footer-contact-value,
   .footer-social-links a {
-    font-size: clamp(20px, 6.5vw, 28px) !important;
+    font-size: clamp(21px, 5.8vw, 25px) !important;
   }
 
   .footer-wordmark {
-    padding-inline: 10px;
+    width: 100%;
+    margin-top: 6px;
+    padding: 0 22px 16px;
+    overflow: hidden;
     font-size: clamp(54px, 18.5vw, 72px);
     line-height: .82;
     letter-spacing: -.065em !important;
-  }
-
-  :root[data-theme] .footer.footer-v249 .footer-bottom {
-    padding: 24px 22px calc(var(--dock-h, 64px) + 30px) !important;
+    transform: none;
   }
 }
 

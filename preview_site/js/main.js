@@ -1280,3 +1280,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ---- Hero — reliable static portrait, with no scroll-linked style work ---- */
 document.getElementById('heroPortrait')?.classList.add('is-in');
+
+/* =========================================================
+   Footer colour scene — match VOXO's closing behaviour:
+   the page itself turns into the footer colour while the
+   final section is still visible, then the contact block enters.
+   ========================================================= */
+(function footerColourScene() {
+  const footer = document.querySelector('.footer-v249');
+  if (!footer) return;
+
+  const root = document.documentElement;
+  const body = document.body;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let frame = 0;
+
+  const render = () => {
+    frame = 0;
+    const vh = Math.max(window.innerHeight || 0, 1);
+    const top = footer.getBoundingClientRect().top;
+    const start = vh * 1.08;
+    const end = vh * .48;
+    const raw = Math.min(1, Math.max(0, (start - top) / Math.max(start - end, 1)));
+    const eased = raw * raw * (3 - 2 * raw);
+    const progress = reduced.matches ? (raw >= .5 ? 1 : 0) : eased;
+
+    root.style.setProperty('--bq-footer-progress', progress.toFixed(4));
+    root.style.setProperty('--bq-footer-mix', (progress * 100).toFixed(2) + '%');
+    body.classList.toggle('footer-arriving', raw > .001);
+    body.classList.toggle('footer-entered', raw > .72);
+  };
+
+  const queue = () => {
+    if (!frame) frame = requestAnimationFrame(render);
+  };
+
+  window.addEventListener('scroll', queue, { passive: true });
+  window.addEventListener('resize', queue, { passive: true });
+  window.addEventListener('orientationchange', queue, { passive: true });
+  window.addEventListener('pageshow', queue);
+  window.addEventListener('load', queue);
+  reduced.addEventListener?.('change', queue);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) queue(); });
+  document.addEventListener('click', () => setTimeout(queue, 80), { passive: true });
+  window.__bqFooterScene = queue;
+  render();
+  setTimeout(queue, 400);
+})();
