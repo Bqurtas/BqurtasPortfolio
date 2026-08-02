@@ -2409,3 +2409,112 @@ body.menu-closing .bq-page-stage .main {
     padding-inline-start: 12px;
   }
 }
+
+/* ============================================================================
+   v44 — pinned opening scene, quieter card deck, and number-free presentation.
+
+   The hero is the fixed visual backdrop for the Design room. The catalogue
+   remains in normal document flow and rises over it; every following section
+   then overlaps the completed card before it. This gives the editorial stack
+   without making tall content sticky or trapping any part of a section.
+   ============================================================================ */
+:root {
+  --bq-frame-r: clamp(20px, 2.6vw, 38px);
+  --bq-deck-radius: clamp(26px, 3.25vw, 46px);
+  --bq-deck-overlap: clamp(46px, 5vw, 76px);
+}
+
+#design > .hero,
+#design > .hero.is-hero-covered {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 0 !important;
+  visibility: visible !important;
+}
+
+/* Opaque cards own the foreground while the hero stays still behind them. */
+#design > .section.section {
+  position: relative !important;
+  background-clip: padding-box !important;
+  box-shadow:
+    0 -26px 68px -48px rgba(0, 0, 0, .72),
+    inset 0 1px 0 color-mix(in srgb, #fff 36%, transparent) !important;
+}
+
+/* The homepage reads as an unnumbered body of work. Descriptive labels stay;
+   catalogue totals, ordinal labels and decorative numeral ghosts do not. */
+.rail-tip-num,
+.rail-card-n,
+.rail-card-count,
+.tab-card-n,
+.tab-card-count,
+.mm-cover-no,
+#design .service-index,
+#design .service-panel::after,
+#design .stats,
+#design .tab-header-ghost,
+#design .load-more-info {
+  display: none !important;
+}
+
+/* Keep the category caption, but retire filename-like identifiers such as
+   “Photo 145” and “Design 78”. The full descriptive title remains available
+   to the lightbox and assistive technology. */
+#design #grid .card-caption .card-title {
+  display: none !important;
+}
+
+#design #grid .card-caption {
+  min-height: 30px !important;
+  padding-top: 7px !important;
+}
+
+#design .bio-teaser-grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+#design .bio-teaser-text {
+  width: min(100%, 860px);
+  margin-inline: auto;
+  text-align: center;
+}
+
+#design .bio-teaser-text p {
+  max-width: 680px;
+  margin-inline: auto;
+}
+
+#design .bio-teaser-link {
+  margin-inline: auto;
+}
+
+@media (max-width: 820px) {
+  :root {
+    --bq-frame-r: 22px;
+    --bq-deck-radius: 24px;
+    --bq-deck-overlap: 34px;
+  }
+
+  #design > .section.section {
+    box-shadow:
+      0 -20px 48px -38px rgba(0, 0, 0, .76),
+      inset 0 1px 0 color-mix(in srgb, #fff 32%, transparent) !important;
+  }
+
+  #design .service-showcase .service-trigger {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #design .service-showcase .service-name,
+  #design .service-showcase .service-sub {
+    grid-column: 1 !important;
+  }
+
+  #design .service-showcase .service-name {
+    grid-row: 1 !important;
+  }
+
+  #design .service-showcase .service-sub {
+    grid-row: 2 !important;
+  }
+}

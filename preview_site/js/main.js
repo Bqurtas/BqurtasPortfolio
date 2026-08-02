@@ -490,21 +490,6 @@ document.addEventListener('DOMContentLoaded', () => {
     (window.TAB_META_I18N && window.TAB_META_I18N[currentLang]) ||
     (window.TAB_META_I18N && window.TAB_META_I18N.en) || TAB_META;
 
-  const WORKS_WORD = { en: 'works', ku: 'کار', kmr: 'kar', ar: 'عمل', fr: 'œuvres', tr: 'iş', sv: 'verk' };
-  const fallbackTabTotal = (filter) => {
-    try {
-      const live = window.__bqGalleryCounts && window.__bqGalleryCounts();
-      if (live) return filter === 'all' ? (live.total || 0) : ((live.cats && live.cats[filter]) || 0);
-    } catch (e) {}
-    const collections = window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS;
-    if (!collections) return 0;
-    return Object.entries(collections).reduce((sum, [key, coll]) => {
-      if (!coll || key === 'certificate') return sum;
-      const cat = coll.cat || key;
-      if (filter !== 'all' && cat !== filter) return sum;
-      return sum + ((coll.files && coll.files.length) || coll.count || 0);
-    }, 0);
-  };
   const updateTabHeader = (filter, total) => {
     const tm    = getTabMeta();
     const meta  = tm[filter] || TAB_META[filter] || tm.all;   // ai/stationery may only exist in the base TAB_META
@@ -513,12 +498,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const note  = document.getElementById('tabHeaderNote');
     const ghost = document.getElementById('tabHeaderGhost');
     if (!title) return;
-    const shownTotal = (total == null) ? fallbackTabTotal(filter) : total;
-    const count = shownTotal + ' ' + (WORKS_WORD[currentLang] || WORKS_WORD.en);
     title.textContent = meta.title;
-    if (desc)  desc.textContent  = count;
-    if (note)  note.textContent  = '';
-    if (ghost) ghost.dataset.ghost = shownTotal;
+    if (desc)  desc.textContent  = meta.desc || '';
+    if (note)  note.textContent  = meta.note || '';
+    if (ghost) ghost.dataset.ghost = '';
     title.classList.remove('anim-out');
     title.classList.add('anim-in');
     clearTimeout(updateTabHeader._t);
@@ -550,11 +533,10 @@ document.addEventListener('DOMContentLoaded', () => {
     wrap.setAttribute('aria-hidden', total > 0 ? 'false' : 'true');
     if (fill) fill.style.width = pct + '%';
     const d = window.BQ_DICT || {};
-    const infoT = d['lm.info'] || '{shown} / {total} — {rem} remaining';
-    const loadT = d['lm.load'] || 'Load {n} more';
-    if (info) info.textContent = infoT.replace('{shown}', currentShown).replace('{total}', total).replace('{rem}', remaining);
+    const loadT = d['lm.more'] || 'Load more';
+    if (info) info.textContent = '';
     if (btn)  btn.style.display = remaining > 0 ? 'inline-flex' : 'none';
-    if (btnT) btnT.textContent  = loadT.replace('{n}', Math.min(remaining, PAGE_SIZE));
+    if (btnT) btnT.textContent  = loadT;
     // Show-less / collapse appear once the viewer has loaded past the first batch
     const less = document.getElementById('loadLessBtn');
     const coll = document.getElementById('loadCollapseBtn');

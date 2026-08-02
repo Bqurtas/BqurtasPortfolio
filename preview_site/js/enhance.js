@@ -240,12 +240,10 @@
     const card = document.createElement('div');
     card.className = 'rail-card';
     card.innerHTML = `
-      <span class="rail-card-n" id="rcN"></span>
       <div class="rail-card-body">
         <span class="mono rail-card-tag" id="rcTag"></span>
         <h4 class="rail-card-title" id="rcTitle"></h4>
         <p class="rail-card-desc" id="rcDesc"></p>
-        <span class="mono rail-card-count" id="rcCount"></span>
       </div>
       <i class="fa-solid rail-card-icon" id="rcIcon" aria-hidden="true"></i>`;
     document.body.appendChild(card);
@@ -260,11 +258,9 @@
       clearTimeout(hideT);
       const tr = trFor(route);
       const nm = (window.BQ_DICT && window.BQ_DICT['nav.' + route]) || r.name;
-      $('#rcN', card).textContent = r.n;
       $('#rcTag', card).textContent = (tr && tr.tag) || r.tag;
       $('#rcTitle', card).textContent = nm;
       $('#rcDesc', card).textContent = (tr && tr.desc) || r.desc;
-      $('#rcCount', card).textContent = (tr && tr.count) || r.count;
       $('#rcIcon', card).className = `fa-solid ${r.icon} rail-card-icon`;
       const b = link.getBoundingClientRect();
       card.style.top = Math.max(16, Math.min(b.top + b.height / 2, window.innerHeight - 120)) + 'px';
@@ -395,9 +391,7 @@
       curDisc = item;
       info.imgs.forEach((src, i) => { if (album[i]) album[i].src = src; });
       hfTitle.textContent = discLabel(item.dataset.disc);
-      const albumT = (window.BQ_DICT && window.BQ_DICT['float.album']) || '{n} works · click to open';
-      const count = (typeof info.count === 'function') ? info.count() : info.count;
-      hfSub.textContent = albumT.replace('{n}', count);
+      hfSub.textContent = (window.BQ_DICT && window.BQ_DICT['foot.view']) || 'View section';
       float.classList.remove('is-portrait');
       float.classList.add('is-shown', 'is-album');
     };
@@ -499,29 +493,12 @@
       ai:       { tag: 'AI · Experiments',        desc: 'AI-assisted posters, video, and visual experiments. Coming soon.' },
     };
 
-    /* work counts per category from the live gallery state */
-    const countFor = (f) => {
-      try {
-        const live = window.__bqGalleryCounts && window.__bqGalleryCounts();
-        if (live) return f === 'all' ? (live.total || 0) : ((live.cats && live.cats[f]) || 0);
-      } catch (e) {}
-      const catCount = {};
-      const COLL = (window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS) || {};
-      Object.values(COLL).forEach(c => {
-        const k = c.cat || '';
-        catCount[k] = (catCount[k] || 0) + ((c.files && c.files.length) || c.count || 0);
-      });
-      return f === 'all' ? Object.values(catCount).reduce((a, b) => a + b, 0) : (catCount[f] || 0);
-    };
-
     const card = document.createElement('div');
     card.className = 'tab-card';
     card.innerHTML = `
-      <span class="tab-card-n" id="tcN"></span>
       <span class="mono tab-card-tag" id="tcTag"></span>
       <h4 class="tab-card-title" id="tcTitle"></h4>
-      <p class="tab-card-desc" id="tcDesc"></p>
-      <span class="mono tab-card-count" id="tcCount"></span>`;
+      <p class="tab-card-desc" id="tcDesc"></p>`;
     document.body.appendChild(card);
 
     const tcLang = () => document.documentElement.dataset.lang || 'en';
@@ -533,13 +510,9 @@
       const info = infoFor(f); if (!info) return;
       clearTimeout(hideT);
       const name = (tab.querySelector('.tab-label')?.textContent || f).trim();
-      const count = countFor(f);
-      const worksT = (window.BQ_DICT && window.BQ_DICT['tab.works']) || '{n} works · click to filter';
       $('#tcTag', card).textContent = info.tag;
       $('#tcTitle', card).textContent = name;
       $('#tcDesc', card).textContent = info.desc;
-      $('#tcN', card).textContent = count || '';
-      $('#tcCount', card).innerHTML = `<i class="fa-solid fa-layer-group"></i> ${worksT.replace('{n}', count)}`;
 
       /* the filters are a vertical side menu now, so the card opens BESIDE the tab
          (to its right), vertically centred and clamped to the viewport */
