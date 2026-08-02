@@ -533,10 +533,11 @@ document.addEventListener('DOMContentLoaded', () => {
     wrap.setAttribute('aria-hidden', total > 0 ? 'false' : 'true');
     if (fill) fill.style.width = pct + '%';
     const d = window.BQ_DICT || {};
-    const loadT = d['lm.more'] || 'Load more';
-    if (info) info.textContent = '';
+    const infoT = d['lm.info'] || '{shown} / {total} — {rem} remaining';
+    const loadT = d['lm.load'] || 'Load {n} more';
+    if (info) info.textContent = infoT.replace('{shown}', currentShown).replace('{total}', total).replace('{rem}', remaining);
     if (btn)  btn.style.display = remaining > 0 ? 'inline-flex' : 'none';
-    if (btnT) btnT.textContent  = loadT;
+    if (btnT) btnT.textContent  = loadT.replace('{n}', Math.min(remaining, PAGE_SIZE));
     // Show-less / collapse appear once the viewer has loaded past the first batch
     const less = document.getElementById('loadLessBtn');
     const coll = document.getElementById('loadCollapseBtn');

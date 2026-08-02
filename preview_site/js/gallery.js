@@ -414,15 +414,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const all = [...wLogos, ...wLogos]; // duplicate for seamless loop
     marqueeTrack.innerHTML = all.map(src =>
       `<div class="logo-chip logo-chip--img">
-         <img src="${window.BQ_GALLERY.thumb(src, 180)}" data-full="${src}" alt="" loading="lazy" decoding="async" width="180" height="135" />
+         <img src="${src}" alt="" loading="lazy" decoding="async" width="180" height="135" />
        </div>`
     ).join('');
-    /* resized copy failed → original full file once; only then drop the chip */
+    /* The local thumbnail bundle does not contain WorkWith; use the canonical
+       CDN asset directly so the marquee never starts with a guaranteed 404. */
     marqueeTrack.querySelectorAll('img').forEach(img =>
-      img.addEventListener('error', () => {
-        if (img.dataset.full && img.src !== img.dataset.full) { img.src = img.dataset.full; return; }
-        img.closest('.logo-chip')?.remove();
-      })
+      img.addEventListener('error', () => img.closest('.logo-chip')?.remove())
     );
   }
 
