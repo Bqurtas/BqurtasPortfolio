@@ -1282,6 +1282,48 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('heroPortrait')?.classList.add('is-in');
 
 /* =========================================================
+   FOOTER SHELL — Cloudflare can briefly retain an older HTML
+   shell after deploy while serving the newest JS/CSS assets.
+   Recreate the current footer structure when that happens.
+   ========================================================= */
+(function ensureFooterShell() {
+  const footer = document.querySelector('.footer-v249');
+  if (!footer) return;
+
+  const dict = window.BQ_DICT || {};
+  if (!footer.querySelector('.footer-stage')) {
+    const stage = document.createElement('div');
+    stage.className = 'footer-stage';
+    stage.innerHTML = `
+      <div class="footer-stage-copy">
+        <span class="footer-kicker mono">
+          <span class="footer-live-dot" aria-hidden="true"></span>
+          <span data-i18n="f.avail"></span>
+        </span>
+        <h2 class="footer-cta-title" id="footerCtaTitle" data-i18n="f.cta.title"></h2>
+      </div>
+      <a href="/contact" class="footer-cta-btn" data-route="contact">
+        <span data-i18n="f.cta.btn"></span>
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </a>`;
+    stage.querySelector('[data-i18n="f.avail"]').textContent = dict['f.avail'] || 'Available for select commissions';
+    stage.querySelector('[data-i18n="f.cta.title"]').innerHTML = dict['f.cta.title'] || "Let's make something <em>quietly</em> good together.";
+    stage.querySelector('[data-i18n="f.cta.btn"]').textContent = dict['f.cta.btn'] || 'Start a conversation';
+    footer.prepend(stage);
+  }
+
+  if (!footer.querySelector('.footer-bottom')) {
+    const bottom = document.createElement('div');
+    bottom.className = 'footer-bottom mono';
+    bottom.innerHTML = `© 2026 <span data-i18n="name.full"></span>`;
+    bottom.querySelector('[data-i18n="name.full"]').textContent = dict['name.full'] || 'Barakat Qurtas';
+    footer.append(bottom);
+  }
+
+  footer.setAttribute('aria-labelledby', 'footerCtaTitle');
+})();
+
+/* =========================================================
    Footer colour scene — match VOXO's closing behaviour:
    the page itself turns into the footer colour while the
    final section is still visible, then the contact block enters.
