@@ -1327,3 +1327,45 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   render();
   setTimeout(queue, 400);
 })();
+
+/* =========================================================
+   GLOBAL GO UP — the control belongs to the core interface,
+   so it must not wait for the optional enhancement bundle.
+   ========================================================= */
+(function globalGoUp() {
+  const control = document.getElementById('toTop');
+  if (!control) return;
+
+  const ring = document.getElementById('toTopProg');
+  const circumference = 2 * Math.PI * 20;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (ring) {
+    ring.style.strokeDasharray = String(circumference);
+    ring.style.strokeDashoffset = String(circumference);
+  }
+
+  const update = () => {
+    const doc = document.documentElement;
+    const top = window.scrollY || document.scrollingElement?.scrollTop || 0;
+    const max = Math.max(doc.scrollHeight - doc.clientHeight, 1);
+    const progress = Math.min(Math.max(top / max, 0), 1);
+    control.classList.toggle('is-shown', top > 160);
+    if (ring) ring.style.strokeDashoffset = String(circumference * (1 - progress));
+  };
+
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('touchmove', update, { passive: true });
+  window.addEventListener('resize', update, { passive: true });
+  window.addEventListener('pageshow', update);
+  window.__bqCoreGoUpUpdate = update;
+
+  if (!window.__bqTopClickBound) {
+    control.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: reduced.matches ? 'auto' : 'smooth' });
+    });
+    window.__bqTopClickBound = true;
+  }
+
+  update();
+})();

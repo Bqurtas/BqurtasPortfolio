@@ -257,7 +257,7 @@
     html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="panjamor"] #panjamor,html.bq-css-timeout[data-room="panjamor"] #panjamor,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="work"] #work,html.bq-css-timeout[data-room="work"] #work,html.bq-css-error[data-room="brandboard"] #brandboard,html.bq-css-timeout[data-room="brandboard"] #brandboard,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
   </style>
   <link rel="preload" as="style" href="css/style.v417.min.css?v=421" data-href="css/style.v417.min.css?v=421" fetchpriority="high" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=47">
+  <link rel="stylesheet" href="css/modern-framer.css?v=50">
   <noscript><link rel="stylesheet" href="css/style.v417.min.css"></noscript>
   <script>
     (function () {
@@ -1704,7 +1704,21 @@
     </section>
 
     <!-- ===== FOOTER ===== -->
-    <footer class="footer footer-v249" aria-label="Contact and studio information">
+    <footer class="footer footer-v249" aria-labelledby="footerCtaTitle">
+      <div class="footer-stage">
+        <div class="footer-stage-copy">
+          <span class="footer-kicker mono">
+            <span class="footer-live-dot" aria-hidden="true"></span>
+            <span data-i18n="f.avail">Available for select commissions</span>
+          </span>
+          <h2 class="footer-cta-title" id="footerCtaTitle" data-i18n="f.cta.title">Let's make something <em>quietly</em> good together.</h2>
+        </div>
+        <a href="/contact" class="footer-cta-btn" data-route="contact">
+          <span data-i18n="f.cta.btn">Start a conversation</span>
+          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
+
       <div class="footer-main-v249 footer-contact-grid">
         <div class="footer-contact-item">
           <span class="footer-contact-label mono" data-i18n="qc.call">Call Direct</span>
@@ -1729,6 +1743,10 @@
       </div>
 
       <div class="footer-wordmark" aria-hidden="true">BQURTAS</div>
+
+      <div class="footer-bottom mono">
+        <span>© 2026 <span data-i18n="name.full">Barakat Qurtas</span></span>
+      </div>
     </footer>
 
   </main>
@@ -1933,7 +1951,7 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=423"></script>
+  <script defer src="js/main.v420.min.js?v=426"></script>
   <script defer src="js/revert-theme.js?v=2"></script>
   <script defer src="js/gallery.v420.min.js"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or

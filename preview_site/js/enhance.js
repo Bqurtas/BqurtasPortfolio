@@ -178,7 +178,7 @@
       requestAnimationFrame(step);
     };
 
-    toTop && toTop.addEventListener('click', () => {
+    if (toTop && !window.__bqTopClickBound) toTop.addEventListener('click', () => {
       /* to the ABSOLUTE top in every room. We turn OFF both the CSS scroll-snap
          (so proximity can't stop us short) and CSS scroll-behavior:smooth (so our
          own rAF glide isn't fought), poll until we truly reach 0, then restore. */
@@ -200,6 +200,7 @@
         }
       }, 50);
     });
+    if (toTop) window.__bqTopClickBound = true;
 
     /* Mobile scroll is now PLAIN and free — no hero snapping at all (it caught in
        too many places on touch). Keep a no-op so the rAF watcher / go-to-top that

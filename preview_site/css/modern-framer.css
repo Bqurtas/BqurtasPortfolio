@@ -878,92 +878,6 @@ body.menu-open .mobilebar {
   }
 }
 
-@media (max-width: 820px) and (prefers-reduced-motion: reduce) {
-  #mobileMenu .mobile-menu-close,
-  [dir="rtl"] #mobileMenu .mobile-menu-close {
-    transform: none !important;
-  }
-}
-
-/* =========================================================
-   v25 — Fixed rounded viewport frame
-
-   The whole site sits inside one pinned, rounded window. Content scrolls
-   beneath the frame and is masked at every edge, so the shape holds at the
-   top AND ends rounded at the bottom of the screen. A pure overlay: layout,
-   native scrolling and Lighthouse behaviour stay untouched.
-   ========================================================= */
-
-:root {
-  --bq-frame-gap: clamp(10px, 1.5vw, 22px);
-  --bq-frame-r: clamp(20px, 3vw, 44px);
-  /* The mat around the page is black, so the light page reads as a single card
-     framed by a dark surround. */
-  --bq-frame-bed: #060607;
-  --bq-frame-line: rgba(255, 255, 255, .14);
-}
-
-:root[data-theme="light"] {
-  --bq-frame-bed: #14130f;
-  --bq-frame-line: rgba(255, 255, 255, .22);
-}
-
-/* Overscroll rubber-banding shows the frame bed, not raw page colour. */
-html {
-  background: var(--bq-frame-bed);
-}
-
-.bq-frame {
-  position: fixed;
-  top: calc(var(--bq-frame-gap) + env(safe-area-inset-top, 0px));
-  right: calc(var(--bq-frame-gap) + env(safe-area-inset-right, 0px));
-  bottom: calc(var(--bq-frame-gap) + env(safe-area-inset-bottom, 0px));
-  left: calc(var(--bq-frame-gap) + env(safe-area-inset-left, 0px));
-  /* Above the menu bed (1220) so the rounded frame stays wrapped around the menu
-     too; still below the floating dock (1300). Transparent + pointer-events:none,
-     so it never blocks content or clicks. */
-  z-index: 1250;
-  pointer-events: none;
-  border-radius: var(--bq-frame-r);
-  /* Hairline ring + a bed band that masks the gap and corners. The spread only
-     needs to reach past the viewport edge (the gap is ≤22px), so a small fixed
-     band replaces the old 200vmax fill — that huge shadow forced a full-screen
-     repaint on every scroll frame under the sticky hero and tore the scroll. */
-  box-shadow:
-    0 0 0 1px var(--bq-frame-line),
-    0 0 0 64px var(--bq-frame-bed);
-  transition: opacity .3s ease;
-}
-
-/* The rounded frame stays wrapped around the menu too (it no longer hides on
-   open), matching the framed website. */
-
-/* Floating chrome steps inside the window so it never crosses the frame line. */
-.rail {
-  bottom: calc(var(--bq-frame-gap) + 10px) !important;
-}
-
-.mobilebar {
-  bottom: calc(var(--bq-frame-gap) + 10px + env(safe-area-inset-bottom, 0px)) !important;
-}
-
-.to-top {
-  right: calc(var(--bq-frame-gap) + 16px) !important;
-  bottom: calc(var(--bq-frame-gap) + 16px) !important;
-}
-
-[dir="rtl"] .to-top {
-  right: auto !important;
-  left: calc(var(--bq-frame-gap) + 16px) !important;
-}
-
-/* Lift the back-to-top control clear of the floating dock so the two never
-   overlap (that overlap was the "go up" button's problem). */
-.to-top {
-  bottom: calc(var(--bq-frame-gap) + var(--dock-h, 64px) + 22px) !important;
-  z-index: 720 !important;
-}
-
 /* =========================================================
    v28 — Flat by request: no decorative shadows anywhere.
 
@@ -2647,12 +2561,92 @@ body.footer-arriving #design > .section.latest-blog {
   box-shadow: none !important;
 }
 
+body.footer-arriving #design > .section.latest-blog .latest-blog-head,
+body.footer-arriving #design > .section.latest-blog .latest-blog-grid {
+  opacity: calc(1 - var(--bq-footer-progress)) !important;
+}
+
 /* VOXO leaves the closing wordmark unobstructed. The BQ dock quietly clears
    once the footer has taken over, then returns as soon as the user scrolls up. */
 body.footer-entered .rail,
 body.footer-entered .mobilebar {
   opacity: 0 !important;
   pointer-events: none !important;
+}
+
+body.footer-arriving .bq-frame {
+  opacity: 0 !important;
+}
+
+.footer-fixed-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1400;
+  height: 90px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 28px 60px 0;
+  color: #f7f7f4;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  background: linear-gradient(180deg, #050506 0%, rgba(5, 5, 6, .92) 62%, transparent 100%);
+  transition: opacity .28s ease, visibility .28s ease;
+}
+
+body.footer-entered .footer-fixed-header {
+  opacity: 1;
+  visibility: visible;
+}
+
+.footer-fixed-brand,
+.footer-fixed-menu {
+  pointer-events: auto;
+}
+
+.footer-fixed-brand {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 9px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.footer-fixed-name {
+  font-size: 31px;
+  font-weight: 800;
+  line-height: .88;
+  letter-spacing: -.075em;
+}
+
+.footer-fixed-sub {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: .9;
+  letter-spacing: -.025em;
+}
+
+.footer-fixed-menu {
+  width: 40px;
+  height: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+}
+
+.footer-fixed-menu span {
+  width: 100%;
+  height: 2px;
+  background: currentColor;
 }
 
 :root[data-theme] .footer.footer-v249 {
@@ -2665,6 +2659,7 @@ body.footer-entered .mobilebar {
   color: #f7f7f4 !important;
   background: #050506 !important;
   box-shadow: none !important;
+  padding-bottom: 86px !important;
 }
 
 :root[data-theme="light"] .footer.footer-v249 {
@@ -2691,7 +2686,7 @@ body.footer-entered .mobilebar {
   gap: clamp(54px, 7.5vh, 66px) clamp(110px, 12vw, 190px) !important;
   margin: 0 !important;
   padding:
-    clamp(200px, 30vh, 220px)
+    clamp(118px, 18vh, 140px)
     clamp(40px, 4.7vw, 72px)
     clamp(112px, 17vh, 132px) !important;
   border: 0 !important;
@@ -2820,6 +2815,29 @@ body.footer-entered .mobilebar {
     padding: 82px 24px 52px !important;
   }
 
+  :root[data-theme] .footer.footer-v249 {
+    padding-bottom: 0 !important;
+  }
+
+  .footer-fixed-header {
+    height: 72px;
+    padding: 20px 24px 0;
+  }
+
+  .footer-fixed-name {
+    font-size: 25px;
+  }
+
+  .footer-fixed-sub {
+    font-size: 9px;
+  }
+
+  .footer-fixed-menu {
+    width: 28px;
+    height: 26px;
+    gap: 4px;
+  }
+
   .footer-contact-value,
   .footer-social-links a {
     font-size: clamp(21px, 5.8vw, 25px) !important;
@@ -2843,5 +2861,435 @@ body.footer-entered .mobilebar {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+  }
+}
+
+/* v50 cascade lock — intentionally last so the full-bleed system wins over
+   the archived presentation experiments above it. */
+:root {
+  --bq-deck-gutter: 0px;
+  --bq-deck-overlap: clamp(76px, 8vw, 124px);
+  --bq-deck-radius: clamp(18px, 2vw, 26px);
+}
+
+.bq-frame,
+.footer-fixed-header {
+  display: none !important;
+}
+
+.bq-page-stage,
+:root[data-theme="light"] .bq-page-stage,
+:root[data-theme="dark"] .bq-page-stage {
+  width: 100% !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  box-shadow: none !important;
+}
+
+#design > .hero,
+#design > .hero.is-hero-covered {
+  position: relative !important;
+  top: auto !important;
+  min-height: max(720px, var(--app-vh, 100dvh)) !important;
+  border-radius: 0 !important;
+}
+
+#design > .section.section {
+  width: 100% !important;
+  margin: calc(0px - var(--bq-deck-overlap)) 0 0 !important;
+  padding-bottom: calc(var(--bq-deck-overlap) + clamp(76px, 7vw, 118px)) !important;
+  border: 0 !important;
+  border-radius: var(--bq-deck-radius) var(--bq-deck-radius) 0 0 !important;
+  overflow: clip !important;
+  background-clip: border-box !important;
+  box-shadow: 0 -30px 80px -68px rgba(0, 0, 0, .72) !important;
+}
+
+#design > .section.section::after {
+  display: none !important;
+}
+
+#design > .section.work { z-index: 10 !important; }
+#design > .section.service-showcase { z-index: 20 !important; }
+#design > .section.practice-note { z-index: 30 !important; }
+#design > .section.logos-section { z-index: 40 !important; }
+#design > .section.latest-blog {
+  z-index: 50 !important;
+  margin-bottom: 0 !important;
+  padding-top: clamp(88px, 9vw, 144px) !important;
+}
+
+:root[data-theme="light"] #design > .section.work,
+:root[data-theme="light"] #design > .section.practice-note,
+:root[data-theme="light"] #design > .section.latest-blog {
+  background: #fbfbfa !important;
+}
+
+:root[data-theme="light"] #design > .section.service-showcase,
+:root[data-theme="light"] #design > .section.logos-section {
+  background: #efefec !important;
+}
+
+:root[data-theme="dark"] #design > .section.work,
+:root[data-theme="dark"] #design > .section.practice-note,
+:root[data-theme="dark"] #design > .section.latest-blog {
+  background: #101011 !important;
+}
+
+:root[data-theme="dark"] #design > .section.service-showcase,
+:root[data-theme="dark"] #design > .section.logos-section {
+  background: #18181a !important;
+}
+
+#design .section-title {
+  max-width: 1040px;
+  font-size: clamp(44px, 6.25vw, 96px) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -.055em !important;
+}
+
+#design .stats {
+  gap: 0 !important;
+  border-top: 1px solid var(--line) !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+#design .stat {
+  min-height: 150px;
+  padding: 28px 20px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#design .stat:nth-child(odd) {
+  border-inline-end: 1px solid var(--line) !important;
+}
+
+#design .stat:nth-child(-n + 2) {
+  border-bottom: 1px solid var(--line) !important;
+}
+
+:root[data-theme] .footer.footer-v249,
+:root[data-theme="light"] .footer.footer-v249,
+:root[data-theme="dark"] .footer.footer-v249 {
+  position: relative !important;
+  z-index: 100 !important;
+  isolation: isolate;
+  transform: translateZ(0);
+  width: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 0 calc(var(--dock-h, 64px) + 34px) !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: #f6f6f2 !important;
+  background: #050506 !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme] .footer.footer-v249::before {
+  display: none !important;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-stage {
+  width: 100% !important;
+  min-height: min(76vh, 760px);
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: clamp(46px, 8vw, 120px) !important;
+  margin: 0 !important;
+  padding: clamp(116px, 17vh, 184px) clamp(28px, 6vw, 96px) clamp(76px, 10vh, 112px) !important;
+  border: 0 !important;
+  background: #050506 !important;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-stage-copy {
+  max-width: 1080px;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-kicker {
+  display: inline-flex !important;
+  width: auto !important;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 28px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: rgba(246, 246, 242, .68) !important;
+  background: transparent !important;
+  font-size: 11px !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase;
+}
+
+.footer-live-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #73d58a;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-cta-title {
+  max-width: 1000px !important;
+  margin: 0 !important;
+  color: #f6f6f2 !important;
+  font-size: clamp(54px, 8.6vw, 132px) !important;
+  font-weight: 500 !important;
+  line-height: .94 !important;
+  letter-spacing: -.065em !important;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-cta-title em {
+  color: rgba(246, 246, 242, .48) !important;
+  font-style: normal !important;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-cta-btn {
+  min-width: 184px !important;
+  min-height: 58px !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 20px !important;
+  border: 1px solid rgba(246, 246, 242, .28) !important;
+  border-radius: 999px !important;
+  color: #f6f6f2 !important;
+  background: transparent !important;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-cta-btn:hover,
+:root[data-theme] .footer.footer-v249 .footer-cta-btn:focus-visible {
+  border-color: #f6f6f2 !important;
+  color: #050506 !important;
+  background: #f6f6f2 !important;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-main-v249.footer-contact-grid {
+  width: auto !important;
+  max-width: none !important;
+  display: grid !important;
+  grid-template-columns: 1.1fr 1.4fr 1.25fr 1.25fr !important;
+  gap: 0 !important;
+  margin: 0 clamp(28px, 6vw, 96px) !important;
+  padding: 0 !important;
+  border-top: 1px solid rgba(255, 255, 255, .17) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, .17) !important;
+  background: transparent !important;
+}
+
+.footer-contact-item {
+  min-height: 146px;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 26px clamp(18px, 2.4vw, 36px) 28px !important;
+  border-inline-end: 1px solid rgba(255, 255, 255, .17);
+}
+
+.footer-contact-item:first-child {
+  padding-inline-start: 0 !important;
+}
+
+.footer-contact-item:last-child {
+  padding-inline-end: 0 !important;
+  border-inline-end: 0;
+}
+
+.footer-contact-label {
+  color: rgba(246, 246, 242, .55) !important;
+  font-size: 10px !important;
+  letter-spacing: .09em !important;
+}
+
+.footer-contact-value,
+.footer-social-links a {
+  color: #f6f6f2 !important;
+  font-size: clamp(18px, 1.45vw, 24px) !important;
+  font-weight: 500 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -.025em !important;
+}
+
+.footer-wordmark {
+  width: auto !important;
+  margin: 0 !important;
+  padding: clamp(62px, 8vw, 110px) clamp(28px, 6vw, 96px) 0 !important;
+  overflow: hidden !important;
+  color: #f6f6f2 !important;
+  font-size: clamp(112px, 22.2vw, 350px) !important;
+  font-weight: 800 !important;
+  line-height: .7 !important;
+  letter-spacing: -.09em !important;
+  white-space: nowrap;
+  transform: none !important;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-bottom {
+  width: auto !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0 clamp(28px, 6vw, 96px) !important;
+  padding: 28px 0 0 !important;
+  border: 0 !important;
+  color: rgba(246, 246, 242, .56) !important;
+  background: transparent !important;
+}
+
+body.footer-entered .rail,
+body.footer-entered .mobilebar,
+body.footer-arriving .rail,
+body.footer-arriving .mobilebar {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+body.footer-arriving #design > .section.latest-blog .latest-blog-head,
+body.footer-arriving #design > .section.latest-blog .latest-blog-grid {
+  opacity: 1 !important;
+}
+
+.to-top,
+[dir="rtl"] .to-top {
+  z-index: 1450 !important;
+  right: 24px !important;
+  left: auto !important;
+  bottom: calc(var(--dock-h, 64px) + 24px + env(safe-area-inset-bottom, 0px)) !important;
+  width: 50px !important;
+  height: 50px !important;
+  border: 1px solid rgba(127, 127, 127, .32) !important;
+  color: var(--ink) !important;
+  background: color-mix(in srgb, var(--bg) 82%, transparent) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.25) !important;
+  backdrop-filter: blur(18px) saturate(1.25) !important;
+}
+
+body.footer-arriving .to-top,
+body.footer-entered .to-top {
+  border-color: rgba(255, 255, 255, .24) !important;
+  color: #f6f6f2 !important;
+  background: rgba(5, 5, 6, .72) !important;
+}
+
+[dir="rtl"] .to-top {
+  right: auto !important;
+  left: 24px !important;
+}
+
+@media (max-width: 820px) {
+  :root {
+    --bq-deck-overlap: 56px;
+    --bq-deck-radius: 18px;
+  }
+
+  #design > .hero,
+  #design > .hero.is-hero-covered {
+    min-height: var(--app-vh, 100dvh) !important;
+  }
+
+  #design > .section.section {
+    padding-bottom: calc(var(--bq-deck-overlap) + 64px) !important;
+    box-shadow: 0 -22px 56px -52px rgba(0, 0, 0, .84) !important;
+  }
+
+  #design > .section.latest-blog {
+    padding-top: 72px !important;
+  }
+
+  #design .section-title {
+    font-size: clamp(38px, 12vw, 58px) !important;
+  }
+
+  #design .stat {
+    min-height: 118px;
+    padding: 20px 14px !important;
+  }
+
+  :root[data-theme] .footer.footer-v249,
+  :root[data-theme="light"] .footer.footer-v249,
+  :root[data-theme="dark"] .footer.footer-v249 {
+    padding-bottom: calc(var(--dock-h, 64px) + 24px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  :root[data-theme] .footer.footer-v249 .footer-stage {
+    min-height: 0;
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 38px !important;
+    padding: 104px 22px 72px !important;
+  }
+
+  :root[data-theme] .footer.footer-v249 .footer-kicker {
+    margin-bottom: 22px !important;
+  }
+
+  :root[data-theme] .footer.footer-v249 .footer-cta-title {
+    font-size: clamp(48px, 15vw, 76px) !important;
+    line-height: .96 !important;
+  }
+
+  :root[data-theme] .footer.footer-v249 .footer-cta-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  :root[data-theme] .footer.footer-v249 .footer-main-v249.footer-contact-grid {
+    grid-template-columns: 1fr !important;
+    margin: 0 22px !important;
+  }
+
+  .footer-contact-item,
+  .footer-contact-item:first-child,
+  .footer-contact-item:last-child {
+    min-height: 0;
+    gap: 12px;
+    padding: 22px 0 !important;
+    border-inline-end: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .17);
+  }
+
+  .footer-contact-item:last-child {
+    border-bottom: 0;
+  }
+
+  .footer-contact-value,
+  .footer-social-links a {
+    font-size: clamp(21px, 6vw, 27px) !important;
+  }
+
+  .footer-wordmark {
+    padding: 64px 20px 0 !important;
+    font-size: clamp(66px, 21.3vw, 104px) !important;
+    line-height: .78 !important;
+    letter-spacing: -.075em !important;
+  }
+
+  :root[data-theme] .footer.footer-v249 .footer-bottom {
+    margin: 0 22px !important;
+    padding-top: 24px !important;
+  }
+
+  .to-top,
+  [dir="rtl"] .to-top {
+    right: 14px !important;
+    left: auto !important;
+    bottom: calc(var(--dock-h, 64px) + 18px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 46px !important;
+    height: 46px !important;
+  }
+
+  [dir="rtl"] .to-top {
+    right: auto !important;
+    left: 14px !important;
   }
 }
