@@ -1281,6 +1281,39 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ---- Hero — reliable static portrait, with no scroll-linked style work ---- */
 document.getElementById('heroPortrait')?.classList.add('is-in');
 
+/* The hero is the first pinned sheet only. Once Portfolio has completely
+   crossed the framed viewport edge, remove the hero from painting so it can
+   never flash through the rounded shoulders of later stacked sections. The
+   section geometry stays untouched; scrolling back above Portfolio reveals it
+   again. */
+(function heroLayerGuard() {
+  const hero = document.querySelector('#design > .hero');
+  const work = document.querySelector('#design > .section.work');
+  if (!hero || !work) return;
+
+  let frame = 0;
+  let covered = false;
+  const render = () => {
+    frame = 0;
+    const frameTop = Math.max(0, parseFloat(getComputedStyle(hero).top) || 0);
+    const next = work.getBoundingClientRect().top <= frameTop + 1;
+    if (next !== covered) {
+      covered = next;
+      hero.classList.toggle('is-hero-covered', covered);
+    }
+  };
+  const queue = () => {
+    if (!frame) frame = requestAnimationFrame(render);
+  };
+
+  window.addEventListener('scroll', queue, { passive: true });
+  window.addEventListener('resize', queue, { passive: true });
+  window.addEventListener('orientationchange', queue, { passive: true });
+  window.addEventListener('pageshow', queue);
+  window.addEventListener('bq:css-ready', queue);
+  queue();
+})();
+
 /* =========================================================
    FOOTER SHELL — Cloudflare can briefly retain an older HTML
    shell after deploy while serving the newest JS/CSS assets.
