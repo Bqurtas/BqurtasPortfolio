@@ -3295,11 +3295,11 @@ body.footer-entered .to-top {
 }
 
 /* ============================================================================
-   v51 — framed viewport, bottom-pinned section hand-offs, and lighter chrome.
+   v51 — framed viewport, layered section hand-offs, and lighter chrome.
 
-   Tall sections cannot be pinned from the top without hiding their lower
-   content. Pinning their bottom edge instead lets every section scroll in full,
-   pause only at the hand-off, and remain behind the next rounded sheet.
+   Sections stay in normal document flow so an off-screen, bottom-constrained
+   sheet cannot be pulled into the viewport ahead of the content above it. The
+   negative overlap and z-indexes still provide the rounded, layered hand-off.
    ============================================================================ */
 :root {
   --bq-frame-gap: clamp(7px, .75vw, 11px);
@@ -3353,8 +3353,8 @@ body.footer-entered .to-top {
 }
 
 #design > .section.section {
-  position: sticky !important;
-  bottom: calc(var(--bq-frame-gap) + env(safe-area-inset-bottom, 0px)) !important;
+  position: relative !important;
+  bottom: auto !important;
   border-radius: var(--bq-deck-radius) !important;
   box-shadow:
     0 -24px 62px -46px rgba(0, 0, 0, .72),
