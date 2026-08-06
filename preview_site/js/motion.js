@@ -109,7 +109,8 @@
       var magnetic = document.querySelectorAll(
         '.rail-menu, #railChat, #railLatest, #themeToggle, .social-current, .lang-current, ' +
         '.pencemor-hero-btn, .pj-room-btn, .pitch-submit, .service-cta, .software-link, .bio-doc-btn, ' +
-        '.footer-cta-btn, .footer-email, .footer-top-btn, .hero-cta, .load-more-btn, .mobilebar-cta'
+        '.footer-cta-btn, .footer-email, .footer-top-btn, .hero-cta, .load-more-btn, .mobilebar-cta, ' +
+        '.mm-touch, .tab, .blog-more, .latest-blog-all, .bio-teaser-link'
       );
       magnetic.forEach(function (el) {
         el.classList.add('motion-magnetic');
@@ -123,7 +124,7 @@
       });
 
       /* ---- restrained card tilt ---- */
-      document.querySelectorAll('.feature-card, .latest-blog-grid .blog-card, .work-card, .studio-card, .studio-step').forEach(function (card) {
+      document.querySelectorAll('.feature-card, .latest-blog-grid .blog-card, .work-card, .studio-card, .studio-step, #grid .card').forEach(function (card) {
         card.classList.add('motion-tilt');
         card.addEventListener('pointermove', function (event) {
           var rect = card.getBoundingClientRect();
@@ -139,6 +140,15 @@
           card.style.setProperty('--tilt-y', '0deg');
           card.style.setProperty('--shine-x', '50%');
           card.style.setProperty('--shine-y', '50%');
+        });
+      });
+
+      /* ---- soft spotlight across stacked homepage sheets ---- */
+      document.querySelectorAll('#design > .section.section').forEach(function (sheet) {
+        sheet.addEventListener('pointermove', function (event) {
+          var rect = sheet.getBoundingClientRect();
+          sheet.style.setProperty('--bq-spot-x', (event.clientX - rect.left) + 'px');
+          sheet.style.setProperty('--bq-spot-y', (event.clientY - rect.top) + 'px');
         });
       });
 

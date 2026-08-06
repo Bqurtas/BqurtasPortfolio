@@ -352,29 +352,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const wasOpen = mobileMenu.classList.contains('is-open') || mobileMenu.classList.contains('is-ready');
     if (!open && !wasOpen) {
       mobileMenu.classList.remove('is-open', 'is-ready', 'is-closing');
-      document.body.classList.remove('menu-open');
+      document.body.classList.remove('menu-open', 'menu-revealed', 'menu-closing');
       document.body.style.overflow = '';
+      document.body.style.removeProperty('--bq-menu-scroll-shift');
       syncMenuA11y(false);
       return;
     }
     if (open) {
       lastMenuTrigger = trigger || document.activeElement;
+      const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+      document.body.style.setProperty('--bq-menu-scroll-shift', (-scrollY) + 'px');
       mobileMenu.classList.remove('is-closing');
+      document.body.classList.remove('menu-closing');
       mobileMenu.classList.add('is-open');
+      document.body.classList.add('menu-open');
       menuFrame = requestAnimationFrame(() => {
         mobileMenu.classList.add('is-ready');
+        document.body.classList.add('menu-revealed');
         try { menuCloseBtn?.focus({ preventScroll: true }); } catch (e) { menuCloseBtn?.focus(); }
       });
     } else {
+      document.body.classList.remove('menu-revealed');
+      document.body.classList.add('menu-closing');
       mobileMenu.classList.remove('is-ready', 'is-open');
       mobileMenu.classList.add('is-closing');
-      window.setTimeout(() => mobileMenu.classList.remove('is-closing'), 220);
+      window.setTimeout(() => {
+        mobileMenu.classList.remove('is-closing');
+        document.body.classList.remove('menu-open', 'menu-closing');
+        document.body.style.removeProperty('--bq-menu-scroll-shift');
+      }, 520);
       if (lastMenuTrigger && document.contains(lastMenuTrigger)) {
         try { lastMenuTrigger.focus({ preventScroll: true }); } catch (e) { lastMenuTrigger.focus(); }
       }
       lastMenuTrigger = null;
     }
-    document.body.classList.toggle('menu-open', open);
     document.body.style.overflow = open ? 'hidden' : '';
     syncMenuA11y(open);
   };
