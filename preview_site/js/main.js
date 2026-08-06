@@ -1306,8 +1306,11 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   let covered = false;
   const render = () => {
     frame = 0;
-    const frameTop = Math.max(0, parseFloat(getComputedStyle(hero).top) || 0);
-    const next = work.getBoundingClientRect().top <= frameTop + 1;
+    /* Hide the pinned hero as soon as Portfolio has covered ~18% of the
+       viewport. Waiting until the sheet fully reaches the sticky top left the
+       hero flashing through the rounded shoulders during fast scroll. */
+    const coverLine = Math.max(48, Math.round(window.innerHeight * 0.18));
+    const next = work.getBoundingClientRect().top <= coverLine;
     if (next !== covered) {
       covered = next;
       hero.classList.toggle('is-hero-covered', covered);
