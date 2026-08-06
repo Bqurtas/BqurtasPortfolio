@@ -5628,3 +5628,121 @@ body.menu-open .mobilebar {
     transform: none !important;
   }
 }
+
+/* ============================================================================
+   v58 — Nuclear hero pin (fixed + spacer) · quieter footer · Voxo menu type
+   ============================================================================ */
+
+.hero-flow-spacer {
+  display: block !important;
+  width: 100% !important;
+  height: 100svh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* Fixed pin kills sticky compositor wounds at rounded card shoulders. */
+#design > .hero.is-hero-pinned,
+#design > .hero.is-hero-pinned.is-hero-covered {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  z-index: 1 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  background: var(--bg) !important;
+  transform: none !important;
+  contain: paint;
+}
+
+#design > .hero.is-hero-pinned.is-hero-covered {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* First sheet pulls up over the spacer / pinned hero. */
+#design > .section.work {
+  margin-top: calc(0px - var(--bq-deck-overlap)) !important;
+}
+
+/* Quieter footer — invitation + email, no pill noise */
+:root[data-theme] .footer.footer-v249 {
+  z-index: 70 !important;
+  margin-top: calc(0px - var(--bq-deck-overlap)) !important;
+  border-radius: var(--bq-deck-radius) var(--bq-deck-radius) 0 0 !important;
+  background: #050506 !important;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-stage {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-end !important;
+  gap: 0 !important;
+  min-height: min(72vh, 640px) !important;
+  padding: clamp(80px, 12vw, 140px) clamp(24px, 5vw, 80px) 48px !important;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-cta-btn {
+  display: none !important;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-email {
+  margin-top: 28px !important;
+  font-size: clamp(20px, 2.6vw, 32px) !important;
+  border-bottom-width: 1px;
+}
+
+:root[data-theme] .footer.footer-v249 .footer-bottom {
+  padding-bottom: 28px !important;
+}
+
+/* Voxo-like menu links: big type, no chrome */
+#mobileMenu .mm-link .mm-n,
+#mobileMenu .mm-link i {
+  display: none !important;
+}
+
+#mobileMenu .mm-link .mm-link-text {
+  font-size: clamp(36px, 4.2vw, 56px) !important;
+  font-weight: 500 !important;
+  letter-spacing: -.04em !important;
+  line-height: 1.05 !important;
+}
+
+#mobileMenu .mm-link {
+  padding: 10px 0 !important;
+  opacity: .55 !important;
+  transition: opacity .35s ease !important;
+}
+
+#mobileMenu .mm-link:hover,
+#mobileMenu .mm-link:focus-visible,
+#mobileMenu .mm-link.is-active {
+  opacity: 1 !important;
+}
+
+@media (max-width: 820px) {
+  :root {
+    --bq-menu-panel: 100vw;
+  }
+
+  body.menu-revealed .bq-page-stage {
+    transform: translate3d(-12vw, 0, 0) scale(.94) !important;
+    border-radius: 18px !important;
+    transform-origin: left center !important;
+  }
+
+  #mobileMenu .mm-left,
+  [dir="rtl"] #mobileMenu .mm-left {
+    width: 100% !important;
+  }
+}

@@ -1292,25 +1292,41 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ---- Hero — reliable static portrait, with no scroll-linked style work ---- */
 document.getElementById('heroPortrait')?.classList.add('is-in');
 
-/* The hero is the first pinned sheet only. Once Portfolio has completely
-   crossed the framed viewport edge, remove the hero from painting so it can
-   never flash through the rounded shoulders of later stacked sections. The
-   section geometry stays untouched; scrolling back above Portfolio reveals it
-   again. */
+/* Hero pin — fixed (not sticky) so rounded portfolio shoulders can never
+   composite a "wound" flash of hero content during fast scroll. A spacer
+   keeps document flow height; Portfolio scrolls over the pinned plane.
+   Hide the hero the moment Portfolio enters the viewport. */
 (function heroLayerGuard() {
   const hero = document.querySelector('#design > .hero');
   const work = document.querySelector('#design > .section.work');
   if (!hero || !work) return;
 
+  let spacer = document.querySelector('.hero-flow-spacer');
+  if (!spacer) {
+    spacer = document.createElement('div');
+    spacer.className = 'hero-flow-spacer';
+    spacer.setAttribute('aria-hidden', 'true');
+    hero.before(spacer);
+  }
+  hero.classList.add('is-hero-pinned');
+
   let frame = 0;
   let covered = false;
+
+  const syncSpacer = () => {
+    const h = Math.max(
+      Math.round(hero.getBoundingClientRect().height) || 0,
+      Math.round(window.innerHeight) || 0
+    );
+    spacer.style.height = h + 'px';
+  };
+
   const render = () => {
     frame = 0;
-    /* Hide the pinned hero as soon as Portfolio has covered ~18% of the
-       viewport. Waiting until the sheet fully reaches the sticky top left the
-       hero flashing through the rounded shoulders during fast scroll. */
-    const coverLine = Math.max(48, Math.round(window.innerHeight * 0.18));
-    const next = work.getBoundingClientRect().top <= coverLine;
+    syncSpacer();
+    /* Cover as soon as Portfolio peeks into the viewport — earlier than the
+       rounded top can reach the sticky/fixed plane and flash through. */
+    const next = work.getBoundingClientRect().top < window.innerHeight - 2;
     if (next !== covered) {
       covered = next;
       hero.classList.toggle('is-hero-covered', covered);
@@ -1325,6 +1341,9 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   window.addEventListener('orientationchange', queue, { passive: true });
   window.addEventListener('pageshow', queue);
   window.addEventListener('bq:css-ready', queue);
+  if (typeof ResizeObserver === 'function') {
+    new ResizeObserver(queue).observe(hero);
+  }
   queue();
 })();
 
@@ -1338,6 +1357,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   if (!footer) return;
 
   const dict = window.BQ_DICT || {};
+  footer.querySelectorAll('.footer-wordmark, .footer-contact-grid, .footer-main-v249, .footer-cta-btn').forEach((el) => el.remove());
+
   if (!footer.querySelector('.footer-stage')) {
     const stage = document.createElement('div');
     stage.className = 'footer-stage';
@@ -1348,22 +1369,31 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
           <span data-i18n="f.avail"></span>
         </span>
         <h2 class="footer-cta-title" id="footerCtaTitle" data-i18n="f.cta.title"></h2>
-      </div>
-      <a href="/contact" class="footer-cta-btn" data-route="contact">
-        <span data-i18n="f.cta.btn"></span>
-        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-      </a>`;
+        <a class="footer-email" href="mailto:hello@bqurtas.com">hello@bqurtas.com</a>
+      </div>`;
     stage.querySelector('[data-i18n="f.avail"]').textContent = dict['f.avail'] || 'Available for select commissions';
     stage.querySelector('[data-i18n="f.cta.title"]').innerHTML = dict['f.cta.title'] || "Let's make something <em>quietly</em> good together.";
-    stage.querySelector('[data-i18n="f.cta.btn"]').textContent = dict['f.cta.btn'] || 'Start a conversation';
     footer.prepend(stage);
+  } else if (!footer.querySelector('.footer-email')) {
+    const copy = footer.querySelector('.footer-stage-copy') || footer.querySelector('.footer-stage');
+    const mail = document.createElement('a');
+    mail.className = 'footer-email';
+    mail.href = 'mailto:hello@bqurtas.com';
+    mail.textContent = 'hello@bqurtas.com';
+    copy?.append(mail);
   }
 
   if (!footer.querySelector('.footer-bottom')) {
     const bottom = document.createElement('div');
     bottom.className = 'footer-bottom mono';
-    bottom.innerHTML = `© 2026 <span data-i18n="name.full"></span>`;
-    bottom.querySelector('[data-i18n="name.full"]').textContent = dict['name.full'] || 'Barakat Qurtas';
+    bottom.innerHTML = `
+      <span data-i18n="f.loc">${dict['f.loc'] || 'Erbil — Kurdistan, Iraq'}</span>
+      <div class="footer-social-links">
+        <a href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.behance.net/bqurtas" target="_blank" rel="noopener">Behance</a>
+        <a href="https://instagram.com/bqurtas" target="_blank" rel="noopener">Instagram</a>
+      </div>
+      <span>© 2026 <span data-i18n="name.full">${dict['name.full'] || 'Barakat Qurtas'}</span></span>`;
     footer.append(bottom);
   }
 
