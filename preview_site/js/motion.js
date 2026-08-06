@@ -15,6 +15,34 @@
   }
 
   ready(function () {
+    /* ---- hero entrance: one quiet rise, then still ---- */
+    var hero = document.querySelector('#design > .hero');
+    if (hero && !reduce) {
+      var heroBits = hero.querySelectorAll(
+        '.hero-portrait, .hero-sign, .hero-spark, .hero-lede, .hero-cta, .hero-corner, .hero-scrolldown'
+      );
+      heroBits.forEach(function (el, i) {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(14px)';
+        el.style.transition =
+          'opacity .9s cubic-bezier(.16,1,.3,1) ' + (120 + i * 70) + 'ms, ' +
+          'transform .9s cubic-bezier(.16,1,.3,1) ' + (120 + i * 70) + 'ms';
+      });
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          heroBits.forEach(function (el) {
+            el.style.opacity = '';
+            el.style.transform = '';
+          });
+          setTimeout(function () {
+            heroBits.forEach(function (el) {
+              el.style.transition = '';
+            });
+          }, 1400);
+        });
+      });
+    }
+
     /* ---- service accordion ---- */
     var panels = Array.from(document.querySelectorAll('.service-panel'));
     var activate = function (panel) {
@@ -81,7 +109,7 @@
       var magnetic = document.querySelectorAll(
         '.rail-menu, #railChat, #railLatest, #themeToggle, .social-current, .lang-current, ' +
         '.pencemor-hero-btn, .pj-room-btn, .pitch-submit, .service-cta, .software-link, .bio-doc-btn, ' +
-        '.footer-cta-btn, .footer-email, .footer-top-btn'
+        '.footer-cta-btn, .footer-email, .footer-top-btn, .hero-cta, .load-more-btn, .mobilebar-cta'
       );
       magnetic.forEach(function (el) {
         el.classList.add('motion-magnetic');
