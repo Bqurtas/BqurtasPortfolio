@@ -5746,3 +5746,232 @@ body.menu-open .mobilebar {
     width: 100% !important;
   }
 }
+
+/* ============================================================================
+   v59 — Editorial Paper Stack
+   Sheets scroll normally; hand-off only in the last viewport band.
+   Black underlay + opaque panels kill the fast wound flash.
+   ============================================================================ */
+
+:root {
+  --bq-deck-overlap: clamp(72px, 8vw, 100px);
+  --bq-deck-radius: clamp(24px, 2.6vw, 30px);
+  --bq-deck-gutter: 0px;
+  --bq-paper-rise: 28px;
+  --bq-paper-scale: 0.015;
+  --bq-paper-dim: 0.26;
+  --bq-paper-hero: #f6f3ec;
+  --bq-paper-work: #ecece8;
+  --bq-paper-focus: #e2e0da;
+  --bq-paper-note: #f2ebe0;
+  --bq-paper-clients: #e7e7e4;
+  --bq-paper-blog: #fafafa;
+  --bq-paper-footer: #050506;
+  --bq-paper-underlay: #050506;
+}
+
+:root[data-theme="dark"] {
+  --bq-paper-hero: #121211;
+  --bq-paper-work: #161616;
+  --bq-paper-focus: #1a1a1c;
+  --bq-paper-note: #1c1a17;
+  --bq-paper-clients: #181818;
+  --bq-paper-blog: #141414;
+  --bq-paper-footer: #050506;
+  --bq-paper-underlay: #050506;
+}
+
+@media (max-width: 820px) {
+  :root {
+    --bq-deck-overlap: clamp(40px, 7.5vw, 52px);
+    --bq-deck-radius: 24px;
+    --bq-paper-rise: 18px;
+  }
+}
+
+#design.paper-stack {
+  position: relative !important;
+  isolation: isolate !important;
+  background: var(--bq-paper-underlay) !important;
+}
+
+#design.paper-stack > .hero-flow-spacer {
+  background: transparent !important;
+}
+
+/* ---- Shared paper sheet geometry (no sticky on long bodies) ---- */
+#design.paper-stack > .paper-sheet.section,
+#design.paper-stack > .section.paper-sheet,
+.footer.footer-v249.paper-sheet {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin-top: calc(0px - var(--bq-deck-overlap)) !important;
+  margin-inline: 0 !important;
+  border-radius: var(--bq-deck-radius) var(--bq-deck-radius) 0 0 !important;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 7%, transparent) !important;
+  overflow: clip !important;
+  isolation: isolate !important;
+  contain: paint;
+  background-clip: border-box !important;
+  transform-origin: 50% 0% !important;
+  transform:
+    translate3d(0, calc((1 - var(--bq-in, 1)) * var(--bq-paper-rise)), 0)
+    scale(calc(1 - (var(--bq-out, 0) * var(--bq-paper-scale)))) !important;
+  will-change: transform;
+  box-shadow:
+    0 -24px 60px -40px rgba(0, 0, 0, .55),
+    0 -1px 0 color-mix(in srgb, #fff 28%, transparent) !important;
+  z-index: var(--bq-paper-z, 10) !important;
+}
+
+/* Soft black veil on the page being covered — never filter:blur */
+#design.paper-stack > .paper-sheet.section::after,
+.footer.footer-v249.paper-sheet::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: inherit !important;
+  background: #000 !important;
+  opacity: calc(var(--bq-out, 0) * var(--bq-paper-dim)) !important;
+  pointer-events: none !important;
+  z-index: 8 !important;
+  transition: none !important;
+}
+
+#design.paper-stack > .paper-sheet.section > *,
+.footer.footer-v249.paper-sheet > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Opaque lip under the rounded crown */
+#design.paper-stack > .paper-sheet.section::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 0 auto !important;
+  height: calc(var(--bq-deck-radius) + 20px) !important;
+  border-radius: inherit !important;
+  background: inherit !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+/* ---- Paper colours ---- */
+#design.paper-stack > .hero.paper-sheet,
+#design.paper-stack > .hero.is-hero-pinned {
+  background: var(--bq-paper-hero) !important;
+}
+
+#design.paper-stack > .section.work {
+  background: var(--bq-paper-work) !important;
+  background-image: none !important;
+  z-index: 10 !important;
+  padding-top: clamp(68px, 7.5vw, 112px) !important;
+  padding-bottom: calc(var(--bq-deck-overlap) + clamp(40px, 5vw, 72px)) !important;
+}
+
+#design.paper-stack > .section.service-showcase {
+  background: var(--bq-paper-focus) !important;
+  background-image: none !important;
+  z-index: 20 !important;
+  padding-top: clamp(68px, 7.5vw, 112px) !important;
+  padding-bottom: calc(var(--bq-deck-overlap) + clamp(40px, 5vw, 72px)) !important;
+}
+
+#design.paper-stack > .section.practice-note {
+  background: var(--bq-paper-note) !important;
+  background-image: none !important;
+  z-index: 30 !important;
+  padding-top: clamp(68px, 7.5vw, 112px) !important;
+  padding-bottom: calc(var(--bq-deck-overlap) + clamp(40px, 5vw, 72px)) !important;
+}
+
+#design.paper-stack > .section.logos-section {
+  background: var(--bq-paper-clients) !important;
+  background-image: none !important;
+  z-index: 40 !important;
+  padding-top: clamp(68px, 7.5vw, 112px) !important;
+  padding-bottom: calc(var(--bq-deck-overlap) + clamp(40px, 5vw, 72px)) !important;
+}
+
+#design.paper-stack > .section.latest-blog {
+  background: var(--bq-paper-blog) !important;
+  background-image: none !important;
+  z-index: 50 !important;
+  padding-top: clamp(68px, 7.5vw, 112px) !important;
+  padding-bottom: calc(var(--bq-deck-overlap) + clamp(40px, 5vw, 72px)) !important;
+}
+
+.footer.footer-v249.paper-sheet {
+  background: var(--bq-paper-footer) !important;
+  z-index: 70 !important;
+  border-top-color: rgba(255, 255, 255, .06) !important;
+}
+
+/* ---- Hero: fixed pin only (never sticky the long sheets) ---- */
+#design.paper-stack > .hero.is-hero-pinned,
+#design.paper-stack > .hero.is-hero-pinned.is-hero-covered {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  z-index: 1 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  contain: paint;
+  transform-origin: 50% 0% !important;
+  transform:
+    translate3d(0, calc((1 - var(--bq-in, 1)) * 12px), 0)
+    scale(calc(1 - (var(--bq-out, 0) * var(--bq-paper-scale)))) !important;
+  will-change: transform, opacity;
+}
+
+#design.paper-stack > .hero.is-hero-pinned::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: #000 !important;
+  opacity: calc(var(--bq-out, 0) * var(--bq-paper-dim)) !important;
+  pointer-events: none !important;
+  z-index: 6 !important;
+}
+
+#design.paper-stack > .hero.is-hero-pinned.is-hero-covered {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Kill older translucent / gutter deck leftovers inside the stack */
+:root[data-theme] #design.paper-stack > .section.work,
+:root[data-theme] #design.paper-stack > .section.service-showcase,
+:root[data-theme] #design.paper-stack > .section.practice-note,
+:root[data-theme] #design.paper-stack > .section.logos-section,
+:root[data-theme] #design.paper-stack > .section.latest-blog {
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #design.paper-stack > .paper-sheet.section,
+  #design.paper-stack > .hero.is-hero-pinned,
+  .footer.footer-v249.paper-sheet {
+    transform: none !important;
+    will-change: auto !important;
+  }
+
+  #design.paper-stack > .paper-sheet.section::after,
+  #design.paper-stack > .hero.is-hero-pinned::after,
+  .footer.footer-v249.paper-sheet::after {
+    opacity: 0 !important;
+  }
+}

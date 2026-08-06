@@ -1292,14 +1292,24 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ---- Hero — reliable static portrait, with no scroll-linked style work ---- */
 document.getElementById('heroPortrait')?.classList.add('is-in');
 
-/* Hero pin — fixed (not sticky) so rounded portfolio shoulders can never
-   composite a "wound" flash of hero content during fast scroll. A spacer
-   keeps document flow height; Portfolio scrolls over the pinned plane.
-   Hide the hero the moment Portfolio enters the viewport. */
-(function heroLayerGuard() {
-  const hero = document.querySelector('#design > .hero');
-  const work = document.querySelector('#design > .section.work');
-  if (!hero || !work) return;
+/* =========================================================
+   EDITORIAL PAPER STACK
+   Long sheets scroll normally. Hand-off lives only in the last
+   ~18% (next sheet entering the viewport): previous scales to
+   0.985 + soft black veil; incoming rises with translateY.
+   Hero is fixed+spacer (not sticky-on-long-content). A solid
+   black underlay + opaque panels kill the fast "wound" flash.
+   ========================================================= */
+(function editorialPaperStack() {
+  const design = document.getElementById('design');
+  if (!design) return;
+
+  design.classList.add('paper-stack');
+
+  const hero = design.querySelector(':scope > .hero');
+  const footer = document.querySelector('.footer.footer-v249');
+  const sections = [...design.querySelectorAll(':scope > .section')];
+  if (!hero || !sections.length) return;
 
   let spacer = document.querySelector('.hero-flow-spacer');
   if (!spacer) {
@@ -1308,10 +1318,30 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     spacer.setAttribute('aria-hidden', 'true');
     hero.before(spacer);
   }
-  hero.classList.add('is-hero-pinned');
+  hero.classList.add('is-hero-pinned', 'paper-sheet');
+  hero.dataset.paper = 'hero';
 
+  const paperNames = ['work', 'practice', 'note', 'clients', 'blog'];
+  sections.forEach((sheet, i) => {
+    sheet.classList.add('paper-sheet');
+    sheet.dataset.paper = paperNames[i] || `sheet-${i + 1}`;
+    sheet.style.setProperty('--bq-paper-z', String((i + 2) * 10));
+  });
+  hero.style.setProperty('--bq-paper-z', '1');
+
+  if (footer) {
+    footer.classList.add('paper-sheet', 'paper-sheet--footer');
+    footer.dataset.paper = 'footer';
+    footer.style.setProperty('--bq-paper-z', '70');
+  }
+
+  const sheets = [hero, ...sections, footer].filter(Boolean);
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   let frame = 0;
   let covered = false;
+
+  const clamp01 = (n) => Math.min(1, Math.max(0, n));
+  const ease = (t) => t * t * (3 - 2 * t);
 
   const syncSpacer = () => {
     const h = Math.max(
@@ -1321,17 +1351,62 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     spacer.style.height = h + 'px';
   };
 
+  const handoffProgress = (next, vh) => {
+    const top = next.getBoundingClientRect().top;
+    /* Motion only while the next page is rising through the viewport —
+       which, in document flow, is the last ~15–20% of the previous sheet. */
+    const band = Math.min(Math.max(vh * 0.34, 160), vh * 0.55);
+    return clamp01((vh - top) / band);
+  };
+
   const render = () => {
     frame = 0;
     syncSpacer();
-    /* Cover as soon as Portfolio peeks into the viewport — earlier than the
-       rounded top can reach the sticky/fixed plane and flash through. */
-    const next = work.getBoundingClientRect().top < window.innerHeight - 2;
-    if (next !== covered) {
-      covered = next;
+
+    const designActive = !design.classList.contains('is-hidden');
+    if (!designActive) {
+      sheets.forEach((sheet) => {
+        sheet.style.setProperty('--bq-out', '0');
+        sheet.style.setProperty('--bq-in', '1');
+      });
+      if (covered) {
+        covered = false;
+        hero.classList.remove('is-hero-covered');
+      }
+      return;
+    }
+
+    const vh = Math.max(window.innerHeight || 0, 1);
+    const motionOff = reduced.matches;
+
+    sheets.forEach((sheet, i) => {
+      if (i === 0) sheet.style.setProperty('--bq-in', '1');
+      sheet.style.setProperty('--bq-out', '0');
+    });
+
+    for (let i = 0; i < sheets.length - 1; i += 1) {
+      const curr = sheets[i];
+      const next = sheets[i + 1];
+      const raw = handoffProgress(next, vh);
+      const p = motionOff ? (raw >= 0.5 ? 1 : 0) : ease(raw);
+      curr.style.setProperty('--bq-out', p.toFixed(4));
+      next.style.setProperty('--bq-in', p.toFixed(4));
+    }
+
+    /* Hide hero paint near the end of its hand-off so rounded shoulders
+       never reveal a compositor wound; black underlay fills any gap. */
+    const work = sections[0];
+    const heroOut = Number(hero.style.getPropertyValue('--bq-out') || 0);
+    const nextCovered = !!work && (
+      heroOut >= 0.82 ||
+      work.getBoundingClientRect().top <= Math.max(36, Math.round(vh * 0.06))
+    );
+    if (nextCovered !== covered) {
+      covered = nextCovered;
       hero.classList.toggle('is-hero-covered', covered);
     }
   };
+
   const queue = () => {
     if (!frame) frame = requestAnimationFrame(render);
   };
@@ -1341,6 +1416,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   window.addEventListener('orientationchange', queue, { passive: true });
   window.addEventListener('pageshow', queue);
   window.addEventListener('bq:css-ready', queue);
+  reduced.addEventListener?.('change', queue);
+  document.addEventListener('bq:route', queue);
   if (typeof ResizeObserver === 'function') {
     new ResizeObserver(queue).observe(hero);
   }
