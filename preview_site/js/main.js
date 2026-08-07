@@ -43,10 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
     try { localStorage.setItem('bq_theme3', t); } catch(e){}
     themeBtns.forEach(b => b.setAttribute('aria-checked', t === 'dark' ? 'true' : 'false'));
   };
-  // Default is DARK now (a fresh key so an old saved 'light' pref doesn't override it).
+  // Light is the site default (matches the bq_light_v1 migration that runs
+  // inline in index.html before first paint).
   let savedTheme = null;
   try { savedTheme = localStorage.getItem('bq_theme3'); } catch(e){}
-  applyTheme(savedTheme || 'dark');
+  applyTheme(savedTheme === 'dark' ? 'dark' : 'light');
   themeBtns.forEach(btn => btn.addEventListener('click', () => {
     const cur = document.documentElement.dataset.theme;
     applyTheme(cur === 'dark' ? 'light' : 'dark');
@@ -61,8 +62,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const codeMEl = document.getElementById('langCurrentCodeM');
     if (codeEl) codeEl.textContent = langCodeMap[lang] || 'EN';
     if (codeMEl) codeMEl.textContent = langCodeMap[lang] || 'EN';
+    const langLabel = (langCodeMap[lang] || 'EN') + ' — ' + (langLabelMap[lang] || 'Language');
     const langPopBtn = document.getElementById('langPopBtn');
-    if (langPopBtn) langPopBtn.setAttribute('aria-label', (langCodeMap[lang] || 'EN') + ' — ' + (langLabelMap[lang] || 'Language'));
+    if (langPopBtn) langPopBtn.setAttribute('aria-label', langLabel);
+    const langCurrentBtn = document.getElementById('langCurrentBtn');
+    if (langCurrentBtn) langCurrentBtn.setAttribute('aria-label', langLabel);
     // mark active state in flyout
     document.querySelectorAll('.lang-opt').forEach(o => {
       o.classList.toggle('is-active', o.dataset.lang === lang);
@@ -380,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileMenu.classList.remove('is-closing');
         document.body.classList.remove('menu-open', 'menu-closing');
         document.body.style.removeProperty('--bq-menu-scroll-shift');
-      }, 520);
+      }, 840);   /* matches the .8s Voxo slide-home */
       if (lastMenuTrigger && document.contains(lastMenuTrigger)) {
         try { lastMenuTrigger.focus({ preventScroll: true }); } catch (e) { lastMenuTrigger.focus(); }
       }
@@ -417,6 +421,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   mobileMenu?.querySelectorAll('.mm-link, .mm-touch, .mm-logo').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+
+  /* Voxo behaviour: while the menu is open the receded page sheet is itself a
+     close target — one click anywhere on it slides everything home. */
+  document.getElementById('bqPageStage')?.addEventListener('click', (e) => {
+    if (!document.body.classList.contains('menu-revealed')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setMenu(false);
+  }, true);
 
   document.querySelector('[data-footer-top]')?.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1351,12 +1364,22 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     spacer.style.height = h + 'px';
   };
 
-  const handoffProgress = (next, vh) => {
+  /* Two separate progress curves per hand-off:
+     - enter: the incoming sheet's rise/settle. Runs only over the last ~18%
+       of a viewport as the sheet crosses the fold, so the motion lives in the
+       tail of the previous section and content scrolls untouched before it.
+     - cover: the outgoing sheet's dim + scale. Runs over the full traversal
+       (fold to top), so the page below darkens exactly as it is covered and
+       is never blacked out while still exposed. */
+  const handoffEnter = (next, vh) => {
     const top = next.getBoundingClientRect().top;
-    /* Motion only while the next page is rising through the viewport —
-       which, in document flow, is the last ~15–20% of the previous sheet. */
-    const band = Math.min(Math.max(vh * 0.34, 160), vh * 0.55);
+    const band = Math.min(Math.max(vh * 0.18, 140), vh * 0.5);
     return clamp01((vh - top) / band);
+  };
+
+  const handoffCover = (next, vh) => {
+    const top = next.getBoundingClientRect().top;
+    return clamp01((vh - top) / Math.max(vh - 36, 1));
   };
 
   const render = () => {
@@ -1387,18 +1410,19 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     for (let i = 0; i < sheets.length - 1; i += 1) {
       const curr = sheets[i];
       const next = sheets[i + 1];
-      const raw = handoffProgress(next, vh);
-      const p = motionOff ? (raw >= 0.5 ? 1 : 0) : ease(raw);
-      curr.style.setProperty('--bq-out', p.toFixed(4));
-      next.style.setProperty('--bq-in', p.toFixed(4));
+      const enterRaw = handoffEnter(next, vh);
+      const coverRaw = handoffCover(next, vh);
+      const pIn = motionOff ? (enterRaw >= 0.5 ? 1 : 0) : ease(enterRaw);
+      const pOut = motionOff ? 0 : ease(coverRaw);
+      curr.style.setProperty('--bq-out', pOut.toFixed(4));
+      next.style.setProperty('--bq-in', pIn.toFixed(4));
     }
 
-    /* Hide hero paint near the end of its hand-off so rounded shoulders
-       never reveal a compositor wound; black underlay fills any gap. */
+    /* Hide hero paint only once the first sheet truly reaches the top, so
+       rounded shoulders never reveal a compositor wound; the black underlay
+       fills the last few pixels. */
     const work = sections[0];
-    const heroOut = Number(hero.style.getPropertyValue('--bq-out') || 0);
     const nextCovered = !!work && (
-      heroOut >= 0.82 ||
       work.getBoundingClientRect().top <= Math.max(36, Math.round(vh * 0.06))
     );
     if (nextCovered !== covered) {

@@ -26,6 +26,7 @@ window.I18N.en = Object.assign(window.I18N.en || {}, {
     'nav.blog': 'Blog',
     'nav.bio': 'Biography',
     'nav.contact': 'Contact',
+    'a11y.skip': 'Skip to content',
 
     'hero.eyebrow': '— Independent Designer · Available for select commissions',
 
@@ -158,7 +159,10 @@ window.applyLang = function(lang) {
   // an earlier version closed over the reassigned parameter, so the callback
   // re-applied English and every language switch / localized deep link silently
   // stayed in English. Never collapse these two back into one variable.
-  if (requestedLang !== 'en' && !window.I18N[requestedLang] && !window.__i18nMoreLoaded) {
+  // NOTE: don't gate on `window.I18N[requestedLang]` here — i18n.js seeds tiny
+  // stub objects for every language (hero.place/hero.since), so that check was
+  // always false and runtime language switches silently stayed in English.
+  if (requestedLang !== 'en' && !window.__i18nMoreLoaded) {
     waitingForDictionary = true;
     window.__loadI18nMore(function () { window.applyLang(requestedLang); });
     activeLang = 'en';   // paint English immediately; the requested language re-applies once loaded
