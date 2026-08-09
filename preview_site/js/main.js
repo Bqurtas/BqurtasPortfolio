@@ -1306,14 +1306,17 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('heroPortrait')?.classList.add('is-in');
 
 /* =========================================================
-   EDITORIAL PAPER STACK
-   Long sheets scroll normally. Hand-off lives only in the last
-   ~18% (next sheet entering the viewport): previous scales to
-   0.985 + soft black veil; incoming rises with translateY.
-   Hero is fixed+spacer (not sticky-on-long-content). A solid
-   black underlay + opaque panels kill the fast "wound" flash.
+   FEATURED-STACK (Framer sticky cards)
+
+   Matches bqurtas.framer.media Featured Projects:
+   every sheet is position:sticky;top:0 so the next page lands
+   on the previous and pins it. While covered, the previous
+   scales toward ~0.82 + a soft black veil (measured on Framer).
+
+   Long Portfolio (work) stays position:relative so its full
+   catalogue remains scrollable; every other sheet sticks.
    ========================================================= */
-(function editorialPaperStack() {
+(function featuredPaperStack() {
   const design = document.getElementById('design');
   if (!design) return;
 
@@ -1324,14 +1327,10 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   const sections = [...design.querySelectorAll(':scope > .section')];
   if (!hero || !sections.length) return;
 
-  let spacer = document.querySelector('.hero-flow-spacer');
-  if (!spacer) {
-    spacer = document.createElement('div');
-    spacer.className = 'hero-flow-spacer';
-    spacer.setAttribute('aria-hidden', 'true');
-    hero.before(spacer);
-  }
-  hero.classList.add('is-hero-pinned', 'paper-sheet');
+  /* Drop the old fixed-hero spacer — sticky stack does not need it. */
+  document.querySelectorAll('.hero-flow-spacer').forEach((node) => node.remove());
+  hero.classList.remove('is-hero-pinned', 'is-hero-covered');
+  hero.classList.add('paper-sheet');
   hero.dataset.paper = 'hero';
 
   const paperNames = ['work', 'practice', 'note', 'clients', 'blog'];
@@ -1351,83 +1350,41 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   const sheets = [hero, ...sections, footer].filter(Boolean);
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   let frame = 0;
-  let covered = false;
 
   const clamp01 = (n) => Math.min(1, Math.max(0, n));
   const ease = (t) => t * t * (3 - 2 * t);
 
-  const syncSpacer = () => {
-    const h = Math.max(
-      Math.round(hero.getBoundingClientRect().height) || 0,
-      Math.round(window.innerHeight) || 0
-    );
-    spacer.style.height = h + 'px';
-  };
-
-  /* Two separate progress curves per hand-off:
-     - enter: the incoming sheet's rise/settle. Runs only over the last ~18%
-       of a viewport as the sheet crosses the fold, so the motion lives in the
-       tail of the previous section and content scrolls untouched before it.
-     - cover: the outgoing sheet's dim + scale. Runs over the full traversal
-       (fold to top), so the page below darkens exactly as it is covered and
-       is never blacked out while still exposed. */
-  const handoffEnter = (next, vh) => {
+  /* Cover progress = how far the next sticky card has climbed from the
+     fold to the pin line (top:0). Same curve Framer uses for scale. */
+  const coverProgress = (next, pin, vh) => {
     const top = next.getBoundingClientRect().top;
-    const band = Math.min(Math.max(vh * 0.18, 140), vh * 0.5);
-    return clamp01((vh - top) / band);
-  };
-
-  const handoffCover = (next, vh) => {
-    const top = next.getBoundingClientRect().top;
-    return clamp01((vh - top) / Math.max(vh - 36, 1));
+    const start = vh;
+    const end = pin;
+    if (start <= end) return top <= end ? 1 : 0;
+    return clamp01((start - top) / (start - end));
   };
 
   const render = () => {
     frame = 0;
-    syncSpacer();
 
     const designActive = !design.classList.contains('is-hidden');
     if (!designActive) {
-      sheets.forEach((sheet) => {
-        sheet.style.setProperty('--bq-out', '0');
-        sheet.style.setProperty('--bq-in', '1');
-      });
-      if (covered) {
-        covered = false;
-        hero.classList.remove('is-hero-covered');
-      }
+      sheets.forEach((sheet) => sheet.style.setProperty('--bq-out', '0'));
       return;
     }
 
     const vh = Math.max(window.innerHeight || 0, 1);
+    const pin = 0;
     const motionOff = reduced.matches;
 
-    sheets.forEach((sheet, i) => {
-      if (i === 0) sheet.style.setProperty('--bq-in', '1');
-      sheet.style.setProperty('--bq-out', '0');
-    });
+    sheets.forEach((sheet) => sheet.style.setProperty('--bq-out', '0'));
 
     for (let i = 0; i < sheets.length - 1; i += 1) {
       const curr = sheets[i];
       const next = sheets[i + 1];
-      const enterRaw = handoffEnter(next, vh);
-      const coverRaw = handoffCover(next, vh);
-      const pIn = motionOff ? (enterRaw >= 0.5 ? 1 : 0) : ease(enterRaw);
-      const pOut = motionOff ? 0 : ease(coverRaw);
-      curr.style.setProperty('--bq-out', pOut.toFixed(4));
-      next.style.setProperty('--bq-in', pIn.toFixed(4));
-    }
-
-    /* Hide hero paint only once the first sheet truly reaches the top, so
-       rounded shoulders never reveal a compositor wound; the black underlay
-       fills the last few pixels. */
-    const work = sections[0];
-    const nextCovered = !!work && (
-      work.getBoundingClientRect().top <= Math.max(36, Math.round(vh * 0.06))
-    );
-    if (nextCovered !== covered) {
-      covered = nextCovered;
-      hero.classList.toggle('is-hero-covered', covered);
+      const raw = coverProgress(next, pin, vh);
+      const p = motionOff ? 0 : ease(raw);
+      curr.style.setProperty('--bq-out', p.toFixed(4));
     }
   };
 
@@ -1442,9 +1399,6 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   window.addEventListener('bq:css-ready', queue);
   reduced.addEventListener?.('change', queue);
   document.addEventListener('bq:route', queue);
-  if (typeof ResizeObserver === 'function') {
-    new ResizeObserver(queue).observe(hero);
-  }
   queue();
 })();
 
