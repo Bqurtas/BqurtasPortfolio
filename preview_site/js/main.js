@@ -1354,14 +1354,27 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   const clamp01 = (n) => Math.min(1, Math.max(0, n));
   const ease = (t) => t * t * (3 - 2 * t);
 
-  /* Cover progress = how far the next sticky card has climbed from the
-     fold to the pin line (top:0). Same curve Framer uses for scale. */
+  const readGutter = () => {
+    const raw = getComputedStyle(document.documentElement)
+      .getPropertyValue('--bq-deck-gutter')
+      .trim();
+    const n = parseFloat(raw);
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  /* Cover progress = how far the next card has climbed from the fold to the
+     inset pin line. Fade starts later so the card vanishes as it shrinks. */
   const coverProgress = (next, pin, vh) => {
     const top = next.getBoundingClientRect().top;
-    const start = vh;
+    const start = vh - pin;
     const end = pin;
     if (start <= end) return top <= end ? 1 : 0;
     return clamp01((start - top) / (start - end));
+  };
+
+  const fadeFrom = (raw) => {
+    /* Dissolve early so a covered card is gone before the next pins. */
+    return ease(clamp01((raw - 0.06) / 0.5));
   };
 
   const render = () => {
@@ -1369,22 +1382,34 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
     const designActive = !design.classList.contains('is-hidden');
     if (!designActive) {
-      sheets.forEach((sheet) => sheet.style.setProperty('--bq-out', '0'));
+      sheets.forEach((sheet) => {
+        sheet.style.setProperty('--bq-out', '0');
+        sheet.style.setProperty('--bq-fade', '0');
+        sheet.classList.remove('is-paper-gone');
+      });
       return;
     }
 
     const vh = Math.max(window.innerHeight || 0, 1);
-    const pin = 0;
+    const pin = readGutter();
     const motionOff = reduced.matches;
 
-    sheets.forEach((sheet) => sheet.style.setProperty('--bq-out', '0'));
+    sheets.forEach((sheet) => {
+      sheet.style.setProperty('--bq-out', '0');
+      sheet.style.setProperty('--bq-fade', '0');
+      sheet.classList.remove('is-paper-gone');
+    });
 
     for (let i = 0; i < sheets.length - 1; i += 1) {
       const curr = sheets[i];
       const next = sheets[i + 1];
       const raw = coverProgress(next, pin, vh);
-      const p = motionOff ? 0 : ease(raw);
-      curr.style.setProperty('--bq-out', p.toFixed(4));
+      if (motionOff) continue;
+      const out = ease(raw);
+      const fade = fadeFrom(raw);
+      curr.style.setProperty('--bq-out', out.toFixed(4));
+      curr.style.setProperty('--bq-fade', fade.toFixed(4));
+      curr.classList.toggle('is-paper-gone', fade >= 0.92);
     }
   };
 
