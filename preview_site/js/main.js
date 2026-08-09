@@ -1306,51 +1306,10 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('heroPortrait')?.classList.add('is-in');
 
 /* =========================================================
-   FEATURED-STACK (Framer sticky cards)
-
-   Matches bqurtas.framer.media Featured Projects:
-   every sheet is position:sticky;top:0 so the next page lands
-   on the previous and pins it. While covered, the previous
-   scales toward ~0.82 + a soft black veil (measured on Framer).
-
-   Long Portfolio (work) stays position:relative so its full
-   catalogue remains scrollable; every other sheet sticks.
+   FEATURED PAPER STACK — fixed rounded frames; content scrolls
+   inside .paper-scroll. Same system on home + other rooms.
    ========================================================= */
 (function featuredPaperStack() {
-  const design = document.getElementById('design');
-  if (!design) return;
-
-  design.classList.add('paper-stack');
-
-  const hero = design.querySelector(':scope > .hero');
-  const footer = document.querySelector('.footer.footer-v249');
-  const sections = [...design.querySelectorAll(':scope > .section')];
-  if (!hero || !sections.length) return;
-
-  /* Drop the old fixed-hero spacer — sticky stack does not need it. */
-  document.querySelectorAll('.hero-flow-spacer').forEach((node) => node.remove());
-  hero.classList.remove('is-hero-pinned', 'is-hero-covered');
-  hero.classList.add('paper-sheet');
-  hero.dataset.paper = 'hero';
-
-  const paperNames = ['work', 'practice', 'note', 'clients', 'blog'];
-  sections.forEach((sheet, i) => {
-    sheet.classList.add('paper-sheet');
-    sheet.dataset.paper = paperNames[i] || `sheet-${i + 1}`;
-    sheet.style.setProperty('--bq-paper-z', String((i + 2) * 10));
-  });
-  hero.style.setProperty('--bq-paper-z', '1');
-
-  if (footer) {
-    footer.classList.add('paper-sheet', 'paper-sheet--footer');
-    footer.dataset.paper = 'footer';
-    footer.style.setProperty('--bq-paper-z', '70');
-  }
-
-  const sheets = [hero, ...sections, footer].filter(Boolean);
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let frame = 0;
-
   const clamp01 = (n) => Math.min(1, Math.max(0, n));
   const ease = (t) => t * t * (3 - 2 * t);
 
@@ -1362,8 +1321,14 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     return Number.isFinite(n) ? n : 0;
   };
 
-  /* Cover progress = how far the next card has climbed from the fold to the
-     inset pin line. Fade starts later so the card vanishes as it shrinks. */
+  const wrapPaperScroll = (sheet) => {
+    if (!sheet || sheet.querySelector(':scope > .paper-scroll')) return;
+    const scroller = document.createElement('div');
+    scroller.className = 'paper-scroll';
+    while (sheet.firstChild) scroller.appendChild(sheet.firstChild);
+    sheet.appendChild(scroller);
+  };
+
   const coverProgress = (next, pin, vh) => {
     const top = next.getBoundingClientRect().top;
     const start = vh - pin;
@@ -1372,59 +1337,122 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     return clamp01((start - top) / (start - end));
   };
 
-  const fadeFrom = (raw) => {
-    /* Dissolve early so a covered card is gone before the next pins. */
-    return ease(clamp01((raw - 0.06) / 0.5));
-  };
+  const fadeFrom = (raw) => ease(clamp01((raw - 0.06) / 0.5));
 
-  const render = () => {
-    frame = 0;
+  const bindStack = (root, sheets, { requireActive } = {}) => {
+    if (!root || sheets.length < 1) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let frame = 0;
 
-    const designActive = !design.classList.contains('is-hidden');
-    if (!designActive) {
+    const render = () => {
+      frame = 0;
+      if (requireActive && root.classList.contains('is-hidden')) {
+        sheets.forEach((sheet) => {
+          sheet.style.setProperty('--bq-out', '0');
+          sheet.style.setProperty('--bq-fade', '0');
+          sheet.classList.remove('is-paper-gone');
+        });
+        return;
+      }
+
+      const vh = Math.max(window.innerHeight || 0, 1);
+      const pin = readGutter();
+      const motionOff = reduced.matches;
+
       sheets.forEach((sheet) => {
         sheet.style.setProperty('--bq-out', '0');
         sheet.style.setProperty('--bq-fade', '0');
         sheet.classList.remove('is-paper-gone');
       });
-      return;
-    }
 
-    const vh = Math.max(window.innerHeight || 0, 1);
-    const pin = readGutter();
-    const motionOff = reduced.matches;
+      if (sheets.length < 2) return;
 
+      for (let i = 0; i < sheets.length - 1; i += 1) {
+        const curr = sheets[i];
+        const next = sheets[i + 1];
+        const raw = coverProgress(next, pin, vh);
+        if (motionOff) continue;
+        const out = ease(raw);
+        const fade = fadeFrom(raw);
+        curr.style.setProperty('--bq-out', out.toFixed(4));
+        curr.style.setProperty('--bq-fade', fade.toFixed(4));
+        curr.classList.toggle('is-paper-gone', fade >= 0.92);
+      }
+    };
+
+    const queue = () => {
+      if (!frame) frame = requestAnimationFrame(render);
+    };
+
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue, { passive: true });
+    window.addEventListener('orientationchange', queue, { passive: true });
+    window.addEventListener('pageshow', queue);
+    window.addEventListener('bq:css-ready', queue);
+    reduced.addEventListener?.('change', queue);
+    document.addEventListener('bq:route', queue);
     sheets.forEach((sheet) => {
-      sheet.style.setProperty('--bq-out', '0');
-      sheet.style.setProperty('--bq-fade', '0');
-      sheet.classList.remove('is-paper-gone');
+      const scroller = sheet.querySelector(':scope > .paper-scroll');
+      scroller?.addEventListener('scroll', queue, { passive: true });
     });
+    queue();
+  };
 
-    for (let i = 0; i < sheets.length - 1; i += 1) {
-      const curr = sheets[i];
-      const next = sheets[i + 1];
-      const raw = coverProgress(next, pin, vh);
-      if (motionOff) continue;
-      const out = ease(raw);
-      const fade = fadeFrom(raw);
-      curr.style.setProperty('--bq-out', out.toFixed(4));
-      curr.style.setProperty('--bq-fade', fade.toFixed(4));
-      curr.classList.toggle('is-paper-gone', fade >= 0.92);
+  /* ---- Home deck ---- */
+  const design = document.getElementById('design');
+  if (design) {
+    design.classList.add('paper-stack');
+
+    const hero = design.querySelector(':scope > .hero');
+    const footer = document.querySelector('.footer.footer-v249');
+    const sections = [...design.querySelectorAll(':scope > .section')];
+
+    document.querySelectorAll('.hero-flow-spacer').forEach((node) => node.remove());
+
+    if (hero && sections.length) {
+      hero.classList.remove('is-hero-pinned', 'is-hero-covered');
+      hero.classList.add('paper-sheet');
+      hero.dataset.paper = 'hero';
+      hero.style.setProperty('--bq-paper-z', '1');
+      wrapPaperScroll(hero);
+
+      const paperNames = ['work', 'practice', 'note', 'clients', 'blog'];
+      sections.forEach((sheet, i) => {
+        sheet.classList.add('paper-sheet');
+        sheet.dataset.paper = paperNames[i] || `sheet-${i + 1}`;
+        sheet.style.setProperty('--bq-paper-z', String((i + 2) * 10));
+        wrapPaperScroll(sheet);
+      });
+
+      if (footer) {
+        footer.classList.add('paper-sheet', 'paper-sheet--footer');
+        footer.dataset.paper = 'footer';
+        footer.style.setProperty('--bq-paper-z', '70');
+        wrapPaperScroll(footer);
+      }
+
+      bindStack(design, [hero, ...sections, footer].filter(Boolean), { requireActive: true });
     }
-  };
+  }
 
-  const queue = () => {
-    if (!frame) frame = requestAnimationFrame(render);
-  };
+  /* ---- Blog / Bio / Contact — same inset paper frames ---- */
+  ['blog', 'bio', 'contact'].forEach((id) => {
+    const room = document.getElementById(id);
+    if (!room) return;
+    room.classList.add('paper-stack', 'room-paper');
 
-  window.addEventListener('scroll', queue, { passive: true });
-  window.addEventListener('resize', queue, { passive: true });
-  window.addEventListener('orientationchange', queue, { passive: true });
-  window.addEventListener('pageshow', queue);
-  window.addEventListener('bq:css-ready', queue);
-  reduced.addEventListener?.('change', queue);
-  document.addEventListener('bq:route', queue);
-  queue();
+    const parts = [
+      ...room.querySelectorAll(':scope > .room-hero'),
+      ...room.querySelectorAll(':scope > .section'),
+    ];
+    parts.forEach((sheet, i) => {
+      sheet.classList.add('paper-sheet');
+      sheet.dataset.paper = `${id}-${i}`;
+      sheet.style.setProperty('--bq-paper-z', String((i + 1) * 10));
+      wrapPaperScroll(sheet);
+    });
+    bindStack(room, parts, { requireActive: true });
+  });
 })();
 
 /* =========================================================

@@ -6802,3 +6802,324 @@ body.menu-revealed .bq-page-stage,
 #mobileMenu .mm-link > i {
   display: none !important;
 }
+
+/* ============================================================================
+   v65 — Fixed rounded frames + inner scroll; circular tabs; room paper.
+   The sheet's border-radius stays put. Content scrolls inside .paper-scroll.
+   ============================================================================ */
+
+/* Every sheet is a sticky viewport frame (Portfolio included). */
+#design.paper-stack > .paper-sheet,
+#design.paper-stack > .section.work.paper-sheet,
+:root[data-theme] #design.paper-stack > .paper-sheet,
+:root[data-theme] #design.paper-stack > .section.work.paper-sheet,
+.footer.footer-v249.paper-sheet,
+:root[data-theme] .footer.footer-v249.paper-sheet,
+.room.paper-stack > .paper-sheet,
+:root[data-theme] .room.paper-stack > .paper-sheet {
+  position: sticky !important;
+  top: var(--bq-stack-top) !important;
+  height: var(--bq-stack-sheet-h) !important;
+  max-height: var(--bq-stack-sheet-h) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  border-radius: var(--bq-deck-radius) !important;
+}
+
+.footer.footer-v249.paper-sheet,
+:root[data-theme] .footer.footer-v249.paper-sheet {
+  height: auto !important;
+  max-height: var(--bq-stack-sheet-h) !important;
+  min-height: min(64vh, 560px) !important;
+}
+
+/* Inner scroller — rounded frame never moves with content. */
+.paper-sheet > .paper-scroll {
+  position: relative !important;
+  z-index: 1 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: inherit;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--ink) 28%, transparent) transparent;
+}
+
+.paper-sheet > .paper-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.paper-sheet > .paper-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--ink) 22%, transparent);
+  border-radius: 999px;
+}
+
+/* Rooms share the same black bed + gutters as home. */
+.room.paper-stack,
+:root[data-theme] .room.paper-stack {
+  position: relative !important;
+  isolation: isolate !important;
+  background: var(--bq-paper-underlay) !important;
+  padding: var(--bq-deck-gutter) !important;
+  box-sizing: border-box !important;
+}
+
+:root[data-theme] .room.paper-stack > .room-hero.paper-sheet {
+  background: var(--bq-paper-hero) !important;
+  background-image: none !important;
+}
+
+:root[data-theme] .room.paper-stack > .section.paper-sheet {
+  background: var(--bq-paper-work) !important;
+  background-image: none !important;
+}
+
+.room.paper-stack > .paper-sheet {
+  transform-origin: 50% 50% !important;
+  transform: scale(calc(1 - (var(--bq-out, 0) * var(--bq-paper-scale)))) !important;
+  opacity: calc(1 - var(--bq-fade, 0)) !important;
+  box-shadow:
+    0 28px 70px -24px rgba(0, 0, 0, .62),
+    0 0 0 1px rgba(0, 0, 0, .08) !important;
+  z-index: var(--bq-paper-z, 10) !important;
+}
+
+.room.paper-stack > .paper-sheet::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: inherit !important;
+  background: #000 !important;
+  opacity: calc(var(--bq-out, 0) * var(--bq-paper-dim)) !important;
+  pointer-events: none !important;
+  z-index: 20 !important;
+}
+
+.room.paper-stack > .paper-sheet.is-paper-gone {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Quiet room heroes inside the paper frame. */
+.room.paper-stack > .room-hero.paper-sheet .paper-scroll {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(48px, 8vh, 96px) clamp(22px, 4vw, 56px) !important;
+  text-align: center;
+}
+
+.room.paper-stack .room-hero-corner,
+.room.paper-stack .room-hero-scroll {
+  display: none !important;
+}
+
+.room.paper-stack .room-hero-return {
+  position: absolute !important;
+  top: clamp(18px, 3vh, 32px) !important;
+  left: clamp(18px, 3vw, 36px) !important;
+  z-index: 3 !important;
+}
+
+[dir="rtl"] .room.paper-stack .room-hero-return {
+  left: auto !important;
+  right: clamp(18px, 3vw, 36px) !important;
+}
+
+.room.paper-stack .room-hero-ghost {
+  opacity: .04 !important;
+}
+
+.room.paper-stack > .section.paper-sheet .paper-scroll {
+  padding: clamp(40px, 5vw, 72px) clamp(20px, 4vw, 56px) !important;
+}
+
+/* ---- Circular portfolio tabs (desktop + mobile) ---- */
+#design.paper-stack > .section.work,
+:root[data-theme] #design.paper-stack > .section.work {
+  display: block !important;
+  grid-template-columns: none !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+#design .section.work > .paper-scroll {
+  display: flex !important;
+  flex-direction: column !important;
+  padding: clamp(28px, 4vw, 48px) clamp(18px, 3vw, 40px) clamp(36px, 5vw, 64px) !important;
+  box-sizing: border-box !important;
+}
+
+#design .section.work .section-head,
+#design .section.work .tabs-wrap,
+#design .section.work .tab-header,
+#design .section.work .grid,
+#design .section.work .load-more-wrap {
+  grid-column: auto !important;
+  grid-row: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+#design .section.work .tabs-wrap,
+:root[data-theme] #design .section.work .tabs-wrap {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 5 !important;
+  width: 100% !important;
+  margin: 0 0 18px !important;
+  padding: 10px 0 14px !important;
+  background: color-mix(in srgb, var(--bq-paper-work, var(--bg)) 92%, transparent) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+#design .section.work .tabs,
+:root[data-theme] #design .section.work .tabs {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  width: 100% !important;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+#design .section.work .tabs-row,
+:root[data-theme] #design .section.work .tabs-row {
+  display: contents !important;
+}
+
+#design .section.work .tabs .tab,
+:root[data-theme] #design .section.work .tabs .tab {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  max-width: 48px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  border-radius: 50% !important;
+  border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent) !important;
+  background: color-mix(in srgb, var(--ink) 4%, transparent) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  transform: none !important;
+  overflow: hidden !important;
+  color: var(--ink) !important;
+}
+
+#design .section.work .tabs .tab:hover,
+#design .section.work .tabs .tab:focus-visible {
+  background: color-mix(in srgb, var(--ink) 8%, transparent) !important;
+  border-color: color-mix(in srgb, var(--ink) 22%, transparent) !important;
+  transform: none !important;
+}
+
+#design .section.work .tabs .tab.is-active,
+#design .section.work .tabs .tab.is-active:hover {
+  background: var(--ink) !important;
+  border-color: var(--ink) !important;
+  color: var(--bg) !important;
+}
+
+#design .section.work .tabs .tab i {
+  width: auto !important;
+  margin: 0 !important;
+  font-size: 15px !important;
+  opacity: .85 !important;
+  color: inherit !important;
+}
+
+#design .section.work .tabs .tab.is-active i {
+  opacity: 1 !important;
+  color: var(--bg) !important;
+}
+
+#design .section.work .tabs .tab::after {
+  display: none !important;
+}
+
+#design .section.work .tabs .tab .tab-label {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
+
+#design .section.work .tab-card {
+  display: none !important;
+}
+
+@media (max-width: 820px) {
+  #design .section.work .tabs .tab {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    max-width: 44px !important;
+  }
+
+  #design .section.work .tabs {
+    gap: 8px !important;
+  }
+}
+
+/* Focus section — proper head rhythm for svc copy */
+#design .service-showcase .service-showcase-head {
+  margin: 0 0 clamp(28px, 4vw, 48px) !important;
+  max-width: 42rem !important;
+}
+
+#design .service-showcase .service-showcase-head .section-lede,
+#design .service-showcase .service-showcase-lede {
+  margin: 0 !important;
+  max-width: 38rem !important;
+  color: color-mix(in srgb, var(--ink) 62%, transparent) !important;
+  font-size: clamp(15px, 1.35vw, 18px) !important;
+  line-height: 1.55 !important;
+}
+
+#design .service-showcase .paper-scroll {
+  padding: clamp(40px, 5vw, 72px) clamp(20px, 4vw, 56px) !important;
+  box-sizing: border-box !important;
+}
+
+#design .section.paper-sheet:not(.work) > .paper-scroll,
+#design .hero.paper-sheet > .paper-scroll {
+  padding-inline: clamp(18px, 3.5vw, 48px);
+  box-sizing: border-box;
+}
+
+#design .hero.paper-sheet > .paper-scroll {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
+  padding-block: clamp(24px, 4vh, 48px);
+}
