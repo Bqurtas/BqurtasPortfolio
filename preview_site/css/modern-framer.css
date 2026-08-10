@@ -7123,3 +7123,195 @@ body.menu-revealed .bq-page-stage,
   min-height: 100%;
   padding-block: clamp(24px, 4vh, 48px);
 }
+
+/* ============================================================================
+   v66 — The shape, fully visible — like the studio card reference.
+
+   Large radius, clear black bed around all four corners, content clipped
+   strictly inside. Desktop tabs = vertical circle rail. Mobile keeps the
+   same full card above the floating bar.
+   ============================================================================ */
+
+:root {
+  --bq-deck-gutter: clamp(18px, 2.2vw, 36px);
+  --bq-deck-radius: clamp(28px, 3.6vw, 52px);
+  --bq-chrome-bottom: 0px;
+  --bq-stack-top: var(--bq-deck-gutter);
+  --bq-stack-sheet-h: calc(100dvh - (var(--bq-deck-gutter) * 2) - var(--bq-chrome-bottom));
+}
+
+@media (max-width: 820px) {
+  :root {
+    --bq-deck-gutter: 12px;
+    --bq-deck-radius: 28px;
+    /* Keep the whole card above the floating mobile bar. */
+    --bq-chrome-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+#design.paper-stack,
+.room.paper-stack,
+:root[data-theme] #design.paper-stack,
+:root[data-theme] .room.paper-stack {
+  padding: var(--bq-deck-gutter) !important;
+  padding-bottom: calc(var(--bq-deck-gutter) + var(--bq-chrome-bottom)) !important;
+  background: var(--bq-paper-underlay, #050506) !important;
+}
+
+#design.paper-stack > .paper-sheet,
+#design.paper-stack > .section.work.paper-sheet,
+.footer.footer-v249.paper-sheet,
+.room.paper-stack > .paper-sheet,
+:root[data-theme] #design.paper-stack > .paper-sheet,
+:root[data-theme] #design.paper-stack > .section.work.paper-sheet,
+:root[data-theme] .footer.footer-v249.paper-sheet,
+:root[data-theme] .room.paper-stack > .paper-sheet {
+  top: var(--bq-stack-top) !important;
+  height: var(--bq-stack-sheet-h) !important;
+  max-height: var(--bq-stack-sheet-h) !important;
+  border-radius: var(--bq-deck-radius) !important;
+  overflow: hidden !important;
+  clip-path: inset(0 round var(--bq-deck-radius));
+  box-shadow:
+    0 40px 90px -36px rgba(0, 0, 0, .72),
+    0 0 0 1px rgba(0, 0, 0, .1) !important;
+}
+
+.paper-sheet > .paper-scroll {
+  border-radius: var(--bq-deck-radius) !important;
+  /* Keep content off the curved rim */
+  padding-bottom: clamp(28px, 4vh, 56px) !important;
+}
+
+/* ---- Desktop: vertical circle rail (reference layout) ---- */
+@media (min-width: 821px) {
+  #design .section.work > .paper-scroll {
+    display: grid !important;
+    grid-template-columns: 56px minmax(0, 1fr) !important;
+    grid-template-rows: auto auto 1fr auto !important;
+    column-gap: clamp(22px, 2.4vw, 40px) !important;
+    row-gap: 0 !important;
+    align-items: start !important;
+    padding: clamp(36px, 4.5vw, 64px) clamp(28px, 3.5vw, 56px) !important;
+  }
+
+  #design .section.work .section-head {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    margin-bottom: 18px !important;
+  }
+
+  #design .section.work .tabs-wrap,
+  :root[data-theme] #design .section.work .tabs-wrap {
+    grid-column: 1 !important;
+    grid-row: 1 / -1 !important;
+    position: sticky !important;
+    top: 8px !important;
+    align-self: start !important;
+    width: 56px !important;
+    margin: 0 !important;
+    padding: 4px 0 !important;
+    background: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  #design .section.work .tabs,
+  :root[data-theme] #design .section.work .tabs {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    width: 56px !important;
+  }
+
+  #design .section.work .tabs-row {
+    display: contents !important;
+  }
+
+  #design .section.work .tabs .tab,
+  :root[data-theme] #design .section.work .tabs .tab {
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px !important;
+    min-height: 46px !important;
+    max-width: 46px !important;
+  }
+
+  #design .section.work .tab-header {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    margin: 8px 0 22px !important;
+  }
+
+  #design .section.work .grid {
+    grid-column: 2 !important;
+    grid-row: 3 !important;
+  }
+
+  #design .section.work .load-more-wrap {
+    grid-column: 2 !important;
+    grid-row: 4 !important;
+  }
+}
+
+/* ---- Mobile: full card, circle tabs wrap cleanly ---- */
+@media (max-width: 820px) {
+  #design .section.work > .paper-scroll {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 22px 16px 28px !important;
+  }
+
+  #design .section.work .tabs-wrap,
+  :root[data-theme] #design .section.work .tabs-wrap {
+    position: relative !important;
+    top: auto !important;
+    width: 100% !important;
+    margin: 0 0 14px !important;
+    padding: 0 0 8px !important;
+    background: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  #design .section.work .tabs,
+  :root[data-theme] #design .section.work .tabs {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  #design .section.work .tabs .tab,
+  :root[data-theme] #design .section.work .tabs .tab {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    max-width: 42px !important;
+  }
+
+  #design .section.work .section-head {
+    margin-bottom: 14px !important;
+  }
+
+  #design .section.work .section-title {
+    font-size: clamp(26px, 7.2vw, 34px) !important;
+    line-height: 1.12 !important;
+  }
+}
+
+/* Hero + rooms: same full-shape presence */
+#design .hero.paper-sheet > .paper-scroll,
+.room.paper-stack > .room-hero.paper-sheet > .paper-scroll {
+  padding: clamp(28px, 5vh, 64px) clamp(20px, 4vw, 56px) !important;
+}
+
+.room.paper-stack > .section.paper-sheet > .paper-scroll {
+  padding: clamp(28px, 4vw, 56px) clamp(18px, 3.5vw, 48px) calc(28px + var(--bq-chrome-bottom)) !important;
+}
