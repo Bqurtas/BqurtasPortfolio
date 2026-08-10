@@ -9,6 +9,11 @@
   const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const CDN = (window.BQ_GALLERY && window.BQ_GALLERY.CDN_BASE) || '';
+  const scrollTarget = (target, options = {}) => {
+    if (!target) return;
+    if (window.__bqScrollPaperTarget?.(target, options)) return;
+    target.scrollIntoView(options);
+  };
 
   /* Language-change dispatcher — modules push callbacks to re-render
      their JS-generated content (marquee, blog, chatbot) on language switch. */
@@ -281,7 +286,7 @@
   /* Pencemor "View the work" → jump to the gallery */
   $('#pencemorViewWork')?.addEventListener('click', () => {
     const head = document.querySelector('#design .section.work .section-head') || document.getElementById('grid');
-    head?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    scrollTarget(head, { behavior: 'smooth', block: 'start' });
   });
 
   /* =======================================================
@@ -353,7 +358,7 @@
       t.click();
       /* scroll so the section header (title + info) is visible, not just images */
       const head = document.getElementById('tabHeader') || document.getElementById('grid');
-      head?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      scrollTarget(head, { behavior: 'smooth', block: 'start' });
     };
 
     /* ---- Build a truly seamless marquee ----
@@ -449,7 +454,7 @@
       grid.addEventListener('click', (e) => {
         if (!e.target.closest('.logo-mark')) return;
         const t = document.querySelector('.tab[data-filter="logo"]');
-        if (t) { t.click(); document.getElementById('grid')?.scrollIntoView({ behavior: 'smooth' }); }
+        if (t) { t.click(); scrollTarget(document.getElementById('grid'), { behavior: 'smooth' }); }
       });
     }
   })();
@@ -2051,7 +2056,7 @@
             `<button class="index-inline-more" type="button">${dT('blog.readMore', 'Read more')} →</button>`;
           a.after(panel);
           panel.querySelector('.index-inline-more').addEventListener('click', () => openReader(p));
-          panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          scrollTarget(panel, { behavior: 'smooth', block: 'nearest' });
         });
         list.appendChild(a);
       });
@@ -2062,7 +2067,7 @@
 
     /* ----- pager ----- */
     const pagesWrap = $('#blogPages');
-    const goTo = (n) => { page = Math.min(Math.max(1, n), pageCount); renderPage(); layout.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+    const goTo = (n) => { page = Math.min(Math.max(1, n), pageCount); renderPage(); scrollTarget(layout, { behavior: 'smooth', block: 'start' }); };
     const renderPager = () => {
       if (!pagesWrap) return;
       pagesWrap.innerHTML = '';
@@ -2435,7 +2440,7 @@
           const tb = document.querySelector('.tab[data-filter="' + cat + '"]');
           if (tb) tb.click();
           const w = document.querySelector('.section.work');
-          if (w) w.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          scrollTarget(w, { behavior: 'smooth', block: 'start' });
         });
       };
       if (kind === 'work') {

@@ -591,6 +591,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!head) return;
     if (workScroller?.contains(head)) {
       const targetTop = head.classList?.contains('section-head') ? 0 : head.offsetTop;
+      if (workScroller.classList.contains('is-window-driven')) {
+        const sheetStart = Number(workScroller.dataset.paperStart);
+        const innerMax = Number(workScroller.dataset.paperOverflow) || 0;
+        if (Number.isFinite(sheetStart)) {
+          window.scrollTo({
+            top: Math.max(0, sheetStart + Math.min(innerMax, Math.max(0, targetTop))),
+            behavior,
+          });
+          return;
+        }
+      }
       workScroller.scrollTo({ top: Math.max(0, targetTop), behavior });
       return;
     }
@@ -1339,8 +1350,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     sheet.appendChild(scroller);
   };
 
-  const coverProgress = (next, pin, vh) => {
-    const top = next.getBoundingClientRect().top;
+  const coverProgress = (top, pin, vh) => {
     const start = vh - pin;
     const end = pin;
     if (start <= end) return top <= end ? 1 : 0;
@@ -1350,44 +1360,133 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   /* Start fading/blurring a touch earlier so the hand-off feels soft */
   const fadeFrom = (raw) => ease(clamp01((raw - 0.02) / 0.58));
 
+  window.__bqScrollPaperTarget = (target, { behavior = 'smooth', block = 'start' } = {}) => {
+    if (!target?.closest) return false;
+    const sheet = target.matches?.('.paper-sheet') ? target : target.closest('.paper-sheet');
+    const scroller = target.matches?.('.paper-scroll')
+      ? target
+      : sheet?.querySelector(':scope > .paper-scroll');
+    if (!scroller?.classList.contains('is-window-driven')) return false;
+
+    const sheetStart = Number(scroller.dataset.paperStart);
+    const innerMax = Number(scroller.dataset.paperOverflow) || 0;
+    if (!Number.isFinite(sheetStart)) return false;
+
+    let desired = 0;
+    if (target !== sheet && target !== scroller) {
+      const scrollerRect = scroller.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      const targetTop = targetRect.top - scrollerRect.top + scroller.scrollTop;
+      const targetBottom = targetTop + targetRect.height;
+      if (block === 'nearest') {
+        if (targetTop < scroller.scrollTop) desired = targetTop;
+        else if (targetBottom > scroller.scrollTop + scroller.clientHeight) desired = targetBottom - scroller.clientHeight;
+        else desired = scroller.scrollTop;
+      } else if (block === 'center') {
+        desired = targetTop - ((scroller.clientHeight - targetRect.height) / 2);
+      } else {
+        desired = targetTop;
+      }
+    }
+
+    window.scrollTo({
+      top: Math.max(0, sheetStart + Math.min(innerMax, Math.max(0, desired))),
+      behavior,
+    });
+    return true;
+  };
+
+  document.addEventListener('focusin', (event) => {
+    const target = event.target;
+    if (!target?.closest?.('.paper-scroll.is-window-driven')) return;
+    requestAnimationFrame(() => {
+      window.__bqScrollPaperTarget?.(target, { behavior: 'auto', block: 'nearest' });
+    });
+  });
+
   const bindStack = (root, sheets, { requireActive } = {}) => {
     if (!root || sheets.length < 1) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     let frame = 0;
+    let measureFrame = 0;
+
+    const inactive = () => requireActive && root.classList.contains('is-hidden');
+    const readPin = () => parseFloat(getComputedStyle(sheets[0]).top) || 0;
+    const readGap = (sheet) => parseFloat(getComputedStyle(sheet).getPropertyValue('--bq-card-gap')) || 0;
+
+    const resetVisuals = () => {
+      sheets.forEach((sheet) => {
+        sheet.style.setProperty('--bq-out', '0');
+        sheet.style.setProperty('--bq-fade', '0');
+        sheet.style.setProperty('--bq-push-y', '0px');
+        sheet.classList.remove('is-paper-gone');
+      });
+    };
 
     const render = () => {
       frame = 0;
-      if (requireActive && root.classList.contains('is-hidden')) {
-        sheets.forEach((sheet) => {
-          sheet.style.setProperty('--bq-out', '0');
-          sheet.style.setProperty('--bq-fade', '0');
-          sheet.classList.remove('is-paper-gone');
-        });
+      if (inactive()) {
+        resetVisuals();
         return;
       }
 
       const vh = Math.max(window.innerHeight || 0, 1);
-      const pin = parseFloat(getComputedStyle(sheets[0]).top) || 0;
+      const pin = readPin();
       const motionOff = reduced.matches;
 
+      resetVisuals();
+
+      /* Long cards use the page timeline as their scroll track. This makes
+         wheel, touch, keyboard and scrollbar movement obey one hard gate. */
       sheets.forEach((sheet) => {
-        sheet.style.setProperty('--bq-out', '0');
-        sheet.style.setProperty('--bq-fade', '0');
-        sheet.classList.remove('is-paper-gone');
+        const scroller = sheet.querySelector(':scope > .paper-scroll');
+        if (!scroller?.classList.contains('is-window-driven')) return;
+        const innerMax = Number(scroller.dataset.paperOverflow) || 0;
+        const measuredStart = Number(scroller.dataset.paperStart);
+        const sheetStart = Number.isFinite(measuredStart) ? measuredStart : 0;
+        const target = Math.min(innerMax, Math.max(0, window.scrollY - sheetStart));
+        if (Math.abs(scroller.scrollTop - target) > 0.5) scroller.scrollTop = target;
       });
 
       if (sheets.length < 2) return;
 
+      /* Read every geometry value together before writing transforms. */
+      const metrics = sheets.map((sheet) => {
+        const scroller = sheet.querySelector(':scope > .paper-scroll');
+        const sheetStart = Number(scroller?.dataset.paperStart);
+        return {
+          top: sheet.getBoundingClientRect().top,
+          naturalTop: Number.isFinite(sheetStart)
+            ? sheetStart + pin - window.scrollY
+            : sheet.getBoundingClientRect().top,
+          height: sheet.offsetHeight,
+          gap: readGap(sheet),
+        };
+      });
+
       for (let i = 0; i < sheets.length - 1; i += 1) {
         const curr = sheets[i];
-        const next = sheets[i + 1];
-        const raw = coverProgress(next, pin, vh);
-        if (motionOff) continue;
+        const current = metrics[i];
+        const nextTop = metrics[i + 1].top;
+        const currentTop = Math.max(pin, current.naturalTop);
+        const gap = current.gap;
+        const push = Math.min(
+          current.height + gap,
+          Math.max(0, currentTop + current.height + gap - nextTop),
+        );
+        curr.style.setProperty('--bq-push-y', `${push.toFixed(2)}px`);
+
+        const raw = coverProgress(nextTop, pin, vh);
+        if (motionOff) {
+          curr.style.setProperty('--bq-push-y', '0px');
+          curr.classList.toggle('is-paper-gone', push > 0.5);
+          continue;
+        }
         const out = ease(raw);
         const fade = fadeFrom(raw);
         curr.style.setProperty('--bq-out', out.toFixed(4));
         curr.style.setProperty('--bq-fade', fade.toFixed(4));
-        curr.classList.toggle('is-paper-gone', fade >= 0.92);
+        curr.classList.toggle('is-paper-gone', fade >= 0.985);
       }
     };
 
@@ -1395,18 +1494,100 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       if (!frame) frame = requestAnimationFrame(render);
     };
 
+    const measure = () => {
+      measureFrame = 0;
+      if (inactive()) {
+        resetVisuals();
+        return;
+      }
+
+      const pin = readPin();
+      sheets.forEach((sheet, index) => {
+        const scroller = sheet.querySelector(':scope > .paper-scroll');
+        if (!scroller) return;
+        const rawOverflow = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+        /* Ignore sub-pixel/font rounding on otherwise short hero cards. */
+        const overflow = rawOverflow > 12 ? Math.ceil(rawOverflow) : 0;
+        const gap = readGap(sheet);
+        const gate = overflow > 0 && index < sheets.length - 1
+          ? Math.max(0, window.innerHeight - pin - sheet.offsetHeight - gap)
+          : 0;
+
+        sheet.style.setProperty('--bq-flow-extra', `${overflow + gate}px`);
+        scroller.classList.toggle('is-window-driven', overflow > 0);
+        scroller.dataset.paperOverflow = String(overflow);
+      });
+
+      /* Build stable normal-flow offsets instead of reading `offsetTop` from a
+         sticky element (Chromium reports its painted/stuck position there). */
+      const rootStyle = getComputedStyle(root);
+      const rootTop = root.getBoundingClientRect().top + window.scrollY;
+      let cursor = rootTop
+        + (parseFloat(rootStyle.borderTopWidth) || 0)
+        + (parseFloat(rootStyle.paddingTop) || 0);
+
+      sheets.forEach((sheet) => {
+        const scroller = sheet.querySelector(':scope > .paper-scroll');
+        if (!scroller) return;
+        const style = getComputedStyle(sheet);
+        const marginTop = parseFloat(style.marginTop) || 0;
+        const marginBottom = parseFloat(style.marginBottom) || 0;
+        let naturalTop;
+
+        if (sheet.parentElement === root) {
+          naturalTop = cursor + marginTop;
+          cursor = naturalTop + sheet.offsetHeight + marginBottom;
+        } else {
+          /* Home footer lives immediately after #design (other rooms are
+             display:none). Its sticky inset is also the deliberate outer gap
+             between the deck and footer in normal flow. */
+          naturalTop = rootTop + root.offsetHeight + pin + marginTop;
+        }
+        scroller.dataset.paperStart = String(naturalTop - pin);
+      });
+      queue();
+    };
+
+    const queueMeasure = () => {
+      if (!measureFrame) measureFrame = requestAnimationFrame(measure);
+    };
+
     window.addEventListener('scroll', queue, { passive: true });
-    window.addEventListener('resize', queue, { passive: true });
-    window.addEventListener('orientationchange', queue, { passive: true });
-    window.addEventListener('pageshow', queue);
-    window.addEventListener('bq:css-ready', queue);
+    window.addEventListener('resize', queueMeasure, { passive: true });
+    window.addEventListener('orientationchange', queueMeasure, { passive: true });
+    window.addEventListener('pageshow', queueMeasure);
+    window.addEventListener('load', queueMeasure, { once: true });
+    window.addEventListener('bq:css-ready', queueMeasure);
     reduced.addEventListener?.('change', queue);
-    document.addEventListener('bq:route', queue);
+    document.addEventListener('bq:route', queueMeasure);
+
+    const resizeObserver = typeof ResizeObserver === 'function'
+      ? new ResizeObserver(queueMeasure)
+      : null;
+    const mutationObserver = typeof MutationObserver === 'function' && resizeObserver
+      ? new MutationObserver((records) => {
+          records.forEach((record) => {
+            record.addedNodes.forEach((node) => {
+              if (node.nodeType === 1 && node.parentElement?.classList.contains('paper-scroll')) {
+                resizeObserver.observe(node);
+              }
+            });
+          });
+          queueMeasure();
+        })
+      : null;
+
     sheets.forEach((sheet) => {
       const scroller = sheet.querySelector(':scope > .paper-scroll');
       scroller?.addEventListener('scroll', queue, { passive: true });
+      if (scroller && resizeObserver) {
+        resizeObserver.observe(scroller);
+        [...scroller.children].forEach((child) => resizeObserver.observe(child));
+        mutationObserver?.observe(scroller, { childList: true, subtree: true });
+      }
     });
-    queue();
+    document.fonts?.ready?.then(queueMeasure, () => {});
+    queueMeasure();
   };
 
   /* ---- Home deck ---- */
