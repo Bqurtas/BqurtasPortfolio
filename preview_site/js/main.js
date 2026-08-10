@@ -198,6 +198,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById(id)?.querySelectorAll('.paper-scroll').forEach((scroller) => {
       scroller.scrollTop = 0;
     });
+    const footerScroller = document.querySelector('.footer.footer-v249.paper-sheet > .paper-scroll');
+    if (footerScroller) footerScroller.scrollTop = 0;
     document.body.dataset.room = id;
     document.documentElement.dataset.room = id;
     document.dispatchEvent(new CustomEvent('bq:route', { detail: { room: id } }));
@@ -435,8 +437,15 @@ document.addEventListener('DOMContentLoaded', () => {
     setMenu(false);
   }, true);
 
+  window.__bqGoDocumentTop = (behavior = 'smooth') => {
+    window.__bqPaperBypassUntil = performance.now() + (behavior === 'smooth' ? 1200 : 180);
+    document.querySelectorAll('.room:not(.is-hidden) .paper-scroll, .footer.footer-v249.paper-sheet > .paper-scroll')
+      .forEach((scroller) => { scroller.scrollTop = 0; });
+    window.scrollTo({ top: 0, behavior });
+  };
+
   document.querySelector('[data-footer-top]')?.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.__bqGoDocumentTop('smooth');
   });
 
   /* Instagram-style dock response: shrink slightly while moving down, restore
@@ -513,6 +522,104 @@ document.addEventListener('DOMContentLoaded', () => {
     video:    { title: 'Video',           desc: 'Documentary edits, motion reels, and protocol media coverage.',         note: '2019—Now · KRG official media' },
     other:    { title: 'Other Works',     desc: 'Miscellaneous — flex banners, type experiments, and notes.',            note: 'Always ongoing' },
   };
+
+  /* Rich portfolio-tab preview lives in the critical bundle so the very
+     first hover works on a fresh Home / Design visit. Keep it under body: a
+     fixed card must never be clipped by the rounded work scroller. */
+  (function initTabHoverCards() {
+    if (window.__bqTabCardsBound || !tabs.length) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    window.__bqTabCardsBound = true;
+
+    const INFO = {
+      all:        { tag: 'Full catalogue',        desc: 'Every discipline gathered in one place — the complete body of work.' },
+      official:   { tag: 'Official · Editorial', desc: 'Editorial design — books, layouts, and official publications.' },
+      book:       { tag: 'Print · Covers',        desc: 'Book covers — typography, illustration, and print composition.' },
+      image:      { tag: 'Photography',            desc: 'Photo editing, composites, and editorial retouching.' },
+      logo:       { tag: 'Brand identity',         desc: 'Logos, wordmarks, and visual identities drawn by hand.' },
+      posters:    { tag: 'Print',                  desc: 'Cultural, political, and typographic poster series.' },
+      social:     { tag: 'Digital',                desc: 'Social campaigns, grids, and digital storytelling.' },
+      events:     { tag: 'Identity',               desc: 'Ceremony materials, banners, and event identity design.' },
+      stationery: { tag: 'Stationery',             desc: 'Business cards, letterheads, invoices and receipts — the quiet system behind a brand.' },
+      video:      { tag: 'Motion',                 desc: 'Documentary edits, motion reels, and media coverage.' },
+      other:      { tag: 'Miscellany',             desc: 'Flex banners, type experiments, and the small things.' },
+      ai:         { tag: 'AI · Experiments',       desc: 'AI-assisted posters, video, and visual experiments. Coming soon.' },
+    };
+
+    const card = document.createElement('div');
+    card.className = 'tab-card';
+    card.setAttribute('role', 'tooltip');
+    card.setAttribute('aria-hidden', 'true');
+    card.innerHTML = `
+      <span class="mono tab-card-tag"></span>
+      <h4 class="tab-card-title"></h4>
+      <p class="tab-card-desc"></p>`;
+    document.body.appendChild(card);
+
+    const tag = card.querySelector('.tab-card-tag');
+    const title = card.querySelector('.tab-card-title');
+    const desc = card.querySelector('.tab-card-desc');
+    let activeTab = null;
+    let hideTimer = 0;
+
+    const translatedInfo = (filter) => {
+      const lang = document.documentElement.dataset.lang || 'en';
+      return window.TABCARD_I18N?.[lang]?.[filter] || INFO[filter];
+    };
+    const hide = (immediate = false) => {
+      clearTimeout(hideTimer);
+      const close = () => {
+        card.classList.remove('is-shown');
+        card.setAttribute('aria-hidden', 'true');
+        activeTab?.removeAttribute('aria-describedby');
+        activeTab = null;
+      };
+      if (immediate) close();
+      else hideTimer = window.setTimeout(close, 120);
+    };
+    const show = (tab) => {
+      const filter = tab.dataset.filter;
+      const info = translatedInfo(filter);
+      if (!info) return;
+      clearTimeout(hideTimer);
+      activeTab?.removeAttribute('aria-describedby');
+      activeTab = tab;
+      tag.textContent = info.tag;
+      title.textContent = (tab.querySelector('.tab-label')?.textContent || filter).trim();
+      desc.textContent = info.desc;
+      card.id = 'portfolioTabPreview';
+      tab.setAttribute('aria-describedby', card.id);
+      card.style.visibility = 'hidden';
+      card.classList.add('is-shown');
+      card.setAttribute('aria-hidden', 'false');
+
+      const tabRect = tab.getBoundingClientRect();
+      const cardWidth = card.offsetWidth;
+      const cardHeight = card.offsetHeight;
+      let left = tabRect.right + 14;
+      if (left + cardWidth > window.innerWidth - 12) left = tabRect.left - cardWidth - 14;
+      const top = Math.max(12, Math.min(
+        tabRect.top + (tabRect.height - cardHeight) / 2,
+        window.innerHeight - cardHeight - 12,
+      ));
+      card.style.left = `${left}px`;
+      card.style.top = `${top}px`;
+      card.style.visibility = '';
+    };
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('mouseenter', () => show(tab));
+      tab.addEventListener('mouseleave', () => hide());
+      tab.addEventListener('focus', () => show(tab));
+      tab.addEventListener('blur', () => hide());
+      tab.addEventListener('click', () => hide(true));
+    });
+    card.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+    card.addEventListener('mouseleave', () => hide());
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') hide(true);
+    });
+  }());
 
   const getTabMeta = () =>
     (window.TAB_META_I18N && window.TAB_META_I18N[currentLang]) ||
@@ -591,17 +698,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!head) return;
     if (workScroller?.contains(head)) {
       const targetTop = head.classList?.contains('section-head') ? 0 : head.offsetTop;
-      if (workScroller.classList.contains('is-window-driven')) {
-        const sheetStart = Number(workScroller.dataset.paperStart);
-        const innerMax = Number(workScroller.dataset.paperOverflow) || 0;
-        if (Number.isFinite(sheetStart)) {
-          window.scrollTo({
-            top: Math.max(0, sheetStart + Math.min(innerMax, Math.max(0, targetTop))),
-            behavior,
-          });
-          return;
-        }
-      }
+      const paperTarget = head.classList?.contains('section-head') ? workScroller : head;
+      if (window.__bqScrollPaperTarget?.(paperTarget, { behavior, block: 'start' })) return;
       workScroller.scrollTo({ top: Math.max(0, targetTop), behavior });
       return;
     }
@@ -1306,6 +1404,12 @@ document.addEventListener('DOMContentLoaded', () => {
 (function scrollCues() {
   const glide = (cue) => {
     const hero = cue.closest('.hero, .room-hero, .pencemor-hero');
+    const nextPaper = hero?.nextElementSibling;
+    if (nextPaper && window.__bqScrollPaperTarget?.(nextPaper, { behavior: 'smooth', block: 'start' })) {
+      window.__bqNoSnap = true;
+      setTimeout(() => { window.__bqNoSnap = false; }, 1100);
+      return;
+    }
     const top = hero ? Math.max(0, hero.getBoundingClientRect().bottom + window.scrollY - 2)
                      : window.scrollY + window.innerHeight * 0.9;
     window.__bqNoSnap = true;                       // don't let the hero-snap fight this deliberate scroll-down
@@ -1333,6 +1437,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 (function featuredPaperStack() {
   const clamp01 = (n) => Math.min(1, Math.max(0, n));
   const ease = (t) => t * t * (3 - 2 * t);
+  const paperStacks = [];
 
   const wrapPaperScroll = (sheet) => {
     if (!sheet || sheet.querySelector(':scope > .paper-scroll')) return;
@@ -1366,10 +1471,11 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const scroller = target.matches?.('.paper-scroll')
       ? target
       : sheet?.querySelector(':scope > .paper-scroll');
-    if (!scroller?.classList.contains('is-window-driven')) return false;
+    if (!scroller) return false;
 
     const sheetStart = Number(scroller.dataset.paperStart);
-    const innerMax = Number(scroller.dataset.paperOverflow) || 0;
+    const liveOverflow = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+    const innerMax = liveOverflow > 12 ? Math.ceil(liveOverflow) : 0;
     if (!Number.isFinite(sheetStart)) return false;
 
     let desired = 0;
@@ -1389,16 +1495,24 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       }
     }
 
-    window.scrollTo({
-      top: Math.max(0, sheetStart + Math.min(innerMax, Math.max(0, desired))),
-      behavior,
-    });
+    const innerTarget = Math.min(innerMax, Math.max(0, desired));
+    const scrollInside = () => scroller.scrollTo({ top: innerTarget, behavior });
+    if (Math.abs(window.scrollY - sheetStart) > 2) {
+      /* Deliberate navigation may cross earlier cards. The input router still
+         gates ordinary wheel/touch/scrollbar movement. */
+      window.__bqPaperBypassUntil = performance.now() + (behavior === 'smooth' ? 1200 : 180);
+      window.scrollTo({ top: Math.max(0, sheetStart), behavior });
+      if (behavior === 'smooth') window.setTimeout(scrollInside, 520);
+      else requestAnimationFrame(scrollInside);
+    } else {
+      scrollInside();
+    }
     return true;
   };
 
   document.addEventListener('focusin', (event) => {
     const target = event.target;
-    if (!target?.closest?.('.paper-scroll.is-window-driven')) return;
+    if (!target?.closest?.('.paper-scroll')) return;
     requestAnimationFrame(() => {
       window.__bqScrollPaperTarget?.(target, { behavior: 'auto', block: 'nearest' });
     });
@@ -1406,6 +1520,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
   const bindStack = (root, sheets, { requireActive } = {}) => {
     if (!root || sheets.length < 1) return;
+    paperStacks.push({ root, sheets, requireActive });
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     let frame = 0;
     let measureFrame = 0;
@@ -1435,18 +1550,6 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       const motionOff = reduced.matches;
 
       resetVisuals();
-
-      /* Long cards use the page timeline as their scroll track. This makes
-         wheel, touch, keyboard and scrollbar movement obey one hard gate. */
-      sheets.forEach((sheet) => {
-        const scroller = sheet.querySelector(':scope > .paper-scroll');
-        if (!scroller?.classList.contains('is-window-driven')) return;
-        const innerMax = Number(scroller.dataset.paperOverflow) || 0;
-        const measuredStart = Number(scroller.dataset.paperStart);
-        const sheetStart = Number.isFinite(measuredStart) ? measuredStart : 0;
-        const target = Math.min(innerMax, Math.max(0, window.scrollY - sheetStart));
-        if (Math.abs(scroller.scrollTop - target) > 0.5) scroller.scrollTop = target;
-      });
 
       if (sheets.length < 2) return;
 
@@ -1502,19 +1605,18 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       }
 
       const pin = readPin();
-      sheets.forEach((sheet, index) => {
+      sheets.forEach((sheet) => {
         const scroller = sheet.querySelector(':scope > .paper-scroll');
         if (!scroller) return;
         const rawOverflow = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
         /* Ignore sub-pixel/font rounding on otherwise short hero cards. */
         const overflow = rawOverflow > 12 ? Math.ceil(rawOverflow) : 0;
-        const gap = readGap(sheet);
-        const gate = overflow > 0 && index < sheets.length - 1
-          ? Math.max(0, window.innerHeight - pin - sheet.offsetHeight - gap)
-          : 0;
 
-        sheet.style.setProperty('--bq-flow-extra', `${overflow + gate}px`);
-        scroller.classList.toggle('is-window-driven', overflow > 0);
+        /* Overflow belongs to the rounded surface itself. The black deck no
+           longer borrows document height from the card's inner content. */
+        sheet.style.setProperty('--bq-flow-extra', '0px');
+        scroller.classList.remove('is-window-driven');
+        scroller.classList.toggle('is-paper-scrollable', overflow > 0);
         scroller.dataset.paperOverflow = String(overflow);
       });
 
@@ -1645,6 +1747,251 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     });
     bindStack(room, parts, { requireActive: true });
   });
+
+  /* Rounded-scroll ownership -------------------------------------------------
+     The paper surface, not the black deck, owns reading. At a sheet's sticky
+     anchor wheel/touch/keyboard input stays in its inner scroller. Only after
+     that scroller reaches an edge can the document advance to the next card.
+     A small outer-scroll gate also covers scrollbar drags and gutter input. */
+  (function installPaperInputRouter() {
+    if (window.__bqPaperInputRouterBound || !paperStacks.length) return;
+    window.__bqPaperInputRouterBound = true;
+
+    const EDGE = 1.5;
+    const ANCHOR_EPSILON = 2.5;
+    const overlaySelector = [
+      '#mobileMenu', '.latest-panel', '.chat', '.dashboard', '.reader',
+      '.lb-overlay', '.cookie-card', '[role="dialog"]', '[aria-modal="true"]',
+    ].join(',');
+    const openOverlaySelector = [
+      '#mobileMenu.is-open', '.latest-panel.is-open', '.chat.is-open',
+      '#dash.is-open', '.reader.is-open', '.lb-overlay.is-open',
+      '.lb-overlay.is-active', '[role="dialog"][open]',
+      '[aria-modal="true"]:not([aria-hidden="true"])',
+    ].join(',');
+    let lastWindowY = window.scrollY;
+    let correctingWindow = false;
+    let touchY = null;
+    let touchOwned = false;
+    const sharedFooter = document.querySelector('.footer.footer-v249.paper-sheet');
+
+    const isActiveStack = (stack) => {
+      if (stack.requireActive && stack.root.classList.contains('is-hidden')) return false;
+      return getComputedStyle(stack.root).display !== 'none';
+    };
+
+    const activeStack = () => paperStacks.find(isActiveStack) || null;
+
+    const entriesFor = (stack = activeStack()) => {
+      if (!stack) return [];
+      const entries = stack.sheets.map((sheet) => {
+        const scroller = sheet?.querySelector(':scope > .paper-scroll');
+        const liveOverflow = scroller
+          ? Math.max(0, scroller.scrollHeight - scroller.clientHeight)
+          : 0;
+        return {
+          sheet,
+          scroller,
+          start: Number(scroller?.dataset.paperStart),
+          max: liveOverflow > 12 ? Math.ceil(liveOverflow) : 0,
+        };
+      }).filter((entry) => entry.scroller && Number.isFinite(entry.start));
+
+      /* The shared contact footer sits outside every room. Give it the active
+         room's live flow start so its rounded surface keeps the same ownership
+         contract on Journal / Designer / Contact as it has on Design. */
+      if (sharedFooter && !stack.sheets.includes(sharedFooter)) {
+        const scroller = sharedFooter.querySelector(':scope > .paper-scroll');
+        if (scroller) {
+          const rootTop = stack.root.getBoundingClientRect().top + window.scrollY;
+          const marginTop = parseFloat(getComputedStyle(sharedFooter).marginTop) || 0;
+          const start = rootTop + stack.root.offsetHeight + marginTop;
+          const liveOverflow = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+          scroller.dataset.paperStart = String(start);
+          entries.push({
+            sheet: sharedFooter,
+            scroller,
+            start,
+            max: liveOverflow > 12 ? Math.ceil(liveOverflow) : 0,
+          });
+        }
+      }
+
+      return entries.sort((a, b) => a.start - b.start);
+    };
+
+    const anchoredEntry = (entries, y = window.scrollY) => {
+      let current = null;
+      entries.forEach((entry) => {
+        if (entry.start <= y + ANCHOR_EPSILON) current = entry;
+      });
+      return current && Math.abs(y - current.start) <= ANCHOR_EPSILON ? current : null;
+    };
+
+    const overlayIsOpen = () => (
+      document.body.classList.contains('menu-open')
+      || document.body.classList.contains('menu-closing')
+      || Boolean(document.querySelector(openOverlaySelector))
+    );
+    const isOverlayInput = (target) => overlayIsOpen() || Boolean(target?.closest?.(overlaySelector));
+    const scrollWindowBy = (delta) => {
+      if (Math.abs(delta) < .01) return;
+      window.scrollBy({ top: delta, left: 0, behavior: 'auto' });
+    };
+
+    const routeDelta = (event, delta, { forceWindow = false } = {}) => {
+      if (!Number.isFinite(delta) || Math.abs(delta) < .01 || isOverlayInput(event.target)) return false;
+      const entries = entriesFor();
+      if (!entries.length) return false;
+      const anchored = anchoredEntry(entries);
+
+      if (anchored && anchored.max > EDGE) {
+        const before = anchored.scroller.scrollTop;
+        const after = Math.min(anchored.max, Math.max(0, before + delta));
+        const consumed = after - before;
+        const residual = delta - consumed;
+        event.preventDefault();
+        if (Math.abs(consumed) > .01) anchored.scroller.scrollTop = after;
+        if (Math.abs(residual) > .01) scrollWindowBy(residual);
+        return true;
+      }
+
+      /* At an inner edge, or while cards are handing off, input belongs to the
+         document. Prevent the browser from accidentally scrolling the next
+         card merely because the pointer happens to be over it. */
+      if (anchored || forceWindow || event.target?.closest?.('.paper-scroll')) {
+        event.preventDefault();
+        scrollWindowBy(delta);
+        return true;
+      }
+      return false;
+    };
+
+    const wheelPixels = (event) => {
+      if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) return event.deltaY * 18;
+      if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) return event.deltaY * window.innerHeight;
+      return event.deltaY;
+    };
+
+    window.addEventListener('wheel', (event) => {
+      if (event.ctrlKey) return;
+      if (event.isTrusted) window.__bqPaperBypassUntil = 0;
+      routeDelta(event, wheelPixels(event));
+    }, { capture: true, passive: false });
+
+    window.addEventListener('touchstart', (event) => {
+      if (event.isTrusted) window.__bqPaperBypassUntil = 0;
+      if (event.touches.length === 1) {
+        touchY = event.touches[0].clientY;
+        touchOwned = Boolean(anchoredEntry(entriesFor()) || event.target?.closest?.('.paper-scroll'));
+      } else {
+        touchY = null;
+        touchOwned = false;
+      }
+    }, { capture: true, passive: true });
+
+    window.addEventListener('touchmove', (event) => {
+      if (touchY === null || event.touches.length !== 1) return;
+      const nextY = event.touches[0].clientY;
+      const delta = touchY - nextY;
+      touchY = nextY;
+      routeDelta(event, delta, { forceWindow: touchOwned });
+    }, { capture: true, passive: false });
+
+    const clearTouch = () => {
+      touchY = null;
+      touchOwned = false;
+    };
+    window.addEventListener('touchend', clearTouch, { capture: true, passive: true });
+    window.addEventListener('touchcancel', clearTouch, { capture: true, passive: true });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey || isOverlayInput(event.target)) return;
+      if (event.target?.closest?.('input, textarea, select, [contenteditable="true"]')) return;
+      const composite = event.target?.closest?.('[role="tablist"], [role="menu"], [role="listbox"]');
+      if (composite && ['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      const actionControl = event.target?.closest?.('button, summary, [role="button"]');
+      const link = event.target?.closest?.('a[href]');
+      if ((actionControl && (event.key === ' ' || event.key === 'Enter')) || (link && event.key === 'Enter')) return;
+      const interactive = actionControl || link;
+      if (interactive && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) return;
+
+      const entries = entriesFor();
+      const anchored = anchoredEntry(entries);
+      if (!anchored && !event.target?.closest?.('.paper-scroll')) return;
+
+      let delta = 0;
+      let direct = null;
+      if (event.key === 'ArrowDown') delta = 52;
+      else if (event.key === 'ArrowUp') delta = -52;
+      else if (event.key === 'PageDown') delta = window.innerHeight * .82;
+      else if (event.key === 'PageUp') delta = -window.innerHeight * .82;
+      else if (event.key === ' ') delta = window.innerHeight * (event.shiftKey ? -.82 : .82);
+      else if (event.key === 'Home' && anchored) direct = 0;
+      else if (event.key === 'End' && anchored) direct = anchored.max;
+      else return;
+
+      if (event.isTrusted) window.__bqPaperBypassUntil = 0;
+
+      if (direct !== null && Math.abs(anchored.scroller.scrollTop - direct) > EDGE) {
+        event.preventDefault();
+        anchored.scroller.scrollTo({ top: direct, behavior: 'smooth' });
+        return;
+      }
+      routeDelta(event, delta || (direct === 0 ? -window.innerHeight : window.innerHeight));
+    }, true);
+
+    /* Correct outer-scroll bypasses (scrollbar drag, restoration, scripts).
+       Ordinary deliberate route/tab navigation sets __bqPaperBypassUntil. */
+    const gateOuterScroll = () => {
+      const y = window.scrollY;
+      if (correctingWindow || performance.now() < (window.__bqPaperBypassUntil || 0)) {
+        lastWindowY = y;
+        return;
+      }
+
+      const entries = entriesFor();
+      if (!entries.length || Math.abs(y - lastWindowY) < .5) {
+        lastWindowY = y;
+        return;
+      }
+
+      let lock = null;
+      if (y > lastWindowY) {
+        lock = entries.find((entry) => (
+          entry.start >= lastWindowY - ANCHOR_EPSILON
+          && entry.start <= y + ANCHOR_EPSILON
+          && entry.max > EDGE
+          && entry.scroller.scrollTop < entry.max - EDGE
+        ));
+      } else {
+        lock = [...entries].reverse().find((entry) => (
+          entry.start <= lastWindowY + ANCHOR_EPSILON
+          && entry.start >= y - ANCHOR_EPSILON
+          && entry.max > EDGE
+          && entry.scroller.scrollTop > EDGE
+        ));
+      }
+
+      if (!lock) {
+        lastWindowY = y;
+        return;
+      }
+
+      correctingWindow = true;
+      lastWindowY = lock.start;
+      window.scrollTo({ top: Math.max(0, lock.start), left: 0, behavior: 'auto' });
+      requestAnimationFrame(() => { correctingWindow = false; });
+    };
+
+    window.addEventListener('scroll', gateOuterScroll, { passive: true });
+    document.addEventListener('bq:route', () => {
+      lastWindowY = window.scrollY;
+      clearTouch();
+    });
+    window.addEventListener('pageshow', () => { lastWindowY = window.scrollY; });
+    window.addEventListener('resize', () => { lastWindowY = window.scrollY; }, { passive: true });
+  }());
 })();
 
 /* =========================================================
@@ -1655,6 +2002,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 (function ensureFooterShell() {
   const footer = document.querySelector('.footer-v249');
   if (!footer) return;
+  const footerContent = footer.querySelector(':scope > .paper-scroll') || footer;
 
   const dict = window.BQ_DICT || {};
   footer.querySelectorAll('.footer-wordmark, .footer-contact-grid, .footer-main-v249, .footer-cta-btn').forEach((el) => el.remove());
@@ -1673,7 +2021,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       </div>`;
     stage.querySelector('[data-i18n="f.avail"]').textContent = dict['f.avail'] || 'Available for select commissions';
     stage.querySelector('[data-i18n="f.cta.title"]').innerHTML = dict['f.cta.title'] || "Let's make something <em>quietly</em> good together.";
-    footer.prepend(stage);
+    footerContent.prepend(stage);
   } else if (!footer.querySelector('.footer-email')) {
     const copy = footer.querySelector('.footer-stage-copy') || footer.querySelector('.footer-stage');
     const mail = document.createElement('a');
@@ -1694,7 +2042,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         <a href="https://instagram.com/bqurtas" target="_blank" rel="noopener">Instagram</a>
       </div>
       <span>© 2026 <span data-i18n="name.full">${dict['name.full'] || 'Barakat Qurtas'}</span></span>`;
-    footer.append(bottom);
+    footerContent.append(bottom);
   }
 
   footer.setAttribute('aria-labelledby', 'footerCtaTitle');
@@ -1781,7 +2129,9 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
   if (!window.__bqTopClickBound) {
     control.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: reduced.matches ? 'auto' : 'smooth' });
+      const behavior = reduced.matches ? 'auto' : 'smooth';
+      if (window.__bqGoDocumentTop) window.__bqGoDocumentTop(behavior);
+      else window.scrollTo({ top: 0, behavior });
     });
     window.__bqTopClickBound = true;
   }

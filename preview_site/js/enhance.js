@@ -480,9 +480,11 @@
      5c · TAB HOVER CARDS — info card per portfolio tab (no image)
      ======================================================= */
   (function tabCards() {
+    if (window.__bqTabCardsBound) return;
     const tabs = $$('.tab');
     if (!tabs.length) return;
     if (!window.matchMedia('(pointer: fine)').matches) return;  // hover only
+    window.__bqTabCardsBound = true;
 
     const INFO = {
       all:      { tag: 'Full catalogue',         desc: 'Every discipline gathered in one place — the complete body of work.' },

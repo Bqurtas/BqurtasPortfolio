@@ -8284,3 +8284,93 @@ body.menu-revealed .bq-page-stage {
     opacity: 1 !important;
   }
 }
+
+/* ============================================================================
+   v71 — The rounded paper owns scrolling.
+
+   The black deck is a fixed, inert backdrop. Long copy scrolls inside the
+   clipped paper surface; the document advances only at the paper's edge.
+   ============================================================================ */
+
+:root {
+  --bq-deck-radius: clamp(44px, 4.25vw, 82px);
+}
+
+@media (max-width: 820px) {
+  :root {
+    --bq-deck-radius: 38px;
+  }
+}
+
+html {
+  scroll-behavior: auto !important;
+  overscroll-behavior-y: none;
+  background: var(--bq-paper-underlay) !important;
+}
+
+body,
+:root[data-theme] body,
+#design.paper-stack,
+.room.paper-stack,
+:root[data-theme] #design.paper-stack,
+:root[data-theme] .room.paper-stack {
+  background-color: var(--bq-paper-underlay) !important;
+  background-image: none !important;
+  background-attachment: fixed !important;
+}
+
+/* Native wheel/touch movement belongs to the clipped rounded surface. The
+   input router performs the deliberate edge hand-off to the document. */
+.paper-sheet > .paper-scroll,
+.paper-sheet > .paper-scroll.is-window-driven {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-x: none !important;
+  overscroll-behavior-y: contain !important;
+  scrollbar-gutter: auto !important;
+  scrollbar-width: thin !important;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.paper-sheet > .paper-scroll.is-paper-scrollable {
+  scrollbar-gutter: stable !important;
+}
+
+.paper-sheet > .paper-scroll::-webkit-scrollbar,
+.paper-sheet > .paper-scroll.is-window-driven::-webkit-scrollbar {
+  display: block !important;
+  width: 7px !important;
+}
+
+.paper-sheet > .paper-scroll::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.paper-sheet > .paper-scroll::-webkit-scrollbar-thumb {
+  border: 2px solid transparent !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--ink) 24%, transparent) !important;
+  background-clip: padding-box !important;
+}
+
+/* The rich icon preview is body-fixed so it never gets clipped by the paper
+   or changes Portfolio's inner height. Coarse pointers keep first-tap filters. */
+@media (min-width: 821px) and (hover: hover) and (pointer: fine) {
+  body > .tab-card {
+    display: block !important;
+    position: fixed !important;
+  }
+}
+
+@media (hover: none), (pointer: coarse), (max-width: 820px) {
+  body > .tab-card {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paper-sheet > .paper-scroll {
+    scroll-behavior: auto !important;
+  }
+}
