@@ -1337,7 +1337,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     return clamp01((start - top) / (start - end));
   };
 
-  const fadeFrom = (raw) => ease(clamp01((raw - 0.06) / 0.5));
+  /* Start fading/blurring a touch earlier so the hand-off feels soft */
+  const fadeFrom = (raw) => ease(clamp01((raw - 0.02) / 0.58));
 
   const bindStack = (root, sheets, { requireActive } = {}) => {
     if (!root || sheets.length < 1) return;
