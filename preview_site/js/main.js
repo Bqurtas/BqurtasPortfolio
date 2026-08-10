@@ -195,8 +195,12 @@ document.addEventListener('DOMContentLoaded', () => {
       l.classList.toggle('is-active', l.dataset.route === id);
     });
     window.scrollTo({ top: 0, behavior: 'auto' });
+    document.getElementById(id)?.querySelectorAll('.paper-scroll').forEach((scroller) => {
+      scroller.scrollTop = 0;
+    });
     document.body.dataset.room = id;
     document.documentElement.dataset.room = id;
+    document.dispatchEvent(new CustomEvent('bq:route', { detail: { room: id } }));
     setRoomChrome(id);
     document.querySelectorAll('.reveal').forEach(el => el.classList.remove('is-in'));
     requestAnimationFrame(() => triggerReveals());
@@ -582,8 +586,14 @@ document.addEventListener('DOMContentLoaded', () => {
     updateLoadMore(matching.length);
   };
   const scrollToGridTop = (behavior = 'smooth') => {
-    const head = document.querySelector('.section.work > .section-head') || document.getElementById('tabHeader') || gridEl;
+    const workScroller = document.querySelector('.section.work > .paper-scroll');
+    const head = workScroller?.querySelector(':scope > .section-head') || document.querySelector('.section.work > .section-head') || document.getElementById('tabHeader') || gridEl;
     if (!head) return;
+    if (workScroller?.contains(head)) {
+      const targetTop = head.classList?.contains('section-head') ? 0 : head.offsetTop;
+      workScroller.scrollTo({ top: Math.max(0, targetTop), behavior });
+      return;
+    }
     const topbar = document.querySelector('.rail');
     const topbarH = topbar && getComputedStyle(topbar).position === 'fixed'
       ? topbar.getBoundingClientRect().height
@@ -1313,19 +1323,19 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   const clamp01 = (n) => Math.min(1, Math.max(0, n));
   const ease = (t) => t * t * (3 - 2 * t);
 
-  const readGutter = () => {
-    const raw = getComputedStyle(document.documentElement)
-      .getPropertyValue('--bq-deck-gutter')
-      .trim();
-    const n = parseFloat(raw);
-    return Number.isFinite(n) ? n : 0;
-  };
-
   const wrapPaperScroll = (sheet) => {
     if (!sheet || sheet.querySelector(':scope > .paper-scroll')) return;
     const scroller = document.createElement('div');
     scroller.className = 'paper-scroll';
     while (sheet.firstChild) scroller.appendChild(sheet.firstChild);
+    const heading = scroller.querySelector('h1, h2, h3, .section-title, .room-hero-title');
+    const fallbackLabel = String(sheet.dataset.paper || 'Scrollable section')
+      .replace(/[-_]+/g, ' ')
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
+    const label = heading?.textContent?.replace(/\s+/g, ' ').trim() || fallbackLabel;
+    scroller.tabIndex = 0;
+    scroller.setAttribute('role', 'region');
+    scroller.setAttribute('aria-label', label);
     sheet.appendChild(scroller);
   };
 
@@ -1357,7 +1367,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       }
 
       const vh = Math.max(window.innerHeight || 0, 1);
-      const pin = readGutter();
+      const pin = parseFloat(getComputedStyle(sheets[0]).top) || 0;
       const motionOff = reduced.matches;
 
       sheets.forEach((sheet) => {

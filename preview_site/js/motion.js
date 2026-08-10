@@ -242,9 +242,11 @@
     else fn();
   }
   ready(function () {
-    var wrap = document.querySelector('.section.work > .tabs-wrap');
     var section = document.querySelector('.section.work');
-    if (!wrap || !section) return;
+    if (!section) return;
+    var scroller = section.querySelector(':scope > .paper-scroll');
+    var wrap = (scroller && scroller.querySelector(':scope > .tabs-wrap')) || section.querySelector(':scope > .tabs-wrap');
+    if (!wrap) return;
     var grid = section.querySelector('.grid');
     var mq = matchMedia('(max-width:820px)');
     var raf = 0;
@@ -264,6 +266,7 @@
     };
     var queue = function () { if (!raf) raf = requestAnimationFrame(update); };
     addEventListener('scroll', queue, { passive: true });
+    if (scroller) scroller.addEventListener('scroll', queue, { passive: true });
     addEventListener('resize', queue);
     mq.addEventListener('change', queue);
     update();
