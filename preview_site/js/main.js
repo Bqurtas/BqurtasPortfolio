@@ -1884,21 +1884,16 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
       /* Portfolio owns nested reading while window is parked on its anchor. */
       if (portfolio && Math.abs(y - portfolio.start) <= ANCHOR_EPSILON) {
+        /* Phones: never hijack touch — native momentum inside .paper-scroll
+           feels right, and overscroll releases sheet-to-sheet naturally. */
+        if (softTouch.matches && event.type === 'touchmove') return false;
         const before = portfolio.scroller.scrollTop;
-        const atTop = before <= EDGE;
-        const atBottom = before >= portfolio.max - EDGE;
-        /* On touch, release at the edges so native momentum can continue. */
-        if (softTouch.matches && event.type === 'touchmove') {
-          if ((delta > 0 && atBottom) || (delta < 0 && atTop)) return false;
-        }
         portfolio.scroller.scrollTop = before + delta;
         const after = portfolio.scroller.scrollTop;
         const consumed = after - before;
         const residual = delta - consumed;
         event.preventDefault();
-        if (Math.abs(residual) > .01 && !(softTouch.matches && event.type === 'touchmove')) {
-          scrollWindowBy(residual);
-        }
+        if (Math.abs(residual) > .01) scrollWindowBy(residual);
         return true;
       }
 
