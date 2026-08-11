@@ -4,8 +4,8 @@
   "description": "Independent graphic designer in Erbil, Kurdistan — brand identity, editorial, books, logos, posters & video.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#efe6d2",
-  "theme_color": "#14100b",
+  "background_color": "#e8e9eb",
+  "theme_color": "#141414",
   "icons": [
     { "src": "/assets/favicons/favicon-32x32.png", "sizes": "32x32", "type": "image/png", "purpose": "any" },
     { "src": "/assets/favicon-48.png", "sizes": "48x48", "type": "image/png", "purpose": "any" },

@@ -1,9 +1,9 @@
 /* Final presentation layer: native scrolling, a static curved work panel,
    and one precise centre line for the full-screen menu. */
 :root {
-  --bq-accent: #3b3b3b;
-  --bq-accent-soft: #5b5b5b;
-  --bq-accent-light: #8b8b8b;
+  --bq-accent: #8b5e45;
+  --bq-accent-soft: #6f4a36;
+  --bq-accent-light: #a8785c;
 }
 
 ::selection {
@@ -18,8 +18,8 @@
 
 .design-cta-dot,
 .mobilebar-cta .design-cta-dot {
-  background: #39d98a !important;
-  box-shadow: 0 0 0 4px rgba(57, 217, 138, .18) !important;
+  background: var(--accent, #8b5e45) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #8b5e45) 22%, transparent) !important;
 }
 
 /* The hero is a pinned backdrop: it sticks to the top of the viewport while
@@ -105,11 +105,11 @@
 :root[data-theme="light"] #design > .section.work {
   background:
     radial-gradient(circle, rgba(0, 0, 0, .05) 1px, transparent 1.4px) 0 0 / 26px 26px,
-    radial-gradient(circle at 90% 0%, rgba(39, 39, 87, .055), transparent 26rem),
-    #f4f3f0 !important;
-  border: 1px solid rgba(39, 39, 87, .12);
+    radial-gradient(circle at 90% 0%, rgba(139, 94, 69, .06), transparent 26rem),
+    #e8e9eb !important;
+  border: 1px solid rgba(20, 20, 20, .12);
   border-bottom: 0;
-  box-shadow: 0 -24px 64px -50px rgba(39, 39, 87, .24);
+  box-shadow: 0 -24px 64px -50px rgba(20, 20, 20, .22);
 }
 
 /* =========================================================
@@ -157,9 +157,9 @@ body.menu-open .bq-page-stage #design > .hero {
    the dot texture, and keep the layout untouched — plain and quiet.
    ========================================================= */
 :root[data-theme="light"] .footer.footer-v249 {
-  --bg: #f4f3f0;
+  --bg: #e8e9eb;
   --surface: #eae9e5;
-  --card-bg: #f4f3f0;
+  --card-bg: #e8e9eb;
   --ink: #17110c;
   --ink-2: #2a2620;
   --ink-soft: #5f5c55;
@@ -170,7 +170,7 @@ body.menu-open .bq-page-stage #design > .hero {
   --gold-ink: #17110c;
   --ember: #17110c;
   color-scheme: light;
-  background-color: #f4f3f0 !important;   /* match the site's paper, not pure white */
+  background-color: #e8e9eb !important;   /* match the site's paper, not pure white */
   background-image: none !important;
   color: var(--ink) !important;
   border-top: 1px solid var(--line) !important;
@@ -903,7 +903,7 @@ body *:not(.bq-frame) {
    sits centred on the seam between the shown room and the menu index.
    ========================================================= */
 :root {
-  --bq-menu-bed: #f4f3f0;   /* exactly the site's paper — the card's border keeps it legible */
+  --bq-menu-bed: #e8e9eb;   /* exactly the site's paper — the card's border keeps it legible */
 }
 :root[data-theme="dark"] {
   --bq-menu-bed: #101011;
@@ -2137,7 +2137,7 @@ body.menu-closing .bq-page-stage .main {
 /* The fade is part of the footer itself. Its first pixel matches the page, then
    settles into black before any copy begins, so there is no hard black slab. */
 :root[data-theme="light"] .footer.footer-v249 {
-  --bq-footer-from: #f4f3f0;
+  --bq-footer-from: #e8e9eb;
 }
 
 :root[data-theme="dark"] .footer.footer-v249 {
@@ -4350,7 +4350,7 @@ body:has(#cookieCard.is-shown) #design > .hero .hero-corner--bl {
 /* ---- Soft page selection + image drag polish ---- */
 ::selection {
   background: #232220;
-  color: #f4f3f0;
+  color: #e8e9eb;
 }
 
 :root[data-theme="dark"] ::selection {
@@ -4583,7 +4583,7 @@ body.menu-closing .bq-page-stage {
   border: 0 !important;
   border-radius: 0 !important;
   background: #0b0b0c !important;
-  color: #f4f3f0 !important;
+  color: #e8e9eb !important;
   box-shadow: none !important;
   opacity: 0 !important;
   transform: translate3d(112px, 0, 0) !important;
@@ -4619,14 +4619,14 @@ body.menu-closing .bq-page-stage {
   padding: 0 !important;
   align-items: center !important;
   justify-content: flex-start !important;
-  color: #f4f3f0 !important;
+  color: #e8e9eb !important;
 }
 
 #mobileMenu .mm-logo {
   display: inline-flex !important;
   align-items: center !important;
   gap: 12px !important;
-  color: #f4f3f0 !important;
+  color: #e8e9eb !important;
   text-decoration: none !important;
   opacity: 0;
   transform: translate3d(28px, 0, 0);
@@ -4655,7 +4655,7 @@ body.menu-closing .bq-page-stage {
   font-family: Liana, "Noto Kufi Arabic", serif !important;
   font-size: 22px !important;
   line-height: 1 !important;
-  color: #f4f3f0 !important;
+  color: #e8e9eb !important;
 }
 
 #mobileMenu .mm-logo-role {
@@ -4679,7 +4679,7 @@ body.menu-closing .bq-page-stage {
   border: 1px solid rgba(255, 255, 255, .14) !important;
   border-radius: 50% !important;
   background: transparent !important;
-  color: #f4f3f0 !important;
+  color: #e8e9eb !important;
   font-size: 15px !important;
   transform: none !important;
   transition: background .3s ease, border-color .3s ease, transform .35s ease !important;
@@ -4724,7 +4724,7 @@ body.menu-closing .bq-page-stage {
   border: 0 !important;
   border-radius: 0 !important;
   background: transparent !important;
-  color: #f4f3f0 !important;
+  color: #e8e9eb !important;
   box-shadow: none !important;
   opacity: 0;
   transform: translate3d(48px, 0, 0);
@@ -4745,7 +4745,7 @@ body.menu-closing .bq-page-stage {
 #mobileMenu .mm-link[data-route].is-active .mm-link-text {
   position: relative !important;
   width: auto !important;
-  color: #f4f3f0 !important;
+  color: #e8e9eb !important;
   font-family: "Noto Kufi Arabic", system-ui, sans-serif !important;
   font-size: clamp(34px, 4.2vw, 54px) !important;
   font-weight: 500 !important;
@@ -4822,7 +4822,7 @@ body.menu-closing .bq-page-stage {
   border: 1px solid rgba(255, 255, 255, .22) !important;
   border-radius: 999px !important;
   background: transparent !important;
-  color: #f4f3f0 !important;
+  color: #e8e9eb !important;
   font-size: 12px !important;
   font-weight: 600 !important;
   letter-spacing: .04em !important;
@@ -4831,9 +4831,9 @@ body.menu-closing .bq-page-stage {
 
 #mobileMenu .mm-touch:hover,
 #mobileMenu .mm-touch:focus-visible {
-  background: #f4f3f0 !important;
+  background: #e8e9eb !important;
   color: #0b0b0c !important;
-  border-color: #f4f3f0 !important;
+  border-color: #e8e9eb !important;
   transform: translateY(-2px);
 }
 
@@ -5465,7 +5465,7 @@ body.menu-open .mobilebar {
   border-radius: var(--bq-deck-radius) var(--bq-deck-radius) 0 0 !important;
   background: #050506 !important;
   background-image: none !important;
-  color: #f4f3f0 !important;
+  color: #e8e9eb !important;
   box-shadow: 0 -34px 90px -50px rgba(0, 0, 0, .88) !important;
   overflow: hidden !important;
 }
@@ -5510,7 +5510,7 @@ body.menu-open .mobilebar {
   font-weight: 500 !important;
   line-height: 1.02 !important;
   letter-spacing: -.04em !important;
-  color: #f4f3f0 !important;
+  color: #e8e9eb !important;
 }
 
 :root[data-theme] .footer.footer-v249 .footer-cta-title em {
@@ -5524,7 +5524,7 @@ body.menu-open .mobilebar {
   font-size: clamp(18px, 2.2vw, 28px) !important;
   font-weight: 500 !important;
   letter-spacing: -.02em !important;
-  color: #f4f3f0 !important;
+  color: #e8e9eb !important;
   text-decoration: none !important;
   border-bottom: 1px solid rgba(244, 243, 240, .28);
   transition: border-color .3s ease, opacity .3s ease !important;
@@ -5532,7 +5532,7 @@ body.menu-open .mobilebar {
 
 :root[data-theme] .footer.footer-v249 .footer-email:hover,
 :root[data-theme] .footer.footer-v249 .footer-email:focus-visible {
-  border-bottom-color: #f4f3f0;
+  border-bottom-color: #e8e9eb;
   opacity: .85;
 }
 
@@ -5545,7 +5545,7 @@ body.menu-open .mobilebar {
   border: 1px solid rgba(244, 243, 240, .3) !important;
   border-radius: 999px !important;
   background: transparent !important;
-  color: #f4f3f0 !important;
+  color: #e8e9eb !important;
   font-size: 13px !important;
   font-weight: 600 !important;
   transition: background .3s ease, color .3s ease, border-color .3s ease, transform .35s ease !important;
@@ -5553,9 +5553,9 @@ body.menu-open .mobilebar {
 
 :root[data-theme] .footer.footer-v249 .footer-cta-btn:hover,
 :root[data-theme] .footer.footer-v249 .footer-cta-btn:focus-visible {
-  background: #f4f3f0 !important;
+  background: #e8e9eb !important;
   color: #050506 !important;
-  border-color: #f4f3f0 !important;
+  border-color: #e8e9eb !important;
   transform: translateY(-2px);
 }
 

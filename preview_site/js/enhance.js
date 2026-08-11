@@ -498,7 +498,6 @@
       stationery: { tag: 'Stationery',            desc: 'Business cards, letterheads, invoices & receipts — the quiet system behind a brand.' },
       video:    { tag: 'Motion',                  desc: 'Documentary edits, motion reels, and media coverage.' },
       other:    { tag: 'Miscellany',              desc: 'Flex banners, type experiments, and the small things.' },
-      ai:       { tag: 'AI · Experiments',        desc: 'AI-assisted posters, video, and visual experiments. Coming soon.' },
     };
 
     const card = document.createElement('div');

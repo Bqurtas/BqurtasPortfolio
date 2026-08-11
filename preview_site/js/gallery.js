@@ -27,7 +27,6 @@ window.BQ_GALLERY = {
     events:      { folder: 'EventandCon',   prefix: 'Event',       ext: 'webp', count: 16,  cat: 'events',      tag: 'Events',        icon: 'fa-calendar-day',   title: 'Event' },
     business:    { folder: 'Businesscard',  prefix: 'Bcard',       ext: 'webp', count: 11,  cat: 'stationery',  tag: 'Business Card', icon: 'fa-id-card',        title: 'Business Card' },
     invoices:    { folder: 'Invoice',       prefix: 'Invoice',     ext: 'webp', count: 12,  cat: 'stationery',  tag: 'Invoice',       icon: 'fa-file-invoice',   title: 'Invoice' },
-    ai:          { folder: 'AI',            prefix: 'AI',          ext: 'webp', count: 0,   cat: 'ai',          tag: 'AI',            icon: 'fa-microchip',      title: 'AI' },
     image:       { folder: 'Photos',        prefix: 'Photo',       ext: 'webp', count: 147, cat: 'image',       tag: 'Photo',         icon: 'fa-camera',         title: 'Photo' },
     other:       { folder: 'Other',         prefix: 'Other',       ext: 'webp', count: 45,  cat: 'other',       tag: 'Other',         icon: 'fa-ellipsis',       title: 'Other' },
     certificate: { folder: 'Certificate',   prefix: 'Certificate', ext: 'webp', count: 16,  cat: 'certificate', tag: 'Certificate',   icon: 'fa-award',          title: 'Certificate' }, /* bio only */
@@ -424,10 +423,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     );
   }
 
-  /* ── TickerLogo: real images in Designed by hand grid ── */
+  /* ── LogoDesign: real marks in Designed by hand grid ── */
   const logosGrid = document.querySelector('.logos-grid');
   if (logosGrid) {
-    const logos = window.BQ_GALLERY.items('tickerlogo');
+    const logos = (window.BQ_GALLERY.items('logo') || []).slice(0, 12);
+    logosGrid.removeAttribute('aria-busy');
+    logosGrid.removeAttribute('data-logos-empty');
     logosGrid.innerHTML = logos.map((item, idx) => {
       const src = item.url;
       return `<div class="logo-mark logo-mark--img" data-full="${src}">
@@ -441,7 +442,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         img.closest('.logo-mark')?.remove();
       })
     );
-    /* lightbox for ticker logos */
     logosGrid.addEventListener('click', e => {
       const mark = e.target.closest('.logo-mark--img');
       if (!mark || !window.__bqOpenLightboxPool) return;

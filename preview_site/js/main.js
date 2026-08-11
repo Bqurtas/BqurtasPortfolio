@@ -515,10 +515,9 @@ document.addEventListener('DOMContentLoaded', () => {
     image:    { title: 'Photography',     desc: 'Lightroom editing, composites, and editorial retouching.',               note: 'Erbil & Kurdistan Region · 2018—Now' },
     logo:     { title: 'Logos',           desc: 'Marks, wordmarks, and visual identities — a decade of drawn signs.',    note: '2014—2025 · Various clients' },
     posters:  { title: 'Posters',         desc: 'Cultural, political, and typographic poster series.',                   note: 'Series · Erbil & Kurdistan Region' },
-    social:   { title: 'Social M',        desc: 'Instagram grids, campaigns, and digital storytelling.',                 note: '2023—Now · Various brands' },
+    social:   { title: 'Social',          desc: 'Instagram grids, campaigns, and digital storytelling.',                 note: '2023—Now · Various brands' },
     events:   { title: 'Events',          desc: 'Ceremony materials, banners, and event identity design.',                note: 'Conferences & cultural events · KRG' },
     stationery: { title: 'Stationery',    desc: 'Business cards, letterheads, invoices, and receipts.',                  note: '' },
-    ai:         { title: 'AI',            desc: 'AI-assisted posters, video, and experiments.',                          note: '' },
     video:    { title: 'Video',           desc: 'Documentary edits, motion reels, and protocol media coverage.',         note: '2019—Now · KRG official media' },
     other:    { title: 'Other Works',     desc: 'Miscellaneous — flex banners, type experiments, and notes.',            note: 'Always ongoing' },
   };
@@ -543,7 +542,6 @@ document.addEventListener('DOMContentLoaded', () => {
       stationery: { tag: 'Stationery',             desc: 'Business cards, letterheads, invoices and receipts — the quiet system behind a brand.' },
       video:      { tag: 'Motion',                 desc: 'Documentary edits, motion reels, and media coverage.' },
       other:      { tag: 'Miscellany',             desc: 'Flex banners, type experiments, and the small things.' },
-      ai:         { tag: 'AI · Experiments',       desc: 'AI-assisted posters, video, and visual experiments. Coming soon.' },
     };
 
     const card = document.createElement('div');
@@ -816,15 +814,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return stills.concat(videos);
   };
 
-  const COMING_SOON = {
-    en:  { t: 'Coming soon', s: 'AI-assisted posters and video — landing here shortly.' },
-    ku:  { t: 'بەم زووانە', s: 'پۆستەر و ڤیدیۆی بە یارمەتی AI — بەم زووانە لێرە دەردەکەون.' },
-    kmr: { t: 'Bi lez tê', s: 'Poster û vîdyoyên bi alîkariya AI — di demek nêz de li vir.' },
-    ar:  { t: 'قريباً', s: 'ملصقات وفيديو بمساعدة الذكاء الاصطناعي — قريباً هنا.' },
-    fr:  { t: 'Bientôt', s: 'Affiches et vidéos assistées par IA — bientôt ici.' },
-    tr:  { t: 'Yakında', s: 'AI destekli afişler ve video — çok yakında burada.' },
-    sv:  { t: 'Kommer snart', s: 'AI-stödda affischer och video — landar här snart.' },
-  };
   /* Mix disciplines once with a deterministic seed. The opening pins stay
      visually varied without making image weight and audit results random. */
   const shuffleAllCards = () => {
@@ -846,18 +835,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!gridEl) return;
     if (reset) { shuffleAllCards(); buildColumns(colCountForWidth()); currentShown = 0; }
     const matching = matchingCards();
-    if (currentFilter === 'ai' && matching.length === 0) {   // AI tab, no works yet → coming soon
-      gridEl.innerHTML = '';
-      const cs = document.createElement('div');
-      cs.className = 'tab-coming-soon';
-      const t = COMING_SOON[currentLang] || COMING_SOON.en;
-      cs.innerHTML = '<i class="fa-solid fa-microchip"></i><h3></h3><p></p>';
-      cs.querySelector('h3').textContent = t.t; cs.querySelector('p').textContent = t.s;
-      gridEl.appendChild(cs);
-      updateTabHeader(currentFilter, 0);
-      updateLoadMore(0);
-      return;
-    }
     const batch = matching.slice(currentShown, currentShown + PAGE_SIZE);
     batch.forEach((entry, idx) => placeCard(entry, currentShown + idx));
     currentShown += batch.length;

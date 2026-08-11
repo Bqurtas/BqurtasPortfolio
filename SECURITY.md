@@ -1,21 +1,23 @@
 # Security Policy
 
-## Supported Versions
+## Supported surface
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+This repository ships the public portfolio at [bqurtas.com](https://bqurtas.com) (Cloudflare Pages + Pages Functions). The live site is the only supported surface for security reports.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+## Reporting a vulnerability
 
-## Reporting a Vulnerability
+Email **hello@bqurtas.com** with:
 
-Use this section to tell people how to report a vulnerability.
+- A clear description of the issue and impact
+- Steps to reproduce (or a proof-of-concept)
+- The URL / endpoint involved
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Please do not open a public GitHub issue for undisclosed vulnerabilities.
+
+You can expect an acknowledgement within a few business days. Fixes are prioritized by severity; confirmation follows once a patch is live or the report is declined with a short reason.
+
+## Scope notes
+
+- Public content APIs (read-only Supabase keys, Umami) are intentional and not secret credentials.
+- Studio / 2FA endpoints require a private edit token; do not attempt to brute-force them.
+- Out of scope: social-engineering of personal accounts, physical office access, and third-party services we do not control.
