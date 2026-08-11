@@ -1027,6 +1027,7 @@ document.addEventListener('DOMContentLoaded', () => {
     overlay.className = 'lb-overlay';
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-hidden', 'true');
     overlay.setAttribute('aria-label', 'Portfolio preview');
     overlay.innerHTML = `
       <div class="lb-img-wrap" id="lbWrap">
@@ -1080,12 +1081,14 @@ document.addEventListener('DOMContentLoaded', () => {
       wrap.insertBefore(lbMedia, lbCaption);
       lbCaption.textContent = title;
       overlay.classList.add('is-open');
+      overlay.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
       requestAnimationFrame(() => document.getElementById('lbClose')?.focus());
     };
 
     const close = () => {
       overlay.classList.remove('is-open');
+      overlay.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
       clearMedia();
       if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
@@ -1762,14 +1765,18 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const EDGE = 1.5;
     const ANCHOR_EPSILON = 2.5;
     const overlaySelector = [
-      '#mobileMenu', '.latest-panel', '.chat', '.dashboard', '.reader',
-      '.lb-overlay', '.cookie-card', '[role="dialog"]', '[aria-modal="true"]',
+      '#mobileMenu.is-open', '#mobileMenu.is-ready',
+      '.latest-panel.is-open', '.chat.is-open', '.dashboard.is-open',
+      '.reader.is-open', '.lb-overlay.is-open', '.lb-overlay.is-active',
+      '.cookie-card:not([aria-hidden="true"])',
+      '[role="dialog"][open]',
     ].join(',');
     const openOverlaySelector = [
-      '#mobileMenu.is-open', '.latest-panel.is-open', '.chat.is-open',
-      '#dash.is-open', '.reader.is-open', '.lb-overlay.is-open',
-      '.lb-overlay.is-active', '[role="dialog"][open]',
-      '[aria-modal="true"]:not([aria-hidden="true"])',
+      '#mobileMenu.is-open', '#mobileMenu.is-ready',
+      '.latest-panel.is-open', '.chat.is-open',
+      '#dash.is-open', '.dashboard.is-open', '.reader.is-open',
+      '.lb-overlay.is-open', '.lb-overlay.is-active',
+      '[role="dialog"][open]',
     ].join(',');
     let lastWindowY = window.scrollY;
     let correctingWindow = false;
@@ -1796,7 +1803,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
           sheet,
           scroller,
           start: Number(scroller?.dataset.paperStart),
-          max: liveOverflow > 12 ? Math.ceil(liveOverflow) : 0,
+          max: liveOverflow > 12 ? liveOverflow : 0,
           inner: allowInner,
         };
       }).filter((entry) => entry.scroller && Number.isFinite(entry.start));
@@ -1831,6 +1838,14 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       return current && Math.abs(y - current.start) <= ANCHOR_EPSILON ? current : null;
     };
 
+    const entryAtOrBefore = (entries, y = window.scrollY) => {
+      let current = null;
+      entries.forEach((entry) => {
+        if (entry.start <= y + ANCHOR_EPSILON) current = entry;
+      });
+      return current;
+    };
+
     const overlayIsOpen = () => (
       document.body.classList.contains('menu-open')
       || document.body.classList.contains('menu-closing')
@@ -1841,31 +1856,65 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       if (Math.abs(delta) < .01) return;
       window.scrollBy({ top: delta, left: 0, behavior: 'auto' });
     };
+    const scrollWindowTo = (top) => {
+      window.scrollTo({ top: Math.max(0, top), left: 0, behavior: 'auto' });
+    };
 
     const routeDelta = (event, delta, { forceWindow = false } = {}) => {
       if (!Number.isFinite(delta) || Math.abs(delta) < .01 || isOverlayInput(event.target)) return false;
       const entries = entriesFor();
       if (!entries.length) return false;
-      const anchored = anchoredEntry(entries);
-      const overInner = event.target?.closest?.('.section.work > .paper-scroll');
 
-      /* Only Portfolio consumes wheel/touch inside its frame. */
-      if (anchored?.inner && anchored.max > EDGE) {
-        const before = anchored.scroller.scrollTop;
-        const after = Math.min(anchored.max, Math.max(0, before + delta));
-        const consumed = after - before;
-        const residual = delta - consumed;
+      const y = window.scrollY;
+      const current = entryAtOrBefore(entries, y);
+      const currentIndex = current ? entries.indexOf(current) : -1;
+      const next = currentIndex >= 0 ? entries[currentIndex + 1] : entries[0];
+      const portfolio = entries.find((entry) => entry.inner && entry.max > EDGE);
+
+      /* Hero → Portfolio: finish landing on the work sheet before inner scroll. */
+      if (delta > 0 && portfolio && y < portfolio.start - ANCHOR_EPSILON) {
         event.preventDefault();
-        if (Math.abs(consumed) > .01) anchored.scroller.scrollTop = after;
-        if (Math.abs(residual) > .01) scrollWindowBy(residual);
+        scrollWindowBy(Math.min(delta, portfolio.start - y));
         return true;
       }
 
-      /* Sheet-to-sheet (and black gutter) movement always drives the document,
-         so the page never feels like it is scrolling the underlay itself. */
-      if (anchored || forceWindow || overInner || event.target?.closest?.('.paper-sheet, .paper-stack')) {
+      /* Portfolio owns nested reading while window is parked on its anchor. */
+      if (portfolio && Math.abs(y - portfolio.start) <= ANCHOR_EPSILON) {
+        const before = portfolio.scroller.scrollTop;
+        portfolio.scroller.scrollTop = before + delta;
+        const after = portfolio.scroller.scrollTop;
+        const consumed = after - before;
+        const residual = delta - consumed;
         event.preventDefault();
-        scrollWindowBy(delta);
+        if (Math.abs(residual) > .01) {
+          /* Bottom → next sheet, or top → previous sheet. */
+          scrollWindowBy(residual);
+        }
+        return true;
+      }
+
+      /* Scrolling back up through portfolio's sticky range: re-park on its
+         anchor so the remaining inner content can be read upward. */
+      if (
+        delta < 0
+        && portfolio
+        && current === portfolio
+        && y > portfolio.start + ANCHOR_EPSILON
+      ) {
+        event.preventDefault();
+        scrollWindowBy(Math.max(delta, portfolio.start - y));
+        return true;
+      }
+
+      /* Sheet-to-sheet (and black gutter) movement drives the document. */
+      if (current || forceWindow || event.target?.closest?.('.paper-sheet, .paper-stack')) {
+        event.preventDefault();
+        /* Don't skip past portfolio in one flick from an earlier sheet. */
+        if (delta > 0 && portfolio && y < portfolio.start && next === portfolio) {
+          scrollWindowBy(Math.min(delta, portfolio.start - y));
+        } else {
+          scrollWindowBy(delta);
+        }
         return true;
       }
       return false;
@@ -1982,6 +2031,10 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
           && entry.scroller.scrollTop > EDGE
         ));
       }
+
+      /* Never re-lock portfolio once its inner scroller is spent in that direction. */
+      if (lock && y > lastWindowY && lock.scroller.scrollTop >= lock.max - EDGE) lock = null;
+      if (lock && y < lastWindowY && lock.scroller.scrollTop <= EDGE) lock = null;
 
       if (!lock) {
         lastWindowY = y;

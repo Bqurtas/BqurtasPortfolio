@@ -8385,9 +8385,9 @@ body,
    ============================================================================ */
 
 :root {
-  --bq-deck-gutter: clamp(4px, 0.4vw, 8px);
-  --bq-card-gap: 8px;
-  --bq-deck-radius: clamp(24px, 2.6vw, 40px);
+  --bq-deck-gutter: clamp(14px, 1.6vw, 24px);
+  --bq-card-gap: 14px;
+  --bq-deck-radius: clamp(26px, 2.8vw, 44px);
   --bq-stack-top: var(--bq-deck-gutter);
   --bq-stack-sheet-h: calc(100dvh - (var(--bq-deck-gutter) * 2) - var(--bq-chrome-bottom, 0px));
   --bq-paper-scale: 0.06;
@@ -8396,11 +8396,11 @@ body,
 
 @media (max-width: 820px) {
   :root {
-    --bq-deck-gutter: 4px;
-    --bq-card-gap: 6px;
-    --bq-deck-radius: 20px;
+    --bq-deck-gutter: 10px;
+    --bq-card-gap: 10px;
+    --bq-deck-radius: 22px;
     /* Keep a slim black lip above the floating bar — sheet stays large. */
-    --bq-chrome-bottom: calc(52px + env(safe-area-inset-bottom, 0px));
+    --bq-chrome-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
   }
 }
 
