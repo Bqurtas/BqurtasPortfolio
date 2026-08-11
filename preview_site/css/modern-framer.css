@@ -8625,3 +8625,46 @@ body,
     }
   }
 }
+
+/* ============================================================================
+   v74 — Softer mobile scroll + portfolio tabs travel with content.
+
+   Phones keep native momentum for sheet-to-sheet motion. Portfolio filter
+   chips stop sticking and scroll away with the catalogue on small screens.
+   ============================================================================ */
+
+@media (max-width: 820px) {
+  #design .section.work .tabs-wrap,
+  #design > .section.work > .tabs-wrap,
+  :root[data-theme] #design .section.work .tabs-wrap,
+  :root[data-theme] #design > .section.work > .tabs-wrap {
+    position: static !important;
+    top: auto !important;
+    align-self: auto !important;
+    z-index: 1 !important;
+    width: 100% !important;
+    margin: 0 0 14px !important;
+    padding: 4px 0 10px !important;
+    background: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+
+  #design .section.work > .paper-scroll,
+  #design .section.work.paper-sheet > .paper-scroll {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: auto !important;
+    scroll-behavior: auto !important;
+  }
+
+  .paper-sheet > .paper-scroll.is-window-driven {
+    overscroll-behavior-y: auto !important;
+  }
+
+  html,
+  body {
+    overscroll-behavior-y: auto;
+  }
+}

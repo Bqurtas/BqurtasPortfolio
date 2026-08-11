@@ -1859,6 +1859,9 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const scrollWindowTo = (top) => {
       window.scrollTo({ top: Math.max(0, top), left: 0, behavior: 'auto' });
     };
+    /* Touch devices feel harsh when every move is preventDefault'd + scrollBy.
+       Keep native momentum for sheet-to-sheet; only own portfolio inner scroll. */
+    const softTouch = window.matchMedia('(hover: none), (pointer: coarse)');
 
     const routeDelta = (event, delta, { forceWindow = false } = {}) => {
       if (!Number.isFinite(delta) || Math.abs(delta) < .01 || isOverlayInput(event.target)) return false;
@@ -1873,6 +1876,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
       /* Hero → Portfolio: finish landing on the work sheet before inner scroll. */
       if (delta > 0 && portfolio && y < portfolio.start - ANCHOR_EPSILON) {
+        if (softTouch.matches && event.type === 'touchmove') return false;
         event.preventDefault();
         scrollWindowBy(Math.min(delta, portfolio.start - y));
         return true;
@@ -1881,13 +1885,18 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       /* Portfolio owns nested reading while window is parked on its anchor. */
       if (portfolio && Math.abs(y - portfolio.start) <= ANCHOR_EPSILON) {
         const before = portfolio.scroller.scrollTop;
+        const atTop = before <= EDGE;
+        const atBottom = before >= portfolio.max - EDGE;
+        /* On touch, release at the edges so native momentum can continue. */
+        if (softTouch.matches && event.type === 'touchmove') {
+          if ((delta > 0 && atBottom) || (delta < 0 && atTop)) return false;
+        }
         portfolio.scroller.scrollTop = before + delta;
         const after = portfolio.scroller.scrollTop;
         const consumed = after - before;
         const residual = delta - consumed;
         event.preventDefault();
-        if (Math.abs(residual) > .01) {
-          /* Bottom → next sheet, or top → previous sheet. */
+        if (Math.abs(residual) > .01 && !(softTouch.matches && event.type === 'touchmove')) {
           scrollWindowBy(residual);
         }
         return true;
@@ -1901,15 +1910,17 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         && current === portfolio
         && y > portfolio.start + ANCHOR_EPSILON
       ) {
+        if (softTouch.matches && event.type === 'touchmove') return false;
         event.preventDefault();
         scrollWindowBy(Math.max(delta, portfolio.start - y));
         return true;
       }
 
-      /* Sheet-to-sheet (and black gutter) movement drives the document. */
+      /* Sheet-to-sheet: let touch keep native scrolling; wheel still routes. */
+      if (softTouch.matches && event.type === 'touchmove') return false;
+
       if (current || forceWindow || event.target?.closest?.('.paper-sheet, .paper-stack')) {
         event.preventDefault();
-        /* Don't skip past portfolio in one flick from an earlier sheet. */
         if (delta > 0 && portfolio && y < portfolio.start && next === portfolio) {
           scrollWindowBy(Math.min(delta, portfolio.start - y));
         } else {
@@ -2002,6 +2013,11 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
        Ordinary deliberate route/tab navigation sets __bqPaperBypassUntil. */
     const gateOuterScroll = () => {
       const y = window.scrollY;
+      /* Soft touch: never yank the window mid-momentum on phones. */
+      if (softTouch.matches) {
+        lastWindowY = y;
+        return;
+      }
       if (correctingWindow || performance.now() < (window.__bqPaperBypassUntil || 0)) {
         lastWindowY = y;
         return;
