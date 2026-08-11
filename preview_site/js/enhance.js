@@ -1617,7 +1617,7 @@
         body: JSON.stringify(payload)
       }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
     };
-    const LATEST_TABS = [['logo','Logos'],['book','Book Covers'],['image','Photography'],['posters','Posters'],['social','Social'],['events','Events'],['stationery','Stationery'],['official','Official'],['video','Video'],['ai','AI'],['other','Other'],['','']];
+    const LATEST_TABS = [['logo','Logos'],['book','Book Covers'],['image','Photography'],['posters','Posters'],['social','Social'],['events','Events'],['stationery','Stationery'],['official','Official'],['video','Video'],['other','Other'],['','']];
     const TAB_EN = Object.fromEntries(LATEST_TABS);
     const LA_I18N = {
       en: { note:'Pin an important work to the homepage “Latest” bell. It shows for 7 days, then drops off on its own — alongside the new works the bell already finds automatically.', headline:'Headline', headlinePh:'e.g. New identity for Rwanga', opens:'Opens tab', room:'Design room (all)', image:'Image — choose a file (optional)', pin:'Pin to Latest', uploading:'Uploading…', uploaded:'Uploaded ✓', connect:'Connect the editor first (Content tab).', live:'Reachable on the live site only.', empty:'Nothing pinned right now.', need:'Add a headline.', saving:'Saving…', pinned:'Pinned ✓', fail:'Could not save (live site only).' },

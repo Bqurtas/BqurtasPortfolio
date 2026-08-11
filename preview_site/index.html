@@ -1800,8 +1800,8 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=447"></script>
-  <script defer src="js/gallery.v420.min.js"></script>
+  <script defer src="js/main.v420.min.js?v=448"></script>
+  <script defer src="js/gallery.v420.min.js?v=448"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
        still receive them immediately. This removes their database/GitHub work
@@ -1820,7 +1820,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=447';
+        s.src = 'js/enhance.v420.min.js?v=448';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -1918,13 +1918,14 @@
       document.addEventListener('click', function (e) {
         if (e.target && e.target.closest && e.target.closest('#toTop, .to-top, .footer-top-btn')) hardTopRepeated();
       }, true);
-      // hero CTA → glide down to the work gallery (same room, no route change)
+      // hero CTA → glide to the portfolio paper sheet (respects inner scroll ownership)
       document.addEventListener('click', function (e) {
         var b = e.target && e.target.closest && e.target.closest('[data-hero-cta]');
         if (!b) return;
         e.preventDefault();
-        var work = document.querySelector('#design .section.work') || document.getElementById('grid');
+        var work = document.querySelector('#design .section.work.paper-sheet') || document.querySelector('#design .section.work');
         if (!work) return;
+        if (window.__bqScrollPaperTarget && window.__bqScrollPaperTarget(work, { behavior: 'smooth', block: 'start' })) return;
         var y = window.scrollY + work.getBoundingClientRect().top - 14;
         window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
       }, true);

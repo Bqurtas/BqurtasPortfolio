@@ -39,6 +39,7 @@ window.BQ_GALLERY = {
      it falls back to the static prefix+number scheme. */
   url(coll, i) {
     const c = this.COLLECTIONS[coll];
+    if (!c) return '';
     if (c.files && c.files[i - 1] != null)
       return `${this.CDN_BASE}/${c.folder}/${encodeURIComponent(c.files[i - 1])}`;
     return `${this.CDN_BASE}/${c.folder}/${c.prefix}${i}.${c.ext}`;
@@ -48,6 +49,7 @@ window.BQ_GALLERY = {
      hasn't cached a brand-new file yet, so freshly dropped work still shows. */
   rawUrl(coll, i) {
     const c = this.COLLECTIONS[coll];
+    if (!c) return '';
     if (c.files && c.files[i - 1] != null)
       return `${this.RAW_BASE}/${c.folder}/${encodeURIComponent(c.files[i - 1])}`;
     return `${this.RAW_BASE}/${c.folder}/${c.prefix}${i}.${c.ext}`;
@@ -77,6 +79,7 @@ window.BQ_GALLERY = {
 
   items(coll) {
     const c   = this.COLLECTIONS[coll];
+    if (!c) return [];
     const cat = c.cat || coll;
     const n   = (c.files && c.files.length) ? c.files.length : c.count;
     const out = [];
@@ -179,7 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
   const ORDER = [
     'general','official','book','image','logo',
-    'posters','social','events','business','invoices','ai',
+    'posters','social','events','business','invoices',
     'flex','video','other'
   ];
 
