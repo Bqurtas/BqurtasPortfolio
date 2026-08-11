@@ -8513,3 +8513,115 @@ body,
   justify-content: center;
   box-sizing: border-box;
 }
+
+/* ============================================================================
+   v73 — Dock lives on the paper; hero corner labels retire.
+
+   The floating menu pill used to sit in the black lip under the sheet.
+   Lift it onto the rounded paper, drop the Based in Erbil / Established
+   labels, and keep mobile sizing compact without changing the dock system.
+   ============================================================================ */
+
+#design .hero-corners,
+#design .hero-corner {
+  display: none !important;
+}
+
+:root {
+  /* Keep a quiet black frame, but no reserved “dock trench” under the sheet. */
+  --bq-chrome-bottom: 0px;
+  --bq-dock-inset: calc(var(--bq-deck-gutter) + 12px);
+}
+
+@media (max-width: 820px) {
+  :root {
+    --bq-deck-gutter: 10px;
+    --bq-card-gap: 10px;
+    --bq-chrome-bottom: 0px;
+    --bq-dock-inset: calc(var(--bq-deck-gutter) + 10px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+#design.paper-stack,
+.room.paper-stack,
+:root[data-theme] #design.paper-stack,
+:root[data-theme] .room.paper-stack {
+  padding: var(--bq-deck-gutter) !important;
+  padding-bottom: var(--bq-deck-gutter) !important;
+}
+
+.footer.footer-v249.paper-sheet,
+:root[data-theme] .footer.footer-v249.paper-sheet {
+  margin-bottom: var(--bq-deck-gutter) !important;
+}
+
+/* Desktop dock — park fully on the white sheet above the black bed. */
+@media (min-width: 821px) {
+  .rail,
+  [dir="rtl"] .rail {
+    bottom: var(--bq-dock-inset) !important;
+    left: 50% !important;
+    right: auto !important;
+  }
+
+  body.nav-compact:not(.menu-open) .rail {
+    transform: translateX(-50%) scale(.92) !important;
+  }
+}
+
+/* Mobile dock — same idea: float on the paper, not in a black trench. */
+@media (max-width: 820px) {
+  .mobilebar,
+  [dir="rtl"] .mobilebar {
+    bottom: var(--bq-dock-inset) !important;
+    left: 50% !important;
+    right: auto !important;
+    width: min(calc(100% - (var(--bq-deck-gutter) * 2) - 8px), 380px) !important;
+    max-width: calc(100vw - 24px) !important;
+    height: 54px !important;
+    padding: 0 10px !important;
+    gap: 4px !important;
+    transform: translateX(-50%) scale(1) !important;
+  }
+
+  body.nav-compact:not(.menu-open) .mobilebar,
+  [dir="rtl"] body.nav-compact:not(.menu-open) .mobilebar {
+    transform: translateX(-50%) translateY(1px) scale(.96) !important;
+  }
+
+  body.menu-open .mobilebar {
+    transform: translateX(-50%) scale(1) !important;
+  }
+
+  /* Keep tools readable on narrow phones without changing the pill system. */
+  .mobilebar .mobilebar-btn,
+  .mobilebar .mobilebar-pop-wrap,
+  .mobilebar .mobilebar-pop-wrap > .mobilebar-btn {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    flex: 0 0 40px !important;
+  }
+
+  .mobilebar .mobilebar-cta {
+    height: 40px !important;
+    min-height: 40px !important;
+  }
+
+  @media (max-width: 379px) {
+    .mobilebar {
+      width: calc(100vw - 20px) !important;
+      padding: 0 6px !important;
+      gap: 2px !important;
+    }
+
+    .mobilebar .mobilebar-btn,
+    .mobilebar .mobilebar-pop-wrap,
+    .mobilebar .mobilebar-pop-wrap > .mobilebar-btn {
+      width: 36px !important;
+      height: 36px !important;
+      min-width: 36px !important;
+      flex: 0 0 36px !important;
+    }
+  }
+}
