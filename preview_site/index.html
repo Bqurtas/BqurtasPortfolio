@@ -268,7 +268,7 @@
     html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
   </style>
   <link rel="preload" as="style" href="css/style.v417.min.css?v=447" data-href="css/style.v417.min.css?v=447" fetchpriority="high" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=78">
+  <link rel="stylesheet" href="css/modern-framer.css?v=79">
   <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=447"></noscript>
   <script>
     (function () {
@@ -737,94 +737,99 @@
 
       <!-- ===== SERVICES — interactive accordion ===== -->
       <div class="section service-showcase" id="services">
-        <header class="section-head service-showcase-head" data-motion>
-          <span class="section-num mono"><i class="fa-solid fa-layer-group"></i> &nbsp; <span data-i18n="svc.eye">What I do</span></span>
-          <h2 class="section-title" data-i18n="svc.title">Ideas, made <em>visible</em>.</h2>
-          <p class="section-lede" data-i18n="svc.lede">A focused practice across identity, print, campaigns and motion — built as one clear visual system.</p>
-        </header>
+        <div class="service-showcase-layout">
+          <header class="section-head service-showcase-head" data-motion>
+            <span class="section-num mono"><i class="fa-solid fa-layer-group"></i> &nbsp; <span data-i18n="svc.eye">What I do</span></span>
+            <h2 class="section-title" data-i18n="svc.title">Ideas, made <em>visible</em>.</h2>
+            <p class="section-lede" data-i18n="svc.lede">A focused practice across identity, print, campaigns and motion — built as one clear visual system.</p>
+            <a class="service-cta mono" href="/contact" data-route="contact">
+              <span data-i18n="svc.cta">Discuss a project</span>
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+          </header>
 
-        <div class="service-accordion" data-motion>
-          <article class="service-panel is-active" data-service="identity">
-            <button class="service-trigger" type="button" aria-expanded="true">
-              <span class="service-icon"><i class="fa-solid fa-pen-nib"></i></span>
-              <span class="service-name" data-i18n="svc.identity">Brand Identity &amp; Logo</span>
-              <span class="service-sub" data-i18n="svc.identity.sub">Marks &amp; identity systems</span>
-              <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
-            </button>
-            <div class="service-detail">
-              <div class="service-detail-inner">
-                <p data-i18n="svc.identity.desc">Distinctive marks and flexible identity systems designed to remain clear across every touchpoint.</p>
-                <ul>
-                  <li data-i18n="svc.identity.a">Logo &amp; wordmark design</li>
-                  <li data-i18n="svc.identity.b">Typography &amp; colour systems</li>
-                  <li data-i18n="svc.identity.c">Guidelines &amp; stationery</li>
-                </ul>
+          <div class="service-accordion" data-motion>
+            <article class="service-panel is-active" data-service="identity">
+              <button class="service-trigger" type="button" aria-expanded="true">
+                <span class="service-index mono" aria-hidden="true">01</span>
+                <span class="service-icon"><i class="fa-solid fa-pen-nib"></i></span>
+                <span class="service-name" data-i18n="svc.identity">Brand Identity &amp; Logo</span>
+                <span class="service-sub" data-i18n="svc.identity.sub">Marks &amp; identity systems</span>
+                <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
+              </button>
+              <div class="service-detail">
+                <div class="service-detail-inner">
+                  <p data-i18n="svc.identity.desc">Distinctive marks and flexible identity systems designed to remain clear across every touchpoint.</p>
+                  <ul>
+                    <li data-i18n="svc.identity.a">Logo &amp; wordmark design</li>
+                    <li data-i18n="svc.identity.b">Typography &amp; colour systems</li>
+                    <li data-i18n="svc.identity.c">Guidelines &amp; stationery</li>
+                  </ul>
+                </div>
               </div>
-            </div>
-          </article>
+            </article>
 
-          <article class="service-panel" data-service="editorial">
-            <button class="service-trigger" type="button" aria-expanded="false">
-              <span class="service-icon"><i class="fa-solid fa-book-open"></i></span>
-              <span class="service-name" data-i18n="svc.editorial">Editorial &amp; Print</span>
-              <span class="service-sub" data-i18n="svc.editorial.sub">Books, posters &amp; production</span>
-              <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
-            </button>
-            <div class="service-detail">
-              <div class="service-detail-inner">
-                <p data-i18n="svc.editorial.desc">Printed matter with hierarchy, rhythm and a strong sense of place — from a single cover to a full publication.</p>
-                <ul>
-                  <li data-i18n="svc.editorial.a">Books &amp; editorial layouts</li>
-                  <li data-i18n="svc.editorial.b">Posters &amp; cultural print</li>
-                  <li data-i18n="svc.editorial.c">Packaging &amp; production</li>
-                </ul>
+            <article class="service-panel" data-service="editorial">
+              <button class="service-trigger" type="button" aria-expanded="false">
+                <span class="service-index mono" aria-hidden="true">02</span>
+                <span class="service-icon"><i class="fa-solid fa-book-open"></i></span>
+                <span class="service-name" data-i18n="svc.editorial">Editorial &amp; Print</span>
+                <span class="service-sub" data-i18n="svc.editorial.sub">Books, posters &amp; production</span>
+                <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
+              </button>
+              <div class="service-detail">
+                <div class="service-detail-inner">
+                  <p data-i18n="svc.editorial.desc">Printed matter with hierarchy, rhythm and a strong sense of place — from a single cover to a full publication.</p>
+                  <ul>
+                    <li data-i18n="svc.editorial.a">Books &amp; editorial layouts</li>
+                    <li data-i18n="svc.editorial.b">Posters &amp; cultural print</li>
+                    <li data-i18n="svc.editorial.c">Packaging &amp; production</li>
+                  </ul>
+                </div>
               </div>
-            </div>
-          </article>
+            </article>
 
-          <article class="service-panel" data-service="campaign">
-            <button class="service-trigger" type="button" aria-expanded="false">
-              <span class="service-icon"><i class="fa-solid fa-bullhorn"></i></span>
-              <span class="service-name" data-i18n="svc.campaign">Campaigns &amp; Social</span>
-              <span class="service-sub" data-i18n="svc.campaign.sub">Campaigns &amp; social systems</span>
-              <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
-            </button>
-            <div class="service-detail">
-              <div class="service-detail-inner">
-                <p data-i18n="svc.campaign.desc">Campaign systems that stay coherent from the first key visual to the final social post or event application.</p>
-                <ul>
-                  <li data-i18n="svc.campaign.a">Advertising campaigns</li>
-                  <li data-i18n="svc.campaign.b">Social media systems</li>
-                  <li data-i18n="svc.campaign.c">Events &amp; public communication</li>
-                </ul>
+            <article class="service-panel" data-service="campaign">
+              <button class="service-trigger" type="button" aria-expanded="false">
+                <span class="service-index mono" aria-hidden="true">03</span>
+                <span class="service-icon"><i class="fa-solid fa-bullhorn"></i></span>
+                <span class="service-name" data-i18n="svc.campaign">Campaigns &amp; Social</span>
+                <span class="service-sub" data-i18n="svc.campaign.sub">Campaigns &amp; social systems</span>
+                <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
+              </button>
+              <div class="service-detail">
+                <div class="service-detail-inner">
+                  <p data-i18n="svc.campaign.desc">Campaign systems that stay coherent from the first key visual to the final social post or event application.</p>
+                  <ul>
+                    <li data-i18n="svc.campaign.a">Advertising campaigns</li>
+                    <li data-i18n="svc.campaign.b">Social media systems</li>
+                    <li data-i18n="svc.campaign.c">Events &amp; public communication</li>
+                  </ul>
+                </div>
               </div>
-            </div>
-          </article>
+            </article>
 
-          <article class="service-panel" data-service="motion">
-            <button class="service-trigger" type="button" aria-expanded="false">
-              <span class="service-icon"><i class="fa-solid fa-play"></i></span>
-              <span class="service-name" data-i18n="svc.motion">Motion, Image &amp; AI</span>
-              <span class="service-sub" data-i18n="svc.motion.sub">Motion, image &amp; AI craft</span>
-              <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
-            </button>
-            <div class="service-detail">
-              <div class="service-detail-inner">
-                <p data-i18n="svc.motion.desc">Image and motion work that extends the identity without losing its character, supported by careful AI-assisted exploration.</p>
-                <ul>
-                  <li data-i18n="svc.motion.a">Video editing &amp; motion</li>
-                  <li data-i18n="svc.motion.b">Photography &amp; retouching</li>
-                  <li data-i18n="svc.motion.c">AI-assisted visual development</li>
-                </ul>
+            <article class="service-panel" data-service="motion">
+              <button class="service-trigger" type="button" aria-expanded="false">
+                <span class="service-index mono" aria-hidden="true">04</span>
+                <span class="service-icon"><i class="fa-solid fa-play"></i></span>
+                <span class="service-name" data-i18n="svc.motion">Motion, Image &amp; AI</span>
+                <span class="service-sub" data-i18n="svc.motion.sub">Motion, image &amp; AI craft</span>
+                <span class="service-toggle" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
+              </button>
+              <div class="service-detail">
+                <div class="service-detail-inner">
+                  <p data-i18n="svc.motion.desc">Image and motion work that extends the identity without losing its character, supported by careful AI-assisted exploration.</p>
+                  <ul>
+                    <li data-i18n="svc.motion.a">Video editing &amp; motion</li>
+                    <li data-i18n="svc.motion.b">Photography &amp; retouching</li>
+                    <li data-i18n="svc.motion.c">AI-assisted visual development</li>
+                  </ul>
+                </div>
               </div>
-            </div>
-          </article>
+            </article>
+          </div>
         </div>
-
-        <a class="service-cta mono" href="/contact" data-route="contact" data-motion>
-          <span data-i18n="svc.cta">Discuss a project</span>
-          <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </a>
       </div>
 
       <!-- ===== PRACTICE NOTE + SOFTWARE EXPERIENCE ===== -->
