@@ -10099,3 +10099,40 @@ body,
     border: 0 !important;
   }
 }
+
+/* ============================================================================
+   v81 — Mobile inherits the desktop paper router.
+
+   Own the gesture (touch-action: none) so hero → portfolio park, inner
+   catalogue reading, and the release into the next sheet match desktop.
+   Tabs stay static and travel with the scroll.
+   ============================================================================ */
+
+@media (max-width: 820px) {
+  html,
+  body,
+  #design.paper-stack,
+  #design.paper-stack > .paper-sheet,
+  #design .section.work > .paper-scroll,
+  #design .section.work.paper-sheet > .paper-scroll,
+  #design .section.work.paper-sheet > .paper-scroll.is-window-driven,
+  #design .section.work.paper-sheet > .paper-scroll.is-paper-scrollable {
+    touch-action: none !important;
+  }
+
+  #design .section.work > .paper-scroll,
+  #design .section.work.paper-sheet > .paper-scroll {
+    -webkit-overflow-scrolling: auto !important;
+    overscroll-behavior-y: contain !important;
+    scroll-behavior: auto !important;
+  }
+
+  #design .section.work .tabs-wrap,
+  #design > .section.work > .tabs-wrap,
+  :root[data-theme] #design .section.work .tabs-wrap,
+  :root[data-theme] #design > .section.work > .tabs-wrap {
+    position: static !important;
+    top: auto !important;
+    z-index: 1 !important;
+  }
+}

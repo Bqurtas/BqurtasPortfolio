@@ -1859,8 +1859,20 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const scrollWindowTo = (top) => {
       window.scrollTo({ top: Math.max(0, top), left: 0, behavior: 'auto' });
     };
-    /* Phones keep native momentum. Desktop wheel still owns paper routing. */
+    /* Desktop wheel + phone touch share one paper router.
+       Touch adds a short fling so sheet / portfolio hand-offs stay smooth. */
     const softTouch = window.matchMedia('(hover: none), (pointer: coarse)');
+    let touchVelocity = 0;
+    let lastTouchTs = 0;
+    let flingFrame = 0;
+
+    const stopFling = () => {
+      if (flingFrame) {
+        cancelAnimationFrame(flingFrame);
+        flingFrame = 0;
+      }
+      touchVelocity = 0;
+    };
 
     const routeDelta = (event, delta, { forceWindow = false } = {}) => {
       if (!Number.isFinite(delta) || Math.abs(delta) < .01 || isOverlayInput(event.target)) return false;
@@ -1872,26 +1884,25 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       const currentIndex = current ? entries.indexOf(current) : -1;
       const next = currentIndex >= 0 ? entries[currentIndex + 1] : entries[0];
       const portfolio = entries.find((entry) => entry.inner && entry.max > EDGE);
-      const isTouch = softTouch.matches && event.type === 'touchmove';
+      /* Phones need a slightly looser park window than trackpads. */
+      const parkEps = softTouch.matches ? 6 : ANCHOR_EPSILON;
 
       /* Hero → Portfolio: finish landing on the work sheet before inner scroll. */
-      if (delta > 0 && portfolio && y < portfolio.start - ANCHOR_EPSILON) {
-        if (isTouch) return false;
-        event.preventDefault();
+      if (delta > 0 && portfolio && y < portfolio.start - parkEps) {
+        if (event?.cancelable) event.preventDefault();
         scrollWindowBy(Math.min(delta, portfolio.start - y));
         return true;
       }
 
       /* Portfolio owns nested reading while window is parked on its anchor. */
-      if (portfolio && Math.abs(y - portfolio.start) <= ANCHOR_EPSILON) {
-        /* Touch: never hijack — native momentum inside .paper-scroll feels right. */
-        if (isTouch) return false;
+      if (portfolio && Math.abs(y - portfolio.start) <= parkEps) {
+        if (Math.abs(y - portfolio.start) > .5) scrollWindowTo(portfolio.start);
         const before = portfolio.scroller.scrollTop;
         portfolio.scroller.scrollTop = before + delta;
         const after = portfolio.scroller.scrollTop;
         const consumed = after - before;
         const residual = delta - consumed;
-        event.preventDefault();
+        if (event?.cancelable) event.preventDefault();
         if (Math.abs(residual) > .01) scrollWindowBy(residual);
         return true;
       }
@@ -1902,19 +1913,15 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         delta < 0
         && portfolio
         && current === portfolio
-        && y > portfolio.start + ANCHOR_EPSILON
+        && y > portfolio.start + parkEps
       ) {
-        if (isTouch) return false;
-        event.preventDefault();
+        if (event?.cancelable) event.preventDefault();
         scrollWindowBy(Math.max(delta, portfolio.start - y));
         return true;
       }
 
-      /* Sheet-to-sheet: native on touch, routed on wheel. */
-      if (isTouch) return false;
-
-      if (current || forceWindow || event.target?.closest?.('.paper-sheet, .paper-stack')) {
-        event.preventDefault();
+      if (current || forceWindow || event?.target?.closest?.('.paper-sheet, .paper-stack')) {
+        if (event?.cancelable) event.preventDefault();
         if (delta > 0 && portfolio && y < portfolio.start && next === portfolio) {
           scrollWindowBy(Math.min(delta, portfolio.start - y));
         } else {
@@ -1923,6 +1930,34 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         return true;
       }
       return false;
+    };
+
+    const startFling = () => {
+      if (!softTouch.matches || Math.abs(touchVelocity) < .35) {
+        touchVelocity = 0;
+        return;
+      }
+      let previous = performance.now();
+      const step = (now) => {
+        flingFrame = 0;
+        const dt = Math.min(32, Math.max(8, now - previous));
+        previous = now;
+        const delta = touchVelocity * dt;
+        touchVelocity *= Math.pow(0.965, dt / 16);
+        if (Math.abs(touchVelocity) < .28 || Math.abs(delta) < .4) {
+          touchVelocity = 0;
+          /* Soft settle onto the nearest parked sheet when close. */
+          const entries = entriesFor();
+          const portfolio = entries.find((entry) => entry.inner && entry.max > EDGE);
+          if (portfolio && Math.abs(window.scrollY - portfolio.start) < 28) {
+            scrollWindowTo(portfolio.start);
+          }
+          return;
+        }
+        routeDelta({ cancelable: false, type: 'fling', target: document.body }, delta);
+        flingFrame = requestAnimationFrame(step);
+      };
+      flingFrame = requestAnimationFrame(step);
     };
 
     const wheelPixels = (event) => {
@@ -1934,16 +1969,20 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     window.addEventListener('wheel', (event) => {
       if (event.ctrlKey) return;
       if (event.isTrusted) window.__bqPaperBypassUntil = 0;
+      stopFling();
       routeDelta(event, wheelPixels(event));
     }, { capture: true, passive: false });
 
     window.addEventListener('touchstart', (event) => {
       if (event.isTrusted) window.__bqPaperBypassUntil = 0;
+      stopFling();
       if (event.touches.length === 1) {
         touchY = event.touches[0].clientY;
+        lastTouchTs = performance.now();
+        touchVelocity = 0;
         touchOwned = Boolean(
           anchoredEntry(entriesFor())?.inner
-          || event.target?.closest?.('.section.work > .paper-scroll')
+          || event.target?.closest?.('.section.work > .paper-scroll, .paper-sheet, .paper-stack')
         );
       } else {
         touchY = null;
@@ -1953,18 +1992,29 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
     window.addEventListener('touchmove', (event) => {
       if (touchY === null || event.touches.length !== 1) return;
+      const now = performance.now();
       const nextY = event.touches[0].clientY;
       const delta = touchY - nextY;
+      const dt = Math.max(8, now - lastTouchTs);
+      /* Blend velocity so a short fling can finish sheet / portfolio edges. */
+      const instant = delta / dt;
+      touchVelocity = (touchVelocity * 0.65) + (instant * 0.35);
       touchY = nextY;
+      lastTouchTs = now;
       routeDelta(event, delta, { forceWindow: touchOwned });
     }, { capture: true, passive: false });
 
     const clearTouch = () => {
       touchY = null;
       touchOwned = false;
+      startFling();
     };
     window.addEventListener('touchend', clearTouch, { capture: true, passive: true });
-    window.addEventListener('touchcancel', clearTouch, { capture: true, passive: true });
+    window.addEventListener('touchcancel', () => {
+      touchY = null;
+      touchOwned = false;
+      stopFling();
+    }, { capture: true, passive: true });
 
     document.addEventListener('keydown', (event) => {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey || isOverlayInput(event.target)) return;
@@ -1994,6 +2044,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       else return;
 
       if (event.isTrusted) window.__bqPaperBypassUntil = 0;
+      stopFling();
 
       if (direct !== null && anchored?.inner && Math.abs(anchored.scroller.scrollTop - direct) > EDGE) {
         event.preventDefault();
@@ -2007,12 +2058,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
        Ordinary deliberate route/tab navigation sets __bqPaperBypassUntil. */
     const gateOuterScroll = () => {
       const y = window.scrollY;
-      /* Soft touch: never yank the window mid-momentum on phones. */
-      if (softTouch.matches) {
-        lastWindowY = y;
-        return;
-      }
-      if (correctingWindow || performance.now() < (window.__bqPaperBypassUntil || 0)) {
+      if (correctingWindow || performance.now() < (window.__bqPaperBypassUntil || 0) || flingFrame) {
         lastWindowY = y;
         return;
       }
@@ -2060,7 +2106,9 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     window.addEventListener('scroll', gateOuterScroll, { passive: true });
     document.addEventListener('bq:route', () => {
       lastWindowY = window.scrollY;
-      clearTouch();
+      touchY = null;
+      touchOwned = false;
+      stopFling();
     });
     window.addEventListener('pageshow', () => { lastWindowY = window.scrollY; });
     window.addEventListener('resize', () => { lastWindowY = window.scrollY; }, { passive: true });
