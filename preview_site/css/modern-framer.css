@@ -12625,3 +12625,239 @@ body,
     height: 42px !important;
   }
 }
+
+/* ============================================================================
+   v91 — Menu curtain: restore identity, equal room labels, full mobile bed.
+   ============================================================================ */
+
+/* Logo was force-hidden for an older list-only experiment — bring it back. */
+#mobileMenu .mm-top .mm-logo,
+:root[data-theme] #mobileMenu .mm-top .mm-logo {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  opacity: 1 !important;
+  transform: none !important;
+  color: #f3f2ef !important;
+  text-decoration: none !important;
+}
+
+#mobileMenu .mm-top {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 48px !important;
+  margin: 0 !important;
+  padding: 0 52px 0 0 !important;
+  box-sizing: border-box !important;
+}
+
+#mobileMenu .mm-logo-av {
+  display: block !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  filter: grayscale(1);
+}
+
+#mobileMenu .mm-logo-txt,
+#mobileMenu .mm-logo span.mm-logo-txt {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+#mobileMenu .mm-logo-name,
+#mobileMenu .mm-logo span.mm-logo-name {
+  display: block !important;
+  color: #f3f2ef !important;
+  font-size: clamp(18px, 1.8vw, 24px) !important;
+  font-weight: 600 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -.02em !important;
+}
+
+#mobileMenu .mm-logo-role,
+#mobileMenu .mm-logo span.mm-logo-role {
+  display: block !important;
+  color: rgba(243, 242, 239, .55) !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+}
+
+/* Active room must keep the same display size as its siblings. */
+#mobileMenu .mm-link .mm-link-text,
+#mobileMenu .mm-link:hover .mm-link-text,
+#mobileMenu .mm-link:focus-visible .mm-link-text,
+#mobileMenu .mm-link.is-active .mm-link-text,
+#mobileMenu .mm-link[data-route].is-active .mm-link-text,
+#mobileMenu.is-ready .mm-link.is-active .mm-link-text,
+#mobileMenu.is-ready .mm-link[data-route].is-active .mm-link-text,
+#mobileMenu.is-open .mm-link.is-active .mm-link-text,
+#mobileMenu.is-open .mm-link[data-route].is-active .mm-link-text,
+:root[data-theme] #mobileMenu .mm-link .mm-link-text,
+:root[data-theme] #mobileMenu .mm-link.is-active .mm-link-text,
+:root[data-theme] #mobileMenu.is-open .mm-link.is-active .mm-link-text {
+  font-size: clamp(32px, 3.4vw, 48px) !important;
+  font-weight: 500 !important;
+  letter-spacing: -.04em !important;
+  line-height: 1.08 !important;
+  text-align: center !important;
+  width: auto !important;
+  color: #f1efed !important;
+}
+
+#mobileMenu .mm-link.is-active .mm-link-text,
+#mobileMenu .mm-link[data-route].is-active .mm-link-text,
+#mobileMenu.is-open .mm-link.is-active .mm-link-text,
+#mobileMenu.is-ready .mm-link.is-active .mm-link-text {
+  color: #b8b8b8 !important;
+}
+
+#mobileMenu .mm-link,
+#mobileMenu .mm-link.is-active,
+#mobileMenu .mm-link[data-route].is-active {
+  justify-content: center !important;
+  text-align: center !important;
+  text-decoration: none !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+#mobileMenu .mm-nav {
+  align-items: center !important;
+  text-align: center !important;
+  gap: clamp(8px, 1.4vh, 16px) !important;
+}
+
+#mobileMenu .mm-foot {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+  margin: 0 !important;
+  max-width: 520px !important;
+}
+
+#mobileMenu .mm-socs {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 14px 18px !important;
+  margin: 0 !important;
+}
+
+#mobileMenu .mobile-menu-close,
+[dir="rtl"] #mobileMenu .mobile-menu-close {
+  position: absolute !important;
+  top: max(18px, calc(env(safe-area-inset-top, 0px) + 10px)) !important;
+  left: clamp(16px, 2.4vw, 28px) !important;
+  right: auto !important;
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 50% !important;
+  border: 0 !important;
+  background: #f3f2ef !important;
+  color: #101011 !important;
+  box-shadow: none !important;
+  z-index: 5 !important;
+}
+
+/* Kill the old bottom-sheet mobile rewrite when the stage curtain is open. */
+@media (max-width: 820px) {
+  #mobileMenu.mobile-menu,
+  [dir="rtl"] #mobileMenu.mobile-menu {
+    background: #0f0f10 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  #mobileMenu .mobile-sheet {
+    inset: 0 !important;
+    pointer-events: auto !important;
+  }
+
+  #mobileMenu .mm-left,
+  [dir="rtl"] #mobileMenu .mm-left,
+  #mobileMenu.is-ready .mm-left,
+  [dir="rtl"] #mobileMenu.is-ready .mm-left {
+    inset: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #0f0f10 !important;
+    color: #f3f2ef !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    overflow: hidden !important;
+    padding:
+      max(64px, calc(env(safe-area-inset-top, 0px) + 52px))
+      clamp(22px, 7vw, 36px)
+      max(28px, calc(env(safe-area-inset-bottom, 0px) + 22px)) !important;
+  }
+
+  #mobileMenu .mm-link .mm-link-text,
+  #mobileMenu .mm-link:hover .mm-link-text,
+  #mobileMenu .mm-link:focus-visible .mm-link-text,
+  #mobileMenu .mm-link.is-active .mm-link-text,
+  #mobileMenu .mm-link[data-route].is-active .mm-link-text,
+  #mobileMenu.is-ready .mm-link.is-active .mm-link-text,
+  #mobileMenu.is-open .mm-link.is-active .mm-link-text,
+  #mobileMenu.is-open .mm-link[data-route].is-active .mm-link-text {
+    font-size: clamp(30px, 8.2vw, 38px) !important;
+    text-align: center !important;
+  }
+
+  #mobileMenu .mm-foot {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    gap: 14px !important;
+  }
+
+  #mobileMenu .mm-touch {
+    min-height: 44px !important;
+    padding: 12px 20px !important;
+    font-size: 11px !important;
+  }
+
+  body.menu-open .mobilebar > *:not(.menu-toggle-btn) {
+    opacity: .42 !important;
+  }
+}
+
+@media (min-width: 821px) {
+  #mobileMenu .mm-left,
+  #mobileMenu.is-ready .mm-left {
+    width: min(42vw, 480px) !important;
+    inset: 0 auto 0 0 !important;
+    height: 100% !important;
+    background: #0f0f10 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  [dir="rtl"] #mobileMenu .mm-left,
+  [dir="rtl"] #mobileMenu.is-ready .mm-left {
+    inset: 0 0 0 auto !important;
+  }
+}
