@@ -1752,6 +1752,20 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       sheet.dataset.paper = `${id}-${i}`;
       sheet.style.setProperty('--bq-paper-z', String((i + 1) * 10));
       wrapPaperScroll(sheet);
+
+      /* Pack sheet content into .sheet-mid so rooms centre like home. */
+      const scroller = sheet.querySelector(':scope > .paper-scroll');
+      if (scroller && !scroller.querySelector(':scope > .sheet-mid')) {
+        const mid = document.createElement('div');
+        mid.className = 'sheet-mid';
+        const chrome = [];
+        [...scroller.children].forEach((node) => {
+          if (node.matches?.('.room-hero-return, .room-hero-corner')) chrome.push(node);
+          else mid.appendChild(node);
+        });
+        scroller.appendChild(mid);
+        chrome.forEach((node) => scroller.appendChild(node));
+      }
     });
     bindStack(room, parts, { requireActive: true });
   });
