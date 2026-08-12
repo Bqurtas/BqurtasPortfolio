@@ -2267,6 +2267,7 @@
         // in-app reader (preventDefault below).
         const href = blogBase() + '/' + (p.slug || slugify(q.title || p.title || ''));
         return `<a class="blog-card" href="${esc(href)}" data-slug="${esc(p.slug || p.num)}">
+          <span class="blog-card-plate" aria-hidden="true"></span>
           <span class="mono blog-meta"><i class="fa-solid fa-calendar"></i> ${esc(q.date || '')} · <i class="fa-solid fa-clock"></i> ${esc(String(p.read || 4))} min</span>
           <h3>${esc(title)}</h3>
           <p>${esc(q.sub || '')}</p>

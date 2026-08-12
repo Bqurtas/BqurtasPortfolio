@@ -11020,3 +11020,438 @@ body,
     max-width: none !important;
   }
 }
+
+/* ============================================================================
+   v84 — Point-by-point polish: B&W site, no brown stroke, tighter sheets.
+
+   • Kill warm/brown accents → pure black & white (portfolio photos stay colour)
+   • Remove portfolio brown stroke / warm paper tints
+   • Larger Design Room head + slightly larger hero
+   • Stats tighter; teaser title smaller; software ALL CAPS
+   • Worked-with: drop marquee hairlines, less white space
+   • Designed-by-hand: one larger logo row
+   • Blog: eye + All posts on one row; three professional cards
+   • Footer lifted above dock; menu dots green
+   ============================================================================ */
+
+:root,
+:root[data-theme],
+:root[data-theme="light"],
+:root[data-theme="dark"] {
+  --bq-accent: #141414 !important;
+  --bq-accent-soft: #141414 !important;
+  --bq-accent-light: #2a2a2a !important;
+  --accent: #141414 !important;
+  --gold: #141414 !important;
+  --gold-ink: #141414 !important;
+  --gold-bright: #141414 !important;
+  --gold-soft: rgba(20, 20, 20, .35) !important;
+  --ember: #141414 !important;
+  --cov-1: #141414 !important;
+  --cov-2: #2a2a2a !important;
+  --bq-paper-hero: #f4f4f4 !important;
+  --bq-paper-work: #f0f0f0 !important;
+  --bq-paper-focus: #ededed !important;
+  --bq-paper-note: #f2f2f2 !important;
+  --bq-paper-clients: #efefef !important;
+  --bq-paper-blog: #f7f7f7 !important;
+  --bq-paper-sheet: #f3f3f3 !important;
+}
+
+:root[data-theme="dark"] {
+  --bq-accent: #f2f2f2 !important;
+  --bq-accent-soft: #f2f2f2 !important;
+  --bq-accent-light: #d0d0d0 !important;
+  --accent: #f2f2f2 !important;
+  --gold: #f2f2f2 !important;
+  --gold-ink: #f2f2f2 !important;
+  --gold-bright: #f2f2f2 !important;
+  --bq-paper-hero: #121212 !important;
+  --bq-paper-work: #161616 !important;
+  --bq-paper-focus: #181818 !important;
+  --bq-paper-note: #171717 !important;
+  --bq-paper-clients: #151515 !important;
+  --bq-paper-blog: #141414 !important;
+  --bq-paper-sheet: #161616 !important;
+}
+
+::selection {
+  background: #141414 !important;
+  color: #fff !important;
+}
+
+:root[data-theme="dark"] ::selection {
+  background: #f2f2f2 !important;
+  color: #111 !important;
+}
+
+:focus-visible {
+  outline: 2px solid #141414 !important;
+}
+
+:root[data-theme="dark"] :focus-visible {
+  outline-color: #f2f2f2 !important;
+}
+
+/* Green status dots on the menu strip */
+.rail-dot,
+.design-cta-dot,
+.mobilebar-cta .design-cta-dot,
+.rail-chat-dot,
+.rail-latest-badge,
+.mobilebar-btn .rail-chat-dot,
+.mobilebar-btn .rail-latest-badge {
+  background: #2fbf6b !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--bg, #e8e9eb) 90%, transparent) !important;
+}
+
+.rail-dot,
+.design-cta-dot {
+  box-shadow: 0 0 0 4px color-mix(in srgb, #2fbf6b 22%, transparent) !important;
+}
+
+/* Strip brown / warm portfolio frame */
+:root[data-theme="light"] #design > .section.work,
+#design > .section.work.paper-sheet,
+#design.paper-stack > .section.work.paper-sheet,
+:root[data-theme] #design.paper-stack > .section.work.paper-sheet {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: 0 40px 90px -48px rgba(0, 0, 0, .42) !important;
+  background:
+    radial-gradient(circle, rgba(0, 0, 0, .04) 1px, transparent 1.4px) 0 0 / 26px 26px,
+    var(--bq-paper-work, #f0f0f0) !important;
+}
+
+:root[data-theme="light"] #design > .section.work {
+  background:
+    radial-gradient(circle, rgba(0, 0, 0, .045) 1px, transparent 1.4px) 0 0 / 26px 26px,
+    #f0f0f0 !important;
+  border: 0 !important;
+}
+
+#design > .section.work::before,
+#design > .section.work::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Hero a touch larger */
+#design .hero .hero-title,
+#design .hero.paper-sheet .hero-title {
+  font-size: clamp(64px, 9vw, 128px) !important;
+}
+
+@media (max-width: 820px) {
+  #design .hero .hero-title,
+  #design .hero.paper-sheet .hero-title {
+    font-size: clamp(58px, 17vw, 118px) !important;
+  }
+}
+
+/* Design Room head — larger & cleaner */
+#design .section.work .section-num {
+  font-size: 13px !important;
+  letter-spacing: .16em !important;
+  margin-bottom: 16px !important;
+}
+
+#design .section.work .section-title {
+  font-size: clamp(36px, 4.4vw, 56px) !important;
+  line-height: 1.06 !important;
+  letter-spacing: -.04em !important;
+  max-width: 18ch !important;
+}
+
+#design .section.work .section-lede {
+  font-size: clamp(16px, 1.35vw, 19px) !important;
+  margin-top: 16px !important;
+  max-width: 40ch !important;
+}
+
+@media (max-width: 820px) {
+  #design .section.work .section-title {
+    font-size: clamp(30px, 8vw, 38px) !important;
+    max-width: none !important;
+  }
+}
+
+/* Stats: aligned, tighter gaps */
+#design .practice-note .stats {
+  gap: clamp(14px, 2vh, 22px) clamp(16px, 2.2vw, 28px) !important;
+}
+
+#design .practice-note .stat {
+  gap: 6px !important;
+}
+
+#design .practice-note .stat-num {
+  font-size: clamp(40px, 4.6vw, 60px) !important;
+  line-height: .92 !important;
+}
+
+#design .practice-note .stat-label {
+  font-size: 11px !important;
+  letter-spacing: .14em !important;
+}
+
+/* Teaser title: smaller & quieter */
+#design .practice-note .bio-teaser-title {
+  font-size: clamp(28px, 3.2vw, 44px) !important;
+  line-height: 1.12 !important;
+  letter-spacing: -.03em !important;
+  max-width: 18ch !important;
+}
+
+#design .practice-note .bio-teaser-text p {
+  font-size: clamp(14.5px, 1.2vw, 17px) !important;
+  margin-top: 14px !important;
+}
+
+/* Software chips: all caps */
+#design .practice-note .software-chip,
+.practice-note .software-experience .software-chip {
+  text-transform: uppercase !important;
+  letter-spacing: .08em !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+}
+
+/* Worked with — less white space, no hairline rules */
+#design .section.logos-section > .paper-scroll {
+  gap: 18px !important;
+  justify-content: center !important;
+  padding-block: clamp(22px, 3.2vh, 40px) !important;
+}
+
+#design .logos-section .logos-head {
+  margin: 0 !important;
+}
+
+#design .logos-section .logos-title {
+  font-size: clamp(28px, 3.2vw, 42px) !important;
+  max-width: 18ch !important;
+}
+
+#design .logos-section .logo-marquee,
+:root[data-theme] #design .logos-section .logo-marquee {
+  border: 0 !important;
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+  margin: 4px 0 8px !important;
+  padding: 10px 0 !important;
+  min-height: 0 !important;
+  flex: 0 0 auto !important;
+}
+
+#design .logos-section .logo-marquee + .logos-head {
+  margin-top: 10px !important;
+}
+
+/* Designed by hand — one row, larger marks */
+#design .logos-grid,
+:root[data-theme] #design .logos-grid {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: clamp(12px, 1.8vw, 28px) !important;
+  margin-top: 8px !important;
+}
+
+#design .logos-grid .logo-mark--ticker,
+#design .logos-grid .logo-mark--img {
+  height: clamp(72px, 10vh, 112px) !important;
+  min-height: 72px !important;
+  padding: 6px !important;
+}
+
+/* ---- Latest blog: eye + All posts on one row; 3 pro cards ---- */
+#design .section.latest-blog > .paper-scroll {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 22px !important;
+  justify-content: center !important;
+}
+
+#design .latest-blog .latest-blog-head {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 14px !important;
+  height: auto !important;
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+#design .latest-blog .latest-blog-top {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  width: 100% !important;
+}
+
+#design .latest-blog .latest-blog-top .section-num {
+  margin: 0 !important;
+}
+
+#design .latest-blog .latest-blog-all {
+  margin: 0 !important;
+  padding: 10px 16px !important;
+  flex-shrink: 0 !important;
+}
+
+#design .latest-blog .latest-blog-title {
+  margin: 0 !important;
+  max-width: 16ch !important;
+  font-size: clamp(34px, 4vw, 52px) !important;
+}
+
+#design .latest-blog .latest-blog-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  height: auto !important;
+  width: 100% !important;
+  align-items: stretch !important;
+}
+
+#design .latest-blog .blog-card {
+  position: relative !important;
+  flex: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  min-height: 220px !important;
+  height: 100% !important;
+  padding: 22px 20px !important;
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent) !important;
+  border-radius: 18px !important;
+  background: color-mix(in srgb, var(--ink) 2.5%, transparent) !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  color: inherit !important;
+  overflow: hidden !important;
+  transition: border-color .25s ease, background .25s ease, transform .3s ease !important;
+}
+
+#design .latest-blog .blog-card:hover {
+  border-color: color-mix(in srgb, var(--ink) 28%, transparent) !important;
+  background: color-mix(in srgb, var(--ink) 4%, transparent) !important;
+  transform: translateY(-2px) !important;
+}
+
+#design .latest-blog .blog-card-plate {
+  display: block !important;
+  width: 36px !important;
+  height: 3px !important;
+  border-radius: 999px !important;
+  background: var(--ink) !important;
+  opacity: .35 !important;
+  margin-bottom: 4px !important;
+}
+
+#design .latest-blog .blog-card .blog-meta {
+  font-size: 10px !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+  color: color-mix(in srgb, var(--ink) 46%, transparent) !important;
+}
+
+#design .latest-blog .blog-card h3 {
+  margin: 0 !important;
+  font-size: clamp(18px, 1.7vw, 23px) !important;
+  line-height: 1.2 !important;
+  letter-spacing: -.02em !important;
+  color: var(--ink) !important;
+}
+
+#design .latest-blog .blog-card p {
+  margin: 0 !important;
+  flex: 1 1 auto !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  color: color-mix(in srgb, var(--ink) 58%, transparent) !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+#design .latest-blog .blog-card .blog-more {
+  margin-top: 8px !important;
+  font-size: 11px !important;
+  letter-spacing: .1em !important;
+  text-transform: uppercase !important;
+  color: var(--ink) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* Footer — lift copy above the menu strip */
+.footer.footer-v249.paper-sheet > .paper-scroll,
+:root[data-theme] .footer.footer-v249.paper-sheet > .paper-scroll {
+  padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+.footer.footer-v249 .footer-stage {
+  padding-bottom: clamp(28px, 4vh, 48px) !important;
+  align-items: start !important;
+}
+
+.footer.footer-v249 .footer-cta-title {
+  font-size: clamp(30px, 4.6vw, 56px) !important;
+}
+
+.footer.footer-v249 .footer-bottom {
+  padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+@media (max-width: 820px) {
+  #design .practice-note .stats {
+    gap: 12px 14px !important;
+  }
+
+  #design .practice-note .stat-num {
+    font-size: clamp(32px, 9vw, 40px) !important;
+  }
+
+  #design .practice-note .bio-teaser-title {
+    font-size: clamp(24px, 6.6vw, 30px) !important;
+    max-width: none !important;
+  }
+
+  #design .logos-section .logos-title {
+    font-size: clamp(24px, 6.8vw, 30px) !important;
+    max-width: none !important;
+  }
+
+  #design .logos-grid .logo-mark--ticker,
+  #design .logos-grid .logo-mark--img {
+    height: 56px !important;
+    min-height: 52px !important;
+  }
+
+  #design .latest-blog .latest-blog-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  #design .latest-blog .blog-card {
+    min-height: 0 !important;
+    padding: 18px 16px !important;
+  }
+
+  #design .latest-blog .latest-blog-title {
+    font-size: clamp(28px, 7.6vw, 34px) !important;
+    max-width: none !important;
+  }
+
+  .footer.footer-v249.paper-sheet > .paper-scroll {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
