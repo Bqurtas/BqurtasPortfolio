@@ -11455,3 +11455,96 @@ body,
     padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
+
+/* ============================================================================
+   v85 — Smaller stats, larger software chips, logos sheet centered.
+   ============================================================================ */
+
+#design .practice-note .stat-num {
+  font-size: clamp(28px, 3.2vw, 40px) !important;
+  line-height: .95 !important;
+  letter-spacing: -.04em !important;
+}
+
+#design .practice-note .stat-label {
+  font-size: 10px !important;
+  letter-spacing: .12em !important;
+  gap: 5px !important;
+}
+
+#design .practice-note .stat-label i {
+  font-size: 9px !important;
+}
+
+#design .practice-note .stats {
+  gap: clamp(10px, 1.6vh, 16px) clamp(12px, 1.8vw, 20px) !important;
+}
+
+#design .practice-note .stat {
+  gap: 4px !important;
+}
+
+/* Software names — larger again, still all caps */
+#design .practice-note .software-chip,
+.practice-note .software-experience .software-chip,
+:root[lang] .practice-note .software-experience .software-chip {
+  font-size: clamp(13px, 1.15vw, 16px) !important;
+  letter-spacing: .1em !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  padding: 10px 16px !important;
+  gap: 10px !important;
+}
+
+#design .practice-note .software-chip img,
+.practice-note .software-experience .software-chip img {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+/* Logos sheet: vertically centered with breathing space above & below */
+#design .section.logos-section > .paper-scroll,
+:root[data-theme] #design .section.logos-section > .paper-scroll {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  gap: clamp(18px, 2.6vh, 32px) !important;
+  padding-block: clamp(40px, 7vh, 88px) !important;
+  box-sizing: border-box !important;
+}
+
+#design .logos-section .logos-head {
+  text-align: start !important;
+  margin-inline: 0 !important;
+}
+
+#design .logos-section .logo-marquee {
+  margin: 0 !important;
+  padding: 8px 0 !important;
+}
+
+#design .logos-section .logo-marquee + .logos-head {
+  margin-top: 8px !important;
+}
+
+#design .logos-grid {
+  margin-top: 4px !important;
+}
+
+@media (max-width: 820px) {
+  #design .practice-note .stat-num {
+    font-size: clamp(24px, 6.8vw, 30px) !important;
+  }
+
+  #design .practice-note .software-chip,
+  .practice-note .software-experience .software-chip {
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+  }
+
+  #design .section.logos-section > .paper-scroll {
+    padding-block: clamp(28px, 6vh, 48px) calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    gap: 16px !important;
+  }
+}
