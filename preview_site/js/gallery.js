@@ -29,7 +29,7 @@ window.BQ_GALLERY = {
     invoices:    { folder: 'Invoice',       prefix: 'Invoice',     ext: 'webp', count: 12,  cat: 'stationery',  tag: 'Invoice',       icon: 'fa-file-invoice',   title: 'Invoice' },
     image:       { folder: 'Photos',        prefix: 'Photo',       ext: 'webp', count: 147, cat: 'image',       tag: 'Photo',         icon: 'fa-camera',         title: 'Photo' },
     other:       { folder: 'Other',         prefix: 'Other',       ext: 'webp', count: 45,  cat: 'other',       tag: 'Other',         icon: 'fa-ellipsis',       title: 'Other' },
-    certificate: { folder: 'Certificate',   prefix: 'Certificate', ext: 'webp', count: 16,  cat: 'certificate', tag: 'Certificate',   icon: 'fa-award',          title: 'Certificate' }, /* bio only */
+    certificate: { folder: 'Certificate',   prefix: 'Certificate', ext: 'webp', count: 16,  cat: 'certificate', tag: 'Certificate',   icon: 'fa-award',          title: 'Certificate' },
     flex:        { folder: 'Flex',          prefix: 'Flex',        ext: 'webp', count: 13,  cat: 'other',       tag: 'Other',         icon: 'fa-ellipsis',       title: 'Flex' },
     video:       { folder: 'Videos',        prefix: 'Videos',      ext: 'mp4',  count: 30,  cat: 'video',       tag: 'Video',         icon: 'fa-video',          title: 'Video' },
   },
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const ORDER = [
     'general','official','book','image','logo',
     'posters','social','events','business','invoices',
-    'flex','video','other'
+    'flex','video','other','certificate'
   ];
 
   const buildCard = (item) => {
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Design works (logos, book covers, stationery, etc.) are exported with
     // transparency — give them a clean white plate instead of the dark block
     // that otherwise shows through. Photos/posters/social are full-bleed, left dark.
-    const PLATE_CATS = { book: 1, logo: 1, stationery: 1, events: 1, general: 1, other: 1 };
+    const PLATE_CATS = { book: 1, logo: 1, stationery: 1, events: 1, general: 1, other: 1, certificate: 1 };
     const plate = /\.png(\?|$)/i.test(item.url || '') || !!PLATE_CATS[item.cat];
     article.className = 'card card--photo card--pending-media' + (plate ? ' card--plate' : '');
     const fallbackRatio = item.type === 'video' ? '16 / 9' : '4 / 5';
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   /* Build every card once into a shared array — main.js masonry handles
-     placement, filtering, and pagination. certificate is bio-only. */
+     placement, filtering, and pagination. */
   const fmtCount = (n) => n >= 100 ? String(n) : String(n).padStart(2, '0');
   const computeGalleryCounts = () => {
     const cats = {};
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     if (!Object.keys(cats).length) {
       Object.entries(window.BQ_GALLERY.COLLECTIONS || {}).forEach(([key, coll]) => {
-        if (!coll || key === 'certificate') return;
+        if (!coll) return;
         const cat = coll.cat || key;
         cats[cat] = (cats[cat] || 0) + ((coll.files && coll.files.length) || coll.count || 0);
       });
@@ -426,15 +426,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     );
   }
 
-  /* ── LogoDesign: real marks in Designed by hand grid ── */
+  /* ── TickerLogo: B/W marks in Designed by hand grid ── */
   const logosGrid = document.querySelector('.logos-grid');
   if (logosGrid) {
-    const logos = (window.BQ_GALLERY.items('logo') || []).slice(0, 12);
+    const logos = (window.BQ_GALLERY.items('tickerlogo') || []).slice(0, 8);
     logosGrid.removeAttribute('aria-busy');
     logosGrid.removeAttribute('data-logos-empty');
     logosGrid.innerHTML = logos.map((item, idx) => {
       const src = item.url;
-      return `<div class="logo-mark logo-mark--img" data-full="${src}">
+      return `<div class="logo-mark logo-mark--img logo-mark--ticker" data-full="${src}">
          <img src="${window.BQ_GALLERY.thumb(src, 180)}" data-full="${src}" data-raw="${item.rawUrl}" alt="Logo ${idx + 1}" loading="lazy" decoding="async" width="180" height="135" />
        </div>`
     }).join('');

@@ -456,9 +456,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const updateDock = () => {
     const y = Math.max(0, window.scrollY);
     const delta = y - dockLastY;
-    if (y < 36 || delta < -5) document.body.classList.remove('nav-compact');
-    else if (y > 96 && delta > 5) document.body.classList.add('nav-compact');
-    if (Math.abs(delta) > 5) dockLastY = y;
+    if (y < 28 || delta < -3) document.body.classList.remove('nav-compact');
+    else if (y > 56 && delta > 3) document.body.classList.add('nav-compact');
+    if (Math.abs(delta) > 3) dockLastY = y;
     dockTicking = false;
   };
   window.addEventListener('scroll', () => {
@@ -520,6 +520,7 @@ document.addEventListener('DOMContentLoaded', () => {
     stationery: { title: 'Stationery',    desc: 'Business cards, letterheads, invoices, and receipts.',                  note: '' },
     video:    { title: 'Video',           desc: 'Documentary edits, motion reels, and protocol media coverage.',         note: '2019—Now · KRG official media' },
     other:    { title: 'Other Works',     desc: 'Miscellaneous — flex banners, type experiments, and notes.',            note: 'Always ongoing' },
+    certificate: { title: 'Certificates', desc: 'Recognition, awards, and studio credentials.',                           note: 'Selected · Studio archive' },
   };
 
   /* Rich portfolio-tab preview lives in the critical bundle so the very
@@ -542,6 +543,7 @@ document.addEventListener('DOMContentLoaded', () => {
       stationery: { tag: 'Stationery',             desc: 'Business cards, letterheads, invoices and receipts — the quiet system behind a brand.' },
       video:      { tag: 'Motion',                 desc: 'Documentary edits, motion reels, and media coverage.' },
       other:      { tag: 'Miscellany',             desc: 'Flex banners, type experiments, and the small things.' },
+      certificate: { tag: 'Credentials',           desc: 'Recognition, awards, and studio credentials on paper.' },
     };
 
     const card = document.createElement('div');

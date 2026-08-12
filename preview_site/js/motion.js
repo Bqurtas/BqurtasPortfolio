@@ -232,8 +232,8 @@
 })();
 
 /* =========================================================
-   The sticky mobile filter tabs ease out as the gallery scroll reaches its end,
-   instead of snapping away at the section edge.
+   Mobile portfolio tabs stay pinned while the catalogue scrolls.
+   (Fade-out removed — filters must remain readable end-to-end.)
    ========================================================= */
 (function () {
   'use strict';
@@ -247,28 +247,7 @@
     var scroller = section.querySelector(':scope > .paper-scroll');
     var wrap = (scroller && scroller.querySelector(':scope > .tabs-wrap')) || section.querySelector(':scope > .tabs-wrap');
     if (!wrap) return;
-    var grid = section.querySelector('.grid');
-    var mq = matchMedia('(max-width:820px)');
-    var raf = 0;
-    var update = function () {
-      raf = 0;
-      if (!mq.matches) { wrap.style.opacity = ''; wrap.style.pointerEvents = ''; return; }
-      var ref = grid || section;
-      var bottom = ref.getBoundingClientRect().bottom;       // gallery base vs viewport top
-      var h = wrap.offsetHeight || 120;
-      var fade = 200;
-      // fully gone while the gallery base is still ~h+40 below the pinned tabs,
-      // i.e. before the "Load more" row ever reaches them
-      var o = (bottom - (h + 40)) / fade;
-      o = o < 0 ? 0 : o > 1 ? 1 : o;
-      wrap.style.opacity = o.toFixed(2);
-      wrap.style.pointerEvents = o < 0.06 ? 'none' : '';
-    };
-    var queue = function () { if (!raf) raf = requestAnimationFrame(update); };
-    addEventListener('scroll', queue, { passive: true });
-    if (scroller) scroller.addEventListener('scroll', queue, { passive: true });
-    addEventListener('resize', queue);
-    mq.addEventListener('change', queue);
-    update();
+    wrap.style.opacity = '';
+    wrap.style.pointerEvents = '';
   });
 })();

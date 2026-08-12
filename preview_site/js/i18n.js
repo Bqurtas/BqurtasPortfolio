@@ -32,7 +32,7 @@ window.I18N.en = Object.assign(window.I18N.en || {}, {
 
     'design.label': 'Design Room',
     'design.title': 'A small catalogue of <em>printed</em> & pixel things.',
-    'design.lede': 'Filter the work by category — eleven disciplines, one practice.',
+    'design.lede': 'Filter the work by category — twelve disciplines, one practice.',
 
     'blog.label': 'Blog Room',
     'blog.title': 'Notes from the <em>desk</em>.',

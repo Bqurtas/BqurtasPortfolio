@@ -268,7 +268,7 @@
     html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
   </style>
   <link rel="preload" as="style" href="css/style.v417.min.css?v=447" data-href="css/style.v417.min.css?v=447" fetchpriority="high" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=89">
+  <link rel="stylesheet" href="css/modern-framer.css?v=90">
   <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=447"></noscript>
   <script>
     (function () {
@@ -669,10 +669,10 @@
         <header class="section-head">
           <span class="section-num mono"><i class="fa-solid fa-compass-drafting"></i> &nbsp; <span data-i18n="design.label">Design Room</span></span>
           <h2 class="section-title" data-i18n="design.title">A small catalogue of <em>printed</em> &amp; pixel things.</h2>
-          <p class="section-lede" data-i18n="design.lede">Filter the work by category — eleven disciplines, one practice.</p>
+          <p class="section-lede" data-i18n="design.lede">Filter the work by category — twelve disciplines, one practice.</p>
         </header>
 
-        <!-- Tabs — 2 rows of 6 -->
+        <!-- Tabs — 2 rows of 6, equal circles -->
         <div class="tabs-wrap">
           <div class="tabs" role="tablist" aria-label="Portfolio categories">
             <div class="tabs-row" role="presentation">
@@ -689,6 +689,7 @@
               <button class="tab" role="tab" aria-selected="false" data-filter="image">              <i class="fa-solid fa-camera"></i>       <span class="tab-label" data-i18n="tab.image">Image</span></button>
               <button class="tab" role="tab" aria-selected="false" data-filter="video">              <i class="fa-solid fa-video"></i>        <span class="tab-label" data-i18n="tab.video">Video</span></button>
               <button class="tab" role="tab" aria-selected="false" data-filter="other">              <i class="fa-solid fa-ellipsis"></i>     <span class="tab-label" data-i18n="tab.other">Other</span></button>
+              <button class="tab" role="tab" aria-selected="false" data-filter="certificate">        <i class="fa-solid fa-award"></i>        <span class="tab-label" data-i18n="tab.certificate">Certificate</span></button>
             </div>
           </div>
         </div>
@@ -945,7 +946,7 @@
           <h3 class="logos-title" data-i18n="d.drawn.title">Selected logos I've drawn.</h3>
         </header>
         <div class="logos-grid" aria-busy="true" data-logos-empty>
-          <!-- Filled from LogoDesign via gallery.js -->
+          <!-- Filled from TickerLogo (B/W marks) via gallery.js -->
         </div>
       </div>
 
@@ -1779,7 +1780,7 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script defer src="js/i18n.v420.min.js?v=447"></script>
+  <script defer src="js/i18n.v420.min.js?v=448"></script>
   <!-- Non-English visitors need the extra dictionaries before first render;
        English (the default + PSI) never loads them, keeping the parse light.
        applyLang() can also fetch this on its own, but starting it here — in
@@ -1805,8 +1806,8 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=455"></script>
-  <script defer src="js/gallery.v420.min.js?v=451"></script>
+  <script defer src="js/main.v420.min.js?v=456"></script>
+  <script defer src="js/gallery.v420.min.js?v=452"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
        still receive them immediately. This removes their database/GitHub work
@@ -1865,7 +1866,7 @@
     }());
   </script>
   <script defer src="js/lux.min.js?v=359"></script>
-  <script defer src="js/motion.min.js?v=407"></script>
+  <script defer src="js/motion.min.js?v=408"></script>
   <!-- The chatbot knowledge base is loaded only when a visitor shows intent. -->
   <script>
     (function () {
