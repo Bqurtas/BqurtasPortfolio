@@ -11743,12 +11743,12 @@ body,
     height: 22px !important;
   }
 
-  /* Keep equal top/bottom air; dock clearance added equally as extra bottom only
-     when needed — still centered relative to the usable paper. */
+  /* Center in the usable paper above the floating dock */
   #design .section.logos-section > .paper-scroll,
   #design .section.latest-blog > .paper-scroll {
-    padding-top: clamp(36px, 7vh, 56px) !important;
-    padding-bottom: calc(clamp(36px, 7vh, 56px) + 64px + env(safe-area-inset-bottom, 0px)) !important;
+    justify-content: center !important;
+    padding-top: 24px !important;
+    padding-bottom: calc(24px + 64px + env(safe-area-inset-bottom, 0px)) !important;
     gap: 16px !important;
   }
 
