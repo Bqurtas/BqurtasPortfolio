@@ -35,6 +35,29 @@ test('known app routes and static files continue to Pages', async () => {
   assert.equal((await runRoute('/sitemap-images.xml', 'application/xml')).status, 204);
 });
 
+test('mail autoconfig and autodiscover publish SpaceMail IMAP/SMTP hosts', async () => {
+  const auto = await runRoute('/.well-known/autoconfig/mail/config-v1.1.xml', 'application/xml');
+  assert.equal(auto.status, 200);
+  const autoXml = await auto.text();
+  assert.match(autoXml, /mail\.spacemail\.com/);
+  assert.match(autoXml, /<port>993<\/port>/);
+  assert.match(autoXml, /<port>465<\/port>/);
+
+  const discover = await onRequest({
+    request: new Request('https://bqurtas.com/autodiscover/autodiscover.xml', {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/xml' },
+      body: '<Autodiscover><Request><EMailAddress>hello@bqurtas.com</EMailAddress></Request></Autodiscover>'
+    }),
+    env: {},
+    next: () => new Response(null, { status: 204 })
+  });
+  assert.equal(discover.status, 200);
+  const discoverXml = await discover.text();
+  assert.match(discoverXml, /<Server>mail\.spacemail\.com<\/Server>/);
+  assert.match(discoverXml, /<LoginName>hello@bqurtas.com<\/LoginName>/);
+});
+
 test('two-factor authentication fails closed without server secrets', async () => {
   const response = await onTwoFactorPost({
     request: new Request('https://bqurtas.com/api/2fa', {

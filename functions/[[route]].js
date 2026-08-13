@@ -135,7 +135,7 @@ function retiredRedirectPath(pathname) {
 }
 
 function isPassthroughPath(pathname, request) {
-  if (/^\/(?:api|assets|css|js|vendor|\.well-known)(?:\/|$)/i.test(pathname)) return true;
+  if (/^\/(?:api|assets|css|js|vendor|\.well-known|mail|autodiscover)(?:\/|$)/i.test(pathname)) return true;
   if (['/index.html', '/404.html', '/favicon.ico', '/llms.txt', '/robots.txt', '/security.txt', '/site.webmanifest', '/sitemap-images.xml'].includes(pathname)) return true;
   const acceptsHtml = /(?:^|,)\s*text\/html(?:\s*;|\s*,|$)/i.test(request.headers.get('Accept') || '');
   return !acceptsHtml && /\.[a-z0-9]{2,10}$/i.test(pathname);
@@ -233,9 +233,137 @@ const setHref    = (v) => ({ element(el) { el.setAttribute('href', v); } });
 const setText    = (v) => ({ element(el) { el.setInnerContent(v); } });
 const setLangAttr = (v) => ({ element(el) { el.setAttribute('lang', BCP47[v] || v); } });
 
+const MAIL_AUTOCONFIG_XML = `<?xml version="1.0" encoding="utf-8"?>
+<clientConfig version="1.1">
+  <emailProvider id="bqurtas.com">
+    <domain>bqurtas.com</domain>
+    <displayName>Barakat Qurtas</displayName>
+    <displayShortName>bqurtas</displayShortName>
+    <incomingServer type="imap">
+      <hostname>mail.spacemail.com</hostname>
+      <port>993</port>
+      <socketType>SSL</socketType>
+      <username>%EMAILADDRESS%</username>
+      <authentication>password-cleartext</authentication>
+    </incomingServer>
+    <incomingServer type="pop3">
+      <hostname>mail.spacemail.com</hostname>
+      <port>995</port>
+      <socketType>SSL</socketType>
+      <username>%EMAILADDRESS%</username>
+      <authentication>password-cleartext</authentication>
+      <pop3>
+        <leaveMessagesOnServer>true</leaveMessagesOnServer>
+      </pop3>
+    </incomingServer>
+    <outgoingServer type="smtp">
+      <hostname>mail.spacemail.com</hostname>
+      <port>465</port>
+      <socketType>SSL</socketType>
+      <username>%EMAILADDRESS%</username>
+      <authentication>password-cleartext</authentication>
+    </outgoingServer>
+    <outgoingServer type="smtp">
+      <hostname>mail.spacemail.com</hostname>
+      <port>587</port>
+      <socketType>STARTTLS</socketType>
+      <username>%EMAILADDRESS%</username>
+      <authentication>password-cleartext</authentication>
+    </outgoingServer>
+  </emailProvider>
+</clientConfig>`;
+
+function mailXmlHeaders(type) {
+  return {
+    'Content-Type': type,
+    'Cache-Control': 'public, max-age=3600',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Robots-Tag': 'noindex'
+  };
+}
+
+function mailAutodiscoverXml(login) {
+  const user = String(login || 'hello@bqurtas.com').trim() || 'hello@bqurtas.com';
+  const safe = user.replace(/[<>&'"]/g, '');
+  return `<?xml version="1.0" encoding="utf-8"?>
+<Autodiscover xmlns="http://schemas.microsoft.com/exchange/autodiscover/responseschema/2006">
+  <Response xmlns="http://schemas.microsoft.com/exchange/autodiscover/outlook/responseschema/2006a">
+    <Account>
+      <AccountType>email</AccountType>
+      <Action>settings</Action>
+      <Protocol>
+        <Type>IMAP</Type>
+        <Server>mail.spacemail.com</Server>
+        <Port>993</Port>
+        <DomainRequired>off</DomainRequired>
+        <SPA>off</SPA>
+        <SSL>on</SSL>
+        <AuthRequired>on</AuthRequired>
+        <LoginName>${safe}</LoginName>
+      </Protocol>
+      <Protocol>
+        <Type>SMTP</Type>
+        <Server>mail.spacemail.com</Server>
+        <Port>465</Port>
+        <DomainRequired>off</DomainRequired>
+        <SPA>off</SPA>
+        <SSL>on</SSL>
+        <AuthRequired>on</AuthRequired>
+        <LoginName>${safe}</LoginName>
+      </Protocol>
+    </Account>
+  </Response>
+</Autodiscover>`;
+}
+
+async function serveAutodiscover(request) {
+  if (request.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: mailXmlHeaders('text/xml; charset=utf-8') });
+  }
+  let login = 'hello@bqurtas.com';
+  if (request.method === 'POST') {
+    try {
+      const body = await request.text();
+      const m = body.match(/<EMailAddress>\s*([^<]+)\s*<\/EMailAddress>/i);
+      if (m && /@bqurtas\.com$/i.test(m[1].trim())) login = m[1].trim();
+    } catch (e) {}
+  } else {
+    const url = new URL(request.url);
+    const q = url.searchParams.get('Email') || url.searchParams.get('email');
+    if (q && /@bqurtas\.com$/i.test(q.trim())) login = q.trim();
+  }
+  const xml = mailAutodiscoverXml(login);
+  if (request.method === 'HEAD') {
+    return new Response(null, { status: 200, headers: mailXmlHeaders('text/xml; charset=utf-8') });
+  }
+  return new Response(xml, { status: 200, headers: mailXmlHeaders('text/xml; charset=utf-8') });
+}
+
+function serveAutoconfig(request) {
+  if (request.method === 'OPTIONS' || request.method === 'HEAD') {
+    return new Response(null, {
+      status: request.method === 'OPTIONS' ? 204 : 200,
+      headers: mailXmlHeaders('application/xml; charset=utf-8')
+    });
+  }
+  return new Response(MAIL_AUTOCONFIG_XML, {
+    status: 200,
+    headers: mailXmlHeaders('application/xml; charset=utf-8')
+  });
+}
+
 export async function onRequest(context) {
   const { request, env, next } = context;
   const url = new URL(request.url);
+  if (/^\/autodiscover\/autodiscover\.xml$/i.test(url.pathname)) {
+    return serveAutodiscover(request);
+  }
+  if (
+    /^\/\.well-known\/autoconfig\/mail\/config-v1\.1\.xml$/i.test(url.pathname) ||
+    /^\/mail\/config-v1\.1\.xml$/i.test(url.pathname)
+  ) {
+    return serveAutoconfig(request);
+  }
   // Google Search Console ownership token — served from the function because
   // Pages' pretty-URL normalisation 308-redirects any static *.html path,
   // and Google's verifier requires a plain 200 at the exact URL.
