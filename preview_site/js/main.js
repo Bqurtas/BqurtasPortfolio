@@ -1420,11 +1420,14 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   const clamp01 = (n) => Math.min(1, Math.max(0, n));
   const ease = (t) => t * t * (3 - 2 * t);
   const paperStacks = [];
-  /* Only Portfolio keeps nested scroll. Other sheets advance via window scroll. */
-  const allowsInnerScroll = (sheet) => (
-    Boolean(sheet?.classList?.contains('work'))
-    || sheet?.dataset?.paperScroll === 'inner'
-  );
+  /* Desktop: Portfolio keeps nested scroll. Phones use native document
+     flow so iOS/Android momentum is not killed by a custom router. */
+  const isPhonePaper = () => window.matchMedia('(max-width: 820px)').matches;
+  const allowsInnerScroll = (sheet) => {
+    if (isPhonePaper()) return false;
+    return Boolean(sheet?.classList?.contains('work')
+      || sheet?.dataset?.paperScroll === 'inner');
+  };
 
   const wrapPaperScroll = (sheet) => {
     if (!sheet || sheet.querySelector(':scope > .paper-scroll')) return;
@@ -1983,13 +1986,14 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     };
 
     window.addEventListener('wheel', (event) => {
-      if (event.ctrlKey) return;
+      if (event.ctrlKey || isPhonePaper()) return;
       if (event.isTrusted) window.__bqPaperBypassUntil = 0;
       stopFling();
       routeDelta(event, wheelPixels(event));
     }, { capture: true, passive: false });
 
     window.addEventListener('touchstart', (event) => {
+      if (softTouch.matches) return;
       if (event.isTrusted) window.__bqPaperBypassUntil = 0;
       stopFling();
       if (event.touches.length === 1) {
@@ -2007,6 +2011,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     }, { capture: true, passive: true });
 
     window.addEventListener('touchmove', (event) => {
+      if (softTouch.matches) return;
       if (touchY === null || event.touches.length !== 1) return;
       const now = performance.now();
       const nextY = event.touches[0].clientY;
