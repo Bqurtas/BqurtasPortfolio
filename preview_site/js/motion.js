@@ -163,13 +163,42 @@
         var translated = function (key, fallback) {
           return (key && window.BQ_DICT && window.BQ_DICT[key]) || fallback || '';
         };
+        var coverImg = document.getElementById('menuCoverImg');
+        var navEl = menu.querySelector('.mm-nav');
+        var coverFor = function (link) {
+          var lang = (document.documentElement.getAttribute('lang') || 'en').toLowerCase();
+          var map = { ckb: 'ku', ku: 'ku', ar: 'ar', kmr: 'kmr', fr: 'fr', tr: 'tr', sv: 'sv' };
+          var prefix = map[lang] || 'en';
+          var room = link.dataset.route || 'design';
+          return 'assets/covers/' + prefix + '-' + room + '.jpg';
+        };
+        var placeRail = function (link) {
+          if (!navEl || !link) return;
+          var navBox = navEl.getBoundingClientRect();
+          var box = link.getBoundingClientRect();
+          navEl.style.setProperty('--mm-rail-y', (box.top - navBox.top + (box.height / 2)) + 'px');
+        };
         var applyPreview = function (link) {
           var number = link.querySelector('.mm-n');
           var title = link.querySelector('.mm-link-text');
+          var room = link.dataset.route || 'design';
           if (previewNo && number) previewNo.textContent = number.textContent.trim() + ' / ' + String(roomLinks.length).padStart(2, '0');
           if (previewTitle && title) previewTitle.textContent = title.textContent.trim();
           if (previewNote) previewNote.textContent = translated(link.dataset.i18nMenuNote, link.dataset.menuNote || '');
-          if (figure) figure.dataset.room = link.dataset.route || 'design';
+          if (figure) figure.dataset.room = room;
+          menu.dataset.previewRoom = room;
+          placeRail(link);
+          roomLinks.forEach(function (el) { el.classList.toggle('is-preview', el === link); });
+          if (coverImg) {
+            var next = coverFor(link);
+            if (coverImg.getAttribute('src') !== next) {
+              coverImg.classList.add('is-swapping');
+              window.setTimeout(function () {
+                coverImg.src = next;
+                requestAnimationFrame(function () { coverImg.classList.remove('is-swapping'); });
+              }, 180);
+            }
+          }
         };
         var updatePreview = function (link) {
           if (!link) return;
@@ -193,6 +222,12 @@
           link.addEventListener('focus', function () { updatePreview(link); });
         });
         updatePreview(menu.querySelector('.mm-link.is-active') || roomLinks[0]);
+        if (typeof MutationObserver === 'function') {
+          new MutationObserver(function () {
+            if (!menu.classList.contains('is-ready')) return;
+            placeRail(menu.querySelector('.mm-link.is-preview') || menu.querySelector('.mm-link.is-active') || roomLinks[0]);
+          }).observe(menu, { attributes: true, attributeFilter: ['class'] });
+        }
       }
 
       /* ---- biography spotlight follows the pointer without moving layout ---- */
