@@ -2695,3 +2695,18 @@ Object.assign(window.I18N, {
     "hero.cta":"Voir les travaux"
   }
 });
+
+/* Canonical four-room index after full language dictionaries load */
+(function applyRoomIndex() {
+  var rooms = window.I18N_ROOMS_INDEX || {
+    ku: { "rh.blog.num": "№ ٠٢ · گۆڤار", "rh.bio.num": "№ ٠٣ · دیزاینەر", "rh.contact.num": "№ ٠٤ · با قسە بکەین", "menu.rooms": "ژوورەکان / ٠١—٠٤" },
+    kmr: { "rh.blog.num": "№ 02 · Kovar", "rh.bio.num": "№ 03 · Sêwirmend", "rh.contact.num": "№ 04 · Em biaxivin", "menu.rooms": "Ode / 01—04" },
+    ar: { "rh.blog.num": "№ ٠٢ · المدونة", "rh.bio.num": "№ ٠٣ · المصمم", "rh.contact.num": "№ ٠٤ · لنتحدث", "menu.rooms": "الغرف / ٠١—٠٤" },
+    fr: { "rh.blog.num": "№ 02 · Le Journal", "rh.bio.num": "№ 03 · Le Designer", "rh.contact.num": "№ 04 · Parlons", "menu.rooms": "Salles / 01—04" },
+    tr: { "rh.blog.num": "№ 02 · Günlük", "rh.bio.num": "№ 03 · Tasarımcı", "rh.contact.num": "№ 04 · Konuşalım", "menu.rooms": "Odalar / 01—04" },
+    sv: { "rh.blog.num": "№ 02 · Journalen", "rh.bio.num": "№ 03 · Formgivaren", "rh.contact.num": "№ 04 · Låt oss prata", "menu.rooms": "Rum / 01—04" }
+  };
+  Object.keys(rooms).forEach(function (lang) {
+    window.I18N[lang] = Object.assign(window.I18N[lang] || {}, rooms[lang]);
+  });
+})();

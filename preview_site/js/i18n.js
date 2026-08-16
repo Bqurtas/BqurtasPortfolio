@@ -16,11 +16,11 @@ window.I18N.en = Object.assign(window.I18N.en || {}, {
     'pj.contact': 'Get in touch', 'pj.work': 'View the work',
     'pj.tl': '№ 02 — The Studio', 'pj.tr': 'Hewlêr · Est. 2014',
     'rh.return': 'Return to start', 'rh.scroll': 'Scroll',
-    'rh.blog.num': '№ 04 · The Journal', 'rh.blog.title': 'The <em>Journal</em>',
+    'rh.blog.num': '№ 02 · The Journal', 'rh.blog.title': 'The <em>Journal</em>',
     'rh.blog.sub': 'Short notes from the desk — on typography, place, and the slow craft of design.',
-    'rh.bio.num': '№ 05 · The Designer', 'rh.bio.title': 'The <em>Designer</em>',
+    'rh.bio.num': '№ 03 · The Designer', 'rh.bio.title': 'The <em>Designer</em>',
     'rh.bio.sub': 'A decade of practice in Hewlêr — the story, the work, and the people behind it.',
-    'rh.contact.num': "№ 06 · Let's Talk", 'rh.contact.title': "Let's <em>talk</em>.",
+    'rh.contact.num': "№ 04 · Let's Talk", 'rh.contact.title': "Let's <em>talk</em>.",
     'rh.contact.sub': 'Pitch a project in one careful letter. I reply to every serious enquiry within 48 hours.',
     'nav.design': 'Design',
     'nav.blog': 'Blog',
@@ -136,7 +136,7 @@ window.__loadI18nMore = function(cb) {
   if (window.__i18nMoreLoading) { window.__i18nMoreCbs.push(cb); return; }
   window.__i18nMoreLoading = true; window.__i18nMoreCbs = [cb];
   var sc = document.createElement('script');
-  sc.src = 'js/i18n-more.min.js?v=420'; sc.async = false;
+  sc.src = 'js/i18n-more.min.js?v=422'; sc.async = false;
   sc.onload = function () {
     window.__i18nMoreLoaded = true;
     window.__i18nMoreLoading = false;
@@ -1567,3 +1567,53 @@ Object.assign(window.I18N.kmr||(window.I18N.kmr={}),{"hero.place":"Li Hewlêrê"
 Object.assign(window.I18N.fr||(window.I18N.fr={}),{"hero.place":"Basé à Erbil","hero.since":"Établi en 2014"});
 Object.assign(window.I18N.tr||(window.I18N.tr={}),{"hero.place":"Erbil merkezli","hero.since":"2014’ten beri"});
 Object.assign(window.I18N.sv||(window.I18N.sv={}),{"hero.place":"Baserad i Erbil","hero.since":"Etablerad 2014"});
+
+/* Canonical four-room index — Design 01, Journal 02, Designer 03, Contact 04 */
+window.I18N_ROOMS_INDEX = {
+  en: {
+    "rh.blog.num": "№ 02 · The Journal",
+    "rh.bio.num": "№ 03 · The Designer",
+    "rh.contact.num": "№ 04 · Let's Talk",
+    "menu.rooms": "Rooms / 01—04",
+    "ex1.date": "Dec 2021 — Present · 4 yrs 9 mos"
+  },
+  ku: {
+    "rh.blog.num": "№ ٠٢ · گۆڤار",
+    "rh.bio.num": "№ ٠٣ · دیزاینەر",
+    "rh.contact.num": "№ ٠٤ · با قسە بکەین",
+    "menu.rooms": "ژوورەکان / ٠١—٠٤"
+  },
+  kmr: {
+    "rh.blog.num": "№ 02 · Kovar",
+    "rh.bio.num": "№ 03 · Sêwirmend",
+    "rh.contact.num": "№ 04 · Em biaxivin",
+    "menu.rooms": "Ode / 01—04"
+  },
+  ar: {
+    "rh.blog.num": "№ ٠٢ · المدونة",
+    "rh.bio.num": "№ ٠٣ · المصمم",
+    "rh.contact.num": "№ ٠٤ · لنتحدث",
+    "menu.rooms": "الغرف / ٠١—٠٤"
+  },
+  fr: {
+    "rh.blog.num": "№ 02 · Le Journal",
+    "rh.bio.num": "№ 03 · Le Designer",
+    "rh.contact.num": "№ 04 · Parlons",
+    "menu.rooms": "Salles / 01—04"
+  },
+  tr: {
+    "rh.blog.num": "№ 02 · Günlük",
+    "rh.bio.num": "№ 03 · Tasarımcı",
+    "rh.contact.num": "№ 04 · Konuşalım",
+    "menu.rooms": "Odalar / 01—04"
+  },
+  sv: {
+    "rh.blog.num": "№ 02 · Journalen",
+    "rh.bio.num": "№ 03 · Formgivaren",
+    "rh.contact.num": "№ 04 · Låt oss prata",
+    "menu.rooms": "Rum / 01—04"
+  }
+};
+Object.keys(window.I18N_ROOMS_INDEX).forEach(function (lang) {
+  window.I18N[lang] = Object.assign(window.I18N[lang] || {}, window.I18N_ROOMS_INDEX[lang]);
+});

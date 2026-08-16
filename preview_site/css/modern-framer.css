@@ -13965,3 +13965,287 @@ body.menu-open .mobilebar {
     height: 36px !important;
   }
 }
+
+/* ============================================================================
+   v94 — Four rooms on the home paper system.
+
+   Journal / Designer / Contact keep the same black bed and sticky sheets as
+   Design. Long sheets read inside the rounded frame (desktop) or grow with
+   the page (phone). Interiors match Services: one head, one composition,
+   hairlines instead of nested cards.
+   ============================================================================ */
+
+/* Inner-scroll room sheets — same behaviour as the portfolio catalogue */
+.room.paper-stack > .section.room-sheet--scroll.paper-sheet > .paper-scroll,
+:root[data-theme] .room.paper-stack > .section.room-sheet--scroll.paper-sheet > .paper-scroll {
+  justify-content: flex-start !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.room.paper-stack > .section.room-sheet--scroll.paper-sheet > .paper-scroll > .sheet-mid,
+:root[data-theme] .room.paper-stack > .section.room-sheet--scroll.paper-sheet > .paper-scroll > .sheet-mid {
+  justify-content: flex-start !important;
+  flex: 1 1 auto !important;
+  max-height: none !important;
+}
+
+/* Shared room head — Services composition */
+.room.paper-stack > .section.paper-sheet .section-head {
+  margin: 0 0 clamp(18px, 2.4vh, 28px) !important;
+  max-width: 42rem !important;
+}
+
+.room.paper-stack > .section.paper-sheet .section-num {
+  display: inline-flex !important;
+  align-items: center !important;
+  margin-bottom: 12px !important;
+  color: color-mix(in srgb, var(--ink) 48%, transparent) !important;
+}
+
+.room.paper-stack > .section.paper-sheet .section-title {
+  font-size: clamp(32px, 3.8vw, 54px) !important;
+  line-height: 1.04 !important;
+  letter-spacing: -.04em !important;
+  max-width: 16ch !important;
+  margin: 0 !important;
+}
+
+.room.paper-stack > .section.paper-sheet .section-lede {
+  margin: 12px 0 0 !important;
+  max-width: 46ch !important;
+  color: color-mix(in srgb, var(--ink) 58%, transparent) !important;
+}
+
+.room.paper-stack .bio-block,
+.room.paper-stack .bio-social,
+.room.paper-stack .subscribe,
+.room.paper-stack .pitch-wrap,
+.room.paper-stack .contact-quick,
+.room.paper-stack .index-layout {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.room.paper-stack .bio-block + .bio-block,
+.room.paper-stack .bio-block + .bio-social,
+.room.paper-stack .bio-social + .bio-social {
+  margin-top: clamp(22px, 3vh, 36px) !important;
+  padding-top: clamp(18px, 2.4vh, 28px) !important;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent) !important;
+}
+
+.room.paper-stack .bio-block-title,
+.room.paper-stack .bio-phil-label {
+  font-size: clamp(22px, 2.4vw, 32px) !important;
+  letter-spacing: -.03em !important;
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.room.paper-stack .bio-phil-quote {
+  margin: 0 0 18px !important;
+  font-family: Fraunces, serif !important;
+  font-style: italic !important;
+  font-size: clamp(20px, 2.2vw, 28px) !important;
+  line-height: 1.35 !important;
+  max-width: 28ch !important;
+  color: var(--ink) !important;
+}
+
+.room.paper-stack .bio-phil-text {
+  max-width: 54ch !important;
+}
+
+.room.paper-stack .bio-phil-text p {
+  margin: 0 0 12px !important;
+  font-size: clamp(15px, 1.25vw, 17px) !important;
+  line-height: 1.6 !important;
+  color: color-mix(in srgb, var(--ink) 68%, transparent) !important;
+}
+
+.room.paper-stack .bio-phil-sign {
+  display: inline-block !important;
+  margin-top: 8px !important;
+  font-family: Liana, Fraunces, serif !important;
+  font-size: clamp(28px, 3vw, 40px) !important;
+  color: var(--ink) !important;
+}
+
+.room.paper-stack .tools-group {
+  margin: 0 0 18px !important;
+}
+
+.room.paper-stack .tools-grid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+.room.paper-stack .tool {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 12px 8px 8px !important;
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent) !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--ink) 3%, transparent) !important;
+}
+
+.room.paper-stack .tl-card,
+.room.paper-stack .bio-card {
+  padding: 0 0 16px !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.room.paper-stack .timeline {
+  border-inline-start: 1px solid color-mix(in srgb, var(--ink) 12%, transparent) !important;
+  padding-inline-start: 22px !important;
+  margin: 0 !important;
+}
+
+.room.paper-stack .contact-quick {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent) !important;
+}
+
+.room.paper-stack .qc-card {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  margin: 0 !important;
+  padding: clamp(18px, 2vw, 24px) 4px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 10%, transparent) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.room.paper-stack .qc-card i {
+  width: 36px !important;
+  height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  background: color-mix(in srgb, var(--ink) 6%, transparent) !important;
+}
+
+.room.paper-stack .subscribe {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr) !important;
+  gap: clamp(28px, 4vw, 64px) !important;
+  align-items: center !important;
+}
+
+.room.paper-stack .subscribe-title {
+  font-size: clamp(30px, 3.6vw, 48px) !important;
+  letter-spacing: -.035em !important;
+  line-height: 1.08 !important;
+  margin: 8px 0 12px !important;
+}
+
+.room.paper-stack .bio-connect-links {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  margin-top: clamp(18px, 2.4vh, 28px) !important;
+}
+
+.room.paper-stack .bio-connect-links .bio-social {
+  margin: 0 !important;
+  padding: 16px 4px !important;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent) !important;
+}
+
+.room.paper-stack .bio-social-mark {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.room.paper-stack .services-grid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+.room.paper-stack .service {
+  padding: 8px 14px !important;
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent) !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.room.paper-stack .pitch-head h3 {
+  font-size: clamp(28px, 3.2vw, 44px) !important;
+  letter-spacing: -.035em !important;
+  line-height: 1.08 !important;
+  max-width: 16ch !important;
+}
+
+.room.paper-stack .pitch-form .field input,
+.room.paper-stack .pitch-form .field select,
+.room.paper-stack .pitch-form .field textarea,
+.room.paper-stack .subscribe-field {
+  border-radius: 14px !important;
+  border-color: color-mix(in srgb, var(--ink) 14%, transparent) !important;
+  background: color-mix(in srgb, var(--ink) 3%, transparent) !important;
+  box-shadow: none !important;
+}
+
+.room.paper-stack .pitch-submit,
+.room.paper-stack .subscribe-form button {
+  border-radius: 999px !important;
+}
+
+@media (max-width: 820px) {
+  .room.paper-stack > .section.room-sheet--scroll.paper-sheet,
+  :root[data-theme] .room.paper-stack > .section.room-sheet--scroll.paper-sheet {
+    position: relative !important;
+    top: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    transform: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+  }
+
+  .room.paper-stack > .section.room-sheet--scroll.paper-sheet > .paper-scroll,
+  :root[data-theme] .room.paper-stack > .section.room-sheet--scroll.paper-sheet > .paper-scroll {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+    padding-bottom: calc(28px + 56px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .room.paper-stack > .section.room-sheet--scroll.paper-sheet.is-paper-gone {
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  .room.paper-stack .subscribe,
+  .room.paper-stack .contact-quick,
+  .room.paper-stack .bio-connect-links {
+    grid-template-columns: 1fr !important;
+  }
+
+  .room.paper-stack > .section.paper-sheet .section-title {
+    font-size: clamp(26px, 7vw, 34px) !important;
+    max-width: none !important;
+  }
+}

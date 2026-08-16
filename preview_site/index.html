@@ -106,7 +106,7 @@
         "url": "https://bqurtas.com/",
         "name": "Barakat Qurtas — Graphic Designer in Erbil, Kurdistan",
         "description": "The official portfolio and profile of Kurdish graphic and motion designer Barakat Qurtas in Erbil, Kurdistan Region of Iraq.",
-        "dateModified": "2026-08-11",
+        "dateModified": "2026-08-16",
         "inLanguage": "en",
         "isPartOf": { "@id": "https://bqurtas.com/#website" },
         "mainEntity": { "@id": "https://bqurtas.com/#person" },
@@ -268,7 +268,7 @@
     html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
   </style>
   <link rel="preload" as="style" href="css/style.v417.min.css?v=447" data-href="css/style.v417.min.css?v=447" fetchpriority="high" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=102">
+  <link rel="stylesheet" href="css/modern-framer.css?v=103">
   <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=447"></noscript>
   <script>
     (function () {
@@ -987,14 +987,13 @@
          ROOM 02 — BLOG
          ============================================================ -->
     <section class="room is-hidden" id="blog" data-room="blog">
-      <!-- Room hero -->
       <div class="room-hero">
         <a class="room-hero-return" href="/design" data-route="design" aria-label="Return to start"><i class="fa-solid fa-arrow-left-long"></i> <span data-i18n="rh.return">Return to start</span></a>
         <span class="room-hero-corner room-hero-corner--tr mono"><i class="fa-solid fa-location-dot"></i> <span data-i18n="krg">Hewlêr · KRG</span></span>
         <span class="room-hero-corner room-hero-corner--bl mono">36.19° N · 44.01° E</span>
         <div class="room-hero-inner">
-          <span class="room-hero-ghost" aria-hidden="true">04</span>
-          <span class="mono room-hero-num" data-i18n="rh.blog.num">04 · Journal</span>
+          <span class="room-hero-ghost" aria-hidden="true">02</span>
+          <span class="mono room-hero-num" data-i18n="rh.blog.num">№ 02 · The Journal</span>
           <h2 class="room-hero-title" data-i18n="rh.blog.title">The <em>Journal</em></h2>
           <p class="room-hero-sub" data-i18n="rh.blog.sub">Short notes on type, place and practice.</p>
         </div>
@@ -1004,63 +1003,68 @@
         </div>
       </div>
 
-      <div class="section">
-        <!-- ===== INDEX LAYOUT (rows + pagination rendered by enhance.js) ===== -->
-        <div class="index-layout index-layout--blog" id="blogIndex">
-          <div class="index-list" id="blogList">
-            <span class="index-ghost" id="blogGhost" aria-hidden="true">01</span>
-          </div>
-
-          <!-- Rich preview card (image + excerpt + author) -->
-          <div class="index-preview" aria-hidden="true">
-            <article class="index-card index-card--blog" id="blogCard">
-              <div class="blog-card-cover">
-                <img id="bcImg" alt="" />
-                <span class="mono blog-card-tag" id="bcTag">Editorial</span>
-              </div>
-              <div class="blog-card-body">
-                <h3 class="blog-card-title" id="bcTitle">On the architecture of meaning</h3>
-                <p class="blog-card-excerpt" id="bcSub">Typography is not decoration — it is the floorplan of the page.</p>
-                <div class="blog-card-foot">
-                  <span class="blog-card-author">
-                    <img src="assets/avatar.webp" alt="" width="124" height="124" />
-                    <span><strong data-i18n="name.full">Barakat Qurtas</strong><small class="mono" id="bcMeta">MAY 2026</small></span>
-                  </span>
-                  <span class="mono blog-card-read" id="bcRead">6 MIN</span>
-                </div>
-                <span class="blog-card-cta mono"><i class="fa-solid fa-arrow-right"></i> <span data-i18n="blog.cta">Click to read the full note</span></span>
-              </div>
-            </article>
-          </div>
-        </div>
-
-        <!-- Pagination -->
-        <nav class="blog-pager" id="blogPager" aria-label="Blog pages">
-          <button class="blog-pager-arrow" id="blogPrev" aria-label="Previous page"><i class="fa-solid fa-arrow-left-long"></i></button>
-          <div class="blog-pager-pages" id="blogPages"></div>
-          <button class="blog-pager-arrow" id="blogNext" aria-label="Next page"><i class="fa-solid fa-arrow-right-long"></i></button>
-          <form class="blog-pager-go" id="blogGoForm">
-            <label class="mono" for="blogGoInput" data-i18n="blog.goto">Go to</label>
-            <input type="number" id="blogGoInput" min="1" inputmode="numeric" placeholder="#" />
-            <button type="submit" aria-label="Go to page" data-i18n="blog.go">Go</button>
-          </form>
-        </nav>
-
-        <!-- Subscribe box -->
-        <div class="subscribe" id="subscribe">
-          <div class="subscribe-text">
-            <span class="mono subscribe-eyebrow"><i class="fa-solid fa-envelope-open-text"></i> <span data-i18n="sub.eye">The Journal · Newsletter</span></span>
-            <h3 class="subscribe-title" data-i18n="sub.title">Subscribe for new <em>notes</em>.</h3>
-            <p data-i18n="sub.desc">Short essays on typography, place, and the slow craft of design — sent only when there's something worth reading.</p>
-          </div>
-          <form class="subscribe-form" id="subscribeForm" novalidate>
-            <div class="subscribe-field">
-              <i class="fa-solid fa-envelope"></i>
-              <input type="email" id="subEmail" aria-label="Email address" placeholder="you@email.com" data-i18n-ph="sub.ph" autocomplete="email" required />
+      <div class="section blog-index-sheet room-sheet--scroll">
+        <div class="sheet-mid">
+          <header class="section-head">
+            <span class="section-num mono"><i class="fa-solid fa-feather-pointed"></i> &nbsp; <span data-i18n="blog.label">Journal</span></span>
+            <h2 class="section-title" data-i18n="blog.title">Short <em>notes</em>.</h2>
+            <p class="section-lede" data-i18n="blog.lede">Ideas from the desk, kept simple.</p>
+          </header>
+          <div class="index-layout index-layout--blog" id="blogIndex">
+            <div class="index-list" id="blogList">
+              <span class="index-ghost" id="blogGhost" aria-hidden="true">01</span>
             </div>
-            <button type="submit"><span data-i18n="sub.btn">Subscribe</span> <i class="fa-solid fa-arrow-right"></i></button>
-            <p class="subscribe-status mono" id="subStatus" aria-live="polite"></p>
-          </form>
+            <div class="index-preview" aria-hidden="true">
+              <article class="index-card index-card--blog" id="blogCard">
+                <div class="blog-card-cover">
+                  <img id="bcImg" alt="" />
+                  <span class="mono blog-card-tag" id="bcTag">Editorial</span>
+                </div>
+                <div class="blog-card-body">
+                  <h3 class="blog-card-title" id="bcTitle">On the architecture of meaning</h3>
+                  <p class="blog-card-excerpt" id="bcSub">Typography is not decoration — it is the floorplan of the page.</p>
+                  <div class="blog-card-foot">
+                    <span class="blog-card-author">
+                      <img src="assets/avatar.webp" alt="" width="124" height="124" />
+                      <span><strong data-i18n="name.full">Barakat Qurtas</strong><small class="mono" id="bcMeta">MAY 2026</small></span>
+                    </span>
+                    <span class="mono blog-card-read" id="bcRead">6 MIN</span>
+                  </div>
+                  <span class="blog-card-cta mono"><i class="fa-solid fa-arrow-right"></i> <span data-i18n="blog.cta">Click to read the full note</span></span>
+                </div>
+              </article>
+            </div>
+          </div>
+          <nav class="blog-pager" id="blogPager" aria-label="Blog pages">
+            <button class="blog-pager-arrow" id="blogPrev" aria-label="Previous page"><i class="fa-solid fa-arrow-left-long"></i></button>
+            <div class="blog-pager-pages" id="blogPages"></div>
+            <button class="blog-pager-arrow" id="blogNext" aria-label="Next page"><i class="fa-solid fa-arrow-right-long"></i></button>
+            <form class="blog-pager-go" id="blogGoForm">
+              <label class="mono" for="blogGoInput" data-i18n="blog.goto">Go to</label>
+              <input type="number" id="blogGoInput" min="1" inputmode="numeric" placeholder="#" />
+              <button type="submit" aria-label="Go to page" data-i18n="blog.go">Go</button>
+            </form>
+          </nav>
+        </div>
+      </div>
+
+      <div class="section blog-subscribe-sheet">
+        <div class="sheet-mid">
+          <div class="subscribe" id="subscribe">
+            <div class="subscribe-text">
+              <span class="mono subscribe-eyebrow"><i class="fa-solid fa-envelope-open-text"></i> <span data-i18n="sub.eye">The Journal · Newsletter</span></span>
+              <h3 class="subscribe-title" data-i18n="sub.title">Subscribe for new <em>notes</em>.</h3>
+              <p data-i18n="sub.desc">Short essays on typography, place, and the slow craft of design — sent only when there's something worth reading.</p>
+            </div>
+            <form class="subscribe-form" id="subscribeForm" novalidate>
+              <div class="subscribe-field">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" id="subEmail" aria-label="Email address" placeholder="you@email.com" data-i18n-ph="sub.ph" autocomplete="email" required />
+              </div>
+              <button type="submit"><span data-i18n="sub.btn">Subscribe</span> <i class="fa-solid fa-arrow-right"></i></button>
+              <p class="subscribe-status mono" id="subStatus" aria-live="polite"></p>
+            </form>
+          </div>
         </div>
       </div>
     </section>
@@ -1069,14 +1073,13 @@
          ROOM 03 — BIOGRAPHY
          ============================================================ -->
     <section class="room is-hidden" id="bio" data-room="bio">
-      <!-- Room hero -->
       <div class="room-hero">
         <a class="room-hero-return" href="/design" data-route="design" aria-label="Return to start"><i class="fa-solid fa-arrow-left-long"></i> <span data-i18n="rh.return">Return to start</span></a>
         <span class="room-hero-corner room-hero-corner--tr mono"><i class="fa-solid fa-location-dot"></i> <span data-i18n="krg">Hewlêr · KRG</span></span>
         <span class="room-hero-corner room-hero-corner--bl mono">36.19° N · 44.01° E</span>
         <div class="room-hero-inner">
-          <span class="room-hero-ghost" aria-hidden="true">05</span>
-          <span class="mono room-hero-num" data-i18n="rh.bio.num">№ 05 · The Designer</span>
+          <span class="room-hero-ghost" aria-hidden="true">03</span>
+          <span class="mono room-hero-num" data-i18n="rh.bio.num">№ 03 · The Designer</span>
           <h2 class="room-hero-title" data-i18n="rh.bio.title">The <em>Designer</em></h2>
           <p class="room-hero-sub" data-i18n="rh.bio.sub">A decade of practice in Hewlêr — the story, the work, and the people behind it.</p>
         </div>
@@ -1086,15 +1089,13 @@
         </div>
       </div>
 
-      <div class="section">
+      <div class="section bio-story-sheet">
+        <div class="sheet-mid">
         <header class="section-head">
           <span class="section-num mono"><i class="fa-solid fa-user-pen"></i> &nbsp; <span data-i18n="bio.label">Biography Room</span></span>
           <h2 class="section-title" data-i18n="bio.title">A short, <em>honest</em> biography.</h2>
           <p class="section-lede" data-i18n="bio.lede"><span class="dropcap">B</span>arakat Qurtas Babakr — independent graphic designer, working between state protocol, editorial design, and quiet personal projects. Based in Erbil, Kurdistan Region of Iraq.</p>
         </header>
-
-        <div class="bio-stack">
-        <!-- WORK PHILOSOPHY -->
         <div class="bio-block bio-philosophy" data-wm="&#xf14e;">
           <span class="mono bio-phil-eyebrow"><i class="fa-solid fa-compass"></i> <span data-i18n="bp.eye">Discover the story behind the designer</span></span>
           <h3 class="bio-phil-label" data-i18n="bp.label">Work <em>Philosophy</em></h3>
@@ -1106,8 +1107,11 @@
           </div>
           <span class="bio-phil-sign" data-i18n="name.full">Barakat Qurtas</span>
         </div>
+        </div>
+      </div>
 
-        <!-- TOOLS & SOFTWARE -->
+      <div class="section bio-kit-sheet">
+        <div class="sheet-mid">
         <div class="bio-block bio-tools" data-wm="&#xf0ad;">
           <h3 class="bio-block-title"><i class="fa-solid fa-toolbox"></i> <span data-i18n="bt.title">Tools &amp; Software</span></h3>
           <p class="bio-block-lede" data-i18n="bt.lede">The kit I design, edit and move with every day.</p>
@@ -1157,8 +1161,11 @@
 
           <p class="tools-typing"><i class="fa-solid fa-keyboard"></i> <span data-i18n="bt.typing">Fast, accurate typist — quick keyboarding in Kurdish, Arabic &amp; English.</span></p>
         </div>
+        </div>
+      </div>
 
-        <!-- EXPERIENCE -->
+      <div class="section bio-record-sheet room-sheet--scroll">
+        <div class="sheet-mid">
         <div class="bio-block" data-wm="&#xf0b1;">
           <h3 class="bio-block-title"><i class="fa-solid fa-briefcase"></i> <span data-i18n="bio.experience">Experience</span></h3>
           <ol class="timeline">
@@ -1167,7 +1174,7 @@
               <div class="tl-card">
                 <div class="tl-head">
                   <h4 data-i18n="ex1.title">Designer at Directorate of Media Affairs</h4>
-                  <span class="mono tl-date" data-i18n="ex1.date">Dec 2021 — Present · 4 yrs 6 mos</span>
+                  <span class="mono tl-date" data-i18n="ex1.date">Dec 2021 — Present · 4 yrs 9 mos</span>
                 </div>
                 <p class="tl-org"><i class="fa-solid fa-landmark"></i> <span data-i18n="ex1.org">Kurdistan Region Presidency · Part-time</span></p>
                 <p class="tl-loc"><i class="fa-solid fa-location-dot"></i> <span data-i18n="ex1.loc">Erbil Plains District, Erbil Governorate, Iraq</span></p>
@@ -1216,8 +1223,11 @@
             <div class="tl-skills"><i class="fa-solid fa-scale-balanced"></i> <span data-i18n="ed.skills">Law and International Law</span></div>
           </div>
         </div>
+        </div>
+      </div>
 
-        <!-- HONORS & AWARDS — Index layout -->
+      <div class="section bio-honors-sheet room-sheet--scroll">
+        <div class="sheet-mid">
         <div class="bio-block" data-wm="&#xf091;">
           <h3 class="bio-block-title"><i class="fa-solid fa-trophy"></i> <span data-i18n="bio.honors">Honors &amp; Awards</span></h3>
 
@@ -1297,20 +1307,11 @@
             </div>
           </div>
         </div>
+        </div>
+      </div>
 
-        <!-- LINKEDIN -->
-        <a class="bio-block bio-social bio-social--linkedin" data-wm="&#xf08c;" href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener">
-          <span class="bio-social-mark"><i class="fa-brands fa-linkedin-in"></i></span>
-          <div class="bio-social-text">
-            <span class="mono bio-social-eyebrow" data-i18n="li.eye">Connect · Professional Network</span>
-            <h3 class="bio-social-title" data-i18n="li.title">Barakat on <em>LinkedIn</em></h3>
-            <p class="bio-social-desc" data-i18n="li.desc">Experience, recommendations, and the professional record — kept current and open for collaboration.</p>
-            <span class="bio-social-handle mono">linkedin.com/in/bqurtas</span>
-          </div>
-          <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
-        </a>
-
-        <!-- LANGUAGES -->
+      <div class="section bio-world-sheet">
+        <div class="sheet-mid">
         <div class="bio-block" data-wm="&#xf1ab;">
           <h3 class="bio-block-title"><i class="fa-solid fa-language"></i> <span data-i18n="bio.languages">Languages</span></h3>
           <div class="langs-grid">
@@ -1324,19 +1325,6 @@
           </div>
         </div>
 
-        <!-- BEHANCE -->
-        <a class="bio-block bio-social bio-social--behance" data-wm="&#xf1b4;" href="https://www.behance.net/bqurtas" target="_blank" rel="noopener">
-          <span class="bio-social-mark"><i class="fa-brands fa-behance"></i></span>
-          <div class="bio-social-text">
-            <span class="mono bio-social-eyebrow" data-i18n="be.eye">Portfolio · Creative Network</span>
-            <h3 class="bio-social-title" data-i18n="be.title">Barakat on <em>Behance</em></h3>
-            <p class="bio-social-desc" data-i18n="be.desc">The full creative portfolio — projects, case studies, and work in progress, curated in one place.</p>
-            <span class="bio-social-handle mono">behance.net/bqurtas</span>
-          </div>
-          <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
-        </a>
-
-        <!-- ORGANIZATIONS -->
         <div class="bio-block" data-wm="&#xf500;">
           <h3 class="bio-block-title"><i class="fa-solid fa-people-group"></i> <span data-i18n="bio.orgs">Organizations</span></h3>
           <ul class="orgs">
@@ -1346,8 +1334,25 @@
             <li><i class="fa-solid fa-building"></i><div><h4 data-i18n="bo4.name">Justice NGO for Lagan Issues</h4><p data-i18n="bo4.role">Graphic Designer and website developer · Feb 2014 — Feb 2017</p></div></li>
           </ul>
         </div>
+        </div>
+      </div>
 
-        <!-- SERVICES -->
+      <div class="section bio-proof-sheet room-sheet--scroll">
+        <div class="sheet-mid">
+        <div class="bio-block" data-wm="&#xf559;">
+          <h3 class="bio-block-title"><i class="fa-solid fa-award"></i> <span data-i18n="bio.certificates">Certificates &amp; Honours</span></h3>
+          <div class="cert-grid" id="certGrid">
+            <div class="gallery-loading" id="certLoading">
+              <i class="fa-solid fa-circle-notch fa-spin"></i>
+              <span class="mono" data-i18n="cert.loading">Loading…</span>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <div class="section bio-connect-sheet room-sheet--scroll">
+        <div class="sheet-mid">
         <div class="bio-block" data-wm="&#xf552;">
           <h3 class="bio-block-title"><i class="fa-solid fa-toolbox"></i> <span data-i18n="bio.services">Services Provided</span></h3>
           <div class="services-grid">
@@ -1364,18 +1369,29 @@
           </div>
         </div>
 
-        <!-- CERTIFICATES -->
-        <div class="bio-block" data-wm="&#xf559;">
-          <h3 class="bio-block-title"><i class="fa-solid fa-award"></i> <span data-i18n="bio.certificates">Certificates &amp; Honours</span></h3>
-          <div class="cert-grid" id="certGrid">
-            <div class="gallery-loading" id="certLoading">
-              <i class="fa-solid fa-circle-notch fa-spin"></i>
-              <span class="mono" data-i18n="cert.loading">Loading…</span>
-            </div>
+        <div class="bio-connect-links">
+        <a class="bio-block bio-social bio-social--linkedin" data-wm="&#xf08c;" href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener">
+          <span class="bio-social-mark"><i class="fa-brands fa-linkedin-in"></i></span>
+          <div class="bio-social-text">
+            <span class="mono bio-social-eyebrow" data-i18n="li.eye">Connect · Professional Network</span>
+            <h3 class="bio-social-title" data-i18n="li.title">Barakat on <em>LinkedIn</em></h3>
+            <p class="bio-social-desc" data-i18n="li.desc">Experience, recommendations, and the professional record — kept current and open for collaboration.</p>
+            <span class="bio-social-handle mono">linkedin.com/in/bqurtas</span>
           </div>
-        </div>
+          <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+        </a>
 
-        <!-- GOOGLE -->
+        <a class="bio-block bio-social bio-social--behance" data-wm="&#xf1b4;" href="https://www.behance.net/bqurtas" target="_blank" rel="noopener">
+          <span class="bio-social-mark"><i class="fa-brands fa-behance"></i></span>
+          <div class="bio-social-text">
+            <span class="mono bio-social-eyebrow" data-i18n="be.eye">Portfolio · Creative Network</span>
+            <h3 class="bio-social-title" data-i18n="be.title">Barakat on <em>Behance</em></h3>
+            <p class="bio-social-desc" data-i18n="be.desc">The full creative portfolio — projects, case studies, and work in progress, curated in one place.</p>
+            <span class="bio-social-handle mono">behance.net/bqurtas</span>
+          </div>
+          <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+        </a>
+
         <a class="bio-block bio-social bio-social--google" data-wm="&#xf1a0;" href="https://www.google.com/search?q=Barakat+Qurtas" target="_blank" rel="noopener">
           <span class="bio-social-mark"><i class="fa-brands fa-google"></i></span>
           <div class="bio-social-text">
@@ -1387,7 +1403,6 @@
           <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
         </a>
 
-        <!-- CV PDF -->
         <a class="bio-block bio-social bio-doc-card bio-doc-card--cv" data-wm="&#xf15c;" href="https://dcnkhzrishphpismmxuu.supabase.co/storage/v1/object/public/PDF/df9e89_a909ec87afa044c9aca814e2de2e553c_compressed.pdf" target="_blank" rel="noopener">
           <span class="bio-social-mark"><i class="fa-solid fa-file-lines"></i></span>
           <div class="bio-social-text">
@@ -1399,7 +1414,6 @@
           <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
         </a>
 
-        <!-- Catalogue PDF -->
         <a class="bio-block bio-social bio-doc-card bio-doc-card--catalogue" data-wm="&#xf518;" href="https://dcnkhzrishphpismmxuu.supabase.co/storage/v1/object/public/PDF/df9e89_fc710677a00048569ff9b0f6f86efebd_compressed.pdf" target="_blank" rel="noopener">
           <span class="bio-social-mark"><i class="fa-solid fa-book-open"></i></span>
           <div class="bio-social-text">
@@ -1410,8 +1424,8 @@
           </div>
           <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
         </a>
-        </div><!-- /.bio-stack -->
-
+        </div>
+        </div>
       </div>
     </section>
 
@@ -1419,14 +1433,13 @@
          ROOM 04 — CONTACT
          ============================================================ -->
     <section class="room is-hidden" id="contact" data-room="contact">
-      <!-- Room hero -->
       <div class="room-hero">
         <a class="room-hero-return" href="/design" data-route="design" aria-label="Return to start"><i class="fa-solid fa-arrow-left-long"></i> <span data-i18n="rh.return">Return to start</span></a>
         <span class="room-hero-corner room-hero-corner--tr mono"><i class="fa-solid fa-location-dot"></i> <span data-i18n="krg">Hewlêr · KRG</span></span>
         <span class="room-hero-corner room-hero-corner--bl mono">36.19° N · 44.01° E</span>
         <div class="room-hero-inner">
-          <span class="room-hero-ghost" aria-hidden="true">06</span>
-          <span class="mono room-hero-num" data-i18n="rh.contact.num">№ 06 · Let's Talk</span>
+          <span class="room-hero-ghost" aria-hidden="true">04</span>
+          <span class="mono room-hero-num" data-i18n="rh.contact.num">№ 04 · Let's Talk</span>
           <h2 class="room-hero-title" data-i18n="rh.contact.title">Let's <em>talk</em>.</h2>
           <p class="room-hero-sub" data-i18n="rh.contact.sub">Pitch a project in one careful letter. I reply to every serious enquiry within 48 hours.</p>
         </div>
@@ -1436,7 +1449,8 @@
         </div>
       </div>
 
-      <div class="section">
+      <div class="section contact-reach-sheet">
+        <div class="sheet-mid">
         <header class="section-head">
           <span class="section-num mono"><i class="fa-solid fa-paper-plane"></i> &nbsp; <span data-i18n="contact.label">Contact Room</span></span>
           <p class="contact-eyebrow mono" data-i18n="c.eyebrow">— Get in Touch · Let's Collaborate · Digital Landscape</p>
@@ -1474,8 +1488,11 @@
             </div>
           </a>
         </div>
+        </div>
+      </div>
 
-        <!-- Pitch form -->
+      <div class="section contact-pitch-sheet room-sheet--scroll">
+        <div class="sheet-mid">
         <div class="pitch-wrap">
           <header class="pitch-head">
             <span class="mono"><i class="fa-solid fa-handshake-angle"></i> &nbsp; <span data-i18n="c.submit.eye">Submit your project</span></span>
@@ -1589,6 +1606,7 @@
             </button>
             <p class="contact-status" id="pitchStatus" aria-live="polite"></p>
           </form>
+        </div>
         </div>
       </div>
     </section>
@@ -1793,7 +1811,7 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script defer src="js/i18n.v420.min.js?v=448"></script>
+  <script defer src="js/i18n.v420.min.js?v=449"></script>
   <!-- Non-English visitors need the extra dictionaries before first render;
        English (the default + PSI) never loads them, keeping the parse light.
        applyLang() can also fetch this on its own, but starting it here — in
@@ -1808,7 +1826,7 @@
       var lang=u||saved;
       if(lang && lang!=='en'){
         window.__i18nMoreLoading=true; window.__i18nMoreCbs=window.__i18nMoreCbs||[];
-        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=421'; s.async=false;
+        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=422'; s.async=false;
         s.onload=function(){
           window.__i18nMoreLoaded=true; window.__i18nMoreLoading=false;
           var cbs=(window.__i18nMoreCbs||[]).slice(); window.__i18nMoreCbs=[];
@@ -1819,7 +1837,7 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=459"></script>
+  <script defer src="js/main.v420.min.js?v=460"></script>
   <script defer src="js/gallery.v420.min.js?v=452"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -1879,7 +1897,7 @@
     }());
   </script>
   <script defer src="js/lux.min.js?v=359"></script>
-  <script defer src="js/motion.min.js?v=410"></script>
+  <script defer src="js/motion.min.js?v=411"></script>
   <!-- The chatbot knowledge base is loaded only when a visitor shows intent. -->
   <script>
     (function () {

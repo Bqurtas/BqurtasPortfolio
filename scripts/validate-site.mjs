@@ -43,6 +43,13 @@ for (const forbidden of [
   if (html.includes(forbidden)) failures.push(`index.html contains retired token: ${forbidden}`);
 }
 
+if (!html.includes('aria-hidden="true">02</span>') || !html.includes('aria-hidden="true">03</span>') || !html.includes('aria-hidden="true">04</span>')) {
+  failures.push('room heroes are not numbered 02–04 to match the four-room menu');
+}
+if (html.includes('aria-hidden="true">05</span>') || html.includes('aria-hidden="true">06</span>')) {
+  failures.push('retired room numbers 05/06 still present');
+}
+
 if (failures.length) {
   console.error(failures.map((failure) => `- ${failure}`).join('\n'));
   process.exit(1);
