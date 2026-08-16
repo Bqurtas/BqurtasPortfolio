@@ -268,7 +268,7 @@
     html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
   </style>
   <link rel="preload" as="style" href="css/style.v417.min.css?v=447" data-href="css/style.v417.min.css?v=447" fetchpriority="high" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=102">
+  <link rel="stylesheet" href="css/modern-framer.css?v=143">
   <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=447"></noscript>
   <script>
     (function () {
@@ -363,7 +363,7 @@
     }());
   </script>
   <link rel="stylesheet" href="css/fonts.css?v=447">
-  <link rel="stylesheet" href="css/experience.css?v=1">
+  <link rel="stylesheet" href="css/experience.css?v=4">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315"></noscript>
 
@@ -582,47 +582,18 @@
     <div class="latest-panel-list" id="latestList"></div>
   </section>
 
-  <!-- Full-screen atelier curtain -->
+  <!-- Full-screen curtain menu (minimal, Voxo-style page-push) -->
   <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menu" aria-hidden="true">
     <div class="mobile-sheet">
-      <div class="mm-right" aria-hidden="true">
-        <figure class="mm-figure" id="menuFigure" data-room="design">
-          <img class="mm-cover-img" id="menuCoverImg" src="assets/covers/en-design.jpg" alt="" width="1600" height="900" decoding="async" />
-          <div class="mm-cover">
-            <div class="mm-cover-top">
-              <span class="mm-cover-eyebrow mono" data-i18n="menu.cover">Index</span>
-              <span class="mm-cover-no mono" id="menuPreviewNo">01 / 04</span>
-            </div>
-            <div class="mm-cover-mid">
-              <h3 class="mm-cover-title" id="menuPreviewTitle" data-i18n="nav.design">Design</h3>
-              <p class="mm-cover-note" id="menuPreviewNote" data-i18n="menu.note.design">Selected design and visual systems</p>
-            </div>
-            <div class="mm-cover-base mono">bqurtas.com · Hewlêr</div>
-          </div>
-        </figure>
-      </div>
-      <span class="mm-grain" aria-hidden="true"></span>
       <div class="mm-left">
-        <div class="mm-top">
-          <span class="mm-kicker mono"><span data-i18n="menu.cover">Index</span><span aria-hidden="true">01 — 04</span></span>
-          <a href="/design" class="mm-logo" data-route="design" aria-label="Barakat Qurtas">
-            <img class="mm-logo-av" src="assets/portrait.webp?v=2" alt="" width="42" height="42" loading="lazy" decoding="async" />
-            <span class="mm-logo-txt">
-              <span class="mm-logo-name">Barakat Qurtas</span>
-              <span class="mm-logo-role" data-i18n="hero.place">Based in Erbil</span>
-            </span>
-          </a>
-        </div>
         <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
         <nav class="mm-nav" aria-label="Menu">
-          <span class="mm-nav-rail" aria-hidden="true"></span>
-          <a href="/design" class="mm-link" data-route="design" data-i18n-menu-note="menu.note.design" data-menu-note="Selected design and visual systems" data-menu-img="assets/covers/en-design.jpg"><span class="mm-n">01</span><span class="mm-link-copy"><span class="mm-link-text" data-i18n="nav.design">Design</span><span class="mm-link-note" data-i18n="menu.note.design">Selected design and visual systems</span></span><span class="mm-link-arrow" aria-hidden="true">→</span></a>
-          <a href="/blog" class="mm-link" data-route="blog" data-i18n-menu-note="menu.note.blog" data-menu-note="Notes on typography, place and practice" data-menu-img="assets/covers/en-blog.jpg"><span class="mm-n">02</span><span class="mm-link-copy"><span class="mm-link-text" data-i18n="nav.blog">The Journal</span><span class="mm-link-note" data-i18n="menu.note.blog">Notes on typography, place and practice</span></span><span class="mm-link-arrow" aria-hidden="true">→</span></a>
-          <a href="/bio" class="mm-link" data-route="bio" data-i18n-menu-note="menu.note.bio" data-menu-note="Experience, tools, awards and biography" data-menu-img="assets/covers/en-bio.jpg"><span class="mm-n">03</span><span class="mm-link-copy"><span class="mm-link-text" data-i18n="nav.bio">The Designer</span><span class="mm-link-note" data-i18n="menu.note.bio">Experience, tools, awards and biography</span></span><span class="mm-link-arrow" aria-hidden="true">→</span></a>
-          <a href="/contact" class="mm-link" data-route="contact" data-i18n-menu-note="menu.note.contact" data-menu-note="Start a clear, useful conversation" data-menu-img="assets/covers/en-contact.jpg"><span class="mm-n">04</span><span class="mm-link-copy"><span class="mm-link-text" data-i18n="nav.contact">Let's talk.</span><span class="mm-link-note" data-i18n="menu.note.contact">Start a clear, useful conversation</span></span><span class="mm-link-arrow" aria-hidden="true">→</span></a>
+          <a href="/design" class="mm-link" data-route="design"><span class="mm-link-text" data-i18n="nav.design">Design</span></a>
+          <a href="/blog" class="mm-link" data-route="blog"><span class="mm-link-text" data-i18n="nav.blog">The Journal</span></a>
+          <a href="/bio" class="mm-link" data-route="bio"><span class="mm-link-text" data-i18n="nav.bio">The Designer</span></a>
+          <a href="/contact" class="mm-link" data-route="contact"><span class="mm-link-text" data-i18n="nav.contact">Let's talk.</span></a>
         </nav>
         <div class="mm-foot">
-          <a class="mm-touch" href="/contact" data-route="contact"><span data-i18n="profile.btn2">Get in touch</span> <i class="fa-solid fa-arrow-right"></i></a>
           <div class="mm-socs">
             <a href="https://instagram.com/bqurtas" target="_blank" rel="noopener">Instagram</a>
             <a href="https://www.behance.net/bqurtas" target="_blank" rel="noopener">Behance</a>
@@ -1819,7 +1790,7 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=459"></script>
+  <script defer src="js/main.v420.min.js?v=472"></script>
   <script defer src="js/gallery.v420.min.js?v=452"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs

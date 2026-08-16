@@ -1420,14 +1420,11 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   const clamp01 = (n) => Math.min(1, Math.max(0, n));
   const ease = (t) => t * t * (3 - 2 * t);
   const paperStacks = [];
-  /* Desktop: Portfolio keeps nested scroll. Phones use native document
-     flow so iOS/Android momentum is not killed by a custom router. */
+  /* The portfolio gallery is driven by the tall-track "magic scroll" below
+     (page-scroll → reel translate), NOT by the input router's nested scrollTop,
+     so no sheet claims router-owned inner scroll. */
   const isPhonePaper = () => window.matchMedia('(max-width: 820px)').matches;
-  const allowsInnerScroll = (sheet) => {
-    if (isPhonePaper()) return false;
-    return Boolean(sheet?.classList?.contains('work')
-      || sheet?.dataset?.paperScroll === 'inner');
-  };
+  const allowsInnerScroll = () => false;
 
   const wrapPaperScroll = (sheet) => {
     if (!sheet || sheet.querySelector(':scope > .paper-scroll')) return;
@@ -1772,6 +1769,128 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     });
     bindStack(room, parts, { requireActive: true });
   });
+
+  /* Portfolio "magic scroll" (tall-track): the work section becomes a tall
+     scroll TRACK; its .paper-scroll is a sticky CARD that pins fully over the
+     hero first; a .work-reel inside it is translated up by page scroll to
+     reveal the gallery within the fixed frame; at the reel's end the track ends
+     and the next card takes over. Purely page-scroll driven — deterministic,
+     native momentum, identical on desktop and phones. */
+  (function portfolioMagicScroll() {
+    const track = document.querySelector('#design.paper-stack > .section.work.paper-sheet');
+    const card = track?.querySelector(':scope > .paper-scroll');
+    if (!card) return;
+    let vp = card.querySelector(':scope > .work-vp');
+    let reel = vp && vp.querySelector(':scope > .work-reel');
+    if (!vp) {
+      /* Fixed head (intro + filter tabs stay put) + scrolling gallery reel. */
+      const head = document.createElement('div');
+      head.className = 'work-head';
+      vp = document.createElement('div');
+      vp.className = 'work-vp';
+      reel = document.createElement('div');
+      reel.className = 'work-reel';
+      /* Only the filter TABS stay fixed. Everything else — the "Design Room /
+         A small catalogue…" section-head, the "All Work / The full catalogue…"
+         tab-header, the grid and load-more — scrolls inside the reel (so the
+         intro copy is kept, and a tall title no longer collapses the viewport). */
+      [...card.children].forEach((node) => {
+        (node.matches && node.matches('.tabs-wrap') ? head : reel).appendChild(node);
+      });
+      vp.appendChild(reel);
+      card.appendChild(head);
+      card.appendChild(vp);
+    }
+    const headEl = card.querySelector(':scope > .work-head');
+    const tabsWrap = headEl && headEl.querySelector('.tabs-wrap');
+    /* MOBILE: the section-head ("Design Room / A small catalogue…") sits in the
+       head ABOVE the tabs, and the head flows at the card top (owner: put the
+       buttons UNDER that heading). DESKTOP: the tabs are a side rail, so the
+       section-head stays at the top of the scrolling reel instead. */
+    const placeChrome = () => {
+      const sh = card.querySelector('.section-head');
+      if (!headEl || !tabsWrap) return;
+      const mobile = window.matchMedia('(max-width: 820px)').matches;
+      card.classList.toggle('work-head-flow', mobile);
+      if (mobile) {
+        if (sh && (sh.parentElement !== headEl || sh.nextElementSibling !== tabsWrap)) {
+          headEl.insertBefore(sh, tabsWrap);
+        }
+      } else if (sh && sh.parentElement === headEl) {
+        reel.insertBefore(sh, reel.firstChild);
+      }
+    };
+    let overflow = 0;
+    let cardH = 0;
+    let collapseDist = 0;   /* how far the head slides up before the tabs pin (mobile) */
+    const nextSheet = () => {
+      const n = track.nextElementSibling;
+      return (n && n.classList && n.classList.contains('paper-sheet')) ? n : null;
+    };
+    const measure = () => {
+      cardH = card.clientHeight;
+      /* Mobile: the head holds the section-head heading + the tabs, pinned at the
+         card top. The heading STAYS fixed in place (owner) — no collapse — while
+         the gallery scrolls up under the glass tabs. The reel starts below the
+         full head. */
+      if (card.classList.contains('work-head-flow') && headEl && tabsWrap) {
+        collapseDist = 0;
+        card.style.setProperty('--work-head-h', headEl.offsetHeight + 'px');
+        headEl.style.transform = '';
+      } else {
+        collapseDist = 0;
+        card.style.removeProperty('--work-head-h');
+        if (headEl) headEl.style.transform = '';
+      }
+      const vpH = vp.clientHeight;
+      const reelH = reel.scrollHeight;
+      overflow = Math.max(0, reelH - vpH);
+      /* track = card + gallery-scroll + one card-height of "hold": after the
+         gallery ends the card stays PINNED for a card-height while the next
+         sheet (pulled up by its negative margin) rises over it — a clean pile
+         hand-off, no gap where the portfolio scrolls away first. */
+      track.style.setProperty('--work-track-h', (cardH * 2 + overflow) + 'px');
+      /* Pin the next sheet's overlap to the SAME measured pixels the track uses.
+         The CSS margin is dvh-based, which drifts as the mobile address bar
+         hides during scroll — desyncing the hand-off so the portfolio appears
+         to scroll along under the following sheets. Fixed px keeps them locked. */
+      const next = nextSheet();
+      if (next) next.style.setProperty('margin-top', (-cardH) + 'px', 'important');
+    };
+    const gutter = () => parseFloat(getComputedStyle(card).top) || 0;
+    /* Hide the card the INSTANT the next sheet fully covers it — the moment the
+       sticky card would otherwise unpin and scroll up. Run this SYNCHRONOUSLY on
+       every scroll (not in rAF) so the card is never painted mid-unpin: no brief
+       portfolio "flash" at the hand-off. At this exact point the next sheet is
+       pinned and fully opaque over it, so hiding is invisible. */
+    const setCovered = () => {
+      const g = gutter();
+      const trackTop = track.getBoundingClientRect().top;
+      card.style.visibility = (trackTop <= g - overflow - cardH) ? 'hidden' : 'visible';
+    };
+    let raf = 0;
+    const drive = () => {
+      raf = 0;
+      const g = gutter();
+      const trackTop = track.getBoundingClientRect().top;
+      const y = Math.min(overflow, Math.max(0, g - trackTop));
+      reel.style.transform = 'translate3d(0,' + (-y) + 'px,0)';
+      /* slide the head up until the tabs reach the top, then hold — the heading
+         scrolls away while ONLY the tabs stay pinned (owner). */
+      if (collapseDist && headEl) {
+        headEl.style.transform = 'translate3d(0,' + (-Math.min(y, collapseDist)) + 'px,0)';
+      }
+    };
+    const onScroll = () => { setCovered(); if (!raf) raf = requestAnimationFrame(drive); };
+    const remeasure = () => { placeChrome(); measure(); setCovered(); drive(); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', remeasure, { passive: true });
+    window.addEventListener('bq:gallery-built', remeasure);
+    window.addEventListener('bq:gallery-counts', remeasure);
+    if (typeof ResizeObserver === 'function') { try { new ResizeObserver(remeasure).observe(reel); } catch (e) {} }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure, () => {});
+    remeasure();
+  })();
 
   /* Scroll ownership ---------------------------------------------------------
      Portfolio owns nested reading inside its rounded frame. Every other sheet

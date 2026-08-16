@@ -6564,9 +6564,7 @@ body,
   visibility: visible;
   pointer-events: auto;
   will-change: transform, opacity;
-  box-shadow:
-    0 28px 70px -24px rgba(0, 0, 0, .62),
-    0 0 0 1px rgba(0, 0, 0, .08) !important;
+  box-shadow: none !important;   /* owner: no shadow behind the sheets */
   z-index: var(--bq-paper-z, 10) !important;
 }
 
@@ -12876,7 +12874,7 @@ body,
   --bq-r-md: 18px;
   --bq-r-lg: 28px;
   --bq-r-xl: 40px;
-  --bq-menu-ink: #0c0c0d;
+  --bq-menu-ink: #0a0a0a;
   --bq-menu-paper: #f4f1eb;
 }
 
@@ -13719,7 +13717,14 @@ body.menu-open .mobilebar {
   --bq-card-gap: clamp(14px, 2vh, 24px);
   --bq-stack-top: var(--bq-deck-gutter, 12px);
   --bq-stack-sheet-h: calc(100dvh - (var(--bq-deck-gutter, 12px) * 2) - var(--bq-chrome-bottom, 0px));
-  --bq-paper-scale: 0.05;
+  /* Framer "featured projects" pile: the covered card STAYS pinned and scales
+     down as the next card lands on top of it — crisp, no fade, no blur (matches
+     bqurtas.framer.media). The reference uses 0.80, but its cards carry their
+     own margin; our sheets are full-bleed, so ~0.90 gives the same "sink behind"
+     read without opening a big dark gap. 0.10 => min scale 0.90. */
+  --bq-paper-scale: 0.10;
+  --bq-stack-fade: 0;
+  --bq-stack-blur: 0px;
 }
 
 @media (max-width: 820px) {
@@ -13750,12 +13755,15 @@ body.menu-open .mobilebar {
   max-height: var(--bq-stack-sheet-h) !important;
   min-height: 0 !important;
   overflow: hidden !important;
-  transform:
-    translate3d(0, calc(0px - var(--bq-push-y, 0px)), 0)
-    scale(calc(1 - (var(--bq-out, 0) * var(--bq-paper-scale)))) !important;
-  transform-origin: 50% 50% !important;
+  /* PILE-UP: the covered sheet STAYS FIXED (pinned) — the next shape rises up
+     and lands on top of it. IMPORTANT: no transform on the sheet — a transform
+     on a position:sticky element disables the sticky (the card would scroll
+     away instead of staying fixed). The sink/scale therefore cannot live here. */
+  transform: none !important;
+  opacity: 1 !important;
+  filter: none !important;
   z-index: var(--bq-paper-z, 10) !important;
-  will-change: transform, opacity;
+  will-change: auto;
 }
 
 #design.paper-stack > .paper-sheet.is-paper-gone,
@@ -13964,4 +13972,518 @@ body.menu-open .mobilebar {
     width: 36px !important;
     height: 36px !important;
   }
+}
+
+/* ============================================================================
+   PAPER STACK — final say (wins the ~15 legacy layers via the 2-id / 2-class
+   trick). The covered card must STAY FIXED while the next lands on top, so the
+   sheet MUST carry no transform: a transform on a position:sticky element kills
+   the sticky and the card scrolls away. Force transform:none here to override
+   every legacy scale() layer; crisp, no fade, no blur.
+   ========================================================================== */
+#design#design.paper-stack > .paper-sheet,
+.room.room.paper-stack > .paper-sheet,
+.footer.footer-v249.paper-sheet,
+:root[data-theme] #design#design.paper-stack > .paper-sheet,
+:root[data-theme] .room.room.paper-stack > .paper-sheet,
+:root[data-theme] .footer.footer-v249.paper-sheet {
+  transform: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  box-shadow: none !important;   /* owner: no shadow behind the sheets */
+  clip-path: none !important;
+  -webkit-clip-path: none !important;
+}
+
+/* Soften the legacy dim veil: the fixed card underneath should stay crisp, only
+   a hair of shadow as the next lands on it (the old veil dimmed it up to ~70%,
+   greying it out). Scales with --bq-out; ~14% max. */
+#design#design.paper-stack > .paper-sheet::after,
+.room.room.paper-stack > .paper-sheet::after,
+:root[data-theme] #design#design.paper-stack > .paper-sheet::after,
+:root[data-theme] .room.room.paper-stack > .paper-sheet::after {
+  opacity: calc(var(--bq-out, 0) * 0.14) !important;
+}
+
+/* Keep a covered card painted as it recedes (it sits behind the opaque incoming
+   card, or has already scrolled off) instead of hard-hiding it mid-viewport —
+   that hard hide is what used to flash the dark deck through during hand-off. */
+@media (prefers-reduced-motion: no-preference) {
+  #design#design.paper-stack > .paper-sheet.is-paper-gone,
+  .room.room.paper-stack > .paper-sheet.is-paper-gone,
+  .footer.footer-v249.paper-sheet.is-paper-gone {
+    visibility: visible !important;
+  }
+}
+
+/* ============================================================================
+   PORTFOLIO "magic scroll" — a TALL TRACK (px height set by JS) whose sticky
+   CARD pins FULLY over the hero first; then a reel of the gallery translates
+   inside the fixed frame as you scroll; then the next card takes over. It is
+   page-scroll driven (deterministic, native momentum) → identical on desktop
+   AND phones. 2-id specificity wins the legacy layers.
+   ========================================================================== */
+/* the TRACK: tall, transparent, no card chrome (the card carries the look) */
+#design#design.paper-stack > .section.work.paper-sheet,
+:root[data-theme] #design#design.paper-stack > .section.work.paper-sheet {
+  position: relative !important;
+  height: var(--work-track-h, var(--bq-stack-sheet-h)) !important;  /* JS sets --work-track-h */
+  max-height: none !important;
+  min-height: var(--bq-stack-sheet-h) !important;
+  overflow: visible !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  clip-path: none !important;              /* never clip the pinned card's shadow */
+  -webkit-clip-path: none !important;
+  transform: none !important;
+  filter: none !important;
+}
+#design#design.paper-stack > .section.work.paper-sheet::after,
+#design#design.paper-stack > .section.work.paper-sheet::before {
+  display: none !important;           /* veil/grain belong to the card, not the track */
+}
+#design#design.paper-stack > .section.work.paper-sheet.is-paper-gone {
+  visibility: visible !important;
+}
+
+/* The sheet AFTER the portfolio track overlaps its "hold" window (one card
+   height) so it rises over the still-pinned portfolio card — a clean pile
+   hand-off instead of the portfolio scrolling away first. */
+#design#design.paper-stack > .section.work.paper-sheet + .paper-sheet,
+:root[data-theme] #design#design.paper-stack > .section.work.paper-sheet + .paper-sheet {
+  margin-top: calc(-1 * var(--bq-stack-sheet-h)) !important;
+}
+
+/* the pinned CARD: the fixed frame — same look as every other sheet */
+#design#design.paper-stack > .section.work.paper-sheet > .paper-scroll,
+:root[data-theme] #design#design.paper-stack > .section.work.paper-sheet > .paper-scroll {
+  position: sticky !important;
+  top: var(--bq-stack-top) !important;
+  height: var(--bq-stack-sheet-h) !important;
+  max-height: var(--bq-stack-sheet-h) !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  background: var(--bq-paper-sheet, #f3f3f3) !important;
+  border-radius: var(--bq-deck-radius, 24px) !important;
+  box-shadow: none !important;             /* owner: no shadow behind the sheets */
+  clip-path: none !important;
+  -webkit-clip-path: none !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+/* ============================ PORTFOLIO HEAD / TABS ========================
+   The gallery fills the whole card; the filter tabs float over it as GLASS
+   round buttons. MOBILE: a bar across the TOP. DESKTOP: a rail down the SIDE.
+   Icon-only, with the label popping as a hover tooltip. The section-head and
+   tab-header copy live in the scrolling reel (kept, not removed). ========== */
+#design#design.paper-stack > .section.work.paper-sheet > .paper-scroll > .work-head {
+  position: absolute !important;
+  z-index: 6 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  pointer-events: none !important;   /* only the buttons catch clicks */
+}
+#design#design.paper-stack > .section.work.paper-sheet > .paper-scroll > .work-vp {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* MOBILE COLLAPSING HEADER (owner: the "Design Room / A small catalogue…"
+   heading sits above the tabs at rest; on scroll the heading slides up and off
+   while ONLY the tabs stay pinned at the top). JS adds .work-head-flow on
+   ≤820px, moves the section-head into the head above the tabs, and slides the
+   head up by --collapse in drive(). The reel starts below the full head. */
+#design#design.paper-stack > .section.work.paper-sheet > .paper-scroll.work-head-flow {
+  display: block !important;
+}
+#design#design.paper-stack > .section.work.paper-sheet > .paper-scroll.work-head-flow > .work-head {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 6 !important;
+  pointer-events: none !important;   /* the heading text never blocks the gallery */
+  display: flex !important;
+  flex-direction: column !important;
+  gap: clamp(10px, 2.6vw, 16px) !important;
+  padding: clamp(16px, 4.4vw, 22px) clamp(16px, 4vw, 22px) clamp(8px, 2vw, 12px) !important;
+  will-change: transform;
+}
+#design#design.paper-stack .paper-scroll.work-head-flow > .work-head > .section-head,
+#design#design.paper-stack .paper-scroll.work-head-flow > .work-head .tabs-wrap {
+  pointer-events: auto !important;   /* heading + tabs stay interactive */
+}
+#design#design.paper-stack > .section.work.paper-sheet > .paper-scroll.work-head-flow > .work-vp {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  min-height: 0 !important;
+}
+/* fully GLASS + classy tab buttons (owner) — they blur the gallery scrolling
+   beneath them once the heading has slid away */
+#design#design.paper-stack .paper-scroll.work-head-flow > .work-head .tab {
+  background: rgba(255, 255, 255, .5) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.6) !important;
+  backdrop-filter: blur(16px) saturate(1.6) !important;
+  border: 1px solid rgba(255, 255, 255, .6) !important;
+  box-shadow: 0 8px 22px -10px rgba(0, 0, 0, .38), inset 0 1px 0 rgba(255, 255, 255, .6) !important;
+}
+#design#design.paper-stack .paper-scroll.work-head-flow > .work-head .tab.is-active {
+  background: rgba(18, 18, 20, .6) !important;
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, .35) !important;
+}
+/* the section-head is a SOLID fixed bar at the card top (owner: stays in place,
+   separate from the tabs) — it bleeds over the head's top + sides and rounds
+   with the card so the gallery scrolls cleanly behind it. */
+#design#design.paper-stack > .section.work.paper-sheet > .paper-scroll.work-head-flow > .work-head > .section-head {
+  width: auto !important;
+  background: var(--bq-paper-sheet, #f3f3f3) !important;
+  margin: calc(-1 * clamp(16px, 4.4vw, 22px)) calc(-1 * clamp(16px, 4vw, 22px)) 0 !important;
+  padding: clamp(16px, 4.4vw, 22px) clamp(16px, 4vw, 22px) clamp(12px, 3vw, 16px) !important;
+  border-radius: var(--bq-deck-radius, 24px) var(--bq-deck-radius, 24px) 0 0 !important;
+}
+#design#design.paper-stack .paper-scroll.work-head-flow > .work-head > .section-head h1,
+#design#design.paper-stack .paper-scroll.work-head-flow > .work-head > .section-head h2,
+#design#design.paper-stack .paper-scroll.work-head-flow > .work-head > .section-head h3,
+#design#design.paper-stack .paper-scroll.work-head-flow > .work-head > .section-head [class*="title"] {
+  font-size: clamp(20px, 5.6vw, 26px) !important;
+  line-height: 1.12 !important;
+  margin: 3px 0 0 !important;
+}
+/* tabs: exactly 6 per row → 6 + 6 (owner) */
+#design#design.paper-stack .paper-scroll.work-head-flow > .work-head .tabs-wrap {
+  display: block !important;
+  width: 100% !important;
+}
+#design#design.paper-stack .paper-scroll.work-head-flow > .work-head .tabs {
+  display: grid !important;
+  grid-template-columns: repeat(6, 1fr) !important;
+  gap: clamp(7px, 2vw, 11px) !important;
+  width: 100% !important;
+  justify-items: center !important;
+  align-items: center !important;
+}
+#design#design.paper-stack .paper-scroll.work-head-flow > .work-head .tabs-row {
+  display: contents !important;
+}
+#design#design.paper-stack .paper-scroll.work-head-flow > .work-head .tab {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 56px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: 1 / 1 !important;
+}
+#design#design.paper-stack .paper-scroll.work-head-flow > .work-head > .section-head .section-lead,
+#design#design.paper-stack .paper-scroll.work-head-flow > .work-head > .section-head [class*="hint"],
+#design#design.paper-stack .paper-scroll.work-head-flow > .work-head > .section-head p:last-child {
+  display: none !important;   /* drop the "filter the work" hint line in this compact head */
+}
+/* the gallery starts below the FULL head (heading + tabs); JS sets --work-head-h.
+   As the head slides up, the gallery scrolls up under the pinned tabs. */
+#design#design.paper-stack > .section.work.paper-sheet > .paper-scroll.work-head-flow > .work-vp > .work-reel {
+  padding-top: calc(var(--work-head-h, 210px) + clamp(6px, 2vw, 12px)) !important;
+}
+#design#design.paper-stack > .section.work.paper-sheet > .paper-scroll > .work-vp > .work-reel {
+  display: block !important;
+  width: 100% !important;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+/* tab cluster — no container chrome, no blurred rectangle */
+#design#design.paper-stack .work-head .tabs-wrap,
+#design#design.paper-stack .work-head .tabs {
+  display: flex !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  pointer-events: auto !important;
+}
+#design#design.paper-stack .work-head .tabs-wrap::before,
+#design#design.paper-stack .work-head .tabs-wrap::after,
+#design#design.paper-stack .work-head .tabs::before,
+#design#design.paper-stack .work-head .tabs::after,
+#design#design.paper-stack .work-head .tabs-row::before,
+#design#design.paper-stack .work-head .tabs-row::after {
+  display: none !important;
+}
+#design#design.paper-stack .work-head .tabs-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+/* GLASS round button */
+#design#design.paper-stack .work-head .tab {
+  position: relative !important;              /* tooltip anchor */
+  flex: 0 0 auto !important;
+  width: clamp(38px, 4.4vw, 46px) !important;
+  height: clamp(38px, 4.4vw, 46px) !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow: visible !important;              /* let the hover tooltip escape the circle */
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  border: 1px solid rgba(255, 255, 255, .55) !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, .26) !important;      /* fully glass */
+  -webkit-backdrop-filter: blur(14px) saturate(1.5) !important;
+  backdrop-filter: blur(14px) saturate(1.5) !important;
+  box-shadow: 0 6px 18px -8px rgba(0, 0, 0, .38), inset 0 1px 0 rgba(255, 255, 255, .5) !important;
+  color: var(--ink, #111) !important;
+  transition: background .25s ease, color .25s ease, transform .25s ease !important;
+}
+#design#design.paper-stack .work-head .tab:hover {
+  transform: translateY(-2px) !important;
+  background: rgba(255, 255, 255, .42) !important;
+}
+#design#design.paper-stack .work-head .tab.is-active {
+  background: rgba(17, 17, 19, .55) !important;         /* dark glass for the active filter */
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, .35) !important;
+}
+#design#design.paper-stack .work-head .tab i {
+  font-size: clamp(13px, 1.5vw, 16px) !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+/* HOVER TOOLTIP: the tab's label pops as a little dark card next to the button */
+#design#design.paper-stack .work-head .tab .tab-label {
+  display: block !important;
+  position: absolute !important;
+  pointer-events: none !important;
+  white-space: nowrap !important;
+  width: auto !important;
+  max-width: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  text-indent: 0 !important;
+  clip: auto !important;
+  margin: 0 !important;
+  padding: 5px 10px !important;
+  border-radius: 9px !important;
+  background: rgba(17, 17, 19, .92) !important;
+  color: #fff !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: .01em !important;
+  line-height: 1.2 !important;
+  opacity: 0 !important;
+  z-index: 20 !important;
+  box-shadow: 0 10px 26px -12px rgba(0, 0, 0, .55) !important;
+  transition: opacity .18s ease, transform .18s ease !important;
+}
+#design#design.paper-stack .work-head .tab:hover .tab-label {
+  opacity: 1 !important;
+}
+
+/* ---- MOBILE (default / ≤820px): tab bar across the TOP ---- */
+#design#design.paper-stack > .section.work.paper-sheet > .paper-scroll > .work-head {
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: auto !important;
+  padding: clamp(12px, 2vw, 18px) clamp(12px, 2vw, 20px) !important;
+}
+#design#design.paper-stack .work-head .tabs-wrap,
+#design#design.paper-stack .work-head .tabs {
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: clamp(6px, 1vw, 10px) !important;
+  width: 100% !important;
+  height: auto !important;
+}
+#design#design.paper-stack .work-head .tabs-row {
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  gap: clamp(6px, 1vw, 10px) !important;
+  width: auto !important;
+  height: auto !important;
+}
+#design#design.paper-stack .work-head .tab .tab-label {
+  top: calc(100% + 8px) !important;
+  left: 50% !important;
+  transform: translate(-50%, 4px) !important;
+}
+#design#design.paper-stack .work-head .tab:hover .tab-label {
+  transform: translate(-50%, 0) !important;
+}
+/* clear the two-row top tab bar (a touch more, tabs are bigger now) + a little
+   extra side breathing room so the gallery isn't so packed (owner: کەمێک بۆشایی) */
+#design#design.paper-stack > .section.work.paper-sheet > .paper-scroll > .work-vp > .work-reel {
+  padding: clamp(146px, 21vw, 168px) clamp(20px, 3vw, 34px) clamp(30px, 4vw, 52px) !important;
+}
+/* a little more air between the gallery items (was 10px) */
+#design#design.paper-stack .section.work .work-reel .grid {
+  gap: clamp(13px, 3.2vw, 18px) !important;
+}
+/* mobile: bigger, fuller tab buttons — matched to the image/text scale
+   (owner: کەمێک گەورەتر و پڕتر لە ئاستی ستانداری وێنە و نووسینەکان) */
+@media (max-width: 820px) {
+  #design#design.paper-stack .work-head .tab {
+    width: clamp(50px, 13.5vw, 56px) !important;
+    height: clamp(50px, 13.5vw, 56px) !important;
+    min-width: clamp(50px, 13.5vw, 56px) !important;   /* beat the legacy max-width:42px cap */
+    max-width: clamp(50px, 13.5vw, 56px) !important;
+    min-height: clamp(50px, 13.5vw, 56px) !important;
+    max-height: clamp(50px, 13.5vw, 56px) !important;
+    background: rgba(255, 255, 255, .34) !important;
+  }
+  #design#design.paper-stack .work-head .tab i {
+    font-size: clamp(16px, 3.8vw, 18px) !important;   /* icon back to normal — bigger BUTTON, not bigger icon */
+  }
+}
+
+/* ---- DESKTOP (≥821px): tab RAIL down the LEFT side (owner: "بێنەوە تەنیشت") ---- */
+@media (min-width: 821px) {
+  #design#design.paper-stack > .section.work.paper-sheet > .paper-scroll > .work-head {
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    /* inset the rail from the card edge — breathing room (owner: بۆشایی سپی) */
+    padding: clamp(16px, 1.6vw, 26px) clamp(14px, 1.4vw, 20px) clamp(16px, 1.6vw, 26px) clamp(26px, 2.6vw, 44px) !important;
+  }
+  #design#design.paper-stack .work-head .tabs-wrap,
+  #design#design.paper-stack .work-head .tabs {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: clamp(8px, .9vw, 12px) !important;
+    width: auto !important;
+    height: auto !important;
+  }
+  #design#design.paper-stack .work-head .tabs-row {
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    gap: clamp(8px, .9vw, 12px) !important;
+  }
+  /* tooltip to the RIGHT of the button */
+  #design#design.paper-stack .work-head .tab .tab-label {
+    top: 50% !important;
+    left: calc(100% + 10px) !important;
+    transform: translate(-4px, -50%) !important;
+  }
+  #design#design.paper-stack .work-head .tab:hover .tab-label {
+    transform: translate(0, -50%) !important;
+  }
+  /* gallery clears the left rail (rail is inset, so clear a bit more) */
+  #design#design.paper-stack > .section.work.paper-sheet > .paper-scroll > .work-vp > .work-reel {
+    padding: clamp(20px, 2vw, 32px) clamp(20px, 2.4vw, 34px) clamp(28px, 4vw, 52px) clamp(100px, 9vw, 128px) !important;
+  }
+}
+
+/* ======================= PRACTICE-NOTE — SOFTWARE =========================
+   Owner: keep the scrolling marquee, but SMALLER + a clean/proper font, show on
+   MOBILE too, and merge to ONE row (the merge is done in JS). ================ */
+#design .practice-note .software-experience {
+  display: block !important;                 /* was display:none on mobile */
+}
+/* 2-id trick beats the :root[data-theme]/:root[lang] chip rules on font */
+#design#design .practice-note .software-experience .software-chip {
+  font-size: clamp(12px, 1.5vw, 15px) !important;   /* smaller (owner reversed) */
+  font-weight: 600 !important;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  letter-spacing: .05em !important;
+}
+
+/* ================= "DESIGNED BY HAND" — 8 LOGOS AS A 4+4 GRID ==============
+   Owner: 4 on top, 4 on bottom, neat on desktop AND mobile. ================= */
+#design#design .logos-section .logos-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: clamp(8px, 1.4vw, 18px) !important;
+  align-items: stretch !important;
+  justify-items: stretch !important;
+  width: 100% !important;
+}
+#design#design .logos-section .logos-grid > .logo-mark {
+  width: 100% !important;
+  margin: 0 !important;
+  aspect-ratio: 1 / 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+#design#design .logos-section .logos-grid > .logo-mark img {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+
+/* ===== SERVICE "What I do / Ideas" accordion — fix the trigger clipping its
+   subtitle (that overlap where the detail collides with the subtitle) and make
+   it a touch smaller so every detail shows completely. Minimal, no restructure.
+   (owner) ===== */
+#design#design .service-showcase .service-accordion .service-trigger {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  position: relative !important;
+  gap: 2px !important;
+  padding: clamp(12px, 1.6vw, 18px) clamp(52px, 8vw, 64px) clamp(12px, 1.6vw, 18px) 0 !important;
+}
+/* the +/× toggle: out of flow, centred on the right, so name+subtitle stack
+   cleanly and the detail never collides with the subtitle */
+#design#design .service-showcase .service-accordion .service-trigger .service-toggle {
+  position: absolute !important;
+  right: 0 !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  margin: 0 !important;
+}
+/* index + icon are empty/hidden here — keep them out of the column */
+#design#design .service-showcase .service-accordion .service-trigger .service-index,
+#design#design .service-showcase .service-accordion .service-trigger .service-icon {
+  display: none !important;
+}
+#design#design .service-showcase .service-panel .service-name {
+  font-size: clamp(16px, 1.9vw, 21px) !important;
+  line-height: 1.18 !important;
+}
+#design#design .service-showcase .service-panel .service-sub {
+  font-size: clamp(12px, 1.2vw, 14px) !important;
+  line-height: 1.3 !important;
+  margin-top: 2px !important;
+}
+#design#design .service-showcase .service-panel .service-detail {
+  font-size: clamp(12.5px, 1.25vw, 14.5px) !important;
+  line-height: 1.4 !important;
+}
+#design#design .service-showcase .service-panel .service-detail li {
+  font-size: clamp(12px, 1.2vw, 14px) !important;
 }
