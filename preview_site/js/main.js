@@ -1426,6 +1426,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   const allowsInnerScroll = (sheet) => {
     if (isPhonePaper()) return false;
     return Boolean(sheet?.classList?.contains('work')
+      || sheet?.classList?.contains('room-sheet--scroll')
       || sheet?.dataset?.paperScroll === 'inner');
   };
 
@@ -1754,6 +1755,9 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       sheet.classList.add('paper-sheet');
       sheet.dataset.paper = `${id}-${i}`;
       sheet.style.setProperty('--bq-paper-z', String((i + 1) * 10));
+      if (sheet.classList.contains('room-sheet--scroll')) {
+        sheet.dataset.paperScroll = 'inner';
+      }
       wrapPaperScroll(sheet);
 
       /* Pack sheet content into .sheet-mid so rooms centre like home. */
