@@ -231,7 +231,7 @@
       }
 
       /* ---- biography spotlight follows the pointer without moving layout ---- */
-      document.querySelectorAll('#bio .bio-stack > .bio-block').forEach(function (card) {
+      document.querySelectorAll('#bio .bio-block').forEach(function (card) {
         card.addEventListener('pointermove', function (event) {
           var rect = card.getBoundingClientRect();
           card.style.setProperty('--bio-x', event.clientX - rect.left + 'px');

@@ -86,6 +86,21 @@
   Content-Type: text/plain; charset=utf-8
   Cache-Control: public, max-age=86400
 
+/.well-known/autoconfig/mail/config-v1.1.xml
+  Content-Type: application/xml; charset=utf-8
+  Cache-Control: public, max-age=86400
+  X-Robots-Tag: noindex
+
+/mail/config-v1.1.xml
+  Content-Type: application/xml; charset=utf-8
+  Cache-Control: public, max-age=86400
+  X-Robots-Tag: noindex
+
+/autodiscover/autodiscover.xml
+  Content-Type: text/xml; charset=utf-8
+  Cache-Control: public, max-age=3600
+  X-Robots-Tag: noindex
+
 # robots/llms must never linger stale at the edge (an old cached copy kept
 # failing Lighthouse's robots.txt audit after the fix deployed)
 /robots.txt

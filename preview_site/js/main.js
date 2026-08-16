@@ -1424,7 +1424,14 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
      (page-scroll → reel translate), NOT by the input router's nested scrollTop,
      so no sheet claims router-owned inner scroll. */
   const isPhonePaper = () => window.matchMedia('(max-width: 820px)').matches;
-  const allowsInnerScroll = () => false;
+  const allowsInnerScroll = (sheet) => {
+    if (isPhonePaper()) return false;
+    /* the portfolio (.work) is driven by the tall-track reel translate, NOT the
+       router's inner scroll — keep it out. Rooms/opt-in sheets still inner-scroll. */
+    if (sheet?.classList?.contains('work')) return false;
+    return Boolean(sheet?.classList?.contains('room-sheet--scroll')
+      || sheet?.dataset?.paperScroll === 'inner');
+  };
 
   const wrapPaperScroll = (sheet) => {
     if (!sheet || sheet.querySelector(':scope > .paper-scroll')) return;
@@ -1751,6 +1758,9 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       sheet.classList.add('paper-sheet');
       sheet.dataset.paper = `${id}-${i}`;
       sheet.style.setProperty('--bq-paper-z', String((i + 1) * 10));
+      if (sheet.classList.contains('room-sheet--scroll')) {
+        sheet.dataset.paperScroll = 'inner';
+      }
       wrapPaperScroll(sheet);
 
       /* Pack sheet content into .sheet-mid so rooms centre like home. */
