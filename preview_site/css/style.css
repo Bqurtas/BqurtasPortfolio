@@ -6824,6 +6824,7 @@ body.is-scrolled .rail-room-name,
 .lux-transition.is-active {
   transform: translateX(0) !important;
   transition: transform .62s cubic-bezier(.76,0,.24,1) !important;
+  visibility: visible !important;   /* only visible while the transition runs */
 }
 .lux-transition.is-active.is-leaving {
   transform: translateX(101%) !important;
@@ -7444,6 +7445,7 @@ body.is-scrolled .rail-room-name,
   padding: 28px !important;
   background: #f4f2ec !important;
   color: #171716 !important;
+  visibility: hidden !important;   /* fully hidden at rest — no leaking side panel */
 }
 .lux-transition::before,
 .lux-transition-line { display: none !important; }
