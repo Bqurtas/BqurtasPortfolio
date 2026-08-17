@@ -1898,7 +1898,14 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
             unpins). At that moment the next sheet is already stuck and fully
             covering, so the hand-off is gallery → next sheet with NO portfolio
             ever visible under the incoming sheet. Also hide once it unpins. */
+      /* Raise the track ABOVE the next sheet with an INLINE !important z-index —
+         a CSS class lost the cascade to a higher-specificity sheet rule, so the
+         next sheet (z30) rose over the still-pinned card (z10) and the two
+         "merged" during scroll. Inline !important always wins. 39 > service(30),
+         < practice-note(40). Cleared at reel-end so the next sheet takes over. */
       track.classList.toggle('work--cover', !reelDone);
+      if (!reelDone) track.style.setProperty('z-index', '39', 'important');
+      else track.style.removeProperty('z-index');
       const unpinned = card.getBoundingClientRect().top < g - 1;
       card.style.visibility = (reelDone || unpinned) ? 'hidden' : 'visible';
     };
