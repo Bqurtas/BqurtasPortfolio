@@ -1863,30 +1863,49 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
          hides during scroll — desyncing the hand-off so the portfolio appears
          to scroll along under the following sheets. Fixed px keeps them locked. */
       const next = nextSheet();
-      if (next) next.style.setProperty('margin-top', (-cardH) + 'px', 'important');
+      /* Pull the next sheet up by TWO card-heights so it is fully STUCK and
+         covering exactly when the reel finishes — the hand-off lands at reel-end,
+         not a screen-height later. (Was -cardH: the next sheet then stuck only
+         when the card unpinned, so for a whole card-height it rose slowly over the
+         still-pinned finished portfolio — the recurring "portfolio shows under the
+         next sheet" leak.) A small buffer makes it stick a hair EARLY so it is
+         provably covering before the card is hidden, even as cardH drifts. */
+      if (next) next.style.setProperty('margin-top', (-(cardH * 2 + 20)) + 'px', 'important');
     };
     const gutter = () => parseFloat(getComputedStyle(card).top) || 0;
+    /* Shared reel state: how far the gallery has scrolled (y, 0..overflow) and
+       whether it has fully finished (reelDone). Both setCovered and drive read
+       this so the hide/cover decisions and the reel transform never disagree. */
+    const reelState = () => {
+      const g = gutter();
+      const trackTop = track.getBoundingClientRect().top;
+      const y = Math.min(overflow, Math.max(0, g - trackTop));
+      return { g, y, reelDone: overflow > 0 ? y >= overflow - 1 : trackTop <= g - 1 };
+    };
     /* Hide the card the INSTANT the next sheet fully covers it — the moment the
        sticky card would otherwise unpin and scroll up. Run this SYNCHRONOUSLY on
        every scroll (not in rAF) so the card is never painted mid-unpin: no brief
        portfolio "flash" at the hand-off. At this exact point the next sheet is
        pinned and fully opaque over it, so hiding is invisible. */
     const setCovered = () => {
-      const g = gutter();
-      /* The card is pinned at top:gutter for the whole gallery scroll. The ONLY
-         time its own top drops below the gutter is when the track ends and it
-         starts to UNPIN (scroll up) — and by then the next sheet is pinned and
-         fully covering. So: pinned or rising ⇒ visible; unpinning ⇒ hidden. This
-         is position-based (robust), so the card can never leak above/around the
-         sheets that follow ("merge"). */
-      card.style.visibility = (card.getBoundingClientRect().top < g - 1) ? 'hidden' : 'visible';
+      const { g, reelDone } = reelState();
+      /* Two guarantees, both position-based (robust to the drift that used to
+         re-open this leak):
+         1. While the gallery is still scrolling, the track sits ABOVE the next
+            sheet (work--cover) so the next sheet — already pulled up to stick a
+            hair early — can never rise into view and eat the gallery's tail.
+         2. The card is hidden the INSTANT the reel is done (not when it later
+            unpins). At that moment the next sheet is already stuck and fully
+            covering, so the hand-off is gallery → next sheet with NO portfolio
+            ever visible under the incoming sheet. Also hide once it unpins. */
+      track.classList.toggle('work--cover', !reelDone);
+      const unpinned = card.getBoundingClientRect().top < g - 1;
+      card.style.visibility = (reelDone || unpinned) ? 'hidden' : 'visible';
     };
     let raf = 0;
     const drive = () => {
       raf = 0;
-      const g = gutter();
-      const trackTop = track.getBoundingClientRect().top;
-      const y = Math.min(overflow, Math.max(0, g - trackTop));
+      const { y } = reelState();
       reel.style.transform = 'translate3d(0,' + (-y) + 'px,0)';
       /* slide the head up until the tabs reach the top, then hold — the heading
          scrolls away while ONLY the tabs stay pinned (owner). */

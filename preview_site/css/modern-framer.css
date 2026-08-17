@@ -14765,3 +14765,13 @@ body.menu-open .mobilebar {
     max-width: none !important;
   }
 }
+
+/* Portfolio hand-off cover (owner: "portfolio must not show under the next
+   sheet", said 100×). While the gallery reel is still scrolling, main.js adds
+   .work--cover so the track rides ABOVE the next sheet — the next sheet (pulled
+   up to stick a hair early) waits fully covering but hidden BEHIND the card, so
+   it can never rise into view and eat the gallery tail. The instant the reel is
+   done, main.js drops the class (track back to z10, under the next sheet) and
+   hides the card, so the hand-off is gallery → next sheet with no portfolio ever
+   visible beneath it. 39 sits above service (30) and below practice-note (40). */
+#design.paper-stack > .section.work.work--cover { z-index: 39 !important; }
