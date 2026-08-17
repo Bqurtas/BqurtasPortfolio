@@ -1873,8 +1873,13 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
        pinned and fully opaque over it, so hiding is invisible. */
     const setCovered = () => {
       const g = gutter();
-      const trackTop = track.getBoundingClientRect().top;
-      card.style.visibility = (trackTop <= g - overflow - cardH) ? 'hidden' : 'visible';
+      /* The card is pinned at top:gutter for the whole gallery scroll. The ONLY
+         time its own top drops below the gutter is when the track ends and it
+         starts to UNPIN (scroll up) — and by then the next sheet is pinned and
+         fully covering. So: pinned or rising ⇒ visible; unpinning ⇒ hidden. This
+         is position-based (robust), so the card can never leak above/around the
+         sheets that follow ("merge"). */
+      card.style.visibility = (card.getBoundingClientRect().top < g - 1) ? 'hidden' : 'visible';
     };
     let raf = 0;
     const drive = () => {
