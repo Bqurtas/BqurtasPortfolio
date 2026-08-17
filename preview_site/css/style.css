@@ -6804,6 +6804,11 @@ body.is-scrolled .rail-room-name,
   background: var(--ink) !important;
   color: var(--bg);
   transform: translateX(-101%) !important;
+  /* pass WITHIN the sheet area (owner): inset to the deck gutter + rounded, so
+     the black bed stays visible around the curtain instead of it covering all. */
+  inset: var(--bq-stack-top, 10px) var(--bq-deck-gutter-x, 12px) calc(var(--bq-chrome-bottom, 56px) + var(--bq-deck-gutter, 10px)) !important;
+  border-radius: var(--bq-deck-radius, 24px) !important;
+  overflow: hidden !important;
 }
 [dir="rtl"] .lux-transition { transform: translateX(101%) !important; }
 .lux-transition::before {
