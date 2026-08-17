@@ -1853,72 +1853,36 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       const vpH = vp.clientHeight;
       const reelH = reel.scrollHeight;
       overflow = Math.max(0, reelH - vpH);
-      /* track = card + gallery-scroll (NO extra hold). The old "+ one card-height
-         of hold" left a dead zone: after the gallery ended the card stayed pinned
-         for a whole screen of scroll where nothing moved (the next sheet already
-         stuck behind it) — a stuck/janky "scroll to the next sheet". Ending the
-         track at the reel's end lets the card unpin and the next sheet take over
-         immediately, so the scroll into the next sheet is smooth. */
-      track.style.setProperty('--work-track-h', (cardH + overflow) + 'px');
-      /* Pin the next sheet's overlap to the SAME measured pixels the track uses.
-         The CSS margin is dvh-based, which drifts as the mobile address bar
-         hides during scroll — desyncing the hand-off so the portfolio appears
-         to scroll along under the following sheets. Fixed px keeps them locked. */
+      /* track = card + gallery-scroll + ONE card-height of HOLD. The hold is the
+         window in which the NEXT sheet ("What I do") RISES up over the still-pinned
+         card — the same scroll-driven "next sheet climbs over the previous" as every
+         other sheet on the page, so it comes up WITH the scroll and never pops in
+         suddenly (owner, said many times). The reel scrolls through `overflow`,
+         then the card stays pinned a card-height while the next sheet rises over it. */
+      track.style.setProperty('--work-track-h', (cardH * 2 + overflow) + 'px');
+      /* Overlap the next sheet by ONE card-height in fixed px (not the dvh CSS
+         margin, which drifts as the mobile address bar hides and desyncs the
+         hand-off). It starts to rise as the reel finishes and finishes covering as
+         the card unpins — a plain sticky rise, no pull-up, no occlusion, no cut. */
       const next = nextSheet();
-      /* Pull the next sheet up by ONE card-height (+ a small buffer) so it is fully
-         STUCK and covering exactly when the reel finishes — with the shorter track
-         above, the card unpins at the same instant, so the hand-off is a single
-         continuous motion (gallery ends → next sheet), no dead zone, no gap. The
-         buffer makes it stick a hair EARLY so it provably covers before the card
-         is hidden, even as cardH drifts. */
-      if (next) next.style.setProperty('margin-top', (-(cardH + 20)) + 'px', 'important');
+      if (next) next.style.setProperty('margin-top', (-cardH) + 'px', 'important');
     };
     const gutter = () => parseFloat(getComputedStyle(card).top) || 0;
-    /* Shared reel state: how far the gallery has scrolled (y, 0..overflow) and
-       whether it has fully finished (reelDone). Both setCovered and drive read
-       this so the hide/cover decisions and the reel transform never disagree. */
     const reelState = () => {
       const g = gutter();
       const trackTop = track.getBoundingClientRect().top;
       const y = Math.min(overflow, Math.max(0, g - trackTop));
-      const reelDone = overflow > 0 ? y >= overflow - 1 : trackTop <= g - 1;
-      /* pinned = the card is actively covering the sheet area (track reached the
-         pin point, gallery not finished). Only while pinned do we lift/occlude. */
-      const pinned = trackTop <= g + 1 && !reelDone;
-      return { g, trackTop, y, reelDone, pinned };
+      return { g, y };
     };
-    /* Hide the card the INSTANT the next sheet fully covers it — the moment the
-       sticky card would otherwise unpin and scroll up. Run this SYNCHRONOUSLY on
-       every scroll (not in rAF) so the card is never painted mid-unpin: no brief
-       portfolio "flash" at the hand-off. At this exact point the next sheet is
-       pinned and fully opaque over it, so hiding is invisible. */
+    /* The card stays visible the WHOLE time it is pinned — including while the next
+       sheet rises up over it (that rise IS the hand-off the owner wants). It is
+       hidden only the instant it UNPINS and scrolls up, by which point the next
+       sheet has fully climbed over it, so hiding is invisible. Position-based, so
+       the card can never leak above/beside the sheets that follow. No z-lift, no
+       occlusion — a plain sticky card the next sheet rises over like any other. */
     const setCovered = () => {
-      const { g, reelDone, pinned } = reelState();
-      /* Clean hand-off with ZERO peeking, either direction (owner: portfolio and
-         "What I do" are two independent sheets — nothing of one shows in the
-         other's space). While the card is pinned covering the gallery, the next
-         sheet is pulled up so it sticks exactly as the reel ends. To keep that
-         early-arriving sheet fully hidden until then, the TRACK does two things
-         while pinned, both inline !important (a CSS class lost the cascade):
-           • z-index 39 — sits ABOVE the next sheet (service z30, note z40) so the
-             opaque card hides it across the sheet area.
-           • background = the bed colour — the card only covers the sheet area
-             (10..746); the next sheet, while RISING, overflows into the gutter
-             below/above the card. Painting the track the bed colour occludes it
-             there too, so the next sheet can NEVER peek in the gutter.
-         The instant the reel finishes, both are cleared and the card hidden: the
-         next sheet (now stuck, exactly filling the sheet area, no gutter overflow)
-         takes over with the real black bed showing cleanly around it. */
-      track.classList.toggle('work--cover', pinned);
-      if (pinned) {
-        track.style.setProperty('z-index', '39', 'important');
-        track.style.setProperty('background-color', 'rgb(10,10,10)', 'important');
-      } else {
-        track.style.removeProperty('z-index');
-        track.style.removeProperty('background-color');
-      }
-      const unpinned = card.getBoundingClientRect().top < g - 1;
-      card.style.visibility = (reelDone || unpinned) ? 'hidden' : 'visible';
+      const g = gutter();
+      card.style.visibility = (card.getBoundingClientRect().top < g - 1) ? 'hidden' : 'visible';
     };
     let raf = 0;
     const drive = () => {
