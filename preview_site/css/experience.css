@@ -8,7 +8,7 @@
 
 html body #mobileMenu.mobile-menu,
 html body[dir="rtl"] #mobileMenu.mobile-menu {
-  --menu-ink: #0a0a0a;
+  --menu-ink: #0a0a0a;   /* EXACT site black (body + #design are #0a0a0a) — no seam */
   --menu-paper: #f3f1ea;
   --menu-muted: rgba(243, 241, 234, .42);
   --menu-line: rgba(243, 241, 234, .14);
@@ -22,7 +22,7 @@ html body[dir="rtl"] #mobileMenu.mobile-menu {
   width: 100% !important;
   height: 100% !important;
   overflow: hidden !important;
-  background: #0a0a0a !important;
+  background: #0a0a0a !important;   /* = site black, no seam */
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
   opacity: 0 !important;
@@ -399,4 +399,14 @@ html body #mobileMenu :is(a, button):focus-visible {
     transition-duration: .01ms !important;
     animation: none !important;
   }
+}
+
+/* Decisive: force the curtain to the EXACT site black (#0a0a0a). A legacy rule
+   sets it via var(--bq-menu-ink) which resolves to #0f0f10 — slightly lighter,
+   leaving a seam against the #0a0a0a site bed. 2-id beats it. (owner) */
+html body #mobileMenu#mobileMenu.mobile-menu,
+html body #mobileMenu#mobileMenu.mobile-menu.is-open,
+html body #mobileMenu#mobileMenu.mobile-menu.is-ready,
+html body[dir="rtl"] #mobileMenu#mobileMenu.mobile-menu {
+  background: #0a0a0a !important;
 }

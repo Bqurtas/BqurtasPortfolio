@@ -1839,14 +1839,12 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     };
     const measure = () => {
       cardH = card.clientHeight;
-      /* Mobile: the head holds the section-head heading + the tabs, pinned at the
-         card top. The heading STAYS fixed in place (owner) — no collapse — while
-         the gallery scrolls up under the glass tabs. The reel starts below the
-         full head. */
+      /* Mobile: the head holds the section-head heading + the tabs. On scroll the
+         head slides up by collapseDist so the HEADING scrolls away and ONLY the
+         tabs stay pinned at the top (owner). The reel starts below the full head. */
       if (card.classList.contains('work-head-flow') && headEl && tabsWrap) {
-        collapseDist = 0;
+        collapseDist = Math.max(0, tabsWrap.offsetTop - 6);
         card.style.setProperty('--work-head-h', headEl.offsetHeight + 'px');
-        headEl.style.transform = '';
       } else {
         collapseDist = 0;
         card.style.removeProperty('--work-head-h');

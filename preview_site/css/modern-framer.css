@@ -6564,7 +6564,7 @@ body,
   visibility: visible;
   pointer-events: auto;
   will-change: transform, opacity;
-  box-shadow: none !important;   /* owner: no shadow behind the sheets */
+  box-shadow: 0 -7px 22px -12px rgba(0, 0, 0, .14), 0 0 0 1px rgba(0, 0, 0, .045) !important;   /* owner: subtle, light seam so sheets separate on scroll */
   z-index: var(--bq-paper-z, 10) !important;
 }
 
@@ -13990,7 +13990,7 @@ body.menu-open .mobilebar {
   transform: none !important;
   opacity: 1 !important;
   filter: none !important;
-  box-shadow: none !important;   /* owner: no shadow behind the sheets */
+  box-shadow: 0 -7px 22px -12px rgba(0, 0, 0, .14), 0 0 0 1px rgba(0, 0, 0, .045) !important;   /* owner: subtle, light seam so sheets separate on scroll */
   clip-path: none !important;
   -webkit-clip-path: none !important;
 }
@@ -14071,7 +14071,7 @@ body.menu-open .mobilebar {
   padding: 0 !important;
   background: var(--bq-paper-sheet, #f3f3f3) !important;
   border-radius: var(--bq-deck-radius, 24px) !important;
-  box-shadow: none !important;             /* owner: no shadow behind the sheets */
+  box-shadow: 0 -7px 22px -12px rgba(0, 0, 0, .14), 0 0 0 1px rgba(0, 0, 0, .045) !important;   /* owner: subtle, light seam */
   clip-path: none !important;
   -webkit-clip-path: none !important;
   -webkit-mask-image: none !important;
@@ -14143,15 +14143,12 @@ body.menu-open .mobilebar {
   color: #fff !important;
   border-color: rgba(255, 255, 255, .35) !important;
 }
-/* the section-head is a SOLID fixed bar at the card top (owner: stays in place,
-   separate from the tabs) — it bleeds over the head's top + sides and rounds
-   with the card so the gallery scrolls cleanly behind it. */
+/* the section-head sits above the tabs and scrolls away with the head (owner:
+   only the tabs stay) — plain, no fixed-bar background. */
 #design#design.paper-stack > .section.work.paper-sheet > .paper-scroll.work-head-flow > .work-head > .section-head {
-  width: auto !important;
-  background: var(--bq-paper-sheet, #f3f3f3) !important;
-  margin: calc(-1 * clamp(16px, 4.4vw, 22px)) calc(-1 * clamp(16px, 4vw, 22px)) 0 !important;
-  padding: clamp(16px, 4.4vw, 22px) clamp(16px, 4vw, 22px) clamp(12px, 3vw, 16px) !important;
-  border-radius: var(--bq-deck-radius, 24px) var(--bq-deck-radius, 24px) 0 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
 }
 #design#design.paper-stack .paper-scroll.work-head-flow > .work-head > .section-head h1,
 #design#design.paper-stack .paper-scroll.work-head-flow > .work-head > .section-head h2,
@@ -14408,10 +14405,10 @@ body.menu-open .mobilebar {
 }
 /* 2-id trick beats the :root[data-theme]/:root[lang] chip rules on font */
 #design#design .practice-note .software-experience .software-chip {
-  font-size: clamp(12px, 1.5vw, 15px) !important;   /* smaller (owner reversed) */
-  font-weight: 600 !important;
+  font-size: clamp(16px, 2.1vw, 21px) !important;   /* bigger + fuller (owner), same one-row design */
+  font-weight: 700 !important;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-  letter-spacing: .05em !important;
+  letter-spacing: .04em !important;
 }
 
 /* ================= "DESIGNED BY HAND" — 8 LOGOS AS A 4+4 GRID ==============
