@@ -14344,3 +14344,24 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible{
     padding:58px 0 88px;
   }
 }
+
+/* Curtain reveals WITHIN the fixed sheet-area box (owner): a clip-path wipe in
+   place — it never slides across / onto the black bed, only over the white
+   sheet. Overrides the earlier translateX slide. */
+.lux-transition {
+  transform: none !important;
+  clip-path: inset(0 100% 0 0) !important;      /* hidden: clipped to zero width */
+  transition: clip-path .55s cubic-bezier(.76, 0, .24, 1) !important;
+}
+[dir="rtl"] .lux-transition { clip-path: inset(0 0 0 100%) !important; }
+.lux-transition.is-active {
+  transform: none !important;
+  clip-path: inset(0 0 0 0) !important;         /* revealed fully, in place */
+  transition: clip-path .55s cubic-bezier(.76, 0, .24, 1) !important;
+}
+.lux-transition.is-active.is-leaving {
+  transform: none !important;
+  clip-path: inset(0 0 0 100%) !important;      /* wipes out, still in place */
+  transition: clip-path .6s cubic-bezier(.76, 0, .24, 1) !important;
+}
+[dir="rtl"] .lux-transition.is-active.is-leaving { clip-path: inset(0 100% 0 0) !important; }
