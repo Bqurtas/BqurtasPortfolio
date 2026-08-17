@@ -1880,7 +1880,11 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       const g = gutter();
       const trackTop = track.getBoundingClientRect().top;
       const y = Math.min(overflow, Math.max(0, g - trackTop));
-      return { g, y, reelDone: overflow > 0 ? y >= overflow - 1 : trackTop <= g - 1 };
+      const reelDone = overflow > 0 ? y >= overflow - 1 : trackTop <= g - 1;
+      /* pinned = the card is actively covering the sheet area (track reached the
+         pin point, gallery not finished). Only while pinned do we lift/occlude. */
+      const pinned = trackTop <= g + 1 && !reelDone;
+      return { g, trackTop, y, reelDone, pinned };
     };
     /* Hide the card the INSTANT the next sheet fully covers it — the moment the
        sticky card would otherwise unpin and scroll up. Run this SYNCHRONOUSLY on
@@ -1888,24 +1892,30 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
        portfolio "flash" at the hand-off. At this exact point the next sheet is
        pinned and fully opaque over it, so hiding is invisible. */
     const setCovered = () => {
-      const { g, reelDone } = reelState();
-      /* Two guarantees, both position-based (robust to the drift that used to
-         re-open this leak):
-         1. While the gallery is still scrolling, the track sits ABOVE the next
-            sheet (work--cover) so the next sheet — already pulled up to stick a
-            hair early — can never rise into view and eat the gallery's tail.
-         2. The card is hidden the INSTANT the reel is done (not when it later
-            unpins). At that moment the next sheet is already stuck and fully
-            covering, so the hand-off is gallery → next sheet with NO portfolio
-            ever visible under the incoming sheet. Also hide once it unpins. */
-      /* Raise the track ABOVE the next sheet with an INLINE !important z-index —
-         a CSS class lost the cascade to a higher-specificity sheet rule, so the
-         next sheet (z30) rose over the still-pinned card (z10) and the two
-         "merged" during scroll. Inline !important always wins. 39 > service(30),
-         < practice-note(40). Cleared at reel-end so the next sheet takes over. */
-      track.classList.toggle('work--cover', !reelDone);
-      if (!reelDone) track.style.setProperty('z-index', '39', 'important');
-      else track.style.removeProperty('z-index');
+      const { g, reelDone, pinned } = reelState();
+      /* Clean hand-off with ZERO peeking, either direction (owner: portfolio and
+         "What I do" are two independent sheets — nothing of one shows in the
+         other's space). While the card is pinned covering the gallery, the next
+         sheet is pulled up so it sticks exactly as the reel ends. To keep that
+         early-arriving sheet fully hidden until then, the TRACK does two things
+         while pinned, both inline !important (a CSS class lost the cascade):
+           • z-index 39 — sits ABOVE the next sheet (service z30, note z40) so the
+             opaque card hides it across the sheet area.
+           • background = the bed colour — the card only covers the sheet area
+             (10..746); the next sheet, while RISING, overflows into the gutter
+             below/above the card. Painting the track the bed colour occludes it
+             there too, so the next sheet can NEVER peek in the gutter.
+         The instant the reel finishes, both are cleared and the card hidden: the
+         next sheet (now stuck, exactly filling the sheet area, no gutter overflow)
+         takes over with the real black bed showing cleanly around it. */
+      track.classList.toggle('work--cover', pinned);
+      if (pinned) {
+        track.style.setProperty('z-index', '39', 'important');
+        track.style.setProperty('background-color', 'rgb(10,10,10)', 'important');
+      } else {
+        track.style.removeProperty('z-index');
+        track.style.removeProperty('background-color');
+      }
       const unpinned = card.getBoundingClientRect().top < g - 1;
       card.style.visibility = (reelDone || unpinned) ? 'hidden' : 'visible';
     };
