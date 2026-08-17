@@ -1853,24 +1853,25 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       const vpH = vp.clientHeight;
       const reelH = reel.scrollHeight;
       overflow = Math.max(0, reelH - vpH);
-      /* track = card + gallery-scroll + one card-height of "hold": after the
-         gallery ends the card stays PINNED for a card-height while the next
-         sheet (pulled up by its negative margin) rises over it — a clean pile
-         hand-off, no gap where the portfolio scrolls away first. */
-      track.style.setProperty('--work-track-h', (cardH * 2 + overflow) + 'px');
+      /* track = card + gallery-scroll (NO extra hold). The old "+ one card-height
+         of hold" left a dead zone: after the gallery ended the card stayed pinned
+         for a whole screen of scroll where nothing moved (the next sheet already
+         stuck behind it) — a stuck/janky "scroll to the next sheet". Ending the
+         track at the reel's end lets the card unpin and the next sheet take over
+         immediately, so the scroll into the next sheet is smooth. */
+      track.style.setProperty('--work-track-h', (cardH + overflow) + 'px');
       /* Pin the next sheet's overlap to the SAME measured pixels the track uses.
          The CSS margin is dvh-based, which drifts as the mobile address bar
          hides during scroll — desyncing the hand-off so the portfolio appears
          to scroll along under the following sheets. Fixed px keeps them locked. */
       const next = nextSheet();
-      /* Pull the next sheet up by TWO card-heights so it is fully STUCK and
-         covering exactly when the reel finishes — the hand-off lands at reel-end,
-         not a screen-height later. (Was -cardH: the next sheet then stuck only
-         when the card unpinned, so for a whole card-height it rose slowly over the
-         still-pinned finished portfolio — the recurring "portfolio shows under the
-         next sheet" leak.) A small buffer makes it stick a hair EARLY so it is
-         provably covering before the card is hidden, even as cardH drifts. */
-      if (next) next.style.setProperty('margin-top', (-(cardH * 2 + 20)) + 'px', 'important');
+      /* Pull the next sheet up by ONE card-height (+ a small buffer) so it is fully
+         STUCK and covering exactly when the reel finishes — with the shorter track
+         above, the card unpins at the same instant, so the hand-off is a single
+         continuous motion (gallery ends → next sheet), no dead zone, no gap. The
+         buffer makes it stick a hair EARLY so it provably covers before the card
+         is hidden, even as cardH drifts. */
+      if (next) next.style.setProperty('margin-top', (-(cardH + 20)) + 'px', 'important');
     };
     const gutter = () => parseFloat(getComputedStyle(card).top) || 0;
     /* Shared reel state: how far the gallery has scrolled (y, 0..overflow) and

@@ -14483,6 +14483,9 @@ body.menu-open .mobilebar {
 }
 #design#design .service-showcase .service-panel .service-detail li {
   font-size: clamp(12px, 1.2vw, 14px) !important;
+}
+
+/* ============================================================================
    v94 — Four rooms on the home paper system.
 
    Journal / Designer / Contact keep the same black bed and sticky sheets as
@@ -14775,3 +14778,10 @@ body.menu-open .mobilebar {
    hides the card, so the hand-off is gallery → next sheet with no portfolio ever
    visible beneath it. 39 sits above service (30) and below practice-note (40). */
 #design.paper-stack > .section.work.work--cover { z-index: 39 !important; }
+
+/* Owner: extend the homepage sheets DOWN so the floating menu bar sits INSIDE
+   the sheets, not below them on the black bed. The stock height subtracts a
+   ~56px chrome-bottom reserve that parked the nav on the bed; dropping it gives
+   a symmetric ~one-deck-gutter bottom, so every sheet reaches past the nav and
+   the pill floats over the sheet. Scoped to #design (the homepage stack). */
+#design.paper-stack { --bq-stack-sheet-h: calc(100dvh - (var(--bq-deck-gutter) * 2)) !important; }
