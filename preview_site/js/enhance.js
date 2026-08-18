@@ -106,7 +106,7 @@
     const BQ_AWAY_KEY = 'bq_last_away_at';
     const bqResumeDelay = () => {
       try {
-        return window.matchMedia('(max-width: 820px)').matches ? BQ_MOBILE_RESUME_RESET_MS : BQ_RESUME_RESET_MS;
+        return window.matchMedia('(max-width: 1024px)').matches ? BQ_MOBILE_RESUME_RESET_MS : BQ_RESUME_RESET_MS;
       } catch (e) {
         return BQ_RESUME_RESET_MS;
       }
@@ -698,7 +698,7 @@
        tracks the finger and the page can't scroll under it) */
     const cHead = panel.querySelector('.chat-head');
     if (cHead) {
-      const isMobile = () => window.matchMedia('(max-width: 820px)').matches;
+      const isMobile = () => window.matchMedia('(max-width: 1024px)').matches;
       let sy = null, dy = 0, drag = false;
       const down = (y) => { if (!isMobile()) return; sy = y; dy = 0; drag = true; panel.style.transition = 'none'; };
       const move = (y, ev) => { if (!drag) return; dy = y - sy; if (dy < 0) dy = 0; if (dy > 3 && ev && ev.cancelable) ev.preventDefault(); panel.style.transform = `translateY(${dy}px)`; };
@@ -1122,8 +1122,16 @@
         </div>`;
       $('#setSplash').addEventListener('change', (e) => localStorage.setItem('bq_splash', e.target.checked ? 'on' : 'off'));
       const themeSel = $('#setTheme'); themeSel.value = document.documentElement.dataset.theme || 'light';
-      themeSel.addEventListener('change', (e) => { document.documentElement.dataset.theme = e.target.value; try { localStorage.setItem('bq_theme', e.target.value); } catch (x) {} });
-      $('#setReset').addEventListener('click', () => { if (confirm(DT('sResetConfirm'))) { ['bq_theme','bq_lang','bq_splash'].forEach(k => localStorage.removeItem(k)); alert(DT('sDone')); } });
+      themeSel.addEventListener('change', (e) => {
+        const next = e.target.value === 'dark' ? 'dark' : 'light';
+        if (typeof window.__bqApplyTheme === 'function') window.__bqApplyTheme(next);
+        else {
+          document.documentElement.dataset.theme = next;
+          document.documentElement.style.colorScheme = next;
+          try { localStorage.setItem('bq_theme3', next); } catch (x) {}
+        }
+      });
+      $('#setReset').addEventListener('click', () => { if (confirm(DT('sResetConfirm'))) { ['bq_theme','bq_theme3','bq_lang','bq_splash'].forEach(k => localStorage.removeItem(k)); alert(DT('sDone')); } });
       $('#gen2fa').addEventListener('click', () => {
         const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
         const r = crypto.getRandomValues(new Uint8Array(32));
@@ -1871,8 +1879,12 @@
     // dark / light toggle
     $('#dashTheme')?.addEventListener('click', () => {
       const next = (document.documentElement.dataset.theme === 'dark') ? 'light' : 'dark';
-      document.documentElement.dataset.theme = next;
-      try { localStorage.setItem('bq_theme', next); } catch (e) {}
+      if (typeof window.__bqApplyTheme === 'function') window.__bqApplyTheme(next);
+      else {
+        document.documentElement.dataset.theme = next;
+        document.documentElement.style.colorScheme = next;
+        try { localStorage.setItem('bq_theme3', next); } catch (e) {}
+      }
     });
     // AI + Add-admin sidebar tools
     $('#dashAi')?.addEventListener('click', () => openTool(renderAssistant, DT('tAi')));
@@ -2039,7 +2051,7 @@
         a.addEventListener('mouseenter', () => { setActive(a); preview(p); });
         a.addEventListener('click', (e) => {
           e.preventDefault();
-          if (!window.matchMedia('(max-width: 820px)').matches) { openReader(p); return; }
+          if (!window.matchMedia('(max-width: 1024px)').matches) { openReader(p); return; }
           // Mobile: a tap opens an inline preview under the row; "Read more" opens the full post.
           const isOpen = a.nextElementSibling && a.nextElementSibling.classList.contains('index-inline');
           list.querySelectorAll('.index-inline').forEach(el => el.remove());
@@ -2513,7 +2525,7 @@
   /* mobile: drag the header down to dismiss — same firm gesture as the chat sheet */
   const lHead = panel.querySelector('.latest-panel-head');
   if (lHead) {
-    const isMobile = () => window.matchMedia('(max-width: 820px)').matches;
+    const isMobile = () => window.matchMedia('(max-width: 1024px)').matches;
     let sy = null, dy = 0, drag = false;
     const down = (y) => { if (!isMobile()) return; sy = y; dy = 0; drag = true; panel.style.transition = 'none'; };
     const move = (y, ev) => { if (!drag) return; dy = y - sy; if (dy < 0) dy = 0; if (dy > 3 && ev && ev.cancelable) ev.preventDefault(); panel.style.transform = `translateY(${dy}px)`; };
