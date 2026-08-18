@@ -845,8 +845,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (reset && correctScrollAfterGallery) {
       correctScrollAfterGallery = false;
       setTimeout(() => scrollToGridTop('auto'), 40);
-      setTimeout(() => scrollToGridTop('auto'), 260);
-      setTimeout(() => scrollToGridTop('auto'), 700);
     }
   };
 
@@ -876,13 +874,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const activateTab = (tab, push) => {
     correctScrollAfterGallery = !Array.isArray(window.BQ_ALL_CARDS) || !window.BQ_ALL_CARDS.length;
+    const track = document.querySelector('#design.paper-stack > .section.work.paper-sheet');
+    const card = track?.querySelector(':scope > .paper-scroll');
+    const pinTop = card?.getBoundingClientRect().top;
+    if (track) track.dataset.holdTrack = '1';
     setActiveTab(tab);
     if (push !== false) syncURL(!!push);
-    /* ONE clean movement: a single smooth glide to the room intro, plus one
-       silent correction after the glide settles — same target, so it is
-       invisible unless a late layout shift nudged the landing. */
-    requestAnimationFrame(() => scrollToGridTop(push === false ? 'auto' : 'smooth'));
-    setTimeout(() => scrollToGridTop('auto'), 650);
+    /* Keep the portfolio FRAME where it is. Filter changes used to smooth-scroll
+       the page (and fire a late correction), which made the sheet drop. */
+    const settle = () => {
+      if (track) delete track.dataset.holdTrack;
+      window.dispatchEvent(new Event('bq:gallery-built'));
+      if (!card || pinTop == null) return;
+      const drift = card.getBoundingClientRect().top - pinTop;
+      if (Math.abs(drift) <= 0.5) return;
+      window.__bqPaperBypassUntil = performance.now() + 200;
+      window.scrollTo({ top: Math.max(0, window.scrollY + drift), left: 0, behavior: 'auto' });
+    };
+    requestAnimationFrame(() => requestAnimationFrame(settle));
   };
 
   /* re-layout on width change (column count change) */
@@ -1425,12 +1434,14 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
      so no sheet claims router-owned inner scroll. */
   const isPhonePaper = () => window.matchMedia('(max-width: 820px)').matches;
   const allowsInnerScroll = (sheet) => {
-    if (isPhonePaper()) return false;
     /* the portfolio (.work) is driven by the tall-track reel translate, NOT the
-       router's inner scroll — keep it out. Rooms/opt-in sheets still inner-scroll. */
+       router's inner scroll — keep it out. */
     if (sheet?.classList?.contains('work')) return false;
-    return Boolean(sheet?.classList?.contains('room-sheet--scroll')
-      || sheet?.dataset?.paperScroll === 'inner');
+    /* Journal / Designer / Contact are one sticky sheet; reading happens inside. */
+    if (sheet?.classList?.contains('room-sheet--one')
+      || sheet?.dataset?.paperScroll === 'inner') return true;
+    if (isPhonePaper()) return false;
+    return Boolean(sheet?.classList?.contains('room-sheet--scroll'));
   };
 
   const wrapPaperScroll = (sheet) => {
@@ -1744,40 +1755,32 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     }
   }
 
-  /* ---- Blog / Bio / Contact — same inset paper frames ---- */
+  /* ---- Blog / Bio / Contact — one inset paper frame per room ---- */
   ['blog', 'bio', 'contact'].forEach((id) => {
     const room = document.getElementById(id);
     if (!room) return;
     room.classList.add('paper-stack', 'room-paper');
 
-    const parts = [
-      ...room.querySelectorAll(':scope > .room-hero'),
-      ...room.querySelectorAll(':scope > .section'),
-    ];
-    parts.forEach((sheet, i) => {
-      sheet.classList.add('paper-sheet');
-      sheet.dataset.paper = `${id}-${i}`;
-      sheet.style.setProperty('--bq-paper-z', String((i + 1) * 10));
-      if (sheet.classList.contains('room-sheet--scroll')) {
-        sheet.dataset.paperScroll = 'inner';
-      }
-      wrapPaperScroll(sheet);
+    let sheet = room.querySelector(':scope > .paper-sheet.room-sheet--one');
+    if (!sheet) {
+      sheet = document.createElement('div');
+      sheet.className = 'paper-sheet room-sheet--one room-sheet--scroll';
+      sheet.dataset.paper = id;
+      sheet.dataset.paperScroll = 'inner';
+      sheet.style.setProperty('--bq-paper-z', '10');
+      [...room.children].forEach((node) => sheet.appendChild(node));
+      room.appendChild(sheet);
+    }
+    wrapPaperScroll(sheet);
 
-      /* Pack sheet content into .sheet-mid so rooms centre like home. */
-      const scroller = sheet.querySelector(':scope > .paper-scroll');
-      if (scroller && !scroller.querySelector(':scope > .sheet-mid')) {
-        const mid = document.createElement('div');
-        mid.className = 'sheet-mid';
-        const chrome = [];
-        [...scroller.children].forEach((node) => {
-          if (node.matches?.('.room-hero-return, .room-hero-corner')) chrome.push(node);
-          else mid.appendChild(node);
-        });
-        scroller.appendChild(mid);
-        chrome.forEach((node) => scroller.appendChild(node));
-      }
-    });
-    bindStack(room, parts, { requireActive: true });
+    const scroller = sheet.querySelector(':scope > .paper-scroll');
+    if (scroller && !scroller.querySelector(':scope > .room-sheet-flow')) {
+      const flow = document.createElement('div');
+      flow.className = 'room-sheet-flow';
+      [...scroller.children].forEach((node) => flow.appendChild(node));
+      scroller.appendChild(flow);
+    }
+    bindStack(room, [sheet], { requireActive: true });
   });
 
   /* Portfolio "magic scroll" (tall-track): the work section becomes a tall
@@ -1858,8 +1861,12 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
          card — the same scroll-driven "next sheet climbs over the previous" as every
          other sheet on the page, so it comes up WITH the scroll and never pops in
          suddenly (owner, said many times). The reel scrolls through `overflow`,
-         then the card stays pinned a card-height while the next sheet rises over it. */
-      track.style.setProperty('--work-track-h', (cardH * 2 + overflow) + 'px');
+         then the card stays pinned a card-height while the next sheet rises over it.
+         Tab switches freeze the track height so a brief empty-grid measure cannot
+         shrink the track and drop the sticky card. */
+      if (track.dataset.holdTrack !== '1') {
+        track.style.setProperty('--work-track-h', (cardH * 2 + overflow) + 'px');
+      }
       /* Overlap the next sheet by ONE card-height in fixed px (not the dvh CSS
          margin, which drifts as the mobile address bar hides and desyncs the
          hand-off). It starts to rise as the reel finishes and finishes covering as
