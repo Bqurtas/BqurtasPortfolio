@@ -15986,6 +15986,10 @@ html.bq-paused .hero-spark svg {
   }
 }
 
+html.bq-compact {
+  --bq-chrome-bottom: calc(var(--dock-h, 56px) + 16px);
+  --bq-stack-sheet-h: calc(100dvh - (var(--bq-deck-gutter, 10px) * 2) - var(--bq-chrome-bottom));
+}
 html.bq-compact .rail,
 html.bq-compact [dir="rtl"] .rail,
 [dir="rtl"] html.bq-compact .rail {
@@ -16009,6 +16013,8 @@ html.bq-compact [dir="rtl"] .main,
     --bq-card-gap: 10px;
     --bq-dock-inset: calc(10px + env(safe-area-inset-bottom, 0px));
     --dock-h: calc(56px + env(safe-area-inset-bottom, 0px));
+    --bq-chrome-bottom: calc(var(--dock-h) + 16px);
+    --bq-stack-sheet-h: calc(100dvh - (var(--bq-deck-gutter) * 2) - var(--bq-chrome-bottom));
     --pad-x: clamp(16px, 4vw, 32px);
   }
 
@@ -16060,8 +16066,17 @@ html.bq-compact [dir="rtl"] .main,
     max-width: none !important;
   }
 
+  :root[data-theme] .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll,
   html .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll {
-    padding: 22px 18px calc(28px + 56px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: 22px 18px 24px !important;
+    scroll-padding-bottom: 24px !important;
+  }
+
+  html .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll > .room-sheet-flow > :last-child,
+  html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-subscribe-sheet,
+  html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-wrap,
+  html #contact.room.paper-stack > .paper-sheet.room-sheet--one .contact-reach-sheet {
+    padding-bottom: 8px !important;
   }
 
   html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-layout,
