@@ -14796,7 +14796,7 @@ body.menu-open .mobilebar {
 @media (max-width: 820px) {
   :root {
     --bq-footer-dock-h: 56px;
-    --bq-footer-text-gap: 20px;
+    --bq-footer-text-gap: 28px;
   }
 
   .footer.footer-v249,

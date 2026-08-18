@@ -14377,6 +14377,6 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible{
 
   .footer.footer-v249 > .paper-scroll,
   .footer.footer-v249.paper-sheet > .paper-scroll {
-    padding-bottom: calc(20px + 56px + var(--bq-dock-inset, 20px)) !important;
+    padding-bottom: calc(28px + 56px + var(--bq-dock-inset, 20px)) !important;
   }
 }
