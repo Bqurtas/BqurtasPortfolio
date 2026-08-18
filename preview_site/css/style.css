@@ -1536,7 +1536,7 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
   flex-direction: column;
   align-items: center;
   gap: 28px;
-  padding: 56px 0 52px;   /* breathing room below the works + the load-more controls */
+  padding: 56px 12px 80px;   /* breathing room so Load more is easy to click */
 }
 .load-more-wrap.is-pending {
   visibility: hidden;
@@ -14378,5 +14378,13 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible{
   .footer.footer-v249 > .paper-scroll,
   .footer.footer-v249.paper-sheet > .paper-scroll {
     padding-bottom: calc(28px + 56px + var(--bq-dock-inset, 20px)) !important;
+  }
+
+  .footer.footer-v249 .footer-bottom,
+  .footer-bottom {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important;
+    align-items: center !important;
+    text-align: start !important;
   }
 }

@@ -14853,15 +14853,16 @@ body.menu-open .mobilebar {
 
   :root[data-theme] .footer.footer-v249 .footer-bottom,
   .footer.footer-v249 .footer-bottom {
-    display: flex !important;
-    flex-direction: column !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important;
+    grid-template-areas: "loc social copy" !important;
     align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 11px !important;
+    justify-content: stretch !important;
+    gap: 10px 14px !important;
     width: auto !important;
     margin: 0 22px !important;
     padding: 16px 0 0 !important;
-    text-align: center !important;
+    text-align: start !important;
     border-top: 1px solid rgba(244, 243, 240, .12) !important;
   }
 
@@ -14869,13 +14870,259 @@ body.menu-open .mobilebar {
   .footer.footer-v249 .footer-bottom > * {
     width: auto !important;
     max-width: 100% !important;
-    justify-content: center !important;
+    justify-content: initial !important;
+  }
+
+  :root[data-theme] .footer.footer-v249 .footer-bottom > span:first-child,
+  .footer.footer-v249 .footer-bottom > span:first-child {
+    grid-area: loc !important;
+    justify-self: start !important;
+    text-align: start !important;
   }
 
   :root[data-theme] .footer.footer-v249 .footer-social-links,
   .footer.footer-v249 .footer-social-links {
+    grid-area: social !important;
+    justify-self: center !important;
     justify-content: center !important;
     flex-wrap: wrap !important;
-    gap: 14px 18px !important;
+    gap: 12px 16px !important;
+  }
+
+  :root[data-theme] .footer.footer-v249 .footer-bottom > span:last-child,
+  .footer.footer-v249 .footer-bottom > span:last-child {
+    grid-area: copy !important;
+    justify-self: end !important;
+    text-align: end !important;
+  }
+}
+
+@media (max-width: 520px) {
+  :root[data-theme] .footer.footer-v249 .footer-bottom,
+  .footer.footer-v249 .footer-bottom {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    grid-template-areas:
+      "loc copy"
+      "social social" !important;
+  }
+
+  :root[data-theme] .footer.footer-v249 .footer-social-links,
+  .footer.footer-v249 .footer-social-links {
+    justify-self: center !important;
+    width: 100% !important;
+  }
+}
+
+/* ============================================================================
+   Load more — white air around the control so it is easy to click on
+   desktop and on phones (especially while the dock sits over the sheet).
+   ============================================================================ */
+#design .section.work .load-more-wrap,
+#design#design.paper-stack .section.work .work-reel .load-more-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 22px !important;
+  width: 100% !important;
+  margin-top: 28px !important;
+  padding: 36px 12px 64px !important;
+  box-sizing: border-box !important;
+}
+
+#design .section.work .load-more-btn,
+#design#design.paper-stack .section.work .load-more-btn {
+  min-height: 48px !important;
+  padding: 16px 36px !important;
+}
+
+@media (max-width: 820px) {
+  #design .section.work .load-more-wrap,
+  #design#design.paper-stack .section.work .work-reel .load-more-wrap {
+    margin-top: 22px !important;
+    padding: 40px 8px 88px !important;
+  }
+
+  #design#design.paper-stack > .section.work.paper-sheet > .paper-scroll > .work-vp > .work-reel {
+    padding-bottom: 24px !important;
+  }
+}
+
+@media (min-width: 821px) {
+  #design .section.work .load-more-wrap,
+  #design#design.paper-stack .section.work .work-reel .load-more-wrap {
+    padding: 48px 12px 80px !important;
+  }
+
+  #design#design.paper-stack > .section.work.paper-sheet > .paper-scroll > .work-vp > .work-reel {
+    padding-bottom: 36px !important;
+  }
+}
+
+/* Cookie notice: do not cover footer meta once the closing sheet is in view */
+body.footer-entered .cookie-card,
+body.footer-arriving .cookie-card {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* ============================================================================
+   Rooms = ONE sticky paper sheet. Hero + every section live inside it;
+   the viewer scrolls that sheet, not a stack of cards.
+   ============================================================================ */
+.room.paper-stack > .paper-sheet.room-sheet--one,
+:root[data-theme] .room.paper-stack > .paper-sheet.room-sheet--one {
+  position: sticky !important;
+  top: var(--bq-stack-top) !important;
+  height: var(--bq-stack-sheet-h) !important;
+  max-height: var(--bq-stack-sheet-h) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  background: var(--bq-paper-sheet) !important;
+}
+
+.room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll,
+:root[data-theme] .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll {
+  display: block !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain !important;
+  -webkit-overflow-scrolling: touch;
+  padding: clamp(28px, 4.5vh, 56px) clamp(20px, 3.2vw, 56px) clamp(36px, 5vh, 64px) !important;
+  box-sizing: border-box !important;
+}
+
+.room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll > .room-sheet-flow {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: min(1100px, 100%) !important;
+  margin: 0 auto !important;
+  min-height: 0 !important;
+  gap: 0 !important;
+}
+
+.room.paper-stack > .paper-sheet.room-sheet--one .room-hero,
+:root[data-theme] .room.paper-stack > .paper-sheet.room-sheet--one .room-hero {
+  position: relative !important;
+  display: block !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 8px 0 28px !important;
+  overflow: visible !important;
+  text-align: start !important;
+  background: transparent !important;
+}
+
+.room.paper-stack > .paper-sheet.room-sheet--one .room-hero::before {
+  display: none !important;
+}
+
+.room.paper-stack > .paper-sheet.room-sheet--one .room-hero-inner {
+  text-align: start !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.room.paper-stack > .paper-sheet.room-sheet--one .room-hero-title {
+  font-size: clamp(36px, 4.6vw, 64px) !important;
+  line-height: 1.04 !important;
+  letter-spacing: -.045em !important;
+  margin: 0 !important;
+  max-width: 14ch !important;
+}
+
+.room.paper-stack > .paper-sheet.room-sheet--one .room-hero-sub {
+  margin: 14px 0 0 !important;
+  max-width: 46ch !important;
+  font-size: clamp(15px, 1.3vw, 18px) !important;
+  line-height: 1.55 !important;
+}
+
+.room.paper-stack > .paper-sheet.room-sheet--one .room-hero-return {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 4 !important;
+  display: inline-flex !important;
+  margin: 0 0 18px !important;
+  background: color-mix(in srgb, var(--bq-paper-sheet, var(--bg)) 88%, transparent) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.room.paper-stack > .paper-sheet.room-sheet--one .section,
+:root[data-theme] .room.paper-stack > .paper-sheet.room-sheet--one .section {
+  position: relative !important;
+  top: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: clamp(28px, 4vh, 48px) 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.room.paper-stack > .paper-sheet.room-sheet--one .section .section-head {
+  margin: 0 0 clamp(16px, 2.2vh, 26px) !important;
+  max-width: 42rem !important;
+}
+
+.room.paper-stack > .paper-sheet.room-sheet--one .section .section-title {
+  font-size: clamp(28px, 3.4vw, 48px) !important;
+  line-height: 1.06 !important;
+  max-width: 18ch !important;
+}
+
+.room.paper-stack > .paper-sheet.room-sheet--one .sheet-mid {
+  display: block !important;
+  max-width: none !important;
+  margin: 0 !important;
+  max-height: none !important;
+}
+
+@media (max-width: 820px) {
+  .room.paper-stack > .paper-sheet.room-sheet--one,
+  :root[data-theme] .room.paper-stack > .paper-sheet.room-sheet--one {
+    position: sticky !important;
+    top: var(--bq-stack-top) !important;
+    height: var(--bq-stack-sheet-h) !important;
+    max-height: var(--bq-stack-sheet-h) !important;
+    overflow: hidden !important;
+  }
+
+  .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll,
+  :root[data-theme] .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll {
+    padding: 22px 16px calc(28px + 56px + env(safe-area-inset-bottom, 0px)) !important;
+    overflow-y: auto !important;
+    height: 100% !important;
+    max-height: 100% !important;
+  }
+
+  .room.paper-stack > .paper-sheet.room-sheet--one .room-hero-title,
+  .room.paper-stack > .paper-sheet.room-sheet--one .section .section-title {
+    font-size: clamp(28px, 7.4vw, 36px) !important;
+    max-width: none !important;
+  }
+
+  .room.paper-stack > .paper-sheet.room-sheet--one .subscribe,
+  .room.paper-stack > .paper-sheet.room-sheet--one .contact-quick,
+  .room.paper-stack > .paper-sheet.room-sheet--one .bio-connect-links {
+    grid-template-columns: 1fr !important;
   }
 }
