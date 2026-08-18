@@ -15668,6 +15668,19 @@ html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-layout--blog {
   grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr) !important;
 }
 
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-layout:not(:has(.index-row)) {
+  grid-template-columns: minmax(240px, 28rem) !important;
+  justify-content: start !important;
+}
+
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-layout:not(:has(.index-row)) .index-list {
+  display: none !important;
+}
+
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-layout:not(:has(.index-row)) ~ .blog-pager {
+  display: none !important;
+}
+
 html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-list {
   display: flex !important;
   flex-direction: column !important;
