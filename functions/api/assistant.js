@@ -56,7 +56,12 @@ export async function onRequestPost(context) {
   try {
     if (env.ANTHROPIC_API_KEY) return json(await viaAnthropic(env, messages));   // paid upgrade if configured
     if (env.AI) return json(await viaWorkersAI(env, messages));                  // free default
-    return json({ ok: false, error: 'no-ai' });
+    
+    // Graceful offline/unconfigured fallback
+    return json({
+      ok: true,
+      text: "سڵاو! من یاریدەدەری ستۆدیۆی بەرەکاتم. بۆ چالاککردنی تەواوی ژیری دەستکرد لە سێرڤەر، تکایە Workers AI یان ANTHROPIC_API_KEY لە پڕۆژەی Cloudflare زیاد بکە."
+    });
   } catch (e) {
     return json({ ok: false, error: 'ai-failed' });
   }

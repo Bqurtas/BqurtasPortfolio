@@ -240,10 +240,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     if ((media.tagName === 'IMG' && media.complete && media.naturalHeight) ||
         media.tagName === 'VIDEO') markReady();
     media.addEventListener('error', () => {
-      // resized phone copy failed → original full image (jsDelivr)
-      if (media.src !== item.url && !media.dataset.orig) { media.dataset.orig = '1'; media.src = item.url; return; }
-      // jsDelivr failed → raw.githubusercontent once
-      if (item.rawUrl && !media.dataset.fb) { media.dataset.fb = '1'; media.src = item.rawUrl; return; }
+      // 1) resized phone copy failed → original full image (jsDelivr)
+      if (media.src !== item.url && !media.dataset.orig) {
+        media.dataset.orig = '1';
+        media.src = item.url;
+        return;
+      }
+      // 2) jsDelivr failed → raw.githubusercontent
+      if (item.rawUrl && !media.dataset.fb) {
+        media.dataset.fb = '1';
+        media.src = item.rawUrl;
+        return;
+      }
+      // 3) raw GitHub failed → Statically CDN
+      if (!media.dataset.stat && item.coll) {
+        media.dataset.stat = '1';
+        const collInfo = window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS && window.BQ_GALLERY.COLLECTIONS[item.coll];
+        const folder = (collInfo && collInfo.folder) || item.coll;
+        const fname = collInfo && collInfo.files && collInfo.files[item.index - 1] ? collInfo.files[item.index - 1] : `${collInfo.prefix || item.coll}${item.index}.${collInfo.ext || 'webp'}`;
+        media.src = `https://cdn.statically.io/gh/Bqurtas/BqurtasPortfolio/main/${folder}/${encodeURIComponent(fname)}`;
+        return;
+      }
       article.remove();
     });
     return article;

@@ -838,8 +838,6 @@ document.addEventListener('DOMContentLoaded', () => {
   window.__bqRenderGallery = (reset) => {
     if (!gridEl) return;
     if (reset) {
-      const lock = Math.round(gridEl.getBoundingClientRect().height);
-      if (lock > 48) gridEl.style.minHeight = lock + 'px';
       shuffleAllCards();
       buildColumns(colCountForWidth());
       currentShown = 0;
@@ -850,62 +848,10 @@ document.addEventListener('DOMContentLoaded', () => {
     currentShown += batch.length;
     updateTabHeader(currentFilter, matching.length);
     updateLoadMore(matching.length);
-    if (reset && correctScrollAfterGallery) {
-      correctScrollAfterGallery = false;
-      setTimeout(() => scrollToGridTop('auto'), 40);
-    }
   };
 
-  const freezeWorkTrack = (track, card) => {
-    if (!track || !card) return 0;
-    const g = parseFloat(getComputedStyle(card).top) || 0;
-    const yLock = Math.max(0, Math.round(g - track.getBoundingClientRect().top));
-    const measured = Math.round(track.getBoundingClientRect().height);
-    let trackH = getComputedStyle(track).getPropertyValue('--work-track-h').trim();
-    if (!trackH || trackH === '0px') trackH = measured + 'px';
-    track.dataset.holdTrack = '1';
-    track.dataset.skipChrome = '1';
-    track.dataset.overflowFloor = String(Math.max(yLock, 1));
-    track.dataset.reelY = String(yLock);
-    track.dataset.trackHLock = trackH;
-    track.style.setProperty('--work-track-h', trackH);
-    track.style.minHeight = trackH;
-    const reel = track.querySelector('.work-reel');
-    if (reel) {
-      const rh = Math.round(reel.scrollHeight);
-      if (rh > 48) reel.style.minHeight = rh + 'px';
-    }
-    if (gridEl) {
-      const gh = Math.round(gridEl.getBoundingClientRect().height);
-      if (gh > 48) gridEl.style.minHeight = gh + 'px';
-    }
-    return yLock;
-  };
-
-  const thawWorkTrack = (track, after) => {
-    if (!track) {
-      after?.();
-      return;
-    }
-    after?.();
-    requestAnimationFrame(() => {
-      after?.();
-      delete track.dataset.holdTrack;
-      delete track.dataset.trackHLock;
-      delete track.dataset.reelY;
-      track.style.minHeight = '';
-      window.dispatchEvent(new Event('bq:gallery-built'));
-      requestAnimationFrame(() => {
-        const reel = track.querySelector('.work-reel');
-        if (reel) reel.style.minHeight = '';
-        if (gridEl) gridEl.style.minHeight = '';
-        delete track.dataset.overflowFloor;
-        delete track.dataset.skipChrome;
-        window.dispatchEvent(new Event('bq:gallery-built'));
-        after?.();
-      });
-    });
-  };
+  const freezeWorkTrack = () => 0;
+  const thawWorkTrack = (_track, after) => { after?.(); };
 
   // Re-translate the tab header + load-more in place when the language flips
   window.__bqRerenderChrome = () => {
@@ -936,31 +882,37 @@ document.addEventListener('DOMContentLoaded', () => {
       if (push !== false) syncURL(!!push);
       return;
     }
-    correctScrollAfterGallery = !Array.isArray(window.BQ_ALL_CARDS) || !window.BQ_ALL_CARDS.length;
-    const track = document.querySelector('#design.paper-stack > .section.work.paper-sheet');
-    const card = track?.querySelector(':scope > .paper-scroll');
-    const pinTop = card?.getBoundingClientRect().top ?? null;
-    if (track && card) freezeWorkTrack(track, card);
+
+    const currentScrollY = window.scrollY;
+
+    // Lock grid height before clearing so document never collapses and scroll never clamps
+    if (gridEl) {
+      const curH = gridEl.offsetHeight;
+      if (curH > 200) {
+        gridEl.style.minHeight = curH + 'px';
+      }
+    }
+
     setActiveTab(tab);
     if (push !== false) syncURL(!!push);
-    const restorePin = () => {
-      if (!card || pinTop == null) return;
-      const drift = card.getBoundingClientRect().top - pinTop;
-      if (Math.abs(drift) <= 2) return;
-      window.__bqPaperBypassUntil = performance.now() + 400;
-      window.scrollTo({ top: Math.max(0, window.scrollY + drift), left: 0, behavior: 'auto' });
-    };
-    let frames = 0;
-    const waitForCards = () => {
-      frames += 1;
-      const ready = !!(gridEl && gridEl.querySelector('.card'));
-      if (ready || frames > 16) {
-        thawWorkTrack(track, restorePin);
-        return;
+
+    // Keep scroll position 100% steady in place with zero jump and zero shape drop
+    const lockScroll = () => {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const targetScroll = Math.min(currentScrollY, Math.max(0, maxScroll));
+      if (Math.abs(window.scrollY - targetScroll) > 0.5) {
+        window.scrollTo({ top: targetScroll, behavior: 'instant' });
       }
-      requestAnimationFrame(waitForCards);
     };
-    requestAnimationFrame(() => requestAnimationFrame(waitForCards));
+
+    lockScroll();
+    requestAnimationFrame(() => {
+      lockScroll();
+      requestAnimationFrame(() => {
+        if (gridEl) gridEl.style.minHeight = '';
+        lockScroll();
+      });
+    });
   };
 
   /* re-layout on width change (column count change) */

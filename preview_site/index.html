@@ -1934,7 +1934,7 @@
         var work = document.querySelector('#design .section.work.paper-sheet') || document.querySelector('#design .section.work');
         if (!work) return;
         if (window.__bqScrollPaperTarget && window.__bqScrollPaperTarget(work, { behavior: 'smooth', block: 'start' })) return;
-        var y = window.scrollY + work.getBoundingClientRect().top - 14;
+        var y = window.scrollY + work.getBoundingClientRect().top + 1;
         window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
       }, true);
       // first paint + bfcache restore → top of the home hero
@@ -1944,6 +1944,11 @@
           try { if (typeof window.__bqResetToHomeHero === 'function') window.__bqResetToHomeHero(); } catch (er) {}
         }
         hardTopRepeated();
+      });
+      window.addEventListener('load', function () {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/sw.js').catch(function () {});
+        }
       });
     }());
   </script>

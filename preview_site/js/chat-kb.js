@@ -215,9 +215,43 @@ window.CHAT_I18N = {
       { "k": ["3d", "maquette", "animation", "logo animé", "animer"], "a": "Je peux présenter votre logo en <b>maquette 3D</b> (sur un panneau ou un mur) et ajouter une <b>animation de logo</b> pour des vidéos plus pro. L'animation 3D complète est un projet séparé." },
       { "k": ["heures de travail", "week-end", "tard", "quand répondez", "temps de réponse"], "a": "J'ai des horaires de travail définis pour donner à votre projet ma meilleure concentration. Toute note envoyée est appliquée avec soin pendant ces heures." },
       { "k": ["rebranding", "refonte", "moderniser", "entreprise a grandi", "actualiser"], "a": "Quand votre entreprise grandit, on rafraîchit votre ancienne identité pour la rendre plus moderne — sans déstabiliser vos clients actuels. C'est un signe de votre croissance." },
-      { "k": ["plusieurs langues", "trois langues", "deux langues", "kurde arabe"], "a": "Oui — mais un design doit rester épuré. Mieux vaut garder le message principal dans une langue (les autres plus petites), ou un design séparé par langue pour éviter l'encombrement." },
       { "k": ["bonjour", "salut", "coucou"], "a": "Bonjour ! 👋 Je suis l'assistant de studio de Barakat. Demandez-moi services, tarifs, délais, ou comment démarrer un projet." },
       { "k": ["merci"], "a": "Avec plaisir ! Autre chose que vous aimeriez savoir ? 🙂" }
+    ]
+  },
+
+  /* ---------------- TURKISH ---------------- */
+  "tr": {
+    "greet": "Merhaba! 👋 Ben Barakat'ın stüdyo asistanıyım. Bana <b>hizmetler</b>, <b>fiyatlar</b>, <b>süreler</b> veya bir <b>projeye başlama</b> hakkında soru sorabilirsiniz.",
+    "fallback": "Bu konuda tam emin değilim — ancak Barakat doğrudan yardımcı olabilir. <b>İletişim</b> odasını deneyin veya bana <i>fiyatlar, süreler, revizyonlar, ödeme, dosyalar veya hizmetler</i> hakkında sorun.",
+    "quick": [{ "label": "Fiyatlar", "q": "fiyat" }, { "label": "Hizmetler", "q": "hizmet" }, { "label": "Süreler", "q": "süre" }, { "label": "İletişim", "q": "iletişim" }],
+    "kb": [
+      { "k": ["hizmet", "ne yapıyorsun", "neler var", "sunulan"], "a": "Barakat <b>marka kimliği & logo tasarımı</b>, <b>kitap kapağı & editöryel</b>, <b>afiş & poster</b>, <b>sosyal medya</b>, <b>baskı & fatura</b>, ve <b>video & motion graphics</b> hizmetleri sunmaktadır." },
+      { "k": ["fiyat", "ücret", "ne kadar", "bütçe", "kaç para", "maliyet"], "a": "Fiyatlar proje kapsamına göre değişir. Başlangıç aralıkları:<br>• <b>Logo</b> — 100$ → 1.500$+<br>• <b>Tam marka kimliği</b> — 250$ → 2.500$<br>• <b>Afiş / Poster</b> — 15$ → 150$<br>• <b>Sosyal medya gönderisi</b> — 10$ → 25$<br>• <b>Video (dakika başı)</b> — 100$'dan başlayan fiyatlarla<br>• <b>Aylık yönetim</b> — 250$ → 1.000$+<br>Net bir teklif için <b>İletişim</b> odasından brief gönderebilirsiniz." },
+      { "k": ["logo", "marka", "kimlik", "branding"], "a": "<b>Logo ve Marka Kimliği:</b><br>• Logo tasarımı — <b>100$</b> (temel) ile <b>1.500$+</b> (tam profesyonel) arası<br>• Tam marka kimliği (logo, kartvizit, dosya, afiş) — <b>250$ → 2.500$</b><br>Logo yalnızca bir resim değil, markanızın yüzüdür ve tüm telif hakları size aittir." },
+      { "k": ["afiş", "poster", "kartvizit", "fatura", "baskı", "kitap kapağı"], "a": "<b>Baskı ve Reklam:</b><br>• Afiş / Poster — <b>15$ → 150$</b><br>• Kartvizit — <b>10$ → 25$</b><br>• Fatura / Başlıklı kâğıt — adet başı <b>10$ → 20$</b><br>• Kitap kapağı — <b>50$ → 100$</b><br>• İç sayfa düzeni — sayfa başı <b>1.5$ → 2.5$</b>" },
+      { "k": ["video", "motion", "animasyon", "kurgu", "reels"], "a": "<b>Video ve Motion:</b><br>• Reklam / Sinematik video — dakikası <b>100$'dan</b><br>• Motion graphics — saniyesi <b>3$ → 10$</b><br>• Reels / Shorts — <b>15$ → 40$</b>" },
+      { "k": ["süre", "zaman", "ne zaman", "kaç gün", "teslimat"], "a": "Tipik teslim süreleri: <b>Logo 3–7 iş günü</b>, sosyal medya gönderisi <b>24–48 saat</b>, tam kurumsal kimlik <b>3–5 hafta</b>, kitap kapağı <b>~1 hafta</b>. Acil işler için ek ücretle hızlandırma yapılabilir." },
+      { "k": ["revizyon", "beğenmedim", "değişiklik", "düzeltme"], "a": "Başlamadan önce renk ve tarzı belirlemek için bir <b>moodboard</b> hazırlarız. Sonuçta <b>2–3 ücretsiz revizyon</b> hakkınız bulunmaktadır." },
+      { "k": ["ödeme", "nasıl öderim", "peşinat", "kapora"], "a": "Ödeme planı: Başlangıçta <b>%50 peşinat</b>, nihai onay ve kaynak dosyaların teslimi öncesinde kalan <b>%50</b>." },
+      { "k": ["kim", "hakkında", "deneyim", "barakat", "kaç yıl"], "a": "Barakat Qurtas — <b>2014'ten beri</b> Erbil/Kürdistan merkezli bağımsız grafik ve motion tasarımcısı. 1000'den fazla tamamlanmış proje." },
+      { "k": ["iletişim", "eposta", "telefon", "whatsapp"], "a": "Ulaşım kanalları:<br>• ✉️ <a href='mailto:hello@bqurtas.com'>hello@bqurtas.com</a><br>• 📱 <a href='https://wa.me/9647517884985' target='_blank' rel='noopener'>WhatsApp +964 751 788 4985</a>" }
+    ]
+  },
+
+  /* ---------------- SWEDISH ---------------- */
+  "sv": {
+    "greet": "Hej! 👋 Jag är Barakat studiossistent. Fråga mig om <b>tjänster</b>, <b>priser</b>, <b>leveranstid</b> eller att <b>starta ett projekt</b>.",
+    "fallback": "Jag är inte helt säker på det — men Barakat kan hjälpa dig direkt. Prova <b>Kontakt</b>-rummet eller fråga mig om <i>priser, tidsplan, revideringar eller tjänster</i>.",
+    "quick": [{ "label": "Priser", "q": "pris" }, { "label": "Tjänster", "q": "tjänst" }, { "label": "Tidsplan", "q": "tid" }, { "label": "Kontakt", "q": "kontakt" }],
+    "kb": [
+      { "k": ["tjänst", "vad gör du", "erbjuder"], "a": "Barakat erbjuder <b>varumärkesidentitet & logotypdesign</b>, <b>bokomslag & redaktionell design</b>, <b>affischer</b>, <b>sociala medier</b>, <b>tryck & fakturor</b>, och <b>video & rörlig grafik</b>." },
+      { "k": ["pris", "kostnad", "hur mycket", "budget"], "a": "Priset beror på projektets omfattning. Riktpriser:<br>• <b>Logotyp</b> — 100$ → 1 500$+<br>• <b>Komplett varumärkesidentitet</b> — 250$ → 2 500$<br>• <b>Affisch</b> — 15$ → 150$<br>• <b>Inlägg sociala medier</b> — 10$ → 25$<br>• <b>Video (per minut)</b> — från 100$<br>För en exakt offert, skicka en brief via <b>Kontakt</b>-rummet." },
+      { "k": ["logotyp", "logo", "varumärke", "identitet"], "a": "<b>Logotyp & varumärkesidentitet:</b><br>• Logotypdesign — från <b>100$</b> till <b>1 500$+</b><br>• Komplett varumärkesidentitet — <b>250$ → 2 500$</b><br>Fullständig upphovsrätt tillhör dig." },
+      { "k": ["tid", "hur lång tid", "leverans", "tidsplan", "färdig"], "a": "Vanliga leveranstider: <b>Logotyp 3–7 arbetsdagar</b>, socialt inlägg <b>24–48 timmar</b>, komplett identitet <b>3–5 veckor</b>, bokomslag <b>~1 vecka</b>." },
+      { "k": ["revidering", "ändring", "inte nöjd", "ändra"], "a": "Vi enas om en <b>moodboard</b> innan start. Vi inkluderar <b>2–3 kostnadsfria revideringsrundor</b> fram till godkänt slutresultat." },
+      { "k": ["betalning", "betala", "deposition", "förskott"], "a": "Betalning: <b>50% förskott</b> vid start, och resterande <b>50%</b> efter slutligt godkännande innan källfiler skickas." },
+      { "k": ["kontakt", "e-post", "telefon", "whatsapp"], "a": "Kontakta Barakat:<br>• ✉️ <a href='mailto:hello@bqurtas.com'>hello@bqurtas.com</a><br>• 📱 <a href='https://wa.me/9647517884985' target='_blank' rel='noopener'>WhatsApp +964 751 788 4985</a>" }
     ]
   }
 
