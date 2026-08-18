@@ -684,6 +684,8 @@ document.addEventListener('DOMContentLoaded', () => {
   /* Re-render the grid showing exactly `n` cards (used by show-less/collapse). */
   const renderUpTo = (n) => {
     if (!gridEl) return;
+    const workTrack = document.querySelector('#design.paper-stack > .section.work.paper-sheet');
+    if (workTrack) delete workTrack.dataset.overflowFloor;
     buildColumns(colCountForWidth());
     const matching = matchingCards();
     const target = Math.max(0, Math.min(n, matching.length));
@@ -835,7 +837,13 @@ document.addEventListener('DOMContentLoaded', () => {
   /* render the gallery. reset=true rebuilds columns (tab switch / resize). */
   window.__bqRenderGallery = (reset) => {
     if (!gridEl) return;
-    if (reset) { shuffleAllCards(); buildColumns(colCountForWidth()); currentShown = 0; }
+    if (reset) {
+      const lock = Math.round(gridEl.getBoundingClientRect().height);
+      if (lock > 48) gridEl.style.minHeight = lock + 'px';
+      shuffleAllCards();
+      buildColumns(colCountForWidth());
+      currentShown = 0;
+    }
     const matching = matchingCards();
     const batch = matching.slice(currentShown, currentShown + PAGE_SIZE);
     batch.forEach((entry, idx) => placeCard(entry, currentShown + idx));
@@ -846,6 +854,47 @@ document.addEventListener('DOMContentLoaded', () => {
       correctScrollAfterGallery = false;
       setTimeout(() => scrollToGridTop('auto'), 40);
     }
+  };
+
+  const freezeWorkTrack = (track, card) => {
+    if (!track || !card) return 0;
+    const g = parseFloat(getComputedStyle(card).top) || 0;
+    const yLock = Math.max(0, Math.round(g - track.getBoundingClientRect().top));
+    const trackH = getComputedStyle(track).getPropertyValue('--work-track-h').trim();
+    track.dataset.holdTrack = '1';
+    track.dataset.overflowFloor = String(yLock);
+    track.dataset.reelY = String(yLock);
+    if (trackH) {
+      track.dataset.trackHLock = trackH;
+      track.style.setProperty('--work-track-h', trackH);
+    }
+    const reel = track.querySelector('.work-reel');
+    if (reel) {
+      const rh = Math.round(reel.scrollHeight);
+      if (rh > 48) reel.style.minHeight = rh + 'px';
+    }
+    return yLock;
+  };
+
+  const thawWorkTrack = (track, after) => {
+    if (!track) {
+      after?.();
+      return;
+    }
+    delete track.dataset.holdTrack;
+    delete track.dataset.trackHLock;
+    delete track.dataset.reelY;
+    window.dispatchEvent(new Event('bq:gallery-built'));
+    after?.();
+    requestAnimationFrame(() => {
+      const reel = track.querySelector('.work-reel');
+      if (reel) reel.style.minHeight = '';
+      if (gridEl) gridEl.style.minHeight = '';
+      delete track.dataset.overflowFloor;
+      window.dispatchEvent(new Event('bq:gallery-built'));
+      after?.();
+      requestAnimationFrame(() => after?.());
+    });
   };
 
   // Re-translate the tab header + load-more in place when the language flips
@@ -869,7 +918,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gridEl) gridEl.setAttribute('aria-labelledby', tab.id);
     currentFilter = tab.dataset.filter;
     window.__bqRenderGallery(true);
-    animateTabHeader();
   };
 
   const activateTab = (tab, push) => {
@@ -877,27 +925,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const track = document.querySelector('#design.paper-stack > .section.work.paper-sheet');
     const card = track?.querySelector(':scope > .paper-scroll');
     const pinTop = card?.getBoundingClientRect().top ?? null;
-    if (track) track.dataset.holdTrack = '1';
+    if (track && card) freezeWorkTrack(track, card);
     setActiveTab(tab);
     if (push !== false) syncURL(!!push);
-    /* Freeze magic-scroll geometry while the grid rebuilds. Emptying the
-       columns used to collapse overflow, snap the reel to 0, and drop the
-       sticky card. Restore the pin, then remeasure. */
     const restorePin = () => {
       if (!card || pinTop == null) return;
       const drift = card.getBoundingClientRect().top - pinTop;
-      if (Math.abs(drift) <= 0.5) return;
+      if (Math.abs(drift) <= 2) return;
       window.__bqPaperBypassUntil = performance.now() + 280;
       window.scrollTo({ top: Math.max(0, window.scrollY + drift), left: 0, behavior: 'auto' });
     };
-    const settle = () => {
-      restorePin();
-      if (track) delete track.dataset.holdTrack;
-      window.dispatchEvent(new Event('bq:gallery-built'));
-      restorePin();
-      requestAnimationFrame(restorePin);
-    };
-    requestAnimationFrame(() => requestAnimationFrame(settle));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      thawWorkTrack(track, restorePin);
+    }));
   };
 
   /* re-layout on width change (column count change) */
@@ -915,8 +955,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 200);
   });
 
+  const clearWorkOverflowFloor = () => {
+    const workTrack = document.querySelector('#design.paper-stack > .section.work.paper-sheet');
+    if (workTrack) delete workTrack.dataset.overflowFloor;
+  };
+
   /* Load more — appends to the bottom of the shortest columns */
   document.getElementById('loadMoreBtn')?.addEventListener('click', () => {
+    clearWorkOverflowFloor();
     window.__bqRenderGallery(false);
   });
   /* Show fewer (one batch) / collapse all the way back to the first batch */
@@ -1846,14 +1892,23 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       const n = track.nextElementSibling;
       return (n && n.classList && n.classList.contains('paper-sheet')) ? n : null;
     };
+    let lastY = 0;
     const measure = () => {
       /* Tab switches hold geometry so an empty-grid frame cannot snap the reel. */
-      if (track.dataset.holdTrack === '1') return;
+      if (track.dataset.holdTrack === '1') {
+        if (track.dataset.trackHLock) {
+          track.style.setProperty('--work-track-h', track.dataset.trackHLock);
+        }
+        return;
+      }
       cardH = card.clientHeight;
       /* Mobile: the head holds the section-head heading + the tabs. On scroll the
          head slides up by collapseDist so the HEADING scrolls away and ONLY the
-         tabs stay pinned at the top (owner). The reel starts below the full head. */
-      if (card.classList.contains('work-head-flow') && headEl && tabsWrap) {
+         tabs stay pinned at the top (owner). The reel starts below the full head.
+         Tab switches freeze this so the heading cannot drop back into view. */
+      if (Number(track.dataset.overflowFloor) > 0) {
+        /* keep collapseDist / --work-head-h as last measured */
+      } else if (card.classList.contains('work-head-flow') && headEl && tabsWrap) {
         collapseDist = Math.max(0, tabsWrap.offsetTop - 6);
         card.style.setProperty('--work-head-h', headEl.offsetHeight + 'px');
       } else {
@@ -1864,6 +1919,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       const vpH = vp.clientHeight;
       const reelH = reel.scrollHeight;
       overflow = Math.max(0, reelH - vpH);
+      const floor = Number(track.dataset.overflowFloor);
+      if (Number.isFinite(floor) && floor > 0) overflow = Math.max(overflow, floor);
       /* track = card + gallery-scroll + ONE card-height of HOLD. The hold is the
          window in which the NEXT sheet ("What I do") RISES up over the still-pinned
          card — the same scroll-driven "next sheet climbs over the previous" as every
@@ -1898,7 +1955,12 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     let raf = 0;
     const drive = () => {
       raf = 0;
-      const { y } = reelState();
+      let { y } = reelState();
+      if (track.dataset.holdTrack === '1') {
+        const locked = Number(track.dataset.reelY);
+        y = Number.isFinite(locked) ? locked : lastY;
+      }
+      lastY = y;
       reel.style.transform = 'translate3d(0,' + (-y) + 'px,0)';
       /* slide the head up until the tabs reach the top, then hold — the heading
          scrolls away while ONLY the tabs stay pinned (owner). */
