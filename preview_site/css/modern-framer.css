@@ -15141,6 +15141,7 @@ body.footer-arriving .cookie-card {
 
 #design.paper-stack > .section.work.paper-sheet[data-hold-track="1"] {
   min-height: var(--work-track-h) !important;
+  height: var(--work-track-h) !important;
 }
 
 html .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll {
@@ -15574,144 +15575,124 @@ html #contact.room.paper-stack > .paper-sheet.room-sheet--one .qc-card:last-chil
 }
 
 /* ============================================================================
-   Rooms fill the paper. Compact intro, one growing chapter, quiet footer.
-   No extra widgets — existing pieces stretched into a simple folio page.
+   Rooms — same paper frame and catalogue rhythm as Design.
+   Left-led type, medium scale, air between chapters. Nothing stretched.
    ============================================================================ */
 :root[data-theme] .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll,
 html .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll {
-  display: flex !important;
-  flex-direction: column !important;
-  padding: 18px clamp(18px, 3vw, 36px) 12px !important;
+  display: block !important;
+  padding: clamp(28px, 4vw, 48px) clamp(18px, 3vw, 40px) calc(36px + 64px) !important;
 }
 
-:root[data-theme] .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll > .room-sheet-flow,
 html .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll > .room-sheet-flow {
-  flex: 1 1 auto !important;
-  min-height: 100% !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: flex-start !important;
+  gap: 0 !important;
 }
 
 html .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll > .room-sheet-flow > :last-child {
-  padding-bottom: calc(8px + 64px) !important;
+  padding-bottom: 8px !important;
 }
 
 html .room.paper-stack > .paper-sheet.room-sheet--one .room-hero {
   position: relative !important;
   flex: 0 0 auto !important;
-  padding: 0 0 6px !important;
+  padding: 0 0 28px !important;
 }
 
 html .room.paper-stack > .paper-sheet.room-sheet--one .room-hero-return {
-  position: absolute !important;
+  position: sticky !important;
   top: 0 !important;
-  inset-inline-start: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  inset: auto !important;
+  margin: 0 0 18px !important;
+  padding: 2px 0 10px !important;
 }
 
 html .room.paper-stack > .paper-sheet.room-sheet--one .room-hero-inner {
-  padding-top: 22px !important;
+  padding-top: 0 !important;
+  max-width: min(38rem, 62%) !important;
 }
 
 html .room.paper-stack > .paper-sheet.room-sheet--one .room-hero-title {
-  font-size: clamp(24px, 2.8vw, 34px) !important;
+  font-size: clamp(28px, 3.6vw, 44px) !important;
+  max-width: 16ch !important;
 }
 
 html .room.paper-stack > .paper-sheet.room-sheet--one .room-hero-sub {
-  margin: 4px 0 0 !important;
+  margin: 10px 0 0 !important;
+  max-width: 42rem !important;
+  font-size: clamp(15px, 1.25vw, 17px) !important;
+  line-height: 1.55 !important;
 }
 
 html .room.paper-stack > .paper-sheet.room-sheet--one .section {
   flex: 0 0 auto !important;
-  padding: 10px 0 !important;
+  padding: clamp(22px, 3.2vh, 40px) 0 !important;
 }
 
 html .room.paper-stack > .paper-sheet.room-sheet--one .section:first-of-type {
-  padding-top: 2px !important;
+  padding-top: 8px !important;
 }
 
 html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-index-sheet,
 html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-story-sheet,
 html #contact.room.paper-stack > .paper-sheet.room-sheet--one .contact-pitch-sheet {
-  flex: 1 1 auto !important;
-  display: flex !important;
-  flex-direction: column !important;
+  flex: 0 0 auto !important;
   min-height: 0 !important;
-}
-
-html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-index-sheet {
-  min-height: calc(var(--bq-stack-sheet-h) - 300px) !important;
-  padding: 0 !important;
-}
-
-html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-story-sheet {
-  min-height: calc(var(--bq-stack-sheet-h) - 148px) !important;
-  padding-bottom: calc(10px + 64px) !important;
-}
-
-html #contact.room.paper-stack > .paper-sheet.room-sheet--one .contact-pitch-sheet {
-  min-height: calc(var(--bq-stack-sheet-h) - 220px) !important;
+  height: auto !important;
+  display: block !important;
 }
 
 html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-index-sheet > .sheet-mid,
 html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-story-sheet > .sheet-mid,
 html #contact.room.paper-stack > .paper-sheet.room-sheet--one .contact-pitch-sheet > .sheet-mid {
-  flex: 1 1 auto !important;
-  display: flex !important;
-  flex-direction: column !important;
+  flex: none !important;
+  display: block !important;
+  height: auto !important;
   min-height: 0 !important;
-  height: 100% !important;
   max-width: none !important;
   width: 100% !important;
 }
 
 html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-layout,
 html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-layout--blog {
-  flex: 1 1 auto !important;
-  align-items: stretch !important;
+  flex: none !important;
+  height: auto !important;
   min-height: 0 !important;
-  height: 100% !important;
-  grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr) !important;
-}
-
-html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-layout:not(:has(.index-row)) {
-  grid-template-columns: 1fr !important;
-}
-
-html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-layout:not(:has(.index-row)) .index-list {
-  display: none !important;
-}
-
-html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-layout:not(:has(.index-row)) ~ .blog-pager {
-  display: none !important;
+  align-items: start !important;
+  gap: clamp(24px, 3vw, 40px) !important;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr) !important;
 }
 
 html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-list {
   display: flex !important;
   flex-direction: column !important;
-  min-height: 0 !important;
 }
 
-html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-preview {
-  max-height: none !important;
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-row {
+  padding: 16px 0 !important;
 }
 
 html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-preview,
 html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-card--blog {
   display: flex !important;
   flex-direction: column !important;
-  height: 100% !important;
-  min-height: calc(var(--bq-stack-sheet-h) - 320px) !important;
-  align-self: stretch !important;
+  height: auto !important;
+  min-height: 0 !important;
+  align-self: start !important;
+  position: sticky !important;
+  top: 8px !important;
 }
 
 html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-card-cover {
-  flex: 1 1 auto !important;
-  aspect-ratio: auto !important;
+  flex: 0 0 auto !important;
+  aspect-ratio: 4 / 3 !important;
   height: auto !important;
-  max-height: none !important;
+  max-height: 240px !important;
   min-height: 0 !important;
 }
 
@@ -15721,50 +15702,46 @@ html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-card-cover img 
   object-fit: cover !important;
 }
 
-html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-card-body {
-  flex: 0 0 auto !important;
-}
-
 html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-pager {
-  margin-top: auto !important;
-  padding-top: 10px !important;
+  margin-top: 20px !important;
+  padding-top: 14px !important;
 }
 
 html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-subscribe-sheet {
-  margin-top: auto !important;
-  padding: 10px 0 0 !important;
+  margin-top: 8px !important;
+  padding: 28px 0 0 !important;
   border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent) !important;
 }
 
 html #blog.room.paper-stack > .paper-sheet.room-sheet--one .subscribe {
-  gap: 12px !important;
-  align-items: center !important;
+  gap: 28px !important;
+  align-items: start !important;
 }
 
 html #blog.room.paper-stack > .paper-sheet.room-sheet--one .subscribe-title {
-  font-size: clamp(18px, 2vw, 22px) !important;
-  margin: 0 !important;
+  font-size: clamp(22px, 2.6vw, 32px) !important;
 }
 
 html #blog.room.paper-stack > .paper-sheet.room-sheet--one .subscribe-text p {
-  display: none !important;
+  display: block !important;
+  margin: 10px 0 0 !important;
+  max-width: 42ch !important;
 }
 
 html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-story-sheet .section-lede {
-  max-width: none !important;
-  margin: 0 0 14px !important;
+  max-width: 54ch !important;
+  margin: 0 0 28px !important;
 }
 
 html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-philosophy {
-  flex: 1 1 auto !important;
   display: grid !important;
-  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) !important;
-  grid-template-rows: auto auto minmax(0, 1fr) auto !important;
-  gap: clamp(18px, 2.4vw, 36px) clamp(22px, 3.2vw, 48px) !important;
-  align-items: stretch !important;
-  align-content: stretch !important;
+  grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr) !important;
+  grid-template-rows: none !important;
+  gap: clamp(28px, 3.6vw, 56px) !important;
+  align-items: start !important;
+  align-content: start !important;
+  height: auto !important;
   min-height: 0 !important;
-  height: 100% !important;
 }
 
 html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-eyebrow,
@@ -15778,61 +15755,56 @@ html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-sign {
   grid-column: 2 !important;
 }
 
-html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-eyebrow {
-  grid-row: 1 !important;
-}
-
-html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-label {
-  grid-row: 2 !important;
-}
-
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-eyebrow { grid-row: 1 !important; }
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-label { grid-row: 2 !important; }
 html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-quote {
   grid-row: 3 !important;
-  align-self: center !important;
-  max-width: 16ch !important;
-  font-size: clamp(24px, 3.2vw, 40px) !important;
-  line-height: 1.18 !important;
-  margin: 8px 0 0 !important;
+  align-self: start !important;
+  max-width: 22ch !important;
+  font-size: clamp(20px, 2.3vw, 30px) !important;
+  line-height: 1.28 !important;
+  margin: 12px 0 0 !important;
 }
 
 html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-text {
   grid-row: 1 / span 3 !important;
+  display: block !important;
   columns: 1 !important;
-  max-width: none !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-evenly !important;
+  max-width: 54ch !important;
 }
 
 html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-sign {
   grid-row: 4 !important;
-  margin-top: 8px !important;
+  margin-top: 16px !important;
 }
 
 html #contact.room.paper-stack > .paper-sheet.room-sheet--one .contact-reach-sheet {
-  padding-bottom: 6px !important;
+  padding-bottom: 8px !important;
+}
+
+html #contact.room.paper-stack > .paper-sheet.room-sheet--one .contact-quick {
+  margin-top: 8px !important;
 }
 
 html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-wrap {
-  flex: 1 1 auto !important;
+  flex: none !important;
+  height: auto !important;
   min-height: 0 !important;
-  height: 100% !important;
-  align-items: stretch !important;
+  align-items: start !important;
+  gap: clamp(28px, 3.4vw, 52px) !important;
 }
 
 html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-form {
   display: flex !important;
   flex-direction: column !important;
-  justify-content: space-between !important;
+  justify-content: flex-start !important;
+  gap: 16px !important;
+  height: auto !important;
   min-height: 0 !important;
-  height: 100% !important;
 }
 
 html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-form .field:has(textarea) {
-  flex: 1 1 auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  min-height: 0 !important;
+  flex: none !important;
 }
 
 html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-form .field input,
@@ -15841,19 +15813,17 @@ html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-form .field
 }
 
 html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-form .field textarea {
-  flex: 1 1 auto !important;
-  min-height: 120px !important;
+  flex: none !important;
+  min-height: 132px !important;
 }
 
 @media (max-width: 820px) {
   html .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll {
-    padding: 18px 16px 12px !important;
+    padding: 22px 16px calc(24px + 56px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
-  html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-index-sheet,
-  html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-story-sheet,
-  html #contact.room.paper-stack > .paper-sheet.room-sheet--one .contact-pitch-sheet {
-    min-height: 0 !important;
+  html .room.paper-stack > .paper-sheet.room-sheet--one .room-hero-inner {
+    max-width: none !important;
   }
 
   html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-layout,
@@ -15872,9 +15842,8 @@ html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-form .field
     align-self: auto !important;
   }
 
-  html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-card-cover,
-  html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-preview,
-  html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-card--blog {
-    min-height: 0 !important;
+  html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-preview {
+    position: relative !important;
+    top: auto !important;
   }
 }

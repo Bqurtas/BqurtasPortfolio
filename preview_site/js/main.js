@@ -860,19 +860,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!track || !card) return 0;
     const g = parseFloat(getComputedStyle(card).top) || 0;
     const yLock = Math.max(0, Math.round(g - track.getBoundingClientRect().top));
-    const trackH = getComputedStyle(track).getPropertyValue('--work-track-h').trim();
+    const measured = Math.round(track.getBoundingClientRect().height);
+    let trackH = getComputedStyle(track).getPropertyValue('--work-track-h').trim();
+    if (!trackH || trackH === '0px') trackH = measured + 'px';
     track.dataset.holdTrack = '1';
     track.dataset.skipChrome = '1';
-    track.dataset.overflowFloor = String(yLock);
+    track.dataset.overflowFloor = String(Math.max(yLock, 1));
     track.dataset.reelY = String(yLock);
-    if (trackH) {
-      track.dataset.trackHLock = trackH;
-      track.style.setProperty('--work-track-h', trackH);
-    }
+    track.dataset.trackHLock = trackH;
+    track.style.setProperty('--work-track-h', trackH);
+    track.style.minHeight = trackH;
     const reel = track.querySelector('.work-reel');
     if (reel) {
       const rh = Math.round(reel.scrollHeight);
       if (rh > 48) reel.style.minHeight = rh + 'px';
+    }
+    if (gridEl) {
+      const gh = Math.round(gridEl.getBoundingClientRect().height);
+      if (gh > 48) gridEl.style.minHeight = gh + 'px';
     }
     return yLock;
   };
@@ -882,20 +887,23 @@ document.addEventListener('DOMContentLoaded', () => {
       after?.();
       return;
     }
-    delete track.dataset.holdTrack;
-    delete track.dataset.trackHLock;
-    delete track.dataset.reelY;
-    window.dispatchEvent(new Event('bq:gallery-built'));
     after?.();
     requestAnimationFrame(() => {
-      const reel = track.querySelector('.work-reel');
-      if (reel) reel.style.minHeight = '';
-      if (gridEl) gridEl.style.minHeight = '';
-      delete track.dataset.overflowFloor;
-      delete track.dataset.skipChrome;
-      window.dispatchEvent(new Event('bq:gallery-built'));
       after?.();
-      requestAnimationFrame(() => after?.());
+      delete track.dataset.holdTrack;
+      delete track.dataset.trackHLock;
+      delete track.dataset.reelY;
+      track.style.minHeight = '';
+      window.dispatchEvent(new Event('bq:gallery-built'));
+      requestAnimationFrame(() => {
+        const reel = track.querySelector('.work-reel');
+        if (reel) reel.style.minHeight = '';
+        if (gridEl) gridEl.style.minHeight = '';
+        delete track.dataset.overflowFloor;
+        delete track.dataset.skipChrome;
+        window.dispatchEvent(new Event('bq:gallery-built'));
+        after?.();
+      });
     });
   };
 
@@ -923,6 +931,11 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const activateTab = (tab, push) => {
+    if (!tab) return;
+    if (tab.classList.contains('is-active') && currentFilter === tab.dataset.filter) {
+      if (push !== false) syncURL(!!push);
+      return;
+    }
     correctScrollAfterGallery = !Array.isArray(window.BQ_ALL_CARDS) || !window.BQ_ALL_CARDS.length;
     const track = document.querySelector('#design.paper-stack > .section.work.paper-sheet');
     const card = track?.querySelector(':scope > .paper-scroll');
@@ -934,12 +947,20 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!card || pinTop == null) return;
       const drift = card.getBoundingClientRect().top - pinTop;
       if (Math.abs(drift) <= 2) return;
-      window.__bqPaperBypassUntil = performance.now() + 280;
+      window.__bqPaperBypassUntil = performance.now() + 400;
       window.scrollTo({ top: Math.max(0, window.scrollY + drift), left: 0, behavior: 'auto' });
     };
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      thawWorkTrack(track, restorePin);
-    }));
+    let frames = 0;
+    const waitForCards = () => {
+      frames += 1;
+      const ready = !!(gridEl && gridEl.querySelector('.card'));
+      if (ready || frames > 16) {
+        thawWorkTrack(track, restorePin);
+        return;
+      }
+      requestAnimationFrame(waitForCards);
+    };
+    requestAnimationFrame(() => requestAnimationFrame(waitForCards));
   };
 
   /* re-layout on width change (column count change) */
