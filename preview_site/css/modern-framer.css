@@ -15977,12 +15977,13 @@ html.bq-paused .hero-spark svg {
   scrollbar-color: color-mix(in srgb, var(--ink) 28%, transparent) transparent;
 }
 
-:root[data-theme="dark"] .paper-sheet,
 :root[data-theme="dark"] .room.paper-stack > .paper-sheet.room-sheet--one,
+:root[data-theme="dark"] .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll,
+:root[data-theme="dark"] #design > .hero.paper-sheet,
 :root[data-theme="dark"] .qc-card,
 :root[data-theme="dark"] .blog-card,
 :root[data-theme="dark"] .index-card {
-  background-color: var(--bq-paper-sheet, #161616);
+  background-color: var(--bq-paper-sheet, #161616) !important;
   color: var(--ink);
 }
 
