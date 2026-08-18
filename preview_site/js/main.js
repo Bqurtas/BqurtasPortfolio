@@ -862,6 +862,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const yLock = Math.max(0, Math.round(g - track.getBoundingClientRect().top));
     const trackH = getComputedStyle(track).getPropertyValue('--work-track-h').trim();
     track.dataset.holdTrack = '1';
+    track.dataset.skipChrome = '1';
     track.dataset.overflowFloor = String(yLock);
     track.dataset.reelY = String(yLock);
     if (trackH) {
@@ -891,6 +892,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (reel) reel.style.minHeight = '';
       if (gridEl) gridEl.style.minHeight = '';
       delete track.dataset.overflowFloor;
+      delete track.dataset.skipChrome;
       window.dispatchEvent(new Event('bq:gallery-built'));
       after?.();
       requestAnimationFrame(() => after?.());
@@ -1970,8 +1972,13 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     };
     const onScroll = () => { setCovered(); if (!raf) raf = requestAnimationFrame(drive); };
     const remeasure = () => {
-      if (track.dataset.holdTrack === '1') return;
-      placeChrome();
+      if (track.dataset.holdTrack === '1') {
+        if (track.dataset.trackHLock) {
+          track.style.setProperty('--work-track-h', track.dataset.trackHLock);
+        }
+        return;
+      }
+      if (track.dataset.skipChrome !== '1') placeChrome();
       measure();
       setCovered();
       drive();
