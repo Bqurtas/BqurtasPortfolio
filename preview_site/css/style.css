@@ -1536,7 +1536,7 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
   flex-direction: column;
   align-items: center;
   gap: 28px;
-  padding: 56px 12px 80px;   /* breathing room so Load more is easy to click */
+  padding: 56px 12px min(36vh, 320px);
 }
 .load-more-wrap.is-pending {
   visibility: hidden;

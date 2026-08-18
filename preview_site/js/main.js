@@ -876,20 +876,26 @@ document.addEventListener('DOMContentLoaded', () => {
     correctScrollAfterGallery = !Array.isArray(window.BQ_ALL_CARDS) || !window.BQ_ALL_CARDS.length;
     const track = document.querySelector('#design.paper-stack > .section.work.paper-sheet');
     const card = track?.querySelector(':scope > .paper-scroll');
-    const pinTop = card?.getBoundingClientRect().top;
+    const pinTop = card?.getBoundingClientRect().top ?? null;
     if (track) track.dataset.holdTrack = '1';
     setActiveTab(tab);
     if (push !== false) syncURL(!!push);
-    /* Keep the portfolio FRAME where it is. Filter changes used to smooth-scroll
-       the page (and fire a late correction), which made the sheet drop. */
-    const settle = () => {
-      if (track) delete track.dataset.holdTrack;
-      window.dispatchEvent(new Event('bq:gallery-built'));
+    /* Freeze magic-scroll geometry while the grid rebuilds. Emptying the
+       columns used to collapse overflow, snap the reel to 0, and drop the
+       sticky card. Restore the pin, then remeasure. */
+    const restorePin = () => {
       if (!card || pinTop == null) return;
       const drift = card.getBoundingClientRect().top - pinTop;
       if (Math.abs(drift) <= 0.5) return;
-      window.__bqPaperBypassUntil = performance.now() + 200;
+      window.__bqPaperBypassUntil = performance.now() + 280;
       window.scrollTo({ top: Math.max(0, window.scrollY + drift), left: 0, behavior: 'auto' });
+    };
+    const settle = () => {
+      restorePin();
+      if (track) delete track.dataset.holdTrack;
+      window.dispatchEvent(new Event('bq:gallery-built'));
+      restorePin();
+      requestAnimationFrame(restorePin);
     };
     requestAnimationFrame(() => requestAnimationFrame(settle));
   };
@@ -1841,6 +1847,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       return (n && n.classList && n.classList.contains('paper-sheet')) ? n : null;
     };
     const measure = () => {
+      /* Tab switches hold geometry so an empty-grid frame cannot snap the reel. */
+      if (track.dataset.holdTrack === '1') return;
       cardH = card.clientHeight;
       /* Mobile: the head holds the section-head heading + the tabs. On scroll the
          head slides up by collapseDist so the HEADING scrolls away and ONLY the
@@ -1861,12 +1869,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
          card — the same scroll-driven "next sheet climbs over the previous" as every
          other sheet on the page, so it comes up WITH the scroll and never pops in
          suddenly (owner, said many times). The reel scrolls through `overflow`,
-         then the card stays pinned a card-height while the next sheet rises over it.
-         Tab switches freeze the track height so a brief empty-grid measure cannot
-         shrink the track and drop the sticky card. */
-      if (track.dataset.holdTrack !== '1') {
-        track.style.setProperty('--work-track-h', (cardH * 2 + overflow) + 'px');
-      }
+         then the card stays pinned a card-height while the next sheet rises over it. */
+      track.style.setProperty('--work-track-h', (cardH * 2 + overflow) + 'px');
       /* Overlap the next sheet by ONE card-height in fixed px (not the dvh CSS
          margin, which drifts as the mobile address bar hides and desyncs the
          hand-off). It starts to rise as the reel finishes and finishes covering as
@@ -1903,7 +1907,13 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       }
     };
     const onScroll = () => { setCovered(); if (!raf) raf = requestAnimationFrame(drive); };
-    const remeasure = () => { placeChrome(); measure(); setCovered(); drive(); };
+    const remeasure = () => {
+      if (track.dataset.holdTrack === '1') return;
+      placeChrome();
+      measure();
+      setCovered();
+      drive();
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', remeasure, { passive: true });
     window.addEventListener('bq:gallery-built', remeasure);
