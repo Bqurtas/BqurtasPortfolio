@@ -1936,7 +1936,7 @@
     let POSTS = [
     ];
 
-    const PAGE_SIZE = 4;
+    const PAGE_SIZE = 8;
     const slugify = (s) => String(s || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 60) || 'note';
     POSTS.forEach((p) => { if (!p.slug) p.slug = String(p.num || slugify(p.title)); });   // built-ins: numeric link
     let pageCount = Math.ceil(POSTS.length / PAGE_SIZE);

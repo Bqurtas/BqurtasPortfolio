@@ -15572,3 +15572,270 @@ html #contact.room.paper-stack > .paper-sheet.room-sheet--one .qc-card:last-chil
     border-inline-end: 0 !important;
   }
 }
+
+/* ============================================================================
+   Rooms fill the paper. Compact intro, one growing chapter, quiet footer.
+   No extra widgets — existing pieces stretched into a simple folio page.
+   ============================================================================ */
+html .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll {
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 22px clamp(18px, 3vw, 36px) 16px !important;
+}
+
+html .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll > .room-sheet-flow {
+  flex: 1 1 auto !important;
+  min-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+}
+
+html .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll > .room-sheet-flow > :last-child {
+  padding-bottom: calc(10px + 64px) !important;
+}
+
+html .room.paper-stack > .paper-sheet.room-sheet--one .room-hero {
+  flex: 0 0 auto !important;
+  padding: 0 0 8px !important;
+}
+
+html .room.paper-stack > .paper-sheet.room-sheet--one .room-hero-return {
+  margin: 0 0 8px !important;
+  padding: 0 0 4px !important;
+}
+
+html .room.paper-stack > .paper-sheet.room-sheet--one .room-hero-title {
+  font-size: clamp(26px, 3.1vw, 36px) !important;
+}
+
+html .room.paper-stack > .paper-sheet.room-sheet--one .room-hero-sub {
+  margin: 6px 0 0 !important;
+}
+
+html .room.paper-stack > .paper-sheet.room-sheet--one .section {
+  flex: 0 0 auto !important;
+  padding: 10px 0 !important;
+}
+
+html .room.paper-stack > .paper-sheet.room-sheet--one .section:first-of-type {
+  padding-top: 2px !important;
+}
+
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-index-sheet,
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-story-sheet,
+html #contact.room.paper-stack > .paper-sheet.room-sheet--one .contact-pitch-sheet {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+}
+
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-story-sheet {
+  min-height: calc(var(--bq-stack-sheet-h) - 148px) !important;
+  padding-bottom: calc(10px + 64px) !important;
+}
+
+html #contact.room.paper-stack > .paper-sheet.room-sheet--one .contact-pitch-sheet {
+  min-height: calc(var(--bq-stack-sheet-h) - 220px) !important;
+}
+
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-index-sheet > .sheet-mid,
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-story-sheet > .sheet-mid,
+html #contact.room.paper-stack > .paper-sheet.room-sheet--one .contact-pitch-sheet > .sheet-mid {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+}
+
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-layout,
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-layout--blog {
+  flex: 1 1 auto !important;
+  align-items: stretch !important;
+  min-height: 0 !important;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr) !important;
+}
+
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-list {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+}
+
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-preview {
+  max-height: none !important;
+}
+
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-preview,
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-card--blog {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  align-self: stretch !important;
+}
+
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-card-cover {
+  flex: 1 1 auto !important;
+  aspect-ratio: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 220px !important;
+}
+
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-card-cover img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-card-body {
+  flex: 0 0 auto !important;
+}
+
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-pager {
+  margin-top: auto !important;
+  padding-top: 10px !important;
+}
+
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-subscribe-sheet {
+  margin-top: auto !important;
+  padding: 12px 0 0 !important;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent) !important;
+}
+
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .subscribe {
+  gap: 16px !important;
+  align-items: center !important;
+}
+
+html #blog.room.paper-stack > .paper-sheet.room-sheet--one .subscribe-title {
+  font-size: clamp(18px, 2vw, 24px) !important;
+}
+
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-story-sheet .section-lede {
+  max-width: none !important;
+  margin: 0 0 14px !important;
+}
+
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-philosophy {
+  flex: 1 1 auto !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) !important;
+  gap: clamp(22px, 3.2vw, 48px) !important;
+  align-items: stretch !important;
+  align-content: stretch !important;
+  min-height: 0 !important;
+}
+
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-eyebrow,
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-label,
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-quote {
+  grid-column: 1 !important;
+}
+
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-text,
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-sign {
+  grid-column: 2 !important;
+}
+
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-eyebrow {
+  grid-row: 1 !important;
+}
+
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-label {
+  grid-row: 2 !important;
+}
+
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-quote {
+  grid-row: 3 !important;
+  align-self: center !important;
+  max-width: 18ch !important;
+  font-size: clamp(22px, 2.8vw, 34px) !important;
+  margin: 12px 0 0 !important;
+}
+
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-text {
+  grid-row: 1 / span 3 !important;
+  columns: 1 !important;
+  max-width: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-sign {
+  grid-row: 4 !important;
+  margin-top: 8px !important;
+}
+
+html #contact.room.paper-stack > .paper-sheet.room-sheet--one .contact-reach-sheet {
+  padding-bottom: 6px !important;
+}
+
+html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-wrap {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  align-items: stretch !important;
+}
+
+html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-form {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-form .field:has(textarea) {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+}
+
+html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-form .field input,
+html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-form .field select {
+  min-height: 44px !important;
+}
+
+html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-form .field textarea {
+  flex: 1 1 auto !important;
+  min-height: 120px !important;
+}
+
+@media (max-width: 820px) {
+  html .room.paper-stack > .paper-sheet.room-sheet--one > .paper-scroll {
+    padding: 18px 16px 12px !important;
+  }
+
+  html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-index-sheet,
+  html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-story-sheet,
+  html #contact.room.paper-stack > .paper-sheet.room-sheet--one .contact-pitch-sheet {
+    min-height: 0 !important;
+  }
+
+  html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-layout,
+  html #blog.room.paper-stack > .paper-sheet.room-sheet--one .index-layout--blog,
+  html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-philosophy {
+    grid-template-columns: 1fr !important;
+  }
+
+  html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-eyebrow,
+  html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-label,
+  html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-quote,
+  html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-text,
+  html #bio.room.paper-stack > .paper-sheet.room-sheet--one .bio-phil-sign {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+    align-self: auto !important;
+  }
+
+  html #blog.room.paper-stack > .paper-sheet.room-sheet--one .blog-card-cover {
+    min-height: 0 !important;
+  }
+}
