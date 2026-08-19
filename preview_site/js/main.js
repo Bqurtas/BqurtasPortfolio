@@ -1470,10 +1470,15 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
      so no sheet claims router-owned inner scroll. */
   const isPhonePaper = () => window.matchMedia('(max-width: 1024px)').matches;
   const allowsInnerScroll = (sheet) => {
-    /* the portfolio (.work) is driven by the tall-track reel translate, NOT the
-       router's inner scroll — keep it out. */
+    /* Tall-track sheets are page-scroll → reel translate, never nested overflow. */
+    if (sheet?.classList?.contains('is-magic-track')) return false;
     if (sheet?.classList?.contains('work')) return false;
-    /* Journal / Designer / Contact are one sticky sheet; reading happens inside. */
+    /* Phones: What I do + Journal/Bio/Contact match the catalogue — no inner scroller. */
+    if (isPhonePaper() && (
+      sheet?.classList?.contains('service-showcase')
+      || sheet?.classList?.contains('room-sheet--one')
+    )) return false;
+    /* Desktop: Journal / Designer / Contact read inside one sticky sheet. */
     if (sheet?.classList?.contains('room-sheet--one')
       || sheet?.dataset?.paperScroll === 'inner') return true;
     if (isPhonePaper()) return false;
@@ -1972,6 +1977,178 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     if (typeof ResizeObserver === 'function') { try { new ResizeObserver(remeasure).observe(reel); } catch (e) {} }
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure, () => {});
     remeasure();
+  })();
+
+  /* Phone "magic scroll" for What I do + Journal/Bio/Contact — same page-scroll
+     tall-track as the portfolio catalogue (sticky card + reel translate). Nested
+     overflow-y:auto on rooms, and the one-viewport flex squash on services, are
+     what made those sheets feel unlike the catalogue on mobile. */
+  (function phoneSheetMagicScroll() {
+    const phone = window.matchMedia('(max-width: 1024px)');
+    const bound = new WeakSet();
+    const sharedFooter = document.querySelector('.footer.footer-v249.paper-sheet');
+    let footerLockOwner = null;
+
+    const wrapReel = (card) => {
+      let vp = card.querySelector(':scope > .sheet-vp');
+      let reel = vp && vp.querySelector(':scope > .sheet-reel');
+      if (!vp) {
+        vp = document.createElement('div');
+        vp.className = 'sheet-vp';
+        reel = document.createElement('div');
+        reel.className = 'sheet-reel';
+        [...card.children].forEach((node) => reel.appendChild(node));
+        vp.appendChild(reel);
+        card.appendChild(vp);
+      }
+      return { vp, reel };
+    };
+
+    const trackHidden = (track) => {
+      const room = track.closest('.room');
+      return Boolean(room && room.classList.contains('is-hidden'));
+    };
+
+    const attach = (track, card, vp, reel, opts) => {
+      if (bound.has(track)) return;
+      bound.add(track);
+      let overflow = 0;
+      let cardH = 0;
+      let raf = 0;
+
+      const nextSheet = () => {
+        if (!phone.matches || trackHidden(track)) return null;
+        if (opts.overlap === 'footer') return sharedFooter;
+        const n = track.nextElementSibling;
+        return (n && n.classList && n.classList.contains('paper-sheet')) ? n : null;
+      };
+
+      const restFooter = () => {
+        if (footerLockOwner !== track || !sharedFooter) return;
+        sharedFooter.style.removeProperty('margin-top');
+        footerLockOwner = null;
+      };
+
+      const idleDesktop = () => {
+        track.classList.remove('is-magic-track');
+        track.style.removeProperty('--work-track-h');
+        ['height', 'max-height', 'min-height', 'position', 'overflow', 'top'].forEach((prop) => {
+          track.style.removeProperty(prop);
+        });
+        ['position', 'top', 'height', 'max-height', 'overflow', 'overflow-x', 'overflow-y', 'padding'].forEach((prop) => {
+          card.style.removeProperty(prop);
+        });
+        reel.style.transform = '';
+        card.style.visibility = '';
+        restFooter();
+        const sibling = track.nextElementSibling;
+        if (sibling && sibling.classList && sibling.classList.contains('paper-sheet')) {
+          sibling.style.removeProperty('margin-top');
+        }
+      };
+
+      const measure = () => {
+        if (!phone.matches) { idleDesktop(); return; }
+        if (trackHidden(track)) { restFooter(); return; }
+        track.classList.add('is-magic-track');
+        track.style.setProperty('position', 'relative', 'important');
+        track.style.setProperty('top', 'auto', 'important');
+        track.style.setProperty('overflow', 'visible', 'important');
+        track.style.setProperty('max-height', 'none', 'important');
+        card.style.setProperty('position', 'sticky', 'important');
+        card.style.setProperty('top', 'var(--bq-stack-top)', 'important');
+        card.style.setProperty('height', 'var(--bq-stack-sheet-h)', 'important');
+        card.style.setProperty('max-height', 'var(--bq-stack-sheet-h)', 'important');
+        card.style.setProperty('overflow', 'hidden', 'important');
+        card.style.setProperty('padding', '0px', 'important');
+        cardH = card.clientHeight;
+        const vpH = vp.clientHeight;
+        const reelH = reel.scrollHeight;
+        overflow = Math.max(0, reelH - vpH);
+        /* Same hold as the catalogue: reel distance + one card for the next
+           sheet to rise over the still-pinned card. */
+        const trackH = cardH * 2 + overflow;
+        track.style.setProperty('--work-track-h', trackH + 'px');
+        track.style.setProperty('height', trackH + 'px', 'important');
+        track.style.setProperty('min-height', cardH + 'px', 'important');
+        const next = nextSheet();
+        if (next) {
+          next.style.setProperty('margin-top', (-cardH) + 'px', 'important');
+          if (opts.overlap === 'footer') footerLockOwner = track;
+        }
+      };
+
+      const gutter = () => parseFloat(getComputedStyle(card).top) || 0;
+      const setCovered = () => {
+        if (!phone.matches || trackHidden(track) || !track.classList.contains('is-magic-track')) return;
+        const g = gutter();
+        card.style.visibility = (card.getBoundingClientRect().top < g - 1) ? 'hidden' : 'visible';
+      };
+      const drive = () => {
+        raf = 0;
+        if (!phone.matches || trackHidden(track) || !track.classList.contains('is-magic-track')) return;
+        const g = gutter();
+        const y = Math.min(overflow, Math.max(0, g - track.getBoundingClientRect().top));
+        reel.style.transform = 'translate3d(0,' + (-y) + 'px,0)';
+      };
+      const onScroll = () => { setCovered(); if (!raf) raf = requestAnimationFrame(drive); };
+      const remeasure = () => { measure(); setCovered(); drive(); };
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', remeasure, { passive: true });
+      window.addEventListener('orientationchange', remeasure, { passive: true });
+      document.addEventListener('bq:route', remeasure);
+      if (typeof ResizeObserver === 'function') {
+        try { new ResizeObserver(remeasure).observe(reel); } catch (e) {}
+      }
+      if (typeof MutationObserver === 'function') {
+        try {
+          new MutationObserver(remeasure).observe(reel, {
+            subtree: true,
+            childList: true,
+            attributes: true,
+            attributeFilter: ['class', 'aria-expanded'],
+          });
+        } catch (e) {}
+      }
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure, () => {});
+      remeasure();
+    };
+
+    const setup = (track, overlap) => {
+      if (!phone.matches) return;
+      const card = track && track.querySelector(':scope > .paper-scroll');
+      if (!card) return;
+      track.classList.add('is-magic-track');
+      const { vp, reel } = wrapReel(card);
+      attach(track, card, vp, reel, { overlap: overlap || 'sibling' });
+    };
+
+    const sync = () => {
+      const svc = document.querySelector('#design.paper-stack > .section.service-showcase.paper-sheet');
+      if (svc) setup(svc, 'sibling');
+      document.querySelectorAll('.room.paper-stack > .paper-sheet.room-sheet--one').forEach((sheet) => {
+        setup(sheet, 'footer');
+      });
+      if (!phone.matches) {
+        document.querySelectorAll('.is-magic-track:not(.work)').forEach((track) => {
+          track.classList.remove('is-magic-track');
+          track.style.removeProperty('--work-track-h');
+          const reel = track.querySelector(':scope > .paper-scroll > .sheet-vp > .sheet-reel');
+          const card = track.querySelector(':scope > .paper-scroll');
+          if (reel) reel.style.transform = '';
+          if (card) card.style.visibility = '';
+        });
+        if (footerLockOwner && sharedFooter) {
+          sharedFooter.style.removeProperty('margin-top');
+          footerLockOwner = null;
+        }
+      }
+    };
+
+    phone.addEventListener('change', sync);
+    document.addEventListener('bq:route', sync);
+    sync();
   })();
 
   /* Scroll ownership ---------------------------------------------------------
