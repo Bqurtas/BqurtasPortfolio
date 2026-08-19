@@ -1,25 +1,23 @@
 /* Final presentation layer: native scrolling, a static curved work panel,
    and one precise centre line for the full-screen menu. */
 :root {
-  --bq-accent: #8b5e45;
-  --bq-accent-soft: #6f4a36;
-  --bq-accent-light: #a8785c;
+  --bq-accent: #141414;
+  --bq-accent-soft: #141414;
+  --bq-accent-light: #2a2a2a;
 }
 
 ::selection {
-  background: var(--bq-accent);
+  background: var(--ink, #141414);
   color: #fff;
 }
 
-.rail-dot {
-  background: var(--bq-accent-light) !important;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--bq-accent-light) 18%, transparent) !important;
-}
-
+.rail-dot,
 .design-cta-dot,
-.mobilebar-cta .design-cta-dot {
-  background: var(--accent, #8b5e45) !important;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #8b5e45) 22%, transparent) !important;
+.mobilebar-cta .design-cta-dot,
+.rail-chat-dot,
+.profile-card-dot {
+  background: #2fbf6b !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, #2fbf6b 22%, transparent) !important;
 }
 
 /* The hero is a pinned backdrop: it sticks to the top of the viewport while
@@ -105,7 +103,7 @@
 :root[data-theme="light"] #design > .section.work {
   background:
     radial-gradient(circle, rgba(0, 0, 0, .05) 1px, transparent 1.4px) 0 0 / 26px 26px,
-    radial-gradient(circle at 90% 0%, rgba(139, 94, 69, .06), transparent 26rem),
+    radial-gradient(circle at 90% 0%, rgba(0, 0, 0, .06), transparent 26rem),
     #e8e9eb !important;
   border: 1px solid rgba(20, 20, 20, .12);
   border-bottom: 0;
@@ -7684,13 +7682,13 @@ body,
   margin: 0 0 16px !important;
   padding: 6px 14px !important;
   border-radius: 999px !important;
-  background: rgba(192, 122, 82, 0.1) !important;
-  border: 1px solid rgba(192, 122, 82, 0.28) !important;
+  background: color-mix(in srgb, var(--ink) 10%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--ink) 28%, transparent) !important;
   font-size: 11px !important;
   font-weight: 600 !important;
   letter-spacing: .14em !important;
   text-transform: uppercase !important;
-  color: var(--bq-accent, #c07a52) !important;
+  color: var(--bq-accent, var(--ink)) !important;
 }
 
 #design .practice-note .bio-teaser-title {
@@ -7705,7 +7703,7 @@ body,
 
 #design .practice-note .bio-teaser-title em {
   font-style: italic !important;
-  background: linear-gradient(135deg, #c07a52 0%, #dfa581 100%) !important;
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   display: inline-block !important;
@@ -7739,9 +7737,9 @@ body,
 
 #design .practice-note .bio-teaser-link:hover {
   transform: translateY(-2px) !important;
-  border-color: var(--bq-accent, #c07a52) !important;
-  color: var(--bq-accent, #c07a52) !important;
-  box-shadow: 0 12px 28px -8px rgba(192, 122, 82, 0.25) !important;
+  border-color: var(--bq-accent, var(--ink)) !important;
+  color: var(--bq-accent, var(--ink)) !important;
+  box-shadow: 0 12px 28px -8px color-mix(in srgb, var(--ink) 25%, transparent) !important;
 }
 
 #design .practice-note .bio-teaser-link i {
@@ -7783,8 +7781,8 @@ body,
 
 #design .practice-note .stat:hover {
   transform: translateY(-4px) !important;
-  border-color: rgba(192, 122, 82, 0.4) !important;
-  box-shadow: 0 20px 40px -16px rgba(192, 122, 82, 0.22) !important;
+  border-color: color-mix(in srgb, var(--ink) 40%, transparent) !important;
+  box-shadow: 0 20px 40px -16px color-mix(in srgb, var(--ink) 22%, transparent) !important;
 }
 
 #design .practice-note .stat-num {
@@ -7793,7 +7791,7 @@ body,
   font-weight: 600 !important;
   line-height: 1 !important;
   letter-spacing: -.04em !important;
-  background: linear-gradient(135deg, var(--ink) 40%, var(--bq-accent, #c07a52) 100%) !important;
+  background: linear-gradient(135deg, var(--ink) 40%, var(--bq-accent, var(--ink)) 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   display: block !important;
@@ -7817,8 +7815,8 @@ body,
   width: 24px !important;
   height: 24px !important;
   border-radius: 7px !important;
-  background: rgba(192, 122, 82, 0.1) !important;
-  color: var(--bq-accent, #c07a52) !important;
+  background: color-mix(in srgb, var(--ink) 10%, transparent) !important;
+  color: var(--bq-accent, var(--ink)) !important;
   font-size: 11px !important;
 }
 
@@ -8914,13 +8912,13 @@ body,
   margin: 0 0 16px !important;
   padding: 6px 14px !important;
   border-radius: 999px !important;
-  background: rgba(192, 122, 82, 0.1) !important;
-  border: 1px solid rgba(192, 122, 82, 0.28) !important;
+  background: color-mix(in srgb, var(--ink) 10%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--ink) 28%, transparent) !important;
   font-size: 11px !important;
   font-weight: 600 !important;
   letter-spacing: .14em !important;
   text-transform: uppercase !important;
-  color: var(--bq-accent, #c07a52) !important;
+  color: var(--bq-accent, var(--ink)) !important;
 }
 
 :root[data-theme] #design .service-showcase .service-showcase-head .section-title,
@@ -8937,7 +8935,7 @@ body,
 
 #design .service-showcase .service-showcase-head .section-title em {
   font-style: italic !important;
-  background: linear-gradient(135deg, #c07a52 0%, #dfa581 100%) !important;
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   display: inline-block !important;
@@ -8976,9 +8974,9 @@ body,
 
 #design .service-showcase .service-cta:hover {
   transform: translateY(-2px) !important;
-  border-color: var(--bq-accent, #c07a52) !important;
-  color: var(--bq-accent, #c07a52) !important;
-  box-shadow: 0 12px 28px -8px rgba(192, 122, 82, 0.25) !important;
+  border-color: var(--bq-accent, var(--ink)) !important;
+  color: var(--bq-accent, var(--ink)) !important;
+  box-shadow: 0 12px 28px -8px color-mix(in srgb, var(--ink) 25%, transparent) !important;
 }
 
 #design .service-showcase .service-cta i {
@@ -9010,15 +9008,15 @@ body,
 }
 
 #design .service-showcase .service-panel:hover {
-  border-color: rgba(192, 122, 82, 0.35) !important;
+  border-color: color-mix(in srgb, var(--ink) 35%, transparent) !important;
   transform: translateY(-2px) !important;
   box-shadow: 0 14px 32px -10px rgba(0, 0, 0, 0.18) !important;
 }
 
 #design .service-showcase .service-panel.is-active {
-  border-color: var(--bq-accent, #c07a52) !important;
+  border-color: var(--bq-accent, var(--ink)) !important;
   background: color-mix(in srgb, var(--bq-accent) 5%, var(--surface)) !important;
-  box-shadow: 0 18px 40px -14px rgba(192, 122, 82, 0.2) !important;
+  box-shadow: 0 18px 40px -14px color-mix(in srgb, var(--ink) 20%, transparent) !important;
 }
 
 #design .service-showcase .service-trigger {
@@ -9042,7 +9040,7 @@ body,
   font-size: 12px !important;
   font-weight: 600 !important;
   letter-spacing: .08em !important;
-  color: var(--bq-accent, #c07a52) !important;
+  color: var(--bq-accent, var(--ink)) !important;
   opacity: 0.8 !important;
 }
 
@@ -9054,16 +9052,16 @@ body,
   width: 36px !important;
   height: 36px !important;
   border-radius: 10px !important;
-  background: rgba(192, 122, 82, 0.08) !important;
-  color: var(--bq-accent, #c07a52) !important;
+  background: color-mix(in srgb, var(--ink) 8%, transparent) !important;
+  color: var(--bq-accent, var(--ink)) !important;
   font-size: 14px !important;
   transition: all 0.3s ease !important;
 }
 
 #design .service-showcase .service-panel.is-active .service-icon {
-  background: var(--bq-accent, #c07a52) !important;
+  background: var(--bq-accent, var(--ink)) !important;
   color: #ffffff !important;
-  box-shadow: 0 4px 12px rgba(192, 122, 82, 0.35) !important;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--ink) 35%, transparent) !important;
 }
 
 #design .service-showcase .service-name {
@@ -9096,8 +9094,8 @@ body,
 }
 
 #design .service-showcase .service-panel.is-active .service-toggle {
-  background: var(--bq-accent, #c07a52) !important;
-  border-color: var(--bq-accent, #c07a52) !important;
+  background: var(--bq-accent, var(--ink)) !important;
+  border-color: var(--bq-accent, var(--ink)) !important;
   color: #ffffff !important;
   transform: rotate(45deg) !important;
 }
@@ -9142,7 +9140,7 @@ body,
 
 #design .service-showcase .service-detail-inner li::before {
   content: "✦" !important;
-  color: var(--bq-accent, #c07a52) !important;
+  color: var(--bq-accent, var(--ink)) !important;
   font-size: 10px !important;
 }
 
@@ -16133,7 +16131,7 @@ html, body, .main, .paper-sheet, .card, .rail, .mobilebar, .service-panel, .pitc
 
 /* 7. Accessibility focus rings */
 :focus-visible {
-  outline: 2px solid var(--bq-accent, #c07a52) !important;
+  outline: 2px solid var(--bq-accent, var(--ink)) !important;
   outline-offset: 3px !important;
 }
 
@@ -16629,3 +16627,36 @@ html.bq-compact [dir="rtl"] .main,
   }
 }
 >>>>>>> fb64e0156a9d439d405ba3f9bea6a8ffd4b3757d
+
+/* Owner: coffee/bronze off buttons; the status dot stays green. */
+html .hero-cta,
+html .design-cta,
+html .mobilebar-cta,
+html .service-cta,
+html .bio-teaser-link,
+html .pitch-submit,
+html .subscribe-form button,
+html .load-more-btn {
+  --bq-accent: var(--ink);
+  --accent: var(--ink);
+}
+
+html .service-cta:hover,
+html .bio-teaser-link:hover,
+html .hero-cta:hover {
+  border-color: var(--ink) !important;
+  color: var(--ink) !important;
+  box-shadow: 0 12px 28px -8px color-mix(in srgb, var(--ink) 25%, transparent) !important;
+}
+
+html .rail-dot,
+html .design-cta-dot,
+html .mobilebar-cta .design-cta-dot,
+html .mobilebar .mobilebar-cta .design-cta-dot,
+html .rail-chat-dot,
+html .mobilebar-btn .rail-chat-dot,
+html .profile-card-dot,
+html .latest-item-new {
+  background: #2fbf6b !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, #2fbf6b 22%, transparent) !important;
+}

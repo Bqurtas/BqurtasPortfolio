@@ -365,11 +365,11 @@ input, select, textarea { font-family: inherit; color: inherit; }
    Cool limestone paper + deep ink + slate-copper accent (print atelier). */
 :root {
   --gold: #141414;
-  --gold-bright: #8b5e45;
-  --gold-deep: #5c3d2e;
-  --gold-soft: rgba(139, 94, 69, 0.14);
-  --ember: #8b5e45;
-  --accent: #8b5e45;
+  --gold-bright: #141414;
+  --gold-deep: #141414;
+  --gold-soft: rgba(20, 20, 20, 0.14);
+  --ember: #141414;
+  --accent: #141414;
 
   --rail-w: 96px;
   --dock-h: calc(64px + env(safe-area-inset-bottom));   /* mobile bottom dock height */
@@ -392,9 +392,9 @@ input, select, textarea { font-family: inherit; color: inherit; }
   --ink-muted: #5c5c5c;   /* AA-contrast (>=4.5:1) for small muted labels */
   --gold: #141414;
   --gold-ink: #141414;
-  --gold-bright: #8b5e45;
-  --ember: #8b5e45;
-  --accent: #8b5e45;
+  --gold-bright: #141414;
+  --ember: #141414;
+  --accent: #141414;
   --line: rgba(20, 20, 20, 0.12);
   --line-soft: rgba(20, 20, 20, 0.06);
   --rail-bg: #e8e9eb;
@@ -414,11 +414,11 @@ input, select, textarea { font-family: inherit; color: inherit; }
   --ink-muted: #868a90;
   --gold: #eceef0;
   --gold-ink: #eceef0;
-  --gold-bright: #c4896a;
-  --gold-deep: #c4896a;
-  --gold-soft: rgba(196, 137, 106, 0.16);
-  --ember: #c4896a;
-  --accent: #c4896a;
+  --gold-bright: #eceef0;
+  --gold-deep: #eceef0;
+  --gold-soft: rgba(236, 238, 240, 0.16);
+  --ember: #eceef0;
+  --accent: #eceef0;
   --line: rgba(255, 255, 255, 0.13);
   --line-soft: rgba(255, 255, 255, 0.06);
   --rail-bg: #0e0f11;
