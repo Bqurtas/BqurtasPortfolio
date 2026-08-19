@@ -16,8 +16,10 @@
 
   ready(function () {
     /* ---- hero entrance: one quiet rise, then still ---- */
+    var compactStart = matchMedia('(max-width: 1024px)').matches
+      || matchMedia('(hover: none), (pointer: coarse)').matches;
     var hero = document.querySelector('#design > .hero');
-    if (hero && !reduce) {
+    if (hero && !reduce && !compactStart) {
       var heroBits = hero.querySelectorAll(
         '.hero-portrait, .hero-sign, .hero-spark, .hero-lede, .hero-cta, .hero-corner, .hero-scrolldown'
       );
@@ -242,7 +244,9 @@
     }
 
     /* ---- slow section-title drift gives long pages a soft depth cue ---- */
-    if (!reduce) {
+    var compact = matchMedia('(max-width: 1024px)').matches
+      || matchMedia('(hover: none), (pointer: coarse)').matches;
+    if (!reduce && !compact) {
       var driftItems = Array.from(document.querySelectorAll(
         '.service-showcase-title, .bio-teaser-title, .software-title, .latest-blog-title, .room-hero-title, .pj-room-title'
       ));
@@ -263,6 +267,22 @@
       addEventListener('scroll', queueDrift, { passive: true });
       addEventListener('resize', queueDrift);
     }
+
+    /* Infinite marquees only run while on-screen; pause in background tabs. */
+    var softwareTracks = Array.from(document.querySelectorAll('.software-track, .hero-marquee-track'));
+    if (softwareTracks.length && 'IntersectionObserver' in window) {
+      var trackObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          entry.target.classList.toggle('is-offscreen', !entry.isIntersecting);
+        });
+      }, { rootMargin: '12% 0px' });
+      softwareTracks.forEach(function (track) { trackObserver.observe(track); });
+    }
+    var syncPaused = function () {
+      document.documentElement.classList.toggle('bq-paused', document.hidden);
+    };
+    syncPaused();
+    document.addEventListener('visibilitychange', syncPaused);
   });
 })();
 

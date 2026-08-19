@@ -39,10 +39,19 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- THEME (dark / light) — toggle switch ---------- */
   const themeBtns = [document.getElementById('themeToggle'), document.getElementById('themeToggleM')].filter(Boolean);
   const applyTheme = (t) => {
-    document.documentElement.dataset.theme = t;
+    const root = document.documentElement;
+    root.dataset.theme = t;
+    root.style.colorScheme = t;
     try { localStorage.setItem('bq_theme3', t); } catch(e){}
     themeBtns.forEach(b => b.setAttribute('aria-checked', t === 'dark' ? 'true' : 'false'));
+    const meta = document.querySelector('meta[name="theme-color"]:not([media])');
+    if (meta) meta.setAttribute('content', t === 'dark' ? '#0f0f10' : '#fbfbfa');
+    const apple = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+    if (apple) apple.setAttribute('content', t === 'dark' ? 'black-translucent' : 'default');
   };
+  window.__bqApplyTheme = applyTheme;
+  const isCompact = () => window.matchMedia('(max-width: 1024px)').matches;
+  window.__bqIsCompact = isCompact;
   // Light is the site default (matches the bq_light_v1 migration that runs
   // inline in index.html before first paint).
   let savedTheme = null;
@@ -265,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const designCta = document.getElementById('designCta');
   const toggleCta = () => {
     if (!designCta) return;
-    if (window.innerWidth <= 820) { designCta.classList.remove('is-shown'); return; }
+    if (isCompact()) { designCta.classList.remove('is-shown'); return; }
     if (document.body.dataset.room !== 'design') { designCta.classList.remove('is-shown'); return; }
     const work = document.querySelector('.section.work');     // the "01 — Design Room" section
     const note = document.querySelector('.practice-note');
@@ -712,11 +721,11 @@ document.addEventListener('DOMContentLoaded', () => {
     /* the sticky tab circles sit BELOW the intro in the document — the offset
        is only needed when falling back to the tab header (they'd cover it) */
     const targetIsIntro = head.classList && head.classList.contains('section-head');
-    const stickyTabs = (!targetIsIntro && window.innerWidth <= 820) ? document.querySelector('.section.work > .tabs-wrap') : null;
+    const stickyTabs = (!targetIsIntro && isCompact()) ? document.querySelector('.section.work > .tabs-wrap') : null;
     const stickyTabsH = stickyTabs && getComputedStyle(stickyTabs).position === 'sticky'
       ? stickyTabs.getBoundingClientRect().height
       : 0;
-    const gap = window.innerWidth <= 820 ? 24 : 18;
+    const gap = isCompact() ? 24 : 18;
     const y = head.getBoundingClientRect().top + window.scrollY - topbarH - stickyTabsH - gap;
     window.scrollTo({ top: Math.max(0, y), behavior });
   };
@@ -736,8 +745,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const colCountForWidth = () => {
     const w = window.innerWidth;
     if (w <= 560)  return 2;
-    if (w <= 820)  return 3;
-    if (w <= 1100) return 4;
+    if (w <= 1024) return 3;
+    if (w <= 1280) return 4;
     if (w <= 1450) return 5;
     return 6;
   };
@@ -1459,7 +1468,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   /* The portfolio gallery is driven by the tall-track "magic scroll" below
      (page-scroll → reel translate), NOT by the input router's nested scrollTop,
      so no sheet claims router-owned inner scroll. */
-  const isPhonePaper = () => window.matchMedia('(max-width: 820px)').matches;
+  const isPhonePaper = () => window.matchMedia('(max-width: 1024px)').matches;
   const allowsInnerScroll = (sheet) => {
     /* the portfolio (.work) is driven by the tall-track reel translate, NOT the
        router's inner scroll — keep it out. */
@@ -1850,7 +1859,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const placeChrome = () => {
       const sh = card.querySelector('.section-head');
       if (!headEl || !tabsWrap) return;
-      const mobile = window.matchMedia('(max-width: 820px)').matches;
+      const mobile = window.matchMedia('(max-width: 1024px)').matches;
       card.classList.toggle('work-head-flow', mobile);
       if (mobile) {
         if (sh && (sh.parentElement !== headEl || sh.nextElementSibling !== tabsWrap)) {

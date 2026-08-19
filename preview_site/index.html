@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <base href="/" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#e8e9eb" />
+  <meta name="theme-color" content="#fbfbfa" />
+  <meta name="color-scheme" content="light dark" />
 
   <!-- Umami analytics (auto-tracks SPA navigation) — SELF-HOSTED so it's a
        same-origin script (no SRI needed → full Subresource-Integrity pass).
@@ -241,6 +242,21 @@
         }
         var savedTheme = localStorage.getItem('bq_theme3');
         if (savedTheme === 'light' || savedTheme === 'dark') root.dataset.theme = savedTheme;
+        var theme = root.dataset.theme === 'dark' ? 'dark' : 'light';
+        root.style.colorScheme = theme;
+        var themeColor = document.querySelector('meta[name="theme-color"]');
+        if (themeColor) themeColor.setAttribute('content', theme === 'dark' ? '#0f0f10' : '#fbfbfa');
+        var appleBar = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+        if (appleBar) appleBar.setAttribute('content', theme === 'dark' ? 'black-translucent' : 'default');
+      } catch (e) {}
+      try {
+        var compactMq = window.matchMedia('(max-width: 1024px)');
+        var syncCompact = function () {
+          root.classList.toggle('bq-compact', compactMq.matches);
+        };
+        syncCompact();
+        if (compactMq.addEventListener) compactMq.addEventListener('change', syncCompact);
+        else compactMq.addListener(syncCompact);
       } catch (e) {}
     }());
   </script>
@@ -266,9 +282,11 @@
     html.bq-css-ready .hero-eyebrow,html.bq-css-ready .hero-line--1,html.bq-css-ready .hero-line--2,html.bq-css-ready .hero-sign,html.bq-css-ready .hero-lede,html.bq-css-ready .hero-scrolldown{animation:none!important;opacity:1!important}
     html.bq-css-error .room,html.bq-css-timeout .room{display:none!important}
     html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
+    @media (max-width:1024px){.rail{display:none!important}.mobilebar{display:flex!important}.main,[dir=rtl] .main{margin-left:0!important;margin-right:0!important;padding-top:0!important}.design-cta{display:none!important}}
+    html.bq-compact .rail{display:none!important}html.bq-compact .mobilebar{display:flex!important}html.bq-compact .main,[dir=rtl] html.bq-compact .main{margin-left:0!important;margin-right:0!important}
   </style>
   <link rel="preload" as="style" href="css/style.v417.min.css?v=458" data-href="css/style.v417.min.css?v=458" fetchpriority="high" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=161">
+  <link rel="stylesheet" href="css/modern-framer.css?v=166">
   <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=458"></noscript>
   <script>
     (function () {
@@ -363,7 +381,7 @@
     }());
   </script>
   <link rel="stylesheet" href="css/fonts.css?v=447">
-  <link rel="stylesheet" href="css/experience.css?v=6">
+  <link rel="stylesheet" href="css/experience.css?v=7">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315"></noscript>
 
@@ -1808,7 +1826,7 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=490"></script>
+  <script defer src="js/main.v420.min.js?v=492"></script>
   <script defer src="js/gallery.v420.min.js?v=452"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -1828,7 +1846,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=450';
+        s.src = 'js/enhance.v420.min.js?v=452';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -1868,7 +1886,7 @@
     }());
   </script>
   <script defer src="js/lux.min.js?v=359"></script>
-  <script defer src="js/motion.min.js?v=411"></script>
+  <script defer src="js/motion.min.js?v=413"></script>
   <!-- The chatbot knowledge base is loaded only when a visitor shows intent. -->
   <script>
     (function () {
