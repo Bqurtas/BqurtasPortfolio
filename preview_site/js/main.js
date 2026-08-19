@@ -2032,6 +2032,12 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       const idleDesktop = () => {
         track.classList.remove('is-magic-track');
         track.style.removeProperty('--work-track-h');
+        ['height', 'max-height', 'min-height', 'position', 'overflow', 'top'].forEach((prop) => {
+          track.style.removeProperty(prop);
+        });
+        ['position', 'top', 'height', 'max-height', 'overflow', 'overflow-x', 'overflow-y', 'padding'].forEach((prop) => {
+          card.style.removeProperty(prop);
+        });
         reel.style.transform = '';
         card.style.visibility = '';
         restFooter();
@@ -2045,13 +2051,26 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         if (!phone.matches) { idleDesktop(); return; }
         if (trackHidden(track)) { restFooter(); return; }
         track.classList.add('is-magic-track');
+        track.style.setProperty('position', 'relative', 'important');
+        track.style.setProperty('top', 'auto', 'important');
+        track.style.setProperty('overflow', 'visible', 'important');
+        track.style.setProperty('max-height', 'none', 'important');
+        card.style.setProperty('position', 'sticky', 'important');
+        card.style.setProperty('top', 'var(--bq-stack-top)', 'important');
+        card.style.setProperty('height', 'var(--bq-stack-sheet-h)', 'important');
+        card.style.setProperty('max-height', 'var(--bq-stack-sheet-h)', 'important');
+        card.style.setProperty('overflow', 'hidden', 'important');
+        card.style.setProperty('padding', '0px', 'important');
         cardH = card.clientHeight;
         const vpH = vp.clientHeight;
         const reelH = reel.scrollHeight;
         overflow = Math.max(0, reelH - vpH);
         /* Same hold as the catalogue: reel distance + one card for the next
            sheet to rise over the still-pinned card. */
-        track.style.setProperty('--work-track-h', (cardH * 2 + overflow) + 'px');
+        const trackH = cardH * 2 + overflow;
+        track.style.setProperty('--work-track-h', trackH + 'px');
+        track.style.setProperty('height', trackH + 'px', 'important');
+        track.style.setProperty('min-height', cardH + 'px', 'important');
         const next = nextSheet();
         if (next) {
           next.style.setProperty('margin-top', (-cardH) + 'px', 'important');
@@ -2100,6 +2119,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       if (!phone.matches) return;
       const card = track && track.querySelector(':scope > .paper-scroll');
       if (!card) return;
+      track.classList.add('is-magic-track');
       const { vp, reel } = wrapReel(card);
       attach(track, card, vp, reel, { overlap: overlap || 'sibling' });
     };
