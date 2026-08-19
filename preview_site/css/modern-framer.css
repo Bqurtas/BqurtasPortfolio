@@ -16031,123 +16031,6 @@ html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-form .field
 }
 
 /* ============================================================================
-<<<<<<< HEAD
-   UI/UX & PERFORMANCE ENHANCEMENTS (Responsive, Smooth Motion, Theme Contrast)
-   ============================================================================ */
-
-/* 1. Global smooth theme transition */
-html, body, .main, .paper-sheet, .card, .rail, .mobilebar, .service-panel, .pitch-wrap {
-  transition: background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-              border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-              color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* 2. Enhanced Dark Mode Contrast */
-:root[data-theme="dark"] {
-  --bg: #0d0d0d;
-  --bg-2: #141414;
-  --bg-3: #1a1a1a;
-  --surface: rgba(255, 255, 255, 0.045);
-  --ink: #f5f4f0;
-  --ink-2: #e2e0d8;
-  --ink-soft: #b8b6af;
-  --ink-muted: #8e8c85;
-  --line: rgba(255, 255, 255, 0.12);
-  --line-soft: rgba(255, 255, 255, 0.06);
-}
-
-/* 3. Enhanced Light Mode Crispness */
-:root[data-theme="light"] {
-  --bg: #e8e9eb;
-  --bg-2: #dfe1e4;
-  --bg-3: #d6d8dc;
-  --surface: #ffffff;
-  --ink: #0f0f0f;
-  --ink-2: #242424;
-  --ink-soft: #4a4a4a;
-  --ink-muted: #6b6b6b;
-  --line: rgba(0, 0, 0, 0.09);
-  --line-soft: rgba(0, 0, 0, 0.045);
-}
-
-/* 4. Fluid Card Interactions & Hardware Acceleration */
-.card {
-  will-change: transform;
-  transform: translateZ(0);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.4s ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .card:hover {
-    transform: translateY(-4px) scale(1.012) translateZ(0);
-    box-shadow: 0 20px 40px -18px rgba(0, 0, 0, 0.45);
-  }
-}
-
-/* 5. Mobile & Tablet Responsive Polish */
-@media (max-width: 820px) {
-  /* Touch target sizes */
-  .mobilebar-btn, .theme-btn, .lang-current, .rail-chat, .filter-pill, .tab {
-    min-width: 44px;
-    min-height: 44px;
-  }
-
-  /* Smooth horizontal filter tabs scrolling */
-  .tabs-track, .filter-track, .cat-filters {
-    display: flex !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    scrollbar-width: none !important;
-    padding-bottom: 6px !important;
-  }
-  .tabs-track::-webkit-scrollbar, .filter-track::-webkit-scrollbar {
-    display: none !important;
-  }
-
-  /* Fluid typography on smaller screens */
-  .hero-title {
-    font-size: clamp(48px, 14vw, 84px) !important;
-    line-height: 1.08 !important;
-  }
-
-  /* Responsive spacing */
-  .paper-sheet {
-    padding-left: clamp(14px, 3.5vw, 28px) !important;
-    padding-right: clamp(14px, 3.5vw, 28px) !important;
-  }
-}
-
-/* 6. Tablet & Foldable screen optimizations */
-@media (min-width: 821px) and (max-width: 1180px) {
-  .rail {
-    padding: 0 16px !important;
-  }
-  #grid {
-    column-count: 3 !important;
-    gap: 16px !important;
-  }
-}
-
-/* 7. Accessibility focus rings */
-:focus-visible {
-  outline: 2px solid var(--bq-accent, #c07a52) !important;
-  outline-offset: 3px !important;
-}
-
-/* 8. Rock-solid Portfolio Sheet Stability (Zero Drop / Zero Shift) */
-#design > .section.work {
-  min-height: 85vh !important;
-}
-
-#design #grid,
-#grid {
-  min-height: 50vh !important;
-}
-
-=======
    Device canvas — phones + tablets, quieter motion, complete light/dark.
    1024px is the compact chrome line so iPad / Android tablets get the dock
    instead of a cramped desktop rail.
@@ -16628,4 +16511,471 @@ html.bq-compact [dir="rtl"] .main,
     animation-iteration-count: 1 !important;
   }
 }
->>>>>>> fb64e0156a9d439d405ba3f9bea6a8ffd4b3757d
+
+/* ============================================================================
+   v95 — Like a flower.
+   The site unfolds: warm cream paper, bronze-rose bloom, petal cards.
+   High specificity so this layer wins the cascade without fighting geometry.
+   ============================================================================ */
+
+:root {
+  --bq-accent: #c07a52;
+  --bq-accent-soft: #8b5e45;
+  --bq-accent-light: #e0b08a;
+  --bq-petal: #c07a52;
+  --bq-petal-mist: rgba(192, 122, 82, .16);
+  --bq-ease-bloom: cubic-bezier(.16, 1, .3, 1);
+}
+
+:root[data-theme="light"] {
+  --bq-paper-sheet: #f6f1ea;
+  --bq-paper-hero: #f7f2eb;
+  --bq-paper-work: #f6f1ea;
+  --bq-paper-focus: #f6f1ea;
+  --bq-paper-note: #f6f1ea;
+  --bq-paper-clients: #f6f1ea;
+  --bq-paper-blog: #f6f1ea;
+}
+
+:root[data-theme="dark"] {
+  --bq-paper-sheet: #161412;
+  --bq-paper-hero: #161412;
+  --bq-paper-work: #161412;
+  --bq-paper-focus: #161412;
+  --bq-paper-note: #161412;
+  --bq-paper-clients: #161412;
+  --bq-paper-blog: #161412;
+}
+
+::selection {
+  background: var(--bq-petal);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--bq-petal) 72%, transparent) !important;
+  outline-offset: 3px !important;
+}
+
+/* ---- Hero: overlapping petal washes behind the portrait ---- */
+html #design > .hero .hero-radial {
+  display: block !important;
+  position: absolute !important;
+  inset: auto !important;
+  left: 50% !important;
+  top: 42% !important;
+  width: min(92vw, 920px) !important;
+  height: min(70vw, 640px) !important;
+  transform: translate(-50%, -48%) !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  opacity: 1 !important;
+  filter: blur(8px);
+  background:
+    radial-gradient(ellipse 42% 48% at 32% 46%, color-mix(in srgb, var(--bq-petal) 28%, transparent), transparent 70%),
+    radial-gradient(ellipse 38% 44% at 68% 42%, color-mix(in srgb, var(--bq-accent-light) 26%, transparent), transparent 72%),
+    radial-gradient(ellipse 36% 40% at 50% 62%, color-mix(in srgb, var(--bq-accent-soft) 18%, transparent), transparent 70%),
+    radial-gradient(ellipse 70% 56% at 50% 50%, color-mix(in srgb, var(--bq-petal) 10%, transparent), transparent 68%) !important;
+  animation: bqPetalBreathe 9s ease-in-out infinite;
+}
+
+:root[data-theme="dark"] #design > .hero .hero-radial {
+  background:
+    radial-gradient(ellipse 42% 48% at 32% 46%, color-mix(in srgb, var(--bq-petal) 22%, transparent), transparent 70%),
+    radial-gradient(ellipse 38% 44% at 68% 42%, color-mix(in srgb, var(--bq-accent-light) 16%, transparent), transparent 72%),
+    radial-gradient(ellipse 70% 56% at 50% 50%, color-mix(in srgb, var(--bq-petal) 8%, transparent), transparent 68%) !important;
+}
+
+@keyframes bqPetalBreathe {
+  0%, 100% { transform: translate(-50%, -48%) scale(1); opacity: .9; }
+  50% { transform: translate(-50%, -50%) scale(1.06); opacity: 1; }
+}
+
+html #design > .hero .hero-inner {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+html #design > .hero .hero-portrait {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--bq-petal) 28%, transparent),
+    0 0 0 12px color-mix(in srgb, var(--bq-petal) 8%, transparent),
+    0 36px 80px -28px color-mix(in srgb, var(--bq-petal) 38%, transparent),
+    0 44px 100px -42px rgba(0, 0, 0, .55) !important;
+}
+
+html #design > .hero .hero-sign .hero-sign-last {
+  background: linear-gradient(135deg, var(--ink) 20%, var(--bq-petal) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html #design > .hero .hero-cta:hover,
+html #design > .hero .hero-cta:focus-visible {
+  border-color: color-mix(in srgb, var(--bq-petal) 55%, transparent) !important;
+  box-shadow:
+    0 18px 40px -18px color-mix(in srgb, var(--bq-petal) 45%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, .12) !important;
+}
+
+/* ---- Paper sheets: a slightly more organic (petal) top curve ---- */
+html #design.paper-stack > .section.paper-sheet,
+html .room.paper-stack > .paper-sheet {
+  border-top-left-radius: clamp(28px, 4.2vw, 56px) !important;
+  border-top-right-radius: clamp(36px, 5.2vw, 72px) !important;
+}
+
+html #design.paper-stack > .section.work.paper-sheet {
+  box-shadow:
+    0 -28px 80px -50px color-mix(in srgb, var(--bq-petal) 35%, transparent),
+    0 -24px 64px -50px rgba(20, 20, 20, .18) !important;
+}
+
+/* ---- Work catalogue: bloom, not jump ---- */
+@media (hover: hover) and (pointer: fine) {
+  html #design #grid .card:hover .card-art,
+  html #design #grid .card:focus-within .card-art {
+    transform: translateY(-8px) scale(1.012) !important;
+    box-shadow:
+      0 28px 64px -32px color-mix(in srgb, var(--bq-petal) 42%, transparent),
+      0 18px 40px -28px rgba(0, 0, 0, .4) !important;
+  }
+}
+
+html #design .section.work .tabs .tab:hover,
+html #design .section.work .tabs .tab:focus-visible {
+  border-color: color-mix(in srgb, var(--bq-petal) 40%, transparent) !important;
+  color: var(--bq-petal) !important;
+}
+
+html #design .section.work .tabs .tab.is-active,
+html #design .section.work .tabs .tab.is-active:hover {
+  background: var(--ink) !important;
+  border-color: var(--ink) !important;
+  box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--bq-petal) 55%, transparent) !important;
+}
+
+/* ---- Services: restore the index + icon, open like petals ---- */
+html #design#design .service-showcase .service-accordion .service-trigger {
+  display: grid !important;
+  grid-template-columns: 28px 40px minmax(0, 1fr) 32px !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: stretch !important;
+  gap: 0 !important;
+  column-gap: 12px !important;
+  height: auto !important;
+  min-height: 56px !important;
+  padding: 10px 0 !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+html #design#design .service-showcase .service-accordion .service-trigger .service-index,
+html #design#design .service-showcase .service-accordion .service-trigger .service-icon {
+  display: flex !important;
+  position: static !important;
+  transform: none !important;
+}
+
+html #design#design .service-showcase .service-accordion .service-trigger .service-toggle {
+  position: static !important;
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  justify-self: end !important;
+}
+
+html #design#design .service-showcase .service-accordion {
+  gap: 12px !important;
+}
+
+html #design#design .service-showcase .service-panel {
+  border-radius: 26px 22px 28px 20px !important;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--bq-petal) 6%, transparent), transparent 42%),
+    color-mix(in srgb, var(--surface) 88%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--ink) 10%, transparent) !important;
+  box-shadow: 0 10px 28px -18px rgba(0, 0, 0, .16) !important;
+  overflow: hidden !important;
+  transition:
+    transform .45s var(--bq-ease-bloom),
+    border-color .45s var(--bq-ease-bloom),
+    box-shadow .45s var(--bq-ease-bloom),
+    background .45s var(--bq-ease-bloom) !important;
+}
+
+html #design#design .service-showcase .service-panel.is-active {
+  border-color: color-mix(in srgb, var(--bq-petal) 55%, transparent) !important;
+  background:
+    linear-gradient(165deg, color-mix(in srgb, var(--bq-petal) 14%, transparent), transparent 55%),
+    color-mix(in srgb, var(--surface) 92%, transparent) !important;
+  box-shadow:
+    0 22px 48px -20px color-mix(in srgb, var(--bq-petal) 38%, transparent),
+    0 8px 20px -14px rgba(0, 0, 0, .18) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html #design#design .service-showcase .service-panel:hover {
+    transform: translateY(-3px) !important;
+    border-color: color-mix(in srgb, var(--bq-petal) 40%, transparent) !important;
+  }
+}
+
+html #design#design .service-showcase .service-name {
+  font-family: Fraunces, "Noto Kufi Arabic", serif !important;
+  font-size: clamp(17px, 1.7vw, 22px) !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+}
+
+html #design#design .service-showcase .service-sub {
+  display: none !important;
+}
+
+html #design#design .service-showcase .service-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 14px 12px 16px 10px !important;
+  background: color-mix(in srgb, var(--bq-petal) 12%, transparent) !important;
+  color: var(--bq-petal) !important;
+}
+
+html #design#design .service-showcase .service-panel.is-active .service-icon {
+  background: var(--bq-petal) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 18px -8px color-mix(in srgb, var(--bq-petal) 70%, transparent) !important;
+}
+
+html #design#design .service-showcase .service-index {
+  color: var(--bq-petal) !important;
+  opacity: .85 !important;
+}
+
+html #design#design .service-showcase .service-toggle {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50% !important;
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent) !important;
+}
+
+html #design#design .service-showcase .service-panel.is-active .service-toggle {
+  background: var(--bq-petal) !important;
+  border-color: var(--bq-petal) !important;
+  color: #fff !important;
+  transform: rotate(45deg) !important;
+}
+
+html #design#design .service-showcase .service-detail-inner {
+  padding-inline-start: 80px !important;
+  padding-block: 4px 16px !important;
+}
+
+html #design#design .service-showcase .service-detail-inner li {
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--bq-petal) 8%, transparent) !important;
+}
+
+html #design#design .service-showcase .service-cta:hover,
+html #design#design .practice-note .bio-teaser-link:hover {
+  border-color: var(--bq-petal) !important;
+  color: var(--bq-petal) !important;
+  box-shadow: 0 14px 32px -12px color-mix(in srgb, var(--bq-petal) 40%, transparent) !important;
+}
+
+/* ---- Practice note: stats as glass petals ---- */
+html #design#design .practice-note .stats,
+html #design#design .practice-note .stats:hover {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html #design#design .practice-note .stat,
+html #design#design .practice-note .stat:hover {
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  gap: 14px !important;
+  padding: clamp(18px, 2.2vw, 26px) !important;
+  border-radius: 24px 18px 26px 16px !important;
+  border: 1px solid color-mix(in srgb, var(--ink) 10%, transparent) !important;
+  background:
+    linear-gradient(165deg, color-mix(in srgb, var(--bq-petal) 10%, transparent), transparent 58%),
+    color-mix(in srgb, var(--surface) 86%, transparent) !important;
+  box-shadow: 0 12px 28px -18px rgba(0, 0, 0, .16) !important;
+  transform: none !important;
+  overflow: hidden !important;
+  transition:
+    transform .45s var(--bq-ease-bloom),
+    border-color .45s var(--bq-ease-bloom),
+    box-shadow .45s var(--bq-ease-bloom) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html #design#design .practice-note .stat:hover {
+    transform: translateY(-4px) !important;
+    border-color: color-mix(in srgb, var(--bq-petal) 42%, transparent) !important;
+    box-shadow: 0 22px 40px -18px color-mix(in srgb, var(--bq-petal) 32%, transparent) !important;
+  }
+}
+
+html #design#design .practice-note .stat-num {
+  font-family: Fraunces, "Noto Kufi Arabic", serif !important;
+  font-size: clamp(36px, 4vw, 52px) !important;
+  font-weight: 600 !important;
+  letter-spacing: -.04em !important;
+  line-height: 1 !important;
+  background: linear-gradient(135deg, var(--ink) 30%, var(--bq-petal) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+}
+
+html #design#design .practice-note .stat-label {
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: .1em !important;
+  color: color-mix(in srgb, var(--ink) 58%, transparent) !important;
+}
+
+html #design#design .practice-note .stat-label i {
+  display: inline-flex !important;
+  width: 24px !important;
+  height: 24px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 8px !important;
+  background: color-mix(in srgb, var(--bq-petal) 14%, transparent) !important;
+  color: var(--bq-petal) !important;
+  opacity: 1 !important;
+  font-size: 11px !important;
+}
+
+html #design#design .practice-note .bio-teaser-title em,
+html #design#design .service-showcase .section-title em {
+  background: linear-gradient(135deg, var(--bq-petal) 0%, var(--bq-accent-light) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+html #design#design .practice-note .software-experience .software-chip:hover {
+  color: var(--bq-petal) !important;
+}
+
+/* ---- Places worked with / drawn logos ---- */
+html #design .logos-section .logo-chip {
+  border-radius: 999px !important;
+  border-color: color-mix(in srgb, var(--ink) 10%, transparent) !important;
+  transition: border-color .35s var(--bq-ease-bloom), transform .35s var(--bq-ease-bloom), box-shadow .35s var(--bq-ease-bloom) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html #design .logos-section .logo-chip:hover {
+    border-color: color-mix(in srgb, var(--bq-petal) 45%, transparent) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -16px color-mix(in srgb, var(--bq-petal) 40%, transparent);
+  }
+}
+
+html #design#design .logos-section .logos-grid > .logo-mark {
+  border-radius: 22px 18px 24px 16px !important;
+  border: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+  background: color-mix(in srgb, var(--bq-petal) 5%, transparent);
+  transition: transform .45s var(--bq-ease-bloom), box-shadow .45s var(--bq-ease-bloom), border-color .45s var(--bq-ease-bloom);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html #design#design .logos-section .logos-grid > .logo-mark:hover {
+    transform: translateY(-4px) rotate(-1.5deg);
+    border-color: color-mix(in srgb, var(--bq-petal) 40%, transparent);
+    box-shadow: 0 18px 32px -18px color-mix(in srgb, var(--bq-petal) 35%, transparent);
+  }
+}
+
+/* ---- Dock, CTA, menu accent ---- */
+html .design-cta-dot,
+html .mobilebar-cta .design-cta-dot,
+html .rail-dot {
+  background: var(--bq-petal) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--bq-petal) 22%, transparent) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html .mobilebar-btn:hover,
+  html .rail-tools .lang-current:hover,
+  html .rail-tools .social-current:hover,
+  html .rail-tools .theme-btn:hover,
+  html .rail-tools .rail-chat:hover,
+  html .rail-tools .rail-latest:hover {
+    color: var(--bq-petal) !important;
+  }
+}
+
+html body #mobileMenu.mobile-menu .mm-nav .mm-link.is-active .mm-link-text,
+html body #mobileMenu.mobile-menu .mm-nav .mm-link[data-route].is-active .mm-link-text {
+  background-image: linear-gradient(var(--bq-petal), var(--bq-petal)) !important;
+}
+
+/* ---- Room sheets: the same warm hairline ---- */
+html .room.paper-stack > .section.paper-sheet .section-num,
+html #design .section-num {
+  color: color-mix(in srgb, var(--bq-petal) 82%, var(--ink)) !important;
+}
+
+html .room.paper-stack .qc-card i {
+  background: color-mix(in srgb, var(--bq-petal) 12%, transparent) !important;
+  color: var(--bq-petal) !important;
+}
+
+html .room.paper-stack .pitch-submit,
+html .room.paper-stack .subscribe-form button {
+  box-shadow: 0 16px 32px -18px color-mix(in srgb, var(--bq-petal) 40%, transparent);
+}
+
+@media (max-width: 820px) {
+  html #design > .hero .hero-radial {
+    width: 140vw !important;
+    height: 90vw !important;
+    filter: blur(12px);
+    animation: none;
+  }
+
+  html #design#design .service-showcase .service-accordion .service-trigger {
+    grid-template-columns: 22px 34px minmax(0, 1fr) 28px !important;
+    column-gap: 8px !important;
+    min-height: 52px !important;
+    padding: 8px 0 !important;
+  }
+
+  html #design#design .service-showcase .service-detail-inner {
+    padding-inline-start: 64px !important;
+  }
+
+  html #design#design .practice-note .stat-num {
+    font-size: clamp(30px, 8.4vw, 40px) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html #design > .hero .hero-radial,
+  html #design#design .service-showcase .service-panel,
+  html #design#design .practice-note .stat,
+  html #design#design .logos-section .logos-grid > .logo-mark {
+    animation: none !important;
+    transition: none !important;
+  }
+}

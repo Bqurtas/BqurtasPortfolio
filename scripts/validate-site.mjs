@@ -50,6 +50,13 @@ if (html.includes('aria-hidden="true">05</span>') || html.includes('aria-hidden=
   failures.push('retired room numbers 05/06 still present');
 }
 
+const cssPath = resolve(root, 'css/modern-framer.css');
+if (existsSync(cssPath)) {
+  const css = readFileSync(cssPath, 'utf8');
+  const conflict = css.split(/\r?\n/).findIndex((line) => /^(<<<<<<<|=======|>>>>>>>)/.test(line));
+  if (conflict !== -1) failures.push(`modern-framer.css has a merge conflict marker on line ${conflict + 1}`);
+}
+
 if (failures.length) {
   console.error(failures.map((failure) => `- ${failure}`).join('\n'));
   process.exit(1);
