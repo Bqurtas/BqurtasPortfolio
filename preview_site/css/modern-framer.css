@@ -14520,17 +14520,64 @@ body.menu-open .mobilebar {
 }
 
 /* ======================= PRACTICE-NOTE — SOFTWARE =========================
-   Owner: keep the scrolling marquee, but SMALLER + a clean/proper font, show on
-   MOBILE too, and merge to ONE row (the merge is done in JS). ================ */
+   Owner: keep the scrolling marquee, but BIG + BOLD + PREMIUM like Stripe/Linear.
+   Show on MOBILE too. ======================================================= */
 #design .practice-note .software-experience {
   display: block !important;                 /* was display:none on mobile */
 }
+
 /* 2-id trick beats the :root[data-theme]/:root[lang] chip rules on font */
 #design#design .practice-note .software-experience .software-chip {
-  font-size: clamp(16px, 2.1vw, 21px) !important;   /* bigger + fuller (owner), same one-row design */
-  font-weight: 700 !important;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-  letter-spacing: .04em !important;
+  font-size: clamp(22px, 3vw, 42px) !important;
+  font-weight: 800 !important;
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif !important;
+  letter-spacing: -.02em !important;
+  text-transform: uppercase !important;
+  line-height: 1 !important;
+  color: var(--ink) !important;
+  opacity: 0.75 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  gap: clamp(14px, 2vw, 24px) !important;
+  transition: opacity 0.35s ease, transform 0.5s cubic-bezier(.16,1,.3,1) !important;
+}
+
+#design#design .practice-note .software-experience .software-chip:hover {
+  opacity: 1 !important;
+  transform: translateY(-3px) !important;
+}
+
+#design#design .practice-note .software-experience .software-chip img {
+  width: clamp(36px, 4.5vw, 56px) !important;
+  height: clamp(36px, 4.5vw, 56px) !important;
+  filter: none !important;
+  transition: transform 0.5s cubic-bezier(.16,1,.3,1) !important;
+}
+
+#design#design .practice-note .software-experience .software-chip:hover img {
+  transform: rotate(-6deg) scale(1.08) !important;
+}
+
+#design#design .practice-note .software-experience .software-track {
+  gap: clamp(28px, 4.5vw, 64px) !important;
+}
+
+#design#design .practice-note .software-experience .software-lines {
+  gap: clamp(16px, 2.5vw, 28px) !important;
+}
+
+/* Force show icons — override style.css that hides them */
+#design#design .practice-note .software-experience .software-chip img {
+  display: inline-block !important;
+}
+
+/* Remove the ✦ text separator — we use icons instead */
+#design#design .practice-note .software-experience .software-chip::after {
+  content: '' !important;
+  display: none !important;
 }
 
 /* ================= "DESIGNED BY HAND" — 8 LOGOS AS A 4+4 GRID ==============
