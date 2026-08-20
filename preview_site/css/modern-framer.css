@@ -13996,13 +13996,13 @@ body.menu-open .mobilebar {
     transform: translate3d(calc(var(--bq-menu-panel) - 7.7vw), 0, 0) scale(.8) !important;
   }
 
-  /* The curtain must sit ABOVE the page card. `body.menu-open .bq-page-stage`
-     raises the receding page to z-index 1210, so a menu pinned at 1200 was
-     painted underneath it — on 821–1024px, where the compact canvas sets the
-     links flush left, the page card covered every link. 1220 clears it. */
+  /* No z-index here. This breakpoint used to pin the curtain at 1200, below the
+     1210 that `body.menu-open .bq-page-stage` gives the receding page card, so
+     between 821–1024px — where the compact canvas sets the links flush left,
+     right under the scaled card — the page covered every link. experience.css
+     now owns the curtain's place in the stack at every width. */
   html body #mobileMenu.mobile-menu,
   html body #mobileMenu.mobile-menu.is-open {
-    z-index: 1220 !important;
     background: var(--bq-menu-ink, #0c0c0d) !important;
   }
 

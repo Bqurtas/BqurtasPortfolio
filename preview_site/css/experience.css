@@ -401,12 +401,36 @@ html body #mobileMenu :is(a, button):focus-visible {
   }
 }
 
-/* Decisive: force the curtain to the EXACT site black (#0a0a0a). A legacy rule
-   sets it via var(--bq-menu-ink) which resolves to #0f0f10 — slightly lighter,
-   leaving a seam against the #0a0a0a site bed. 2-id beats it. (owner) */
+/* ============================================================================
+   DECISIVE — colour and stacking. Around 980 rules across the older sheets
+   touch this menu, and they redefine its z-index seventeen times, so the 1800
+   declared at the top of this file never actually won. Everything below uses a
+   doubled id (2 ids) so it outranks the strongest of them
+   (`html body #mobileMenu.mobile-menu.is-open`, 1 id + 2 classes) at every
+   width, in both directions, with no breakpoint of its own to fall between.
+   ========================================================================== */
+
+/* Colour: force the EXACT site black (#0a0a0a). A legacy rule sets it via
+   var(--bq-menu-ink) which resolves to #0f0f10 — slightly lighter, leaving a
+   seam against the #0a0a0a site bed. (owner) */
 html body #mobileMenu#mobileMenu.mobile-menu,
 html body #mobileMenu#mobileMenu.mobile-menu.is-open,
 html body #mobileMenu#mobileMenu.mobile-menu.is-ready,
 html body[dir="rtl"] #mobileMenu#mobileMenu.mobile-menu {
   background: #0a0a0a !important;
+}
+
+/* Stacking: the curtain must outrank the receding page card at EVERY width.
+   `body.menu-open .bq-page-stage` lifts that card to 1210 while the older
+   breakpoint blocks pinned the menu at 1200 — underneath it. Above 821px that
+   put the links straight under the scaled card; below 821px it only looked
+   right because the card happens to translate fully off-screen, so any change
+   to the push distance would have brought the bug back. 1800 clears the card
+   (1210), the go-up control (1450) and the dock (1600), and still sits under
+   the lightbox (5000), splash, dashboard and reader (100000+). */
+html body #mobileMenu#mobileMenu.mobile-menu,
+html body #mobileMenu#mobileMenu.mobile-menu.is-open,
+html body #mobileMenu#mobileMenu.mobile-menu.is-ready,
+html body[dir="rtl"] #mobileMenu#mobileMenu.mobile-menu {
+  z-index: 1800 !important;
 }
