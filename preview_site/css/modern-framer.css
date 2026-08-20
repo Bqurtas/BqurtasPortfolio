@@ -13996,9 +13996,13 @@ body.menu-open .mobilebar {
     transform: translate3d(calc(var(--bq-menu-panel) - 7.7vw), 0, 0) scale(.8) !important;
   }
 
+  /* The curtain must sit ABOVE the page card. `body.menu-open .bq-page-stage`
+     raises the receding page to z-index 1210, so a menu pinned at 1200 was
+     painted underneath it — on 821–1024px, where the compact canvas sets the
+     links flush left, the page card covered every link. 1220 clears it. */
   html body #mobileMenu.mobile-menu,
   html body #mobileMenu.mobile-menu.is-open {
-    z-index: 1200 !important;
+    z-index: 1220 !important;
     background: var(--bq-menu-ink, #0c0c0d) !important;
   }
 
@@ -16029,17 +16033,15 @@ html #contact.room.paper-stack > .paper-sheet.room-sheet--one .pitch-form .field
 }
 
 /* ============================================================================
-<<<<<<< HEAD
    UI/UX & PERFORMANCE ENHANCEMENTS (Responsive, Smooth Motion, Theme Contrast)
    ============================================================================ */
 
-/* 1. Global smooth theme transition */
-html, body, .main, .paper-sheet, .card, .rail, .mobilebar, .service-panel, .pitch-wrap {
-  transition: background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-              border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-              color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
+/* 1. Theme transition — scoped, NOT global.
+   A blanket colour transition on .paper-sheet / .main / html / body made every
+   deck sheet ease its background over 350ms, so the paper colours and the
+   footer colour scene trailed the scroll instead of tracking it. The theme
+   fade already lives on `body, .bq-page-stage, .rail, .mobilebar` further down
+   this file; the scroll-driven surfaces must stay instant. */
 
 /* 2. Enhanced Dark Mode Contrast */
 :root[data-theme="dark"] {
@@ -16145,7 +16147,7 @@ html, body, .main, .paper-sheet, .card, .rail, .mobilebar, .service-panel, .pitc
   min-height: 50vh !important;
 }
 
-=======
+/* ============================================================================
    Device canvas — phones + tablets, quieter motion, complete light/dark.
    1024px is the compact chrome line so iPad / Android tablets get the dock
    instead of a cramped desktop rail.
@@ -16626,4 +16628,3 @@ html.bq-compact [dir="rtl"] .main,
     animation-iteration-count: 1 !important;
   }
 }
->>>>>>> fb64e0156a9d439d405ba3f9bea6a8ffd4b3757d
