@@ -2379,14 +2379,12 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     bottom.className = 'footer-bottom mono';
     bottom.innerHTML = `
       <span data-i18n="f.loc">${dict['f.loc'] || 'Erbil — Kurdistan, Iraq'}</span>
-      <div class="footer-social-links">
-        <a href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://www.behance.net/bqurtas" target="_blank" rel="noopener">Behance</a>
-        <a href="https://instagram.com/bqurtas" target="_blank" rel="noopener">Instagram</a>
-      </div>
       <span>© 2026 <span data-i18n="name.full">${dict['name.full'] || 'Barakat Qurtas'}</span></span>`;
     footerContent.append(bottom);
   }
+
+  /* An older shell may still carry the social row this footer no longer uses. */
+  footer.querySelectorAll('.footer-social-links').forEach((el) => el.remove());
 
   footer.setAttribute('aria-labelledby', 'footerCtaTitle');
 })();

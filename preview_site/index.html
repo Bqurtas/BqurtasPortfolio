@@ -286,7 +286,7 @@
     html.bq-compact .rail{display:none!important}html.bq-compact .mobilebar{display:flex!important}html.bq-compact .main,[dir=rtl] html.bq-compact .main{margin-left:0!important;margin-right:0!important}
   </style>
   <link rel="preload" as="style" href="css/style.v417.min.css?v=458" data-href="css/style.v417.min.css?v=458" fetchpriority="high" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=176">
+  <link rel="stylesheet" href="css/modern-framer.css?v=178">
   <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=458"></noscript>
   <script>
     (function () {
@@ -381,7 +381,7 @@
     }());
   </script>
   <link rel="stylesheet" href="css/fonts.css?v=447">
-  <link rel="stylesheet" href="css/experience.css?v=8">
+  <link rel="stylesheet" href="css/experience.css?v=9">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315"></noscript>
 
@@ -611,13 +611,8 @@
           <a href="/bio" class="mm-link" data-route="bio"><span class="mm-link-text" data-i18n="nav.bio">The Designer</span></a>
           <a href="/contact" class="mm-link" data-route="contact"><span class="mm-link-text" data-i18n="nav.contact">Let's talk.</span></a>
         </nav>
-        <div class="mm-foot">
-          <div class="mm-socs">
-            <a href="https://instagram.com/bqurtas" target="_blank" rel="noopener">Instagram</a>
-            <a href="https://www.behance.net/bqurtas" target="_blank" rel="noopener">Behance</a>
-            <a href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener">LinkedIn</a>
-          </div>
-        </div>
+        <!-- The curtain is four rooms and nothing else. The social accounts
+             stay reachable from the rail and the dock. -->
       </div>
     </div>
   </div>
@@ -648,7 +643,7 @@
             <span class="hero-sign-first" data-i18n="name.first">Barakat</span>
             <span class="hero-sign-last" data-i18n="name.last">Qurtas</span>
           </div>
-          <p class="hero-lede" data-i18n="hero.lede">I'm Barakat Qurtas — a graphic &amp; motion designer crafting brand identities and editorial systems for over a decade.</p>
+          <p class="hero-lede" data-i18n="hero.lede">I'm Barakat Qurtas — a graphic &amp; motion designer crafting brand identities and editorial systems for over a decade</p>
 
           <a class="hero-cta" href="#grid" data-hero-cta role="button">
             <span class="hero-cta-txt" data-i18n="hero.cta">View the work</span>
@@ -1615,11 +1610,6 @@
 
       <div class="footer-bottom mono">
         <span data-i18n="f.loc">Erbil — Kurdistan, Iraq</span>
-        <div class="footer-social-links">
-          <a href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener">LinkedIn</a>
-          <a href="https://www.behance.net/bqurtas" target="_blank" rel="noopener">Behance</a>
-          <a href="https://instagram.com/bqurtas" target="_blank" rel="noopener">Instagram</a>
-        </div>
         <span>© 2026 <span data-i18n="name.full">Barakat Qurtas</span></span>
       </div>
     </footer>
@@ -1800,7 +1790,7 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script defer src="js/i18n.v420.min.js?v=449"></script>
+  <script defer src="js/i18n.v420.min.js?v=450"></script>
   <!-- Non-English visitors need the extra dictionaries before first render;
        English (the default + PSI) never loads them, keeping the parse light.
        applyLang() can also fetch this on its own, but starting it here — in
@@ -1815,7 +1805,7 @@
       var lang=u||saved;
       if(lang && lang!=='en'){
         window.__i18nMoreLoading=true; window.__i18nMoreCbs=window.__i18nMoreCbs||[];
-        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=422'; s.async=false;
+        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=423'; s.async=false;
         s.onload=function(){
           window.__i18nMoreLoaded=true; window.__i18nMoreLoading=false;
           var cbs=(window.__i18nMoreCbs||[]).slice(); window.__i18nMoreCbs=[];
@@ -1826,7 +1816,7 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=492"></script>
+  <script defer src="js/main.v420.min.js?v=493"></script>
   <script defer src="js/gallery.v420.min.js?v=452"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs

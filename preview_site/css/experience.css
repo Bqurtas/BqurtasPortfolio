@@ -12,7 +12,10 @@ html body[dir="rtl"] #mobileMenu.mobile-menu {
   --menu-paper: #f3f1ea;
   --menu-muted: rgba(243, 241, 234, .42);
   --menu-line: rgba(243, 241, 234, .14);
-  --menu-accent: #c07a52;
+  /* The curtain carries no colour of its own — the site's black and its paper
+     white are the whole palette, so the current room's underline is drawn in
+     the same white as the link rather than a bronze. */
+  --menu-accent: #f3f1ea;
   --menu-panel: var(--bq-menu-panel, max(34vw, 420px));
   --menu-ease: cubic-bezier(.16, 1, .3, 1);
   position: fixed !important;
