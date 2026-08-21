@@ -7705,10 +7705,13 @@ body,
 
 #design .practice-note .bio-teaser-title em {
   font-style: italic !important;
-  background: var(--ink) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  display: inline-block !important;
+  /* This was `background: var(--ink)` clipped to the text with a transparent
+     fill — a gradient technique applied to a flat colour, so it painted exactly
+     what `color` paints, and cost an inline-block box to do it. That box is an
+     atomic inline, which let a comma directly behind the emphasis fall to the
+     next line on its own. Plain colour, plain inline. */
+  color: var(--ink) !important;
+  display: inline !important;
 }
 
 #design .practice-note .bio-teaser-text p {
@@ -8935,10 +8938,13 @@ body,
 
 #design .service-showcase .service-showcase-head .section-title em {
   font-style: italic !important;
-  background: var(--ink) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  display: inline-block !important;
+  /* This was `background: var(--ink)` clipped to the text with a transparent
+     fill — a gradient technique applied to a flat colour, so it painted exactly
+     what `color` paints, and cost an inline-block box to do it. That box is an
+     atomic inline, which let a comma directly behind the emphasis fall to the
+     next line on its own. Plain colour, plain inline. */
+  color: var(--ink) !important;
+  display: inline !important;
 }
 
 :root[data-theme] #design .service-showcase .service-showcase-head .section-lede,
@@ -16717,4 +16723,99 @@ html.bq-compact [dir="rtl"] .main,
     width: 22px !important;
     height: 34px !important;
   }
+}
+
+/* ============================================================================
+   WHAT I DO — let the two columns share one rhythm.
+
+   The head column is as tall as the accordion beside it (781px at 1440), but
+   its content only fills 431px of that and sits centred, so it floated with
+   ~175px of dead air above and below while the accordion ran the full height.
+   Keep the copy at the top where the eye starts and drop the call to action to
+   the foot of the column, so both columns begin and end on the same line.
+   ========================================================================== */
+html body #design#design .service-showcase .service-showcase-head {
+  justify-content: flex-start !important;
+}
+
+html body #design#design .service-showcase .service-showcase-head .service-cta {
+  margin-top: auto !important;
+}
+
+/* ============================================================================
+   A SHORT NOTE — balance the sheet, and stop the heading orphaning its comma.
+   ========================================================================== */
+
+/* 16ch was a tight measure for this sentence — it forced four lines out of a
+   phrase that reads better in three. The orphaned comma that came with it is
+   fixed at its source in the emphasis rule below. Note `text-wrap: balance`
+   does not help here and actively re-creates the orphan. */
+html body #design#design .practice-note .bio-teaser-title {
+  max-width: 24ch !important;
+}
+
+/* Between 821 and 1024px the grid collapsed to a single column. That is right
+   on a phone, but a tablet sheet is ~994px wide, so it left 385px of the sheet
+   empty on the right and pushed the four statistics down underneath the
+   software band, where they were covered. Keep both columns on tablets. */
+@media (min-width: 821px) and (max-width: 1024px) {
+  html body #design#design .practice-note .bio-teaser-grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr) !important;
+    gap: clamp(28px, 4vw, 52px) !important;
+    align-items: center !important;
+  }
+
+  html body #design#design .practice-note .stats {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* The marquee is a full-bleed band, but it was 1034px inside a 994px sheet and
+   spilled 73px past the rounded edge. Hold it to the sheet and let the track
+   run under its own clip instead. */
+html body #design#design .practice-note .software-experience {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-inline: 0 !important;
+  overflow: hidden !important;
+}
+
+/* ============================================================================
+   EMPHASIS — one face per sentence.
+
+   v42 put the whole interface on Noto Kufi Arabic so a single locally-hosted
+   family could carry Latin, Kurdish and Arabic without a flash between faces.
+   The display headings were later moved to Fraunces, but the <em> inside them
+   was not: it matches `body :where(*)` and kept Noto Kufi. So the site's
+   signature move — one italic word inside a serif line — was setting that word
+   in a different typeface from the words either side of it:
+
+     "Ideas, made visible."            Fraunces + Noto Kufi
+     "Designer of printed matter, …"   Fraunces + Noto Kufi
+     "The Journal"                     Fraunces + Noto Kufi
+
+   Let the emphasis inherit whatever family its heading is set in. As a bonus
+   this removes the font boundary that was letting the line break between
+   "matter" and the comma that follows it.
+   ========================================================================== */
+:is(
+  h1, h2, h3, h4,
+  .section-title, .bio-teaser-title, .room-hero-title, .footer-cta-title,
+  .logos-title, .latest-blog-title, .subscribe-title, .blog-card-title,
+  .hero-title, .index-card-title, .bio-social-title, .bio-phil-label
+) :is(em, i:not([class^="fa-"]):not([class*=" fa-"])) {
+  font-family: inherit !important;
+  font-style: italic !important;
+  /* It was display:inline-block, which makes it an atomic box with a break
+     opportunity after it — so a comma sitting right behind the emphasis could
+     be pushed onto the next line by itself:
+
+       Designer of printed matter
+       , working from
+       Hewlêr since 2014.
+
+     Nothing here needs the block box: no background, border, padding or
+     transform is set on it. Inline lets the punctuation stay with its word. */
+  display: inline !important;
 }
