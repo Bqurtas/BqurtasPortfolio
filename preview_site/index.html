@@ -89,123 +89,409 @@
 
   <!-- Structured data: Person -->
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebSite",
-        "@id": "https://bqurtas.com/#website",
-        "name": "Barakat Qurtas",
-        "alternateName": ["Bqurtas", "Bqurtas Design", "Barakat Qurtas Portfolio"],
-        "url": "https://bqurtas.com/",
-        "inLanguage": ["en", "ckb", "ku", "ar", "fr", "tr", "sv"],
-        "publisher": { "@id": "https://bqurtas.com/#person" }
-      },
-      {
-        "@type": "ProfilePage",
-        "@id": "https://bqurtas.com/#profilepage",
-        "url": "https://bqurtas.com/",
-        "name": "Barakat Qurtas — Graphic Designer in Erbil, Kurdistan",
-        "description": "The official portfolio and profile of Kurdish graphic and motion designer Barakat Qurtas in Erbil, Kurdistan Region of Iraq.",
-        "dateModified": "2026-08-16",
-        "inLanguage": "en",
-        "isPartOf": { "@id": "https://bqurtas.com/#website" },
-        "mainEntity": { "@id": "https://bqurtas.com/#person" },
-        "about": [ { "@id": "https://bqurtas.com/#person" }, { "@id": "https://bqurtas.com/#service" } ],
-        "primaryImageOfPage": { "@type": "ImageObject", "url": "https://bqurtas.com/assets/portrait.webp" }
-      },
-      {
-        "@type": "Person",
-        "@id": "https://bqurtas.com/#person",
-        "name": "Barakat Qurtas",
-        "alternateName": ["Bqurtas", "بەرەکات قورتاس", "بەرکەت قورتاس", "بركات قرطاس", "Barakat Qurtas"],
-        "jobTitle": "Graphic Designer",
-        "description": "Independent graphic and motion designer in Erbil, Kurdistan Region of Iraq — brand identity, logos, editorial, print and motion since 2014.",
-        "url": "https://bqurtas.com/",
-        "image": "https://bqurtas.com/assets/portrait.webp",
-        "email": "hello@bqurtas.com",
-        "telephone": "+9647517884985",
-        "mainEntityOfPage": { "@id": "https://bqurtas.com/#profilepage" },
-        "homeLocation": { "@type": "City", "name": "Erbil (Hewlêr), Kurdistan Region, Iraq" },
-        "address": { "@type": "PostalAddress", "streetAddress": "Gullan St. 40M", "addressLocality": "Erbil", "addressRegion": "Kurdistan Region", "postalCode": "44001", "addressCountry": "IQ" },
-        "knowsLanguage": ["ckb", "ku", "ar", "en"],
-        "sameAs": [
-          "https://www.linkedin.com/in/bqurtas/",
-          "https://instagram.com/bqurtas",
-          "https://www.behance.net/bqurtas",
-          "https://dribbble.com/bqurtas"
-        ],
-        "knowsAbout": [
-          "Graphic design",
-          "Graphic designer in Erbil",
-          "Graphic designer in Kurdistan",
-          "Graphic designer in Iraq",
-          "Kurdish graphic design",
-          "Brand identity",
-          "Logo design",
-          "Editorial design",
-          "Poster design",
-          "Book cover design",
-          "Motion graphics",
-          "Print design"
-        ]
-      },
-      { "@type": "SiteNavigationElement", "position": 1, "name": "Design", "url": "https://bqurtas.com/design" },
-      { "@type": "SiteNavigationElement", "position": 2, "name": "The Journal", "url": "https://bqurtas.com/blog" },
-      { "@type": "SiteNavigationElement", "position": 3, "name": "The Designer", "url": "https://bqurtas.com/bio" },
-      { "@type": "SiteNavigationElement", "position": 4, "name": "Let's talk.", "url": "https://bqurtas.com/contact" },
-      {
-        "@type": "ProfessionalService",
-        "@id": "https://bqurtas.com/#service",
-        "name": "Barakat Qurtas — Independent Design Studio",
-        "slogan": "Kurdish design identity, built in Erbil and made for everywhere.",
-        "foundingDate": "2014",
-        "description": "Independent graphic & motion design studio in Hewlêr (Erbil), Kurdistan Region of Iraq — brand identity, logos, book covers, editorial layout, posters, printing, photography and video. A decade of practice, 1000+ works since 2014.",
-        "keywords": "graphic designer Erbil, Kurdish graphic designer, brand identity Kurdistan, logo design Iraq, editorial design, print design, motion graphics",
-        "url": "https://bqurtas.com/",
-        "image": "https://bqurtas.com/assets/portrait.webp",
-        "logo": "https://bqurtas.com/assets/logo-padded.webp",
-        "email": "hello@bqurtas.com",
-        "telephone": "+9647517884985",
-        "priceRange": "$$",
-        "currenciesAccepted": "IQD, USD",
-        "paymentAccepted": "Cash, Bank transfer",
-        "sameAs": [
-          "https://www.linkedin.com/in/bqurtas/",
-          "https://instagram.com/bqurtas",
-          "https://www.behance.net/bqurtas"
-        ],
-        "founder": { "@id": "https://bqurtas.com/#person" },
-        "areaServed": [ { "@type": "City", "name": "Erbil (Hewlêr)" }, { "@type": "AdministrativeArea", "name": "Kurdistan Region, Iraq" }, { "@type": "Country", "name": "Iraq" }, { "@type": "Place", "name": "Middle East" }, { "@type": "Place", "name": "Worldwide (remote)" } ],
-        "address": { "@type": "PostalAddress", "streetAddress": "Gullan St. 40M", "addressLocality": "Erbil", "addressRegion": "Kurdistan Region", "postalCode": "44001", "addressCountry": "IQ" },
-        "geo": { "@type": "GeoCoordinates", "latitude": 36.1901, "longitude": 44.0091 },
-        "openingHoursSpecification": [
-          { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"], "opens": "10:00", "closes": "18:00" }
-        ],
-        "knowsLanguage": ["ckb", "ku", "ar", "en"],
-        "contactPoint": { "@type": "ContactPoint", "contactType": "project enquiries", "email": "hello@bqurtas.com", "telephone": "+9647517884985", "availableLanguage": ["Kurdish", "Arabic", "English"] },
-        "makesOffer": [
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Brand Identity & Logo Design" } },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Brand systems, print & launch materials" } },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Book Cover & Editorial Design" } },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Poster & Print Design" } },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Photography & Photo Editing" } },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Video Editing & Motion Graphics" } }
-        ]
-      },
-      {
-        "@type": "FAQPage",
-        "@id": "https://bqurtas.com/#faq",
-        "mainEntity": [
-          { "@type": "Question", "name": "Who is Barakat Qurtas, the graphic designer in Erbil?", "acceptedAnswer": { "@type": "Answer", "text": "Barakat Qurtas is an independent graphic and motion designer based in Hewlêr (Erbil), Kurdistan Region of Iraq, with a decade of practice and 1000+ works since 2014 across brand identity, logos, editorial, print, posters, photography and video." } },
-          { "@type": "Question", "name": "What does a Kurdish graphic designer in Erbil typically work on?", "acceptedAnswer": { "@type": "Answer", "text": "Barakat Qurtas (Bqurtas) serves clients across Kurdistan, Iraq and internationally with brand systems, print, editorial and motion — bilingual Kurdish/Latin work included." } },
-          { "@type": "Question", "name": "What graphic design services does Barakat Qurtas offer?", "acceptedAnswer": { "@type": "Answer", "text": "Brand identity and logo design, book cover and editorial design, posters and print design, photography and photo editing, and video editing and motion graphics. He replies to every serious enquiry within 48 hours." } },
-          { "@type": "Question", "name": "Where is Barakat Qurtas located and what areas does he serve?", "acceptedAnswer": { "@type": "Answer", "text": "He is based in Hewlêr (Erbil), Kurdistan Region of Iraq, and works with clients across Kurdistan and Iraq, as well as internationally on a remote basis. He works in Kurdish (Sorani), Arabic and English." } },
-          { "@type": "Question", "name": "How can I hire a graphic designer in Erbil or contact Barakat Qurtas?", "acceptedAnswer": { "@type": "Answer", "text": "Email hello@bqurtas.com or use the contact page at https://bqurtas.com/contact. Project communication is available in Kurdish, Arabic and English." } }
-        ]
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://bqurtas.com/#website",
+      "name": "Barakat Qurtas",
+      "alternateName": [
+        "Bqurtas",
+        "Bqurtas Design",
+        "Barakat Qurtas Portfolio"
+      ],
+      "url": "https://bqurtas.com/",
+      "inLanguage": [
+        "en",
+        "ckb",
+        "ku",
+        "ar",
+        "fr",
+        "tr",
+        "sv"
+      ],
+      "publisher": {
+        "@id": "https://bqurtas.com/#person"
       }
-    ]
-  }
+    },
+    {
+      "@type": "ProfilePage",
+      "@id": "https://bqurtas.com/#profilepage",
+      "url": "https://bqurtas.com/",
+      "name": "Barakat Qurtas — Graphic Designer in Erbil, Kurdistan",
+      "description": "The official portfolio and profile of Kurdish graphic and motion designer Barakat Qurtas in Erbil, Kurdistan Region of Iraq.",
+      "dateModified": "2026-08-16",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://bqurtas.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://bqurtas.com/#person"
+      },
+      "about": [
+        {
+          "@id": "https://bqurtas.com/#person"
+        },
+        {
+          "@id": "https://bqurtas.com/#service"
+        }
+      ],
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "url": "https://bqurtas.com/assets/portrait.webp"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://bqurtas.com/#person",
+      "name": "Barakat Qurtas",
+      "alternateName": [
+        "Bqurtas",
+        "بەرەکات قورتاس",
+        "بەرکەت قورتاس",
+        "بركات قرطاس",
+        "Barakat Qurtas"
+      ],
+      "jobTitle": "Graphic Designer",
+      "description": "Independent graphic and motion designer in Erbil, Kurdistan Region of Iraq — brand identity, logos, editorial, print and motion since 2014.",
+      "url": "https://bqurtas.com/",
+      "image": "https://bqurtas.com/assets/portrait.webp",
+      "email": "hello@bqurtas.com",
+      "telephone": "+9647517884985",
+      "mainEntityOfPage": {
+        "@id": "https://bqurtas.com/#profilepage"
+      },
+      "homeLocation": {
+        "@type": "City",
+        "name": "Erbil (Hewlêr), Kurdistan Region, Iraq"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Gullan St. 40M",
+        "addressLocality": "Erbil",
+        "addressRegion": "Kurdistan Region",
+        "postalCode": "44001",
+        "addressCountry": "IQ"
+      },
+      "knowsLanguage": [
+        "ckb",
+        "ku",
+        "ar",
+        "en",
+        "fr",
+        "tr",
+        "fa"
+      ],
+      "sameAs": [
+        "https://www.linkedin.com/in/bqurtas/",
+        "https://instagram.com/bqurtas",
+        "https://www.behance.net/bqurtas",
+        "https://dribbble.com/bqurtas",
+        "https://www.facebook.com/bqurtas",
+        "https://twitter.com/bqurtas",
+        "https://t.me/bqurtas",
+        "https://wa.me/9647517884985",
+        "https://presidency.gov.krd/en/home"
+      ],
+      "knowsAbout": [
+        "Graphic design",
+        "Graphic designer in Erbil",
+        "Graphic designer in Kurdistan",
+        "Graphic designer in Iraq",
+        "Kurdish graphic design",
+        "Brand identity",
+        "Logo design",
+        "Editorial design",
+        "Book cover design",
+        "Poster design",
+        "Print design",
+        "Advertising campaigns",
+        "Social media design",
+        "Event and conference design",
+        "Stationery and business card design",
+        "Certificate design",
+        "Photography",
+        "Photo retouching",
+        "Video editing",
+        "Motion graphics",
+        "AI-assisted visual production",
+        "Kurdish typography",
+        "Arabic typography",
+        "Bilingual Kurdish-Arabic-Latin design systems"
+      ],
+      "birthPlace": {
+        "@type": "Place",
+        "name": "Soran, Kurdistan Region, Iraq"
+      },
+      "nationality": {
+        "@type": "Country",
+        "name": "Iraq"
+      },
+      "hasOccupation": {
+        "@type": "Occupation",
+        "name": "Graphic Designer",
+        "occupationalCategory": "27-1024.00",
+        "occupationLocation": [
+          {
+            "@type": "City",
+            "name": "Erbil (Hewlêr)"
+          },
+          {
+            "@type": "AdministrativeArea",
+            "name": "Kurdistan Region, Iraq"
+          },
+          {
+            "@type": "Country",
+            "name": "Iraq"
+          }
+        ],
+        "skills": "Brand identity, logo design, editorial and book design, poster design, print production, advertising campaigns, social media design, photography, video editing, motion graphics, Kurdish and Arabic typography"
+      },
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "Salahaddin University — Erbil",
+        "sameAs": "https://su.edu.krd/"
+      },
+      "award": [
+        "Shield of Honor & Certificate of Appreciation — Nuche Net Agency, 2025",
+        "Honorary Gift of the Office of the President — Kurdistan Region Presidency, 2024",
+        "Shield of Honor — Soran University, 2023",
+        "Honor & Appreciation, World Volunteer Day — Governor of Erbil, 2020",
+        "Respect & Appreciation — Coordination Network of Organizations, 2020"
+      ],
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Directorate of Media Affairs, Kurdistan Region Presidency",
+        "sameAs": "https://presidency.gov.krd/en/home"
+      },
+      "affiliation": [
+        {
+          "@type": "Organization",
+          "name": "Nuche Net Agency"
+        },
+        {
+          "@type": "Organization",
+          "name": "Kurdistan Democratic Youth Union"
+        },
+        {
+          "@type": "Organization",
+          "name": "CNO Organizations"
+        },
+        {
+          "@type": "Organization",
+          "name": "Justice NGO for Lagan Issues"
+        }
+      ]
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 1,
+      "name": "Design",
+      "url": "https://bqurtas.com/design"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 2,
+      "name": "The Journal",
+      "url": "https://bqurtas.com/blog"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 3,
+      "name": "The Designer",
+      "url": "https://bqurtas.com/bio"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 4,
+      "name": "Let's talk.",
+      "url": "https://bqurtas.com/contact"
+    },
+    {
+      "@type": "ProfessionalService",
+      "@id": "https://bqurtas.com/#service",
+      "name": "Barakat Qurtas — Independent Design Studio",
+      "slogan": "Kurdish design identity, built in Erbil and made for everywhere.",
+      "foundingDate": "2014",
+      "description": "Independent graphic & motion design studio in Hewlêr (Erbil), Kurdistan Region of Iraq — brand identity, logos, book covers, editorial layout, posters, printing, photography and video. A decade of practice, 1000+ works since 2014.",
+      "keywords": "graphic designer Erbil, Kurdish graphic designer, brand identity Kurdistan, logo design Iraq, editorial design, print design, motion graphics",
+      "url": "https://bqurtas.com/",
+      "image": "https://bqurtas.com/assets/portrait.webp",
+      "logo": "https://bqurtas.com/assets/logo-padded.webp",
+      "email": "hello@bqurtas.com",
+      "telephone": "+9647517884985",
+      "priceRange": "$$",
+      "currenciesAccepted": "IQD, USD",
+      "paymentAccepted": "Cash, Bank transfer",
+      "sameAs": [
+        "https://www.linkedin.com/in/bqurtas/",
+        "https://instagram.com/bqurtas",
+        "https://www.behance.net/bqurtas"
+      ],
+      "founder": {
+        "@id": "https://bqurtas.com/#person"
+      },
+      "areaServed": [
+        {
+          "@type": "City",
+          "name": "Erbil (Hewlêr)"
+        },
+        {
+          "@type": "AdministrativeArea",
+          "name": "Kurdistan Region, Iraq"
+        },
+        {
+          "@type": "Country",
+          "name": "Iraq"
+        },
+        {
+          "@type": "Place",
+          "name": "Middle East"
+        },
+        {
+          "@type": "Place",
+          "name": "Worldwide (remote)"
+        }
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Gullan St. 40M",
+        "addressLocality": "Erbil",
+        "addressRegion": "Kurdistan Region",
+        "postalCode": "44001",
+        "addressCountry": "IQ"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 36.1901,
+        "longitude": 44.0091
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Saturday",
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday"
+          ],
+          "opens": "10:00",
+          "closes": "18:00"
+        }
+      ],
+      "knowsLanguage": [
+        "ckb",
+        "ku",
+        "ar",
+        "en"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "project enquiries",
+        "email": "hello@bqurtas.com",
+        "telephone": "+9647517884985",
+        "availableLanguage": [
+          "Kurdish",
+          "Arabic",
+          "English"
+        ]
+      },
+      "makesOffer": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Brand Identity & Logo Design"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Brand systems, print & launch materials"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Book Cover & Editorial Design"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Poster & Print Design"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Photography & Photo Editing"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Video Editing & Motion Graphics"
+          }
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://bqurtas.com/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Who is Barakat Qurtas, the graphic designer in Erbil?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Barakat Qurtas is an independent graphic and motion designer based in Hewlêr (Erbil), Kurdistan Region of Iraq, with a decade of practice and 1000+ works since 2014 across brand identity, logos, editorial, print, posters, photography and video."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What does a Kurdish graphic designer in Erbil typically work on?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Barakat Qurtas (Bqurtas) serves clients across Kurdistan, Iraq and internationally with brand systems, print, editorial and motion — bilingual Kurdish/Latin work included."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What graphic design services does Barakat Qurtas offer?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Brand identity and logo design, book cover and editorial design, posters and print design, photography and photo editing, and video editing and motion graphics. He replies to every serious enquiry within 48 hours."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where is Barakat Qurtas located and what areas does he serve?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "He is based in Hewlêr (Erbil), Kurdistan Region of Iraq, and works with clients across Kurdistan and Iraq, as well as internationally on a remote basis. He works in Kurdish (Sorani), Arabic and English."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How can I hire a graphic designer in Erbil or contact Barakat Qurtas?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Email hello@bqurtas.com or use the contact page at https://bqurtas.com/contact. Project communication is available in Kurdish, Arabic and English."
+          }
+        }
+      ]
+    }
+  ]
+}
   </script>
 
   <!-- Gallery thumbnails are first-party, so media CDNs stay deferred until
