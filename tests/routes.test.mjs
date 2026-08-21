@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { onRequest } from '../functions/[[route]].js';
 import { onRequestPost as onTwoFactorPost } from '../functions/api/2fa.js';
 
@@ -33,6 +34,18 @@ test('known app routes and static files continue to Pages', async () => {
   assert.equal((await runRoute('/blog/12')).status, 204);
   assert.equal((await runRoute('/assets/avatar.webp', 'image/avif,image/webp,*/*')).status, 204);
   assert.equal((await runRoute('/sitemap-images.xml', 'application/xml')).status, 204);
+});
+
+test('every canonical sitemap page is handled by the application router', async () => {
+  const xml = await readFile(new URL('../preview_site/sitemap.xml', import.meta.url), 'utf8');
+  const urls = [...xml.matchAll(/<loc>(https:\/\/bqurtas\.com[^<]*)<\/loc>/g)]
+    .map((match) => new URL(match[1]));
+  assert.ok(urls.length > 0, 'sitemap.xml should contain canonical page URLs');
+
+  for (const url of urls) {
+    const response = await runRoute(url.pathname);
+    assert.notEqual(response.status, 404, `${url.pathname} is listed in the sitemap but the router returns 404`);
+  }
 });
 
 test('mail autoconfig and autodiscover publish SpaceMail IMAP/SMTP hosts', async () => {

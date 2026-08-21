@@ -180,6 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const pfx = (t && t.title) || (c && c.title) || fb || '';
     return `${pfx} ${galDigits(String(i).padStart(2, '0'))}`;
   };
+  const galViewLabel = (title) => `${(window.BQ_DICT && window.BQ_DICT['a11y.view']) || 'View'} ${title}`;
   const ORDER = [
     'general','official','book','image','logo',
     'posters','social','events','business','invoices',
@@ -219,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       : `<img loading="lazy" decoding="async" fetchpriority="low" src="${imgSrc}" alt="${dispTitle}" width="${dims.width}" height="${dims.height}" />`;
 
     article.innerHTML = `
-      <button class="card-open" type="button" aria-label="View ${dispTitle}">
+      <button class="card-open" type="button" aria-label="${galViewLabel(dispTitle)}">
         <span class="card-art card-art--photo">
           ${mediaHtml}
           <span class="card-hover-shade" aria-hidden="true"></span>
@@ -410,7 +411,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const tg = card.querySelector('.card-tag');
       if (tg) tg.textContent = galTag(coll, '');
       const tt = card.querySelector('.card-title'); if (tt) tt.textContent = title;
-      const open = card.querySelector('.card-open'); if (open) open.setAttribute('aria-label', `View ${title}`);
+      const open = card.querySelector('.card-open'); if (open) open.setAttribute('aria-label', galViewLabel(title));
       const media = card.querySelector('img, video');
       if (media) { if (media.tagName === 'IMG') media.alt = title; else media.title = title; }
     });

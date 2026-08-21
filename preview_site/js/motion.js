@@ -435,6 +435,7 @@
      flashes in the top-left corner on load. */
   var px = -100, py = -100;
   var rx = px, ry = py;
+  var magnetX = 0, magnetY = 0;
   var seen = false;
   var frame = 0;
 
@@ -444,17 +445,37 @@
   var HOVER = 'a[href], button, [role="button"], input, textarea, select, summary,' +
               '.tab, .mm-link, .service-trigger, .index-row, .rail-link, .mobilebar-btn';
 
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function cursorAction(target) {
+    if (!target || !target.closest) return '';
+    if (target.closest('#grid .card, .logos-grid .logo-mark, .cert-grid a')) return 'view';
+    if (target.closest('a[href^="mailto:"], a[href^="tel:"], a[href*="wa.me"], [data-route="contact"]')) return 'talk';
+    if (target.closest('button[type="submit"], .pitch-submit')) return 'send';
+    if (target.closest('.mm-link, .hero-cta, .service-cta, .bio-teaser-link, .blog-more, .latest-blog-all')) return 'open';
+    return '';
+  }
+
+  function actionLabel(action) {
+    var fallback = { view: 'View', talk: 'Talk', send: 'Send', open: 'Open' };
+    return (window.BQ_DICT && window.BQ_DICT['cursor.' + action]) || fallback[action] || '';
+  }
+
   function paint() {
     frame = 0;
     /* The ring eases toward the pointer; the dot is already there. A single
        lerp per frame is what produces the trail — no library needed. */
     var k = reduced.matches ? 1 : 0.18;
-    rx += (px - rx) * k;
-    ry += (py - ry) * k;
+    var tx = px + magnetX;
+    var ty = py + magnetY;
+    rx += (tx - rx) * k;
+    ry += (ty - ry) * k;
     dot.style.transform = 'translate(' + px + 'px,' + py + 'px) translate(-50%,-50%)';
     ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px) translate(-50%,-50%)';
     /* Keep animating while the ring still has ground to cover. */
-    if (Math.abs(px - rx) > 0.1 || Math.abs(py - ry) > 0.1) queue();
+    if (Math.abs(tx - rx) > 0.1 || Math.abs(ty - ry) > 0.1) queue();
   }
 
   function queue() {
@@ -474,10 +495,23 @@
     queue();
 
     var t = e.target;
-    var overCard = !!(t && t.closest && t.closest('#grid .card, .logos-grid .logo-mark, .cert-grid a'));
-    var overHit = !overCard && !!(t && t.closest && t.closest(HOVER));
-    ring.classList.toggle('is-open', overCard);
-    ring.classList.toggle('is-hover', overHit);
+    var hit = t && t.closest && t.closest(HOVER);
+    var action = cursorAction(t);
+    var magnetic = hit && hit.matches('.mm-link, .hero-cta, .service-cta, .bio-teaser-link, .pitch-submit, .footer-email');
+    if (magnetic) {
+      var rect = hit.getBoundingClientRect();
+      magnetX = clamp((rect.left + rect.width / 2 - px) * 0.12, -10, 10);
+      magnetY = clamp((rect.top + rect.height / 2 - py) * 0.12, -10, 10);
+    } else {
+      magnetX = 0;
+      magnetY = 0;
+    }
+    label.textContent = actionLabel(action);
+    ring.dataset.cursorAction = action;
+    ring.classList.toggle('is-open', action === 'view');
+    ring.classList.toggle('has-label', !!action && action !== 'view');
+    ring.classList.toggle('is-hover', !!hit && !action);
+    ring.classList.toggle('is-magnet', !!magnetic);
   }, { passive: true });
 
   /* Leaving the window, or a context menu / tab switch, should take the marks

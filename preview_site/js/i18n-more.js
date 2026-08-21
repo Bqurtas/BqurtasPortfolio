@@ -94,7 +94,7 @@ Object.assign(window.I18N, {
     "cf.choose":"Birini seçin…",
     "qc.location":"Konum",
     "qc.inquiry":"Başvuru",
-    "qc.call":"Doğrudan Ara",
+    "qc.call":"WhatsApp",
     "qc.designer":"Tasarımcı",
     "f.loc":"Erbil — Kürdistan, Irak",
     "lm.load":"{n} tane daha yükle",
@@ -543,7 +543,7 @@ Object.assign(window.I18N, {
     "cf.choose":"Välj ett…",
     "qc.location":"Plats",
     "qc.inquiry":"Förfrågan",
-    "qc.call":"Ring direkt",
+    "qc.call":"WhatsApp",
     "qc.designer":"Formgivare",
     "f.loc":"Erbil — Kurdistan, Irak",
     "lm.load":"Ladda {n} till",
@@ -992,7 +992,7 @@ Object.assign(window.I18N, {
     "cf.choose":"یەکێک هەڵبژێرە…",
     "qc.location":"شوێن",
     "qc.inquiry":"پرسیار",
-    "qc.call":"پەیوەندی ڕاستەوخۆ",
+    "qc.call":"واتساپ",
     "qc.designer":"دیزاینەر",
     "f.loc":"هەولێر — کوردستان، عێراق",
     "lm.load":"بارکردنی {n}ی تر",
@@ -1008,7 +1008,7 @@ Object.assign(window.I18N, {
     "tab.invoices":"پسوولە",
     "tab.image":"وێنە",
     "tab.video":"ڤیدیۆ",
-    "tab.other":"هیتر",
+    "tab.other":"شتەکانی تر",
     "tab.certificate":"شایستەنامە",
     "tab.flex":"فلێکس",
     "d.note":"تێبینییەکی کورت",
@@ -1063,7 +1063,7 @@ Object.assign(window.I18N, {
     "opt.vid":"مۆنتاژی ڤیدیۆ",
     "opt.cv":"نووسینی سیڤی",
     "opt.pm":"بەڕێوەبردنی پڕۆژە",
-    "opt.other":"هیتر",
+    "opt.other":"شتەکانی تر",
     "opt.u500":"خوارووی ٥٠٠ دۆلار",
     "opt.discuss":"با گفتوگۆ بکەین",
     "opt.asap":"بەزووترین کات",
@@ -1187,7 +1187,7 @@ Object.assign(window.I18N, {
     "tab.stationery":"نووسراو",
     "tab.ai":"زیرەکیی دەستکرد",
     "cta.float":"با پێکەوە کار بکەین",
-    "tip.latest":"دواین",
+    "tip.latest":"نوێترین",
     "latest.empty":"ئەم هەفتەیە هیچ نوێکارییەکی نوێ نییە.",
     "latest.new":"نوێ",
     "share.page":"هاوبەشکردنی پەڕە",
@@ -1441,7 +1441,7 @@ Object.assign(window.I18N, {
     "cf.choose":"Yekê hilbijêre…",
     "qc.location":"Cî",
     "qc.inquiry":"Pirsyar",
-    "qc.call":"Telefonê rasterast",
+    "qc.call":"WhatsApp",
     "qc.designer":"Sêwirmend",
     "f.loc":"Hewlêr — Kurdistan, Iraq",
     "lm.load":"{n} bêtir bar bike",
@@ -1890,7 +1890,7 @@ Object.assign(window.I18N, {
     "cf.choose":"اختر واحدًا…",
     "qc.location":"الموقع",
     "qc.inquiry":"استفسار",
-    "qc.call":"اتصال مباشر",
+    "qc.call":"واتساب",
     "qc.designer":"المصمم",
     "f.loc":"أربيل — كردستان، العراق",
     "lm.load":"تحميل {n} إضافية",
@@ -2339,7 +2339,7 @@ Object.assign(window.I18N, {
     "cf.choose":"Choisissez…",
     "qc.location":"Lieu",
     "qc.inquiry":"Demande",
-    "qc.call":"Appel direct",
+    "qc.call":"WhatsApp",
     "qc.designer":"Designer",
     "f.loc":"Erbil — Kurdistan, Irak",
     "lm.load":"Charger {n} de plus",
@@ -2708,5 +2708,14 @@ Object.assign(window.I18N, {
   };
   Object.keys(rooms).forEach(function (lang) {
     window.I18N[lang] = Object.assign(window.I18N[lang] || {}, rooms[lang]);
+  });
+})();
+
+/* Keep the authored v418 identity copy authoritative after the full language
+   dictionaries finish loading. */
+(function applyIdentityCopyAfterFullDictionaries() {
+  var copy = window.BQ_IDENTITY_COPY || {};
+  Object.keys(copy).forEach(function (lang) {
+    window.I18N[lang] = Object.assign(window.I18N[lang] || {}, copy[lang]);
   });
 })();

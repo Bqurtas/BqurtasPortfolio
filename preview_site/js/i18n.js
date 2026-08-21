@@ -69,7 +69,7 @@ window.I18N.en = Object.assign(window.I18N.en || {}, {
     'cf.timeline': 'Timeline', 'cf.hear': 'Where did you hear about me?', 'cf.message': 'Tell me about your project',
     'cf.message.ph': 'A short brief — what is the project, who is it for, what does success look like?',
     'cf.nda': 'I need an NDA before sharing details.', 'cf.choose': 'Choose one…',
-    'qc.location': 'Location', 'qc.inquiry': 'Inquiry', 'qc.call': 'Call Direct', 'qc.designer': 'Designer', 'f.loc': 'Erbil — Kurdistan, Iraq', 'lm.load': 'Load {n} more', 'lm.info': '{shown} / {total} — {rem} remaining',
+    'qc.location': 'Location', 'qc.inquiry': 'Inquiry', 'qc.call': 'WhatsApp', 'qc.designer': 'Designer', 'f.loc': 'Erbil — Kurdistan, Iraq', 'lm.load': 'Load {n} more', 'lm.info': '{shown} / {total} — {rem} remaining',
     'tab.all': 'General', 'tab.official': 'Official', 'tab.posters': 'Posters', 'tab.social': 'Social',
     'tab.logo': 'Logo', 'tab.book': 'Book', 'tab.events': 'Events', 'tab.business': 'Business',
     'tab.invoices': 'Invoices', 'tab.image': 'Image', 'tab.video': 'Video', 'tab.other': 'Other',
@@ -136,7 +136,7 @@ window.__loadI18nMore = function(cb) {
   if (window.__i18nMoreLoading) { window.__i18nMoreCbs.push(cb); return; }
   window.__i18nMoreLoading = true; window.__i18nMoreCbs = [cb];
   var sc = document.createElement('script');
-  sc.src = 'js/i18n-more.min.js?v=422'; sc.async = false;
+  sc.src = 'js/i18n-more.min.js?v=425'; sc.async = false;
   sc.onload = function () {
     window.__i18nMoreLoaded = true;
     window.__i18nMoreLoading = false;
@@ -150,6 +150,75 @@ window.__loadI18nMore = function(cb) {
   };
   document.head.appendChild(sc);
 };
+
+/* Small labels that must be available before the on-demand dictionaries load.
+   They keep accessible names and the homepage teaser in the active language. */
+window.BQ_UI_I18N = {
+  en: {
+    'a11y.primaryNav': 'Primary navigation', 'a11y.sections': 'Sections', 'a11y.toolbar': 'Toolbar', 'a11y.home': 'Home',
+    'a11y.menuOpen': 'Open menu', 'a11y.menuClose': 'Close menu', 'a11y.connect': 'Connect', 'a11y.sharePage': 'Share this page',
+    'a11y.theme': 'Toggle color theme', 'a11y.blogPages': 'Blog pages', 'a11y.previousPage': 'Previous page', 'a11y.nextPage': 'Next page',
+    'a11y.goPage': 'Go to page', 'a11y.preview': 'Portfolio preview', 'a11y.close': 'Close', 'a11y.previous': 'Previous',
+    'a11y.next': 'Next', 'a11y.send': 'Send', 'a11y.postComment': 'Post comment', 'a11y.comment': 'Comment',
+    'a11y.morePosts': 'More posts', 'a11y.previousPost': 'Previous post', 'a11y.nextPost': 'Next post', 'a11y.yourName': 'Your name',
+    'a11y.view': 'View', 'd.latest.desc': 'Short notes on typography, place, and the craft of design.'
+  },
+  ku: {
+    'a11y.primaryNav': 'ڕێنیشاندەری سەرەکی', 'a11y.sections': 'بەشەکان', 'a11y.toolbar': 'شریتی ئامراز', 'a11y.home': 'سەرەتا',
+    'a11y.menuOpen': 'کردنەوەی مینیو', 'a11y.menuClose': 'داخستنی مینیو', 'a11y.connect': 'پەیوەندی', 'a11y.sharePage': 'هاوبەشکردنی ئەم پەڕەیە',
+    'a11y.theme': 'گۆڕینی ڕووکار', 'a11y.blogPages': 'پەڕەکانی بلۆگ', 'a11y.previousPage': 'پەڕەی پێشوو', 'a11y.nextPage': 'پەڕەی دواتر',
+    'a11y.goPage': 'بڕۆ بۆ پەڕە', 'a11y.preview': 'پێشبینینی پۆرتفۆلیۆ', 'a11y.close': 'داخستن', 'a11y.previous': 'پێشوو',
+    'a11y.next': 'دواتر', 'a11y.send': 'ناردن', 'a11y.postComment': 'بڵاوکردنەوەی لێدوان', 'a11y.comment': 'لێدوان',
+    'a11y.morePosts': 'بابەتی زیاتر', 'a11y.previousPost': 'بابەتی پێشوو', 'a11y.nextPost': 'بابەتی دواتر', 'a11y.yourName': 'ناوەکەت',
+    'a11y.view': 'بینینی', 'd.latest.desc': 'تێبینیی کورت لەسەر تایپۆگرافی، شوێن و هونەری دیزاین.'
+  },
+  kmr: {
+    'a11y.primaryNav': 'Rêberiya sereke', 'a11y.sections': 'Beş', 'a11y.toolbar': 'Darikê amûran', 'a11y.home': 'Destpêk',
+    'a11y.menuOpen': 'Menûyê veke', 'a11y.menuClose': 'Menûyê bigire', 'a11y.connect': 'Têkilî', 'a11y.sharePage': 'Vê rûpelê parve bike',
+    'a11y.theme': 'Rûkarê biguherîne', 'a11y.blogPages': 'Rûpelên blogê', 'a11y.previousPage': 'Rûpela berê', 'a11y.nextPage': 'Rûpela paş',
+    'a11y.goPage': 'Here rûpelê', 'a11y.preview': 'Pêşdîtina portfolyoyê', 'a11y.close': 'Bigire', 'a11y.previous': 'Berê',
+    'a11y.next': 'Paş', 'a11y.send': 'Bişîne', 'a11y.postComment': 'Şîroveyê biweşîne', 'a11y.comment': 'Şîrove',
+    'a11y.morePosts': 'Nivîsên din', 'a11y.previousPost': 'Nivîsa berê', 'a11y.nextPost': 'Nivîsa paş', 'a11y.yourName': 'Navê te',
+    'a11y.view': 'Bibîne', 'd.latest.desc': 'Notên kurt li ser tîpografî, cî û hunera sêwirandinê.'
+  },
+  ar: {
+    'a11y.primaryNav': 'التنقل الرئيسي', 'a11y.sections': 'الأقسام', 'a11y.toolbar': 'شريط الأدوات', 'a11y.home': 'الرئيسية',
+    'a11y.menuOpen': 'فتح القائمة', 'a11y.menuClose': 'إغلاق القائمة', 'a11y.connect': 'تواصل', 'a11y.sharePage': 'مشاركة هذه الصفحة',
+    'a11y.theme': 'تبديل المظهر', 'a11y.blogPages': 'صفحات المدونة', 'a11y.previousPage': 'الصفحة السابقة', 'a11y.nextPage': 'الصفحة التالية',
+    'a11y.goPage': 'الانتقال إلى الصفحة', 'a11y.preview': 'معاينة معرض الأعمال', 'a11y.close': 'إغلاق', 'a11y.previous': 'السابق',
+    'a11y.next': 'التالي', 'a11y.send': 'إرسال', 'a11y.postComment': 'نشر التعليق', 'a11y.comment': 'تعليق',
+    'a11y.morePosts': 'مقالات أخرى', 'a11y.previousPost': 'المقال السابق', 'a11y.nextPost': 'المقال التالي', 'a11y.yourName': 'اسمك',
+    'a11y.view': 'عرض', 'd.latest.desc': 'ملاحظات قصيرة عن الطباعة والمكان وحرفة التصميم.'
+  },
+  fr: {
+    'a11y.primaryNav': 'Navigation principale', 'a11y.sections': 'Sections', 'a11y.toolbar': 'Barre d’outils', 'a11y.home': 'Accueil',
+    'a11y.menuOpen': 'Ouvrir le menu', 'a11y.menuClose': 'Fermer le menu', 'a11y.connect': 'Se connecter', 'a11y.sharePage': 'Partager cette page',
+    'a11y.theme': 'Changer le thème', 'a11y.blogPages': 'Pages du blog', 'a11y.previousPage': 'Page précédente', 'a11y.nextPage': 'Page suivante',
+    'a11y.goPage': 'Aller à la page', 'a11y.preview': 'Aperçu du portfolio', 'a11y.close': 'Fermer', 'a11y.previous': 'Précédent',
+    'a11y.next': 'Suivant', 'a11y.send': 'Envoyer', 'a11y.postComment': 'Publier le commentaire', 'a11y.comment': 'Commentaire',
+    'a11y.morePosts': 'Plus d’articles', 'a11y.previousPost': 'Article précédent', 'a11y.nextPost': 'Article suivant', 'a11y.yourName': 'Votre nom',
+    'a11y.view': 'Voir', 'd.latest.desc': 'De brèves notes sur la typographie, le lieu et le métier du design.'
+  },
+  tr: {
+    'a11y.primaryNav': 'Ana gezinme', 'a11y.sections': 'Bölümler', 'a11y.toolbar': 'Araç çubuğu', 'a11y.home': 'Ana sayfa',
+    'a11y.menuOpen': 'Menüyü aç', 'a11y.menuClose': 'Menüyü kapat', 'a11y.connect': 'Bağlan', 'a11y.sharePage': 'Bu sayfayı paylaş',
+    'a11y.theme': 'Temayı değiştir', 'a11y.blogPages': 'Blog sayfaları', 'a11y.previousPage': 'Önceki sayfa', 'a11y.nextPage': 'Sonraki sayfa',
+    'a11y.goPage': 'Sayfaya git', 'a11y.preview': 'Portfolyo önizlemesi', 'a11y.close': 'Kapat', 'a11y.previous': 'Önceki',
+    'a11y.next': 'Sonraki', 'a11y.send': 'Gönder', 'a11y.postComment': 'Yorumu gönder', 'a11y.comment': 'Yorum',
+    'a11y.morePosts': 'Daha fazla yazı', 'a11y.previousPost': 'Önceki yazı', 'a11y.nextPost': 'Sonraki yazı', 'a11y.yourName': 'Adınız',
+    'a11y.view': 'Görüntüle', 'd.latest.desc': 'Tipografi, mekân ve tasarım zanaatı üzerine kısa notlar.'
+  },
+  sv: {
+    'a11y.primaryNav': 'Huvudnavigering', 'a11y.sections': 'Sektioner', 'a11y.toolbar': 'Verktygsfält', 'a11y.home': 'Startsida',
+    'a11y.menuOpen': 'Öppna menyn', 'a11y.menuClose': 'Stäng menyn', 'a11y.connect': 'Anslut', 'a11y.sharePage': 'Dela den här sidan',
+    'a11y.theme': 'Byt tema', 'a11y.blogPages': 'Bloggsidor', 'a11y.previousPage': 'Föregående sida', 'a11y.nextPage': 'Nästa sida',
+    'a11y.goPage': 'Gå till sidan', 'a11y.preview': 'Portfolioförhandsvisning', 'a11y.close': 'Stäng', 'a11y.previous': 'Föregående',
+    'a11y.next': 'Nästa', 'a11y.send': 'Skicka', 'a11y.postComment': 'Publicera kommentar', 'a11y.comment': 'Kommentar',
+    'a11y.morePosts': 'Fler inlägg', 'a11y.previousPost': 'Föregående inlägg', 'a11y.nextPost': 'Nästa inlägg', 'a11y.yourName': 'Ditt namn',
+    'a11y.view': 'Visa', 'd.latest.desc': 'Korta anteckningar om typografi, plats och designhantverk.'
+  }
+};
+
 window.applyLang = function(lang) {
   const requestedLang = lang || 'en';
   let activeLang = requestedLang;
@@ -168,7 +237,9 @@ window.applyLang = function(lang) {
     activeLang = 'en';   // paint English immediately; the requested language re-applies once loaded
   }
   // merge over English so any untranslated key gracefully falls back to en
-  const dict = Object.assign({}, window.I18N.en, window.I18N[activeLang] || window.I18N.en, window.BQ_LOCAL_SEO_I18N[activeLang] || window.BQ_LOCAL_SEO_I18N.en);
+  const dict = Object.assign({}, window.I18N.en, window.I18N[activeLang] || window.I18N.en,
+    window.BQ_LOCAL_SEO_I18N[activeLang] || window.BQ_LOCAL_SEO_I18N.en,
+    window.BQ_UI_I18N.en, window.BQ_UI_I18N[activeLang] || {});
   const documentLang = { ku: 'ckb', kb: 'ku', kmr: 'ku', en: 'en', ar: 'ar', fr: 'fr', sv: 'sv', tr: 'tr' }[activeLang] || activeLang;
   document.documentElement.lang = documentLang;
   document.documentElement.dir = dict.dir;
@@ -183,6 +254,11 @@ window.applyLang = function(lang) {
   document.querySelectorAll('[data-i18n-ph]').forEach(el => {
     const key = el.getAttribute('data-i18n-ph');
     if (dict[key] !== undefined) el.setAttribute('placeholder', dict[key]);
+  });
+  /* accessible names */
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+    const key = el.getAttribute('data-i18n-aria');
+    if (dict[key] !== undefined) el.setAttribute('aria-label', dict[key]);
   });
   /* <option> labels */
   document.querySelectorAll('[data-i18n-opt]').forEach(el => {
@@ -325,7 +401,7 @@ window.I18N_EXTRA = {
   "opt.prd": "Print Design",
   "opt.pkg": "Packaging Design",
   "opt.adv": "Advertising",
-  "opt.smm": "Socialedia Marketing",
+  "opt.smm": "Social Media Marketing",
   "opt.evt": "Event Production",
   "opt.vid": "Video Editing",
   "opt.cv": "Resume Writing",
@@ -395,7 +471,7 @@ window.I18N_EXTRA = {
   "opt.vid": "مۆنتاژی ڤیدیۆ",
   "opt.cv": "نووسینی سیڤی",
   "opt.pm": "بەڕێوەبردنی پڕۆژە",
-  "opt.other": "هیتر",
+  "opt.other": "شتەکانی تر",
   "opt.u500": "کەمتر لە ٥٠٠$",
   "opt.discuss": "با گفتوگۆی لەسەر بکەین",
   "opt.asap": "هەرچی زووتر",
@@ -1617,3 +1693,89 @@ window.I18N_ROOMS_INDEX = {
 Object.keys(window.I18N_ROOMS_INDEX).forEach(function (lang) {
   window.I18N[lang] = Object.assign(window.I18N[lang] || {}, window.I18N_ROOMS_INDEX[lang]);
 });
+
+/* v418 — one authored identity across services, biography, menu and cursor. */
+window.BQ_IDENTITY_COPY = {
+  en: {
+    "menu.practice":"Multidisciplinary creative practice","menu.close":"Close","menu.statement":"Design, image, content and technology — shaped as one connected practice from Kurdistan.",
+    "cursor.view":"View","cursor.open":"Open","cursor.talk":"Talk","cursor.send":"Send",
+    "hero.lede":"I'm Barakat Qurtas — a Kurdish multidisciplinary designer and creative technologist shaping identity, image, content and digital experiences from Hewlêr.",
+    "svc.eye":"What I do","svc.title":"One practice. Every form an idea needs.","svc.lede":"Strategy, identity, image, motion, content and technology — shaped as one connected system from the first thought to the final release.","svc.signature":"Multidisciplinary creative practice","svc.cta":"Discuss a project",
+    "svc.identity":"Identity & Design Systems","svc.identity.sub":"Direction, marks & coherent systems","svc.identity.desc":"From the strategic direction to the smallest production detail, I build identities that are recognisable, usable and made to last.","svc.identity.a":"Creative direction & brand strategy","svc.identity.b":"Logo, type & colour systems","svc.identity.c":"Guidelines, print & launch assets",
+    "svc.editorial":"Editorial, Content & Social","svc.editorial.sub":"Stories, publications & content systems","svc.editorial.desc":"I shape information into a voice people can follow — across books, campaigns, social channels and public communication.","svc.editorial.a":"Editorial design & publications","svc.editorial.b":"Content writing & visual storytelling","svc.editorial.c":"Social media direction & management",
+    "svc.campaign":"Photography, Film & Production","svc.campaign.sub":"Image-making from set to final cut","svc.campaign.desc":"Still or moving, every image is directed as part of the same story — photographed, edited and delivered with purpose.","svc.campaign.a":"Photography & art direction","svc.campaign.b":"Video editing & motion graphics","svc.campaign.c":"Campaign and content production",
+    "svc.motion":"Web, Creative Technology & AI","svc.motion.sub":"Digital experiences & intelligent workflows","svc.motion.desc":"I connect design and technology to build useful digital experiences, creative tools and responsible AI-assisted production workflows.","svc.motion.a":"Web design & front-end production","svc.motion.b":"Creative coding & digital prototyping","svc.motion.c":"AI-assisted research & production",
+    "d.note":"A short note","d.teaser.title":"Not a list of titles. <em>One connected creative practice.</em>","d.teaser.body":"I'm Barakat Qurtas — a multidisciplinary designer, creative technologist and producer in Hewlêr. Since 2014, I have carried ideas from direction and identity through print, photography, motion, content, social systems, AI-assisted production and the web. Different tools; one accountable practice.","d.teaser.think":"Think clearly","d.teaser.make":"Make carefully","d.teaser.deliver":"Deliver completely","d.teaser.link":"Read the full biography"
+  },
+  ku: {
+    "menu.practice":"پراکتیکی داهێنەرانەی فرەپسپۆڕی","menu.close":"داخستن","menu.statement":"دیزاین، وێنە، ناوەڕۆک و تەکنەلۆجیا — لە کوردستانەوە وەک یەک پراکتیکی پێکەوەبەستراو.",
+    "cursor.view":"بینین","cursor.open":"کردنەوە","cursor.talk":"قسە","cursor.send":"ناردن",
+    "hero.lede":"من بەرەکات قورتاسم — دیزاینەرێکی کوردی فرەپسپۆڕ و شارەزای تەکنەلۆجیای داهێنەرانەم کە لە هەولێرەوە ناسنامە، وێنە، ناوەڕۆک و ئەزموونی دیجیتاڵ دروست دەکەم.",
+    "svc.eye":"ئەوەی دەیکەم","svc.title":"یەک پراکتیک؛ هەر شێوەیەک کە بیرۆکەکە پێویستی پێیەتی.","svc.lede":"ستراتیژی، ناسنامە، وێنە، جوڵە، ناوەڕۆک و تەکنەلۆجیا — لە یەکەم بیرۆکەوە تا بڵاوکردنەوەی کۆتایی وەک یەک سیستەمی پێکەوەبەستراو.","svc.signature":"پراکتیکی داهێنەرانەی فرەپسپۆڕی","svc.cta":"گفتوگۆ لەسەر پڕۆژە",
+    "svc.identity":"ناسنامە و سیستەمی دیزاین","svc.identity.sub":"ئاراستە، نیشانە و سیستەمی یەکگرتوو","svc.identity.desc":"لە ئاراستەی ستراتیژییەوە تا بچووکترین وردەکاریی بەرهەمهێنان، ناسنامەیەک دروست دەکەم کە ناسراو، بەکارهێنراو و بەردەوام بێت.","svc.identity.a":"ئاراستەی داهێنەرانە و ستراتیژیی براند","svc.identity.b":"سیستەمی لۆگۆ، فۆنت و ڕەنگ","svc.identity.c":"ڕێنمایی، چاپ و کەرەستەی بڵاوکردنەوە",
+    "svc.editorial":"ئێدیتۆریاڵ، ناوەڕۆک و سۆشیاڵ","svc.editorial.sub":"چیرۆک، بڵاوکراوە و سیستەمی ناوەڕۆک","svc.editorial.desc":"زانیاری دەکەمە دەنگێک کە خەڵک بتوانن بەدوایدا بڕۆن — لە کتێب و کەمپەینەوە تا سۆشیاڵ میدیا و پەیوەندیی گشتی.","svc.editorial.a":"دیزاینی ئێدیتۆریاڵ و بڵاوکراوە","svc.editorial.b":"نووسینی ناوەڕۆک و چیرۆکگێڕانەوەی بینراو","svc.editorial.c":"ئاراستە و بەڕێوەبردنی سۆشیاڵ میدیا",
+    "svc.campaign":"وێنەگرتن، فیلم و بەرهەمهێنان","svc.campaign.sub":"وێنەسازی لە سێتەوە تا کۆتا مۆنتاژ","svc.campaign.desc":"جا وێنەکە وەستاو بێت یان بجوڵێت، هەمووی وەک بەشێک لە هەمان چیرۆک ئاراستە، دەستکاری و بە ئامانج ڕادەست دەکرێت.","svc.campaign.a":"وێنەگرتن و ئاراستەی هونەری","svc.campaign.b":"مۆنتاژی ڤیدیۆ و مۆشن گرافیک","svc.campaign.c":"بەرهەمهێنانی کەمپەین و ناوەڕۆک",
+    "svc.motion":"وێب، تەکنەلۆجیای داهێنەرانە و AI","svc.motion.sub":"ئەزموونی دیجیتاڵ و workflowی زیرەک","svc.motion.desc":"دیزاین و تەکنەلۆجیا پێکەوە دەبەستم بۆ دروستکردنی ئەزموونی دیجیتاڵ، ئامرازی داهێنەرانە و ڕێڕەوی بەرپرسانەی بەرهەمهێنان بە یارمەتی AI.","svc.motion.a":"دیزاینی وێب و بەرهەمهێنانی front-end","svc.motion.b":"کۆدینگی داهێنەرانە و پرۆتۆتایپی دیجیتاڵ","svc.motion.c":"توێژینەوە و بەرهەمهێنان بە یارمەتی AI",
+    "d.note":"تێبینییەکی کورت","d.teaser.title":"لیستی ناونیشان نییە؛ <em>یەک پراکتیکی داهێنەرانەی پێکەوەبەستراوە.</em>","d.teaser.body":"من بەرەکات قورتاسم — دیزاینەرێکی فرەپسپۆڕ، شارەزای تەکنەلۆجیای داهێنەرانە و بەرهەمهێنەر لە هەولێر. لە ٢٠١٤ـەوە بیرۆکەکانم لە ئاراستە و ناسنامەوە بۆ چاپ، وێنەگرتن، جوڵە، ناوەڕۆک، سیستەمی سۆشیاڵ، بەرهەمهێنانی یارمەتیدراوی AI و وێب بردووە. ئامرازی جیاواز؛ یەک پراکتیکی بەرپرسیار.","d.teaser.think":"ڕوون بیر بکەرەوە","d.teaser.make":"بە وردی دروست بکە","d.teaser.deliver":"بە تەواوی ڕادەست بکە","d.teaser.link":"بایۆگرافیی تەواو بخوێنەوە"
+  },
+  kmr: {
+    "menu.practice":"Pratîka afirîner a piralî","menu.close":"Bigire","menu.statement":"Sêwiran, wêne, naverok û teknolojî — ji Kurdistanê wek yek pratîka girêdayî hatine şêwandin.",
+    "cursor.view":"Bibîne","cursor.open":"Veke","cursor.talk":"Biaxive","cursor.send":"Bişîne",
+    "hero.lede":"Ez Barakat Qurtas im — sêwirmendekî Kurd ê piralî û teknologê afirîner ku ji Hewlêrê nasname, wêne, naverok û ezmûnên dîjîtal diafirînim.",
+    "svc.eye":"Ez çi dikim","svc.title":"Yek pratîk. Her forma ku raman pêwîst dike.","svc.lede":"Stratejî, nasname, wêne, tevger, naverok û teknolojî — ji ramana yekem heta weşana dawî wek yek sîstema girêdayî.","svc.signature":"Pratîka afirîner a piralî","svc.cta":"Li ser projeyekê biaxive",
+    "svc.identity":"Nasname û Sîstemên Sêwiranê","svc.identity.sub":"Rêberî, nîşan û sîstemên hevgirtî","svc.identity.desc":"Ji rêberiya stratejîk heta hûrguliya hilberînê, ez nasnameyên naskirî, bikaranînbar û mayînde ava dikim.","svc.identity.a":"Rêberiya afirîner û stratejiya brandê","svc.identity.b":"Sîstemên logo, tîp û rengan","svc.identity.c":"Rêbername, çap û materyalên destpêkê",
+    "svc.editorial":"Edîtoryal, Naverok û Civakî","svc.editorial.sub":"Çîrok, weşan û sîstemên naverokê","svc.editorial.desc":"Ez agahiyê vediguherînim dengekî ku mirov dikarin bişopînin — di pirtûk, kampanya, kanalan civakî û ragihandina giştî de.","svc.editorial.a":"Sêwirana edîtoryal û weşan","svc.editorial.b":"Nivîsandina naverokê û çîrokbêjiya dîtbarî","svc.editorial.c":"Rêberî û rêveberiya medyaya civakî",
+    "svc.campaign":"Wênekêşî, Fîlm û Hilberîn","svc.campaign.sub":"Wêne ji setê heta birîna dawî","svc.campaign.desc":"Wêne sekinî be an livdar, her yek wek beşeke heman çîrokê tê rêberî, sererastkirin û bi armanc radestkirin.","svc.campaign.a":"Wênekêşî û rêberiya hunerî","svc.campaign.b":"Montaja vîdyoyê û motion grafîk","svc.campaign.c":"Hilberîna kampanya û naverokê",
+    "svc.motion":"Web, Teknolojiya Afirîner û AI","svc.motion.sub":"Ezmûnên dîjîtal û karherikên zîrek","svc.motion.desc":"Ez sêwiran û teknolojiyê girêdidim da ku ezmûnên dîjîtal, amûrên afirîner û karherikên berpirsiyar ên bi alîkariya AI ava bikim.","svc.motion.a":"Sêwirana webê û hilberîna front-end","svc.motion.b":"Koda afirîner û prototîpa dîjîtal","svc.motion.c":"Lêkolîn û hilberîna bi alîkariya AI",
+    "d.note":"Noteyeke kurt","d.teaser.title":"Ne lîsteyek sernavan e. <em>Yek pratîka afirîner a girêdayî ye.</em>","d.teaser.body":"Ez Barakat Qurtas im — sêwirmendekî piralî, teknologê afirîner û hilberîner li Hewlêrê. Ji 2014an ve ramanan ji rêberî û nasnameyê derbasî çap, wênekêşî, tevger, naverok, sîstemên civakî, hilberîna bi alîkariya AI û webê dikim. Amûrên cûda; yek pratîka berpirsiyar.","d.teaser.think":"Zelal bifikire","d.teaser.make":"Bi baldarî çêbike","d.teaser.deliver":"Bi temamî radest bike","d.teaser.link":"Jînenîgariya temam bixwîne"
+  },
+  ar: {
+    "menu.practice":"ممارسة إبداعية متعددة التخصصات","menu.close":"إغلاق","menu.statement":"تصميم وصورة ومحتوى وتقنية — تُصاغ كممارسة واحدة مترابطة من كردستان.",
+    "cursor.view":"عرض","cursor.open":"فتح","cursor.talk":"تحدث","cursor.send":"إرسال",
+    "hero.lede":"أنا بركات قرطاس — مصمم كردي متعدد التخصصات وتقني إبداعي أصنع الهوية والصورة والمحتوى والتجارب الرقمية من أربيل.",
+    "svc.eye":"ما أقدمه","svc.title":"ممارسة واحدة. كل شكل تحتاجه الفكرة.","svc.lede":"الاستراتيجية والهوية والصورة والحركة والمحتوى والتقنية — كنظام واحد مترابط من الفكرة الأولى حتى الإطلاق النهائي.","svc.signature":"ممارسة إبداعية متعددة التخصصات","svc.cta":"ناقش مشروعاً",
+    "svc.identity":"الهوية وأنظمة التصميم","svc.identity.sub":"اتجاه وعلامات وأنظمة متماسكة","svc.identity.desc":"من الاتجاه الاستراتيجي إلى أدق تفاصيل الإنتاج، أبني هويات مميزة وعملية ومصممة لتدوم.","svc.identity.a":"التوجيه الإبداعي واستراتيجية العلامة","svc.identity.b":"أنظمة الشعار والخط واللون","svc.identity.c":"الإرشادات والطباعة ومواد الإطلاق",
+    "svc.editorial":"التحرير والمحتوى والتواصل","svc.editorial.sub":"قصص ومنشورات وأنظمة محتوى","svc.editorial.desc":"أحوّل المعلومات إلى صوت يمكن للناس متابعته — عبر الكتب والحملات والمنصات الاجتماعية والتواصل العام.","svc.editorial.a":"التصميم التحريري والمنشورات","svc.editorial.b":"كتابة المحتوى والسرد البصري","svc.editorial.c":"إدارة وتوجيه وسائل التواصل",
+    "svc.campaign":"التصوير والفيلم والإنتاج","svc.campaign.sub":"صناعة الصورة من الموقع إلى المونتاج","svc.campaign.desc":"سواء كانت الصورة ثابتة أو متحركة، تُوجَّه كجزء من القصة نفسها وتُحرر وتُسلَّم بهدف واضح.","svc.campaign.a":"التصوير والتوجيه الفني","svc.campaign.b":"مونتاج الفيديو والموشن جرافيك","svc.campaign.c":"إنتاج الحملات والمحتوى",
+    "svc.motion":"الويب والتقنية الإبداعية والذكاء الاصطناعي","svc.motion.sub":"تجارب رقمية ومسارات عمل ذكية","svc.motion.desc":"أربط التصميم بالتقنية لبناء تجارب رقمية مفيدة وأدوات إبداعية ومسارات إنتاج مسؤولة بمساعدة الذكاء الاصطناعي.","svc.motion.a":"تصميم الويب وتطوير الواجهات","svc.motion.b":"البرمجة الإبداعية والنماذج الرقمية","svc.motion.c":"البحث والإنتاج بمساعدة الذكاء الاصطناعي",
+    "d.note":"ملاحظة قصيرة","d.teaser.title":"ليست قائمة مسميات. <em>بل ممارسة إبداعية واحدة مترابطة.</em>","d.teaser.body":"أنا بركات قرطاس — مصمم متعدد التخصصات وتقني إبداعي ومنتج في أربيل. منذ ٢٠١٤ أنقل الأفكار من التوجيه والهوية إلى الطباعة والتصوير والحركة والمحتوى والأنظمة الاجتماعية والإنتاج بمساعدة الذكاء الاصطناعي والويب. أدوات مختلفة؛ وممارسة واحدة مسؤولة.","d.teaser.think":"فكّر بوضوح","d.teaser.make":"اصنع بعناية","d.teaser.deliver":"سلّم باكتمال","d.teaser.link":"اقرأ السيرة كاملة"
+  },
+  fr: {
+    "menu.practice":"Pratique créative multidisciplinaire","menu.close":"Fermer","menu.statement":"Design, image, contenu et technologie — réunis dans une pratique cohérente depuis le Kurdistan.",
+    "cursor.view":"Voir","cursor.open":"Ouvrir","cursor.talk":"Parler","cursor.send":"Envoyer",
+    "hero.lede":"Je suis Barakat Qurtas — designer kurde multidisciplinaire et technologue créatif, je façonne identités, images, contenus et expériences numériques depuis Hewlêr.",
+    "svc.eye":"Ce que je fais","svc.title":"Une seule pratique. Toutes les formes dont une idée a besoin.","svc.lede":"Stratégie, identité, image, mouvement, contenu et technologie — réunis en un système cohérent, de la première idée à la mise en ligne.","svc.signature":"Pratique créative multidisciplinaire","svc.cta":"Parler d'un projet",
+    "svc.identity":"Identité & Systèmes de design","svc.identity.sub":"Direction, signes & systèmes cohérents","svc.identity.desc":"De la direction stratégique au moindre détail de production, je crée des identités reconnaissables, utiles et durables.","svc.identity.a":"Direction créative & stratégie de marque","svc.identity.b":"Systèmes de logo, typographie & couleur","svc.identity.c":"Guides, imprimés & supports de lancement",
+    "svc.editorial":"Éditorial, Contenu & Social","svc.editorial.sub":"Récits, publications & systèmes de contenu","svc.editorial.desc":"Je transforme l'information en une voix que l'on peut suivre — dans les livres, campagnes, réseaux sociaux et communications publiques.","svc.editorial.a":"Design éditorial & publications","svc.editorial.b":"Rédaction de contenu & narration visuelle","svc.editorial.c":"Direction & gestion des réseaux sociaux",
+    "svc.campaign":"Photographie, Film & Production","svc.campaign.sub":"De la prise de vue au montage final","svc.campaign.desc":"Fixe ou en mouvement, chaque image appartient au même récit — dirigée, montée et livrée avec intention.","svc.campaign.a":"Photographie & direction artistique","svc.campaign.b":"Montage vidéo & motion design","svc.campaign.c":"Production de campagnes & de contenu",
+    "svc.motion":"Web, Technologie créative & IA","svc.motion.sub":"Expériences numériques & flux intelligents","svc.motion.desc":"Je relie design et technologie pour créer des expériences numériques utiles, des outils créatifs et des flux de production IA responsables.","svc.motion.a":"Web design & production front-end","svc.motion.b":"Code créatif & prototypage numérique","svc.motion.c":"Recherche & production assistées par IA",
+    "d.note":"Une courte note","d.teaser.title":"Pas une liste de titres. <em>Une pratique créative cohérente.</em>","d.teaser.body":"Je suis Barakat Qurtas — designer multidisciplinaire, technologue créatif et producteur à Hewlêr. Depuis 2014, je porte les idées de la direction et de l'identité vers l'imprimé, la photographie, le motion, le contenu, les systèmes sociaux, la production assistée par IA et le web. Des outils différents ; une seule pratique responsable.","d.teaser.think":"Penser clairement","d.teaser.make":"Faire avec soin","d.teaser.deliver":"Livrer entièrement","d.teaser.link":"Lire la biographie complète"
+  },
+  tr: {
+    "menu.practice":"Çok disiplinli yaratıcı pratik","menu.close":"Kapat","menu.statement":"Tasarım, görüntü, içerik ve teknoloji — Kürdistan'dan tek ve bağlantılı bir pratik olarak şekillenir.",
+    "cursor.view":"Gör","cursor.open":"Aç","cursor.talk":"Konuş","cursor.send":"Gönder",
+    "hero.lede":"Ben Barakat Qurtas — Hewlêr'den kimlik, görüntü, içerik ve dijital deneyimler üreten çok disiplinli Kürt tasarımcı ve yaratıcı teknoloji uzmanıyım.",
+    "svc.eye":"Ne yapıyorum","svc.title":"Tek bir pratik. Bir fikrin ihtiyaç duyduğu her biçim.","svc.lede":"Strateji, kimlik, görüntü, hareket, içerik ve teknoloji — ilk düşünceden son yayına kadar tek bir bağlı sistem.","svc.signature":"Çok disiplinli yaratıcı pratik","svc.cta":"Bir proje konuşalım",
+    "svc.identity":"Kimlik & Tasarım Sistemleri","svc.identity.sub":"Yön, işaretler & tutarlı sistemler","svc.identity.desc":"Stratejik yönden en küçük üretim detayına kadar tanınan, kullanılabilen ve kalıcı kimlikler kuruyorum.","svc.identity.a":"Yaratıcı yön & marka stratejisi","svc.identity.b":"Logo, tipografi & renk sistemleri","svc.identity.c":"Kılavuz, baskı & lansman öğeleri",
+    "svc.editorial":"Editöryel, İçerik & Sosyal","svc.editorial.sub":"Hikâyeler, yayınlar & içerik sistemleri","svc.editorial.desc":"Bilgiyi insanların takip edebileceği bir sese dönüştürüyorum — kitaplar, kampanyalar, sosyal kanallar ve kamusal iletişim boyunca.","svc.editorial.a":"Editöryel tasarım & yayınlar","svc.editorial.b":"İçerik yazımı & görsel anlatım","svc.editorial.c":"Sosyal medya yönü & yönetimi",
+    "svc.campaign":"Fotoğraf, Film & Prodüksiyon","svc.campaign.sub":"Setten son kurguya görüntü üretimi","svc.campaign.desc":"Durağan ya da hareketli, her görüntü aynı hikâyenin parçası olarak yönlendirilir, düzenlenir ve amaçla teslim edilir.","svc.campaign.a":"Fotoğraf & sanat yönetimi","svc.campaign.b":"Video kurgu & motion grafik","svc.campaign.c":"Kampanya ve içerik prodüksiyonu",
+    "svc.motion":"Web, Yaratıcı Teknoloji & Yapay Zekâ","svc.motion.sub":"Dijital deneyimler & akıllı iş akışları","svc.motion.desc":"Faydalı dijital deneyimler, yaratıcı araçlar ve sorumlu yapay zekâ destekli üretim akışları için tasarım ile teknolojiyi bağlıyorum.","svc.motion.a":"Web tasarımı & front-end üretimi","svc.motion.b":"Yaratıcı kodlama & dijital prototipleme","svc.motion.c":"Yapay zekâ destekli araştırma & üretim",
+    "d.note":"Kısa bir not","d.teaser.title":"Bir unvan listesi değil. <em>Tek ve bağlantılı bir yaratıcı pratik.</em>","d.teaser.body":"Ben Barakat Qurtas — Hewlêr'de çok disiplinli tasarımcı, yaratıcı teknoloji uzmanı ve yapımcıyım. 2014'ten beri fikirleri yön ve kimlikten baskı, fotoğraf, hareket, içerik, sosyal sistemler, yapay zekâ destekli üretim ve web'e taşıyorum. Farklı araçlar; tek sorumlu pratik.","d.teaser.think":"Net düşün","d.teaser.make":"Özenle üret","d.teaser.deliver":"Eksiksiz teslim et","d.teaser.link":"Biyografinin tamamını oku"
+  },
+  sv: {
+    "menu.practice":"Tvärdisciplinär kreativ praktik","menu.close":"Stäng","menu.statement":"Design, bild, innehåll och teknik — format som en sammanhängande praktik från Kurdistan.",
+    "cursor.view":"Visa","cursor.open":"Öppna","cursor.talk":"Prata","cursor.send":"Skicka",
+    "hero.lede":"Jag är Barakat Qurtas — en kurdisk tvärdisciplinär designer och kreativ teknolog som formar identitet, bild, innehåll och digitala upplevelser från Hewlêr.",
+    "svc.eye":"Vad jag gör","svc.title":"En praktik. Varje form en idé behöver.","svc.lede":"Strategi, identitet, bild, rörelse, innehåll och teknik — format som ett sammanhängande system från första tanke till slutlig publicering.","svc.signature":"Tvärdisciplinär kreativ praktik","svc.cta":"Diskutera ett projekt",
+    "svc.identity":"Identitet & Designsystem","svc.identity.sub":"Riktning, märken & sammanhängande system","svc.identity.desc":"Från strategisk riktning till minsta produktionsdetalj bygger jag identiteter som känns igen, kan användas och håller över tid.","svc.identity.a":"Kreativ riktning & varumärkesstrategi","svc.identity.b":"Logotyp-, typografi- & färgsystem","svc.identity.c":"Riktlinjer, tryck & lanseringsmaterial",
+    "svc.editorial":"Redaktionellt, Innehåll & Socialt","svc.editorial.sub":"Berättelser, publikationer & innehållssystem","svc.editorial.desc":"Jag formar information till en röst människor kan följa — i böcker, kampanjer, sociala kanaler och offentlig kommunikation.","svc.editorial.a":"Redaktionell design & publikationer","svc.editorial.b":"Innehållsskrivande & visuellt berättande","svc.editorial.c":"Riktning & hantering av sociala medier",
+    "svc.campaign":"Fotografi, Film & Produktion","svc.campaign.sub":"Bildskapande från set till slutklipp","svc.campaign.desc":"Stillbild eller rörelse, varje bild regisseras som del av samma berättelse — fotograferad, redigerad och levererad med avsikt.","svc.campaign.a":"Fotografi & art direction","svc.campaign.b":"Videoredigering & motion graphics","svc.campaign.c":"Kampanj- och innehållsproduktion",
+    "svc.motion":"Webb, Kreativ teknik & AI","svc.motion.sub":"Digitala upplevelser & smarta arbetsflöden","svc.motion.desc":"Jag kopplar design och teknik för att bygga användbara digitala upplevelser, kreativa verktyg och ansvarsfulla AI-stödda produktionsflöden.","svc.motion.a":"Webbdesign & front-end-produktion","svc.motion.b":"Kreativ kodning & digital prototypning","svc.motion.c":"AI-stödd research & produktion",
+    "d.note":"En kort notis","d.teaser.title":"Inte en lista med titlar. <em>En sammanhängande kreativ praktik.</em>","d.teaser.body":"Jag är Barakat Qurtas — tvärdisciplinär designer, kreativ teknolog och producent i Hewlêr. Sedan 2014 har jag fört idéer från riktning och identitet till tryck, fotografi, rörelse, innehåll, sociala system, AI-stödd produktion och webben. Olika verktyg; en ansvarig praktik.","d.teaser.think":"Tänk klart","d.teaser.make":"Skapa omsorgsfullt","d.teaser.deliver":"Leverera komplett","d.teaser.link":"Läs hela biografin"
+  }
+};
+(function applyIdentityCopy(){
+  Object.keys(window.BQ_IDENTITY_COPY).forEach(function (lang) {
+    window.I18N[lang] = Object.assign(window.I18N[lang] || {}, window.BQ_IDENTITY_COPY[lang]);
+  });
+})();

@@ -130,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setLangBadge(lang);
     setDocTitle();
     setRoomChrome(document.body.dataset.room || 'design');
+    if (window.__bqRelocalizeGallery) window.__bqRelocalizeGallery();
     if (routerReady) { syncURL(false); try { if (window.umami) umami.track(); } catch (e) {} }   // Umami: count each language URL (replaceState isn't auto-tracked)
     if (window.__bqRerenderChrome) window.__bqRerenderChrome();
     if (window.__bqRenderActiveHonor) window.__bqRenderActiveHonor();
@@ -356,13 +357,16 @@ document.addEventListener('DOMContentLoaded', () => {
   let lastMenuTrigger = null;
   let menuFrame = 0;
 
-  const syncMenuA11y = (open) => {
+  function syncMenuA11y(open) {
     mobileMenu?.setAttribute('aria-hidden', String(!open));
+    const key = open ? 'a11y.menuClose' : 'a11y.menuOpen';
+    const fallback = open ? 'Close menu' : 'Open menu';
+    const label = (window.BQ_DICT && window.BQ_DICT[key]) || fallback;
     menuTriggers.forEach((trigger) => {
       trigger.setAttribute('aria-expanded', String(open));
-      trigger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      trigger.setAttribute('aria-label', label);
     });
-  };
+  }
 
   const setMenu = (open, trigger) => {
     if (!mobileMenu) return;
@@ -1075,7 +1079,6 @@ document.addEventListener('DOMContentLoaded', () => {
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-modal', 'true');
     overlay.setAttribute('aria-hidden', 'true');
-    overlay.setAttribute('aria-label', 'Portfolio preview');
     overlay.innerHTML = `
       <div class="lb-img-wrap" id="lbWrap">
         <button class="lb-close" id="lbClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
@@ -1085,6 +1088,17 @@ document.addEventListener('DOMContentLoaded', () => {
       <button class="lb-next" id="lbNext" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button>
     `;
     document.body.appendChild(overlay);
+
+    const syncLightboxA11y = () => {
+      const dict = window.BQ_DICT || {};
+      overlay.setAttribute('aria-label', dict['a11y.preview'] || 'Portfolio preview');
+      document.getElementById('lbClose')?.setAttribute('aria-label', dict['a11y.close'] || 'Close');
+      document.getElementById('lbPrev')?.setAttribute('aria-label', dict['a11y.previous'] || 'Previous');
+      document.getElementById('lbNext')?.setAttribute('aria-label', dict['a11y.next'] || 'Next');
+    };
+    syncLightboxA11y();
+    window.__bqLangCb = window.__bqLangCb || [];
+    window.__bqLangCb.push(syncLightboxA11y);
 
     const wrap      = document.getElementById('lbWrap');
     const lbCaption = document.getElementById('lbCaption');
@@ -1101,6 +1115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const show = (idx) => {
+      syncLightboxA11y();
       pool = getPool();
       if (!pool.length) return;
       if (!overlay.classList.contains('is-open')) lastFocus = document.activeElement;

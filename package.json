@@ -5,7 +5,7 @@
   "scripts": {
     "build": "node scripts/build-assets.mjs",
     "dev": "node scripts/build-assets.mjs && node scripts/dev-server.mjs",
-    "check:syntax": "node --check preview_site/js/main.js && node --check preview_site/js/gallery.js && node --check preview_site/js/i18n.js && node --check preview_site/js/i18n-more.js && node --check preview_site/js/enhance.js && node --check preview_site/js/motion.js && node --check preview_site/js/chat-kb.js && node --check preview_site/js/lux.js && node --check functions/api/2fa.js && node --check 'functions/[[route]].js'",
+    "check:syntax": "find preview_site/js functions scripts -type f \\( -name '*.js' -o -name '*.mjs' \\) -print0 | xargs -0 -n1 node --check",
     "validate": "node scripts/validate-site.mjs",
     "test": "npm run check:syntax && npm run validate && node --test tests/*.test.mjs"
   },

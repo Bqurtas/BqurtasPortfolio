@@ -22,4 +22,4 @@ jobs:
       - run: npm run build
       - run: npm test
       - name: Confirm generated bundles are committed
-        run: git diff --exit-code -- preview_site/js/*.v420.min.js
+        run: git diff --exit-code -- preview_site/js/*.min.js preview_site/css/*.min.css

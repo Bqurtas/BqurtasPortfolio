@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 
 const root = resolve('preview_site');
 const html = readFileSync(resolve(root, 'index.html'), 'utf8');
+const i18nSource = readFileSync(resolve(root, 'js/i18n.js'), 'utf8');
 const failures = [];
 
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
@@ -21,9 +22,21 @@ for (const ref of localRefs) {
   if (!existsSync(resolve(root, ref))) failures.push(`missing local asset: ${ref}`);
 }
 
+const ariaKeys = [...new Set([...html.matchAll(/\bdata-i18n-aria="([^"]+)"/g)].map((match) => match[1]))];
+for (const key of ariaKeys) {
+  if (!i18nSource.includes(`'${key}'`) && !i18nSource.includes(`"${key}"`)) {
+    failures.push(`missing accessible-label translation key: ${key}`);
+  }
+}
+
 for (const file of ['site.webmanifest']) {
   try { JSON.parse(readFileSync(resolve(root, file), 'utf8')); }
   catch (error) { failures.push(`${file} is not valid JSON: ${error.message}`); }
+}
+
+for (const [index, match] of [...html.matchAll(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/gi)].entries()) {
+  try { JSON.parse(match[1]); }
+  catch (error) { failures.push(`structured data block ${index + 1} is not valid JSON: ${error.message}`); }
 }
 
 for (const file of ['sitemap.xml', 'sitemap-images.xml']) {
