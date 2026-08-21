@@ -14400,8 +14400,12 @@ a:focus-visible, button:focus-visible, [role="button"]:focus-visible{
    page-push menu and the warm-copper cursor signal.
    ========================================================= */
 :root{
-  --bq-signal:#c56843;
-  --bq-signal-deep:#8f412a;
+  /* Was #c56843 / #8f412a — a copper pair. The site carries no warm colour by
+     the owner's instruction, so the signal is ink and its deep tone is the
+     same ink at rest. Every use of the token follows without touching 41 call
+     sites individually. */
+  --bq-signal:#141414;
+  --bq-signal-deep:#000000;
   --bq-cream:#f1eee7;
   --bq-night:#11110f;
 }
@@ -14726,11 +14730,11 @@ body.menu-open :is(.rail, .mobilebar, .to-top){ opacity:0 !important; pointer-ev
   color:var(--bq-cream) !important;
   overflow:hidden !important;
 }
+/* Paper, not night. This was the one dark sheet in a deck of white ones, and
+   the wash over it was the copper the owner has asked to keep off the site. */
 #design .service-showcase > .paper-scroll{
-  background:
-    radial-gradient(72% 66% at 8% 0%, color-mix(in srgb, var(--bq-signal) 16%, transparent), transparent 68%),
-    var(--bq-night) !important;
-  color:var(--bq-cream) !important;
+  background: var(--bq-paper-sheet, #f3f3f3) !important;
+  color: var(--ink) !important;
 }
 #design .service-showcase .service-showcase-layout{
   width:min(1320px, calc(100% - 2 * var(--pad-x)));
