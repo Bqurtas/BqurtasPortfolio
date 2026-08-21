@@ -99,6 +99,89 @@
       revealItems.forEach(function (el) { el.classList.add('motion-in'); });
     }
 
+    /* ---- masked rise: the two home sheets that arrived with no motion ----
+       "What I do" and "A short note" were assembled and then simply appeared.
+       Everything else on the page has the fade above; these two get a firmer
+       move, because they are the sheets a visitor stops on. Each line is
+       clipped to its own baseline and lifts out from behind it, one after the
+       next, so the sheet composes itself in reading order instead of arriving
+       whole. Selectors live here rather than in the markup so the i18n pass —
+       which rewrites innerHTML on every [data-i18n] node — cannot strip them. */
+    var riseGroups = [
+      { sheet: '#design > .service-showcase',
+        parts: ['.service-showcase-head .section-num',
+                '.service-showcase-head .section-title',
+                '.service-showcase-head .section-lede',
+                '.service-showcase-head .service-cta',
+                '.service-panel'] },
+      { sheet: '#design > .practice-note',
+        parts: ['.bio-teaser-text .section-num',
+                '.bio-teaser-title',
+                '.bio-teaser-text p',
+                '.bio-teaser-link',
+                '.stat',
+                '.software-experience'] }
+    ];
+    var riseSheets = [];
+    riseGroups.forEach(function (group) {
+      var sheet = document.querySelector(group.sheet);
+      if (!sheet) return;
+      var items = [];
+      var step = 0;
+      group.parts.forEach(function (selector) {
+        sheet.querySelectorAll(selector).forEach(function (el) {
+          if (el.dataset.bqRise) return;
+          el.dataset.bqRise = '1';
+          el.classList.add('bq-rise');
+          /* 70ms reads as one continuous move; more and it becomes a queue. */
+          el.style.setProperty('--bq-rise-delay', step * 70 + 'ms');
+          step += 1;
+          items.push(el);
+        });
+      });
+      if (items.length) riseSheets.push({ sheet: sheet, items: items });
+    });
+    var riseItems = riseSheets.reduce(function (all, group) { return all.concat(group.items); }, []);
+    if (riseItems.length) {
+      if (reduce) {
+        riseItems.forEach(function (el) { el.classList.add('is-risen'); });
+      } else {
+        /* Not IntersectionObserver. These two sheets live inside the paper
+           stack, whose sheets sit in a clipped, transformed container, so the
+           observer reports ratio 0 against the viewport root even while the
+           element is plainly on screen — measured, not assumed. getBoundingClientRect
+           does report the true position there, so the scroll position drives it. */
+        var pending = riseSheets.slice();
+        var frame = 0;
+        var checkRise = function () {
+          frame = 0;
+          /* Gate on the SHEET, never on the items. The deck stacks its sheets at
+             the same pinned position, so every item reports itself on screen from
+             the very top of the page and the whole choreography would burn off
+             before the sheet was ever looked at. The sheet's own top is the only
+             honest signal for which one has arrived. */
+          var limit = window.innerHeight * 0.55;
+          for (var i = pending.length - 1; i >= 0; i--) {
+            var group = pending[i];
+            if (group.sheet.getBoundingClientRect().top < limit) {
+              group.items.forEach(function (el) { el.classList.add('is-risen'); });
+              pending.splice(i, 1);
+            }
+          }
+          if (!pending.length) {
+            removeEventListener('scroll', queueRise);
+            removeEventListener('resize', queueRise);
+          }
+        };
+        var queueRise = function () {
+          if (!frame) frame = requestAnimationFrame(checkRise);
+        };
+        addEventListener('scroll', queueRise, { passive: true });
+        addEventListener('resize', queueRise, { passive: true });
+        queueRise();
+      }
+    }
+
     /* ---- top bar hierarchy on scroll ---- */
     var setScrolled = function () {
       document.body.classList.toggle('is-scrolled', window.scrollY > 24);

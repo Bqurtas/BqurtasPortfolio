@@ -17034,3 +17034,101 @@ html.bq-compact .mobilebar #socialPopBtn {
   flex: 0 0 34px !important;
   padding: 0 !important;
 }
+
+/* ============================================================================
+   THE TWO QUIET SHEETS — give them a move of their own.
+
+   "What I do" and "A short note" were built and then simply appeared: no
+   entrance, and nothing under the pointer but a cursor change. They are the
+   sheets a visitor actually stops on, so they get a firmer gesture than the
+   page-wide fade — each line clipped to its own baseline and lifted out from
+   behind it, in reading order. motion.js tags the elements and paces them.
+   ========================================================================== */
+html body #design .bq-rise {
+  /* clipped to a zero-height strip at its own foot, then opened upward */
+  clip-path: inset(100% 0 -0.35em 0);
+  transform: translateY(0.42em);
+  opacity: 0;
+  will-change: clip-path, transform, opacity;
+  transition:
+    clip-path .82s cubic-bezier(.22, 1, .36, 1) var(--bq-rise-delay, 0ms),
+    transform .82s cubic-bezier(.22, 1, .36, 1) var(--bq-rise-delay, 0ms),
+    opacity .5s ease var(--bq-rise-delay, 0ms);
+}
+
+html body #design .bq-rise.is-risen {
+  /* the negative edges keep descenders and the italic's overhang uncut */
+  clip-path: inset(-0.3em 0 -0.35em 0);
+  transform: none;
+  opacity: 1;
+}
+
+/* The stat figures carry the most weight, so they travel a touch further. */
+html body #design .practice-note .stat.bq-rise {
+  transform: translateY(0.6em);
+}
+
+/* ---- Service rows: ink sweeps in under the pointer ------------------------
+   A flat colour swap is the usual answer here. Instead the row fills with the
+   site's ink from the reading edge and the type inverts to paper as it passes,
+   the way a press lays a bar down — a print gesture on a printer's portfolio.
+   The open row keeps its own state and is left alone. */
+#design .service-showcase .service-panel .service-trigger {
+  /* No overflow clip here: a later rule deliberately restores `visible` to stop
+     the trigger cutting its own toggle, and the sweep is bounded by inset:0. */
+  isolation: isolate;
+}
+
+#design .service-showcase .service-panel .service-trigger::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .52s cubic-bezier(.22, 1, .36, 1);
+}
+
+[dir="rtl"] #design .service-showcase .service-panel .service-trigger::before {
+  transform-origin: right center;
+}
+
+#design .service-showcase .service-panel:not(.is-active) .service-trigger:hover::before,
+#design .service-showcase .service-panel:not(.is-active) .service-trigger:focus-visible::before {
+  transform: scaleX(1);
+}
+
+#design .service-showcase .service-panel:not(.is-active) .service-trigger:hover :is(.service-name, .service-sub, .service-index, .service-toggle),
+#design .service-showcase .service-panel:not(.is-active) .service-trigger:focus-visible :is(.service-name, .service-sub, .service-index, .service-toggle) {
+  color: var(--bg) !important;
+  transition: color .3s ease .06s;
+}
+
+/* The index is the row's quiet anchor; let it step aside as the ink arrives. */
+#design .service-showcase .service-panel .service-index {
+  transition: transform .52s cubic-bezier(.22, 1, .36, 1), color .3s ease;
+}
+
+#design .service-showcase .service-panel:not(.is-active) .service-trigger:hover .service-index {
+  transform: translateY(-0.14em);
+}
+
+/* Reduced motion keeps every state, drops the travel. */
+@media (prefers-reduced-motion: reduce) {
+  html body #design .bq-rise,
+  html body #design .bq-rise.is-risen {
+    clip-path: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
+  #design .service-showcase .service-panel .service-trigger::before {
+    transition: none !important;
+  }
+
+  #design .service-showcase .service-panel .service-index {
+    transition: color .3s ease !important;
+  }
+}
