@@ -16989,3 +16989,48 @@ html.bq-cursor-on .cursor-ring {
   mix-blend-mode: difference !important;
   will-change: transform;
 }
+
+/* ============================================================================
+   DOCK BALANCE — one diameter, including the two controls pinned by id.
+
+   The rail's tools all sit at 33px except the theme switch, which stayed 44px
+   and bulged in the middle of the row:  33 · 44 · 33 · 33 · 33.  The hamburger
+   did the same on the other side of the bar, standing 44px next to a 31px
+   pill. Both are held by `#themeToggle` and `#railMenu` in the critical inline
+   sheet, so a class selector can never reach them — the id has to be carried.
+   .rail-tools also stood 54px tall inside a 44px bar because of that one
+   oversized child; with the row even it collapses back to the bar's height.
+   ========================================================================== */
+@media (min-width: 1025px) {
+  html body .rail #themeToggle,
+  html body .rail #railMenu {
+    width: 33px !important;
+    min-width: 33px !important;
+    height: 33px !important;
+    min-height: 33px !important;
+    flex: 0 0 33px !important;
+    padding: 0 !important;
+  }
+
+  html body .rail .rail-tools {
+    height: auto !important;
+    align-items: center !important;
+    padding: 0 !important;
+    gap: 4px !important;
+  }
+}
+
+/* The compact dock pins its own pair the same way. */
+html.bq-compact .mobilebar #themeToggleM,
+html.bq-compact .mobilebar #menuToggle,
+html.bq-compact .mobilebar #railLatestM,
+html.bq-compact .mobilebar #railChatM,
+html.bq-compact .mobilebar #langPopBtn,
+html.bq-compact .mobilebar #socialPopBtn {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  flex: 0 0 34px !important;
+  padding: 0 !important;
+}
