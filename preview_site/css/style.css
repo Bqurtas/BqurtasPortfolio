@@ -15100,25 +15100,32 @@ body.menu-open :is(.rail, .mobilebar, .to-top){ opacity:0 !important; pointer-ev
 /* ---------- branded magnetic cursor ---------- */
 html.bq-cursor-on body,
 html.bq-cursor-on :is(a, button, [role="button"], summary, label, input, textarea, select){ cursor:none !important; }
+/* The cursor is drawn in white and composited with `difference`, so it is the
+   exact inverse of whatever is under it: black over the paper sheets, white
+   over the black bed, the footer and the menu curtain — with no code watching
+   the background. It was `mix-blend-mode: normal` in the signal colour, which
+   is why it read as a dull black dot on white and vanished entirely on black.
+   No blur or coloured shadow here either: both fight the blend and neither
+   survives inversion legibly. */
 .cursor-dot{
   width:6px !important;
   height:6px !important;
   z-index:10002 !important;
-  background:var(--bq-signal) !important;
-  box-shadow:0 0 0 3px color-mix(in srgb, var(--bq-signal) 16%, transparent) !important;
-  mix-blend-mode:normal !important;
+  background:#fff !important;
+  box-shadow:none !important;
+  mix-blend-mode:difference !important;
 }
 .cursor-ring{
   width:40px !important;
   height:40px !important;
   z-index:10001 !important;
-  border:1px solid color-mix(in srgb, var(--bq-signal) 74%, transparent) !important;
-  background:color-mix(in srgb, var(--bq-signal) 4%, transparent) !important;
-  color:var(--bq-cream) !important;
-  box-shadow:0 16px 36px -26px color-mix(in srgb, var(--bq-signal) 75%, transparent) !important;
-  -webkit-backdrop-filter:blur(2px) !important;
-  backdrop-filter:blur(2px) !important;
-  mix-blend-mode:normal !important;
+  border:1px solid rgba(255,255,255,.78) !important;
+  background:rgba(255,255,255,.05) !important;
+  color:#fff !important;
+  box-shadow:none !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+  mix-blend-mode:difference !important;
 }
 .cursor-ring::before{
   content:"" !important;
@@ -15139,24 +15146,26 @@ html.bq-cursor-on :is(a, button, [role="button"], summary, label, input, textare
 .cursor-ring.is-hover{
   width:46px !important;
   height:46px !important;
-  border-color:var(--bq-signal) !important;
-  background:color-mix(in srgb, var(--bq-signal) 9%, transparent) !important;
+  border-color:#fff !important;
+  background:rgba(255,255,255,.10) !important;
 }
 .cursor-ring.is-magnet{
   width:52px !important;
   height:52px !important;
-  border-color:var(--bq-signal) !important;
-  background:color-mix(in srgb, var(--bq-signal) 12%, transparent) !important;
+  border-color:#fff !important;
+  background:rgba(255,255,255,.14) !important;
 }
 .cursor-ring.is-open,
 .cursor-ring.has-label{
   width:66px !important;
   height:66px !important;
-  border-color:var(--bq-signal) !important;
-  background:var(--bq-signal) !important;
-  box-shadow:0 18px 42px -20px color-mix(in srgb, var(--bq-signal) 88%, transparent) !important;
+  border-color:var(--ink) !important;
+  background:var(--ink) !important;
+  box-shadow:0 18px 42px -20px rgba(0,0,0,.45) !important;
   -webkit-backdrop-filter:none !important;
   backdrop-filter:none !important;
+  /* out of the blend: a label has to stay readable, not invert with the disc */
+  mix-blend-mode:normal !important;
 }
 .cursor-ring.is-open::before,
 .cursor-ring.has-label::before{ opacity:0; }

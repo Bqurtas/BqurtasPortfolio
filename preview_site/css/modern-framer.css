@@ -16983,9 +16983,13 @@ html.bq-cursor-on :is(input, textarea, [contenteditable="true"]) {
 
 /* Difference blending is the whole reason these two marks need no colour: they
    invert against whatever is beneath them, so one pair reads on the black bed
-   and on the paper sheets alike. A later rule had flattened it to normal. */
+   and on the paper sheets alike. A later rule had flattened it to normal.
+
+   The labelled disc is excluded. It carries type, and a disc that inverts with
+   its own label behind it is unreadable — that state states its own colours
+   and stays out of the blend. */
 html.bq-cursor-on .cursor-dot,
-html.bq-cursor-on .cursor-ring {
+html.bq-cursor-on .cursor-ring:not(.is-open):not(.has-label) {
   mix-blend-mode: difference !important;
   will-change: transform;
 }
@@ -17286,4 +17290,66 @@ html body #design#design .practice-note .stats .stat .stat-label i {
   html body #design#design .practice-note .stats {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
+}
+
+/* ============================================================================
+   DOCK — balance the composition, not just the gaps.
+
+   The measurements were already even — 34px controls, 6px between each, equal
+   end padding — and the bar still read lopsided, because balance here is about
+   weight, not arithmetic: the hamburger stood alone on the left against a
+   179px call to action and then five icons stacked on the right.
+
+     [menu]  [—— CTA ——]  [•][•][•][•][•]
+
+   Order is a presentational choice, so `order` moves two of the five across to
+   the left of the action without touching the markup or the tab sequence. The
+   bar becomes symmetrical about its centre: three, action, three.
+
+     [menu][•][•]  [—— CTA ——]  [•][•][•]
+   ========================================================================== */
+html.bq-compact .mobilebar {
+  justify-content: center !important;
+}
+
+html.bq-compact .mobilebar > #menuToggle { order: 1 !important; }
+html.bq-compact .mobilebar > #railLatestM { order: 2 !important; }
+html.bq-compact .mobilebar > #railChatM { order: 3 !important; }
+html.bq-compact .mobilebar > .mobilebar-cta { order: 4 !important; }
+html.bq-compact .mobilebar > .mobilebar-pop-wrap:has(#langPopBtn) { order: 5 !important; }
+html.bq-compact .mobilebar > #themeToggleM { order: 6 !important; }
+html.bq-compact .mobilebar > .mobilebar-social-wrap { order: 7 !important; }
+
+/* The action wants a little more air than the icons give each other, so the
+   two spans either side of it read as one gesture rather than a run of seven. */
+html.bq-compact .mobilebar > .mobilebar-cta {
+  margin-inline: 10px !important;
+}
+
+/* Desktop rail: same idea. The tools are one cluster after the action, so the
+   menu opens the bar, the action sits at the centre of gravity and the tools
+   close it — with the action given the same extra air. */
+@media (min-width: 1025px) {
+  html body .rail > .design-cta {
+    margin-inline: 10px !important;
+  }
+}
+
+/* ============================================================================
+   SERVICE DETAIL — stop the open panel running off the sheet.
+
+   `.service-detail-inner` carries `margin-left: 94px` for its indent and a
+   width that resolves to 100% of the panel. Those two do not share: the box
+   ends up its parent's full width and then starts 94px further along, so the
+   open row's copy ran 94px past the panel and 32px past the sheet's rounded
+   edge. Measured with the first panel open — inner right 1282 against a sheet
+   right of 1250. The three closed rows overflow too, but they are height 0, so
+   only the open one shows.
+
+   Width auto lets the block fill what is left after its own margins, which is
+   what the indent assumed all along.
+   ========================================================================== */
+html body #design#design .service-showcase .service-panel .service-detail-inner {
+  width: auto !important;
+  max-width: 100% !important;
 }
