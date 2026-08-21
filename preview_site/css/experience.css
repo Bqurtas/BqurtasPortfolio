@@ -816,3 +816,702 @@ html body[dir="rtl"] #mobileMenu#mobileMenu.mobile-menu {
     display: none !important;
   }
 }
+
+/* ============================================================================
+   v18 — ONE PAPER SYSTEM
+
+   The home deck, Journal, Designer and Contact now share one silhouette and
+   one hand-off. The final layer also restores the phone cards to the sticky
+   stack after the earlier natural-flow experiment separated them.
+   ========================================================================== */
+
+:root {
+  --bq-room-radius: var(--bq-deck-radius, 24px);
+  --bq-menu-paper: #f3f1eb;
+  --bq-menu-muted: rgba(243, 241, 235, .48);
+  --bq-menu-line: rgba(243, 241, 235, .16);
+}
+
+/* Home cards: fixed paper silhouettes that rise over one another. */
+html body #design#design > .section.service-showcase.paper-sheet,
+html body #design#design > .section.practice-note.paper-sheet {
+  position: sticky !important;
+  top: var(--bq-stack-top, 10px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: var(--bq-stack-sheet-h) !important;
+  min-height: 0 !important;
+  max-height: var(--bq-stack-sheet-h) !important;
+  margin-block-end: calc(var(--bq-card-gap, 10px) + var(--bq-flow-extra, 0px)) !important;
+  overflow: hidden !important;
+  opacity: calc(1 - (var(--bq-fade, 0) * .9)) !important;
+  visibility: visible !important;
+  filter: blur(calc(var(--bq-fade, 0) * var(--bq-paper-blur, 10px))) !important;
+  transform:
+    translate3d(0, calc(0px - var(--bq-push-y, 0px)), 0)
+    scale(calc(1 - (var(--bq-out, 0) * var(--bq-paper-scale, .06)))) !important;
+  transform-origin: 50% 50% !important;
+}
+
+html body #design#design > .section.service-showcase.paper-sheet.is-paper-gone,
+html body #design#design > .section.practice-note.paper-sheet.is-paper-gone {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+html body #design#design .section.service-showcase.paper-sheet > .paper-scroll,
+html body #design#design .section.practice-note.paper-sheet > .paper-scroll {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  scrollbar-width: none !important;
+}
+
+html body #design#design .section.service-showcase.paper-sheet > .paper-scroll::-webkit-scrollbar,
+html body #design#design .section.practice-note.paper-sheet > .paper-scroll::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Every secondary room is a deck of the same rounded cards as the home room. */
+html body .room.paper-stack,
+html body[dir="rtl"] .room.paper-stack {
+  padding: var(--bq-deck-gutter, 10px) !important;
+  background: var(--bq-paper-underlay, #0a0a0a) !important;
+}
+
+html body .room.paper-stack > .paper-sheet {
+  position: sticky !important;
+  top: var(--bq-stack-top, 10px) !important;
+  width: 100% !important;
+  height: var(--bq-stack-sheet-h) !important;
+  min-height: 0 !important;
+  max-height: var(--bq-stack-sheet-h) !important;
+  margin-block: 0 calc(var(--bq-card-gap, 10px) + var(--bq-flow-extra, 0px)) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: var(--bq-room-radius) !important;
+  background: var(--bq-paper-sheet) !important;
+  box-shadow: 0 34px 76px -44px rgba(0, 0, 0, .58) !important;
+  opacity: calc(1 - (var(--bq-fade, 0) * .9)) !important;
+  filter: blur(calc(var(--bq-fade, 0) * var(--bq-paper-blur, 10px))) !important;
+  transform:
+    translate3d(0, calc(0px - var(--bq-push-y, 0px)), 0)
+    scale(calc(1 - (var(--bq-out, 0) * var(--bq-paper-scale, .06)))) !important;
+  transform-origin: 50% 50% !important;
+}
+
+html body .room.paper-stack > .paper-sheet.is-paper-gone {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+html body .room.paper-stack > .paper-sheet > .paper-scroll {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  border-radius: inherit !important;
+  box-sizing: border-box !important;
+}
+
+html body .room.paper-stack > .room-hero.paper-sheet > .paper-scroll {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  padding: clamp(42px, 7vh, 88px) clamp(20px, 4vw, 56px) !important;
+}
+
+html body .room.paper-stack > .section.paper-sheet > .paper-scroll {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain !important;
+  padding: clamp(28px, 4vh, 52px) clamp(18px, 3.2vw, 44px) clamp(74px, 9vh, 96px) !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+html body .room.paper-stack > .section.paper-sheet > .paper-scroll::-webkit-scrollbar {
+  display: none !important;
+}
+
+html body .room.paper-stack .sheet-mid {
+  width: min(100%, 1180px) !important;
+  margin-inline: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Short note: no process rail, no nested scroll, one composed card. */
+html body #design#design .practice-note > .paper-scroll {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: clamp(18px, 2.6vh, 28px) !important;
+  padding: clamp(24px, 3.4vh, 44px) clamp(18px, 3vw, 42px) clamp(86px, 10vh, 108px) !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+html body #design#design .practice-note > .paper-scroll > .sheet-mid {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  width: min(100%, 1120px) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin-inline: auto !important;
+  gap: 18px !important;
+}
+
+html body #design#design .practice-note .bio-teaser {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
+html body #design#design .practice-note .bio-teaser-grid {
+  display: grid !important;
+  grid-template-columns: minmax(220px, .64fr) minmax(0, 1fr) !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  column-gap: clamp(28px, 4vw, 58px) !important;
+  row-gap: 16px !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+html body #design#design .practice-note .bio-teaser-portrait {
+  grid-column: 1 !important;
+  grid-row: 1 / span 2 !important;
+  width: 100% !important;
+  height: clamp(300px, 47vh, 430px) !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+}
+
+html body #design#design .practice-note .bio-teaser-text {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  gap: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+html body #design#design .practice-note .bio-teaser-title {
+  margin: 0 0 12px !important;
+  max-width: 18ch !important;
+  font-size: clamp(28px, 3.15vw, 44px) !important;
+  line-height: 1.08 !important;
+}
+
+html body #design#design .practice-note .bio-teaser-text > p {
+  margin: 0 0 18px !important;
+  max-width: 48ch !important;
+  font-size: clamp(13.5px, 1.15vw, 15.5px) !important;
+  line-height: 1.58 !important;
+}
+
+html body #design#design .practice-note .stats {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  align-self: end !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+html body #design#design .practice-note .stats .stat {
+  min-width: 0 !important;
+  padding: 12px 8px 10px 0 !important;
+}
+
+html body #design#design .practice-note .software-experience {
+  display: none !important;
+}
+
+html body #design#design .practice-note .software-lines,
+html body #design#design .practice-note .software-line {
+  height: 70px !important;
+}
+
+html body #design#design .practice-note .software-line--reverse {
+  display: none !important;
+}
+
+/* Menu: a black, text-only index. The page motion stays; decoration leaves. */
+html body #mobileMenu#mobileMenu,
+html body #mobileMenu#mobileMenu .mobile-sheet,
+html body #mobileMenu#mobileMenu .mm-left {
+  background: #0a0a0a !important;
+  color: var(--bq-menu-paper) !important;
+}
+
+html body #mobileMenu#mobileMenu .mm-left,
+html body #mobileMenu#mobileMenu.is-ready .mm-left,
+html body[dir="rtl"] #mobileMenu#mobileMenu .mm-left,
+html body[dir="rtl"] #mobileMenu#mobileMenu.is-ready .mm-left {
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  width: min(41vw, 520px) !important;
+  min-width: 340px !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  padding: clamp(24px, 4vh, 46px) clamp(24px, 3vw, 44px) clamp(20px, 3.5vh, 38px) !important;
+  overflow: hidden !important;
+}
+
+html body #mobileMenu#mobileMenu .mm-menu-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 20px !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+html body #mobileMenu#mobileMenu .mm-menu-monogram,
+html body #mobileMenu#mobileMenu .mm-menu-brand-copy small,
+html body #mobileMenu#mobileMenu .mm-menu-index,
+html body #mobileMenu#mobileMenu .mm-link-copy small,
+html body #mobileMenu#mobileMenu .mm-link > i,
+html body #mobileMenu#mobileMenu .mm-menu-statement,
+html body #mobileMenu#mobileMenu .mm-menu-social {
+  display: none !important;
+}
+
+html body #mobileMenu#mobileMenu .mm-menu-brand,
+html body #mobileMenu#mobileMenu .mm-menu-brand-copy {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: inherit !important;
+}
+
+html body #mobileMenu#mobileMenu .mm-menu-brand-copy strong {
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: .16em !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+  color: var(--bq-menu-paper) !important;
+}
+
+html body #mobileMenu#mobileMenu .mobile-menu-close,
+html body #mobileMenu#mobileMenu.is-ready .mobile-menu-close,
+html body[dir="rtl"] #mobileMenu#mobileMenu .mobile-menu-close,
+html body[dir="rtl"] #mobileMenu#mobileMenu.is-ready .mobile-menu-close {
+  position: static !important;
+  inset: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--bq-menu-paper) !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+  transform: none !important;
+  outline: 0 !important;
+}
+
+html body #mobileMenu#mobileMenu .mobile-menu-close i {
+  display: inline !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+
+html body #mobileMenu#mobileMenu .mobile-menu-close:hover,
+html body #mobileMenu#mobileMenu .mobile-menu-close:focus-visible {
+  color: var(--bq-menu-muted) !important;
+  transform: none !important;
+  outline: 0 !important;
+}
+
+html body #mobileMenu#mobileMenu .mm-link::before,
+html body #mobileMenu#mobileMenu .mm-link::after,
+html body #mobileMenu#mobileMenu .mm-link-text::before,
+html body #mobileMenu#mobileMenu .mm-link-text::after {
+  display: none !important;
+  content: none !important;
+}
+
+html body #mobileMenu#mobileMenu .mm-menu-body {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 0 !important;
+  padding: clamp(18px, 4vh, 42px) 0 !important;
+  overflow: hidden !important;
+}
+
+html body #mobileMenu#mobileMenu .mm-nav {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 0 !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-top: 1px solid var(--bq-menu-line) !important;
+}
+
+html body #mobileMenu#mobileMenu .mm-nav .mm-link,
+html body #mobileMenu#mobileMenu .mm-nav .mm-link.is-active,
+html body #mobileMenu#mobileMenu .mm-nav .mm-link:hover {
+  display: grid !important;
+  grid-template-columns: 30px minmax(0, 1fr) !important;
+  align-items: baseline !important;
+  gap: 14px !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: clamp(13px, 2.2vh, 19px) 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--bq-menu-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--bq-menu-paper) !important;
+  text-decoration: none !important;
+  opacity: .48 !important;
+  transform: none !important;
+  transition: opacity .25s ease !important;
+}
+
+html body #mobileMenu#mobileMenu .mm-nav .mm-link.is-active,
+html body #mobileMenu#mobileMenu .mm-nav .mm-link:hover,
+html body #mobileMenu#mobileMenu .mm-nav .mm-link:focus-visible {
+  opacity: 1 !important;
+  text-decoration: none !important;
+}
+
+html body #mobileMenu#mobileMenu .mm-nav .mm-link .mm-n {
+  grid-column: 1 !important;
+  font-size: 9px !important;
+  letter-spacing: .12em !important;
+  color: var(--bq-menu-muted) !important;
+}
+
+html body #mobileMenu#mobileMenu .mm-nav .mm-link .mm-link-copy {
+  grid-column: 2 !important;
+  display: block !important;
+  width: 100% !important;
+  font-size: inherit !important;
+}
+
+html body #mobileMenu#mobileMenu .mm-nav .mm-link .mm-link-text {
+  display: block !important;
+  width: 100% !important;
+  font-family: 'Manrope', sans-serif !important;
+  font-size: clamp(30px, 3.25vw, 46px) !important;
+  font-weight: 500 !important;
+  line-height: .96 !important;
+  letter-spacing: -.045em !important;
+  color: var(--bq-menu-paper) !important;
+  text-wrap: balance !important;
+}
+
+html body #mobileMenu#mobileMenu .mm-menu-foot {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  padding: 0 !important;
+  border: 0 !important;
+  color: var(--bq-menu-muted) !important;
+  font-size: 9px !important;
+  letter-spacing: .12em !important;
+}
+
+/* Compact layouts: both authored cards fit one viewport and never create a
+   nested scrollbar. The note keeps only its essential text and proof. */
+@media (max-width: 820px) {
+  html body #design#design .service-showcase > .paper-scroll {
+    padding: 18px 16px calc(70px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  html body #design#design .service-showcase .service-showcase-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+
+  html body #design#design .service-showcase .service-showcase-head {
+    position: static !important;
+    inset: auto !important;
+    display: flex !important;
+    flex: 0 0 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    gap: 0 !important;
+    padding: 0 !important;
+  }
+
+  html body #design#design .service-showcase .service-signature {
+    display: none !important;
+  }
+
+  html body #design#design .service-showcase .service-showcase-head .section-num {
+    margin: 0 0 8px !important;
+    padding: 5px 10px !important;
+    font-size: 9px !important;
+  }
+
+  html body #design#design .service-showcase .service-showcase-head .section-title {
+    max-width: 14ch !important;
+    margin: 0 !important;
+    font-size: clamp(28px, 8.2vw, 36px) !important;
+    line-height: 1.02 !important;
+  }
+
+  html body #design#design .service-showcase .service-showcase-head .section-lede {
+    max-width: 42ch !important;
+    margin: 8px 0 0 !important;
+    font-size: 12.5px !important;
+    line-height: 1.4 !important;
+  }
+
+  html body #design#design .service-showcase .service-showcase-head .service-cta {
+    margin-top: 9px !important;
+    padding: 8px 12px !important;
+    font-size: 9.5px !important;
+  }
+
+  html body #design#design .service-showcase .service-accordion {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  html body #design#design .service-showcase .service-panel,
+  html body #design#design .service-showcase .service-panel.is-active {
+    display: block !important;
+    flex: 0 0 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: hidden !important;
+  }
+
+  html body #design#design .service-showcase .service-trigger,
+  html body #design#design .service-showcase .service-panel.is-active .service-trigger {
+    grid-template-columns: 24px minmax(0, 1fr) 26px !important;
+    column-gap: 8px !important;
+    min-height: 0 !important;
+    padding: 9px 0 !important;
+  }
+
+  html body #design#design .service-showcase .service-name {
+    font-size: clamp(15px, 4.4vw, 18px) !important;
+    line-height: 1.12 !important;
+  }
+
+  html body #design#design .service-showcase .service-sub {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+
+  html body #design#design .service-showcase .service-toggle {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 9px !important;
+  }
+
+  html body #design#design .service-showcase .service-panel.is-active .service-detail {
+    max-height: 88px !important;
+  }
+
+  html body #design#design .service-showcase .service-detail-inner,
+  html body[dir="rtl"] #design#design .service-showcase .service-detail-inner {
+    margin: 0 !important;
+    padding: 0 0 9px 32px !important;
+    gap: 0 !important;
+  }
+
+  html body[dir="rtl"] #design#design .service-showcase .service-detail-inner {
+    padding-right: 32px !important;
+    padding-left: 0 !important;
+  }
+
+  html body #design#design .service-showcase .service-detail-inner p {
+    margin: 0 !important;
+    font-size: 11.5px !important;
+    line-height: 1.35 !important;
+  }
+
+  html body #design#design .service-showcase .service-detail-inner ul {
+    display: none !important;
+  }
+
+  html body #design#design .practice-note > .paper-scroll {
+    justify-content: center !important;
+    gap: 12px !important;
+    padding: 22px 16px calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  html body #design#design .practice-note > .paper-scroll > .sheet-mid {
+    justify-content: center !important;
+    width: 100% !important;
+    height: auto !important;
+    gap: 12px !important;
+  }
+
+  html body #design#design .practice-note .bio-teaser-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  html body #design#design .practice-note .bio-teaser-portrait {
+    display: none !important;
+  }
+
+  html body #design#design .practice-note .bio-teaser-text,
+  html body #design#design .practice-note .stats {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  html body #design#design .practice-note .bio-teaser-text .section-num {
+    margin: 0 0 10px !important;
+    padding: 5px 10px !important;
+    font-size: 9px !important;
+  }
+
+  html body #design#design .practice-note .bio-teaser-title {
+    max-width: 18ch !important;
+    margin: 0 0 10px !important;
+    font-size: clamp(25px, 7.2vw, 31px) !important;
+    line-height: 1.08 !important;
+  }
+
+  html body #design#design .practice-note .bio-teaser-text > p {
+    margin: 0 0 13px !important;
+    font-size: 12.5px !important;
+    line-height: 1.48 !important;
+  }
+
+  html body #design#design .practice-note .bio-teaser-link {
+    align-self: flex-start !important;
+    margin: 0 !important;
+    padding: 9px 14px !important;
+    font-size: 9.5px !important;
+  }
+
+  html body #design#design .practice-note .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  html body #design#design .practice-note .stats .stat {
+    padding: 10px 8px 9px 0 !important;
+  }
+
+  html body #design#design .practice-note .stats .stat .stat-num {
+    font-size: 18px !important;
+  }
+
+  html body #design#design .practice-note .stats .stat .stat-label {
+    font-size: 8.5px !important;
+    letter-spacing: .1em !important;
+  }
+
+  html body #design#design .practice-note .software-experience {
+    display: none !important;
+  }
+
+  html body .room.paper-stack > .section.paper-sheet > .paper-scroll {
+    padding: 22px 16px calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  html body #mobileMenu#mobileMenu,
+  html body #mobileMenu#mobileMenu .mobile-sheet {
+    z-index: 1800 !important;
+  }
+
+  html body #mobileMenu#mobileMenu .mm-left,
+  html body #mobileMenu#mobileMenu.is-ready .mm-left,
+  html body[dir="rtl"] #mobileMenu#mobileMenu .mm-left,
+  html body[dir="rtl"] #mobileMenu#mobileMenu.is-ready .mm-left {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: max(20px, env(safe-area-inset-top, 0px)) 20px max(18px, env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  html body #mobileMenu#mobileMenu .mm-menu-body {
+    padding: 18px 0 !important;
+  }
+
+  html body #mobileMenu#mobileMenu .mm-nav .mm-link,
+  html body #mobileMenu#mobileMenu .mm-nav .mm-link.is-active,
+  html body #mobileMenu#mobileMenu .mm-nav .mm-link:hover {
+    grid-template-columns: 26px minmax(0, 1fr) !important;
+    gap: 10px !important;
+    padding: clamp(15px, 2.4vh, 20px) 0 !important;
+  }
+
+  html body #mobileMenu#mobileMenu .mm-nav .mm-link .mm-link-text {
+    font-size: clamp(36px, 11vw, 52px) !important;
+    line-height: .95 !important;
+  }
+}
+
+/* Consent and progress controls never compete for the same corner. */
+html body:has(#cookieCard.is-shown) .to-top {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body #design#design > .paper-sheet,
+  html body .room.paper-stack > .paper-sheet {
+    transform: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+  }
+}

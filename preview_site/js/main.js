@@ -1806,32 +1806,31 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     }
   }
 
-  /* ---- Blog / Bio / Contact — one inset paper frame per room ---- */
+  /* ---- Blog / Bio / Contact — the same paper deck as the main room ---- */
   ['blog', 'bio', 'contact'].forEach((id) => {
     const room = document.getElementById(id);
     if (!room) return;
     room.classList.add('paper-stack', 'room-paper');
 
-    let sheet = room.querySelector(':scope > .paper-sheet.room-sheet--one');
-    if (!sheet) {
-      sheet = document.createElement('div');
-      sheet.className = 'paper-sheet room-sheet--one room-sheet--scroll';
-      sheet.dataset.paper = id;
-      sheet.dataset.paperScroll = 'inner';
-      sheet.style.setProperty('--bq-paper-z', '10');
-      [...room.children].forEach((node) => sheet.appendChild(node));
-      room.appendChild(sheet);
-    }
-    wrapPaperScroll(sheet);
+    const sheets = [...room.children].filter((node) => (
+      node.classList?.contains('room-hero') || node.classList?.contains('section')
+    ));
 
-    const scroller = sheet.querySelector(':scope > .paper-scroll');
-    if (scroller && !scroller.querySelector(':scope > .room-sheet-flow')) {
-      const flow = document.createElement('div');
-      flow.className = 'room-sheet-flow';
-      [...scroller.children].forEach((node) => flow.appendChild(node));
-      scroller.appendChild(flow);
-    }
-    bindStack(room, [sheet], { requireActive: true });
+    sheets.forEach((sheet, index) => {
+      sheet.classList.add('paper-sheet');
+      sheet.classList.remove('room-sheet--one');
+      sheet.dataset.paper = `${id}-${index + 1}`;
+      sheet.style.setProperty('--bq-paper-z', String((index + 1) * 10));
+
+      /* Room chapters use their own clipped reading surface only when their
+         copy exceeds one card. The hero never becomes a nested scroller. */
+      if (sheet.classList.contains('section')) sheet.dataset.paperScroll = 'inner';
+      else delete sheet.dataset.paperScroll;
+
+      wrapPaperScroll(sheet);
+    });
+
+    bindStack(room, sheets, { requireActive: true });
   });
 
   /* Portfolio "magic scroll" (tall-track): the work section becomes a tall
