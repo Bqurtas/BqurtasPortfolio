@@ -13554,11 +13554,16 @@ html:has(.dash.is-open){ overflow:hidden !important; }
    the page; and the compact footer rejoins the site's black palette.
    ========================================================= */
 
-/* Native cursors replace the removed custom ring and pointer halo. */
-body{ cursor:auto !important; }
-a, button, [role="button"], summary, label[for], select{ cursor:pointer !important; }
-input, textarea, [contenteditable="true"]{ cursor:text !important; }
-.cursor-dot, .cursor-ring{ display:none !important; }
+/* Native cursors are the default. motion.js sets .bq-cursor-on once it has
+   actually built the dot and ring — pointer-fine only, and it stands down the
+   moment a finger touches a hybrid screen — so everything here now waits on
+   that class being absent rather than switching the custom cursor off for
+   good. Without JS, on touch, or on a narrow screen, this block still wins and
+   the native cursor is what you get. */
+html:not(.bq-cursor-on) body{ cursor:auto !important; }
+html:not(.bq-cursor-on) :is(a, button, [role="button"], summary, label[for], select){ cursor:pointer !important; }
+html:not(.bq-cursor-on) :is(input, textarea, [contenteditable="true"]){ cursor:text !important; }
+html:not(.bq-cursor-on) :is(.cursor-dot, .cursor-ring){ display:none !important; }
 body::before{ display:none !important; content:none !important; }
 
 /* The owner removed the large service heading; let the remaining intro copy

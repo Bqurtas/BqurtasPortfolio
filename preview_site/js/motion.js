@@ -306,3 +306,112 @@
     wrap.style.pointerEvents = '';
   });
 })();
+
+/* =========================================================
+   CURSOR — a dot that tracks, a ring that trails.
+
+   style.css has carried a complete contract for this since v1 (43 rules:
+   .cursor-dot, .cursor-ring, .is-hover, .is-open with its OPEN label, and a
+   coarse-pointer opt-out) but nothing ever built the two elements, so the
+   whole thing was dead. This wires it up.
+
+   Both marks are drawn with mix-blend-mode: difference, so they carry no
+   colour of their own — they invert against whatever is under them and stay
+   black-and-white on a black-and-white site.
+
+   The dot rides the pointer. The ring trails it on a spring, and the gap
+   between them is the whole effect: fast when you flick, settling when you
+   stop. Pointer-fine only, and reduced motion drops the trail.
+   ========================================================= */
+(function customCursor() {
+  'use strict';
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  if (matchMedia('(max-width: 900px)').matches) return;
+  if (document.querySelector('.cursor-dot')) return;
+
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)');
+
+  var dot = document.createElement('div');
+  dot.className = 'cursor-dot';
+  dot.setAttribute('aria-hidden', 'true');
+
+  var ring = document.createElement('div');
+  ring.className = 'cursor-ring';
+  ring.setAttribute('aria-hidden', 'true');
+
+  var label = document.createElement('span');
+  label.className = 'cursor-ring-label';
+  label.textContent = 'Open';
+  ring.appendChild(label);
+
+  document.body.appendChild(ring);
+  document.body.appendChild(dot);
+  document.documentElement.classList.add('bq-cursor-on');
+
+  /* Park both marks off-screen until the pointer first reports in, so neither
+     flashes in the top-left corner on load. */
+  var px = -100, py = -100;
+  var rx = px, ry = py;
+  var seen = false;
+  var frame = 0;
+
+  dot.style.opacity = '0';
+  ring.style.opacity = '0';
+
+  var HOVER = 'a[href], button, [role="button"], input, textarea, select, summary,' +
+              '.tab, .mm-link, .service-trigger, .index-row, .rail-link, .mobilebar-btn';
+
+  function paint() {
+    frame = 0;
+    /* The ring eases toward the pointer; the dot is already there. A single
+       lerp per frame is what produces the trail — no library needed. */
+    var k = reduced.matches ? 1 : 0.18;
+    rx += (px - rx) * k;
+    ry += (py - ry) * k;
+    dot.style.transform = 'translate(' + px + 'px,' + py + 'px) translate(-50%,-50%)';
+    ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px) translate(-50%,-50%)';
+    /* Keep animating while the ring still has ground to cover. */
+    if (Math.abs(px - rx) > 0.1 || Math.abs(py - ry) > 0.1) queue();
+  }
+
+  function queue() {
+    if (!frame) frame = requestAnimationFrame(paint);
+  }
+
+  document.addEventListener('pointermove', function (e) {
+    if (e.pointerType && e.pointerType !== 'mouse') return;
+    px = e.clientX;
+    py = e.clientY;
+    if (!seen) {
+      seen = true;
+      rx = px; ry = py;
+      dot.style.opacity = '1';
+      ring.style.opacity = '1';
+    }
+    queue();
+
+    var t = e.target;
+    var overCard = !!(t && t.closest && t.closest('#grid .card, .logos-grid .logo-mark, .cert-grid a'));
+    var overHit = !overCard && !!(t && t.closest && t.closest(HOVER));
+    ring.classList.toggle('is-open', overCard);
+    ring.classList.toggle('is-hover', overHit);
+  }, { passive: true });
+
+  /* Leaving the window, or a context menu / tab switch, should take the marks
+     with it — otherwise they sit frozen wherever the pointer left. */
+  function hide() { dot.style.opacity = '0'; ring.style.opacity = '0'; }
+  function show() { if (seen) { dot.style.opacity = '1'; ring.style.opacity = '1'; } }
+  document.addEventListener('pointerleave', hide);
+  document.addEventListener('pointerenter', show);
+  window.addEventListener('blur', hide);
+  window.addEventListener('focus', show);
+  document.addEventListener('visibilitychange', function () { document.hidden ? hide() : show(); });
+
+  /* A pen or finger on a hybrid machine hands control back to the real cursor. */
+  document.addEventListener('pointerdown', function (e) {
+    if (e.pointerType && e.pointerType !== 'mouse') {
+      hide();
+      document.documentElement.classList.remove('bq-cursor-on');
+    }
+  }, { passive: true });
+})();

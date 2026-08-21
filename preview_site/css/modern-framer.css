@@ -16961,3 +16961,31 @@ html.bq-compact .mobilebar .theme-btn.theme-btn {
     flex: 0 0 38px !important;
   }
 }
+
+/* ============================================================================
+   CURSOR — hide the system arrow only once ours is actually running.
+   motion.js sets .bq-cursor-on after it builds the two marks, so a browser
+   that never runs it, a coarse pointer, or a hybrid machine the moment a
+   finger touches the screen all keep the real cursor.
+   ========================================================================== */
+html.bq-cursor-on,
+html.bq-cursor-on body,
+html.bq-cursor-on :is(a, button, [role="button"], summary, label[for], select),
+html.bq-cursor-on .tab,
+html.bq-cursor-on #grid .card {
+  cursor: none !important;
+}
+
+/* Text entry keeps its caret — losing the I-beam in a form is a real cost. */
+html.bq-cursor-on :is(input, textarea, [contenteditable="true"]) {
+  cursor: text !important;
+}
+
+/* Difference blending is the whole reason these two marks need no colour: they
+   invert against whatever is beneath them, so one pair reads on the black bed
+   and on the paper sheets alike. A later rule had flattened it to normal. */
+html.bq-cursor-on .cursor-dot,
+html.bq-cursor-on .cursor-ring {
+  mix-blend-mode: difference !important;
+  will-change: transform;
+}

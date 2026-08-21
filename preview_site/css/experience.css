@@ -17,7 +17,13 @@ html body[dir="rtl"] #mobileMenu.mobile-menu {
      the same white as the link rather than a bronze. */
   --menu-accent: #f3f1ea;
   --menu-panel: var(--bq-menu-panel, max(34vw, 420px));
-  --menu-ease: cubic-bezier(.16, 1, .3, 1);
+  /* One curve for the whole gesture. The page card recedes on
+     cubic-bezier(.15, .2, .1, 1) over .78s (modern-framer.css), so the curtain
+     that replaces it rides the same curve — otherwise the two halves of a
+     single movement ease differently and the menu reads as two events. The
+     lighter curve stays available for the small pieces that follow it in. */
+  --menu-ease: cubic-bezier(.15, .2, .1, 1);
+  --menu-ease-soft: cubic-bezier(.16, 1, .3, 1);
   position: fixed !important;
   inset: 0 !important;
   z-index: 1800 !important;
@@ -33,7 +39,7 @@ html body[dir="rtl"] #mobileMenu.mobile-menu {
   pointer-events: none !important;
   clip-path: inset(0 0 0 100%) !important;
   transition:
-    clip-path .76s var(--menu-ease),
+    clip-path .78s var(--menu-ease),
     opacity .42s ease,
     visibility 0s linear .78s !important;
 }
@@ -49,7 +55,7 @@ html body[dir="rtl"] #mobileMenu.mobile-menu.is-open {
   pointer-events: auto !important;
   clip-path: inset(0 0 0 0) !important;
   transition:
-    clip-path .76s var(--menu-ease),
+    clip-path .78s var(--menu-ease),
     opacity .3s ease,
     visibility 0s linear 0s !important;
 }
@@ -164,7 +170,7 @@ html body #mobileMenu .mm-link:focus-visible {
   transform: translate3d(22px, 0, 0) !important;
   transition:
     opacity .48s ease,
-    transform .68s var(--menu-ease) !important;
+    transform .68s var(--menu-ease-soft) !important;
 }
 
 html body[dir="rtl"] #mobileMenu .mm-link {
@@ -210,7 +216,7 @@ html body #mobileMenu.mobile-menu .mm-nav .mm-link:focus-visible .mm-link-text {
   background-repeat: no-repeat !important;
   background-position: 0 100% !important;
   background-size: 0% 2px !important;
-  transition: color .32s ease, background-size .42s var(--menu-ease) !important;
+  transition: color .32s ease, background-size .42s var(--menu-ease-soft) !important;
 }
 
 html body[dir="rtl"] #mobileMenu.mobile-menu .mm-nav .mm-link .mm-link-text {
@@ -246,7 +252,7 @@ html body #mobileMenu .mm-foot {
   padding: 0 !important;
   opacity: 0;
   transform: translate3d(0, 12px, 0) !important;
-  transition: opacity .44s ease, transform .62s var(--menu-ease) !important;
+  transition: opacity .44s ease, transform .62s var(--menu-ease-soft) !important;
 }
 
 html body[dir="rtl"] #mobileMenu .mm-foot { align-items: flex-end !important; }
@@ -301,7 +307,7 @@ html body[dir="rtl"] #mobileMenu .mobile-menu-close {
   box-shadow: none !important;
   opacity: 0;
   transform: translateY(-50%) scale(.8) !important;
-  transition: opacity .36s ease, transform .5s var(--menu-ease), background .3s ease, color .3s ease !important;
+  transition: opacity .36s ease, transform .5s var(--menu-ease-soft), background .3s ease, color .3s ease !important;
 }
 
 html body[dir="rtl"] #mobileMenu .mobile-menu-close {
