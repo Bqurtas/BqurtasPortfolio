@@ -17353,3 +17353,176 @@ html body #design#design .service-showcase .service-panel .service-detail-inner 
   width: auto !important;
   max-width: 100% !important;
 }
+
+/* ============================================================================
+   THE TWO SHEETS ON A PHONE — they were stacking on top of each other.
+
+   Both sheets keep a desktop skeleton on a 390px screen, and a paper sheet is a
+   fixed height, so nothing can spill and nothing can scroll out of it. Measured
+   at 390 x 844 before this block:
+
+     What I do   head 140-570 (position:sticky, top:96px) and the accordion
+                 315-965 — 255px of the two written over each other, with the
+                 accordion ending 131px below a sheet that stops at 834.
+
+     Short note  grid rows sized 244 / 86 / 162 for the desk layout while the
+                 text column is 563px tall, so the note ran through the steps,
+                 the steps through the figures and the figures into the marquee.
+
+   So on phones: no sticky, rows that size to their content, one column, and a
+   type scale that lets the whole sheet land inside its own height.
+   ========================================================================== */
+@media (max-width: 820px) {
+
+  /* ---- What I do ---- */
+  /* Flex, not grid. As a grid the layout kept a fixed height and split it
+     between two auto rows — 334px each for a 406px head and a 489px list — so
+     the head overran its row and the list started inside it. A column flex box
+     has no row maths to get wrong: each block takes the height it needs. */
+  html body #design#design .service-showcase .service-showcase-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    gap: clamp(10px, 1.6vh, 16px) !important;
+    padding: clamp(20px, 3vh, 30px) 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* The signature block is a desk flourish; the head has three children on a
+     phone and only the copy and the action earn their space. */
+  html body #design#design .service-showcase .service-showcase-head .service-signature {
+    display: none !important;
+  }
+
+  /* Sticky is for a two-column sheet where the head holds while the list runs.
+     In one column it just parks on top of the list. */
+  html body #design#design .service-showcase .service-showcase-head {
+    position: static !important;
+    top: auto !important;
+    align-self: start !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    gap: 10px !important;
+  }
+
+  html body #design#design .service-showcase .service-showcase-head .section-title {
+    font-size: clamp(26px, 8vw, 34px) !important;
+    line-height: 1.08 !important;
+  }
+
+  html body #design#design .service-showcase .service-showcase-head .section-lede {
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+  }
+
+  html body #design#design .service-showcase .service-showcase-head .service-cta {
+    margin-top: 4px !important;
+    align-self: flex-start !important;
+  }
+
+  html body #design#design .service-showcase .service-accordion {
+    align-self: start !important;
+    height: auto !important;
+    gap: 0 !important;
+  }
+
+  /* Closed rows carry the list; the open one has to earn its extra height, so
+     both are tightened to keep four rows plus the head inside the sheet. */
+  html body #design#design .service-showcase .service-panel .service-trigger {
+    padding: 12px 44px 12px 0 !important;
+  }
+
+  html body #design#design .service-showcase .service-panel .service-name {
+    font-size: 15px !important;
+  }
+
+  html body #design#design .service-showcase .service-panel .service-sub {
+    font-size: 10.5px !important;
+  }
+
+  html body #design#design .service-showcase .service-panel .service-detail-inner {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 2px 0 12px !important;
+    font-size: 12.5px !important;
+  }
+
+  html body #design#design .service-showcase .service-panel .service-detail-inner p {
+    font-size: 12.5px !important;
+    line-height: 1.5 !important;
+    margin-bottom: 8px !important;
+  }
+
+  html body #design#design .service-showcase .service-panel .service-detail-inner li {
+    font-size: 11.5px !important;
+    padding: 6px 10px !important;
+  }
+
+  /* ---- A short note ---- */
+  /* Same reason as the sheet above: as a grid this kept desk row sizes and the
+     note ran straight through the figures. A column flex box just stacks. */
+  html body #design#design .practice-note .bio-teaser-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    gap: clamp(12px, 1.8vh, 18px) !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* The portrait is a desk luxury. On a phone it costs 245px that the note,
+     the three steps and the four figures all need, and the hero already opens
+     the page with the same face. */
+  html body #design#design .practice-note .bio-teaser-portrait {
+    display: none !important;
+  }
+
+  html body #design#design .practice-note .bio-teaser-text,
+  html body #design#design .practice-note .stats {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  html body #design#design .practice-note .bio-teaser-title {
+    font-size: clamp(24px, 7.4vw, 32px) !important;
+    line-height: 1.1 !important;
+    max-width: none !important;
+  }
+
+  html body #design#design .practice-note .bio-teaser-text p {
+    font-size: 13px !important;
+    line-height: 1.55 !important;
+  }
+
+  /* Three steps read as three lines on a narrow column, not three columns. */
+  html body #design#design .practice-note .bio-practice-flow {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  html body #design#design .practice-note .bio-practice-flow > * {
+    padding: 10px 0 !important;
+    border-top: 1px solid var(--line, rgba(0, 0, 0, .09)) !important;
+  }
+
+  html body #design#design .practice-note .stats .stat {
+    padding: 11px 8px 11px 0 !important;
+  }
+
+  html body #design#design .practice-note .stats .stat .stat-num {
+    font-size: 19px !important;
+  }
+
+  html body #design#design .practice-note .software-experience {
+    padding-top: 14px !important;
+  }
+}

@@ -443,3 +443,86 @@ html body #mobileMenu#mobileMenu.mobile-menu.is-ready,
 html body[dir="rtl"] #mobileMenu#mobileMenu.mobile-menu {
   z-index: 1800 !important;
 }
+
+/* ============================================================================
+   THE PAGE HAS TO BE VISIBLE WHILE IT RECEDES.
+
+   `body.menu-open .bq-page-stage` scales the live page to .8 and slides it
+   aside — that receding card IS the transition. But the curtain sat at
+   z-index 1800 over a card at 1210, so the whole move happened behind an opaque
+   black field and the menu looked like a plain fade-in with nothing in it.
+
+   The curtain is the ground, not the lid. It drops below the card, and the
+   links live in the strip the card vacates, so nothing is ever covered:
+
+     1280px   card scaled .8 and pushed -328  ->  occupies x -200..824
+     1024px   card scaled .8 and pushed -341  ->  occupies x -239..580
+      820px   card pushed -786, no scale      ->  fully off to the left
+
+   So above 820px the panel stays on the right, against the free strip, and
+   only below that — where the card leaves the screen entirely — does the
+   curtain become the full-width stack it was designed as.
+   ========================================================================== */
+html body #mobileMenu#mobileMenu.mobile-menu,
+html body #mobileMenu#mobileMenu.mobile-menu.is-open,
+html body #mobileMenu#mobileMenu.mobile-menu.is-ready,
+html body[dir="rtl"] #mobileMenu#mobileMenu.mobile-menu {
+  /* under the page card (1210), above the dock (1600 is the bar's own layer,
+     but the bar is hidden while the menu is open) and above the page at rest. */
+  z-index: 1190 !important;
+}
+
+/* Above the phone line the card only moves aside, so the panel holds the strip
+   it leaves rather than spreading under it. */
+@media (min-width: 821px) {
+  html body #mobileMenu .mobile-sheet,
+  html body[dir="rtl"] #mobileMenu .mobile-sheet {
+    display: flex !important;
+    justify-content: flex-end !important;
+  }
+
+  html body[dir="rtl"] #mobileMenu .mobile-sheet {
+    justify-content: flex-start !important;
+  }
+
+  html body #mobileMenu .mm-left,
+  html body #mobileMenu.is-ready .mm-left,
+  html body[dir="rtl"] #mobileMenu .mm-left,
+  html body[dir="rtl"] #mobileMenu.is-ready .mm-left {
+    width: min(38vw, 430px) !important;
+    min-width: 320px !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    padding:
+      clamp(30px, 5vh, 60px)
+      clamp(26px, 2.6vw, 44px)
+      clamp(28px, 4.4vh, 52px) !important;
+  }
+}
+
+/* The link type was set for a full-width curtain, not for the strip beside the
+   receding card: 66.5px against 340px of usable panel, so "The Designer" broke
+   across two lines while its neighbours sat on one. Size the type to the panel
+   it now lives in. */
+@media (min-width: 821px) {
+  html body #mobileMenu.mobile-menu .mm-nav .mm-link .mm-link-copy {
+    font-size: clamp(30px, 3.4vw, 46px) !important;
+    line-height: 1.04 !important;
+    /* .mm-link-copy is a grid, and its single column was sizing to content, so
+       the title got 229px of a 324px box and broke in two. A 1fr column hands
+       the title the width that was already there. */
+    grid-template-columns: minmax(0, 1fr) !important;
+    justify-items: stretch !important;
+  }
+
+  /* The title is a grid item in .mm-link-copy and was being sized to its
+     longest unbreakable run — 229px for a word that needs 280 — so it broke in
+     two while 324px of column sat unused beside it. Let it fill the column. */
+  html body #mobileMenu.mobile-menu .mm-nav .mm-link .mm-link-text {
+    font-size: inherit !important;
+    line-height: inherit !important;
+    width: 100% !important;
+    justify-self: stretch !important;
+    text-wrap: balance;
+  }
+}
