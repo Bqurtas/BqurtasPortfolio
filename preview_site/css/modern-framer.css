@@ -17132,3 +17132,61 @@ html body #design .practice-note .stat.bq-rise {
     transition: color .3s ease !important;
   }
 }
+
+/* ============================================================================
+   DOCK — let the bar hug its icons instead of spreading them.
+
+   The bar is pinned to `min(100% - 24px, 640px)` and then lays its children out
+   with `space-evenly`. At 851px that is a 640px bar around 383px of content, so
+   the 243px left over was divided between the seven controls and every gap
+   measured 31px while the stylesheet said 5px. The icons were not spaced — they
+   were scattered. Size the bar to its content and let the gap mean something.
+   ========================================================================== */
+html.bq-compact .mobilebar,
+html.bq-compact [dir="rtl"] .mobilebar {
+  width: -moz-max-content !important;
+  width: max-content !important;
+  max-width: calc(100% - 24px) !important;
+  justify-content: center !important;
+  gap: 6px !important;
+}
+
+/* ============================================================================
+   COOKIE NOTICE — a card, not a banner.
+
+   It ran 817px wide on an 851px screen, which is a bar across the foot of the
+   page rather than a small notice. Everything comes in a step: the card holds
+   to a readable measure, the mark and the button lose their bulk, and the type
+   settles to the same quiet scale the dock uses.
+   ========================================================================== */
+html body #cookieCard.cookie-card {
+  width: max-content !important;
+  max-width: min(calc(100% - 32px), 400px) !important;
+  padding: 11px 13px !important;
+  gap: 10px !important;
+  border-radius: 14px !important;
+}
+
+html body #cookieCard.cookie-card .cookie-card-ic {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  font-size: 12px !important;
+}
+
+html body #cookieCard.cookie-card .cookie-card-title {
+  font-size: 11.5px !important;
+  line-height: 1.25 !important;
+}
+
+html body #cookieCard.cookie-card .cookie-card-text {
+  font-size: 10.5px !important;
+  line-height: 1.4 !important;
+}
+
+html body #cookieCard.cookie-card .cookie-card-ok {
+  padding: 7px 13px !important;
+  font-size: 10.5px !important;
+  border-radius: 999px !important;
+}
+
