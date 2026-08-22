@@ -464,15 +464,46 @@
      for a grace period after the mouse leaves
      ======================================================= */
   (function flyoutIntent() {
+    if (window.__bqDesktopFlyoutsBound) return;
+    window.__bqDesktopFlyoutsBound = true;
     const GRACE = 420; // ms — just enough to move the cursor across the gap
     $$('.lang-hover, .social-hover').forEach(wrap => {
       let t;
-      const openIt  = () => { clearTimeout(t); wrap.classList.add('is-hovering'); };
-      const closeIt = () => { clearTimeout(t); t = setTimeout(() => wrap.classList.remove('is-hovering'), GRACE); };
+      const trigger = wrap.querySelector(':scope > button[aria-haspopup]');
+      const setOpen = (open) => {
+        wrap.classList.toggle('is-hovering', open);
+        trigger?.setAttribute('aria-expanded', String(open));
+      };
+      const openIt = () => {
+        clearTimeout(t);
+        wrap.classList.remove('is-flyout-dismissed');
+        setOpen(true);
+      };
+      const closeNow = () => {
+        clearTimeout(t);
+        setOpen(false);
+      };
+      const closeIt = () => {
+        clearTimeout(t);
+        t = setTimeout(() => {
+          if (wrap.matches(':hover') || wrap.contains(document.activeElement)) return;
+          closeNow();
+        }, GRACE);
+      };
       wrap.addEventListener('mouseenter', openIt);
       wrap.addEventListener('mouseleave', closeIt);
       wrap.addEventListener('focusin', openIt);
       wrap.addEventListener('focusout', closeIt);
+      trigger?.addEventListener('click', () => {
+        if (wrap.classList.contains('is-flyout-dismissed')) openIt();
+      });
+      wrap.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        e.preventDefault();
+        try { trigger?.focus({ preventScroll: true }); } catch (err) { trigger?.focus(); }
+        wrap.classList.add('is-flyout-dismissed');
+        closeNow();
+      });
     });
   })();
 

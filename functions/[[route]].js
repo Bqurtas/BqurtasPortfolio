@@ -231,7 +231,11 @@ async function serveSitemap(url, env, next) {
 const setContent = (v) => ({ element(el) { el.setAttribute('content', v); } });
 const setHref    = (v) => ({ element(el) { el.setAttribute('href', v); } });
 const setText    = (v) => ({ element(el) { el.setInnerContent(v); } });
-const setLangAttr = (v) => ({ element(el) { el.setAttribute('lang', BCP47[v] || v); } });
+const setLangAttr = (v) => ({ element(el) {
+  el.setAttribute('lang', BCP47[v] || v);
+  el.setAttribute('dir', v === 'ku' || v === 'ar' ? 'rtl' : 'ltr');
+  el.setAttribute('data-lang', v);
+} });
 
 const MAIL_AUTOCONFIG_XML = `<?xml version="1.0" encoding="utf-8"?>
 <clientConfig version="1.1">

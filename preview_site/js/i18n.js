@@ -221,6 +221,9 @@ window.BQ_UI_I18N = {
 
 window.applyLang = function(lang) {
   const requestedLang = lang || 'en';
+  const requestId = (Number(window.__bqLangRequestId) || 0) + 1;
+  window.__bqLangRequestId = requestId;
+  window.__bqDesiredLang = requestedLang;
   let activeLang = requestedLang;
   let waitingForDictionary = false;
   // The non-English dictionaries live in i18n-more.min.js — load on demand, then
@@ -233,7 +236,17 @@ window.applyLang = function(lang) {
   // always false and runtime language switches silently stayed in English.
   if (requestedLang !== 'en' && !window.__i18nMoreLoaded) {
     waitingForDictionary = true;
-    window.__loadI18nMore(function () { window.applyLang(requestedLang); });
+    window.__loadI18nMore(function () {
+      /* A slow dictionary may finish after the visitor has chosen another
+         language or history has restored English. Only the newest request may
+         repaint the document. */
+      if (
+        window.__bqLangRequestId === requestId
+        && window.__bqDesiredLang === requestedLang
+      ) {
+        window.applyLang(requestedLang);
+      }
+    });
     activeLang = 'en';   // paint English immediately; the requested language re-applies once loaded
   }
   // merge over English so any untranslated key gracefully falls back to en
@@ -273,6 +286,11 @@ window.applyLang = function(lang) {
   if (!waitingForDictionary) {
     try { localStorage.setItem('bq_lang', requestedLang); } catch(e){}
   }
+
+  /* Let the application chrome follow the language that was actually painted.
+     During an on-demand dictionary load this is English; the requested language
+     is applied again by the loader callback once its complete dictionary exists. */
+  return activeLang;
 };
 
 

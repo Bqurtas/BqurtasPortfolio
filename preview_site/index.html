@@ -712,7 +712,7 @@
     }());
   </script>
   <link rel="stylesheet" href="css/fonts.css?v=447">
-  <link rel="stylesheet" href="css/experience.css?v=20">
+  <link rel="stylesheet" href="css/experience.css?v=27">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315"></noscript>
 
@@ -792,7 +792,7 @@
 
       <!-- Language hover-menu -->
       <div class="lang-hover" id="langHover">
-        <button class="lang-current" id="langCurrentBtn" aria-haspopup="true" aria-expanded="false" aria-label="Change language">
+        <button class="lang-current" id="langCurrentBtn" aria-haspopup="true" aria-expanded="false" aria-controls="langFlyout" aria-label="Change language">
           <span id="langCurrentCode">EN</span>
         </button>
         <span class="tool-tip" data-i18n="tip.lang">Language</span>
@@ -810,10 +810,10 @@
 
       <!-- Social dropdown -->
       <div class="social-hover" id="socialHover">
-        <button class="social-current" id="socialCurrentBtn" aria-haspopup="true" aria-expanded="false" aria-label="Connect" data-i18n-aria="a11y.connect">
+        <button class="social-current" id="socialCurrentBtn" aria-haspopup="true" aria-expanded="false" aria-controls="socialFlyout" aria-label="Connect" data-i18n-aria="a11y.connect">
           <i class="fa-solid fa-share-nodes"></i>
         </button>
-        <div class="social-flyout" role="menu">
+        <div class="social-flyout" id="socialFlyout" role="menu">
           <button class="social-opt social-opt--share share-page-btn" role="menuitem" aria-label="Share this page" data-i18n-aria="a11y.sharePage"><i class="fa-solid fa-arrow-up-from-bracket"></i><small data-i18n="share.page">Share page</small></button>
           <a class="social-opt" href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener" role="menuitem" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i><small>LinkedIn</small></a>
           <a class="social-opt" href="https://instagram.com/bqurtas" target="_blank" rel="noopener" role="menuitem" aria-label="Instagram"><i class="fa-brands fa-instagram"></i><small>Instagram</small></a>
@@ -2180,7 +2180,7 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script defer src="js/i18n.v420.min.js?v=453"></script>
+  <script defer src="js/i18n.v420.min.js?v=455"></script>
   <!-- Non-English visitors need the extra dictionaries before first render;
        English (the default + PSI) never loads them, keeping the parse light.
        applyLang() can also fetch this on its own, but starting it here — in
@@ -2191,8 +2191,10 @@
     (function(){try{
       var p=location.pathname.split('/').filter(Boolean);
       var u=['ku','kmr','ar','fr','tr','sv'].indexOf(p[0])>-1?p[0]:null;
-      var saved=null; try{saved=localStorage.getItem('bq_lang');}catch(e){}
-      var lang=u||saved;
+      /* English is the canonical/default root language. A saved preference may
+         never change or even preload another language on `/`; only an explicit
+         language prefix owns a localized document. */
+      var lang=u;
       if(lang && lang!=='en'){
         window.__i18nMoreLoading=true; window.__i18nMoreCbs=window.__i18nMoreCbs||[];
         var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=425'; s.async=false;
@@ -2206,7 +2208,7 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=496"></script>
+  <script defer src="js/main.v420.min.js?v=507"></script>
   <script defer src="js/gallery.v420.min.js?v=453"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2226,7 +2228,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=452';
+        s.src = 'js/enhance.v420.min.js?v=453';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
