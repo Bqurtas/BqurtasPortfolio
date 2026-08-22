@@ -97,13 +97,25 @@ html body #design #grid .card-art--photo {
   border-radius: 16px !important;
 }
 
+/* The work sheet clips overflow, so a lift is invisible. The hover stays
+   inside the plate: a tighter crop, a richer print, and a paper ring. */
 html body #design #grid .card:hover .card-art,
 html body #design #grid .card:focus-within .card-art,
 html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art {
-  transform: translateY(-8px) !important;
+  transform: none !important;
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--ink) 8%, transparent),
-    0 34px 72px -38px rgba(0, 0, 0, .58) !important;
+    inset 0 0 0 1px color-mix(in srgb, var(--ink) 14%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--ink) 8%, transparent) !important;
+}
+
+html body #design #grid .card:hover .card-art img,
+html body #design #grid .card:hover .card-art video,
+html body #design #grid .card:focus-within .card-art img,
+html body #design #grid .card:focus-within .card-art video,
+html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art img,
+html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art video {
+  transform: scale(1.07) !important;
+  filter: saturate(1.06) contrast(1.04) !important;
 }
 
 html body #design #grid .card-caption .card-tag {
@@ -437,7 +449,9 @@ html[dir="rtl"] body .dropcap {
   html body #bio .tl-card:hover,
   html body #bio .bio-social:hover,
   html body .index-row:hover,
-  html body #design #grid .card:hover .card-art {
+  html body #design #grid .card:hover .card-art img,
+  html body #design #grid .card:hover .card-art video {
     transform: none !important;
+    filter: none !important;
   }
 }

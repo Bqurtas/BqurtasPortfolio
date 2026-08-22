@@ -7,7 +7,7 @@ test('the draft polish overlay is linked last and can be rolled back on its own'
   const css = await readFile(new URL('../preview_site/css/polish.css', import.meta.url), 'utf8');
 
   const experience = html.indexOf('href="css/experience.css?v=27"');
-  const polish = html.indexOf('href="css/polish.css?v=1"');
+  const polish = html.indexOf('href="css/polish.css?v=2"');
 
   assert.ok(experience > 0, 'experience.css should still load');
   assert.ok(polish > experience, 'polish.css must load after experience.css');
