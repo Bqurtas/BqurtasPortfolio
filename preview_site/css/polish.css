@@ -1,0 +1,457 @@
+/* ============================================================================
+   bq-polish — draft visual overlay.
+
+   Loaded last, after experience.css. Production (main / bqurtas.com) is
+   untouched until this branch is merged. To roll back: drop this file and
+   its <link> in index.html, or close the draft PR.
+   ========================================================================== */
+
+html:root {
+  --bq-polish-ease: cubic-bezier(.22, 1, .36, 1);
+  --bq-polish-ink: color-mix(in srgb, var(--ink) 88%, transparent);
+}
+
+/* Shared focus: one quiet ring instead of mixed browser outlines. */
+html body :is(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ink) 52%, transparent);
+  outline-offset: 3px;
+}
+
+html body :is(.hero-cta, .pitch-submit, .subscribe-form button, .bio-teaser-link, .load-more-btn, .qc-card):focus-visible {
+  outline-offset: 4px;
+}
+
+/* ============================================================================
+   HERO — the press fills the call, the portrait sits on a thin paper ring.
+   ========================================================================== */
+html body #design > .hero .hero-portrait {
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--bg) 82%, transparent),
+    0 0 0 7px color-mix(in srgb, var(--bq-accent, #8b5e45) 30%, transparent),
+    0 40px 96px -42px rgba(0, 0, 0, .74) !important;
+}
+
+html body #design > .hero .hero-sign .hero-sign-last {
+  color: color-mix(in srgb, var(--ink) 78%, var(--bq-accent, #8b5e45)) !important;
+}
+
+html body #design > .hero .hero-lede {
+  max-width: 36rem !important;
+  color: color-mix(in srgb, var(--ink) 74%, transparent) !important;
+}
+
+html body #design > .hero .hero-cta {
+  position: relative !important;
+  isolation: isolate;
+  overflow: hidden !important;
+  gap: 12px !important;
+}
+
+html body #design > .hero .hero-cta > * {
+  position: relative;
+  z-index: 2;
+}
+
+html body #design > .hero .hero-cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .52s var(--bq-polish-ease);
+}
+
+html[dir="rtl"] body #design > .hero .hero-cta::after {
+  transform-origin: right center;
+}
+
+html body #design > .hero .hero-cta:hover,
+html body #design > .hero .hero-cta:focus-visible {
+  color: var(--bg) !important;
+  border-color: var(--ink) !important;
+  background: var(--ink) !important;
+  transform: translateY(-3px) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 14%, transparent),
+    0 30px 64px -26px rgba(0, 0, 0, .66) !important;
+}
+
+html body #design > .hero .hero-cta:hover::after,
+html body #design > .hero .hero-cta:focus-visible::after {
+  transform: scaleX(1);
+}
+
+html body #design > .hero .hero-cta:hover i,
+html body #design > .hero .hero-cta:focus-visible i {
+  color: var(--bg) !important;
+  transform: translateY(4px) !important;
+}
+
+/* ============================================================================
+   GALLERY — the caption comes forward; the plate lifts like a print.
+   ========================================================================== */
+html body #design #grid .card-art,
+html body #design #grid .card-art--photo {
+  border-radius: 16px !important;
+}
+
+/* The work sheet clips overflow, so a lift is invisible. The hover stays
+   inside the plate: a tighter crop, a richer print, and a paper ring. */
+html body #design #grid .card:hover .card-art,
+html body #design #grid .card:focus-within .card-art,
+html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art {
+  transform: none !important;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--ink) 14%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--ink) 8%, transparent) !important;
+}
+
+html body #design #grid .card:hover .card-art img,
+html body #design #grid .card:hover .card-art video,
+html body #design #grid .card:focus-within .card-art img,
+html body #design #grid .card:focus-within .card-art video,
+html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art img,
+html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art video {
+  transform: scale(1.07) !important;
+  filter: saturate(1.06) contrast(1.04) !important;
+}
+
+html body #design #grid .card-caption .card-tag {
+  transition: color .3s ease !important;
+}
+
+html body #design #grid .card:hover .card-caption .card-tag,
+html body #design #grid .card:focus-within .card-caption .card-tag {
+  color: var(--ink) !important;
+}
+
+html body #design .load-more-btn:hover,
+html body #design .load-more-btn:focus-visible {
+  gap: 18px !important;
+}
+
+/* ============================================================================
+   TABS — the active filter reads as a pressed mark.
+   ========================================================================== */
+html body #design .tabs .tab {
+  transition:
+    color .3s ease,
+    background .3s ease,
+    border-color .3s ease,
+    transform .35s var(--bq-polish-ease) !important;
+}
+
+html body #design .tabs .tab:hover {
+  transform: translateY(-2px);
+}
+
+html body #design .tabs .tab.is-active {
+  box-shadow: 0 10px 22px -16px rgba(0, 0, 0, .38);
+}
+
+/* ============================================================================
+   CONTACT — a field draws its own rule; a card fills its mark.
+   ========================================================================== */
+html body #contact .qc-card {
+  border-radius: 16px !important;
+  border-color: color-mix(in srgb, var(--ink) 10%, transparent) !important;
+  background: color-mix(in srgb, var(--bg) 70%, transparent) !important;
+  transition:
+    transform .45s var(--bq-polish-ease),
+    border-color .3s ease,
+    background .3s ease,
+    box-shadow .45s ease !important;
+}
+
+html body #contact .qc-card > i {
+  transition:
+    background .35s ease,
+    color .35s ease,
+    border-color .35s ease,
+    transform .45s var(--bq-polish-ease);
+}
+
+html body #contact .qc-card:hover,
+html body #contact .qc-card:focus-visible {
+  transform: translateY(-5px) !important;
+  border-color: color-mix(in srgb, var(--ink) 22%, transparent) !important;
+  box-shadow: 0 24px 48px -36px rgba(0, 0, 0, .42);
+}
+
+html body #contact .qc-card:hover > i,
+html body #contact .qc-card:focus-visible > i {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+  transform: scale(1.04);
+}
+
+html body #contact .pitch-wrap {
+  border-radius: 22px !important;
+  border-color: color-mix(in srgb, var(--ink) 10%, transparent) !important;
+  background: color-mix(in srgb, var(--bg) 78%, transparent) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent),
+    0 28px 70px -52px rgba(0, 0, 0, .4);
+}
+
+html body #contact .pitch-form .field {
+  position: relative;
+  border-bottom-color: color-mix(in srgb, var(--ink) 12%, transparent) !important;
+}
+
+html body #contact .pitch-form .field::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1.5px;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .45s var(--bq-polish-ease);
+  pointer-events: none;
+}
+
+html[dir="rtl"] body #contact .pitch-form .field::after {
+  transform-origin: right center;
+}
+
+html body #contact .pitch-form .field:focus-within::after {
+  transform: scaleX(1);
+}
+
+html body #contact .pitch-form .field:focus-within label {
+  color: var(--ink) !important;
+}
+
+html body #contact .pitch-submit {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 999px !important;
+  border: 1px solid var(--ink) !important;
+}
+
+html body #contact .pitch-submit > * {
+  position: relative;
+  z-index: 2;
+}
+
+html body #contact .pitch-submit:hover,
+html body #contact .pitch-submit:focus-visible {
+  gap: 20px !important;
+  box-shadow: 0 22px 48px -24px rgba(0, 0, 0, .5);
+}
+
+/* ============================================================================
+   JOURNAL — subscribe sits as one paper bar.
+   ========================================================================== */
+html body #blog .subscribe,
+html body #blog .subscribe-field {
+  border-radius: 999px;
+}
+
+html body #blog .subscribe-field {
+  border-color: color-mix(in srgb, var(--ink) 12%, transparent) !important;
+  background: color-mix(in srgb, var(--bg) 72%, transparent) !important;
+  transition:
+    border-color .3s ease,
+    box-shadow .35s ease,
+    background .3s ease !important;
+}
+
+html body #blog .subscribe-field:focus-within {
+  border-color: color-mix(in srgb, var(--ink) 36%, transparent) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+html body #blog .subscribe-form button:hover,
+html body #blog .subscribe-form button:focus-visible {
+  transform: translateY(-2px);
+  gap: 16px;
+}
+
+html body .index-row {
+  transition:
+    color .3s ease,
+    transform .35s var(--bq-polish-ease),
+    opacity .3s ease !important;
+}
+
+html body .index-row:hover,
+html body .index-row:focus-visible {
+  transform: translateX(6px);
+}
+
+html[dir="rtl"] body .index-row:hover,
+html[dir="rtl"] body .index-row:focus-visible {
+  transform: translateX(-6px);
+}
+
+/* ============================================================================
+   BIO — language bars, records and cards speak the same paper grammar.
+   ========================================================================== */
+html body #bio .tl-card,
+html body #bio .bio-card,
+html body #bio .lang-item,
+html body #bio .orgs li,
+html body #bio .service {
+  border-radius: 14px !important;
+  border-color: color-mix(in srgb, var(--ink) 10%, transparent) !important;
+  transition:
+    transform .4s var(--bq-polish-ease),
+    border-color .3s ease,
+    box-shadow .4s ease,
+    background .3s ease !important;
+}
+
+html body #bio .tl-card:hover,
+html body #bio .bio-card:hover,
+html body #bio .lang-item:hover,
+html body #bio .orgs li:hover,
+html body #bio .service:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--ink) 20%, transparent) !important;
+  box-shadow: 0 20px 40px -32px rgba(0, 0, 0, .38);
+}
+
+html body #bio .lang-bar {
+  height: 3px !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--ink) 10%, transparent) !important;
+}
+
+html body #bio .lang-bar span {
+  border-radius: inherit;
+  background: var(--ink) !important;
+}
+
+html body #bio .bio-social {
+  border-radius: 18px !important;
+  transition:
+    transform .5s var(--bq-polish-ease),
+    border-color .3s ease,
+    box-shadow .5s ease !important;
+}
+
+html body #bio .bio-social:hover,
+html body #bio .bio-social:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 60px -42px rgba(0, 0, 0, .46);
+}
+
+html body #bio .bio-teaser-link:hover,
+html body #bio .bio-teaser-link:focus-visible,
+html body #design .bio-teaser-link:hover,
+html body #design .bio-teaser-link:focus-visible {
+  gap: 16px !important;
+}
+
+/* ============================================================================
+   ROOM HEROES — a slightly quieter measure for the three inner rooms.
+   ========================================================================== */
+html body .room-hero .room-hero-title {
+  letter-spacing: -.035em !important;
+}
+
+html body .room-hero .room-hero-sub {
+  max-width: 38rem !important;
+  color: color-mix(in srgb, var(--ink) 62%, transparent) !important;
+}
+
+html body .room-hero-return {
+  border-radius: 999px !important;
+  transition:
+    gap .3s ease,
+    border-color .3s ease,
+    background .3s ease,
+    color .3s ease !important;
+}
+
+html body .room-hero-return:hover,
+html body .room-hero-return:focus-visible {
+  background: var(--ink);
+  color: var(--bg) !important;
+  border-color: var(--ink) !important;
+}
+
+/* ============================================================================
+   FOOTER — the email is the action.
+   ========================================================================== */
+html body .footer.footer-v249 .footer-email {
+  text-underline-offset: 5px;
+}
+
+html body .footer.footer-v249 .footer-email:hover,
+html body .footer.footer-v249 .footer-email:focus-visible {
+  opacity: 1 !important;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+html body .footer.footer-v249 .footer-live-dot {
+  box-shadow: 0 0 0 4px color-mix(in srgb, #5fbf6a 22%, transparent);
+}
+
+/* ============================================================================
+   KURDISH / RTL — Naskh needs air the Latin face does not.
+   ========================================================================== */
+html[lang="ku"] body,
+html[data-lang="ku"] body {
+  line-height: 1.75;
+}
+
+html[lang="ku"] body #design > .hero .hero-lede,
+html[data-lang="ku"] body #design > .hero .hero-lede,
+html[lang="ar"] body #design > .hero .hero-lede,
+html[data-lang="ar"] body #design > .hero .hero-lede {
+  line-height: 1.85 !important;
+  max-width: 40rem !important;
+}
+
+html[lang="ku"] body .hero-sign,
+html[data-lang="ku"] body .hero-sign {
+  line-height: 1.18 !important;
+}
+
+html[lang="ku"] body .dropcap,
+html[data-lang="ku"] body .dropcap,
+html[dir="rtl"] body .dropcap {
+  line-height: 1 !important;
+}
+
+/* ============================================================================
+   REDUCED MOTION — keep the states, drop the travel.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html body #design > .hero .hero-cta::after,
+  html body #contact .pitch-form .field::after,
+  html body #contact .qc-card,
+  html body #contact .qc-card > i,
+  html body #bio .tl-card,
+  html body #bio .lang-item,
+  html body #bio .orgs li,
+  html body #bio .bio-social,
+  html body .index-row,
+  html body #design #grid .card-art,
+  html body #design #grid .card-art img,
+  html body #design #grid .card-art video {
+    transition: none !important;
+  }
+
+  html body #design > .hero .hero-cta:hover,
+  html body #design > .hero .hero-cta:focus-visible,
+  html body #contact .qc-card:hover,
+  html body #bio .tl-card:hover,
+  html body #bio .bio-social:hover,
+  html body .index-row:hover,
+  html body #design #grid .card:hover .card-art img,
+  html body #design #grid .card:hover .card-art video {
+    transform: none !important;
+    filter: none !important;
+  }
+}
