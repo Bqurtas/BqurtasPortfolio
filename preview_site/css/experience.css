@@ -411,6 +411,301 @@ html body #mobileMenu :is(a, button):focus-visible {
 }
 
 /* ============================================================================
+   v20 — NATIVE READING DECK
+
+   Every long paper now follows the Portfolio model: the browser's document
+   scroll is the single source of momentum, the card stays pinned, and only its
+   interior advances. This removes nested-scroll traps and keeps wheel,
+   trackpad, touch, scrollbar and keyboard behavior identical.
+   ========================================================================== */
+
+:root,
+html.bq-compact {
+  --bq-deck-gutter: clamp(10px, 1.05vw, 16px);
+  --bq-card-gap: clamp(10px, 1.4vh, 18px);
+  --bq-deck-radius: clamp(22px, 2.15vw, 30px);
+  --bq-room-radius: var(--bq-deck-radius);
+  --bq-stack-top: var(--bq-deck-gutter);
+  --bq-stack-sheet-h: calc(100svh - (var(--bq-deck-gutter) * 2)) !important;
+}
+
+/* The sticky element is only a stable carrier. The visible paper lives in its
+   child, so overlap styling never disturbs sticky geometry. */
+html body #design#design.paper-stack > .paper-sheet:not(.work):not(.paper-sheet--footer),
+html body .room.room.paper-stack:not(#design) > .paper-sheet {
+  position: sticky !important;
+  top: var(--bq-stack-top) !important;
+  width: 100% !important;
+  height: var(--bq-stack-sheet-h) !important;
+  min-height: 0 !important;
+  max-height: var(--bq-stack-sheet-h) !important;
+  margin-block-end: calc(var(--bq-card-gap) + var(--bq-flow-extra, 0px)) !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+
+html body #design#design.paper-stack > .paper-sheet:not(.work):not(.paper-sheet--footer) > .paper-scroll,
+html body .room.room.paper-stack:not(#design) > .paper-sheet > .paper-scroll {
+  position: relative !important;
+  isolation: isolate !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+  overscroll-behavior: none !important;
+  touch-action: pan-y !important;
+  border: 1px solid color-mix(in srgb, var(--ink) 7%, transparent) !important;
+  border-radius: var(--bq-deck-radius) !important;
+  background: var(--bq-paper-sheet, #f3f3f3) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .58) inset,
+    0 -8px 24px -17px rgba(0, 0, 0, .26),
+    0 30px 72px -54px rgba(0, 0, 0, .58) !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: auto !important;
+  scroll-padding-block: 34px 112px !important;
+}
+
+html body .paper-sheet > .paper-scroll.is-window-driven,
+html body .paper-sheet > .paper-scroll.is-paper-scrollable {
+  overflow-y: hidden !important;
+  overscroll-behavior: none !important;
+  scrollbar-width: none !important;
+}
+
+html body .paper-sheet > .paper-scroll::-webkit-scrollbar,
+html body .paper-sheet > .paper-scroll.is-window-driven::-webkit-scrollbar {
+  display: none !important;
+}
+
+html body .paper-sheet > .paper-scroll:focus-visible {
+  outline: 0 !important;
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--bq-signal, #101010) 72%, transparent) inset,
+    0 30px 72px -54px rgba(0, 0, 0, .58) !important;
+}
+
+/* A quiet progress hairline appears only when a paper has more to read. */
+html body .paper-scroll-meter {
+  --bq-meter-h: 30px;
+  --bq-meter-y: 0px;
+  position: absolute !important;
+  z-index: 12 !important;
+  inset-block: clamp(54px, 8vh, 86px) clamp(92px, 12vh, 126px) !important;
+  inset-inline-end: clamp(9px, 1vw, 15px) !important;
+  display: block !important;
+  width: 2px !important;
+  min-height: 42px !important;
+  overflow: hidden !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--ink) 9%, transparent) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity .28s ease !important;
+}
+
+html body .paper-scroll-meter > span {
+  position: absolute !important;
+  inset: 0 auto auto 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: var(--bq-meter-h) !important;
+  border-radius: inherit !important;
+  background: color-mix(in srgb, var(--ink) 72%, var(--bq-signal, #111) 28%) !important;
+  transform: translate3d(0, var(--bq-meter-y), 0) !important;
+  transition: height .22s ease !important;
+}
+
+html body .paper-sheet.has-paper-overflow > .paper-scroll-meter {
+  opacity: .48 !important;
+}
+
+html body .paper-sheet.has-paper-overflow:hover > .paper-scroll-meter,
+html body .paper-sheet.has-paper-overflow:focus-within > .paper-scroll-meter,
+html body .paper-sheet.is-paper-reading > .paper-scroll-meter {
+  opacity: .82 !important;
+}
+
+/* Covered papers remain painted beneath the incoming rounded card. This keeps
+   the corner seams solid and prevents a black flash during the final pixel. */
+html body #design#design.paper-stack > .paper-sheet.is-paper-gone,
+html body .room.room.paper-stack > .paper-sheet.is-paper-gone {
+  visibility: visible !important;
+}
+
+/* Reserve the dock band inside every reading card. Longer copy scrolls within
+   the paper rather than compressing or disappearing under the controls. */
+html body #design#design.paper-stack > .section:not(.work) > .paper-scroll,
+html body .room.room.paper-stack:not(#design) > .section.paper-sheet > .paper-scroll {
+  padding-bottom: clamp(94px, 11vh, 124px) !important;
+}
+
+html body #design#design .service-showcase.paper-sheet > .paper-scroll,
+html body #design#design .practice-note.paper-sheet > .paper-scroll {
+  overflow-y: hidden !important;
+  overscroll-behavior: none !important;
+  padding-bottom: clamp(94px, 11vh, 124px) !important;
+}
+
+/* The persistent dock grows only one small step: easier targets, same quiet
+   silhouette. Tablet inherits the same proportions as phone and desktop. */
+html body .mobilebar,
+html body[dir="rtl"] .mobilebar {
+  min-height: 52px !important;
+  padding: 6px 10px !important;
+  gap: 6px !important;
+  border-radius: 999px !important;
+}
+
+html body .mobilebar .mobilebar-pop-wrap.mobilebar-pop-wrap,
+html body .mobilebar .mobilebar-pop-wrap.mobilebar-pop-wrap > .mobilebar-btn,
+html body .mobilebar .mobilebar-btn.mobilebar-btn,
+html body .mobilebar .theme-btn.theme-btn {
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  flex: 0 0 38px !important;
+}
+
+html body .mobilebar .mobilebar-cta.mobilebar-cta {
+  min-width: 42px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  flex-basis: 42px !important;
+}
+
+/* Sorani uses its actual display faces instead of the Latin menu override. */
+html[data-lang="ku"] #mobileMenu .mm-link-text,
+html[data-lang="ku"] :is(
+  .room-hero-title,
+  .section-title,
+  .service-showcase-title,
+  .service-name,
+  .bio-teaser-title,
+  .latest-blog-title,
+  .logos-title
+) {
+  font-family: 'Noto Kufi Arabic', 'Manrope', sans-serif !important;
+  font-style: normal !important;
+  letter-spacing: 0 !important;
+  line-height: 1.24 !important;
+}
+
+html[data-lang="ku"] :is(
+  .room-hero-sub,
+  .section-lede,
+  .service-showcase-lede,
+  .service-sub,
+  .bio-teaser-text > p
+) {
+  font-family: 'Noto Naskh Arabic', 'Manrope', sans-serif !important;
+  letter-spacing: 0 !important;
+}
+
+@media (min-width: 821px) {
+  html body #design#design .service-showcase .service-accordion .service-trigger {
+    align-items: flex-start !important;
+    padding-inline-start: 0 !important;
+    padding-inline-end: clamp(52px, 8vw, 64px) !important;
+    text-align: start !important;
+  }
+
+  html body #design#design .service-showcase .service-accordion .service-trigger .service-toggle {
+    right: auto !important;
+    left: auto !important;
+    inset-inline-end: 0 !important;
+    transform: translateY(-50%) !important;
+  }
+
+  html body #design#design .service-showcase .service-panel.is-active .service-toggle {
+    transform: translateY(-50%) rotate(45deg) !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root,
+  html.bq-compact {
+    --bq-deck-gutter: 10px;
+    --bq-card-gap: 11px;
+    --bq-deck-radius: clamp(22px, 3.4vw, 28px);
+    --bq-stack-sheet-h: calc(100svh - 20px) !important;
+  }
+
+  html body #design#design.paper-stack > .section:not(.work) > .paper-scroll,
+  html body .room.room.paper-stack:not(#design) > .section.paper-sheet > .paper-scroll,
+  html body #design#design .service-showcase.paper-sheet > .paper-scroll,
+  html body #design#design .practice-note.paper-sheet > .paper-scroll {
+    padding-bottom: calc(var(--dock-h, 56px) + var(--bq-dock-inset, 10px) + 24px) !important;
+  }
+
+  html body .paper-scroll-meter {
+    inset-block: 48px calc(var(--dock-h, 56px) + 44px) !important;
+    inset-inline-end: 9px !important;
+  }
+
+  html body .mobilebar,
+  html body[dir="rtl"] .mobilebar {
+    width: auto !important;
+    max-width: calc(100vw - 20px) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  :root,
+  html.bq-compact {
+    --bq-card-gap: 10px;
+    --bq-deck-radius: 22px;
+  }
+
+  html body .mobilebar,
+  html body[dir="rtl"] .mobilebar {
+    min-height: 50px !important;
+    padding: 6px 8px !important;
+    gap: 5px !important;
+  }
+
+  html body .mobilebar .mobilebar-pop-wrap.mobilebar-pop-wrap,
+  html body .mobilebar .mobilebar-pop-wrap.mobilebar-pop-wrap > .mobilebar-btn,
+  html body .mobilebar .mobilebar-btn.mobilebar-btn,
+  html body .mobilebar .theme-btn.theme-btn {
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    flex: 0 0 36px !important;
+  }
+
+  html body .mobilebar .mobilebar-cta.mobilebar-cta {
+    min-width: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    flex: 0 0 40px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body .paper-scroll-meter,
+  html body .paper-scroll-meter > span {
+    transition: none !important;
+  }
+}
+
+/* ============================================================================
    DECISIVE — colour and stacking. Around 980 rules across the older sheets
    touch this menu, and they redefine its z-index seventeen times, so the 1800
    declared at the top of this file never actually won. Everything below uses a
@@ -1513,5 +1808,209 @@ html body:has(#cookieCard.is-shown) .to-top {
     transform: none !important;
     filter: none !important;
     opacity: 1 !important;
+  }
+}
+
+/* ============================================================================
+   v20 FINAL OWNER — the rules below deliberately come last.
+
+   The site has several historical responsive layers. These selectors own the
+   small set of values that must remain identical across them: the single
+   document-driven reading model, solid card coverage, balanced dock sizing,
+   and a menu that remains usable on short landscape screens.
+   ========================================================================== */
+
+:root {
+  --bq-dock-bar-h: 48px;
+}
+
+/* Programmatic paper scrolling always starts at the real top of its content.
+   Centring a child taller than the viewport creates unreachable negative
+   overflow, especially after text zoom or translation changes. */
+html body .paper-sheet > .paper-scroll.is-window-driven,
+html body .paper-sheet > .paper-scroll.is-window-driven > .sheet-mid {
+  justify-content: flex-start !important;
+}
+
+/* Keep the outgoing paper painted until the incoming rounded paper has fully
+   covered it. This closes the dark corner seam without leaving it interactive. */
+html body #design#design > .section.service-showcase.paper-sheet.is-paper-gone,
+html body #design#design > .section.practice-note.paper-sheet.is-paper-gone {
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: none !important;
+}
+
+/* Desktop dock: one restrained step larger, with every control on the same
+   optical diameter. ID selectors are intentional because the legacy layer
+   pins the menu and theme controls by ID. */
+@media (min-width: 1025px) {
+  html body .rail {
+    height: var(--bq-dock-bar-h) !important;
+    min-height: var(--bq-dock-bar-h) !important;
+    padding-inline: 19px !important;
+    gap: 5px !important;
+  }
+
+  html body .rail .rail-tools,
+  html body .rail .rail-tools > *,
+  html body .rail .rail-tools .lang-current,
+  html body .rail .rail-tools .social-current,
+  html body .rail .rail-tools .rail-chat,
+  html body .rail .rail-tools .theme-btn,
+  html body .rail #themeToggle,
+  html body .rail #railMenu {
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    flex: 0 0 36px !important;
+  }
+
+  html body .rail .rail-tools {
+    width: auto !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    gap: 5px !important;
+  }
+
+  html body .rail .design-cta {
+    height: 34px !important;
+    min-height: 34px !important;
+    padding-inline: 16px !important;
+  }
+}
+
+/* Compact dock: 50px shell and 38px controls. The document reserve carries
+   the safe area once; the inner card reserve below uses explicit components
+   so a notched device never counts it twice. */
+@media (max-width: 1024px) {
+  html:root {
+    --bq-dock-bar-h: 50px;
+    --dock-h: calc(
+      var(--bq-dock-bar-h) + var(--bq-deck-gutter, 10px) +
+      env(safe-area-inset-bottom, 0px)
+    );
+  }
+
+  html.bq-compact body .mobilebar,
+  html.bq-compact[dir="rtl"] body .mobilebar {
+    height: var(--bq-dock-bar-h) !important;
+    min-height: var(--bq-dock-bar-h) !important;
+    padding: 0 8px !important;
+    gap: 6px !important;
+  }
+
+  html.bq-compact body .mobilebar .mobilebar-pop-wrap.mobilebar-pop-wrap,
+  html.bq-compact body .mobilebar .mobilebar-pop-wrap.mobilebar-pop-wrap > .mobilebar-btn,
+  html.bq-compact body .mobilebar .mobilebar-btn.mobilebar-btn,
+  html.bq-compact body .mobilebar .theme-btn.theme-btn,
+  html.bq-compact body .mobilebar #themeToggleM,
+  html.bq-compact body .mobilebar #menuToggle,
+  html.bq-compact body .mobilebar #railLatestM,
+  html.bq-compact body .mobilebar #railChatM,
+  html.bq-compact body .mobilebar #langPopBtn,
+  html.bq-compact body .mobilebar #socialPopBtn {
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    flex: 0 0 38px !important;
+    padding: 0 !important;
+  }
+
+  html.bq-compact body .mobilebar .mobilebar-cta.mobilebar-cta {
+    height: 38px !important;
+    min-height: 38px !important;
+  }
+
+  html body #design#design.paper-stack > .section:not(.work) > .paper-scroll,
+  html body .room.room.paper-stack:not(#design) > .section.paper-sheet > .paper-scroll,
+  html body #design#design .service-showcase.paper-sheet > .paper-scroll,
+  html body #design#design .practice-note.paper-sheet > .paper-scroll {
+    padding-bottom: calc(
+      var(--bq-dock-bar-h) + var(--bq-deck-gutter, 10px) +
+      env(safe-area-inset-bottom, 0px) + 24px
+    ) !important;
+  }
+
+  html body .paper-scroll-meter {
+    inset-block-end: calc(
+      var(--bq-dock-bar-h) + var(--bq-deck-gutter, 10px) +
+      env(safe-area-inset-bottom, 0px) + 30px
+    ) !important;
+  }
+}
+
+@media (max-width: 820px) {
+  html.bq-compact body .mobilebar .mobilebar-cta.mobilebar-cta {
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    flex: 0 0 40px !important;
+  }
+}
+
+/* The visual and keyboard order of the compact dock now match. */
+html.bq-compact body .mobilebar > * {
+  order: initial !important;
+}
+
+html[dir="rtl"] body .mobilebar-cta .fa-arrow-right {
+  transform: scaleX(-1) !important;
+}
+
+/* The menu body, rather than the whole black sheet, owns short-screen
+   overflow. Header and footer stay stable while every route remains reachable. */
+html body #mobileMenu#mobileMenu .mm-menu-body {
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+html body #mobileMenu#mobileMenu .mm-menu-body::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Sorani is stored as lang=ckb plus data-lang=ku. This final owner prevents
+   the Latin display face and negative tracking from leaking into the menu. */
+html[data-lang="ku"] body #mobileMenu#mobileMenu .mm-nav .mm-link .mm-link-text,
+html[lang="ckb"] body #mobileMenu#mobileMenu .mm-nav .mm-link .mm-link-text {
+  font-family: "Noto Kufi Arabic", "Manrope", sans-serif !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.24 !important;
+}
+
+@media (max-width: 1024px) and (max-height: 420px) {
+  html body #mobileMenu#mobileMenu .mm-left,
+  html body #mobileMenu#mobileMenu.is-ready .mm-left,
+  html[dir="rtl"] body #mobileMenu#mobileMenu .mm-left,
+  html[dir="rtl"] body #mobileMenu#mobileMenu.is-ready .mm-left {
+    padding: max(10px, env(safe-area-inset-top, 0px)) 20px
+      max(10px, env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  html body #mobileMenu#mobileMenu .mm-menu-body {
+    align-items: flex-start !important;
+    padding-block: 6px !important;
+  }
+
+  html body #mobileMenu#mobileMenu .mm-nav .mm-link,
+  html body #mobileMenu#mobileMenu .mm-nav .mm-link.is-active,
+  html body #mobileMenu#mobileMenu .mm-nav .mm-link:hover {
+    padding-block: 7px !important;
+  }
+
+  html body #mobileMenu#mobileMenu .mm-nav .mm-link .mm-link-text {
+    font-size: clamp(24px, 7.5vh, 30px) !important;
+    line-height: 1.08 !important;
   }
 }

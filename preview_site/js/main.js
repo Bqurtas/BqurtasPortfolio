@@ -130,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setLangBadge(lang);
     setDocTitle();
     setRoomChrome(document.body.dataset.room || 'design');
+    document.dispatchEvent(new CustomEvent('bq:language', { detail: { lang } }));
     if (window.__bqRelocalizeGallery) window.__bqRelocalizeGallery();
     if (routerReady) { syncURL(false); try { if (window.umami) umami.track(); } catch (e) {} }   // Umami: count each language URL (replaceState isn't auto-tracked)
     if (window.__bqRerenderChrome) window.__bqRerenderChrome();
@@ -189,6 +190,10 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const showRoom = (id, push) => {
+    const menuWasOpen = Boolean(
+      document.getElementById('mobileMenu')?.classList.contains('is-open')
+      || document.getElementById('mobileMenu')?.classList.contains('is-ready')
+    );
     rooms.forEach(r => r.classList.toggle('is-hidden', r.id !== id));
     rooms.forEach(r => {
       const title = r.querySelector('.room-hero-title');
@@ -226,6 +231,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (window.__bqToggleCta) window.__bqToggleCta();
     requestAnimationFrame(() => { if (window.__bqOnScroll) window.__bqOnScroll(); });   // refresh the back-to-top button on every room change
+
+    /* A route selected from the curtain should land the keyboard and screen
+       reader in the new room, not back on the now-hidden menu trigger. */
+    if (push) {
+      const destination = document.getElementById(id)?.querySelector('.room-hero-title, h1, h2');
+      if (destination) {
+        const focusDelay = menuWasOpen ? 880 : 0;
+        window.setTimeout(() => {
+          destination.setAttribute('tabindex', '-1');
+          try { destination.focus({ preventScroll: true }); } catch (e) { destination.focus(); }
+          destination.addEventListener('blur', () => destination.removeAttribute('tabindex'), { once: true });
+        }, focusDelay);
+      }
+    }
   };
   window.__bqShowRoom = showRoom;
 
@@ -1483,16 +1502,55 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   /* The portfolio gallery is driven by the tall-track "magic scroll" below
      (page-scroll → reel translate), NOT by the input router's nested scrollTop,
      so no sheet claims router-owned inner scroll. */
-  const isPhonePaper = () => window.matchMedia('(max-width: 1024px)').matches;
   const allowsInnerScroll = (sheet) => {
     /* the portfolio (.work) is driven by the tall-track reel translate, NOT the
        router's inner scroll — keep it out. */
     if (sheet?.classList?.contains('work')) return false;
     /* Journal / Designer / Contact are one sticky sheet; reading happens inside. */
-    if (sheet?.classList?.contains('room-sheet--one')
-      || sheet?.dataset?.paperScroll === 'inner') return true;
-    if (isPhonePaper()) return false;
-    return Boolean(sheet?.classList?.contains('room-sheet--scroll'));
+    return Boolean(
+      sheet?.classList?.contains('room-sheet--one')
+      || sheet?.classList?.contains('room-sheet--scroll')
+      || sheet?.dataset?.paperScroll === 'inner'
+    );
+  };
+
+  const paperLabel = (sheet, scroller) => {
+    const heading = scroller?.querySelector('h1, h2, h3, .section-title, .room-hero-title');
+    const fallback = String(sheet?.dataset?.paper || 'Scrollable section')
+      .replace(/[-_]+/g, ' ')
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
+    return heading?.textContent?.replace(/\s+/g, ' ').trim() || fallback;
+  };
+
+  const ensurePaperMeter = (sheet) => {
+    if (!sheet || sheet.classList.contains('work')) return null;
+    let meter = sheet.querySelector(':scope > .paper-scroll-meter');
+    if (!meter) {
+      meter = document.createElement('span');
+      meter.className = 'paper-scroll-meter';
+      meter.setAttribute('aria-hidden', 'true');
+      meter.innerHTML = '<span></span>';
+      sheet.appendChild(meter);
+    }
+    return meter;
+  };
+
+  const updatePaperMeter = (sheet, scroller, overflow) => {
+    const meter = ensurePaperMeter(sheet);
+    if (!meter) return;
+    const active = overflow > 0;
+    sheet.classList.toggle('has-paper-overflow', active);
+    if (!active) {
+      meter.style.removeProperty('--bq-meter-h');
+      meter.style.removeProperty('--bq-meter-y');
+      return;
+    }
+    const trackHeight = Math.max(1, meter.clientHeight || sheet.clientHeight - 112);
+    const thumbHeight = Math.min(trackHeight, Math.max(30, trackHeight * (scroller.clientHeight / scroller.scrollHeight)));
+    const progress = overflow > 0 ? Math.min(1, Math.max(0, scroller.scrollTop / overflow)) : 0;
+    meter.style.setProperty('--bq-meter-h', `${thumbHeight.toFixed(2)}px`);
+    meter.style.setProperty('--bq-meter-y', `${((trackHeight - thumbHeight) * progress).toFixed(2)}px`);
+    sheet.classList.toggle('is-paper-reading', scroller.scrollTop > 1 && scroller.scrollTop < overflow - 1);
   };
 
   const wrapPaperScroll = (sheet) => {
@@ -1500,11 +1558,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const scroller = document.createElement('div');
     scroller.className = 'paper-scroll';
     while (sheet.firstChild) scroller.appendChild(sheet.firstChild);
-    const heading = scroller.querySelector('h1, h2, h3, .section-title, .room-hero-title');
-    const fallbackLabel = String(sheet.dataset.paper || 'Scrollable section')
-      .replace(/[-_]+/g, ' ')
-      .replace(/\b\w/g, (letter) => letter.toUpperCase());
-    const label = heading?.textContent?.replace(/\s+/g, ' ').trim() || fallbackLabel;
+    const label = paperLabel(sheet, scroller);
+    scroller.dataset.paperLabel = label;
     if (allowsInnerScroll(sheet)) {
       scroller.tabIndex = 0;
       scroller.setAttribute('role', 'region');
@@ -1566,24 +1621,29 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       }
     }
 
+    /* Long cards use the same single-owner model as Portfolio: native window
+       scroll holds the paper in place and advances its interior. Mapping a
+       target to the document track preserves trackpad/touch momentum and
+       keeps focus navigation deterministic. */
     const innerTarget = Math.min(innerMax, Math.max(0, desired));
-    const scrollInside = () => scroller.scrollTo({ top: innerTarget, behavior });
-    if (Math.abs(window.scrollY - sheetStart) > 2) {
-      /* Deliberate navigation may cross earlier cards. The input router still
-         gates ordinary wheel/touch/scrollbar movement. */
-      window.__bqPaperBypassUntil = performance.now() + (behavior === 'smooth' ? 1200 : 180);
-      window.scrollTo({ top: Math.max(0, sheetStart), behavior });
-      if (behavior === 'smooth') window.setTimeout(scrollInside, 520);
-      else requestAnimationFrame(scrollInside);
-    } else {
-      scrollInside();
-    }
+    const windowTarget = Math.max(0, sheetStart + innerTarget);
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const resolvedBehavior = reduce ? 'auto' : behavior;
+    window.__bqPaperBypassUntil = performance.now() + (resolvedBehavior === 'smooth' ? 1200 : 180);
+    window.scrollTo({ top: windowTarget, behavior: resolvedBehavior });
     return true;
   };
 
   document.addEventListener('focusin', (event) => {
     const target = event.target;
-    if (!target?.closest?.('.section.work > .paper-scroll')) return;
+    if (!target?.closest) return;
+    if (target.closest('.section.work > .paper-scroll')) {
+      requestAnimationFrame(() => {
+        window.__bqScrollWorkTarget?.(target, { behavior: 'auto', block: 'nearest' });
+      });
+      return;
+    }
+    if (!target.closest('.paper-scroll.is-window-driven')) return;
     requestAnimationFrame(() => {
       window.__bqScrollPaperTarget?.(target, { behavior: 'auto', block: 'nearest' });
     });
@@ -1598,7 +1658,6 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
     const inactive = () => requireActive && root.classList.contains('is-hidden');
     const readPin = () => parseFloat(getComputedStyle(sheets[0]).top) || 0;
-    const readGap = (sheet) => parseFloat(getComputedStyle(sheet).getPropertyValue('--bq-card-gap')) || 0;
 
     const resetVisuals = () => {
       sheets.forEach((sheet) => {
@@ -1622,6 +1681,18 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
       resetVisuals();
 
+      /* Every long paper follows the Portfolio model: one native document
+         scroll owns momentum while the pinned card's interior advances. */
+      sheets.forEach((sheet) => {
+        const scroller = sheet.querySelector(':scope > .paper-scroll');
+        const sheetStart = Number(scroller?.dataset.paperStart);
+        const overflow = Number(scroller?.dataset.paperOverflow) || 0;
+        if (!scroller || !allowsInnerScroll(sheet) || overflow <= 0 || !Number.isFinite(sheetStart)) return;
+        const innerY = Math.min(overflow, Math.max(0, window.scrollY - sheetStart));
+        if (Math.abs(scroller.scrollTop - innerY) > 0.5) scroller.scrollTop = innerY;
+        updatePaperMeter(sheet, scroller, overflow);
+      });
+
       if (sheets.length < 2) return;
 
       /* Read every geometry value together before writing transforms. */
@@ -1629,38 +1700,28 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         const scroller = sheet.querySelector(':scope > .paper-scroll');
         const sheetStart = Number(scroller?.dataset.paperStart);
         return {
-          top: sheet.getBoundingClientRect().top,
           naturalTop: Number.isFinite(sheetStart)
             ? sheetStart + pin - window.scrollY
             : sheet.getBoundingClientRect().top,
-          height: sheet.offsetHeight,
-          gap: readGap(sheet),
         };
       });
 
       for (let i = 0; i < sheets.length - 1; i += 1) {
         const curr = sheets[i];
-        const current = metrics[i];
-        const nextTop = metrics[i + 1].top;
-        const currentTop = Math.max(pin, current.naturalTop);
-        const gap = current.gap;
-        const push = Math.min(
-          current.height + gap,
-          Math.max(0, currentTop + current.height + gap - nextTop),
-        );
-        curr.style.setProperty('--bq-push-y', `${push.toFixed(2)}px`);
+        const nextTop = Math.max(pin, metrics[i + 1].naturalTop);
+        const fullyCovered = nextTop <= pin + 0.75;
+        curr.style.setProperty('--bq-push-y', '0px');
 
         const raw = coverProgress(nextTop, pin, vh);
         if (motionOff) {
-          curr.style.setProperty('--bq-push-y', '0px');
-          curr.classList.toggle('is-paper-gone', push > 0.5);
+          curr.classList.toggle('is-paper-gone', fullyCovered);
           continue;
         }
         const out = ease(raw);
         const fade = fadeFrom(raw);
         curr.style.setProperty('--bq-out', out.toFixed(4));
         curr.style.setProperty('--bq-fade', fade.toFixed(4));
-        curr.classList.toggle('is-paper-gone', fade >= 0.985);
+        curr.classList.toggle('is-paper-gone', fullyCovered);
       }
     };
 
@@ -1686,12 +1747,23 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         /* Ignore sub-pixel/font rounding on otherwise short hero cards. */
         const overflow = rawOverflow > 12 ? Math.ceil(rawOverflow) : 0;
 
-        /* Portfolio owns overflow inside the rounded frame. Every other sheet
-           reads via document scroll so motion stays sheet-to-sheet. */
-        sheet.style.setProperty('--bq-flow-extra', '0px');
-        scroller.classList.toggle('is-window-driven', !allowInner);
-        scroller.classList.toggle('is-paper-scrollable', overflow > 0);
+        /* Hold the paper for exactly its interior reading distance. Native
+           window scroll then advances the content and releases the next card. */
+        sheet.style.setProperty('--bq-flow-extra', `${overflow}px`);
+        scroller.classList.toggle('is-window-driven', allowInner && overflow > 0);
+        scroller.classList.toggle('is-paper-scrollable', allowInner && overflow > 0);
         scroller.dataset.paperOverflow = String(overflow);
+        scroller.dataset.paperLabel = paperLabel(sheet, scroller);
+        if (allowInner && overflow > 0) {
+          scroller.tabIndex = 0;
+          scroller.setAttribute('role', 'region');
+          scroller.setAttribute('aria-label', scroller.dataset.paperLabel);
+        } else {
+          scroller.removeAttribute('tabindex');
+          scroller.removeAttribute('role');
+          scroller.removeAttribute('aria-label');
+        }
+        updatePaperMeter(sheet, scroller, overflow);
         if (allowInner) sheet.dataset.paperScroll = 'inner';
         else delete sheet.dataset.paperScroll;
       });
@@ -1736,8 +1808,10 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     window.addEventListener('pageshow', queueMeasure);
     window.addEventListener('load', queueMeasure, { once: true });
     window.addEventListener('bq:css-ready', queueMeasure);
+    window.visualViewport?.addEventListener('resize', queueMeasure, { passive: true });
     reduced.addEventListener?.('change', queue);
     document.addEventListener('bq:route', queueMeasure);
+    document.addEventListener('bq:language', queueMeasure);
 
     const resizeObserver = typeof ResizeObserver === 'function'
       ? new ResizeObserver(queueMeasure)
@@ -1757,7 +1831,10 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
     sheets.forEach((sheet) => {
       const scroller = sheet.querySelector(':scope > .paper-scroll');
-      scroller?.addEventListener('scroll', queue, { passive: true });
+      scroller?.addEventListener('scroll', () => {
+        updatePaperMeter(sheet, scroller, Number(scroller.dataset.paperOverflow) || 0);
+        queue();
+      }, { passive: true });
       if (scroller && resizeObserver) {
         resizeObserver.observe(scroller);
         [...scroller.children].forEach((child) => resizeObserver.observe(child));
@@ -1791,7 +1868,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         sheet.classList.add('paper-sheet');
         sheet.dataset.paper = paperNames[i] || `sheet-${i + 1}`;
         sheet.style.setProperty('--bq-paper-z', String((i + 2) * 10));
-        if (sheet.classList.contains('work')) sheet.dataset.paperScroll = 'inner';
+        if (sheet.classList.contains('work')) delete sheet.dataset.paperScroll;
+        else sheet.dataset.paperScroll = 'inner';
         wrapPaperScroll(sheet);
       });
 
@@ -1979,20 +2057,47 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       setCovered();
       drive();
     };
+    window.__bqScrollWorkTarget = (target, { behavior = 'smooth', block = 'nearest' } = {}) => {
+      if (!target?.closest?.('.section.work') || !reel.contains(target)) return false;
+      const targetRect = target.getBoundingClientRect();
+      const reelRect = reel.getBoundingClientRect();
+      const contentTop = targetRect.top - reelRect.top;
+      const contentBottom = contentTop + targetRect.height;
+      const safeTop = Math.max(70, collapseDist ? Math.min(collapseDist + 18, card.clientHeight * .28) : 34);
+      const safeBottom = Math.max(safeTop + 80, card.clientHeight - 96);
+      let desired = lastY;
+
+      if (block === 'center') desired = contentTop - ((card.clientHeight - targetRect.height) / 2);
+      else if (block === 'start') desired = contentTop - safeTop;
+      else if (contentTop < lastY + safeTop) desired = contentTop - safeTop;
+      else if (contentBottom > lastY + safeBottom) desired = contentBottom - safeBottom;
+
+      desired = Math.min(overflow, Math.max(0, desired));
+      const trackTop = track.getBoundingClientRect().top + window.scrollY;
+      const windowTarget = Math.max(0, trackTop - gutter() + desired);
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const resolvedBehavior = reduce ? 'auto' : behavior;
+      window.__bqPaperBypassUntil = performance.now() + (resolvedBehavior === 'smooth' ? 1200 : 180);
+      window.scrollTo({ top: windowTarget, behavior: resolvedBehavior });
+      return true;
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', remeasure, { passive: true });
+    window.visualViewport?.addEventListener('resize', remeasure, { passive: true });
     window.addEventListener('bq:gallery-built', remeasure);
     window.addEventListener('bq:gallery-counts', remeasure);
+    document.addEventListener('bq:language', remeasure);
     if (typeof ResizeObserver === 'function') { try { new ResizeObserver(remeasure).observe(reel); } catch (e) {} }
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure, () => {});
     remeasure();
   })();
 
   /* Scroll ownership ---------------------------------------------------------
-     Portfolio owns nested reading inside its rounded frame. Every other sheet
-     advances via document scroll (sheet → sheet). The black bed stays inert —
-     a thin frame, never the scroll surface. */
+     All papers now use one native document-scroll owner. The legacy input
+     router remains below only as migration history and exits before binding;
+     browser momentum, touch, keyboard and scrollbar input stay native. */
   (function installPaperInputRouter() {
+    return;
     if (window.__bqPaperInputRouterBound || !paperStacks.length) return;
     window.__bqPaperInputRouterBound = true;
 
