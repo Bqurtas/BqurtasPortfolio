@@ -2368,7 +2368,16 @@
       });
       window.addEventListener('load', function () {
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('/sw.js').catch(function () {});
+          /* Fingerprinted like every other asset. sw.js is fetched from a fixed
+             path, so a CDN that has cached one copy keeps handing it back long
+             after a deploy — and that copy is the very file that decides how
+             fresh everything else is. A ?v= makes it a new cache key the stale
+             entry cannot answer, and updateViaCache:'none' stops the browser
+             serving the worker script from its own HTTP cache too.
+             Bump this with SW_VERSION in sw.js. */
+          navigator.serviceWorker
+            .register('/sw.js?v=2', { updateViaCache: 'none' })
+            .catch(function () {});
         }
       });
     }());
