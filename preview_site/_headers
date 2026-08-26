@@ -54,6 +54,16 @@
   Cache-Control: no-store
   CDN-Cache-Control: no-store
 
+/sw.js
+  # The one file that must never be edge-cached. Every other asset carries a
+  # ?v= fingerprint, so a new build is a new URL — but sw.js is fetched at a
+  # fixed path, and it is the file that decides how fresh everything else is.
+  # Cached at the edge, a superseded worker keeps serving its own old cache to
+  # returning visitors long after a deploy.
+  Content-Type: text/javascript; charset=utf-8
+  Cache-Control: no-store
+  CDN-Cache-Control: no-store
+
 /llms.txt
   Content-Type: text/plain; charset=utf-8
   Cache-Control: no-store
