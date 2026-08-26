@@ -1,23 +1,34 @@
 /* =========================================================
    Barakat Qurtas — Service Worker (PWA Offline & Cache)
-   Version: 1.0.0
+
+   Freshness beats speed. Two rules make that true:
+
+   1. SW_VERSION is part of the cache name, so every release drops the
+      whole previous cache in `activate` instead of layering on top of it.
+   2. Only URLs that carry a ?v= fingerprint are served cache-first. Those
+      are immutable by construction — a new build means a new URL. Every
+      other same-origin asset (unversioned art, logos, the avatar) is
+      served stale-while-revalidate, so an edit shows up on the next visit
+      instead of being pinned for the life of the installed worker.
    ========================================================= */
 
-const CACHE_NAME = 'bqurtas-cache-v1';
+const SW_VERSION = 'v2';                       // bump on every deploy
+const CACHE_NAME = `bqurtas-cache-${SW_VERSION}`;
+
+/* Keep in step with the ?v= values in index.html — a stale entry here just
+   wastes an install fetch, it can never be served to the page (the page asks
+   for a different URL). */
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
-  '/css/modern-framer.css?v=161',
-  '/css/style.v417.min.css?v=458',
+  '/css/modern-framer.css?v=209',
+  '/css/style.v417.min.css?v=465',
   '/css/fonts.css?v=447',
-  '/css/experience.css?v=6',
-  '/js/main.v420.min.js?v=490',
-  '/js/gallery.v420.min.js?v=452',
-  '/js/i18n.v420.min.js?v=449',
-  '/js/i18n-more.min.js',
-  '/js/enhance.v420.min.js',
-  '/js/motion.min.js?v=411',
-  '/js/chat-kb.min.js',
+  '/css/experience.css?v=83',
+  '/js/main.v420.min.js?v=514',
+  '/js/gallery.v420.min.js?v=453',
+  '/js/i18n.v420.min.js?v=455',
+  '/js/motion.min.js?v=419',
   '/js/lux.min.js?v=359',
   '/site.webmanifest?v=333',
   '/favicon.ico',
@@ -53,8 +64,9 @@ self.addEventListener('activate', (event) => {
 });
 
 // Fetch: Strategy
-// - Documents (HTML / SPA navigation): Network first, falling back to cache, then /index.html
-// - Static assets (CSS, JS, Fonts, Images): Cache first, falling back to network
+// - Documents (HTML / SPA navigation): network first, then cache, then /index.html
+// - Fingerprinted assets (?v=…):       cache first — the URL changes when the file does
+// - Everything else same-origin:       stale-while-revalidate — fast, but never stale twice
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
@@ -77,27 +89,31 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first for static assets
+  const sameOrigin = url.origin === self.location.origin;
+  const fingerprinted = url.searchParams.has('v');
+
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(request).then((networkResponse) => {
+      const network = fetch(request).then((networkResponse) => {
         if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'opaque') {
           return networkResponse;
         }
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          // Only cache same-origin assets or specific CDN media
-          if (url.origin === self.location.origin) {
-            cache.put(request, responseToCache);
-          }
-        });
+        if (sameOrigin) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
+        }
         return networkResponse;
-      }).catch(() => {
+      }).catch(() => cachedResponse);
+
+      // A fingerprinted URL can never go stale, so the cached copy is final.
+      if (cachedResponse && fingerprinted) return cachedResponse;
+
+      // Otherwise serve what we have and refresh it in the background.
+      if (cachedResponse) {
+        event.waitUntil(network);
         return cachedResponse;
-      });
+      }
+      return network;
     })
   );
 });

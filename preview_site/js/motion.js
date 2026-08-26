@@ -161,12 +161,16 @@
              before the sheet was ever looked at. The sheet's own top is the only
              honest signal for which one has arrived. */
           var limit = window.innerHeight * 0.55;
+          /* read first, mutate after — adding a class mid-loop would force the
+             next sheet's rect to re-run layout */
+          var arrived = [];
           for (var i = pending.length - 1; i >= 0; i--) {
-            var group = pending[i];
-            if (group.sheet.getBoundingClientRect().top < limit) {
-              group.items.forEach(function (el) { el.classList.add('is-risen'); });
-              pending.splice(i, 1);
-            }
+            if (pending[i].sheet.getBoundingClientRect().top < limit) arrived.push(i);
+          }
+          for (var a = 0; a < arrived.length; a++) {
+            var group = pending[arrived[a]];
+            group.items.forEach(function (el) { el.classList.add('is-risen'); });
+            pending.splice(arrived[a], 1);
           }
           if (!pending.length) {
             removeEventListener('scroll', queueRise);
@@ -183,8 +187,12 @@
     }
 
     /* ---- top bar hierarchy on scroll ---- */
+    var scrolledNow = null;
     var setScrolled = function () {
-      document.body.classList.toggle('is-scrolled', window.scrollY > 24);
+      var on = window.scrollY > 24;
+      if (on === scrolledNow) return;
+      scrolledNow = on;
+      document.body.classList.toggle('is-scrolled', on);
     };
     setScrolled();
     addEventListener('scroll', setScrolled, { passive: true });
@@ -334,14 +342,25 @@
         '.service-showcase-title, .bio-teaser-title, .software-title, .latest-blog-title, .room-hero-title, .pj-room-title'
       ));
       var driftFrame = 0;
+      var driftValues = [];
       var updateDrift = function () {
         driftFrame = 0;
-        driftItems.forEach(function (item) {
-          var rect = item.getBoundingClientRect();
-          if (rect.bottom < -80 || rect.top > innerHeight + 80) return;
-          var progress = clamp((rect.top + rect.height * 0.5) / innerHeight, 0, 1);
-          item.style.setProperty('--motion-drift', ((progress - 0.5) * 14).toFixed(2) + 'px');
-        });
+        var vh = innerHeight;
+        /* read every rect first — a write in between forces the next read to
+           re-run layout, which is what made this the most expensive thing on
+           the page during a scroll */
+        for (var i = 0; i < driftItems.length; i++) {
+          var rect = driftItems[i].getBoundingClientRect();
+          driftValues[i] = (rect.bottom < -80 || rect.top > vh + 80)
+            ? null
+            : clamp((rect.top + rect.height * 0.5) / vh, 0, 1);
+        }
+        /* then write */
+        for (var j = 0; j < driftItems.length; j++) {
+          if (driftValues[j] === null) continue;
+          driftItems[j].style.setProperty(
+            '--motion-drift', ((driftValues[j] - 0.5) * 14).toFixed(2) + 'px');
+        }
       };
       var queueDrift = function () {
         if (!driftFrame) driftFrame = requestAnimationFrame(updateDrift);

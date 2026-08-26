@@ -616,9 +616,9 @@
     @media (max-width:1024px){.rail{display:none!important}.mobilebar{display:flex!important}.main,[dir=rtl] .main{margin-left:0!important;margin-right:0!important;padding-top:0!important}.design-cta{display:none!important}}
     html.bq-compact .rail{display:none!important}html.bq-compact .mobilebar{display:flex!important}html.bq-compact .main,[dir=rtl] html.bq-compact .main{margin-left:0!important;margin-right:0!important}
   </style>
-  <link rel="preload" as="style" href="css/style.v417.min.css?v=464" data-href="css/style.v417.min.css?v=464" fetchpriority="high" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=205">
-  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=464"></noscript>
+  <link rel="preload" as="style" href="css/style.v417.min.css?v=465" data-href="css/style.v417.min.css?v=465" fetchpriority="high" id="bqFullCss">
+  <link rel="stylesheet" href="css/modern-framer.css?v=209">
+  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=465"></noscript>
   <script>
     (function () {
       var root = document.documentElement;
@@ -712,7 +712,7 @@
     }());
   </script>
   <link rel="stylesheet" href="css/fonts.css?v=447">
-  <link rel="stylesheet" href="css/experience.css?v=27">
+  <link rel="stylesheet" href="css/experience.css?v=83">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315"></noscript>
 
@@ -1538,7 +1538,7 @@
         </div>
       </div>
 
-      <div class="section bio-record-sheet room-sheet--scroll">
+      <div class="section bio-record-sheet">
         <div class="sheet-mid">
         <div class="bio-block" data-wm="&#xf0b1;">
           <h3 class="bio-block-title"><i class="fa-solid fa-briefcase"></i> <span data-i18n="bio.experience">Experience</span></h3>
@@ -1585,8 +1585,12 @@
             </li>
           </ol>
         </div>
+        </div>
+      </div>
 
-        <!-- EDUCATION -->
+      <!-- EDUCATION -->
+      <div class="section bio-education-sheet">
+        <div class="sheet-mid">
         <div class="bio-block" data-wm="&#xf19d;">
           <h3 class="bio-block-title"><i class="fa-solid fa-graduation-cap"></i> <span data-i18n="bio.education">Education</span></h3>
           <div class="bio-card">
@@ -1725,7 +1729,7 @@
         </div>
       </div>
 
-      <div class="section bio-connect-sheet room-sheet--scroll">
+      <div class="section bio-services-sheet">
         <div class="sheet-mid">
         <div class="bio-block" data-wm="&#xf552;">
           <h3 class="bio-block-title"><i class="fa-solid fa-toolbox"></i> <span data-i18n="bio.services">Services Provided</span></h3>
@@ -1742,7 +1746,11 @@
             <div class="service"><i class="fa-solid fa-hashtag"></i><span data-i18n="opt.smm">Social Media Marketing</span></div>
           </div>
         </div>
+        </div>
+      </div>
 
+      <div class="section bio-connect-sheet">
+        <div class="sheet-mid">
         <div class="bio-connect-links">
         <a class="bio-block bio-social bio-social--linkedin" data-wm="&#xf08c;" href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener">
           <span class="bio-social-mark"><i class="fa-brands fa-linkedin-in"></i></span>
@@ -1777,6 +1785,13 @@
           <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
         </a>
 
+        </div>
+        </div>
+      </div>
+
+      <div class="section bio-documents-sheet">
+        <div class="sheet-mid">
+        <div class="bio-connect-links">
         <a class="bio-block bio-social bio-doc-card bio-doc-card--cv" data-wm="&#xf15c;" href="https://dcnkhzrishphpismmxuu.supabase.co/storage/v1/object/public/PDF/df9e89_a909ec87afa044c9aca814e2de2e553c_compressed.pdf" target="_blank" rel="noopener">
           <span class="bio-social-mark"><i class="fa-solid fa-file-lines"></i></span>
           <div class="bio-social-text">
@@ -1865,7 +1880,7 @@
         </div>
       </div>
 
-      <div class="section contact-pitch-sheet room-sheet--scroll">
+      <div class="section contact-brief-sheet">
         <div class="sheet-mid">
         <div class="pitch-wrap">
           <header class="pitch-head">
@@ -1874,7 +1889,13 @@
             <p class="section-lede" data-i18n="contact.pitch.lede">Tell me about you, your project, your timeline, and your budget. I reply to every serious enquiry within 48 hours.</p>
             <!--email_off--><a class="pitch-mail mono" href="mailto:hello@bqurtas.com"><i class="fa-solid fa-envelope"></i> hello@bqurtas.com</a><!--/email_off-->
           </header>
+        </div>
+        </div>
+      </div>
 
+      <div class="section contact-pitch-sheet">
+        <div class="sheet-mid">
+        <div class="pitch-wrap">
           <form class="pitch-form" id="pitchForm" novalidate>
             <div class="row-2">
               <div class="field">
@@ -2208,7 +2229,7 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=507"></script>
+  <script defer src="js/main.v420.min.js?v=514"></script>
   <script defer src="js/gallery.v420.min.js?v=453"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2268,7 +2289,7 @@
     }());
   </script>
   <script defer src="js/lux.min.js?v=359"></script>
-  <script defer src="js/motion.min.js?v=418"></script>
+  <script defer src="js/motion.min.js?v=419"></script>
   <!-- The chatbot knowledge base is loaded only when a visitor shows intent. -->
   <script>
     (function () {

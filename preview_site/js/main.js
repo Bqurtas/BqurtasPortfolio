@@ -1778,7 +1778,14 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     }
 
     const inactive = () => requireActive && root.classList.contains('is-hidden');
-    const readPin = () => parseFloat(getComputedStyle(sheets[0]).top) || 0;
+    /* The sticky inset only moves when the deck is re-measured, but this ran
+       on every rendered frame — and getComputedStyle forces a style recalc. */
+    let cachedPin = null;
+    const refreshPin = () => {
+      cachedPin = parseFloat(getComputedStyle(sheets[0]).top) || 0;
+      return cachedPin;
+    };
+    const readPin = () => (cachedPin === null ? refreshPin() : cachedPin);
 
     const resetVisuals = () => {
       sheets.forEach((sheet) => {
@@ -1898,7 +1905,16 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       }
 
       const readingState = captureReadingState();
-      const pin = readPin();
+      const pin = refreshPin();
+      /* The final card of a stack has no sibling below it, so it cannot buy its
+         reading track with margin-bottom: a sticky box travels across its
+         containing block's padding box INSET BY ITS OWN MARGINS, so that margin
+         is added and subtracted in the same breath and the card gets zero
+         travel — it slid away while its interior scrolled, doubling the
+         apparent speed. Its distance goes to the root's padding instead. */
+      const rootSheets = sheets.filter((sheet) => sheet.parentElement === root);
+      const tailSheet = rootSheets[rootSheets.length - 1] || null;
+      let tailTrack = 0;
       sheets.forEach((sheet) => {
         const scroller = sheet.querySelector(':scope > .paper-scroll');
         if (!scroller) return;
@@ -1917,13 +1933,24 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         const rawOverflow = allowInner
           ? Math.max(0, scroller.scrollHeight - scroller.clientHeight)
           : 0;
-        /* Ignore sub-pixel/font rounding on otherwise short hero cards. */
-        const overflow = rawOverflow > 12 ? Math.ceil(rawOverflow) : 0;
-        const hasNaturalOverflow = naturalOverflow > 12;
+        /* Hold a card only for reading its OWN content. This used to measure
+           rawOverflow — the authored content plus the breathing spacer — so a
+           page whose content fit comfortably still held for ~80px of scroll,
+           which reads as an inner scroll on a page that has nothing to scroll.
+           Measuring the authored content alone means a card that fits simply
+           hands over to the next one. Sub-pixel/font rounding is ignored. */
+        const overflow = naturalOverflow > 12 ? Math.ceil(naturalOverflow) : 0;
+        const hasNaturalOverflow = overflow > 0;
+        void rawOverflow;
 
         /* Hold the paper for exactly its interior reading distance. Native
            window scroll then advances the content and releases the next card. */
-        sheet.style.setProperty('--bq-flow-extra', `${overflow}px`);
+        if (sheet === tailSheet) {
+          tailTrack = overflow;
+          sheet.style.setProperty('--bq-flow-extra', '0px');
+        } else {
+          sheet.style.setProperty('--bq-flow-extra', `${overflow}px`);
+        }
         scroller.classList.toggle('is-window-driven', allowInner && overflow > 0);
         scroller.classList.toggle('is-paper-scrollable', allowInner && overflow > 0);
         sheet.classList.toggle('has-paper-natural-overflow', hasNaturalOverflow);
@@ -1947,6 +1974,25 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         if (allowInner) sheet.dataset.paperScroll = 'inner';
         else delete sheet.dataset.paperScroll;
       });
+
+      /* Give the final card a real sibling to travel against. Padding on the
+         deck cannot do this — a sticky box is held inside its containing
+         block's CONTENT box — and its own margin-bottom cannot either, because
+         a sticky box's range is inset by its own margins. A spacer is the one
+         thing that lengthens the content box without being subtracted again.
+         root.offsetHeight grows with it, so the footer offset stays correct. */
+      let tailSpacer = root.querySelector(':scope > .paper-tail-track');
+      if (tailTrack > 0) {
+        if (!tailSpacer) {
+          tailSpacer = document.createElement('div');
+          tailSpacer.className = 'paper-tail-track';
+          tailSpacer.setAttribute('aria-hidden', 'true');
+        }
+        if (root.lastElementChild !== tailSpacer) root.appendChild(tailSpacer);
+        tailSpacer.style.setProperty('height', `${tailTrack}px`, 'important');
+      } else if (tailSpacer) {
+        tailSpacer.remove();
+      }
 
       /* Build stable normal-flow offsets instead of reading `offsetTop` from a
          sticky element (Chromium reports its painted/stuck position there). */
@@ -2124,6 +2170,66 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
      reveal the gallery within the fixed frame; at the reel's end the track ends
      and the next card takes over. Purely page-scroll driven — deterministic,
      native momentum, identical on desktop and phones. */
+  /* =======================================================
+     Scroll state.
+     The twelve filter chips each carry backdrop-filter: blur(16px), and the
+     gallery reel scrolls directly behind them, so the browser re-samples and
+     re-blurs twelve regions on every single frame of a portfolio scroll. That
+     is the most expensive thing on the page while it moves — and a 16px blur
+     is not something anyone perceives mid-scroll.
+
+     So the blur is suspended while the page is moving and restored the moment
+     it stops. At rest the design is exactly as authored; in motion it is free.
+     ======================================================= */
+  (function scrollState() {
+    const root = document.documentElement;
+    const SELECTOR = '.tab, .hero-cta, .rail, .mobilebar, .design-cta';
+    /* Applied inline rather than through a class: the authored blur is set at
+       two-id specificity in several places, and an inline !important is the
+       one thing that reliably outranks all of them without starting a
+       specificity war that the next edit would lose. */
+    let blurred = null;
+    const suspend = () => {
+      if (!blurred) blurred = Array.from(document.querySelectorAll(SELECTOR));
+      for (const el of blurred) {
+        el.style.setProperty('backdrop-filter', 'none', 'important');
+        el.style.setProperty('-webkit-backdrop-filter', 'none', 'important');
+      }
+    };
+    const restore = () => {
+      if (!blurred) return;
+      for (const el of blurred) {
+        el.style.removeProperty('backdrop-filter');
+        el.style.removeProperty('-webkit-backdrop-filter');
+      }
+    };
+    let idle = 0;
+    let moving = false;
+    const stop = () => {
+      if (!moving) return;
+      moving = false;
+      root.classList.remove('bq-scrolling');
+      restore();
+    };
+    const onMove = () => {
+      if (!moving) {
+        moving = true;
+        root.classList.add('bq-scrolling');
+        suspend();
+      }
+      clearTimeout(idle);
+      idle = setTimeout(stop, 140);
+    };
+    window.addEventListener('scroll', onMove, { passive: true });
+    window.addEventListener('touchmove', onMove, { passive: true });
+    window.addEventListener('wheel', onMove, { passive: true });
+    window.addEventListener('blur', stop);
+    /* The gallery rebuilds its chrome on a tab switch or a language change. */
+    const forget = () => { restore(); blurred = null; };
+    window.addEventListener('bq:gallery-built', forget);
+    document.addEventListener('bq:language', forget);
+  }());
+
   (function portfolioMagicScroll() {
     const track = document.querySelector('#design.paper-stack > .section.work.paper-sheet');
     const card = track?.querySelector(':scope > .paper-scroll');
@@ -2178,6 +2284,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     let lastY = 0;
     let workReadingState = { active: false };
     const measure = () => {
+      readGutter();
       /* Tab switches hold geometry so an empty-grid frame cannot snap the reel. */
       if (track.dataset.holdTrack === '1') {
         if (track.dataset.trackHLock) {
@@ -2219,7 +2326,15 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       const next = nextSheet();
       if (next) next.style.setProperty('margin-top', (-cardH) + 'px', 'important');
     };
-    const gutter = () => parseFloat(getComputedStyle(card).top) || 0;
+    /* getComputedStyle is a style-recalc barrier; this was being called several
+       times per scroll event for a value that only changes on resize. Cached,
+       refreshed wherever geometry is re-measured. */
+    let cachedGutter = null;
+    const readGutter = () => {
+      cachedGutter = parseFloat(getComputedStyle(card).top) || 0;
+      return cachedGutter;
+    };
+    const gutter = () => (cachedGutter === null ? readGutter() : cachedGutter);
     const reelState = () => {
       const g = gutter();
       const trackTop = track.getBoundingClientRect().top;
@@ -2233,9 +2348,18 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
        sheet has fully climbed over it, so hiding is invisible. Position-based, so
        the card can never leak above/beside the sheets that follow. No z-lift, no
        occlusion — a plain sticky card the next sheet rises over like any other. */
+    /* Writing visibility on every frame invalidates style even when the value
+       is unchanged; remembered so the write happens only on a real transition. */
+    let coveredNow = null;
+    const applyCovered = (cardTop, g) => {
+      const covered = cardTop < g - 1;
+      if (covered === coveredNow) return;
+      coveredNow = covered;
+      card.style.visibility = covered ? 'hidden' : 'visible';
+    };
     const setCovered = () => {
       const g = gutter();
-      card.style.visibility = (card.getBoundingClientRect().top < g - 1) ? 'hidden' : 'visible';
+      applyCovered(card.getBoundingClientRect().top, g);
     };
     const rememberReading = (local) => {
       const span = overflow + cardH;
@@ -2260,25 +2384,36 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       }
     };
     let raf = 0;
+    /* One frame = read everything, then write everything. Interleaving them is
+       what made this scroll stutter: each read that followed a write forced a
+       synchronous relayout, several times per scroll event. */
     const drive = () => {
       raf = 0;
-      let { y, local } = reelState();
+
+      /* ---- reads ---- */
+      const g = gutter();
+      const trackTop = track.getBoundingClientRect().top;
+      const cardTop = card.getBoundingClientRect().top;
+      const local = g - trackTop;
+      let y = Math.min(overflow, Math.max(0, local));
       if (track.dataset.holdTrack === '1') {
         const locked = Number(track.dataset.reelY);
         y = Number.isFinite(locked) ? locked : lastY;
       }
+      const headY = collapseDist ? -Math.min(y, collapseDist) : null;
+
+      /* ---- writes ---- */
       lastY = y;
       reel.style.transform = 'translate3d(0,' + (-y) + 'px,0)';
       /* slide the head up until the tabs reach the top, then hold — the heading
          scrolls away while ONLY the tabs stay pinned (owner). */
-      if (collapseDist && headEl) {
-        headEl.style.transform = 'translate3d(0,' + (-Math.min(y, collapseDist)) + 'px,0)';
+      if (headY !== null && headEl) {
+        headEl.style.transform = 'translate3d(0,' + headY + 'px,0)';
       }
+      applyCovered(cardTop, g);
       rememberReading(local);
     };
     const onScroll = () => {
-      setCovered();
-      rememberReading(reelState().local);
       if (!raf) raf = requestAnimationFrame(drive);
     };
     const remeasure = () => {
@@ -2343,7 +2478,16 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     window.addEventListener('bq:gallery-built', remeasure);
     window.addEventListener('bq:gallery-counts', remeasure);
     document.addEventListener('bq:language', remeasure);
-    if (typeof ResizeObserver === 'function') { try { new ResizeObserver(remeasure).observe(reel); } catch (e) {} }
+    if (typeof ResizeObserver === 'function') {
+      /* Gallery images land one by one, each resizing the reel. Un-coalesced
+         that is one full remeasure — and possibly a scrollTo — per image. */
+      let roFrame = 0;
+      const queueRemeasure = () => {
+        if (roFrame) return;
+        roFrame = requestAnimationFrame(() => { roFrame = 0; remeasure(); });
+      };
+      try { new ResizeObserver(queueRemeasure).observe(reel); } catch (e) {}
+    }
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure, () => {});
     remeasure();
   })();
@@ -2465,18 +2609,35 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     ring.style.strokeDashoffset = String(circumference);
   }
 
-  const update = () => {
+  /* scrollHeight is a layout barrier, so it is read once per resize rather
+     than once per scroll event, and the ring is painted once per frame. */
+  let cachedMax = 0;
+  const readMax = () => {
     const doc = document.documentElement;
+    cachedMax = Math.max(doc.scrollHeight - doc.clientHeight, 1);
+  };
+  let shownNow = null;
+  const update = () => {
     const top = window.scrollY || document.scrollingElement?.scrollTop || 0;
-    const max = Math.max(doc.scrollHeight - doc.clientHeight, 1);
-    const progress = Math.min(Math.max(top / max, 0), 1);
-    control.classList.toggle('is-shown', top > 160);
+    if (!cachedMax) readMax();
+    const progress = Math.min(Math.max(top / cachedMax, 0), 1);
+    const shown = top > 160;
+    if (shown !== shownNow) {
+      shownNow = shown;
+      control.classList.toggle('is-shown', shown);
+    }
     if (ring) ring.style.strokeDashoffset = String(circumference * (1 - progress));
   };
+  let ringFrame = 0;
+  const queueUpdate = () => {
+    if (ringFrame) return;
+    ringFrame = requestAnimationFrame(() => { ringFrame = 0; update(); });
+  };
+  const onResize = () => { readMax(); queueUpdate(); };
 
-  window.addEventListener('scroll', update, { passive: true });
-  window.addEventListener('touchmove', update, { passive: true });
-  window.addEventListener('resize', update, { passive: true });
+  window.addEventListener('scroll', queueUpdate, { passive: true });
+  window.addEventListener('touchmove', queueUpdate, { passive: true });
+  window.addEventListener('resize', onResize, { passive: true });
   window.addEventListener('pageshow', update);
   window.__bqCoreGoUpUpdate = update;
 

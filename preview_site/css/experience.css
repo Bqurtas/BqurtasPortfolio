@@ -462,13 +462,15 @@ html body .room.room.paper-stack:not(#design) > .paper-sheet > .paper-scroll {
   max-height: 100% !important;
   overflow-x: hidden !important;
   overflow-y: hidden !important;
-  overscroll-behavior: none !important;
+  /* The card cannot scroll itself, so the wheel MUST be allowed to chain to
+     the page — `none` here left the pointer dead over the paper and only the
+     black bed still moved the deck. */
+  overscroll-behavior: auto !important;
   touch-action: pan-y !important;
   border: 1px solid color-mix(in srgb, var(--ink) 7%, transparent) !important;
   border-radius: var(--bq-deck-radius) !important;
   background: var(--bq-paper-sheet, #f3f3f3) !important;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, .58) inset,
     0 -8px 24px -17px rgba(0, 0, 0, .26),
     0 30px 72px -54px rgba(0, 0, 0, .58) !important;
   opacity: 1 !important;
@@ -482,7 +484,8 @@ html body .room.room.paper-stack:not(#design) > .paper-sheet > .paper-scroll {
 html body .paper-sheet > .paper-scroll.is-window-driven,
 html body .paper-sheet > .paper-scroll.is-paper-scrollable {
   overflow-y: hidden !important;
-  overscroll-behavior: none !important;
+  /* Window-driven by definition: the page owns the scroll, so let it through. */
+  overscroll-behavior: auto !important;
   scrollbar-width: none !important;
 }
 
@@ -511,7 +514,7 @@ html body .paper-scroll-meter {
   min-height: 42px !important;
   overflow: hidden !important;
   border-radius: 999px !important;
-  background: color-mix(in srgb, var(--ink) 9%, transparent) !important;
+  background: color-mix(in srgb, var(--ink) 7%, transparent) !important;
   opacity: 0 !important;
   pointer-events: none !important;
   transition: opacity .28s ease !important;
@@ -524,19 +527,40 @@ html body .paper-scroll-meter > span {
   width: 100% !important;
   height: var(--bq-meter-h) !important;
   border-radius: inherit !important;
-  background: color-mix(in srgb, var(--ink) 72%, var(--bq-signal, #111) 28%) !important;
+  /* A pale grey, not near-black: the hairline reports position, it does not
+     compete with the type. Kept ink-relative with alpha so it stays a soft
+     grey on the light paper and on the dark one. */
+  background: color-mix(in srgb, var(--ink) 34%, transparent) !important;
   transform: translate3d(0, var(--bq-meter-y), 0) !important;
   transition: height .22s ease !important;
 }
 
 html body .paper-sheet.has-paper-overflow > .paper-scroll-meter {
-  opacity: .48 !important;
+  opacity: .55 !important;
 }
 
 html body .paper-sheet.has-paper-overflow:hover > .paper-scroll-meter,
 html body .paper-sheet.has-paper-overflow:focus-within > .paper-scroll-meter,
 html body .paper-sheet.is-paper-reading > .paper-scroll-meter {
-  opacity: .82 !important;
+  opacity: .78 !important;
+}
+
+/* The deck is driven by window scroll, so the browser drew its bar down the
+   black bed — outside the paper, against the one surface meant to stay empty.
+   The hairline above already reports position from inside the sheet, so the
+   native bar is hidden and the reading indicator lives on the page it belongs
+   to. Wheel, touch, keys and the meter all still work. */
+html,
+body {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
 }
 
 /* Covered papers remain painted beneath the incoming rounded card. This keeps
@@ -556,7 +580,7 @@ html body .room.room.paper-stack:not(#design) > .section.paper-sheet > .paper-sc
 html body #design#design .service-showcase.paper-sheet > .paper-scroll,
 html body #design#design .practice-note.paper-sheet > .paper-scroll {
   overflow-y: hidden !important;
-  overscroll-behavior: none !important;
+  overscroll-behavior: auto !important;
   padding-bottom: clamp(94px, 11vh, 124px) !important;
 }
 
@@ -603,6 +627,36 @@ html[data-lang="ku"] :is(
   font-style: normal !important;
   letter-spacing: 0 !important;
   line-height: 1.24 !important;
+}
+
+/* The tracking reset above is written at (0,2,1) and loses to modern-framer's
+   `#design .section-title` (1,1,0), so the Latin display tightening — down to
+   -.055em — was still reaching the Arabic script and pinching the joins. Repeat
+   it at a weight that actually lands, using the same doubled-selector trick the
+   service headings already use further down this file. Arabic script is drawn
+   connected: it takes zero tracking, never negative. */
+html[data-lang="ku"] body :is(#design, #blog, #bio, #contact):is(#design, #blog, #bio, #contact) :is(
+  .room-hero-title, .section-title, .tab-header-title, .logos-title,
+  .latest-blog-title, .subscribe-title, .bio-phil-label, .pitch-head h3,
+  .service-showcase-title, .service-name, .bio-teaser-title,
+  .card-title, .blog-card h3
+),
+html[data-lang="ku"] body .footer.footer.footer :is(.footer-cta-title),
+html[data-lang="ar"] body :is(#design, #blog, #bio, #contact):is(#design, #blog, #bio, #contact) :is(
+  .room-hero-title, .section-title, .tab-header-title, .logos-title,
+  .latest-blog-title, .subscribe-title, .bio-phil-label, .pitch-head h3,
+  .service-showcase-title, .service-name, .bio-teaser-title,
+  .card-title, .blog-card h3
+),
+html[data-lang="ar"] body .footer.footer.footer :is(.footer-cta-title) {
+  letter-spacing: 0 !important;
+}
+
+/* The gallery caption carries its own themed rule at (2,3,1), so it needs the
+   grid in the path to be reached at all. */
+html[data-lang="ku"] body #design#design #grid .card-caption .card-title,
+html[data-lang="ar"] body #design#design #grid .card-caption .card-title {
+  letter-spacing: 0 !important;
 }
 
 html[data-lang="ku"] :is(
@@ -1164,7 +1218,7 @@ html body #design#design .section.practice-note.paper-sheet > .paper-scroll {
   min-height: 0 !important;
   max-height: 100% !important;
   overflow: hidden !important;
-  overscroll-behavior: none !important;
+  overscroll-behavior: auto !important;
   scrollbar-width: none !important;
 }
 
@@ -1177,7 +1231,29 @@ html body #design#design .section.practice-note.paper-sheet > .paper-scroll::-we
 html body .room.paper-stack,
 html body[dir="rtl"] .room.paper-stack {
   padding: var(--bq-deck-gutter, 10px) !important;
+  /* The last card's reading track lives here, not on its own margin-bottom.
+     A sticky box may travel across its containing block's padding box inset by
+     its OWN margins — so a tall margin-bottom on the final card adds the space
+     and then subtracts it again, leaving zero travel. main.js measures that
+     distance into --bq-tail-track; carrying it as padding lengthens the deck
+     without cancelling the stick, and the footer offset still reads it through
+     root.offsetHeight. */
   background: var(--bq-paper-underlay, #0a0a0a) !important;
+}
+
+/* The final card's reading track is a real element, not padding: a sticky box
+   is held inside its containing block's CONTENT box, so padding on the deck
+   buys it no travel. main.js sizes this spacer to the last card's interior
+   distance and keeps it last in the deck. */
+html body .room.paper-stack > .paper-tail-track {
+  display: block !important;
+  width: 100% !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  pointer-events: none !important;
 }
 
 html body .room.paper-stack > .paper-sheet {
@@ -1228,7 +1304,9 @@ html body .room.paper-stack > .room-hero.paper-sheet > .paper-scroll {
 html body .room.paper-stack > .section.paper-sheet > .paper-scroll {
   overflow-x: hidden !important;
   overflow-y: auto !important;
-  overscroll-behavior-y: contain !important;
+  /* `contain` traps the wheel on a card that a stronger rule later forces to
+     overflow:hidden, so the pointer went dead over the paper. */
+  overscroll-behavior-y: auto !important;
   padding: clamp(28px, 4vh, 52px) clamp(18px, 3.2vw, 44px) clamp(74px, 9vh, 96px) !important;
   scrollbar-width: none !important;
   -webkit-overflow-scrolling: touch !important;
@@ -1372,13 +1450,15 @@ html body[dir="rtl"] #mobileMenu#mobileMenu.is-ready .mm-left {
 html body #mobileMenu#mobileMenu .mm-menu-head {
   display: flex !important;
   align-items: center !important;
-  justify-content: space-between !important;
+  justify-content: center !important;
   gap: 20px !important;
   padding: 0 !important;
   border: 0 !important;
 }
 
 html body #mobileMenu#mobileMenu .mm-menu-monogram,
+html body #mobileMenu#mobileMenu .mm-menu-brand,
+html body #mobileMenu#mobileMenu .mm-menu-foot,
 html body #mobileMenu#mobileMenu .mm-menu-brand-copy small,
 html body #mobileMenu#mobileMenu .mm-menu-index,
 html body #mobileMenu#mobileMenu .mm-link-copy small,
@@ -1388,7 +1468,6 @@ html body #mobileMenu#mobileMenu .mm-menu-social {
   display: none !important;
 }
 
-html body #mobileMenu#mobileMenu .mm-menu-brand,
 html body #mobileMenu#mobileMenu .mm-menu-brand-copy {
   display: block !important;
   width: auto !important;
@@ -1478,7 +1557,7 @@ html body #mobileMenu#mobileMenu .mm-nav {
   width: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
-  border-top: 1px solid var(--bq-menu-line) !important;
+  border-top: 0 !important;
 }
 
 html body #mobileMenu#mobileMenu .mm-nav .mm-link,
@@ -1493,7 +1572,6 @@ html body #mobileMenu#mobileMenu .mm-nav .mm-link:hover {
   margin: 0 !important;
   padding: clamp(13px, 2.2vh, 19px) 0 !important;
   border: 0 !important;
-  border-bottom: 1px solid var(--bq-menu-line) !important;
   border-radius: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
@@ -1529,7 +1607,7 @@ html body #mobileMenu#mobileMenu .mm-nav .mm-link .mm-link-text {
   display: block !important;
   width: 100% !important;
   font-family: 'Manrope', sans-serif !important;
-  font-size: clamp(30px, 3.25vw, 46px) !important;
+  font-size: clamp(26px, 2.8vw, 40px) !important;
   font-weight: 500 !important;
   line-height: .96 !important;
   letter-spacing: -.045em !important;
@@ -1538,7 +1616,7 @@ html body #mobileMenu#mobileMenu .mm-nav .mm-link .mm-link-text {
 }
 
 html body #mobileMenu#mobileMenu .mm-menu-foot {
-  display: flex !important;
+  display: none !important;
   align-items: center !important;
   justify-content: flex-end !important;
   padding: 0 !important;
@@ -1791,7 +1869,7 @@ html body #mobileMenu#mobileMenu .mm-menu-foot {
   }
 
   html body #mobileMenu#mobileMenu .mm-nav .mm-link .mm-link-text {
-    font-size: clamp(36px, 11vw, 52px) !important;
+    font-size: clamp(32px, 9.6vw, 46px) !important;
     line-height: .95 !important;
   }
 }
@@ -2244,4 +2322,727 @@ html body .rail .social-hover.is-flyout-dismissed .social-flyout {
     min-height: 42px !important;
     flex-basis: 42px !important;
   }
+}
+
+/* =========================================================
+   Connect & document cards — a row, not a tower.
+   Stacked centre-aligned (mark over text over "Open") these ran ~470px each,
+   so five of them needed a scroll the deck is not supposed to have. Laid on
+   their side they read the same and cost a third of the height, and the
+   535px-wide column stops being mostly empty. Logical props: mirrors in RTL.
+   ========================================================= */
+html body .room.room.paper-stack .bio-connect-links {
+  gap: 10px !important;
+  align-content: start !important;
+}
+
+html body .room.room.paper-stack .bio-connect-links .bio-social {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: clamp(12px, 1.2vw, 18px) !important;
+  padding: clamp(12px, 1.5vh, 18px) clamp(10px, 1vw, 16px) !important;
+  text-align: start !important;
+}
+
+html body .room.room.paper-stack .bio-connect-links .bio-social-mark {
+  flex: 0 0 auto !important;
+  width: clamp(42px, 4vh, 56px) !important;
+  height: clamp(42px, 4vh, 56px) !important;
+  margin: 0 !important;
+  font-size: clamp(15px, 1.7vh, 20px) !important;
+}
+
+html body .room.room.paper-stack .bio-connect-links .bio-social-text {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  text-align: start !important;
+}
+
+html body .room.room.paper-stack .bio-connect-links .bio-social-go {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+}
+
+/* Nothing on these cards is truncated: the five of them are split across two
+   pages instead, so each card can show its whole description and its address.
+   A card that clips its own text is worse than one more page. */
+html body .room.room.paper-stack .bio-connect-links .bio-social {
+  overflow: visible !important;
+  height: auto !important;
+}
+
+/* Inside the deck the connect card's title was set at hero scale and wrapped to
+   two lines — 98px of the card's 253px. One line at a sensible size, and the
+   URL under it dropped: the title and the Open control already say where it
+   goes. */
+html body .room.room.paper-stack .bio-connect-links .bio-social-title {
+  font-size: clamp(17px, 2.1vh, 23px) !important;
+  line-height: 1.2 !important;
+  margin: 2px 0 4px !important;
+}
+
+html body .room.room.paper-stack .bio-connect-links .bio-social-desc {
+  font-size: clamp(12px, 1.5vh, 14px) !important;
+  line-height: 1.45 !important;
+  margin: 0 !important;
+}
+
+html body .room.room.paper-stack .bio-connect-links .bio-social-handle {
+  display: block !important;
+  font-size: clamp(10px, 1.2vh, 12px) !important;
+  margin-block-start: 2px !important;
+}
+
+/* Certificates: sixteen of them at 217px tall needed four rows the card could
+   not hold. Shorter tiles keep all sixteen on one page. */
+html body .room.room.paper-stack .cert-grid {
+  gap: clamp(10px, 1.2vh, 16px) !important;
+  align-content: start !important;
+}
+
+html body .room.room.paper-stack .cert-grid > * {
+  min-height: 0 !important;
+}
+
+/* =========================================================
+   Short-viewport rhythm.
+   Every card is exactly one screen tall, so on a 720–860px display the
+   authored spacing — tuned on a tall monitor — is what pushes a page over the
+   edge by 10–110px. Tighten the gaps between blocks, never the type, and only
+   where the screen is actually short. Tall screens keep the original setting.
+   ========================================================= */
+@media (max-height: 880px) {
+  html body .room.room.paper-stack .bio-block-title {
+    margin-block-end: clamp(8px, 1.2vh, 16px) !important;
+  }
+
+  html body .room.room.paper-stack .bio-block-lede {
+    margin-block-end: clamp(8px, 1.4vh, 18px) !important;
+  }
+
+  html body .room.room.paper-stack .tools-group {
+    margin-block: 0 clamp(8px, 1.3vh, 16px) !important;
+  }
+
+  html body .room.room.paper-stack .tools-grid {
+    gap: clamp(6px, 0.9vh, 12px) !important;
+  }
+
+  html body .room.room.paper-stack .tools-typing {
+    margin-block-start: clamp(6px, 1vh, 14px) !important;
+  }
+
+  html body .room.room.paper-stack .timeline {
+    gap: clamp(8px, 1.2vh, 16px) !important;
+  }
+
+  html body .room.room.paper-stack .tl-card {
+    padding: clamp(10px, 1.4vh, 18px) clamp(12px, 1.2vw, 20px) !important;
+  }
+
+  html body .room.room.paper-stack .langs-grid,
+  html body .room.room.paper-stack .orgs,
+  html body .room.room.paper-stack .services-grid {
+    gap: clamp(6px, 0.9vh, 12px) !important;
+  }
+
+  html body .room.room.paper-stack .index-layout {
+    gap: clamp(10px, 1.4vh, 20px) !important;
+  }
+}
+
+/* Second pass for the three pages still a hair over on a 720px screen:
+   the experience timeline, the honours index and the certificate wall. All
+   three are lists of short lines, so the height sits in the padding around
+   them rather than in the words. */
+@media (max-height: 880px) {
+  html body .room.room.paper-stack .tl-card {
+    padding-block: clamp(8px, 1.1vh, 14px) !important;
+  }
+
+  html body .room.room.paper-stack .tl-org,
+  html body .room.room.paper-stack .tl-loc,
+  html body .room.room.paper-stack .tl-desc {
+    margin-block: 1px !important;
+    line-height: 1.35 !important;
+  }
+
+  html body .room.room.paper-stack .tl-skills {
+    margin-block-start: clamp(4px, 0.7vh, 9px) !important;
+  }
+
+  html body .room.room.paper-stack .index-row {
+    padding-block: clamp(8px, 1.2vh, 15px) !important;
+  }
+}
+
+/* =========================================================
+   Pitch form — three columns instead of stacked pairs.
+   Twelve fields stacked as six full-width rows needed a scroll inside the
+   card. The eight short fields flow into a three-up grid instead (row-2 goes
+   display:contents so its children join the parent grid), and the long ones —
+   references, the brief, the NDA line and the submit — still span the width.
+   The form element itself is untouched, so submission is unaffected.
+   ========================================================= */
+html body .room.room.paper-stack .pitch-form {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(8px, 1.3vh, 16px) clamp(12px, 1.2vw, 20px) !important;
+  align-content: start !important;
+}
+
+/* Scoped through #pitchForm so it outweighs style.css's own
+   `.pitch-form .row-2:has(#pName)` — an id inside :has() counts, and without
+   the id here that rule kept the first pair boxed into a single grid cell,
+   which is what squeezed six fields across three columns. */
+html body .room.room.paper-stack #pitchForm.pitch-form .row-2 {
+  display: contents !important;
+}
+
+/* References is a single line — it takes the empty third cell beside Timeline
+   and "Where did you hear about me?" instead of a row of its own, which is a
+   whole row (~108px) back for a form that has to fit one page. */
+html body .room.room.paper-stack .pitch-form > .field:has(textarea),
+html body .room.room.paper-stack .pitch-form > .field:has(.checkbox),
+html body .room.room.paper-stack .pitch-form > .pitch-submit,
+html body .room.room.paper-stack .pitch-form > .contact-status {
+  grid-column: 1 / -1 !important;
+}
+
+html body .room.room.paper-stack .pitch-form textarea {
+  min-height: 0 !important;
+  height: clamp(74px, 12vh, 128px) !important;
+  resize: vertical !important;
+}
+
+html body .room.room.paper-stack .pitch-form .field {
+  margin: 0 !important;
+}
+
+html body .room.room.paper-stack .pitch-form label {
+  margin-block-end: clamp(2px, 0.5vh, 6px) !important;
+}
+
+/* The journal index: a 340px cover over a 315px body made the preview card
+   657px on its own, more than a short card can hold once the heading, the
+   filters and the pager are counted. The cover carries the mood, not the
+   information — it gives up the height. */
+@media (max-height: 880px) {
+  /* Section heads repeat on every page of a room; a little less air under
+     each one buys the body of the page the room it needs. */
+  html body .room.room.paper-stack .section-head {
+    margin-block-end: clamp(8px, 1.4vh, 20px) !important;
+  }
+
+  html body .room.room.paper-stack .section-lede {
+    margin-block-start: clamp(4px, 0.8vh, 10px) !important;
+  }
+}
+
+/* The gaps between a page's blocks, not the blocks themselves, were the last
+   28px: 16px of flex gap three times over plus 96px of stacked margins. */
+@media (max-height: 880px) {
+  html body .room.room.paper-stack .sheet-mid {
+    row-gap: clamp(8px, 1.4vh, 16px) !important;
+  }
+
+  html body .room.room.paper-stack .blog-filters {
+    margin-block: 2px clamp(8px, 1.4vh, 22px) !important;
+  }
+
+  html body .room.room.paper-stack .blog-pager {
+    margin-block-start: clamp(10px, 1.8vh, 30px) !important;
+  }
+}
+
+/* Home — "a short note". The portrait sets the height of the whole page here
+   (338px of a 760px block), so on a short screen it is the one that yields. */
+@media (max-height: 880px) {
+  html body #design.paper-stack .bio-teaser-portrait {
+    max-height: clamp(180px, 34vh, 300px) !important;
+  }
+
+  html body #design.paper-stack .bio-teaser-portrait img {
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  html body #design.paper-stack .bio-teaser-grid {
+    gap: clamp(10px, 1.6vh, 22px) !important;
+  }
+
+  html body #design.paper-stack .stats {
+    gap: clamp(8px, 1.2vh, 16px) !important;
+  }
+}
+
+/* Home — "what I do". The open accordion panel decides this page's height. */
+@media (max-height: 880px) {
+  html body #design.paper-stack .service-trigger {
+    padding-block: clamp(8px, 1.2vh, 16px) !important;
+  }
+
+  html body #design.paper-stack .service-detail-inner {
+    padding-block: clamp(4px, 0.8vh, 12px) clamp(8px, 1.2vh, 16px) !important;
+  }
+
+  html body #design.paper-stack .service-detail-inner li {
+    margin-block: 1px !important;
+  }
+
+  html body #design.paper-stack .service-showcase-layout {
+    gap: clamp(12px, 1.8vh, 26px) !important;
+  }
+}
+
+/* The journal preview card, at every height. A 340px cover over a 315px body
+   made this card 657px on its own — too tall for a one-screen page on a
+   laptop AND on a large display. The cover is scaled to the viewport instead
+   of fixed, so it still fills the card on a tall screen. */
+html body .room.room.paper-stack .index-card--blog .blog-card-cover {
+  height: clamp(84px, 13vh, 190px) !important;
+  min-height: 0 !important;
+}
+
+html body .room.room.paper-stack .index-card--blog .blog-card-cover img {
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+html body .room.room.paper-stack .index-card--blog .blog-card-body {
+  padding: clamp(12px, 1.6vh, 24px) clamp(14px, 1.4vw, 24px) !important;
+  gap: clamp(4px, 0.8vh, 12px) !important;
+}
+
+html body .room.room.paper-stack .index-card--blog .blog-card-title {
+  font-size: clamp(17px, 2.3vh, 26px) !important;
+  line-height: 1.22 !important;
+}
+
+/* The excerpt runs in full. Height comes from the cover above it, never from
+   cutting the sentence short. */
+html body .room.room.paper-stack .index-card--blog .blog-card-excerpt {
+  display: block !important;
+  overflow: visible !important;
+}
+
+/* =========================================================
+   Work Philosophy — the story must not be eaten.
+   This block sits in a flex column and carries overflow:hidden, so instead of
+   reporting that it was too tall it quietly shrank and clipped 524px of the
+   biography — the page measured as "fits" while half the text was gone.
+   Two things fix it: the paragraphs run in two columns like the printed page
+   they imitate, and the block is no longer allowed to silently swallow the
+   remainder. Nothing is truncated; it is set, not cut.
+   ========================================================= */
+html body .room.room.paper-stack .bio-philosophy {
+  overflow: visible !important;
+  min-height: 0 !important;
+}
+
+html body .room.room.paper-stack .bio-phil-text {
+  /* The single-column measure (~494px) is right for one column and wrong for
+     two — it made each column 226px, so the paragraphs grew taller than the
+     block they had to fit in. Two measures wide, so each column reads at the
+     length the type was set for. */
+  max-width: min(1060px, 100%) !important;
+  width: 100% !important;
+  columns: 2 !important;
+  column-gap: clamp(20px, 2.4vw, 44px) !important;
+  column-rule: 1px solid color-mix(in srgb, var(--ink) 10%, transparent) !important;
+  orphans: 2 !important;
+  widows: 2 !important;
+}
+
+html body .room.room.paper-stack .bio-phil-text > p {
+  break-inside: avoid !important;
+  margin-block: 0 clamp(8px, 1.2vh, 14px) !important;
+}
+
+html body .room.room.paper-stack .bio-phil-quote {
+  margin-block: clamp(8px, 1.2vh, 18px) !important;
+}
+
+/* One column is the honest setting once the card is too narrow to split. */
+@media (max-width: 900px) {
+  html body .room.room.paper-stack .bio-phil-text {
+    columns: 1 !important;
+    column-rule: 0 !important;
+  }
+}
+
+/* The philosophy page carries a section head (265px), a pull quote (157px) and
+   the story. Together they wanted 888px of a 728px page, which is what forced
+   the block to shrink and clip. The head and the quote give back what the
+   story needs — the story itself is not touched. */
+html body .room.room.paper-stack .bio-story-sheet .section-head {
+  margin-block-end: clamp(6px, 1vh, 14px) !important;
+}
+
+html body .room.room.paper-stack .bio-story-sheet .section-lede {
+  font-size: clamp(14px, 1.7vh, 17px) !important;
+  line-height: 1.5 !important;
+  max-width: min(920px, 100%) !important;
+}
+
+html body .room.room.paper-stack .bio-phil-quote {
+  font-size: clamp(17px, 2.4vh, 26px) !important;
+  line-height: 1.32 !important;
+}
+
+html body .room.room.paper-stack .bio-phil-sign {
+  margin-block-start: clamp(6px, 1vh, 14px) !important;
+}
+
+html body .room.room.paper-stack .bio-phil-eyebrow {
+  margin-block-end: clamp(2px, 0.6vh, 8px) !important;
+}
+
+/* The certificate caption was losing its last 6px to the tile height I set. */
+html body .room.room.paper-stack .cert-grid .cert-label {
+  line-height: 1.25 !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+/* One rule owns the tile height — there were three fighting over it. The tile
+   is a frame for an image, so it scales with the page instead of carrying a
+   fixed size, and its caption is free to sit under it rather than be clipped. */
+html body .room.room.paper-stack .cert-grid > * {
+  height: clamp(120px, 18vh, 158px) !important;
+  overflow: visible !important;
+}
+
+/* Last of the philosophy page: the quote and the standfirst each give a
+   little more so the three paragraphs sit inside the card, not past it. */
+html body .room.room.paper-stack .bio-phil-quote {
+  font-size: clamp(16px, 2.1vh, 23px) !important;
+}
+
+html body .room.room.paper-stack .bio-story-sheet .section-title {
+  margin-block-end: clamp(4px, 0.8vh, 10px) !important;
+}
+
+html body .room.room.paper-stack .bio-story-sheet .section-lede {
+  font-size: clamp(13px, 1.55vh, 16px) !important;
+}
+
+/* Last 19px on the philosophy page, so the signature sits fully on the card. */
+html body .room.room.paper-stack .bio-phil-text > p:last-child {
+  margin-block-end: 0 !important;
+}
+
+html body .room.room.paper-stack .bio-phil-quote {
+  margin-block: clamp(6px, 0.9vh, 14px) !important;
+}
+
+html body .room.room.paper-stack .bio-phil-sign {
+  margin-block-start: clamp(4px, 0.7vh, 10px) !important;
+  line-height: 1.1 !important;
+}
+
+/* Three-up form: a label that wraps to two lines ("Where did you hear about
+   me?") pushed its control below the one beside it. Anchoring the control to
+   the bottom of each cell keeps every row of inputs on one line, whatever the
+   labels above them do. */
+html body .room.room.paper-stack .pitch-form .field {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+}
+
+html body .room.room.paper-stack .pitch-form .field > label {
+  margin-block-start: 0 !important;
+}
+
+/* The checkbox row is a control, not a labelled field — it keeps its own
+   left-aligned flow rather than being pushed to the bottom of a tall cell. */
+html body .room.room.paper-stack .pitch-form .field:has(.checkbox) {
+  justify-content: flex-start !important;
+}
+
+/* The floating bar sits inside the card, so the form's last control has to
+   stop above it — otherwise the dock lies across "Send the pitch". */
+html body .room.room.paper-stack #pitchForm.pitch-form > .pitch-submit {
+  margin-block-end: calc(var(--dock-h, 56px) * 0.5) !important;
+}
+
+/* The philosophy page is the longest read in the room, and Kurdish and Arabic
+   set longer than English, so on a short screen it needs one more notch. Type
+   size moves last and least — the standfirst and the quote go first. */
+@media (max-height: 880px) {
+  html body .room.room.paper-stack .bio-story-sheet .section-lede {
+    font-size: clamp(12px, 1.4vh, 15px) !important;
+    line-height: 1.45 !important;
+  }
+
+  html body .room.room.paper-stack .bio-phil-quote {
+    font-size: clamp(15px, 1.9vh, 21px) !important;
+    line-height: 1.28 !important;
+  }
+
+  html body .room.room.paper-stack .bio-phil-text {
+    font-size: clamp(12px, 1.45vh, 15px) !important;
+    line-height: 1.5 !important;
+  }
+
+  html body .room.room.paper-stack .bio-phil-label {
+    margin-block: 0 clamp(2px, 0.5vh, 8px) !important;
+  }
+}
+
+/* On a short, wide screen the story runs in three columns rather than two:
+   with three paragraphs and break-inside:avoid, each takes a column of its own
+   and the block's height drops to the tallest single paragraph instead of two
+   stacked. The page is wide enough that each column still reads properly. */
+@media (max-height: 880px) and (min-width: 1180px) {
+  html body .room.room.paper-stack .bio-phil-text {
+    columns: 3 !important;
+    max-width: 100% !important;
+  }
+
+  html body .room.room.paper-stack .bio-story-sheet .section-title {
+    font-size: clamp(24px, 3.6vh, 40px) !important;
+    line-height: 1.1 !important;
+  }
+}
+
+/* Kurdish and Arabic field labels set longer than the English ones, so on a
+   short screen the form needs one more notch. Rows tighten, the brief box
+   gives up height; no field is removed and none is made unreadable. */
+@media (max-height: 880px) {
+  html body .room.room.paper-stack #pitchForm.pitch-form {
+    gap: clamp(6px, 1vh, 12px) clamp(10px, 1vw, 18px) !important;
+  }
+
+  html body .room.room.paper-stack #pitchForm.pitch-form label {
+    font-size: clamp(9px, 1.15vh, 11px) !important;
+    line-height: 1.3 !important;
+  }
+
+  html body .room.room.paper-stack #pitchForm.pitch-form textarea {
+    height: clamp(62px, 9vh, 100px) !important;
+  }
+
+  html body .room.room.paper-stack #pitchForm.pitch-form > .pitch-submit {
+    margin-block-end: calc(var(--dock-h, 56px) * 0.42) !important;
+  }
+}
+
+/* Last of the short-screen form: the brief box and the row gaps. */
+@media (max-height: 880px) {
+  html body .room.room.paper-stack #pitchForm.pitch-form textarea {
+    height: clamp(56px, 7.5vh, 88px) !important;
+  }
+
+  html body .room.room.paper-stack #pitchForm.pitch-form .field:has(.checkbox) {
+    margin-block: calc(clamp(6px, 1vh, 12px) * -0.5) !important;
+  }
+}
+
+/* The excerpt now runs in full, so the cover gives back the height it needs on
+   a short screen. An image frame can shrink; a sentence cannot. */
+@media (max-height: 880px) {
+  html body .room.room.paper-stack .index-card--blog .blog-card-cover {
+    height: clamp(72px, 10.5vh, 130px) !important;
+  }
+}
+
+/* Page headings scale with the page on a short screen. This is the one thing
+   that can give height without losing anything: the whole heading is still
+   there and still reads as the heading — it is set smaller, not cut. */
+@media (max-height: 880px) {
+  /* Five classes, to clear modern-framer's own
+     `.room.paper-stack > .section.paper-sheet .section-title`. */
+  html body .room.room.room.paper-stack .section-title {
+    font-size: clamp(23px, 3.4vh, 42px) !important;
+    line-height: 1.12 !important;
+  }
+}
+
+/* "What I do" — the heading column runs to 932px in Kurdish and Arabic, which
+   set longer than English. Written through #design so it clears every
+   competing rule outright. Type scales; no sentence is shortened. */
+@media (max-height: 880px) {
+  html body #design#design.paper-stack .service-showcase-title {
+    font-size: clamp(22px, 3.2vh, 40px) !important;
+    line-height: 1.12 !important;
+    margin-block: 0 clamp(4px, 0.8vh, 12px) !important;
+  }
+
+  html body #design#design.paper-stack .service-showcase-lede {
+    font-size: clamp(12px, 1.5vh, 16px) !important;
+    line-height: 1.45 !important;
+  }
+
+  html body #design#design.paper-stack .service-signature {
+    padding-block: clamp(6px, 1vh, 14px) !important;
+  }
+
+  html body #design#design.paper-stack .service-panel:not(.is-active) .service-trigger {
+    padding-block: clamp(6px, 1vh, 13px) !important;
+  }
+
+  html body #design#design.paper-stack .service-name {
+    font-size: clamp(13px, 1.7vh, 17px) !important;
+  }
+
+  html body #design#design.paper-stack .service-sub {
+    font-size: clamp(10px, 1.25vh, 13px) !important;
+  }
+}
+
+/* Last 42px of "what I do" in the RTL languages. */
+@media (max-height: 880px) {
+  html body #design#design.paper-stack .service-showcase-layout {
+    gap: clamp(10px, 1.4vh, 22px) !important;
+  }
+
+  html body #design#design.paper-stack .service-detail-inner p {
+    margin-block: 0 clamp(3px, 0.6vh, 8px) !important;
+  }
+
+  /* The open panel is the tall one: its paragraph and its three bullets set
+     longer in Kurdish and Arabic. Type and leading tighten; every line stays. */
+  html body #design#design.paper-stack .service-detail-inner {
+    font-size: clamp(12px, 1.45vh, 15px) !important;
+    line-height: 1.45 !important;
+  }
+
+  html body #design#design.paper-stack .service-detail-inner li {
+    line-height: 1.4 !important;
+  }
+
+  html body #design#design.paper-stack .service-icon {
+    width: clamp(26px, 3.2vh, 34px) !important;
+    height: clamp(26px, 3.2vh, 34px) !important;
+  }
+}
+
+/* The three closed rows cost 78px each for one line of name and one of
+   subtitle. Tighter leading and padding brings each to about 60 — both lines
+   are still there, still legible, just not floating in air. */
+@media (max-height: 880px) {
+  html body #design#design.paper-stack .service-panel:not(.is-active) .service-trigger {
+    padding-block: clamp(4px, 0.7vh, 10px) !important;
+  }
+
+  html body #design#design.paper-stack .service-name {
+    line-height: 1.25 !important;
+    margin-block: 0 !important;
+  }
+
+  html body #design#design.paper-stack .service-sub {
+    line-height: 1.3 !important;
+    margin-block: 0 !important;
+  }
+
+  html body #design#design.paper-stack .service-detail-inner {
+    padding-block: clamp(2px, 0.5vh, 8px) clamp(6px, 1vh, 14px) !important;
+  }
+
+  html body #design#design.paper-stack .service-accordion {
+    gap: clamp(4px, 0.7vh, 10px) !important;
+  }
+}
+
+/* The panel's own 8px of padding sits outside the trigger, so four panels
+   carry 64px of it. Half that, and the column fits. */
+@media (max-height: 880px) {
+  html body #design#design.paper-stack .service-panel {
+    padding-block: clamp(2px, 0.5vh, 7px) !important;
+  }
+}
+
+/* =========================================================
+   RTL runs long at every height.
+   Kurdish and Arabic set noticeably longer than English, so the practice page
+   needs on a tall screen the same tightening English only needs on a short
+   one. Scoped to dir="rtl" so the Latin languages keep their full setting.
+   ========================================================= */
+html[dir="rtl"] body #design#design.paper-stack .service-showcase-title {
+  font-size: clamp(24px, 2.9vw, 42px) !important;
+  line-height: 1.14 !important;
+  margin-block: 0 clamp(6px, 1vh, 14px) !important;
+}
+
+html[dir="rtl"] body #design#design.paper-stack .service-showcase-lede {
+  font-size: clamp(13px, 1.05vw, 17px) !important;
+  line-height: 1.5 !important;
+}
+
+html[dir="rtl"] body #design#design.paper-stack .service-panel {
+  padding-block: clamp(4px, 0.8vh, 9px) !important;
+}
+
+html[dir="rtl"] body #design#design.paper-stack .service-trigger {
+  padding-block: clamp(6px, 1vh, 12px) !important;
+}
+
+html[dir="rtl"] body #design#design.paper-stack .service-name {
+  line-height: 1.28 !important;
+}
+
+html[dir="rtl"] body #design#design.paper-stack .service-sub {
+  line-height: 1.32 !important;
+}
+
+html[dir="rtl"] body #design#design.paper-stack .service-detail-inner {
+  line-height: 1.5 !important;
+  padding-block: clamp(3px, 0.6vh, 9px) clamp(8px, 1.2vh, 16px) !important;
+}
+
+html[dir="rtl"] body #design#design.paper-stack .service-detail-inner li {
+  line-height: 1.45 !important;
+  margin-block: 1px !important;
+}
+
+/* =========================================================
+   Suspend backdrop blur while the page moves.
+   Twelve chips blurring a scrolling gallery behind them is the single most
+   expensive thing on a portfolio scroll — the compositor re-samples and
+   re-blurs each of them every frame. Nobody reads a 16px blur mid-scroll, so
+   it is dropped for the duration and restored the instant scrolling stops.
+   The design at rest is untouched.
+   ========================================================= */
+/* Written at the same id weight as the rules that set the blur
+   (`#design#design.paper-stack .work-head .tab`), or it never wins. */
+html.bq-scrolling #design#design.paper-stack .work-head .tab,
+html.bq-scrolling #design#design.paper-stack .tabs .tab,
+html.bq-scrolling #design#design.paper-stack .paper-scroll .tab,
+html.bq-scrolling #design#design .tab,
+html.bq-scrolling body .tabs.tabs .tab,
+html.bq-scrolling body .hero-cta.hero-cta,
+html.bq-scrolling body .rail.rail,
+html.bq-scrolling body .mobilebar.mobilebar,
+html.bq-scrolling body .design-cta.design-cta {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* =========================================================
+   The portfolio viewport must not be a scroll container.
+   .work-vp clips the reel, and the reel is moved by transform — nothing ever
+   scrolls the viewport itself. But `overflow: hidden` on a box that HAS
+   overflow still creates a scroll box, and the browser hands the wheel to that
+   box and consumes it there. Since `hidden` also forbids the user from moving
+   it, the delta lands nowhere: the wheel over the gallery did nothing at all.
+
+   `overflow: clip` clips identically but creates NO scroll box, so the wheel
+   passes straight through to the page that is supposed to receive it. Written
+   at two-id weight to clear the rule that sets `hidden`.
+   ========================================================= */
+html body #design#design.paper-stack > .section.work.work.paper-sheet.paper-sheet .work-vp.work-vp.work-vp {
+  overflow: clip !important;
+  overflow-clip-margin: 0px !important;
+}
+
+/* Same reasoning for the card that holds it: its interior is driven by the
+   window, never by the user, so it must never intercept the wheel. */
+html body #design#design.paper-stack > .section.work.paper-sheet > .paper-scroll {
+  overscroll-behavior: auto !important;
+}
+
+html body #design#design.paper-stack > .section.work.paper-sheet {
+  overscroll-behavior: auto !important;
 }
