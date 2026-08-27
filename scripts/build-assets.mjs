@@ -30,6 +30,27 @@ for (const [input, output] of jsBundles) {
   console.log(`${input} -> ${output}`);
 }
 
+/* Keep the worker's precache list in step with the page.
+   Both name the same fingerprinted files, and they were kept in step by hand —
+   so a deploy that bumped index.html and forgot sw.js left the worker fetching
+   URLs the page no longer asks for. The page is the single source of truth;
+   the worker follows it. */
+{
+  const htmlPath = 'preview_site/index.html';
+  const swPath = 'preview_site/sw.js';
+  const html = await readFile(htmlPath, 'utf8');
+  let sw = await readFile(swPath, 'utf8');
+  const before = sw;
+  sw = sw.replace(/'(\/(?:js|css)\/[^'?]+)\?v=\d+'/g, (whole, path) => {
+    const live = html.match(new RegExp(path.slice(1).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\?v=(\\d+)'));
+    return live ? `'${path}?v=${live[1]}'` : whole;
+  });
+  if (sw !== before) {
+    await writeFile(swPath, sw);
+    console.log(`${swPath} -> precache versions synced from index.html`);
+  }
+}
+
 for (const [input, output] of cssBundles) {
   const source = await readFile(input, 'utf8');
   const result = minifyCss(source, { restructure: false });

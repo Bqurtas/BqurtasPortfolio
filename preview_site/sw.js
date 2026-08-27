@@ -12,15 +12,19 @@
       instead of being pinned for the life of the installed worker.
    ========================================================= */
 
-const SW_VERSION = 'v2';                       // bump on every deploy
+const SW_VERSION = 'v3';                       // bump on every deploy
 const CACHE_NAME = `bqurtas-cache-${SW_VERSION}`;
+const DOC_FALLBACK = '/index.html';
 
 /* Keep in step with the ?v= values in index.html — a stale entry here just
    wastes an install fetch, it can never be served to the page (the page asks
    for a different URL). */
+/* The HTML is deliberately absent. It is the file that names every asset
+   version, so a precached copy pins a whole release: the page goes on asking
+   for last week's bundles however many times the site is deployed. It is
+   cached at runtime instead, from a response the network just gave us, so
+   offline still works and online is never stale. */
 const PRECACHE_ASSETS = [
-  '/',
-  '/index.html',
   '/css/modern-framer.css?v=209',
   '/css/style.v417.min.css?v=465',
   '/css/fonts.css?v=447',
@@ -80,9 +84,16 @@ self.addEventListener('fetch', (event) => {
   // Handle SPA room navigations (HTML)
   if (request.mode === 'navigate' || (request.headers.get('accept') && request.headers.get('accept').includes('text/html'))) {
     event.respondWith(
-      fetch(request).catch(() => {
+      fetch(request).then((response) => {
+        /* Keep the newest document actually seen, for offline only. */
+        if (response && response.status === 200 && response.type === 'basic') {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(DOC_FALLBACK, copy));
+        }
+        return response;
+      }).catch(() => {
         return caches.match(request).then((cached) => {
-          return cached || caches.match('/index.html');
+          return cached || caches.match(DOC_FALLBACK);
         });
       })
     );
