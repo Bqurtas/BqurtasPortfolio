@@ -1663,7 +1663,7 @@ html body #mobileMenu#mobileMenu .mm-menu-foot {
   html body #design#design .service-showcase .service-showcase-head .section-num {
     margin: 0 0 8px !important;
     padding: 5px 10px !important;
-    font-size: 9px !important;
+    font-size: 11px !important;
   }
 
   html body #design#design .service-showcase .service-showcase-head .section-title {
@@ -1683,7 +1683,7 @@ html body #mobileMenu#mobileMenu .mm-menu-foot {
   html body #design#design .service-showcase .service-showcase-head .service-cta {
     margin-top: 9px !important;
     padding: 8px 12px !important;
-    font-size: 9.5px !important;
+    font-size: 11px !important;
   }
 
   html body #design#design .service-showcase .service-accordion {
@@ -1718,14 +1718,14 @@ html body #mobileMenu#mobileMenu .mm-menu-foot {
   }
 
   html body #design#design .service-showcase .service-sub {
-    font-size: 10px !important;
+    font-size: 11.5px !important;
     line-height: 1.2 !important;
   }
 
   html body #design#design .service-showcase .service-toggle {
     width: 26px !important;
     height: 26px !important;
-    font-size: 9px !important;
+    font-size: 11px !important;
   }
 
   html body #design#design .service-showcase .service-panel.is-active .service-detail {
@@ -1794,7 +1794,7 @@ html body #mobileMenu#mobileMenu .mm-menu-foot {
   html body #design#design .practice-note .bio-teaser-text .section-num {
     margin: 0 0 10px !important;
     padding: 5px 10px !important;
-    font-size: 9px !important;
+    font-size: 11px !important;
   }
 
   html body #design#design .practice-note .bio-teaser-title {
@@ -1814,7 +1814,7 @@ html body #mobileMenu#mobileMenu .mm-menu-foot {
     align-self: flex-start !important;
     margin: 0 !important;
     padding: 9px 14px !important;
-    font-size: 9.5px !important;
+    font-size: 11px !important;
   }
 
   html body #design#design .practice-note .stats {
@@ -1830,7 +1830,7 @@ html body #mobileMenu#mobileMenu .mm-menu-foot {
   }
 
   html body #design#design .practice-note .stats .stat .stat-label {
-    font-size: 8.5px !important;
+    font-size: 11px !important;
     letter-spacing: .1em !important;
   }
 
@@ -3045,4 +3045,58 @@ html body #design#design.paper-stack > .section.work.paper-sheet > .paper-scroll
 
 html body #design#design.paper-stack > .section.work.paper-sheet {
   overscroll-behavior: auto !important;
+}
+
+/* =========================================================
+   The route curtain is the sheet, briefly blank.
+   It was inset by --bq-deck-gutter-x (42px) and by a dock reserve at the
+   bottom (88px), while the sheet it covers is inset by --bq-deck-gutter (10px)
+   on every side — so the gallery stayed visible down both edges and along the
+   bottom while the curtain passed. And it was painted a warm cream against a
+   neutral paper, which showed as a seam.
+
+   Both now come from the sheet's own values, so they cannot drift apart again:
+   the same gutter, the same radius, the same paper.
+   ========================================================= */
+html body .lux-transition.lux-transition {
+  inset: var(--bq-deck-gutter, 10px) !important;
+  border-radius: var(--bq-deck-radius, 24px) !important;
+  background: var(--bq-paper-sheet, #f3f3f3) !important;
+}
+
+/* =========================================================
+   A readable floor on a phone.
+   The micro-labels are set in vw/vh clamps tuned on a desktop, and on a 390px
+   screen they land at 8.5–10.5px — below what anyone reads comfortably at
+   arm's length. The scale is kept; only its floor is raised, so the hierarchy
+   is unchanged and nothing else has to move.
+   ========================================================= */
+@media (max-width: 560px) {
+  html body .room.room.room.paper-stack .stat-label,
+  html body .room.room.room.paper-stack .stat-label span {
+    font-size: 11px !important;
+    letter-spacing: .06em !important;
+  }
+
+  html body .room.room.room.paper-stack .section-num,
+  html body .room.room.room.paper-stack .section-num span,
+  html body .room.room.room.paper-stack .mono {
+    font-size: 11px !important;
+  }
+
+  html body .room.room.room.paper-stack .card-tag,
+  html body .room.room.room.paper-stack .service-sub {
+    font-size: 11.5px !important;
+  }
+
+  /* A control has to be big enough to hit. 33px and 35px are both under the
+     40px a thumb needs; the padding grows, the type does not. */
+  html body .room.room.room.paper-stack .service-cta,
+  html body .room.room.room.paper-stack .bio-teaser-link,
+  html body .room.room.room.paper-stack .latest-blog-all,
+  html body .room.room.room.paper-stack .blog-card-cta {
+    min-height: 42px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
 }

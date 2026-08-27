@@ -1024,7 +1024,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setActiveTab(tab);
     if (push !== false) syncURL(!!push);
 
-    // Keep scroll position 100% steady in place with zero jump and zero shape drop
     const lockScroll = () => {
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       const targetScroll = Math.min(currentScrollY, Math.max(0, maxScroll));
@@ -1033,12 +1032,36 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    lockScroll();
-    requestAnimationFrame(() => {
+    /* Choosing a category is asking to see that category — from its first
+       piece. Holding the reader's old offset dropped them into the middle of
+       the new set, past work they had never seen. The height lock still runs
+       so the document cannot collapse mid-swap; only the destination changed.
+       A restore from the URL keeps its position, since that IS the position
+       being restored. */
+    if (push === false) {
       lockScroll();
       requestAnimationFrame(() => {
-        if (gridEl) gridEl.style.minHeight = '';
         lockScroll();
+        requestAnimationFrame(() => {
+          if (gridEl) gridEl.style.minHeight = '';
+          lockScroll();
+        });
+      });
+      return;
+    }
+
+    lockScroll();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (gridEl) gridEl.style.minHeight = '';
+        /* Computed rather than looked up. scrollToGridTop() finds the intro by
+           querying the card's direct children, but the intro now lives inside
+           the reel on desktop, so it fell through to a fallback that left the
+           reader mid-set. The reel sits at its start when the page is scrolled
+           to the track's own top, which is arithmetic the layout cannot
+           mislead. */
+        if (window.__bqResetWorkReel) window.__bqResetWorkReel();
+        else scrollToGridTop('auto');
       });
     });
   };
@@ -2448,6 +2471,20 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       setCovered();
       drive();
     };
+    /* Sending the reel home. remeasure() restores the saved reading position
+       after every measurement, and a tab switch causes several (the grid
+       rebuilds, then each image lands and resizes it) — so simply scrolling to
+       the top got overwritten a frame later. Instead of fighting that, the
+       saved position IS the start: every later remeasure now restores to zero
+       and the reel stays where the reader asked it to be. */
+    window.__bqResetWorkReel = () => {
+      workReadingState = { active: true, phase: 'reel', progress: 0 };
+      lastY = 0;
+      const trackTop = track.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: Math.max(0, trackTop - gutter()), left: 0, behavior: 'auto' });
+      drive();
+    };
+
     window.__bqScrollWorkTarget = (target, { behavior = 'smooth', block = 'nearest' } = {}) => {
       if (!target?.closest?.('.section.work') || !reel.contains(target)) return false;
       const targetRect = target.getBoundingClientRect();
