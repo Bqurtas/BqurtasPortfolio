@@ -3100,3 +3100,48 @@ html body .lux-transition.lux-transition {
     align-items: center !important;
   }
 }
+
+/* =========================================================
+   The journal strip adapts to how many posts there are.
+   It was three fixed columns holding whatever the feed returned, so a single
+   post rendered as one narrow card alone in the top-left corner of a
+   1280px-wide sheet, two thirds of the row empty. A count the layout does not
+   control must not be able to make the page look broken.
+
+   Laid out as a wrapping row instead: each card grows to fill its share, stops
+   at a sensible reading width, and the row centres. One post sits centred at
+   its natural size; three fill the width exactly as before.
+   ========================================================= */
+html body #design .latest-blog .latest-blog-grid.latest-blog-grid {
+  /* auto-fit with a CAPPED track, not 1fr: empty tracks collapse, so the row
+     holds exactly as many cards as there are and justify-content can centre
+     them. (flex-grow with max-width cannot do this — the item swallows the
+     free space and is then clipped, so there is nothing left to centre.) */
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 420px)) !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  gap: clamp(12px, 1.2vw, 18px) !important;
+}
+
+html body #design .latest-blog .latest-blog-grid.latest-blog-grid > * {
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+/* The services + links page carries five cards and a chip list; in Kurdish and
+   Arabic, which set longer, it runs about 32px over on a 720px screen. The
+   cards give it back from their padding, not from their words. */
+@media (max-height: 880px) {
+  html body #bio .bio-connect-sheet .bio-connect-links .bio-social {
+    padding-block: clamp(8px, 1.1vh, 14px) !important;
+  }
+
+  html body #bio .bio-connect-sheet .services-grid {
+    gap: clamp(5px, 0.7vh, 9px) !important;
+  }
+
+  html body #bio .bio-connect-sheet .bio-connect-links {
+    gap: 8px !important;
+  }
+}
