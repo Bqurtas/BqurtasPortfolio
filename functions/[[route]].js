@@ -522,12 +522,9 @@ export async function onRequest(context) {
       .on('link[data-alt-lang="sv"]',          setHref(localizedUrl('sv', r)))
       .on('link[data-alt-lang="x-default"]',   setHref(localizedUrl('en', r)))
       .on('head', { element(el) { if (postJsonLd) el.append(postJsonLd, { html: true }); } });
+    /* Each room's hero title is a real h1 in the markup now, so the ARIA
+       heading role this used to stamp on the active one is no longer needed. */
     const activeRoom = r.key === 'blogpost' ? 'blog' : r.key;
-    if (ROOMS.includes(activeRoom)) {
-      rewriter.on('#' + activeRoom + ' .room-hero-title', {
-        element(el) { el.setAttribute('role', 'heading'); el.setAttribute('aria-level', '1'); }
-      });
-    }
 
     /* Serve each route with ITS room already open.
        The shell ships with Design visible and every other room carrying
