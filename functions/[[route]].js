@@ -528,6 +528,36 @@ export async function onRequest(context) {
         element(el) { el.setAttribute('role', 'heading'); el.setAttribute('aria-level', '1'); }
       });
     }
+
+    /* Serve each route with ITS room already open.
+       The shell ships with Design visible and every other room carrying
+       is-hidden, and the router only swaps them once JavaScript has run. A
+       crawler fetching /bio therefore received the biography inside a hidden
+       element and the Design room as the page's visible content — which is why
+       the inner routes were not being indexed on their own terms while the
+       Behance profile was. The meta was already rewritten per route here; the
+       body was not. Now it is, so the HTML a crawler is handed shows the
+       content that route is about. The bootstrap script sets the same room from
+       the path, so nothing changes for a visitor. */
+    const openRoom = ROOMS.includes(activeRoom) ? activeRoom : 'design';
+    const ALL_ROOMS = ['design'].concat(ROOMS);
+    for (const room of ALL_ROOMS) {
+      rewriter.on('#' + room + '.room', room === openRoom
+        ? { element(el) {
+              const cls = (el.getAttribute('class') || '')
+                .split(/\s+/).filter((c) => c && c !== 'is-hidden').join(' ');
+              el.setAttribute('class', cls);
+            } }
+        : { element(el) {
+              const cls = (el.getAttribute('class') || '').split(/\s+/).filter(Boolean);
+              if (!cls.includes('is-hidden')) cls.push('is-hidden');
+              el.setAttribute('class', cls.join(' '));
+            } });
+    }
+    rewriter.on('html', { element(el) {
+      el.setAttribute('data-room', openRoom);
+      el.setAttribute('data-initial-route', r.key === 'home' ? 'home' : openRoom);
+    } });
     const serverCopy = r.key === 'home' ? SERVER_LOCAL_SEO[r.lang] : null;
     const homeKeywords = r.key === 'home' ? (HOME_KEYWORDS[r.lang] || HOME_KEYWORDS.en) : null;
     if (homeKeywords) rewriter.on('meta[name="keywords"]', setContent(homeKeywords));
