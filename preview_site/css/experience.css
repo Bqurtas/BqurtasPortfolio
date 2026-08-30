@@ -2411,69 +2411,65 @@ html body .room.room.paper-stack .cert-grid > * {
    edge by 10–110px. Tighten the gaps between blocks, never the type, and only
    where the screen is actually short. Tall screens keep the original setting.
    ========================================================= */
-@media (max-height: 880px) {
-  html body .room.room.paper-stack .bio-block-title {
-    margin-block-end: clamp(8px, 1.2vh, 16px) !important;
-  }
+html body .room.room.paper-stack .bio-block-title {
+  margin-block-end: clamp(8px, 1.2vh, 16px) !important;
+}
 
-  html body .room.room.paper-stack .bio-block-lede {
-    margin-block-end: clamp(8px, 1.4vh, 18px) !important;
-  }
+html body .room.room.paper-stack .bio-block-lede {
+  margin-block-end: clamp(8px, 1.4vh, 18px) !important;
+}
 
-  html body .room.room.paper-stack .tools-group {
-    margin-block: 0 clamp(8px, 1.3vh, 16px) !important;
-  }
+html body .room.room.paper-stack .tools-group {
+  margin-block: 0 clamp(8px, 1.3vh, 16px) !important;
+}
 
-  html body .room.room.paper-stack .tools-grid {
-    gap: clamp(6px, 0.9vh, 12px) !important;
-  }
+html body .room.room.paper-stack .tools-grid {
+  gap: clamp(6px, 0.9vh, 12px) !important;
+}
 
-  html body .room.room.paper-stack .tools-typing {
-    margin-block-start: clamp(6px, 1vh, 14px) !important;
-  }
+html body .room.room.paper-stack .tools-typing {
+  margin-block-start: clamp(6px, 1vh, 14px) !important;
+}
 
-  html body .room.room.paper-stack .timeline {
-    gap: clamp(8px, 1.2vh, 16px) !important;
-  }
+html body .room.room.paper-stack .timeline {
+  gap: clamp(8px, 1.2vh, 16px) !important;
+}
 
-  html body .room.room.paper-stack .tl-card {
-    padding: clamp(10px, 1.4vh, 18px) clamp(12px, 1.2vw, 20px) !important;
-  }
+html body .room.room.paper-stack .tl-card {
+  padding: clamp(10px, 1.4vh, 18px) clamp(12px, 1.2vw, 20px) !important;
+}
 
-  html body .room.room.paper-stack .langs-grid,
-  html body .room.room.paper-stack .orgs,
-  html body .room.room.paper-stack .services-grid {
-    gap: clamp(6px, 0.9vh, 12px) !important;
-  }
+html body .room.room.paper-stack .langs-grid,
+html body .room.room.paper-stack .orgs,
+html body .room.room.paper-stack .services-grid {
+  gap: clamp(6px, 0.9vh, 12px) !important;
+}
 
-  html body .room.room.paper-stack .index-layout {
-    gap: clamp(10px, 1.4vh, 20px) !important;
-  }
+html body .room.room.paper-stack .index-layout {
+  gap: clamp(10px, 1.4vh, 20px) !important;
 }
 
 /* Second pass for the three pages still a hair over on a 720px screen:
    the experience timeline, the honours index and the certificate wall. All
    three are lists of short lines, so the height sits in the padding around
    them rather than in the words. */
-@media (max-height: 880px) {
-  html body .room.room.paper-stack .tl-card {
-    padding-block: clamp(8px, 1.1vh, 14px) !important;
-  }
+html body .room.room.paper-stack .tl-card {
+  padding-block: clamp(8px, 1.1vh, 14px) !important;
+}
 
-  html body .room.room.paper-stack .tl-org,
-  html body .room.room.paper-stack .tl-loc,
-  html body .room.room.paper-stack .tl-desc {
-    margin-block: 1px !important;
-    line-height: 1.35 !important;
-  }
+html body .room.room.paper-stack .tl-org,
+html body .room.room.paper-stack .tl-loc,
+html body .room.room.paper-stack .tl-desc {
+  margin-block: 1px !important;
+  line-height: 1.35 !important;
+}
 
-  html body .room.room.paper-stack .tl-skills {
-    margin-block-start: clamp(4px, 0.7vh, 9px) !important;
-  }
+html body .room.room.paper-stack .tl-skills {
+  margin-block-start: clamp(4px, 0.7vh, 9px) !important;
+}
 
-  html body .room.room.paper-stack .index-row {
-    padding-block: clamp(8px, 1.2vh, 15px) !important;
-  }
+html body .room.room.paper-stack .index-row {
+  padding-block: clamp(8px, 1.2vh, 15px) !important;
 }
 
 /* =========================================================
@@ -2527,72 +2523,64 @@ html body .room.room.paper-stack .pitch-form label {
    657px on its own, more than a short card can hold once the heading, the
    filters and the pager are counted. The cover carries the mood, not the
    information — it gives up the height. */
-@media (max-height: 880px) {
-  /* Section heads repeat on every page of a room; a little less air under
-     each one buys the body of the page the room it needs. */
-  html body .room.room.paper-stack .section-head {
-    margin-block-end: clamp(8px, 1.4vh, 20px) !important;
-  }
+/* Section heads repeat on every page of a room; a little less air under
+   each one buys the body of the page the room it needs. */
+html body .room.room.paper-stack .section-head {
+  margin-block-end: clamp(8px, 1.4vh, 20px) !important;
+}
 
-  html body .room.room.paper-stack .section-lede {
-    margin-block-start: clamp(4px, 0.8vh, 10px) !important;
-  }
+html body .room.room.paper-stack .section-lede {
+  margin-block-start: clamp(4px, 0.8vh, 10px) !important;
 }
 
 /* The gaps between a page's blocks, not the blocks themselves, were the last
    28px: 16px of flex gap three times over plus 96px of stacked margins. */
-@media (max-height: 880px) {
-  html body .room.room.paper-stack .sheet-mid {
-    row-gap: clamp(8px, 1.4vh, 16px) !important;
-  }
+html body .room.room.paper-stack .sheet-mid {
+  row-gap: clamp(8px, 1.4vh, 16px) !important;
+}
 
-  html body .room.room.paper-stack .blog-filters {
-    margin-block: 2px clamp(8px, 1.4vh, 22px) !important;
-  }
+html body .room.room.paper-stack .blog-filters {
+  margin-block: 2px clamp(8px, 1.4vh, 22px) !important;
+}
 
-  html body .room.room.paper-stack .blog-pager {
-    margin-block-start: clamp(10px, 1.8vh, 30px) !important;
-  }
+html body .room.room.paper-stack .blog-pager {
+  margin-block-start: clamp(10px, 1.8vh, 30px) !important;
 }
 
 /* Home — "a short note". The portrait sets the height of the whole page here
    (338px of a 760px block), so on a short screen it is the one that yields. */
-@media (max-height: 880px) {
-  html body #design.paper-stack .bio-teaser-portrait {
-    max-height: clamp(180px, 34vh, 300px) !important;
-  }
+html body #design.paper-stack .bio-teaser-portrait {
+  max-height: clamp(180px, 34vh, 300px) !important;
+}
 
-  html body #design.paper-stack .bio-teaser-portrait img {
-    height: 100% !important;
-    object-fit: cover !important;
-  }
+html body #design.paper-stack .bio-teaser-portrait img {
+  height: 100% !important;
+  object-fit: cover !important;
+}
 
-  html body #design.paper-stack .bio-teaser-grid {
-    gap: clamp(10px, 1.6vh, 22px) !important;
-  }
+html body #design.paper-stack .bio-teaser-grid {
+  gap: clamp(10px, 1.6vh, 22px) !important;
+}
 
-  html body #design.paper-stack .stats {
-    gap: clamp(8px, 1.2vh, 16px) !important;
-  }
+html body #design.paper-stack .stats {
+  gap: clamp(8px, 1.2vh, 16px) !important;
 }
 
 /* Home — "what I do". The open accordion panel decides this page's height. */
-@media (max-height: 880px) {
-  html body #design.paper-stack .service-trigger {
-    padding-block: clamp(8px, 1.2vh, 16px) !important;
-  }
+html body #design.paper-stack .service-trigger {
+  padding-block: clamp(8px, 1.2vh, 16px) !important;
+}
 
-  html body #design.paper-stack .service-detail-inner {
-    padding-block: clamp(4px, 0.8vh, 12px) clamp(8px, 1.2vh, 16px) !important;
-  }
+html body #design.paper-stack .service-detail-inner {
+  padding-block: clamp(4px, 0.8vh, 12px) clamp(8px, 1.2vh, 16px) !important;
+}
 
-  html body #design.paper-stack .service-detail-inner li {
-    margin-block: 1px !important;
-  }
+html body #design.paper-stack .service-detail-inner li {
+  margin-block: 1px !important;
+}
 
-  html body #design.paper-stack .service-showcase-layout {
-    gap: clamp(12px, 1.8vh, 26px) !important;
-  }
+html body #design.paper-stack .service-showcase-layout {
+  gap: clamp(12px, 1.8vh, 26px) !important;
 }
 
 /* The journal preview card, at every height. A 340px cover over a 315px body
@@ -2770,25 +2758,23 @@ html body .room.room.paper-stack #pitchForm.pitch-form > .pitch-submit {
 /* The philosophy page is the longest read in the room, and Kurdish and Arabic
    set longer than English, so on a short screen it needs one more notch. Type
    size moves last and least — the standfirst and the quote go first. */
-@media (max-height: 880px) {
-  html body .room.room.paper-stack .bio-story-sheet .section-lede {
-    font-size: clamp(12px, 1.4vh, 15px) !important;
-    line-height: 1.45 !important;
-  }
+html body .room.room.paper-stack .bio-story-sheet .section-lede {
+  font-size: clamp(12px, 1.4vh, 15px) !important;
+  line-height: 1.45 !important;
+}
 
-  html body .room.room.paper-stack .bio-phil-quote {
-    font-size: clamp(15px, 1.9vh, 21px) !important;
-    line-height: 1.28 !important;
-  }
+html body .room.room.paper-stack .bio-phil-quote {
+  font-size: clamp(15px, 1.9vh, 21px) !important;
+  line-height: 1.28 !important;
+}
 
-  html body .room.room.paper-stack .bio-phil-text {
-    font-size: clamp(12px, 1.45vh, 15px) !important;
-    line-height: 1.5 !important;
-  }
+html body .room.room.paper-stack .bio-phil-text {
+  font-size: clamp(12px, 1.45vh, 15px) !important;
+  line-height: 1.5 !important;
+}
 
-  html body .room.room.paper-stack .bio-phil-label {
-    margin-block: 0 clamp(2px, 0.5vh, 8px) !important;
-  }
+html body .room.room.paper-stack .bio-phil-label {
+  margin-block: 0 clamp(2px, 0.5vh, 8px) !important;
 }
 
 /* On a short, wide screen the story runs in three columns rather than two:
@@ -2810,148 +2796,132 @@ html body .room.room.paper-stack #pitchForm.pitch-form > .pitch-submit {
 /* Kurdish and Arabic field labels set longer than the English ones, so on a
    short screen the form needs one more notch. Rows tighten, the brief box
    gives up height; no field is removed and none is made unreadable. */
-@media (max-height: 880px) {
-  html body .room.room.paper-stack #pitchForm.pitch-form {
-    gap: clamp(6px, 1vh, 12px) clamp(10px, 1vw, 18px) !important;
-  }
+html body .room.room.paper-stack #pitchForm.pitch-form {
+  gap: clamp(6px, 1vh, 12px) clamp(10px, 1vw, 18px) !important;
+}
 
-  html body .room.room.paper-stack #pitchForm.pitch-form label {
-    font-size: clamp(9px, 1.15vh, 11px) !important;
-    line-height: 1.3 !important;
-  }
+html body .room.room.paper-stack #pitchForm.pitch-form label {
+  font-size: clamp(9px, 1.15vh, 11px) !important;
+  line-height: 1.3 !important;
+}
 
-  html body .room.room.paper-stack #pitchForm.pitch-form textarea {
-    height: clamp(62px, 9vh, 100px) !important;
-  }
+html body .room.room.paper-stack #pitchForm.pitch-form textarea {
+  height: clamp(62px, 9vh, 100px) !important;
+}
 
-  html body .room.room.paper-stack #pitchForm.pitch-form > .pitch-submit {
-    margin-block-end: calc(var(--dock-h, 56px) * 0.42) !important;
-  }
+html body .room.room.paper-stack #pitchForm.pitch-form > .pitch-submit {
+  margin-block-end: calc(var(--dock-h, 56px) * 0.42) !important;
 }
 
 /* Last of the short-screen form: the brief box and the row gaps. */
-@media (max-height: 880px) {
-  html body .room.room.paper-stack #pitchForm.pitch-form textarea {
-    height: clamp(56px, 7.5vh, 88px) !important;
-  }
+html body .room.room.paper-stack #pitchForm.pitch-form textarea {
+  height: clamp(56px, 7.5vh, 88px) !important;
+}
 
-  html body .room.room.paper-stack #pitchForm.pitch-form .field:has(.checkbox) {
-    margin-block: calc(clamp(6px, 1vh, 12px) * -0.5) !important;
-  }
+html body .room.room.paper-stack #pitchForm.pitch-form .field:has(.checkbox) {
+  margin-block: calc(clamp(6px, 1vh, 12px) * -0.5) !important;
 }
 
 /* The excerpt now runs in full, so the cover gives back the height it needs on
    a short screen. An image frame can shrink; a sentence cannot. */
-@media (max-height: 880px) {
-  html body .room.room.paper-stack .index-card--blog .blog-card-cover {
-    height: clamp(72px, 10.5vh, 130px) !important;
-  }
+html body .room.room.paper-stack .index-card--blog .blog-card-cover {
+  height: clamp(72px, 10.5vh, 130px) !important;
 }
 
 /* Page headings scale with the page on a short screen. This is the one thing
    that can give height without losing anything: the whole heading is still
    there and still reads as the heading — it is set smaller, not cut. */
-@media (max-height: 880px) {
-  /* Five classes, to clear modern-framer's own
-     `.room.paper-stack > .section.paper-sheet .section-title`. */
-  html body .room.room.room.paper-stack .section-title {
-    font-size: clamp(23px, 3.4vh, 42px) !important;
-    line-height: 1.12 !important;
-  }
+/* Five classes, to clear modern-framer's own
+   `.room.paper-stack > .section.paper-sheet .section-title`. */
+html body .room.room.room.paper-stack .section-title {
+  font-size: clamp(23px, 3.4vh, 42px) !important;
+  line-height: 1.12 !important;
 }
 
 /* "What I do" — the heading column runs to 932px in Kurdish and Arabic, which
    set longer than English. Written through #design so it clears every
    competing rule outright. Type scales; no sentence is shortened. */
-@media (max-height: 880px) {
-  html body #design#design.paper-stack .service-showcase-title {
-    font-size: clamp(22px, 3.2vh, 40px) !important;
-    line-height: 1.12 !important;
-    margin-block: 0 clamp(4px, 0.8vh, 12px) !important;
-  }
+html body #design#design.paper-stack .service-showcase-title {
+  font-size: clamp(22px, 3.2vh, 40px) !important;
+  line-height: 1.12 !important;
+  margin-block: 0 clamp(4px, 0.8vh, 12px) !important;
+}
 
-  html body #design#design.paper-stack .service-showcase-lede {
-    font-size: clamp(12px, 1.5vh, 16px) !important;
-    line-height: 1.45 !important;
-  }
+html body #design#design.paper-stack .service-showcase-lede {
+  font-size: clamp(12px, 1.5vh, 16px) !important;
+  line-height: 1.45 !important;
+}
 
-  html body #design#design.paper-stack .service-signature {
-    padding-block: clamp(6px, 1vh, 14px) !important;
-  }
+html body #design#design.paper-stack .service-signature {
+  padding-block: clamp(6px, 1vh, 14px) !important;
+}
 
-  html body #design#design.paper-stack .service-panel:not(.is-active) .service-trigger {
-    padding-block: clamp(6px, 1vh, 13px) !important;
-  }
+html body #design#design.paper-stack .service-panel:not(.is-active) .service-trigger {
+  padding-block: clamp(6px, 1vh, 13px) !important;
+}
 
-  html body #design#design.paper-stack .service-name {
-    font-size: clamp(13px, 1.7vh, 17px) !important;
-  }
+html body #design#design.paper-stack .service-name {
+  font-size: clamp(13px, 1.7vh, 17px) !important;
+}
 
-  html body #design#design.paper-stack .service-sub {
-    font-size: clamp(10px, 1.25vh, 13px) !important;
-  }
+html body #design#design.paper-stack .service-sub {
+  font-size: clamp(10px, 1.25vh, 13px) !important;
 }
 
 /* Last 42px of "what I do" in the RTL languages. */
-@media (max-height: 880px) {
-  html body #design#design.paper-stack .service-showcase-layout {
-    gap: clamp(10px, 1.4vh, 22px) !important;
-  }
+html body #design#design.paper-stack .service-showcase-layout {
+  gap: clamp(10px, 1.4vh, 22px) !important;
+}
 
-  html body #design#design.paper-stack .service-detail-inner p {
-    margin-block: 0 clamp(3px, 0.6vh, 8px) !important;
-  }
+html body #design#design.paper-stack .service-detail-inner p {
+  margin-block: 0 clamp(3px, 0.6vh, 8px) !important;
+}
 
-  /* The open panel is the tall one: its paragraph and its three bullets set
-     longer in Kurdish and Arabic. Type and leading tighten; every line stays. */
-  html body #design#design.paper-stack .service-detail-inner {
-    font-size: clamp(12px, 1.45vh, 15px) !important;
-    line-height: 1.45 !important;
-  }
+/* The open panel is the tall one: its paragraph and its three bullets set
+   longer in Kurdish and Arabic. Type and leading tighten; every line stays. */
+html body #design#design.paper-stack .service-detail-inner {
+  font-size: clamp(12px, 1.45vh, 15px) !important;
+  line-height: 1.45 !important;
+}
 
-  html body #design#design.paper-stack .service-detail-inner li {
-    line-height: 1.4 !important;
-  }
+html body #design#design.paper-stack .service-detail-inner li {
+  line-height: 1.4 !important;
+}
 
-  html body #design#design.paper-stack .service-icon {
-    width: clamp(26px, 3.2vh, 34px) !important;
-    height: clamp(26px, 3.2vh, 34px) !important;
-  }
+html body #design#design.paper-stack .service-icon {
+  width: clamp(26px, 3.2vh, 34px) !important;
+  height: clamp(26px, 3.2vh, 34px) !important;
 }
 
 /* The three closed rows cost 78px each for one line of name and one of
    subtitle. Tighter leading and padding brings each to about 60 — both lines
    are still there, still legible, just not floating in air. */
-@media (max-height: 880px) {
-  html body #design#design.paper-stack .service-panel:not(.is-active) .service-trigger {
-    padding-block: clamp(4px, 0.7vh, 10px) !important;
-  }
+html body #design#design.paper-stack .service-panel:not(.is-active) .service-trigger {
+  padding-block: clamp(4px, 0.7vh, 10px) !important;
+}
 
-  html body #design#design.paper-stack .service-name {
-    line-height: 1.25 !important;
-    margin-block: 0 !important;
-  }
+html body #design#design.paper-stack .service-name {
+  line-height: 1.25 !important;
+  margin-block: 0 !important;
+}
 
-  html body #design#design.paper-stack .service-sub {
-    line-height: 1.3 !important;
-    margin-block: 0 !important;
-  }
+html body #design#design.paper-stack .service-sub {
+  line-height: 1.3 !important;
+  margin-block: 0 !important;
+}
 
-  html body #design#design.paper-stack .service-detail-inner {
-    padding-block: clamp(2px, 0.5vh, 8px) clamp(6px, 1vh, 14px) !important;
-  }
+html body #design#design.paper-stack .service-detail-inner {
+  padding-block: clamp(2px, 0.5vh, 8px) clamp(6px, 1vh, 14px) !important;
+}
 
-  html body #design#design.paper-stack .service-accordion {
-    gap: clamp(4px, 0.7vh, 10px) !important;
-  }
+html body #design#design.paper-stack .service-accordion {
+  gap: clamp(4px, 0.7vh, 10px) !important;
 }
 
 /* The panel's own 8px of padding sits outside the trigger, so four panels
    carry 64px of it. Half that, and the column fits. */
-@media (max-height: 880px) {
-  html body #design#design.paper-stack .service-panel {
-    padding-block: clamp(2px, 0.5vh, 7px) !important;
-  }
+html body #design#design.paper-stack .service-panel {
+  padding-block: clamp(2px, 0.5vh, 7px) !important;
 }
 
 /* =========================================================
@@ -3132,16 +3102,276 @@ html body #design .latest-blog .latest-blog-grid.latest-blog-grid > * {
 /* The services + links page carries five cards and a chip list; in Kurdish and
    Arabic, which set longer, it runs about 32px over on a 720px screen. The
    cards give it back from their padding, not from their words. */
-@media (max-height: 880px) {
-  html body #bio .bio-connect-sheet .bio-connect-links .bio-social {
-    padding-block: clamp(8px, 1.1vh, 14px) !important;
+html body #bio .bio-connect-sheet .bio-connect-links .bio-social {
+  padding-block: clamp(8px, 1.1vh, 14px) !important;
+}
+
+html body #bio .bio-connect-sheet .services-grid {
+  gap: clamp(5px, 0.7vh, 9px) !important;
+}
+
+html body #bio .bio-connect-sheet .bio-connect-links {
+  gap: 8px !important;
+}
+
+/* A journal card that is alone on a full page should have some presence.
+   At 210px in an 870px card the strip read as an afterthought; given a floor
+   tied to the page height it sits as a proper block whether there is one post
+   or three, and still shrinks with the viewport. */
+html body #design .latest-blog .latest-blog-grid.latest-blog-grid > * {
+  min-height: clamp(190px, 30vh, 300px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+/* The five link cards run 58px past their page once the services chips are
+   above them. Taken from the cards' own padding and the gap between them —
+   nothing is hidden and no card is dropped. */
+html body #bio .bio-connect-sheet .bio-connect-links .bio-social {
+  padding-block: clamp(7px, 1vh, 12px) !important;
+}
+
+html body #bio .bio-connect-sheet .bio-connect-links {
+  gap: clamp(6px, 0.8vh, 10px) !important;
+}
+
+/* The text block is what sets these cards' height — 212px of a 232px card.
+   Tighter leading and margins across the five of them is the 50px the page
+   needs; every line of every card still reads. */
+html body #bio .bio-connect-sheet .bio-connect-links .bio-social-text {
+  line-height: 1.3 !important;
+}
+
+html body #bio .bio-connect-sheet .bio-connect-links .bio-social-eyebrow {
+  margin-block-end: 1px !important;
+}
+
+html body #bio .bio-connect-sheet .bio-connect-links .bio-social-title {
+  margin-block: 0 2px !important;
+  line-height: 1.16 !important;
+}
+
+html body #bio .bio-connect-sheet .bio-connect-links .bio-social-desc {
+  line-height: 1.38 !important;
+  margin-block: 0 2px !important;
+}
+
+html body #bio .bio-connect-sheet .bio-connect-links .bio-social-go {
+  padding-block: clamp(6px, 0.8vh, 10px) !important;
+}
+
+/* A page holding a single short block should grow into the room it has rather
+   than sit small in the middle of it. Tied to viewport height, so it fills a
+   tall screen without ever outgrowing a short one. */
+html body #bio .bio-education-sheet .bio-card {
+  padding: clamp(18px, 3.2vh, 44px) clamp(20px, 2.4vw, 46px) !important;
+}
+
+html body #bio .bio-education-sheet .bio-card h4 {
+  font-size: clamp(19px, 2.9vh, 34px) !important;
+  line-height: 1.18 !important;
+}
+
+html body #bio .bio-education-sheet .bio-card p {
+  font-size: clamp(13px, 1.8vh, 18px) !important;
+}
+
+/* The pitch heading is 189px of a 563px page once the quick-contact cards sit
+   above it — it is set at hero scale and Kurdish and Arabic wrap it to four
+   lines. Scaled to the page, the whole sentence still reads. */
+html body #contact .pitch-head h3 {
+  font-size: clamp(20px, 3.1vh, 40px) !important;
+  line-height: 1.16 !important;
+  margin-block: 0 clamp(4px, 0.8vh, 12px) !important;
+}
+
+html body #contact .pitch-head .section-lede {
+  font-size: clamp(12px, 1.6vh, 16px) !important;
+  line-height: 1.45 !important;
+}
+
+html body #contact .contact-reach-sheet .section-head {
+  margin-block-end: clamp(6px, 1vh, 16px) !important;
+}
+
+html body #contact .contact-quick {
+  gap: clamp(8px, 1.1vh, 14px) !important;
+}
+
+/* =========================================================
+   The link cards on a phone.
+   Laid on their side they fit a desktop column beautifully and a 390px screen
+   not at all: the track came out wider than the space left after the sheet's
+   own inset, so every card ran 22px past the right edge, and the "Open"
+   control went with it. On a narrow screen they stack again — the mark and
+   the destination on one line, the text beneath — and the track is told it may
+   never exceed its container.
+   ========================================================= */
+@media (max-width: 620px) {
+  html body #bio .bio-connect-links {
+    grid-template-columns: minmax(0, 1fr) !important;
+    display: grid !important;
   }
 
-  html body #bio .bio-connect-sheet .services-grid {
-    gap: clamp(5px, 0.7vh, 9px) !important;
+  html body #bio .bio-connect-links .bio-social {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    grid-template-areas: "mark text go" !important;
+    align-items: center !important;
+    column-gap: 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
   }
 
-  html body #bio .bio-connect-sheet .bio-connect-links {
-    gap: 8px !important;
+  html body #bio .bio-connect-links .bio-social-mark { grid-area: mark !important; }
+  html body #bio .bio-connect-links .bio-social-text {
+    grid-area: text !important;
+    min-width: 0 !important;
+  }
+  html body #bio .bio-connect-links .bio-social-go {
+    grid-area: go !important;
+    justify-self: end !important;
+    white-space: nowrap !important;
+  }
+
+  /* The description stays. On a 390px card it needs the full width, so the
+     Open control moves to its own line under the text rather than competing
+     with it for a 200px column. */
+  html body #bio .bio-connect-links .bio-social {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    grid-template-areas:
+      "mark text"
+      "go   go" !important;
+    row-gap: 6px !important;
+  }
+
+  html body #bio .bio-connect-links .bio-social-go {
+    justify-self: start !important;
+  }
+
+  html body #bio .bio-connect-links .bio-social-desc {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+  }
+}
+
+/* =========================================================
+   Phone density.
+   What sits side by side on a desktop column stacks on a 390px screen, so the
+   same page runs to 1000px+ there. These grids are made denser rather than
+   shorter: more items per row at a smaller chip size. Nothing is removed —
+   every tool, service and organisation is still on the page.
+   ========================================================= */
+@media (max-width: 620px) {
+  html body #bio .tools-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  html body #bio .tools-group {
+    margin-block: 0 8px !important;
+  }
+
+  html body #bio .tool-ic {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  html body #bio .tool-name {
+    font-size: 10.5px !important;
+    line-height: 1.2 !important;
+  }
+
+  html body #bio .services-grid {
+    gap: 5px !important;
+  }
+
+  html body #bio .orgs {
+    gap: 6px !important;
+  }
+
+  html body #bio .orgs li {
+    padding-block: 6px !important;
+  }
+}
+
+/* =========================================================
+   "What I do" and "A short note" on a phone.
+   Both are two-column compositions on a desktop and stack on a 390px screen,
+   which puts them 46–106px past the card. The practice page was losing its
+   last 68px outright — clipped, with no reading track to recover it.
+
+   Everything stays: four services, all four headings, the portrait, all four
+   figures, the software marquee. The savings come from the scale of the
+   chrome around them.
+   ========================================================= */
+@media (max-width: 620px) {
+  /* ---- What I do ---- */
+  html body #design#design .service-showcase .service-showcase-head .service-showcase-title.service-showcase-title {
+    font-size: clamp(19px, 5.6vw, 26px) !important;
+    line-height: 1.14 !important;
+    margin-block: 0 6px !important;
+  }
+
+  html body #design#design .service-showcase .service-showcase-lede {
+    font-size: 12.5px !important;
+    line-height: 1.4 !important;
+  }
+
+  html body #design#design .service-showcase .service-signature {
+    display: none !important;   /* a decorative monogram, not content */
+  }
+
+  html body #design#design .service-showcase .service-showcase-layout {
+    gap: 10px !important;
+  }
+
+  html body #design#design .service-showcase .service-panel {
+    padding-block: 3px !important;
+  }
+
+  html body #design#design .service-showcase .service-accordion .service-panel .service-trigger.service-trigger {
+    padding-block: 7px !important;
+    gap: 1px !important;
+  }
+
+  html body #design#design .service-showcase .service-detail-inner {
+    padding-block: 2px 6px !important;
+    font-size: 12px !important;
+    line-height: 1.42 !important;
+  }
+
+  html body #design#design .service-showcase .service-detail-inner li {
+    margin-block: 0 !important;
+  }
+
+  /* ---- A short note ---- */
+  html body #design#design .practice-note .bio-teaser-portrait {
+    max-height: clamp(120px, 20vh, 190px) !important;
+  }
+
+  html body #design#design .practice-note .bio-teaser-grid {
+    gap: 10px !important;
+  }
+
+  html body #design#design .practice-note .bio-teaser-text p {
+    font-size: 12.5px !important;
+    line-height: 1.45 !important;
+  }
+
+  html body #design#design .practice-note .stats {
+    gap: 6px !important;
+  }
+
+  html body #design#design .practice-note .stat {
+    padding-block: 6px !important;
+  }
+
+  html body #design#design .practice-note .software-experience {
+    margin-block-start: 6px !important;
   }
 }
