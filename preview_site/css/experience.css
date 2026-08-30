@@ -3375,3 +3375,22 @@ html body #contact .contact-quick {
     margin-block-start: 6px !important;
   }
 }
+
+/* A short note, on a phone. The block holds 420px of content but measured
+   760px: it is a flex item and was being stretched to its row rather than
+   sized by what is in it, which put the page 46px over. Told not to stretch,
+   it sizes to its content and the page fits. */
+@media (max-width: 620px) {
+  html body #design#design .practice-note > .paper-scroll > .sheet-mid {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  html body #design#design .practice-note .bio-teaser.bio-teaser {
+    height: auto !important;
+    min-height: 0 !important;
+    align-self: start !important;
+    flex: 0 0 auto !important;
+  }
+}
