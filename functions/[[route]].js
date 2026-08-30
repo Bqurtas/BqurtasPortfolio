@@ -200,6 +200,15 @@ function blogPostSitemapBlocks(posts) {
   }).filter(Boolean).join('\n');
 }
 
+const sitemapHeaders = () => new Headers({
+  'Content-Type': 'application/xml; charset=UTF-8',
+  'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+  'CDN-Cache-Control': 'no-store',
+  'Cloudflare-CDN-Cache-Control': 'no-store',
+  'Pragma': 'no-cache',
+  'X-Content-Type-Options': 'nosniff'
+});
+
 async function serveSitemap(url, env, next) {
   if (!env || !env.ASSETS) return next();
   const base = await env.ASSETS.fetch(new URL('/sitemap.xml', url.origin));
@@ -220,12 +229,11 @@ async function serveSitemap(url, env, next) {
       }
     }
   } catch (e) {}
-  const headers = new Headers(base.headers);
-  headers.set('Content-Type', 'application/xml; charset=UTF-8');
-  headers.set('Cache-Control', 'no-store');
-  headers.set('CDN-Cache-Control', 'no-store');
-  headers.set('X-Content-Type-Options', 'nosniff');
-  return new Response(body, { status: 200, headers });
+  /* Build the headers rather than inheriting the static asset's. The body
+     leaving here is not the body that came out of ASSETS — blog posts get
+     appended — so the asset's ETag and Content-Length describe something else,
+     and its Age / CF-Cache-Status describe a fetch the client never made. */
+  return new Response(body, { status: 200, headers: sitemapHeaders() });
 }
 
 const setContent = (v) => ({ element(el) { el.setAttribute('content', v); } });
@@ -387,12 +395,7 @@ export async function onRequest(context) {
   // function with no-store — freshness over speed, same policy as sitemap.xml.
   if ((url.pathname === '/sitemap-images.xml' || url.pathname === '/sitemap-media.xml' || url.pathname === '/sitemap-gallery.xml') && env && env.ASSETS) {
     const r = await env.ASSETS.fetch(new URL('/sitemap-images.xml', url.origin));
-    const h = new Headers(r.headers);
-    h.set('Content-Type', 'application/xml; charset=UTF-8');
-    h.set('Cache-Control', 'no-store');
-    h.set('CDN-Cache-Control', 'no-store');
-    h.set('X-Content-Type-Options', 'nosniff');
-    return new Response(r.body, { status: 200, headers: h });
+    return new Response(r.body, { status: 200, headers: sitemapHeaders() });
   }
   const redirectPath = retiredRedirectPath(url.pathname);
   if (redirectPath) {
