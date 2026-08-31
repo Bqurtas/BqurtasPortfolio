@@ -26,7 +26,7 @@ const DOC_FALLBACK = '/index.html';
    offline still works and online is never stale. */
 const PRECACHE_ASSETS = [
   '/css/modern-framer.css?v=209',
-  '/css/style.v417.min.css?v=468',
+  '/css/style.v417.min.css?v=469',
   '/css/fonts.css?v=447',
   '/css/experience.css?v=114',
   '/js/main.v420.min.js?v=518',

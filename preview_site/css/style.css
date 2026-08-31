@@ -15414,7 +15414,11 @@ html.bq-cursor-on :is(a, button, [role="button"], summary, label, input, textare
    ========================================================================== */
 .latest-panel, .chat {
   top: auto !important;
-  bottom: calc(var(--dock-h, 62px) + 30px) !important;
-  height: min(500px, calc(100dvh - 168px)) !important;
-  max-height: min(500px, calc(100dvh - 168px)) !important;
+  /* Explicit, not var(--dock-h): that token resolves to 62px at the root and
+     76px in the panel's own context, so the same expression put the foot at
+     two different places depending on where you read it. The dock is 52px tall
+     sitting 30px up; 10px of daylight above it is 92px, stated once. */
+  bottom: 92px !important;
+  height: min(500px, calc(100vh - 168px)) !important;
+  max-height: min(500px, calc(100vh - 168px)) !important;
 }
