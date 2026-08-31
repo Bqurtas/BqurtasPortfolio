@@ -3681,13 +3681,161 @@ html body .latest-panel.latest-panel {
     aspect-ratio: 1 / 1 !important;
     margin-inline: auto !important;
     border-radius: 50% !important;
+    /* A mount rather than a cut-out: a highlight just inside the edge, a
+       hairline on it, then a wide soft halo, a thin outer ring to close it,
+       and a deep low shadow so the circle sits on the sheet instead of being
+       punched through it. */
     box-shadow:
-      0 0 0 1px rgba(0, 0, 0, .10),
-      0 0 0 9px rgba(0, 0, 0, .035),
-      0 20px 44px rgba(0, 0, 0, .16) !important;
+      inset 0 0 0 1px rgba(255, 255, 255, .55),
+      0 0 0 1px rgba(0, 0, 0, .09),
+      0 0 0 8px rgba(0, 0, 0, .028),
+      0 0 0 9px rgba(0, 0, 0, .055),
+      0 26px 54px -18px rgba(0, 0, 0, .34) !important;
+  }
+  html body #design#design .practice-note .bio-teaser-portrait.bio-teaser-portrait img {
+    transform: scale(1.02) !important;
   }
   html body #design#design .practice-note .bio-teaser-portrait.bio-teaser-portrait img {
     border-radius: 50% !important;
     object-fit: cover !important;
   }
+}
+
+/* ==========================================================================
+   Barakat's list, in his order.
+   ========================================================================== */
+
+/* The curtain arrives from the right and leaves by the right, in both
+   directions. I had mirrored it for RTL last time; he wants one behaviour, so
+   Kurdish and Arabic now wipe from the same edge as English. */
+html[dir="rtl"] body #mobileMenu.mobile-menu {
+  clip-path: inset(0 0 0 100%) !important;
+}
+html[dir="rtl"] body #mobileMenu#mobileMenu .mm-nav,
+html[dir="rtl"] body #mobileMenu#mobileMenu .mm-menu-brand {
+  transform: translateX(7%) !important;
+}
+
+/* No dark rule anywhere in the chat. The form still carried a border-top and
+   the melt border-image; both go, and what is left is a hairline so faint it
+   only separates rather than draws. */
+html body .chat .chat-input {
+  border-top: 1px solid rgba(0, 0, 0, .045) !important;
+  border-image: none !important;
+}
+html body .chat .chat-input input,
+html body .chat .chat-input input:focus,
+html body .chat .chat-input input:focus-visible {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Tools & Software: the logos stand on the page. The plate under each one was
+   a white card with a border and a shadow — five of them per row read as
+   buttons rather than as a list of programs. */
+html body #bio .bio-tools .tool-ic,
+html body #bio .bio-tools .tool-ic--txt {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  width: 46px !important;
+  height: 46px !important;
+  border-radius: 0 !important;
+}
+html body #bio .bio-tools .tool:hover .tool-ic {
+  transform: translateY(-3px) !important;
+  box-shadow: none !important;
+}
+
+/* The Biography room, one sheet per block.
+   Six of its nine sheets were overflowing on a phone. The type comes down a
+   step so each block ends inside its own page instead of asking to be scrolled.
+   Nothing is removed: the same words at a smaller size. */
+@media (max-width: 820px) {
+  html body #bio.room .bio-block-title {
+    font-size: clamp(17px, 4.6vw, 20px) !important;
+  }
+  html body #bio.room .bio-block-lede,
+  html body #bio.room .tl-desc,
+  html body #bio.room .bio-social-desc {
+    font-size: clamp(12px, 3.3vw, 13.5px) !important;
+    line-height: 1.5 !important;
+  }
+  html body #bio.room .tl-card h4,
+  html body #bio.room .bio-social-title {
+    font-size: clamp(14px, 3.9vw, 16px) !important;
+  }
+  html body #bio.room .tl-date,
+  html body #bio.room .tl-org,
+  html body #bio.room .tl-loc,
+  html body #bio.room .tl-skills,
+  html body #bio.room .bio-social-eyebrow,
+  html body #bio.room .bio-social-handle {
+    font-size: clamp(10px, 2.9vw, 11.5px) !important;
+  }
+  html body #bio.room .timeline .tl-item + .tl-item {
+    margin-top: clamp(10px, 2.2vh, 16px) !important;
+  }
+}
+
+/* Certificates: four across, and small enough that four fit. */
+html body #bio .bio-proof-sheet .cert-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: clamp(8px, 1.6vw, 14px) !important;
+}
+html body #bio .bio-proof-sheet .cert-grid .cert-label {
+  font-size: clamp(9px, 2.4vw, 10.5px) !important;
+  line-height: 1.3 !important;
+}
+
+/* The go-up button clears the name in the footer. */
+html body .to-top,
+html[dir="rtl"] body .to-top {
+  bottom: calc(var(--dock-h, 64px) + 46px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* Contact: the cards get smaller and the words get clearer. Four quiet rows
+   beat four crowded cards — the labels were competing with the values. */
+html body #contact .contact-quick {
+  gap: clamp(7px, 1.4vh, 12px) !important;
+}
+html body #contact .contact-quick .qc-card {
+  padding: clamp(9px, 1.5vh, 14px) clamp(12px, 3vw, 18px) !important;
+  gap: clamp(9px, 2.4vw, 14px) !important;
+}
+html body #contact .contact-quick .qc-card i {
+  font-size: clamp(13px, 3.2vw, 15px) !important;
+}
+html body #contact .contact-quick .qc-card .mono {
+  font-size: clamp(9px, 2.5vw, 10.5px) !important;
+  opacity: .62 !important;
+}
+html body #contact .contact-quick .qc-card p {
+  font-size: clamp(13px, 3.5vw, 15px) !important;
+  line-height: 1.35 !important;
+  margin: 2px 0 0 !important;
+}
+
+/* The pitch header now introduces the form it sits above, so it takes the
+   smaller voice of an introduction rather than the larger one of a section. */
+html body #contact .pitch-head--compact h3 {
+  font-size: clamp(17px, 4.4vw, 22px) !important;
+  margin: 6px 0 4px !important;
+}
+html body #contact .pitch-head--compact .section-lede {
+  font-size: clamp(12px, 3.2vw, 13.5px) !important;
+  line-height: 1.5 !important;
+}
+html body #contact .pitch-head--compact {
+  margin-bottom: clamp(10px, 2vh, 18px) !important;
+}
+
+/* The two document cards share the shape of the profile cards above them. */
+html body #bio .bio-docs-sheet .bio-connect-links--docs {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: clamp(10px, 2vh, 18px) !important;
+  height: 100% !important;
 }
