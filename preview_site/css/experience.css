@@ -2210,9 +2210,11 @@ html[lang="ckb"] body #design#design :is(.service-showcase-lede, .service-sub, .
   line-height: 1.55 !important;
 }
 
-/* The curtain opens from the reading-start side in RTL. */
+/* The curtain arrives from the right and leaves by the right, in every
+   language. This rule carries two IDs — (2,2,2) — so nothing appended later at
+   (1,2,2) could correct it from the end of the file; it has to be said here. */
 html[dir="rtl"] body #mobileMenu#mobileMenu.mobile-menu {
-  clip-path: inset(0 100% 0 0) !important;
+  clip-path: inset(0 0 0 100%) !important;
 }
 
 html[dir="rtl"] body #mobileMenu#mobileMenu.mobile-menu:is(.is-open, .is-ready) {
@@ -3619,12 +3621,6 @@ html body #design#design > .section.practice-note .bio-teaser-grid {
    opening rather than a reveal. The slide is on .mm-nav and the brand, never on
    .mm-left: a transform there would become the containing block for the
    position:fixed close button and drag it off the screen edge. */
-html[dir="rtl"] body #mobileMenu.mobile-menu {
-  clip-path: inset(0 100% 0 0) !important;
-}
-html[dir="rtl"] body #mobileMenu.mobile-menu.is-open {
-  clip-path: inset(0 0 0 0) !important;
-}
 html body #mobileMenu#mobileMenu .mm-nav,
 html body #mobileMenu#mobileMenu .mm-menu-brand {
   transform: translateX(7%) !important;
@@ -3705,12 +3701,6 @@ html body .latest-panel.latest-panel {
    Barakat's list, in his order.
    ========================================================================== */
 
-/* The curtain arrives from the right and leaves by the right, in both
-   directions. I had mirrored it for RTL last time; he wants one behaviour, so
-   Kurdish and Arabic now wipe from the same edge as English. */
-html[dir="rtl"] body #mobileMenu.mobile-menu {
-  clip-path: inset(0 0 0 100%) !important;
-}
 html[dir="rtl"] body #mobileMenu#mobileMenu .mm-nav,
 html[dir="rtl"] body #mobileMenu#mobileMenu .mm-menu-brand {
   transform: translateX(7%) !important;
