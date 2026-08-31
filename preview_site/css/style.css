@@ -7670,14 +7670,22 @@ body.is-scrolled .rail-room-name,
   transform: translateY(-2px);
 }
 .chat-input { padding: 13px 15px; }
+/* No rule around the writing. The field carried a border-bottom that darkened
+   to --ink the moment you typed, so a line drew itself under every message you
+   were composing. A quiet filled pill says "type here" without drawing on the
+   page. */
 .chat-input input {
   border: 0;
-  border-bottom: 1px solid var(--line);
-  border-radius: 0;
-  background: transparent;
-  padding: 10px 2px;
+  border-radius: 999px;
+  background: var(--surface);
+  padding: 11px 15px;
 }
-.chat-input input:focus { border-color: var(--ink); }
+.chat-input input:focus,
+.chat-input input:focus-visible {
+  border: 0;
+  outline: 0;
+  background: var(--surface);
+}
 .chat-input button,
 :root[data-theme="dark"] .chat-input button {
   background: var(--ink);
