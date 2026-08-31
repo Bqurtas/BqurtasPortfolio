@@ -3555,3 +3555,44 @@ html body #mobileMenu#mobileMenu .mobile-menu-close:focus-visible {
   backface-visibility: hidden !important;
   -webkit-backface-visibility: hidden !important;
 }
+
+/* ==========================================================================
+   Barakat's next three.
+   ========================================================================== */
+
+/* "A short note" fills its sheet.
+   The .sheet-mid block measured 760px inside an 802px content box, and the
+   breathing spacer put another 75px of nothing below the fold — so the sheet
+   ended in white before it ended. Every box in the chain now stretches, and the
+   grid spreads its own slack between portrait, text and figures rather than
+   pooling it at the foot. Nothing is cut: the three blocks keep their heights
+   (280 / 280 / 137) and simply stand further apart. */
+html body #design#design > .section.practice-note > .paper-scroll {
+  --bq-paper-breathe: 0px;
+}
+html body #design#design > .section.practice-note > .paper-scroll > .sheet-mid {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 100% !important;
+}
+html body #design#design > .section.practice-note .bio-teaser {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+}
+html body #design#design > .section.practice-note .bio-teaser-grid {
+  flex: 1 1 auto !important;
+  justify-content: space-between !important;
+}
+
+/* The footer gets more black around it.
+   It was 382px on a 430x932 phone — 41% of the screen — with the copy pressed
+   against the top edge of its own dark field and 80px of padding only beneath.
+   Air above it now too, and a little between the stage and the bottom rule.
+   That reads 461px, 49%: more room, still short of half the screen. */
+html body .footer.paper-sheet--footer > .paper-scroll {
+  padding-top: clamp(32px, 7vh, 76px) !important;
+}
+html body .footer.paper-sheet--footer > .paper-scroll > .footer-stage {
+  margin-bottom: clamp(8px, 1.5vh, 18px) !important;
+}

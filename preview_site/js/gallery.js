@@ -187,6 +187,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     'flex','video','other','certificate'
   ];
 
+  /* Attach a video's own source as its card nears the viewport, so the first
+     frame can paint as the cover. Falls back to hydrating everything at once
+     where IntersectionObserver is missing. */
+  const hydrateVideo = (vid) => {
+    if (!vid || vid.src || !vid.dataset.src) return;
+    vid.src = vid.dataset.src + '#t=0.1';
+  };
+  const videoWatcher = typeof IntersectionObserver === 'function'
+    ? new IntersectionObserver((entries, obs) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          hydrateVideo(entry.target);
+          obs.unobserve(entry.target);
+        });
+      }, { rootMargin: '400px 0px' })
+    : null;
+
   const buildCard = (item) => {
     const article = document.createElement('article');
     // Design works (logos, book covers, stationery, etc.) are exported with
@@ -215,8 +232,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     // zoom lightbox (data-full) still use the ORIGINAL full file, so quality is
     // untouched where it shows big. Cuts multi-MB originals to small thumbnails.
     const imgSrc = (item.type !== 'video') ? window.BQ_GALLERY.thumb(item.url, 320) : item.url;
+    /* No poster. Every video used to wear assets/covers/en-video.jpg — the
+       social-share card for the /design/video route — so twelve different
+       films showed the reader one identical picture, and on a phone, where
+       there is no hover to trigger playback, that picture was all they ever
+       saw. A film's own first frame is its cover. preload="metadata" plus the
+       #t=0.1 media fragment is what makes the browser fetch enough to paint
+       that frame; the source itself is attached only once the card nears the
+       viewport, so a category of thirty films does not open thirty
+       connections at once. */
     const mediaHtml = item.type === 'video'
-      ? `<video muted loop playsinline preload="none" poster="assets/covers/en-video.jpg" data-src="${item.url}" title="${dispTitle}" width="${dims.width}" height="${dims.height}"></video>`
+      ? `<video muted loop playsinline preload="metadata" data-src="${item.url}" title="${dispTitle}" width="${dims.width}" height="${dims.height}"></video>`
       : `<img loading="lazy" decoding="async" fetchpriority="low" src="${imgSrc}" alt="${dispTitle}" width="${dims.width}" height="${dims.height}" />`;
 
     article.innerHTML = `
@@ -264,6 +290,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       article.remove();
     });
+    if (media.tagName === 'VIDEO') {
+      if (videoWatcher) videoWatcher.observe(media);
+      else hydrateVideo(media);
+    }
     return article;
   };
 
