@@ -3952,3 +3952,34 @@ html body .room .room-hero-sub {
 html body .room .room-hero-ghost {
   opacity: .05 !important;
 }
+
+/* The pitch introduction reads as two lines, one each.
+   The eyebrow already sat on one. The title did not, and the reason was never
+   the type size — modern-framer caps this h3 at 16ch (20ch on the one-sheet
+   rooms), which is 173px of a 364px column, so forty-two characters folded
+   onto three lines no matter how small they got. The cap comes off and the
+   size comes down far enough that the line fits the column it is given. */
+html body #contact .room.paper-stack .pitch-head h3,
+html body #contact .room.paper-stack > .paper-sheet.room-sheet--one .pitch-head h3,
+html body #contact .pitch-head--compact h3 {
+  max-width: none !important;
+  font-size: clamp(12.5px, 3.4vw, 16px) !important;
+  line-height: 1.25 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  margin: 5px 0 3px !important;
+}
+html body #contact .pitch-head--compact .mono {
+  font-size: clamp(9.5px, 2.6vw, 11px) !important;
+  white-space: nowrap !important;
+}
+
+/* The portrait sits lower on the sheet, and the mount comes off it.
+   He wants the picture, not a frame around the picture. */
+@media (max-width: 820px) {
+  html body #design#design .practice-note .bio-teaser-portrait.bio-teaser-portrait {
+    box-shadow: none !important;
+    margin-top: clamp(20px, 5vh, 54px) !important;
+  }
+}
