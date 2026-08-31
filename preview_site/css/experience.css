@@ -3450,3 +3450,90 @@ html body #contact .contact-quick {
     overflow: visible !important;
   }
 }
+
+/* ==========================================================================
+   Four fixes the owner named, in his order.
+   ========================================================================== */
+
+/* 1. The menu curtain's close control.
+   It was rendered position:static inside .mm-menu-head at 11px with no border
+   and no background — measured 10x11 CSS pixels, which is neither findable nor
+   tappable (44px is the floor). It now sits pinned to the middle of the
+   curtain's trailing edge as a real target. inset-inline-end handles RTL on its
+   own: the earlier body[dir="rtl"] pairs were dead selectors, because dir lives
+   on <html>, not <body>. Nothing in the button's ancestor chain carries a
+   transform, so position:fixed resolves against the viewport as intended. */
+html body #mobileMenu#mobileMenu .mobile-menu-close,
+html body #mobileMenu#mobileMenu.is-ready .mobile-menu-close {
+  position: fixed !important;
+  top: 50% !important;
+  inset-inline-end: clamp(12px, 3.5vw, 26px) !important;
+  inset-inline-start: auto !important;
+  bottom: auto !important;
+  transform: translateY(-50%) !important;
+  z-index: 40 !important;
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  width: 54px !important;
+  height: 54px !important;
+  min-width: 54px !important;
+  padding: 0 !important;
+  border: 1px solid var(--bq-menu-line, rgba(243,241,235,.16)) !important;
+  border-radius: 50% !important;
+  background: rgba(243, 241, 235, .10) !important;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .28) !important;
+  color: var(--bq-menu-paper, #f3f1eb) !important;
+  font-size: 8px !important;
+  letter-spacing: .1em !important;
+  text-transform: uppercase !important;
+  transition: background .25s var(--ease, ease), border-color .25s var(--ease, ease) !important;
+}
+html body #mobileMenu#mobileMenu .mobile-menu-close i {
+  font-size: 17px !important;
+  line-height: 1 !important;
+}
+html body #mobileMenu#mobileMenu .mobile-menu-close:hover,
+html body #mobileMenu#mobileMenu .mobile-menu-close:focus-visible {
+  background: rgba(243, 241, 235, .20) !important;
+  border-color: var(--bq-menu-paper, #f3f1eb) !important;
+  color: var(--bq-menu-paper, #f3f1eb) !important;
+  transform: translateY(-50%) !important;
+}
+
+/* 2. "What I do" filling its sheet on a phone.
+   The accordion is flex:1 1 auto, so it stretches to the sheet — but its four
+   panels are flex:0 0 auto and only totalled ~319px inside a 593px box. The
+   leftover 272px pooled underneath the last panel, which is the emptiness the
+   owner kept pointing at. Nothing is cut to fix it: the collapsed rows simply
+   take the height that was already being reserved for them, so the four items
+   read as full cards instead of thin lines above a void. Measured on a
+   430x932 phone this closes the gap from 272px to 18px. */
+@media (max-width: 820px) {
+  html body #design#design #services .service-accordion .service-trigger {
+    min-height: clamp(52px, 12.5vh, 128px) !important;
+  }
+}
+
+/* 3. The portfolio reel on a phone.
+   .work-reel and .work-head are re-translated on every scroll frame
+   (main.js sets translate3d on both), yet both computed will-change:auto —
+   so the compositor had no standing hint for a 3517px subtree carrying 24
+   images, and re-rasterised instead of just moving a layer. That is the catch
+   the owner feels while dragging. The hint goes on the elements that actually
+   move; .section.work already carries its own for the paper-stack fade. */
+#design#design.paper-stack > .section.work.paper-sheet > .paper-scroll > .work-vp > .work-reel,
+#design#design.paper-stack > .section.work.paper-sheet > .paper-scroll.work-head-flow > .work-vp > .work-reel {
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+}
+#design#design.paper-stack > .section.work.paper-sheet .work-head {
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+}

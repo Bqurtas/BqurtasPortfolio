@@ -965,7 +965,23 @@ button.social-opt { background: none; border: none; cursor: pointer; font-family
   color: var(--ink); background: none;
 }
 .mobilebar-pop--lang .mobile-lang.is-active { background: var(--gold-bright); color: var(--bg); }
-.mobilebar-pop--social { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+/* The social curtain stands as tall as the language one. It used to be a
+   4-across grid, so nine icons folded into three squat rows while the language
+   list beside it ran seven rows down the page — two panels from the same dock
+   with two different silhouettes. One column now, same 4px rhythm as the
+   language list, and a viewport cap so a long list can still scroll on a short
+   phone rather than growing past the screen. */
+.mobilebar-pop--social {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  gap: 4px;
+  max-height: min(62vh, 520px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.mobilebar-pop--social::-webkit-scrollbar { width: 0; height: 0; }
 .mobilebar-pop--social a,
 .mobilebar-pop--social .share-page-btn {
   width: 46px; height: 46px; border-radius: 50%;
