@@ -12,7 +12,7 @@
       instead of being pinned for the life of the installed worker.
    ========================================================= */
 
-const SW_VERSION = 'v3';                       // bump on every deploy
+const SW_VERSION = 'v4';                       // bump on every deploy
 const CACHE_NAME = `bqurtas-cache-${SW_VERSION}`;
 const DOC_FALLBACK = '/index.html';
 
@@ -26,9 +26,9 @@ const DOC_FALLBACK = '/index.html';
    offline still works and online is never stale. */
 const PRECACHE_ASSETS = [
   '/css/modern-framer.css?v=209',
-  '/css/style.v417.min.css?v=465',
+  '/css/style.v417.min.css?v=466',
   '/css/fonts.css?v=447',
-  '/css/experience.css?v=108',
+  '/css/experience.css?v=110',
   '/js/main.v420.min.js?v=517',
   '/js/gallery.v420.min.js?v=453',
   '/js/i18n.v420.min.js?v=455',
