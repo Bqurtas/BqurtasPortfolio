@@ -3464,7 +3464,9 @@ html body #contact .contact-quick {
    on <html>, not <body>. Nothing in the button's ancestor chain carries a
    transform, so position:fixed resolves against the viewport as intended. */
 html body #mobileMenu#mobileMenu .mobile-menu-close,
-html body #mobileMenu#mobileMenu.is-ready .mobile-menu-close {
+html body #mobileMenu#mobileMenu.is-ready .mobile-menu-close,
+html[dir="rtl"] body #mobileMenu#mobileMenu .mobile-menu-close,
+html[dir="rtl"] body #mobileMenu#mobileMenu.is-ready .mobile-menu-close {
   position: fixed !important;
   top: 50% !important;
   inset-inline-end: clamp(12px, 3.5vw, 26px) !important;
@@ -3493,7 +3495,8 @@ html body #mobileMenu#mobileMenu.is-ready .mobile-menu-close {
   text-transform: uppercase !important;
   transition: background .25s var(--ease, ease), border-color .25s var(--ease, ease) !important;
 }
-html body #mobileMenu#mobileMenu .mobile-menu-close i {
+html body #mobileMenu#mobileMenu .mobile-menu-close i,
+html[dir="rtl"] body #mobileMenu#mobileMenu .mobile-menu-close i {
   font-size: 17px !important;
   line-height: 1 !important;
 }
@@ -3515,7 +3518,22 @@ html body #mobileMenu#mobileMenu .mobile-menu-close:focus-visible {
    430x932 phone this closes the gap from 272px to 18px. */
 @media (max-width: 820px) {
   html body #design#design #services .service-accordion .service-trigger {
-    min-height: clamp(52px, 12.5vh, 128px) !important;
+    min-height: clamp(48px, 10.5vh, 112px) !important;
+  }
+  /* space-between finishes the job the min-height starts, and does it in a way
+     that cannot overshoot: whatever height the rows do not claim becomes even
+     air between them, in every language, instead of one pool at the foot.
+     Measured at 430x932 — English gaps 31px, Kurdish 7px, Arabic the same as
+     English, and none of the three overflows past the 34px this sheet already
+     had before any of this. */
+  html body #design#design #services .service-accordion {
+    justify-content: space-between !important;
+  }
+  /* With the sheet genuinely full, the breathing spacer underneath it is just
+     75px of blank travel at the end of the scroll — the emptiness the owner
+     was scrolling into. The sheet keeps its own overflow, so nothing is cut. */
+  html body #design#design #services .paper-scroll {
+    --bq-paper-breathe: 0px;
   }
 }
 
