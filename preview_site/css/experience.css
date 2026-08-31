@@ -4076,3 +4076,107 @@ html body #mobileMenu#mobileMenu.is-open .mobile-menu-close:hover {
   opacity: 1 !important;
   transform: translateY(-50%) !important;
 }
+
+/* ==========================================================================
+   The curtain, for a reader who has asked the system to reduce motion.
+
+   This is why he has been asking for the same thing over and over and seeing
+   nothing change. With Reduce Motion on, three separate rules erase the whole
+   effect: style.css:5096 and :7226 set clip-path:none on .mobile-menu AND on
+   .mobile-menu.is-open, so the wipe never exists, and experience.css:401 cuts
+   the close button's transition to .01ms. The curtain simply appears, then
+   simply vanishes. No amount of building the animation elsewhere could show up.
+
+   The guidance for reduced motion is to REDUCE movement, not to remove all
+   feedback — a large sweeping wipe is what a motion-sensitive reader needs
+   spared, not the knowledge that a panel opened. So under Reduce Motion the
+   curtain keeps a short, calm cross-fade and a few pixels of travel, and the
+   close button fades with it. Everyone else keeps the full wipe.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html body #mobileMenu#mobileMenu.mobile-menu,
+  html[dir="rtl"] body #mobileMenu#mobileMenu.mobile-menu {
+    clip-path: none !important;
+    opacity: 0 !important;
+    transition:
+      opacity .24s ease,
+      visibility 0s linear .24s !important;
+  }
+  html body #mobileMenu#mobileMenu.mobile-menu.is-open,
+  html[dir="rtl"] body #mobileMenu#mobileMenu.mobile-menu.is-open {
+    clip-path: none !important;
+    opacity: 1 !important;
+    transition:
+      opacity .26s ease,
+      visibility 0s linear 0s !important;
+  }
+  html body #mobileMenu#mobileMenu .mobile-sheet {
+    transform: translateX(2.5%) !important;
+    opacity: 1 !important;
+    transition: transform .26s ease !important;
+  }
+  html body #mobileMenu#mobileMenu.is-open .mobile-sheet {
+    transform: translateX(0) !important;
+    transition: transform .3s ease !important;
+  }
+  html body #mobileMenu#mobileMenu .mm-nav,
+  html body #mobileMenu#mobileMenu .mm-menu-brand,
+  html[dir="rtl"] body #mobileMenu#mobileMenu .mm-nav,
+  html[dir="rtl"] body #mobileMenu#mobileMenu .mm-menu-brand {
+    transform: none !important;
+    opacity: 0 !important;
+    transition: opacity .2s ease !important;
+  }
+  html body #mobileMenu#mobileMenu.is-open .mm-nav,
+  html body #mobileMenu#mobileMenu.is-open .mm-menu-brand,
+  html[dir="rtl"] body #mobileMenu#mobileMenu.is-open .mm-nav,
+  html[dir="rtl"] body #mobileMenu#mobileMenu.is-open .mm-menu-brand {
+    transform: none !important;
+    opacity: 1 !important;
+    transition: opacity .3s ease .08s !important;
+  }
+  html body #mobileMenu#mobileMenu .mobile-menu-close {
+    transition: opacity .24s ease !important;
+    animation: none !important;
+  }
+  html body #mobileMenu#mobileMenu.is-open .mobile-menu-close {
+    transition: opacity .28s ease .12s !important;
+  }
+}
+
+/* The social icons stand on the dock's own background.
+   Each link and the share button carried a 46px disc — a 1px ring at 9% black
+   with a 50% radius — so nine marks read as nine buttons stacked in a column.
+   The 46px stays: that is the touch target, and it does not need to be drawn. */
+html body .mobilebar-pop--social a,
+html body .mobilebar-pop--social .share-page-btn {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+html body .mobilebar-pop--social a:active,
+html body .mobilebar-pop--social .share-page-btn:active,
+html body .mobilebar-pop--social .share-page-btn.is-copied {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+/* On a phone the tab's name card stays down.
+   .tab-label is an absolutely positioned card at 92% black that fades in on
+   hover — and on a touch screen focus survives the tap, so it stayed up after
+   every press. It is hidden by opacity rather than display:none because that
+   span is the button's accessible name; removing it from the box tree would
+   leave a screen reader with an icon and nothing to call it. */
+@media (max-width: 820px) {
+  html body .work-head .tab .tab-label,
+  html body .work-head .tab:hover .tab-label,
+  html body .work-head .tab:focus .tab-label,
+  html body .work-head .tab:focus-visible .tab-label,
+  html body .work-head .tab:active .tab-label,
+  html body .work-head .tab.is-active .tab-label {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translate(-50%, 0) !important;
+  }
+}

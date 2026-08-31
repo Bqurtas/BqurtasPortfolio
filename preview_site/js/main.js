@@ -1969,7 +1969,17 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         /* Hold the paper for exactly its interior reading distance. Native
            window scroll then advances the content and releases the next card. */
         if (sheet === tailSheet) {
-          tailTrack = overflow;
+          /* The last card needs somewhere to stand after it lands, not only
+             room to read itself. tailTrack used to be exactly this sheet's own
+             inner overflow, so once every sheet was trimmed to fit — overflow
+             zero — the final card arrived at its sticky position and the whole
+             stack released in the same frame. Nothing ever came to rest on top
+             of anything: in the Journal the index sheet stopped 22px short of
+             its own top and both sheets slid away together.
+             Half a viewport of dwell, bounded, is enough for the arrival and
+             the departure to be two separate moments. */
+          const dwell = Math.min(460, Math.max(260, Math.round(vh * 0.5)));
+          tailTrack = Math.max(overflow, dwell);
           sheet.style.setProperty('--bq-flow-extra', '0px');
         } else {
           sheet.style.setProperty('--bq-flow-extra', `${overflow}px`);

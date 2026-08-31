@@ -1717,7 +1717,7 @@ window.BQ_IDENTITY_COPY = {
   en: {
     "menu.practice":"Multidisciplinary creative practice","menu.close":"Close","menu.statement":"Design, image, content and technology — shaped as one connected practice from Kurdistan.",
     "cursor.view":"View","cursor.open":"Open","cursor.talk":"Talk","cursor.send":"Send",
-    "hero.lede":"I'm Barakat Qurtas — a Kurdish multidisciplinary designer and creative technologist shaping identity, image, content and digital experiences from Hewlêr.",
+    "hero.lede":"I'm Barakat Qurtas — a Kurdish multidisciplinary designer and creative technologist shaping identity, image, content and digital experiences from Hewlêr",
     "svc.eye":"What I do","svc.title":"One practice. Every form an idea needs.","svc.lede":"Strategy, identity, image, motion, content and technology — shaped as one connected system from the first thought to the final release.","svc.signature":"Multidisciplinary creative practice","svc.cta":"Discuss a project",
     "svc.identity":"Identity & Design Systems","svc.identity.sub":"Direction, marks & coherent systems","svc.identity.desc":"From the strategic direction to the smallest production detail, I build identities that are recognisable, usable and made to last.","svc.identity.a":"Creative direction & brand strategy","svc.identity.b":"Logo, type & colour systems","svc.identity.c":"Guidelines, print & launch assets",
     "svc.editorial":"Editorial, Content & Social","svc.editorial.sub":"Stories, publications & content systems","svc.editorial.desc":"I shape information into a voice people can follow — across books, campaigns, social channels and public communication.","svc.editorial.a":"Editorial design & publications","svc.editorial.b":"Content writing & visual storytelling","svc.editorial.c":"Social media direction & management",
@@ -1728,7 +1728,7 @@ window.BQ_IDENTITY_COPY = {
   ku: {
     "menu.practice":"پراکتیکی داهێنەرانەی فرەپسپۆڕی","menu.close":"داخستن","menu.statement":"دیزاین، وێنە، ناوەڕۆک و تەکنەلۆجیا — لە کوردستانەوە وەک یەک پراکتیکی پێکەوەبەستراو.",
     "cursor.view":"بینین","cursor.open":"کردنەوە","cursor.talk":"قسە","cursor.send":"ناردن",
-    "hero.lede":"من بەرەکات قورتاسم — دیزاینەرێکی کوردی فرەپسپۆڕ و شارەزای تەکنەلۆجیای داهێنەرانەم کە لە هەولێرەوە ناسنامە، وێنە، ناوەڕۆک و ئەزموونی دیجیتاڵ دروست دەکەم.",
+    "hero.lede":"من بەرەکات قورتاسم — دیزاینەرێکی کوردی فرەپسپۆڕ و شارەزای تەکنەلۆجیای داهێنەرانەم کە لە هەولێرەوە ناسنامە، وێنە، ناوەڕۆک و ئەزموونی دیجیتاڵ دروست دەکەم",
     "svc.eye":"ئەوەی دەیکەم","svc.title":"یەک پراکتیک؛ هەر شێوەیەک کە بیرۆکەکە پێویستی پێیەتی.","svc.lede":"ستراتیژی، ناسنامە، وێنە، جوڵە، ناوەڕۆک و تەکنەلۆجیا — لە یەکەم بیرۆکەوە تا بڵاوکردنەوەی کۆتایی وەک یەک سیستەمی پێکەوەبەستراو.","svc.signature":"پراکتیکی داهێنەرانەی فرەپسپۆڕی","svc.cta":"گفتوگۆ لەسەر پڕۆژە",
     "svc.identity":"ناسنامە و سیستەمی دیزاین","svc.identity.sub":"ئاراستە، نیشانە و سیستەمی یەکگرتوو","svc.identity.desc":"لە ئاراستەی ستراتیژییەوە تا بچووکترین وردەکاریی بەرهەمهێنان، ناسنامەیەک دروست دەکەم کە ناسراو، بەکارهێنراو و بەردەوام بێت.","svc.identity.a":"ئاراستەی داهێنەرانە و ستراتیژیی براند","svc.identity.b":"سیستەمی لۆگۆ، فۆنت و ڕەنگ","svc.identity.c":"ڕێنمایی، چاپ و کەرەستەی بڵاوکردنەوە",
     "svc.editorial":"ئێدیتۆریاڵ، ناوەڕۆک و سۆشیاڵ","svc.editorial.sub":"چیرۆک، بڵاوکراوە و سیستەمی ناوەڕۆک","svc.editorial.desc":"زانیاری دەکەمە دەنگێک کە خەڵک بتوانن بەدوایدا بڕۆن — لە کتێب و کەمپەینەوە تا سۆشیاڵ میدیا و پەیوەندیی گشتی.","svc.editorial.a":"دیزاینی ئێدیتۆریاڵ و بڵاوکراوە","svc.editorial.b":"نووسینی ناوەڕۆک و چیرۆکگێڕانەوەی بینراو","svc.editorial.c":"ئاراستە و بەڕێوەبردنی سۆشیاڵ میدیا",
@@ -1739,7 +1739,7 @@ window.BQ_IDENTITY_COPY = {
   kmr: {
     "menu.practice":"Pratîka afirîner a piralî","menu.close":"Bigire","menu.statement":"Sêwiran, wêne, naverok û teknolojî — ji Kurdistanê wek yek pratîka girêdayî hatine şêwandin.",
     "cursor.view":"Bibîne","cursor.open":"Veke","cursor.talk":"Biaxive","cursor.send":"Bişîne",
-    "hero.lede":"Ez Barakat Qurtas im — sêwirmendekî Kurd ê piralî û teknologê afirîner ku ji Hewlêrê nasname, wêne, naverok û ezmûnên dîjîtal diafirînim.",
+    "hero.lede":"Ez Barakat Qurtas im — sêwirmendekî Kurd ê piralî û teknologê afirîner ku ji Hewlêrê nasname, wêne, naverok û ezmûnên dîjîtal diafirînim",
     "svc.eye":"Ez çi dikim","svc.title":"Yek pratîk. Her forma ku raman pêwîst dike.","svc.lede":"Stratejî, nasname, wêne, tevger, naverok û teknolojî — ji ramana yekem heta weşana dawî wek yek sîstema girêdayî.","svc.signature":"Pratîka afirîner a piralî","svc.cta":"Li ser projeyekê biaxive",
     "svc.identity":"Nasname û Sîstemên Sêwiranê","svc.identity.sub":"Rêberî, nîşan û sîstemên hevgirtî","svc.identity.desc":"Ji rêberiya stratejîk heta hûrguliya hilberînê, ez nasnameyên naskirî, bikaranînbar û mayînde ava dikim.","svc.identity.a":"Rêberiya afirîner û stratejiya brandê","svc.identity.b":"Sîstemên logo, tîp û rengan","svc.identity.c":"Rêbername, çap û materyalên destpêkê",
     "svc.editorial":"Edîtoryal, Naverok û Civakî","svc.editorial.sub":"Çîrok, weşan û sîstemên naverokê","svc.editorial.desc":"Ez agahiyê vediguherînim dengekî ku mirov dikarin bişopînin — di pirtûk, kampanya, kanalan civakî û ragihandina giştî de.","svc.editorial.a":"Sêwirana edîtoryal û weşan","svc.editorial.b":"Nivîsandina naverokê û çîrokbêjiya dîtbarî","svc.editorial.c":"Rêberî û rêveberiya medyaya civakî",
@@ -1750,7 +1750,7 @@ window.BQ_IDENTITY_COPY = {
   ar: {
     "menu.practice":"ممارسة إبداعية متعددة التخصصات","menu.close":"إغلاق","menu.statement":"تصميم وصورة ومحتوى وتقنية — تُصاغ كممارسة واحدة مترابطة من كردستان.",
     "cursor.view":"عرض","cursor.open":"فتح","cursor.talk":"تحدث","cursor.send":"إرسال",
-    "hero.lede":"أنا بركات قرطاس — مصمم كردي متعدد التخصصات وتقني إبداعي أصنع الهوية والصورة والمحتوى والتجارب الرقمية من أربيل.",
+    "hero.lede":"أنا بركات قرطاس — مصمم كردي متعدد التخصصات وتقني إبداعي أصنع الهوية والصورة والمحتوى والتجارب الرقمية من أربيل",
     "svc.eye":"ما أقدمه","svc.title":"ممارسة واحدة. كل شكل تحتاجه الفكرة.","svc.lede":"الاستراتيجية والهوية والصورة والحركة والمحتوى والتقنية — كنظام واحد مترابط من الفكرة الأولى حتى الإطلاق النهائي.","svc.signature":"ممارسة إبداعية متعددة التخصصات","svc.cta":"ناقش مشروعاً",
     "svc.identity":"الهوية وأنظمة التصميم","svc.identity.sub":"اتجاه وعلامات وأنظمة متماسكة","svc.identity.desc":"من الاتجاه الاستراتيجي إلى أدق تفاصيل الإنتاج، أبني هويات مميزة وعملية ومصممة لتدوم.","svc.identity.a":"التوجيه الإبداعي واستراتيجية العلامة","svc.identity.b":"أنظمة الشعار والخط واللون","svc.identity.c":"الإرشادات والطباعة ومواد الإطلاق",
     "svc.editorial":"التحرير والمحتوى والتواصل","svc.editorial.sub":"قصص ومنشورات وأنظمة محتوى","svc.editorial.desc":"أحوّل المعلومات إلى صوت يمكن للناس متابعته — عبر الكتب والحملات والمنصات الاجتماعية والتواصل العام.","svc.editorial.a":"التصميم التحريري والمنشورات","svc.editorial.b":"كتابة المحتوى والسرد البصري","svc.editorial.c":"إدارة وتوجيه وسائل التواصل",
@@ -1761,7 +1761,7 @@ window.BQ_IDENTITY_COPY = {
   fr: {
     "menu.practice":"Pratique créative multidisciplinaire","menu.close":"Fermer","menu.statement":"Design, image, contenu et technologie — réunis dans une pratique cohérente depuis le Kurdistan.",
     "cursor.view":"Voir","cursor.open":"Ouvrir","cursor.talk":"Parler","cursor.send":"Envoyer",
-    "hero.lede":"Je suis Barakat Qurtas — designer kurde multidisciplinaire et technologue créatif, je façonne identités, images, contenus et expériences numériques depuis Hewlêr.",
+    "hero.lede":"Je suis Barakat Qurtas — designer kurde multidisciplinaire et technologue créatif, je façonne identités, images, contenus et expériences numériques depuis Hewlêr",
     "svc.eye":"Ce que je fais","svc.title":"Une seule pratique. Toutes les formes dont une idée a besoin.","svc.lede":"Stratégie, identité, image, mouvement, contenu et technologie — réunis en un système cohérent, de la première idée à la mise en ligne.","svc.signature":"Pratique créative multidisciplinaire","svc.cta":"Parler d'un projet",
     "svc.identity":"Identité & Systèmes de design","svc.identity.sub":"Direction, signes & systèmes cohérents","svc.identity.desc":"De la direction stratégique au moindre détail de production, je crée des identités reconnaissables, utiles et durables.","svc.identity.a":"Direction créative & stratégie de marque","svc.identity.b":"Systèmes de logo, typographie & couleur","svc.identity.c":"Guides, imprimés & supports de lancement",
     "svc.editorial":"Éditorial, Contenu & Social","svc.editorial.sub":"Récits, publications & systèmes de contenu","svc.editorial.desc":"Je transforme l'information en une voix que l'on peut suivre — dans les livres, campagnes, réseaux sociaux et communications publiques.","svc.editorial.a":"Design éditorial & publications","svc.editorial.b":"Rédaction de contenu & narration visuelle","svc.editorial.c":"Direction & gestion des réseaux sociaux",
@@ -1772,7 +1772,7 @@ window.BQ_IDENTITY_COPY = {
   tr: {
     "menu.practice":"Çok disiplinli yaratıcı pratik","menu.close":"Kapat","menu.statement":"Tasarım, görüntü, içerik ve teknoloji — Kürdistan'dan tek ve bağlantılı bir pratik olarak şekillenir.",
     "cursor.view":"Gör","cursor.open":"Aç","cursor.talk":"Konuş","cursor.send":"Gönder",
-    "hero.lede":"Ben Barakat Qurtas — Hewlêr'den kimlik, görüntü, içerik ve dijital deneyimler üreten çok disiplinli Kürt tasarımcı ve yaratıcı teknoloji uzmanıyım.",
+    "hero.lede":"Ben Barakat Qurtas — Hewlêr'den kimlik, görüntü, içerik ve dijital deneyimler üreten çok disiplinli Kürt tasarımcı ve yaratıcı teknoloji uzmanıyım",
     "svc.eye":"Ne yapıyorum","svc.title":"Tek bir pratik. Bir fikrin ihtiyaç duyduğu her biçim.","svc.lede":"Strateji, kimlik, görüntü, hareket, içerik ve teknoloji — ilk düşünceden son yayına kadar tek bir bağlı sistem.","svc.signature":"Çok disiplinli yaratıcı pratik","svc.cta":"Bir proje konuşalım",
     "svc.identity":"Kimlik & Tasarım Sistemleri","svc.identity.sub":"Yön, işaretler & tutarlı sistemler","svc.identity.desc":"Stratejik yönden en küçük üretim detayına kadar tanınan, kullanılabilen ve kalıcı kimlikler kuruyorum.","svc.identity.a":"Yaratıcı yön & marka stratejisi","svc.identity.b":"Logo, tipografi & renk sistemleri","svc.identity.c":"Kılavuz, baskı & lansman öğeleri",
     "svc.editorial":"Editöryel, İçerik & Sosyal","svc.editorial.sub":"Hikâyeler, yayınlar & içerik sistemleri","svc.editorial.desc":"Bilgiyi insanların takip edebileceği bir sese dönüştürüyorum — kitaplar, kampanyalar, sosyal kanallar ve kamusal iletişim boyunca.","svc.editorial.a":"Editöryel tasarım & yayınlar","svc.editorial.b":"İçerik yazımı & görsel anlatım","svc.editorial.c":"Sosyal medya yönü & yönetimi",
@@ -1783,7 +1783,7 @@ window.BQ_IDENTITY_COPY = {
   sv: {
     "menu.practice":"Tvärdisciplinär kreativ praktik","menu.close":"Stäng","menu.statement":"Design, bild, innehåll och teknik — format som en sammanhängande praktik från Kurdistan.",
     "cursor.view":"Visa","cursor.open":"Öppna","cursor.talk":"Prata","cursor.send":"Skicka",
-    "hero.lede":"Jag är Barakat Qurtas — en kurdisk tvärdisciplinär designer och kreativ teknolog som formar identitet, bild, innehåll och digitala upplevelser från Hewlêr.",
+    "hero.lede":"Jag är Barakat Qurtas — en kurdisk tvärdisciplinär designer och kreativ teknolog som formar identitet, bild, innehåll och digitala upplevelser från Hewlêr",
     "svc.eye":"Vad jag gör","svc.title":"En praktik. Varje form en idé behöver.","svc.lede":"Strategi, identitet, bild, rörelse, innehåll och teknik — format som ett sammanhängande system från första tanke till slutlig publicering.","svc.signature":"Tvärdisciplinär kreativ praktik","svc.cta":"Diskutera ett projekt",
     "svc.identity":"Identitet & Designsystem","svc.identity.sub":"Riktning, märken & sammanhängande system","svc.identity.desc":"Från strategisk riktning till minsta produktionsdetalj bygger jag identiteter som känns igen, kan användas och håller över tid.","svc.identity.a":"Kreativ riktning & varumärkesstrategi","svc.identity.b":"Logotyp-, typografi- & färgsystem","svc.identity.c":"Riktlinjer, tryck & lanseringsmaterial",
     "svc.editorial":"Redaktionellt, Innehåll & Socialt","svc.editorial.sub":"Berättelser, publikationer & innehållssystem","svc.editorial.desc":"Jag formar information till en röst människor kan följa — i böcker, kampanjer, sociala kanaler och offentlig kommunikation.","svc.editorial.a":"Redaktionell design & publikationer","svc.editorial.b":"Innehållsskrivande & visuellt berättande","svc.editorial.c":"Riktning & hantering av sociala medier",
