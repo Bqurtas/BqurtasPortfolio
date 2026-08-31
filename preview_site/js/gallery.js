@@ -201,7 +201,14 @@ document.addEventListener('DOMContentLoaded', async () => {
           hydrateVideo(entry.target);
           obs.unobserve(entry.target);
         });
-      }, { rootMargin: '400px 0px' })
+      }, /* A film fetches its moov atom and a media segment before it can paint
+             a frame, and 400px of lead was not enough of a head start: cards
+             arrived on screen as empty plates and filled a second or two later.
+             Measured, every hydrated video does reach a frame — it just needs
+             to start sooner. 1200px is a little over one screen of warning on
+             a phone, which loads roughly two screens of films at a time rather
+             than the whole category. */
+         { rootMargin: '1200px 0px' })
     : null;
 
   const buildCard = (item) => {
