@@ -1978,7 +1978,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
              its own top and both sheets slid away together.
              Half a viewport of dwell, bounded, is enough for the arrival and
              the departure to be two separate moments. */
-          const dwell = Math.min(460, Math.max(260, Math.round(vh * 0.5)));
+          const dwell = Math.min(460, Math.max(260, Math.round((window.innerHeight || 800) * 0.5)));
           tailTrack = Math.max(overflow, dwell);
           sheet.style.setProperty('--bq-flow-extra', '0px');
         } else {
