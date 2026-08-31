@@ -3829,3 +3829,116 @@ html body #bio .bio-docs-sheet .bio-connect-links--docs {
   gap: clamp(10px, 2vh, 18px) !important;
   height: 100% !important;
 }
+
+/* ==========================================================================
+   Tools, the pitch form, the curtain, the room titles.
+   ========================================================================== */
+
+/* 1. The capsule under each tool goes. I removed the plate behind the LOGO
+   last time, but the ring he meant is on .tool itself — the wrapper around
+   logo and name — carrying a 999px radius, a 12% border and a 3% fill. */
+html body #bio .bio-tools .tool,
+html body #bio .bio-tools .tool:hover {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* 2. The pitch form comes down a size. Eleven fields at 18px with 22px between
+   the rows made a 690px form that ran 90px past its sheet. */
+html body #contact .pitch-form input,
+html body #contact .pitch-form select,
+html body #contact .pitch-form textarea {
+  font-size: clamp(14px, 3.6vw, 15px) !important;
+  padding: 3px 0 !important;
+}
+html body #contact .pitch-form textarea {
+  min-height: 54px !important;
+}
+html body #contact .pitch-form label {
+  font-size: clamp(9.5px, 2.5vw, 10.5px) !important;
+  margin-bottom: 3px !important;
+}
+html body #contact .pitch-form .row-2 {
+  gap: clamp(10px, 2.6vw, 14px) !important;
+}
+html body #contact .pitch-form {
+  gap: clamp(6px, 1.2vh, 9px) clamp(10px, 2.6vw, 14px) !important;
+}
+html body #contact .pitch-form button,
+html body #contact .pitch-form .pitch-send {
+  padding: clamp(10px, 1.8vh, 13px) clamp(18px, 4vw, 24px) !important;
+  font-size: clamp(11px, 2.9vw, 12px) !important;
+  margin-bottom: clamp(8px, 1.6vh, 14px) !important;
+}
+
+/* 3. The curtain slides. A clip alone only uncovers what was already there —
+   the panel never travelled, so it read as a reveal rather than an opening.
+   The sheet now comes in from the right edge with the clip and leaves the same
+   way, the index trailing a beat behind it, and the whole thing eases out
+   faster than it eases in, the way a drawer does.
+   This is only possible because the close button moved out of .mobile-sheet:
+   while it lived inside, a transform here became its containing block and
+   carried the fixed button off the screen edge with it. */
+html body #mobileMenu#mobileMenu .mobile-sheet {
+  transform: translateX(9%) !important;
+  opacity: .82 !important;
+  transition:
+    transform .52s cubic-bezier(.4, 0, .78, .34),
+    opacity .3s ease !important;
+  will-change: transform;
+}
+html body #mobileMenu#mobileMenu.is-open .mobile-sheet {
+  transform: translateX(0) !important;
+  opacity: 1 !important;
+  transition:
+    transform .8s cubic-bezier(.16, .84, .26, 1),
+    opacity .42s ease !important;
+}
+/* The close control travels with the curtain instead of appearing on top of
+   it, and it arrives last. */
+html body #mobileMenu#mobileMenu .mobile-menu-close,
+html[dir="rtl"] body #mobileMenu#mobileMenu .mobile-menu-close {
+  opacity: 0 !important;
+  transition: opacity .22s ease, background .25s ease, border-color .25s ease !important;
+}
+html body #mobileMenu#mobileMenu.is-open .mobile-menu-close,
+html[dir="rtl"] body #mobileMenu#mobileMenu.is-open .mobile-menu-close {
+  opacity: 1 !important;
+  transition: opacity .4s ease .34s, background .25s ease, border-color .25s ease !important;
+}
+
+/* 4. The room titles carry the page.
+   On a 430x932 phone the hero is 912px tall and held 110px of content — a
+   35px title adrift in eight hundred pixels of nothing, while the home page
+   opens at 73px. The number, the name and the line beneath it now read as one
+   masthead at a size that belongs to a room you have just walked into. */
+html body .room .room-hero-inner {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+html body .room .room-hero-num {
+  font-size: clamp(10.5px, 2.9vw, 12.5px) !important;
+  letter-spacing: .2em !important;
+  opacity: .62 !important;
+  margin-bottom: clamp(14px, 2.4vh, 22px) !important;
+}
+html body .room .room-hero-title {
+  font-size: clamp(46px, 13.5vw, 104px) !important;
+  line-height: .92 !important;
+  letter-spacing: -.035em !important;
+  margin: 0 !important;
+}
+html body .room .room-hero-sub {
+  font-size: clamp(14px, 3.7vw, 18px) !important;
+  line-height: 1.5 !important;
+  max-width: 34ch !important;
+  opacity: .74 !important;
+  margin-top: clamp(16px, 2.6vh, 26px) !important;
+}
+html body .room .room-hero-ghost {
+  opacity: .05 !important;
+}
