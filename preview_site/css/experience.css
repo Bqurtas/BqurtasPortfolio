@@ -3590,9 +3590,15 @@ html body #design#design > .section.practice-note .bio-teaser-grid {
    against the top edge of its own dark field and 80px of padding only beneath.
    Air above it now too, and a little between the stage and the bottom rule.
    That reads 461px, 49%: more room, still short of half the screen. */
-html body .footer.paper-sheet--footer > .paper-scroll {
-  padding-top: clamp(32px, 7vh, 76px) !important;
-}
-html body .footer.paper-sheet--footer > .paper-scroll > .footer-stage {
-  margin-bottom: clamp(8px, 1.5vh, 18px) !important;
+/* Phones only. Above 820px the footer is already a full-height black sheet
+   capped at the viewport — 89% of the screen before any of this — so there is
+   no room to give it and nothing to gain. Adding the same padding there just
+   pushed it to 96%, which is more than "a bit more". */
+@media (max-width: 820px) {
+  html body .footer.paper-sheet--footer > .paper-scroll {
+    padding-top: clamp(32px, 7vh, 76px) !important;
+  }
+  html body .footer.paper-sheet--footer > .paper-scroll > .footer-stage {
+    margin-bottom: clamp(8px, 1.5vh, 18px) !important;
+  }
 }
