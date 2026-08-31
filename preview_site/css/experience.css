@@ -2295,9 +2295,12 @@ html body .rail .social-hover.is-flyout-dismissed .social-flyout {
     min-height: 40px !important;
   }
 
+  /* The bar draws in once the page moves. It always did — at .96, which is
+     four per cent: real, and too small to see. .93 is about twelve pixels off
+     the width, which reads as the page settling rather than as a resize. */
   html body.nav-compact:not(.menu-open) .mobilebar,
   html[dir="rtl"] body.nav-compact:not(.menu-open) .mobilebar {
-    transform: translateX(-50%) scale(.96) !important;
+    transform: translateX(-50%) scale(.93) !important;
   }
 }
 
@@ -3657,15 +3660,9 @@ html body .latest-panel.latest-panel {
   max-height: min(500px, calc(100dvh - 168px)) !important;
 }
 
-/* 3. The bar draws in a little once the page moves.
-   body.is-scrolled is already toggled past 24px of scroll. The dock centres
-   itself with translateX(-50%), so the scale has to carry that translate with
-   it or the bar jumps to the left edge; transform-origin is the centre, so the
-   centring survives. .94 is about three pixels off each end — enough to feel
-   the page settle, not enough to notice as a resize. */
-html body.is-scrolled .mobilebar {
-  transform: translateX(-50%) scale(.94) !important;
-}
+/* 3. The bar's shrink lives up at the nav-compact rule, not here. What I first
+   wrote in this block hung off body.is-scrolled at (0,2,3) and lost every frame
+   to nav-compact's (0,3,3), so it never applied at all. */
 
 /* 4. The portrait on "A short note" becomes a circle with something around it.
    A bare circle on a pale sheet reads as a placeholder; two rings and a low
