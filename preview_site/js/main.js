@@ -2315,6 +2315,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       return (n && n.classList && n.classList.contains('paper-sheet')) ? n : null;
     };
     let lastY = 0;
+    let holdY = null;
     let workReadingState = { active: false };
     const measure = () => {
       readGutter();
@@ -2435,6 +2436,22 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       const cardTop = card.getBoundingClientRect().top;
       const local = g - trackTop;
       let y = Math.min(overflow, Math.max(0, local));
+      /* Latch the reel the instant the hold begins — the hold IS the next
+         sheet's rise. Through it local >= overflow, so y is exactly `overflow`,
+         and `overflow` is not a constant: measure() recomputes it from the
+         reel's height, and remeasure fires from the reel's own ResizeObserver
+         and from bq:gallery-built / fonts.ready. A lazy image landing or a
+         video's metadata arriving mid-hand-off therefore moved the reel by that
+         delta while the card stayed pinned and the incoming sheet stayed put —
+         so all the reader saw was the gallery sliding under a stationary sheet,
+         then stopping. Holding the value it had when the hold opened means a
+         late resize lands as nothing at all. */
+      if (local >= overflow) {
+        if (holdY === null) holdY = y;
+        y = holdY;
+      } else {
+        holdY = null;
+      }
       if (track.dataset.holdTrack === '1') {
         const locked = Number(track.dataset.reelY);
         y = Number.isFinite(locked) ? locked : lastY;
@@ -2501,6 +2518,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
        and the reel stays where the reader asked it to be. */
     window.__bqResetWorkReel = () => {
       lastY = 0;
+      holdY = null;
       const trackTop = track.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({ top: Math.max(0, trackTop - gutter()), left: 0, behavior: 'auto' });
       drive();
