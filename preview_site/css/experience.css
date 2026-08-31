@@ -3655,9 +3655,15 @@ html[dir="rtl"] body #mobileMenu#mobileMenu.is-open .mm-menu-brand {
 html body .chat.chat,
 html body .latest-panel.latest-panel {
   top: auto !important;
-  bottom: calc(var(--dock-h, 62px) + 30px) !important;
-  height: min(500px, calc(100dvh - 168px)) !important;
-  max-height: min(500px, calc(100dvh - 168px)) !important;
+  /* Both values stated outright. var(--dock-h) reads 62px at the root and 76px
+     in the panel's own context, so calc(var(--dock-h) + 30px) put the foot at
+     92px or 106px depending on where you asked — and it was answering 106.
+     100dvh had the same problem, resolving to 588 here and landing the cap at
+     420px instead of 500. The dock is 52px tall sitting 30px up; 10px of
+     daylight above it is 92px, and vh is the same number everywhere. */
+  bottom: 92px !important;
+  height: min(500px, calc(100vh - 168px)) !important;
+  max-height: min(500px, calc(100vh - 168px)) !important;
 }
 
 /* 3. The bar's shrink lives up at the nav-compact rule, not here. What I first

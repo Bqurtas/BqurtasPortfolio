@@ -15402,23 +15402,3 @@ html.bq-cursor-on :is(a, button, [role="button"], summary, label, input, textare
   letter-spacing:0 !important;
   line-height:1.35 !important;
 }
-
-/* ==========================================================================
-   The docked panels sit lower, closer to the bar, and stand taller.
-   Six earlier rules in this file each set .latest-panel/.chat bottom with
-   !important at (0,1,0); whichever of them was winning put the panels 24px
-   clear of the dock and capped them at 420px. This block is last in the file,
-   so it settles the argument in one place instead of adding a seventh voice
-   somewhere else. The dock sits 30px up on a 52px body, so 10px of daylight
-   above it puts the panel foot at 92px.
-   ========================================================================== */
-.latest-panel, .chat {
-  top: auto !important;
-  /* Explicit, not var(--dock-h): that token resolves to 62px at the root and
-     76px in the panel's own context, so the same expression put the foot at
-     two different places depending on where you read it. The dock is 52px tall
-     sitting 30px up; 10px of daylight above it is 92px, stated once. */
-  bottom: 92px !important;
-  height: min(500px, calc(100vh - 168px)) !important;
-  max-height: min(500px, calc(100vh - 168px)) !important;
-}
