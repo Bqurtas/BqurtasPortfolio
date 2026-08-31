@@ -2397,6 +2397,12 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
           active: true,
           phase: 'reel',
           progress: overflow > 0 ? clamp01(local / overflow) : 0,
+          /* Keep the distance, not just the fraction. "Load 24 more" doubles
+             the reel, and a fraction re-applied to twice the content lands
+             twice as deep — the reader was thrown a thousand pixels past the
+             work they were looking at. The pixel offset is what keeps the same
+             images under their eye. */
+          offset: Math.max(0, local),
         };
       } else {
         workReadingState = {
@@ -2459,9 +2465,15 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       measure();
       if (saved) {
         window.__bqSuppressNextPaperPreserve?.();
+        /* The hold is a fixed card height, so a fraction of it is stable.
+           The reel is not: its length changes whenever the grid grows, so the
+           reel restores by distance and only falls back to the fraction for a
+           state saved before offsets were recorded. */
         const newLocal = saved.phase === 'hold'
           ? overflow + (cardH * saved.progress)
-          : overflow * saved.progress;
+          : Number.isFinite(saved.offset)
+            ? Math.min(overflow, Math.max(0, saved.offset))
+            : overflow * saved.progress;
         const trackTop = track.getBoundingClientRect().top + window.scrollY;
         const targetY = Math.max(0, trackTop - gutter() + newLocal);
         if (Math.abs(targetY - window.scrollY) > 0.75) {
@@ -2478,11 +2490,19 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
        saved position IS the start: every later remeasure now restores to zero
        and the reel stays where the reader asked it to be. */
     window.__bqResetWorkReel = () => {
-      workReadingState = { active: true, phase: 'reel', progress: 0 };
       lastY = 0;
       const trackTop = track.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({ top: Math.max(0, trackTop - gutter()), left: 0, behavior: 'auto' });
       drive();
+      /* State the intent AFTER drive(), not before. drive() ends by re-deriving
+         workReadingState from wherever the browser actually landed, and it does
+         not always land on the track top: a category with fewer pieces makes a
+         shorter document, so the scroll above gets clamped, and the derived
+         local can fall outside the track entirely — which marks the state
+         inactive and leaves every later remeasure with nothing to restore. The
+         reader is then wherever the clamp dropped them, mid-gallery. Setting it
+         last means the start is what survives. */
+      workReadingState = { active: true, phase: 'reel', progress: 0, offset: 0 };
     };
 
     window.__bqScrollWorkTarget = (target, { behavior = 'smooth', block = 'nearest' } = {}) => {
