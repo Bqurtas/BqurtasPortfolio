@@ -4196,3 +4196,15 @@ html body .mobilebar-pop--lang .mobile-lang {
   letter-spacing: .06em !important;
   font-variant-numeric: tabular-nums;
 }
+
+/* The footer's depth follows the variable, not a hard 70.
+   modern-framer.css:4200 pins it with
+     :root[data-theme="light"] body[data-room="design"] .footer.footer-v249
+   — (0,5,1) with !important — which outranks the two var-based rules at
+   (0,5,0) further down the same file. So setting --bq-paper-z from the script
+   changed nothing and the footer went on painting above every sheet. One class
+   deeper puts the variable back in charge, and its fallback is the floor. */
+:root[data-theme] body[data-room] .footer.footer-v249.paper-sheet,
+:root[data-theme] body[data-room] .footer.footer-v249 {
+  z-index: var(--bq-paper-z, 0) !important;
+}
