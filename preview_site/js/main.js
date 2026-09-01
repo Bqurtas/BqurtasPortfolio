@@ -2183,7 +2183,11 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         footer.classList.add('paper-sheet', 'paper-sheet--footer');
         footer.dataset.paper = 'footer';
         delete footer.dataset.paperScroll;
-        footer.style.setProperty('--bq-paper-z', '70');
+        /* The footer lies UNDER the deck, not over it. At 70 it painted above
+           every sheet (1..60) and rose across them like another card; the
+           cards are meant to slide away and leave it standing there. Zero puts
+           it at the bottom of the pile, which is where a floor belongs. */
+        footer.style.setProperty('--bq-paper-z', '0');
         wrapPaperScroll(footer);
       }
 

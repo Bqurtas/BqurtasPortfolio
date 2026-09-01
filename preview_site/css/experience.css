@@ -4180,3 +4180,19 @@ html body .mobilebar-pop--social .share-page-btn.is-copied {
     transform: translate(-50%, 0) !important;
   }
 }
+
+/* The language list is as narrow as the social one.
+   Seven full names needed 156px; seven two- and three-letter codes do not —
+   which is why he turned them into codes in the first place. The social
+   popover next to it measures 68px, so this one matches it. */
+html body .mobilebar-pop--lang {
+  min-width: 0 !important;
+  width: auto !important;
+}
+html body .mobilebar-pop--lang .mobile-lang {
+  padding: 11px 4px !important;
+  min-width: 48px !important;
+  font-size: 13px !important;
+  letter-spacing: .06em !important;
+  font-variant-numeric: tabular-nums;
+}
