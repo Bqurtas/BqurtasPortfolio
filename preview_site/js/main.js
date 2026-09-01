@@ -971,6 +971,27 @@ document.addEventListener('DOMContentLoaded', () => {
       currentShown = 0;
     }
     const matching = matchingCards();
+    /* Level the columns before a second batch lands. Masonry sends each card
+       to the shortest column, so without this the new work fills the gaps
+       beside and ABOVE the last row the reader had already seen — measured:
+       the previous batch ended at 6023px and the new cards started at 4585px.
+       A spacer brings every column down to the tallest, so a batch always
+       begins below everything already on the page and the reader scrolls
+       forward to meet it, every time. */
+    if (!reset && currentShown > 0 && mCols.length) {
+      const floor = Math.max(...mHeights);
+      mCols.forEach((col, i) => {
+        const need = floor - mHeights[i];
+        if (need > 2) {
+          const spacer = document.createElement('div');
+          spacer.className = 'grid-level-spacer';
+          spacer.setAttribute('aria-hidden', 'true');
+          spacer.style.height = `${need}px`;
+          col.appendChild(spacer);
+          mHeights[i] = floor;
+        }
+      });
+    }
     const batch = matching.slice(currentShown, currentShown + PAGE_SIZE);
     batch.forEach((entry, idx) => placeCard(entry, currentShown + idx));
     currentShown += batch.length;
