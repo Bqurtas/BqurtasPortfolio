@@ -1970,17 +1970,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
            window scroll then advances the content and releases the next card. */
         sheet.classList.toggle('is-tail-sheet', sheet === tailSheet);
         if (sheet === tailSheet) {
-          /* The last card needs somewhere to stand after it lands, not only
-             room to read itself. tailTrack used to be exactly this sheet's own
-             inner overflow, so once every sheet was trimmed to fit — overflow
-             zero — the final card arrived at its sticky position and the whole
-             stack released in the same frame. Nothing ever came to rest on top
-             of anything: in the Journal the index sheet stopped 22px short of
-             its own top and both sheets slid away together.
-             Half a viewport of dwell, bounded, is enough for the arrival and
-             the departure to be two separate moments. */
-          const dwell = Math.min(460, Math.max(260, Math.round((window.innerHeight || 800) * 0.5)));
-          tailTrack = Math.max(overflow, dwell);
+          tailTrack = overflow;
           sheet.style.setProperty('--bq-flow-extra', '0px');
         } else {
           sheet.style.setProperty('--bq-flow-extra', `${overflow}px`);
@@ -2034,11 +2024,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
          height puts it where it always was on screen: nothing moves, and the
          last card still has the travel to stand on. This is the same idiom
          measure() uses for the portfolio's next sheet. */
-      /* The home deck does not pass a terminalSheet — it puts the footer in
-         its own sheets array instead, and the footer lives in <main>, not in
-         the room, so rootSheets filters it out of tailSheet and it was left
-         with no correction at all. Whichever way it arrived, the incoming
-         paper is the last sheet that is NOT a child of this root. */
+      /* Whatever the tail spacer's height, the incoming paper must not be
+         pushed down by it or a strip of bare bed opens between them. */
       const tailTerminal = terminalSheet
         || sheets.filter((sheet) => sheet.parentElement !== root).pop()
         || null;
