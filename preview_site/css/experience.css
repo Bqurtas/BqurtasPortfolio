@@ -4449,3 +4449,42 @@ html body #design#design .section.work #loadMoreWrap#loadMoreWrap.load-more-wrap
   padding-bottom: clamp(64px, 10vh, 96px) !important;
   transform: none !important;
 }
+
+/* Reduce Motion, carried through the rest of the interface.
+   He liked what the curtain does under that setting, so the same principle
+   applies where the site otherwise snaps: a short calm fade in place of a
+   sweep, rather than nothing at all. Movement is what a motion-sensitive
+   reader needs spared — knowing that a panel opened is not. */
+@media (prefers-reduced-motion: reduce) {
+  html body #design #services .service-panel .service-detail {
+    transition: opacity .22s ease, height .24s ease !important;
+  }
+  html body #design #services .service-panel .service-detail-inner {
+    transition: opacity .24s ease !important;
+  }
+  html body .mobilebar-pop,
+  html body .lang-flyout,
+  html body .social-flyout {
+    transition: opacity .2s ease, visibility 0s linear .2s !important;
+    transform: none !important;
+  }
+  html body .mobilebar-pop.is-open,
+  html body .lang-flyout.is-open,
+  html body .social-flyout.is-open {
+    transition: opacity .22s ease, visibility 0s linear 0s !important;
+    transform: none !important;
+  }
+  html body .to-top .to-top-prog,
+  html body #toTopProg {
+    transition: stroke-dashoffset .25s ease !important;
+  }
+  html body .card.card--photo {
+    transition: opacity .2s ease !important;
+  }
+  /* The tab underline still travels — it is a few pixels and it is the only
+     thing telling you which category you are in. */
+  html body .work-head .tab,
+  html body .work-head .tab::after {
+    transition: opacity .18s ease, color .18s ease, transform .18s ease !important;
+  }
+}
