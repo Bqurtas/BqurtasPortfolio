@@ -4417,3 +4417,35 @@ html body #design .service-showcase .service-icon i {
   width: auto !important;
   height: auto !important;
 }
+
+/* Both of these matched already and both lost. Written again with the IDs the
+   page gives them, which is the only lever left when the rule that wins is
+   itself an !important at high specificity. */
+
+/* The four panel marks. computed display was none, not a zero-size box. */
+html body #design#design #services.service-showcase .service-trigger .service-icon,
+html body #design#design #services.service-showcase .service-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  opacity: .72 !important;
+  visibility: visible !important;
+}
+html body #design#design #services.service-showcase .service-icon i {
+  display: inline-block !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  visibility: visible !important;
+}
+
+/* Real air between the last row of work and the load-more bar. */
+html body #design#design .section.work #loadMoreWrap#loadMoreWrap,
+html body #design#design .section.work #loadMoreWrap#loadMoreWrap.load-more-wrap {
+  margin-top: clamp(38px, 6vh, 68px) !important;
+  padding-top: clamp(10px, 1.6vh, 18px) !important;
+  padding-bottom: clamp(64px, 10vh, 96px) !important;
+  transform: none !important;
+}
