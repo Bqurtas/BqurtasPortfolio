@@ -4198,3 +4198,172 @@ html body .mobilebar-pop--lang .mobile-lang {
 }
 
 
+
+/* ==========================================================================
+   Portfolio batch, service lines, blog card, close mark.
+   ========================================================================== */
+
+/* The load-more control sits higher, with air under it. */
+html body #design .section.work .load-more-wrap,
+html body #design .section.work #loadMoreWrap {
+  margin-top: clamp(10px, 1.6vh, 18px) !important;
+  padding-bottom: clamp(56px, 9vh, 84px) !important;
+  transform: translateY(-20mm) !important;
+}
+
+/* Each service line carries a mark for what it is. A fixed column keeps the
+   text edges aligned no matter how wide the glyph is. */
+html body #design .service-detail-inner ul {
+  list-style: none !important;
+  margin: clamp(8px, 1.6vh, 14px) 0 0 !important;
+  padding: 0 !important;
+  display: grid !important;
+  gap: clamp(7px, 1.3vh, 11px) !important;
+}
+html body #design .service-detail-inner li.svc-line {
+  display: grid !important;
+  grid-template-columns: 18px 1fr !important;
+  align-items: baseline !important;
+  gap: clamp(9px, 2vw, 13px) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+html body #design .service-detail-inner li.svc-line::before,
+html body #design .service-detail-inner li.svc-line::marker {
+  content: none !important;
+}
+html body #design .service-detail-inner .svc-line-ic {
+  font-size: 12px !important;
+  opacity: .48 !important;
+  justify-self: center !important;
+  line-height: inherit !important;
+}
+html[dir="rtl"] body #design .service-detail-inner li.svc-line {
+  grid-template-columns: 18px 1fr !important;
+}
+
+/* "What I do" reads a step larger, and its three parts keep their balance. */
+html body #design .service-showcase .section-title {
+  font-size: clamp(26px, 6.4vw, 46px) !important;
+  line-height: 1.08 !important;
+}
+html body #design .service-showcase .section-lede {
+  font-size: clamp(13px, 3.5vw, 16px) !important;
+  line-height: 1.55 !important;
+}
+html body #design .service-showcase .service-name {
+  font-size: clamp(14px, 3.7vw, 17px) !important;
+}
+html body #design .service-showcase .service-sub {
+  font-size: clamp(11px, 2.9vw, 12.5px) !important;
+}
+html body #design .service-showcase .service-detail-inner p,
+html body #design .service-showcase .service-detail-inner li {
+  font-size: clamp(12.5px, 3.3vw, 14.5px) !important;
+  line-height: 1.55 !important;
+}
+html body #design .service-showcase .bq-mark,
+html body #design .service-showcase .practice-mark {
+  font-size: clamp(15px, 4vw, 19px) !important;
+}
+html body #design .service-showcase .practice-name,
+html body #design .service-showcase .mono {
+  font-size: clamp(10px, 2.7vw, 11.5px) !important;
+}
+
+/* The latest-blog card sits to the left. */
+html body #design .latest-blog .latest-blog-grid,
+html body #design .latest-blog .latest-blog-grid.latest-blog-grid {
+  justify-items: start !important;
+  justify-content: start !important;
+}
+html body #design .latest-blog .latest-blog-card {
+  margin-inline: 0 auto 0 0 !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+html[dir="rtl"] body #design .latest-blog .latest-blog-card {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+
+/* The close control is a cross and nothing else. */
+html body #mobileMenu#mobileMenu .mobile-menu-close span,
+html[dir="rtl"] body #mobileMenu#mobileMenu .mobile-menu-close span {
+  display: none !important;
+}
+html body #mobileMenu#mobileMenu .mobile-menu-close,
+html[dir="rtl"] body #mobileMenu#mobileMenu .mobile-menu-close {
+  gap: 0 !important;
+  font-size: 0 !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+}
+html body #mobileMenu#mobileMenu .mobile-menu-close i {
+  font-size: 24px !important;
+}
+
+/* Six marks of the trade swim around the portrait.
+   The figure has to stop clipping for them to show — it was set to hidden so
+   the picture would sit inside its circle, and the picture keeps its own
+   rounded clip instead. The ring turns once every eighty seconds, each mark
+   counter-turning so it never reads upside down. */
+html body #design#design .practice-note .bio-teaser-portrait.bio-teaser-portrait {
+  overflow: visible !important;
+  isolation: isolate;
+}
+html body #design#design .practice-note .bio-teaser-portrait > img {
+  border-radius: 50% !important;
+  position: relative;
+  z-index: 1;
+}
+html body #design .practice-note .portrait-orbit {
+  position: absolute !important;
+  inset: -13% !important;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  animation: bq-orbit 80s linear infinite;
+}
+html body #design .practice-note .orbit-ic {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  display: grid;
+  place-items: center;
+  font-size: 11.5px;
+  color: var(--ink, #141414);
+  opacity: .3;
+  border-radius: 50%;
+  background: var(--bq-paper-sheet, #f3f3f3);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .07);
+}
+/* The counter-turn rides on the glyph, not the mark. An animation on transform
+   replaces the element's own transform outright, and these elements carry
+   their position in theirs — animating them would collect all six at the
+   centre. Font Awesome draws into ::before, which is free to spin. */
+html body #design .practice-note .orbit-ic::before {
+  display: block;
+  animation: bq-orbit-counter 80s linear infinite;
+}
+html body #design .practice-note .orbit-ic--1 { transform: rotate(0deg)   translateY(-50%) translateY(-6.2rem); }
+html body #design .practice-note .orbit-ic--2 { transform: rotate(60deg)  translateY(-50%) translateY(-6.2rem); }
+html body #design .practice-note .orbit-ic--3 { transform: rotate(120deg) translateY(-50%) translateY(-6.2rem); }
+html body #design .practice-note .orbit-ic--4 { transform: rotate(180deg) translateY(-50%) translateY(-6.2rem); }
+html body #design .practice-note .orbit-ic--5 { transform: rotate(240deg) translateY(-50%) translateY(-6.2rem); }
+html body #design .practice-note .orbit-ic--6 { transform: rotate(300deg) translateY(-50%) translateY(-6.2rem); }
+
+@keyframes bq-orbit         { to { transform: rotate(360deg); } }
+@keyframes bq-orbit-counter { to { transform: rotate(-360deg); } }
+
+/* A reader who asked for less motion gets the ring standing still, not gone. */
+@media (prefers-reduced-motion: reduce) {
+  html body #design .practice-note .portrait-orbit,
+  html body #design .practice-note .orbit-ic::before {
+    animation: none !important;
+  }
+}

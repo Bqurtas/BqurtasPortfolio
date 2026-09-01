@@ -628,7 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- TABS + PAGINATION + SECTION HEADER ---------- */
   const tabs = document.querySelectorAll('.tab');
-  const PAGE_SIZE = 24;
+  const PAGE_SIZE = 80;
   let currentFilter = 'all';
   let currentShown  = 0;
   let correctScrollAfterGallery = false;
@@ -1087,6 +1087,18 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   /* Load more — appends to the bottom of the shortest columns */
+  /* A panel opens under the pointer. Only for a device that actually has one:
+     on a touch screen hover fires on tap and would open a panel the reader is
+     only scrolling past. The click handler stays for keyboard and touch. */
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    document.querySelectorAll('.service-showcase .service-panel').forEach((panel) => {
+      panel.addEventListener('mouseenter', () => {
+        const trigger = panel.querySelector('.service-trigger');
+        if (trigger && !panel.classList.contains('is-active')) trigger.click();
+      });
+    });
+  }
+
   document.getElementById('loadMoreBtn')?.addEventListener('click', () => {
     clearWorkOverflowFloor();
     window.__bqRenderGallery(false);
@@ -1114,7 +1126,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* The deck re-shuffles on every page load and tab switch — that stays.
-     The gallery shows one compact batch (PAGE_SIZE = 24) at a time; the reader
+     The gallery shows one batch (PAGE_SIZE = 80) at a time; the reader
      taps "Load more" to reveal the next batch. No auto-infinite-scroll — the works
      never all load at once, and nothing swaps under the reader as they scroll. */
 
