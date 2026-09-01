@@ -1856,24 +1856,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         };
       });
 
-      /* The footer lies UNDER the deck now, so nothing is ever painted over the
-         card that hands off to it. The dissolve was written for the opposite
-         arrangement — the card faded out because the footer was coming down on
-         top of it and would hide the last of it. With the footer beneath, that
-         same fade just leaves a translucent white slab lying across the black.
-         A card with nothing above it stays solid and simply travels away. */
-      const applyCoverage = (curr, nextTop, nextEl) => {
-        const coveredFromAbove = !nextEl
-          || !nextEl.classList.contains('paper-sheet--footer');
+      const applyCoverage = (curr, nextTop) => {
         const fullyCovered = nextTop <= pin + 0.75;
-        if (!coveredFromAbove) {
-          curr.style.setProperty('--bq-push-y', '0px');
-          curr.style.setProperty('--bq-out', '0');
-          curr.style.setProperty('--bq-fade', '0');
-          curr.inert = fullyCovered;
-          curr.classList.toggle('is-paper-gone', fullyCovered);
-          return;
-        }
         curr.style.setProperty('--bq-push-y', '0px');
 
         const raw = coverProgress(nextTop, pin, vh);
@@ -1892,7 +1876,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       };
 
       for (let i = 0; i < sheets.length - 1; i += 1) {
-        applyCoverage(sheets[i], Math.max(pin, metrics[i + 1].naturalTop), sheets[i + 1]);
+        applyCoverage(sheets[i], Math.max(pin, metrics[i + 1].naturalTop));
       }
 
       const lastSheet = sheets[sheets.length - 1];
@@ -1903,7 +1887,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
            complete cover or a complete exit retires that card from focus. */
         const terminalTop = Math.max(pin, terminalSheet.getBoundingClientRect().top);
         const lastExited = lastSheet.getBoundingClientRect().bottom <= pin + 0.75;
-        applyCoverage(lastSheet, lastExited ? pin : terminalTop, terminalSheet);
+        applyCoverage(lastSheet, lastExited ? pin : terminalTop);
       } else {
         /* The final card has no incoming paper and must always remain live. */
         lastSheet.inert = false;
@@ -2200,11 +2184,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         footer.classList.add('paper-sheet', 'paper-sheet--footer');
         footer.dataset.paper = 'footer';
         delete footer.dataset.paperScroll;
-        /* The footer lies UNDER the deck, not over it. At 70 it painted above
-           every sheet (1..60) and rose across them like another card; the
-           cards are meant to slide away and leave it standing there. Zero puts
-           it at the bottom of the pile, which is where a floor belongs. */
-        footer.style.setProperty('--bq-paper-z', '0');
+        footer.style.setProperty('--bq-paper-z', '70');
         wrapPaperScroll(footer);
       }
 

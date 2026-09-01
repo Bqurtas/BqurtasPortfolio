@@ -4197,28 +4197,4 @@ html body .mobilebar-pop--lang .mobile-lang {
   font-variant-numeric: tabular-nums;
 }
 
-/* The footer's depth follows the variable, not a hard 70.
-   modern-framer.css:4200 pins it with
-     :root[data-theme="light"] body[data-room="design"] .footer.footer-v249
-   — (0,5,1) with !important — which outranks the two var-based rules at
-   (0,5,0) further down the same file. So setting --bq-paper-z from the script
-   changed nothing and the footer went on painting above every sheet. One class
-   deeper puts the variable back in charge, and its fallback is the floor. */
-:root[data-theme] body[data-room] .footer.footer-v249.paper-sheet,
-:root[data-theme] body[data-room] .footer.footer-v249 {
-  z-index: var(--bq-paper-z, 0) !important;
-}
 
-/* The last card carries its own paper.
-   A sheet's white surface is drawn by its ::before, and on the tail card that
-   pseudo-element does not fill the box — which never showed while the footer
-   painted at z 70 and covered it. With the footer underneath, the uncovered
-   part of the card became a window onto the black, and the content above it
-   read as dissolving. The tail card now has the paper as its own background,
-   so it is opaque edge to edge and simply slides away to reveal the footer. */
-html body .room.paper-stack > .paper-sheet.is-tail-sheet,
-html body #design#design.paper-stack > .paper-sheet.is-tail-sheet {
-  background: var(--bq-paper-sheet, #f3f3f3) !important;
-  border-radius: var(--bq-room-radius, 24px) !important;
-  overflow: hidden !important;
-}
