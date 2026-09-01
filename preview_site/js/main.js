@@ -2033,11 +2033,19 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
          height puts it where it always was on screen: nothing moves, and the
          last card still has the travel to stand on. This is the same idiom
          measure() uses for the portfolio's next sheet. */
-      if (terminalSheet) {
+      /* The home deck does not pass a terminalSheet — it puts the footer in
+         its own sheets array instead, and the footer lives in <main>, not in
+         the room, so rootSheets filters it out of tailSheet and it was left
+         with no correction at all. Whichever way it arrived, the incoming
+         paper is the last sheet that is NOT a child of this root. */
+      const tailTerminal = terminalSheet
+        || sheets.filter((sheet) => sheet.parentElement !== root).pop()
+        || null;
+      if (tailTerminal) {
         if (tailTrack > 0) {
-          terminalSheet.style.setProperty('margin-top', `${-tailTrack}px`, 'important');
+          tailTerminal.style.setProperty('margin-top', `${-tailTrack}px`, 'important');
         } else {
-          terminalSheet.style.removeProperty('margin-top');
+          tailTerminal.style.removeProperty('margin-top');
         }
       }
 
