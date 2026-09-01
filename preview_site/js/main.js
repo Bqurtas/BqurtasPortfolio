@@ -2026,6 +2026,20 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       } else if (tailSpacer) {
         tailSpacer.remove();
       }
+      /* The spacer lengthens the room, which is the whole point — but the
+         footer follows the room in flow, so it was being pushed down by the
+         same amount and the reader met 460px of bare bed between the last card
+         and the footer. Pulling the footer back up by exactly the spacer's
+         height puts it where it always was on screen: nothing moves, and the
+         last card still has the travel to stand on. This is the same idiom
+         measure() uses for the portfolio's next sheet. */
+      if (terminalSheet) {
+        if (tailTrack > 0) {
+          terminalSheet.style.setProperty('margin-top', `${-tailTrack}px`, 'important');
+        } else {
+          terminalSheet.style.removeProperty('margin-top');
+        }
+      }
 
       /* Build stable normal-flow offsets instead of reading `offsetTop` from a
          sticky element (Chromium reports its painted/stuck position there). */
