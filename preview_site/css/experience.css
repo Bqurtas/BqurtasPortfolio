@@ -4206,9 +4206,9 @@ html body .mobilebar-pop--lang .mobile-lang {
 /* The load-more control sits higher, with air under it. */
 html body #design .section.work .load-more-wrap,
 html body #design .section.work #loadMoreWrap {
-  margin-top: clamp(10px, 1.6vh, 18px) !important;
-  padding-bottom: clamp(56px, 9vh, 84px) !important;
-  transform: translateY(-20mm) !important;
+  margin-top: clamp(34px, 5.5vh, 62px) !important;
+  padding-bottom: clamp(64px, 10vh, 96px) !important;
+  transform: none !important;
 }
 
 /* Each service line carries a mark for what it is. A fixed column keeps the
@@ -4366,4 +4366,54 @@ html body #design .practice-note .orbit-ic--6 { transform: rotate(300deg) transl
   html body #design .practice-note .orbit-ic::before {
     animation: none !important;
   }
+}
+
+/* The close control paints above the curtain's own panel.
+   .mobile-sheet is its next sibling at z-index 1800 and carries a solid
+   background, so a control at 40 sat behind it — present, hit-testable in
+   theory, and invisible in fact. That is why he kept saying there was no
+   close button on the phone: there wasn't one to see. */
+html body #mobileMenu#mobileMenu .mobile-menu-close,
+html[dir="rtl"] body #mobileMenu#mobileMenu .mobile-menu-close {
+  z-index: 1900 !important;
+}
+
+/* The portrait is a picture, not a picture on a slab. The figure carried a
+   near-black fill and an ::after, so a dark block showed under and around the
+   circle. */
+html body #design#design .practice-note .bio-teaser-portrait.bio-teaser-portrait {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+html body #design#design .practice-note .bio-teaser-portrait.bio-teaser-portrait::after,
+html body #design#design .practice-note .bio-teaser-portrait.bio-teaser-portrait::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* The marks around it are marks, not buttons. */
+html body #design .practice-note .orbit-ic {
+  background: transparent !important;
+  box-shadow: none !important;
+  opacity: .34 !important;
+}
+
+/* The four panel marks were rendering at zero width — the section heading had
+   its icon all along, these did not. */
+html body #design .service-showcase .service-icon,
+html body #design .service-showcase .service-trigger .service-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  height: 20px !important;
+  opacity: .7 !important;
+}
+html body #design .service-showcase .service-icon i {
+  display: inline-block !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  width: auto !important;
+  height: auto !important;
 }

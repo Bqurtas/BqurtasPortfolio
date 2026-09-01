@@ -39,7 +39,9 @@
       const max = (h.scrollHeight - h.clientHeight) || 1;
       const p = Math.min(Math.max(st / max, 0), 1);
       if (railFill) railFill.style.height = (p * 100) + '%';
-      if (ring) ring.style.strokeDashoffset = C * (1 - p);
+      /* main.js owns the ring now — it counts sheets rather than pixels, and
+         writing the pixel value here every scroll would undo that each frame. */
+      if (ring && !window.__bqDeckRing) ring.style.strokeDashoffset = C * (1 - p);
       /* hidden at the very top; shown once you've scrolled down — in every room. */
       if (toTop) toTop.classList.toggle('is-shown', st > 200);
     };

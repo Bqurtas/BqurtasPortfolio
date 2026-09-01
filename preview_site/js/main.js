@@ -2729,6 +2729,9 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   if (!control) return;
 
   const ring = document.getElementById('toTopProg');
+  /* Claim the ring so the enhancement bundle stops painting pixel progress
+     over the deck progress on every scroll event. */
+  window.__bqDeckRing = true;
   const circumference = 2 * Math.PI * 20;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -2744,11 +2747,42 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const doc = document.documentElement;
     cachedMax = Math.max(doc.scrollHeight - doc.clientHeight, 1);
   };
+  /* Progress by sheet, not by pixel.
+     Raw document scroll is dominated by the portfolio: its track is over half
+     the page, so the ring raced through the gallery and then barely moved for
+     the four sheets after it. Counting the deck instead — which card is pinned,
+     and how far the next one has risen over it — makes one sheet worth one step
+     whatever its track is worth in pixels. Falls back to document scroll for
+     any page that is not a deck. */
+  const deckProgress = () => {
+    const room = document.querySelector('.room:not(.is-hidden).paper-stack');
+    if (!room) return null;
+    const sheets = room.querySelectorAll(':scope > .paper-sheet');
+    const count = sheets.length;
+    if (count < 2) return null;
+    const pin = (parseFloat(getComputedStyle(document.documentElement)
+      .getPropertyValue('--bq-deck-gutter')) || 10) + 1;
+    let index = 0;
+    for (let i = 0; i < count; i += 1) {
+      if (sheets[i].getBoundingClientRect().top <= pin) index = i;
+    }
+    let within = 1;
+    const next = sheets[index + 1];
+    if (next) {
+      const span = Math.max(1, window.innerHeight - pin);
+      within = Math.min(1, Math.max(0, (window.innerHeight - next.getBoundingClientRect().top) / span));
+    }
+    return Math.min(1, Math.max(0, (index + within) / count));
+  };
+
   let shownNow = null;
   const update = () => {
     const top = window.scrollY || document.scrollingElement?.scrollTop || 0;
     if (!cachedMax) readMax();
-    const progress = Math.min(Math.max(top / cachedMax, 0), 1);
+    const deck = deckProgress();
+    const progress = deck === null
+      ? Math.min(Math.max(top / cachedMax, 0), 1)
+      : deck;
     const shown = top > 160;
     if (shown !== shownNow) {
       shownNow = shown;
