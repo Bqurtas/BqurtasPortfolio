@@ -1984,6 +1984,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
         /* Hold the paper for exactly its interior reading distance. Native
            window scroll then advances the content and releases the next card. */
+        sheet.classList.toggle('is-tail-sheet', sheet === tailSheet);
         if (sheet === tailSheet) {
           /* The last card needs somewhere to stand after it lands, not only
              room to read itself. tailTrack used to be exactly this sheet's own
