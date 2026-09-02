@@ -4519,21 +4519,16 @@ html body #design#design .practice-note .bio-teaser-portrait.bio-teaser-portrait
   display: block !important;
 }
 
-/* The marks keep their distance from the edge on a bigger circle. */
-html body #design .practice-note .orbit-ic--1 { transform: rotate(0deg)   translateY(-50%) translateY(-8.4rem); }
-html body #design .practice-note .orbit-ic--2 { transform: rotate(60deg)  translateY(-50%) translateY(-8.4rem); }
-html body #design .practice-note .orbit-ic--3 { transform: rotate(120deg) translateY(-50%) translateY(-8.4rem); }
-html body #design .practice-note .orbit-ic--4 { transform: rotate(180deg) translateY(-50%) translateY(-8.4rem); }
-html body #design .practice-note .orbit-ic--5 { transform: rotate(240deg) translateY(-50%) translateY(-8.4rem); }
-html body #design .practice-note .orbit-ic--6 { transform: rotate(300deg) translateY(-50%) translateY(-8.4rem); }
-@media (max-width: 820px) {
-  html body #design .practice-note .orbit-ic--1 { transform: rotate(0deg)   translateY(-50%) translateY(-6.4rem); }
-  html body #design .practice-note .orbit-ic--2 { transform: rotate(60deg)  translateY(-50%) translateY(-6.4rem); }
-  html body #design .practice-note .orbit-ic--3 { transform: rotate(120deg) translateY(-50%) translateY(-6.4rem); }
-  html body #design .practice-note .orbit-ic--4 { transform: rotate(180deg) translateY(-50%) translateY(-6.4rem); }
-  html body #design .practice-note .orbit-ic--5 { transform: rotate(240deg) translateY(-50%) translateY(-6.4rem); }
-  html body #design .practice-note .orbit-ic--6 { transform: rotate(300deg) translateY(-50%) translateY(-6.4rem); }
-}
+/* One circle size, so one orbit distance. The phone override put the marks
+   inside the photograph once the circle grew to 300px: the ring sat at 102px
+   while the radius became 150px. 176px clears the edge by a mark's width on
+   every screen, and the circle is the same size on all of them. */
+html body #design .practice-note .orbit-ic--1 { transform: rotate(0deg)   translateY(-50%) translateY(-11rem); }
+html body #design .practice-note .orbit-ic--2 { transform: rotate(60deg)  translateY(-50%) translateY(-11rem); }
+html body #design .practice-note .orbit-ic--3 { transform: rotate(120deg) translateY(-50%) translateY(-11rem); }
+html body #design .practice-note .orbit-ic--4 { transform: rotate(180deg) translateY(-50%) translateY(-11rem); }
+html body #design .practice-note .orbit-ic--5 { transform: rotate(240deg) translateY(-50%) translateY(-11rem); }
+html body #design .practice-note .orbit-ic--6 { transform: rotate(300deg) translateY(-50%) translateY(-11rem); }
 
 /* "What I do", at the size a section opener deserves.
    Measured at 1440: the title read 28.8px and the signature block 10–11px —
