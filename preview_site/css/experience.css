@@ -4488,3 +4488,86 @@ html body #design#design .section.work #loadMoreWrap#loadMoreWrap.load-more-wrap
     transition: opacity .18s ease, color .18s ease, transform .18s ease !important;
   }
 }
+
+/* ==========================================================================
+   The portrait is a circle on every screen, and "What I do" is read at a
+   size that matches the room it opens.
+   ========================================================================== */
+
+/* On a phone this was already a circle; on a desktop it measured 408x295 with
+   a 28px radius, because the rule that rounded it lived inside a
+   max-width: 820px block. A square box is what makes 50% a circle, so the
+   figure takes one and centres itself in whatever column it is given. */
+html body #design#design .practice-note .bio-teaser-portrait.bio-teaser-portrait {
+  width: min(300px, 82%) !important;
+  max-width: min(300px, 82%) !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  border-radius: 50% !important;
+  margin-inline: auto !important;
+  overflow: visible !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  flex: 0 0 auto !important;
+  align-self: center !important;
+}
+html body #design#design .practice-note .bio-teaser-portrait.bio-teaser-portrait > img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+  display: block !important;
+}
+
+/* The marks keep their distance from the edge on a bigger circle. */
+html body #design .practice-note .orbit-ic--1 { transform: rotate(0deg)   translateY(-50%) translateY(-8.4rem); }
+html body #design .practice-note .orbit-ic--2 { transform: rotate(60deg)  translateY(-50%) translateY(-8.4rem); }
+html body #design .practice-note .orbit-ic--3 { transform: rotate(120deg) translateY(-50%) translateY(-8.4rem); }
+html body #design .practice-note .orbit-ic--4 { transform: rotate(180deg) translateY(-50%) translateY(-8.4rem); }
+html body #design .practice-note .orbit-ic--5 { transform: rotate(240deg) translateY(-50%) translateY(-8.4rem); }
+html body #design .practice-note .orbit-ic--6 { transform: rotate(300deg) translateY(-50%) translateY(-8.4rem); }
+@media (max-width: 820px) {
+  html body #design .practice-note .orbit-ic--1 { transform: rotate(0deg)   translateY(-50%) translateY(-6.4rem); }
+  html body #design .practice-note .orbit-ic--2 { transform: rotate(60deg)  translateY(-50%) translateY(-6.4rem); }
+  html body #design .practice-note .orbit-ic--3 { transform: rotate(120deg) translateY(-50%) translateY(-6.4rem); }
+  html body #design .practice-note .orbit-ic--4 { transform: rotate(180deg) translateY(-50%) translateY(-6.4rem); }
+  html body #design .practice-note .orbit-ic--5 { transform: rotate(240deg) translateY(-50%) translateY(-6.4rem); }
+  html body #design .practice-note .orbit-ic--6 { transform: rotate(300deg) translateY(-50%) translateY(-6.4rem); }
+}
+
+/* "What I do", at the size a section opener deserves.
+   Measured at 1440: the title read 28.8px and the signature block 10–11px —
+   smaller than the body copy beside it. My earlier clamps matched and lost, so
+   these carry the section's own id twice. */
+html body #design#design #services#services .section-title,
+html body #design#design #services#services .service-showcase-title {
+  font-size: clamp(30px, 4.2vw, 58px) !important;
+  line-height: 1.06 !important;
+  letter-spacing: -.025em !important;
+}
+html body #design#design #services#services .section-lede,
+html body #design#design #services#services .service-showcase-lede {
+  font-size: clamp(14px, 1.35vw, 19px) !important;
+  line-height: 1.55 !important;
+  max-width: 62ch !important;
+}
+html body #design#design #services#services .section-num {
+  font-size: clamp(11px, 1vw, 13.5px) !important;
+  letter-spacing: .18em !important;
+}
+html body #design#design #services#services .service-signature-mark {
+  font-size: clamp(16px, 1.6vw, 24px) !important;
+  line-height: 1 !important;
+}
+html body #design#design #services#services .service-signature strong {
+  font-size: clamp(12px, 1.05vw, 15px) !important;
+  letter-spacing: .12em !important;
+}
+html body #design#design #services#services .service-signature small {
+  font-size: clamp(11px, .95vw, 13.5px) !important;
+  line-height: 1.4 !important;
+}
+html body #design#design #services#services .service-signature {
+  gap: clamp(10px, 1.2vw, 16px) !important;
+  align-items: center !important;
+}
