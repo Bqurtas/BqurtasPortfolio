@@ -4585,3 +4585,72 @@ html body #design#design #services#services .service-signature {
 :root, html.bq-compact, :root[data-theme] {
   --bq-menu-dur: .55s !important;
 }
+
+/* ==========================================================================
+   On a phone the curtain arrives from the left and leaves by the left.
+   Desktop keeps the right-hand entrance it already has.
+
+   The closed state is the whole effect: a transition runs between it and
+   inset(0), so moving the inset from the left edge to the right edge reverses
+   the direction of both the opening and the closing. Everything here carries
+   two IDs, because the rules that own the closed state — html body
+   #mobileMenu.mobile-menu at (1,1,2) and its RTL pair at (2,2,2) — would
+   otherwise decide it.
+   ========================================================================== */
+@media (max-width: 820px) {
+  html body #mobileMenu#mobileMenu.mobile-menu,
+  html[dir="rtl"] body #mobileMenu#mobileMenu.mobile-menu {
+    clip-path: inset(0 100% 0 0) !important;
+  }
+  html body #mobileMenu#mobileMenu.mobile-menu.is-open,
+  html[dir="rtl"] body #mobileMenu#mobileMenu.mobile-menu.is-open,
+  html body #mobileMenu#mobileMenu.mobile-menu:is(.is-open, .is-ready.is-open),
+  html[dir="rtl"] body #mobileMenu#mobileMenu.mobile-menu:is(.is-open, .is-ready.is-open) {
+    clip-path: inset(0) !important;
+  }
+
+  /* The panel travels with the clip, from the same side. */
+  html body #mobileMenu#mobileMenu .mobile-sheet {
+    transform: translateX(-9%) !important;
+  }
+  html body #mobileMenu#mobileMenu.is-open .mobile-sheet {
+    transform: translateX(0) !important;
+  }
+  /* The index trails in from the left too, instead of against the wipe. */
+  html body #mobileMenu#mobileMenu .mm-nav,
+  html body #mobileMenu#mobileMenu .mm-menu-brand,
+  html[dir="rtl"] body #mobileMenu#mobileMenu .mm-nav,
+  html[dir="rtl"] body #mobileMenu#mobileMenu .mm-menu-brand {
+    transform: translateX(-7%) !important;
+  }
+  html body #mobileMenu#mobileMenu.is-open .mm-nav,
+  html body #mobileMenu#mobileMenu.is-open .mm-menu-brand,
+  html[dir="rtl"] body #mobileMenu#mobileMenu.is-open .mm-nav,
+  html[dir="rtl"] body #mobileMenu#mobileMenu.is-open .mm-menu-brand {
+    transform: translateX(0) !important;
+  }
+
+  /* Under Reduce Motion the direction still reads, at a few pixels. */
+  @media (prefers-reduced-motion: reduce) {
+    html body #mobileMenu#mobileMenu .mobile-sheet {
+      transform: translateX(-2.5%) !important;
+    }
+    html body #mobileMenu#mobileMenu.is-open .mobile-sheet {
+      transform: translateX(0) !important;
+    }
+  }
+}
+
+/* A bigger mark to close it. */
+html body #mobileMenu#mobileMenu .mobile-menu-close,
+html body #mobileMenu#mobileMenu.is-ready .mobile-menu-close,
+html[dir="rtl"] body #mobileMenu#mobileMenu .mobile-menu-close,
+html[dir="rtl"] body #mobileMenu#mobileMenu.is-ready .mobile-menu-close {
+  width: 58px !important;
+  height: 58px !important;
+  min-width: 58px !important;
+}
+html body #mobileMenu#mobileMenu .mobile-menu-close i,
+html body #mobileMenu#mobileMenu.is-ready .mobile-menu-close i {
+  font-size: 30px !important;
+}
