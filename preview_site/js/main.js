@@ -141,8 +141,16 @@ document.addEventListener('DOMContentLoaded', () => {
     return resolvedLang;
   };
 
-  // Bind all language option buttons (rail flyout, mobile, footer)
-  document.querySelectorAll('[data-lang]').forEach(opt => {
+  /* Bind the language buttons — and ONLY those.
+     '[data-lang]' also matched <html>, because the boot script writes
+     root.dataset.lang there. Clicks bubble to <html>, so this handler ran on
+     every click anywhere on the site and called preventDefault() on all of
+     them: links did not open, the NDA checkbox could not be ticked, the pitch
+     form could not submit, and choosing Kurdish snapped straight back to
+     English because the handler re-applied whatever <html> already said.
+     The two real controls are .lang-opt in the desktop flyout and
+     .mobile-lang in the dock, seven of each. */
+  document.querySelectorAll('.lang-opt[data-lang], .mobile-lang[data-lang]').forEach(opt => {
     opt.addEventListener('click', (e) => {
       e.preventDefault();
       const l = opt.dataset.lang;
