@@ -1,4 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { minify } from 'terser';
 import { minify as minifyCss } from 'csso';
 
@@ -57,4 +58,27 @@ for (const [input, output] of cssBundles) {
   if (!result.css) throw new Error(`csso produced no output for ${input}`);
   await writeFile(output, `${result.css}\n`);
   console.log(`${input} -> ${output}`);
+}
+
+/* The service worker's cache name is derived from what it precaches, so a
+   release can never ship a worker that still believes it holds the last one.
+   SW_VERSION used to be a hand-typed 'v4' and was forgotten more than once —
+   the live worker was pinning main?v=531 while the HTML asked for v=532. */
+{
+  const swPath = 'preview_site/sw.js';
+  const sw = await readFile(swPath, 'utf8');
+  const precache = (sw.match(/const PRECACHE_ASSETS = \[([\s\S]*?)\];/) || [, ''])[1];
+  const stamp = createHash('sha1').update(precache).digest('hex').slice(0, 10);
+  const nextSw = sw.replace(/const SW_VERSION = '[^']*';/, `const SW_VERSION = '${stamp}';`);
+  if (nextSw !== sw) {
+    await writeFile(swPath, nextSw);
+    console.log(`sw.js -> SW_VERSION ${stamp}`);
+  }
+  const htmlPath = 'preview_site/index.html';
+  const html = await readFile(htmlPath, 'utf8');
+  const nextHtml = html.replace(/\/sw\.js\?v=[A-Za-z0-9]+/, `/sw.js?v=${stamp}`);
+  if (nextHtml !== html) {
+    await writeFile(htmlPath, nextHtml);
+    console.log(`index.html -> sw.js?v=${stamp}`);
+  }
 }

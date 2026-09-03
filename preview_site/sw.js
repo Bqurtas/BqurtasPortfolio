@@ -12,7 +12,7 @@
       instead of being pinned for the life of the installed worker.
    ========================================================= */
 
-const SW_VERSION = 'v4';                       // bump on every deploy
+const SW_VERSION = '93533832f3';                       // bump on every deploy
 const CACHE_NAME = `bqurtas-cache-${SW_VERSION}`;
 const DOC_FALLBACK = '/index.html';
 
@@ -63,7 +63,14 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    }).then(() => self.clients.claim())
+    }).then(() => caches.open(CACHE_NAME).then((cache) => cache.keys().then((reqs) => Promise.all(
+      /* Evict anything an earlier version stored under /api — including URLs
+         that carried a token — rather than waiting for the cache name to change
+         again. */
+      reqs.filter((r) => {
+        try { return new URL(r.url).pathname.toLowerCase().startsWith('/api'); } catch (e) { return false; }
+      }).map((r) => cache.delete(r))
+    )))).then(() => self.clients.claim())
   );
 });
 
@@ -80,6 +87,15 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin && !url.hostname.includes('jsdelivr.net') && !url.hostname.includes('raw.githubusercontent.com')) {
     return;
   }
+
+  /* Never touch the API. Every same-origin GET was being cached, and
+     /api/stats carries its token in the query string — so a URL containing a
+     secret, and the analytics it answered with, were being written to Cache
+     Storage and served from there afterwards, outliving a token rotation.
+     Nothing under /api is cacheable: it is per-request, sometimes
+     authenticated, and always cheap to fetch. The same goes for the worker's
+     own live documents. */
+  if (/^\/(?:api|sw\.js|sitemap|robots\.txt|googlece)/i.test(url.pathname)) return;
 
   // Handle SPA room navigations (HTML)
   if (request.mode === 'navigate' || (request.headers.get('accept') && request.headers.get('accept').includes('text/html'))) {

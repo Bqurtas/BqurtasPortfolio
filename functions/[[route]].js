@@ -184,7 +184,10 @@ function blogPostSitemapBlocks(posts) {
     const id = String(p && p.id != null ? p.id : '').trim();
     if (!id || seen.has(id)) return '';
     seen.add(id);
-    const lastmod = String((p.updated_at || p.created_at || '')).slice(0, 10) || '2026-07-01';
+    /* This table has no updated_at column. Asking for one made PostgREST
+     reject the whole query, the error was swallowed, and every blog post fell
+     out of the sitemap. */
+  const lastmod = String((p.created_at || '')).slice(0, 10) || '2026-07-01';
     return langs.map((lang) => {
       const loc = localizedUrl(lang, { key: 'blogpost', slug: id });
       return [
@@ -214,7 +217,7 @@ async function serveSitemap(url, env, next) {
   const base = await env.ASSETS.fetch(new URL('/sitemap.xml', url.origin));
   let body = await base.text();
   try {
-    const res = await fetch(SUPA + '/rest/v1/posts?select=id,updated_at,created_at&published=eq.true&order=created_at.desc', {
+    const res = await fetch(SUPA + '/rest/v1/posts?select=id,created_at&published=eq.true&order=created_at.desc', {
       headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY }
     });
     if (res.ok) {
@@ -415,13 +418,21 @@ export async function onRequest(context) {
     // a single blog post — fetch it from Supabase so the share shows ITS cover + title
     const id = parseInt(r.slug, 10);
     let post = null;
+    let lookupFailed = false;
     if (id) {
       try {
-        const res = await fetch(SUPA + '/rest/v1/posts?id=eq.' + id + '&select=title,subtitle,cover,i18n&limit=1',
+        const res = await fetch(SUPA + '/rest/v1/posts?id=eq.' + id + '&published=eq.true&select=title,subtitle,cover,i18n&limit=1',
           { headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY } });
         if (res.ok) { const rows = await res.json(); post = Array.isArray(rows) ? rows[0] : null; }
-      } catch (e) {}
+        else { lookupFailed = true; console.warn('blogpost lookup', id, res.status); }
+      } catch (e) { lookupFailed = true; console.warn('blogpost lookup threw', id, String(e)); }
     }
+    /* A post id that does not exist, or is not published, is not a page.
+       /blog/999999999999 was answering 200 with index,follow, which invites
+       Google to index an unbounded number of empty URLs. Only a lookup that
+       actually failed is allowed through to the generic Journal meta — a
+       database hiccup should not delete a real post from the index. */
+    if (!post && !lookupFailed) return serveNotFound(request, url, env);
     if (post) {
       const tr = (post.i18n && post.i18n[r.lang]) || {};
       const blogD = (OG[r.lang] && OG[r.lang].blog && OG[r.lang].blog.d) || OG.en.blog.d;
@@ -481,6 +492,14 @@ export async function onRequest(context) {
     const headers = new Headers(res.headers);
     headers.set('Cache-Control', FRESH);
     headers.set('CDN-Cache-Control', 'no-store');   // Cloudflare edge: don't cache the HTML shell
+    /* Cloudflare reads its own vendor directive ahead of CDN-Cache-Control and
+       ahead of Cache-Control, so this is the strongest thing an origin can say.
+       Measured before adding it: three requests to / returned the same CSP
+       nonce with cf-cache-status HIT and Age climbing past 9400 — the shell was
+       two and a half hours old and still advertising main?v=531 while the build
+       had moved to 533. Every deploy was invisible. */
+    headers.set('Cloudflare-CDN-Cache-Control', 'no-store');
+    headers.set('Vary', 'Cookie');
     headers.set('Content-Security-Policy', CSP);
     // env.ASSETS.fetch returns the shell with Pages' default wildcard CORS; the
     // _headers override only applies to directly-served files, not this internal
