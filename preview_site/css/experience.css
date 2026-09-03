@@ -4769,3 +4769,38 @@ html[dir="rtl"] body #mobileMenu#mobileMenu.is-open .mobile-menu-close {
     align-self: center !important;
   }
 }
+
+/* The sheet you were reading stays behind the curtain.
+   Opening the menu switched .bq-page-stage to position:fixed and translated
+   .main up by the scroll distance to compensate. The compensation works — the
+   variable reads -3000px and the transform applies — but the paper stack is
+   built on position:sticky, and sticky resolves against the document's scroll.
+   With the document pinned at zero every sheet snaps back to its natural place,
+   so whichever sheet you were on vanishes and the deck shows its start. That is
+   the sheet not appearing behind the curtain, and it is also why closing can
+   land you somewhere white.
+
+   Kept in flow instead: the document stays exactly where it is, sticky keeps
+   resolving correctly, and body's own overflow:hidden — which the script
+   already sets — is what stops the background scrolling. Verified live by
+   overriding these three properties by hand: the sheet that was showing before
+   the menu opened was still showing after. */
+html:root[data-theme][data-theme] body.menu-open .bq-page-stage,
+html:root[data-theme][data-theme] body.menu-revealed .bq-page-stage,
+html:root[data-theme][data-theme] body.menu-closing .bq-page-stage,
+html:root[data-theme][data-theme][dir="rtl"] body.menu-open .bq-page-stage,
+html:root[data-theme][data-theme][dir="rtl"] body.menu-revealed .bq-page-stage,
+html:root[data-theme][data-theme][dir="rtl"] body.menu-closing .bq-page-stage {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+}
+html:root[data-theme][data-theme] body.menu-open .bq-page-stage .main,
+html:root[data-theme][data-theme] body.menu-revealed .bq-page-stage .main,
+html:root[data-theme][data-theme] body.menu-closing .bq-page-stage .main,
+html:root[data-theme][data-theme] body.menu-open .bq-page-stage > .main,
+html:root[data-theme][data-theme] body.menu-closing .bq-page-stage > .main {
+  transform: none !important;
+}
