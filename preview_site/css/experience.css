@@ -4651,8 +4651,13 @@ html[dir="rtl"] body #mobileMenu#mobileMenu.is-ready .mobile-menu-close {
   min-width: 58px !important;
 }
 html body #mobileMenu#mobileMenu .mobile-menu-close i,
-html body #mobileMenu#mobileMenu.is-ready .mobile-menu-close i {
+html body #mobileMenu#mobileMenu.is-ready .mobile-menu-close i,
+html[dir="rtl"] body #mobileMenu#mobileMenu .mobile-menu-close i,
+html[dir="rtl"] body #mobileMenu#mobileMenu.is-ready .mobile-menu-close i {
+  /* The RTL pair is not decoration: without it a competing rule kept the glyph
+     at 17px in Kurdish and Arabic while English showed 30px. */
   font-size: 30px !important;
+  line-height: 1 !important;
 }
 
 /* The curtain wipes out as well as in.
