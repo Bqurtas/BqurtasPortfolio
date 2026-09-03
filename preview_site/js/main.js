@@ -150,12 +150,17 @@ document.addEventListener('DOMContentLoaded', () => {
      English because the handler re-applied whatever <html> already said.
      The two real controls are .lang-opt in the desktop flyout and
      .mobile-lang in the dock, seven of each. */
-  document.querySelectorAll('.lang-opt[data-lang], .mobile-lang[data-lang]').forEach(opt => {
-    opt.addEventListener('click', (e) => {
-      e.preventDefault();
-      const l = opt.dataset.lang;
-      window.applyLang(l);
-    });
+  /* Delegated, so it survives the flyout being re-rendered. Binding each
+     button once at start-up did not: applyLang('ku') called by hand switches
+     the site correctly, but clicking the same button did nothing, because the
+     element carrying the listener had been replaced by then. The old
+     '[data-lang]' selector hid this — it also matched <html>, which is never
+     replaced, so the accidental catch-all was the only binding still firing. */
+  document.addEventListener('click', (e) => {
+    const opt = e.target.closest && e.target.closest('.lang-opt[data-lang], .mobile-lang[data-lang]');
+    if (!opt) return;
+    e.preventDefault();
+    window.applyLang(opt.dataset.lang);
   });
 
   // Initial language: ALWAYS English by default — only a /lang prefix in the
