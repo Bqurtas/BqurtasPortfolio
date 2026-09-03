@@ -3890,7 +3890,7 @@ html body #mobileMenu#mobileMenu .mobile-sheet {
   transform: translateX(9%) !important;
   opacity: .82 !important;
   transition:
-    transform .52s cubic-bezier(.4, 0, .78, .34),
+    transform .95s cubic-bezier(.4, 0, .78, .34),
     opacity .3s ease !important;
   will-change: transform;
 }
@@ -3898,7 +3898,7 @@ html body #mobileMenu#mobileMenu.is-open .mobile-sheet {
   transform: translateX(0) !important;
   opacity: 1 !important;
   transition:
-    transform .8s cubic-bezier(.16, .84, .26, 1),
+    transform 1.2s cubic-bezier(.16, .84, .26, 1),
     opacity .42s ease !important;
 }
 /* The close control travels with the curtain instead of appearing on top of
@@ -4583,7 +4583,7 @@ html body #design#design #services#services .service-signature {
    long enough to read as the site having broken rather than a menu having
    closed. A drawer opens deliberately and shuts briskly. */
 :root, html.bq-compact, :root[data-theme] {
-  --bq-menu-dur: .55s !important;
+  --bq-menu-dur: 1s !important;
 }
 
 /* A bigger mark to close it. */
@@ -4615,12 +4615,12 @@ html[dir="rtl"] body #mobileMenu#mobileMenu.is-ready .mobile-menu-close i {
 html body #mobileMenu#mobileMenu.mobile-menu.is-closing,
 html[dir="rtl"] body #mobileMenu#mobileMenu.mobile-menu.is-closing {
   transition:
-    clip-path .5s cubic-bezier(.4, 0, .78, .34),
-    opacity .3s ease,
-    visibility 0s linear .5s !important;
+    clip-path .95s cubic-bezier(.4, 0, .78, .34),
+    opacity .5s ease,
+    visibility 0s linear .95s !important;
 }
 html body #mobileMenu#mobileMenu.is-closing .mobile-sheet {
-  transition: transform .5s cubic-bezier(.4, 0, .78, .34) !important;
+  transition: transform .95s cubic-bezier(.4, 0, .78, .34) !important;
 }
 html body #mobileMenu#mobileMenu.is-closing .mm-nav,
 html body #mobileMenu#mobileMenu.is-closing .mm-menu-brand {
@@ -4650,11 +4650,11 @@ html body #mobileMenu#mobileMenu.is-closing .mm-menu-brand {
    A transition on the element itself is enough. Whenever the transform
    changes — including the moment the classes come off — it travels. */
 html body .bq-page-stage {
-  transition: transform .5s cubic-bezier(.32, .72, .28, 1);
+  transition: transform .9s cubic-bezier(.32, .72, .28, 1);
 }
 @media (prefers-reduced-motion: reduce) {
   html body .bq-page-stage {
-    transition: transform .26s ease;
+    transition: transform .42s ease;
   }
 }
 
@@ -4666,13 +4666,58 @@ html body #mobileMenu#mobileMenu.is-closing .mm-menu-brand,
 html[dir="rtl"] body #mobileMenu#mobileMenu.is-closing .mm-nav,
 html[dir="rtl"] body #mobileMenu#mobileMenu.is-closing .mm-menu-brand {
   transition:
-    opacity .42s ease,
-    transform .42s cubic-bezier(.4, 0, .78, .34) !important;
+    opacity .7s ease,
+    transform .7s cubic-bezier(.4, 0, .78, .34) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
   html:root[data-theme] body.menu-open.menu-closing .bq-page-stage,
   html:root[data-theme] body.menu-revealed.menu-closing .bq-page-stage {
     transition: transform .26s ease !important;
+  }
+}
+
+
+/* Slower, in both directions.
+   Every duration in the curtain was set for briskness — .78s to wipe in, .5s
+   out, .55s for the page. Held together they read as a snap rather than a
+   movement. These are the same curves at close to double the time, and they
+   stay in step with each other: the wipe, the panel behind it, the index on it
+   and the page underneath all finish within a breath of one another. */
+html body #mobileMenu#mobileMenu.mobile-menu,
+html[dir="rtl"] body #mobileMenu#mobileMenu.mobile-menu {
+  transition:
+    clip-path 1.15s var(--menu-ease, cubic-bezier(.16, .84, .26, 1)),
+    opacity .6s ease,
+    visibility 0s linear 1.15s !important;
+}
+html body #mobileMenu#mobileMenu.mobile-menu.is-open,
+html[dir="rtl"] body #mobileMenu#mobileMenu.mobile-menu.is-open {
+  transition:
+    clip-path 1.15s var(--menu-ease, cubic-bezier(.16, .84, .26, 1)),
+    opacity .55s ease,
+    visibility 0s linear 0s !important;
+}
+html body #mobileMenu#mobileMenu.is-open .mm-nav,
+html body #mobileMenu#mobileMenu.is-open .mm-menu-brand,
+html[dir="rtl"] body #mobileMenu#mobileMenu.is-open .mm-nav,
+html[dir="rtl"] body #mobileMenu#mobileMenu.is-open .mm-menu-brand {
+  transition:
+    transform .95s cubic-bezier(.16, .84, .26, 1) .12s,
+    opacity .7s ease .12s !important;
+}
+html body #mobileMenu#mobileMenu.is-open .mobile-menu-close,
+html[dir="rtl"] body #mobileMenu#mobileMenu.is-open .mobile-menu-close {
+  transition: opacity .6s ease .5s !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body #mobileMenu#mobileMenu.mobile-menu,
+  html[dir="rtl"] body #mobileMenu#mobileMenu.mobile-menu {
+    transition: opacity .4s ease, visibility 0s linear .4s !important;
+  }
+  html body #mobileMenu#mobileMenu.mobile-menu.is-open,
+  html[dir="rtl"] body #mobileMenu#mobileMenu.mobile-menu.is-open {
+    transition: opacity .42s ease, visibility 0s linear 0s !important;
   }
 }
