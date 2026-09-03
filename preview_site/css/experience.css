@@ -4721,3 +4721,38 @@ html[dir="rtl"] body #mobileMenu#mobileMenu.is-open .mobile-menu-close {
     transition: opacity .42s ease, visibility 0s linear 0s !important;
   }
 }
+
+/* The page moves sideways and only sideways.
+   transform-origin computed to "1440px 5626px" — 50% 50% of a page that is
+   11252px tall, so the origin sits five and a half thousand pixels below the
+   screen. A uniform scale about a point that far down drags the page
+   VERTICALLY: measured while opening, its top edge travelled 0 -> 90px and its
+   bottom came up 856 -> 810. That is the movement from below he has been
+   pointing at. The horizontal geometry was right the whole time; the vertical
+   was never meant to be there.
+
+   Anchored at the top-left corner and squeezed on one axis, the same
+   destination is reached with no vertical component at all:
+   origin 0 0, scaleX(.8) spans 0..0.8W, translateX(-15.625%) puts it at
+   -0.15625W..0.64375W — at 1440 that is -225..927, exactly where the uniform
+   scale used to land it. Desktop only; a phone has no page-push. */
+@media (min-width: 821px) {
+  html:root[data-theme][data-theme] body.menu-open .bq-page-stage,
+  html:root[data-theme][data-theme] body.menu-revealed .bq-page-stage,
+  html:root[data-theme][data-theme] body.menu-closing .bq-page-stage {
+    transform-origin: 0 0 !important;
+    transform: translateX(-15.625%) scaleX(.8) !important;
+  }
+  html:root[data-theme][data-theme][dir="rtl"] body.menu-open .bq-page-stage,
+  html:root[data-theme][data-theme][dir="rtl"] body.menu-revealed .bq-page-stage,
+  html:root[data-theme][data-theme][dir="rtl"] body.menu-closing .bq-page-stage {
+    transform-origin: 100% 0 !important;
+    transform: translateX(15.625%) scaleX(.8) !important;
+  }
+  html body .bq-page-stage {
+    transform-origin: 0 0;
+  }
+  html[dir="rtl"] body .bq-page-stage {
+    transform-origin: 100% 0;
+  }
+}
