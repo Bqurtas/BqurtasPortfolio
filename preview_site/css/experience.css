@@ -4654,3 +4654,34 @@ html body #mobileMenu#mobileMenu .mobile-menu-close i,
 html body #mobileMenu#mobileMenu.is-ready .mobile-menu-close i {
   font-size: 30px !important;
 }
+
+/* The curtain wipes out as well as in.
+   modern-framer.css:5753 sets transition: none on .is-closing at (1,2,0), so
+   the moment the reader pressed the mark the clip jumped straight to its closed
+   value and only the panel behind it slid — the opening had an effect and the
+   closing had none. Measured: clip-path went to inset(0 100% 0 0) within 60ms
+   while the sheet was still travelling 500ms later. The wipe now runs both ways,
+   and visibility waits for it so the panel is not cut away mid-travel. */
+html body #mobileMenu#mobileMenu.mobile-menu.is-closing,
+html[dir="rtl"] body #mobileMenu#mobileMenu.mobile-menu.is-closing {
+  transition:
+    clip-path .5s cubic-bezier(.4, 0, .78, .34),
+    opacity .3s ease,
+    visibility 0s linear .5s !important;
+}
+html body #mobileMenu#mobileMenu.is-closing .mobile-sheet {
+  transition: transform .5s cubic-bezier(.4, 0, .78, .34) !important;
+}
+html body #mobileMenu#mobileMenu.is-closing .mm-nav,
+html body #mobileMenu#mobileMenu.is-closing .mm-menu-brand {
+  transition: transform .34s ease, opacity .24s ease !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body #mobileMenu#mobileMenu.mobile-menu.is-closing,
+  html[dir="rtl"] body #mobileMenu#mobileMenu.mobile-menu.is-closing {
+    transition:
+      opacity .24s ease,
+      visibility 0s linear .24s !important;
+  }
+}
