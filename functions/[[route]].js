@@ -222,16 +222,25 @@ async function serveSitemap(url, env, next) {
     });
     if (res.ok) {
       const posts = await res.json();
-      const missing = (Array.isArray(posts) ? posts : []).filter((p) => {
-        const id = String(p && p.id != null ? p.id : '').trim();
-        return id && !body.includes('<loc>' + SITE + '/blog/' + id + '</loc>');
-      });
-      const blocks = blogPostSitemapBlocks(missing);
+      const live = Array.isArray(posts) ? posts : [];
+      /* Rebuild the blog section rather than appending to it. The static file
+         still listed /blog/1 through /blog/1134 from an earlier state of the
+         table, while one post is actually published — so Google was being
+         handed a thousand URLs that 404, and the only real post could still be
+         missing. Every existing <url> block whose <loc> is a /blog/<id> comes
+         out, and the current published rows go back in. */
+      body = body.replace(
+        /[ \t]*<url>(?:(?!<\/url>)[\s\S])*?<loc>[^<]*\/blog\/\d+<\/loc>[\s\S]*?<\/url>\s*/gi,
+        ''
+      );
+      const blocks = blogPostSitemapBlocks(live);
       if (blocks) {
         body = body.replace(/\s*<\/urlset>\s*$/i, '\n' + blocks + '\n</urlset>\n');
       }
+    } else {
+      console.warn('sitemap posts query', res.status, await res.text().catch(() => ''));
     }
-  } catch (e) {}
+  } catch (e) { console.warn('sitemap posts query threw', String(e)); }
   /* Build the headers rather than inheriting the static asset's. The body
      leaving here is not the body that came out of ASSETS — blog posts get
      appended — so the asset's ETag and Content-Length describe something else,
