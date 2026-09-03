@@ -3478,7 +3478,11 @@ html[dir="rtl"] body #mobileMenu#mobileMenu.is-ready .mobile-menu-close {
   inset-inline-start: auto !important;
   bottom: auto !important;
   transform: translateY(-50%) !important;
-  z-index: 40 !important;
+  /* 1900, not 40: .mobile-sheet is this control's next sibling at 1800 with a
+     solid background, so anything below that is painted over and invisible.
+     Same value in both places that set it, so neither order nor which one the
+     cascade picks can put it back behind the panel. */
+  z-index: 1900 !important;
   display: inline-flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -4047,6 +4051,11 @@ html body #mobileMenu#mobileMenu .mobile-menu-close,
 html body #mobileMenu#mobileMenu.is-ready .mobile-menu-close,
 html[dir="rtl"] body #mobileMenu#mobileMenu .mobile-menu-close,
 html[dir="rtl"] body #mobileMenu#mobileMenu.is-ready .mobile-menu-close {
+  /* Above the panel, stated in the same breath as everything else about this
+     control. This selector carries .is-ready — (2,3,2) — and the real open
+     path adds that class, which is why a bare (2,2,2) rule further down the
+     file won on a hand-toggled menu and lost on a real one. */
+  z-index: 1900 !important;
   width: 46px !important;
   height: 46px !important;
   min-width: 46px !important;
@@ -4565,4 +4574,14 @@ html body #design#design #services#services .service-signature small {
 html body #design#design #services#services .service-signature {
   gap: clamp(10px, 1.2vw, 16px) !important;
   align-items: center !important;
+}
+
+
+/* The page comes back faster than it left.
+   --bq-menu-dur was .8s in both directions, and with the class only clearing
+   after the transition the page took about a second to return to full size —
+   long enough to read as the site having broken rather than a menu having
+   closed. A drawer opens deliberately and shuts briskly. */
+:root, html.bq-compact, :root[data-theme] {
+  --bq-menu-dur: .55s !important;
 }

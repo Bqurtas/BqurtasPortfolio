@@ -648,8 +648,12 @@
         } else {
           afterDom();
         }
-        /* A broken deferred script must never leave a direct route invisible. */
-        setTimeout(finish, 2000);
+        /* A broken deferred script must never leave a direct route invisible.
+           Two seconds was long enough that a slow refresh read as the site
+           having frozen: the whole body is visibility:hidden until this runs.
+           700ms still covers a stylesheet that is merely late, and no longer
+           holds a blank page while the reader waits for it. */
+        setTimeout(finish, 700);
       };
       var apply = function () {
         if (applied || !link) return;
@@ -712,7 +716,7 @@
     }());
   </script>
   <link rel="stylesheet" href="css/fonts.css?v=447">
-  <link rel="stylesheet" href="css/experience.css?v=132">
+  <link rel="stylesheet" href="css/experience.css?v=133">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315"></noscript>
 
