@@ -404,6 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  let menuScrollY = 0;
   const setMenu = (open, trigger) => {
     if (!mobileMenu) return;
     if (open && window.__bqExclusive) window.__bqExclusive('menu');   // opening the menu closes chat/Latest/popovers
@@ -420,6 +421,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (open) {
       lastMenuTrigger = trigger || document.activeElement;
       const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+      /* Remember where the reader was. body gets overflow:hidden below, and on
+         this site that loses the scroll position outright — open the menu from
+         the portfolio and close it again and you are back at the top of the
+         page, looking at the hero. The offset was already being written to a
+         custom property for the CSS to compensate with; it was never read back
+         when the menu closed. */
+      menuScrollY = scrollY;
       document.body.style.setProperty('--bq-menu-scroll-shift', (-scrollY) + 'px');
       mobileMenu.classList.remove('is-closing');
       document.body.classList.remove('menu-closing');
@@ -435,10 +443,17 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.add('menu-closing');
       mobileMenu.classList.remove('is-ready', 'is-open');
       mobileMenu.classList.add('is-closing');
+      /* Put the reader back before the overflow lock lifts, so the page is
+         already in the right place when it can move again. */
+      const restore = menuScrollY;
       window.setTimeout(() => {
         mobileMenu.classList.remove('is-closing');
         document.body.classList.remove('menu-open', 'menu-closing');
         document.body.style.removeProperty('--bq-menu-scroll-shift');
+        if (restore > 0 && Math.abs(window.scrollY - restore) > 2) {
+          window.scrollTo({ top: restore, left: 0, behavior: 'auto' });
+        }
+        menuScrollY = 0;
       }, 840);   /* matches the .8s Voxo slide-home */
       if (lastMenuTrigger && document.contains(lastMenuTrigger)) {
         try { lastMenuTrigger.focus({ preventScroll: true }); } catch (e) { lastMenuTrigger.focus(); }
