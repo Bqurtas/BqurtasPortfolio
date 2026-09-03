@@ -127,6 +127,15 @@ export async function onRequestPost(context) {
   const { request, env } = context;
   let body;
   try { body = await request.json(); } catch (e) { return json({ ok: false, error: 'bad-json' }, 400); }
+
+  /* Signing out comes before every gate. Throwing away your own cookie needs
+     no PIN, no database and no rate slot — and a logout that answers 503
+     because the DB is briefly unreachable is a logout that leaves the session
+     alive, which is the one outcome that matters here. */
+  if (body && body.action === 'logout') {
+    return json({ ok: true }, 200, { 'Set-Cookie': clearSession() });
+  }
+
   const dashboardPin = String(env.DASH_PIN || '');
   if (!dashboardPin) return json({ ok: false, error: 'not-configured' }, 503);
   if (!env.DB) return json({ ok: false, error: 'no-db' }, 503);
@@ -231,12 +240,6 @@ export async function onRequestPost(context) {
     await clearRateSlot(env.DB, verifyBucket);
     const cookie = await issueSession(env);
     return json({ ok: true }, 200, cookie ? { 'Set-Cookie': cookie } : undefined);
-  }
-
-  /* Signing out has to reach the server too — a flag cleared in the tab left
-     the session valid everywhere else. */
-  if (body.action === 'logout') {
-    return json({ ok: true }, 200, { 'Set-Cookie': clearSession() });
   }
 
   return json({ ok: false, error: 'bad-action' }, 400);
