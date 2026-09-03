@@ -4636,28 +4636,26 @@ html body #mobileMenu#mobileMenu.is-closing .mm-menu-brand {
   }
 }
 
-/* The page comes back WITH the curtain, not after it.
-   Measured on a 1440 desktop, closing: the wipe retreated 1.6% → 20 → 71 → 100
-   over 540ms while the page stayed at scale .8 the whole time, then snapped to
-   1 in a single frame at ~900ms. The reader gets a black field with nothing in
-   it, then a jump. That is the "not solid" close.
+/* The page's return is animated wherever it happens.
+   The snap was at the END: the curtain retreated over 540ms while the page sat
+   at scale .8, then the menu classes cleared at ~900ms and the transform went
+   .8 -> 1 in a single frame, because with no menu class on the body nothing
+   gives .bq-page-stage a transition at all.
 
-   During .menu-closing the body still carries .menu-open, so the open
-   transform kept applying until the classes cleared — hence the snap. This
-   states the returned position while the curtain is still travelling, with a
-   transition of its own, so the two move together. It has to outrank
-   body.menu-open .bq-page-stage (0,2,1) and the :root[data-theme] pairs at
-   (0,4,2), so it carries five classes. */
-html:root[data-theme] body.menu-open.menu-closing .bq-page-stage,
-html:root[data-theme] body.menu-revealed.menu-closing .bq-page-stage,
-html:root[data-theme][dir="rtl"] body.menu-open.menu-closing .bq-page-stage,
-html:root[data-theme][dir="rtl"] body.menu-revealed.menu-closing .bq-page-stage {
-  transform: none !important;
-  border-radius: 0 !important;
-  transition:
-    transform .5s cubic-bezier(.32, .72, .28, 1),
-    border-radius .5s cubic-bezier(.32, .72, .28, 1),
-    box-shadow .5s cubic-bezier(.32, .72, .28, 1) !important;
+   I first tried stating the returned position during .menu-closing. That was
+   worse: the close script waits on a transitionend, and a transform that was
+   already at its final value fired one immediately, so the whole close
+   collapsed into 80ms. The page-push is the script's to drive.
+
+   A transition on the element itself is enough. Whenever the transform
+   changes — including the moment the classes come off — it travels. */
+html body .bq-page-stage {
+  transition: transform .5s cubic-bezier(.32, .72, .28, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  html body .bq-page-stage {
+    transition: transform .26s ease;
+  }
 }
 
 /* The index leaves at the curtain's pace instead of four times its speed —
