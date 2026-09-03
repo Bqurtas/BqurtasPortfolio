@@ -4722,31 +4722,40 @@ html[dir="rtl"] body #mobileMenu#mobileMenu.is-open .mobile-menu-close {
   }
 }
 
-/* The page slides. It does not scale.
+/* The page recedes, whole and undistorted.
 
-   Two wrong answers before this one. A uniform scale distorted nothing but
-   dragged the page vertically, because transform-origin resolved to 50% 50% of
-   an 11252px document — five and a half thousand pixels below the screen — so
-   opening the menu pulled the top edge down 90px and the bottom up 46. Then I
-   anchored it and squeezed a single axis instead, which cured the drift and
-   broke the geometry: scaleX alone is not a scale, it is a distortion. The
-   portrait went oval and every line of type went flat. There is no version of
-   that which is right.
+   Three wrong answers before this one, and the last measurement explains all
+   three: while the menu is open .bq-page-stage is position:fixed at viewport
+   height. Closed, it is static and 11252px tall. transform-origin: 50% 50%
+   resolves against whichever box is current, so during the first frames of the
+   opening it anchored 5626px below the screen and dragged the page down 90px —
+   the movement from below. Anchoring at 0 0 cured that and left the page
+   cut off at its left edge; squeezing one axis cured that and turned the
+   portrait into an oval.
 
-   A translation is the whole thing. The page keeps its size and its
-   proportions exactly, moves aside by the width the panel needs, and has no
-   vertical component to go wrong. Mirrored for RTL; a phone has no push. */
+   50vh is the answer the element was asking for. The stage is fixed to the top
+   of the viewport whenever it is transformed, so half a viewport down is its
+   own centre at any scroll position and against either box — no drift in the
+   first frame or the last. With that origin a uniform scale is safe, and
+   uniform is the only kind that keeps a circle a circle.
+
+   scale(.8) about the centre spans .1W...9W; translateX(-25.6%) lands it at
+   -225..927 on a 1440 screen, which is where this push has always meant to
+   put it. Mirrored for RTL. A phone has no push. */
 @media (min-width: 821px) {
   html:root[data-theme][data-theme] body.menu-open .bq-page-stage,
   html:root[data-theme][data-theme] body.menu-revealed .bq-page-stage,
   html:root[data-theme][data-theme] body.menu-closing .bq-page-stage {
-    transform-origin: 0 0 !important;
-    transform: translateX(-34%) !important;
+    transform-origin: 50% 50vh !important;
+    transform: translateX(-25.6%) scale(.8) !important;
   }
   html:root[data-theme][data-theme][dir="rtl"] body.menu-open .bq-page-stage,
   html:root[data-theme][data-theme][dir="rtl"] body.menu-revealed .bq-page-stage,
   html:root[data-theme][data-theme][dir="rtl"] body.menu-closing .bq-page-stage {
-    transform-origin: 100% 0 !important;
-    transform: translateX(34%) !important;
+    transform-origin: 50% 50vh !important;
+    transform: translateX(25.6%) scale(.8) !important;
+  }
+  html body .bq-page-stage {
+    transform-origin: 50% 50vh;
   }
 }
