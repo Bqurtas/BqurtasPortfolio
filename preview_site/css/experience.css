@@ -4759,3 +4759,13 @@ html[dir="rtl"] body #mobileMenu#mobileMenu.is-open .mobile-menu-close {
     transform-origin: 50% 50vh;
   }
 }
+
+/* The category rail sits in the middle of the card.
+   .work-head already centres its children — align-items: center — and the rail
+   was opting out with align-self: start, so its 684px column began at the top
+   of an 870px card and its centre landed 70px above the card's. One word. */
+@media (min-width: 821px) {
+  html body #design#design .section.work .work-head > .tabs-wrap {
+    align-self: center !important;
+  }
+}
