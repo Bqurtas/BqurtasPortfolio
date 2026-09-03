@@ -169,6 +169,42 @@ document.addEventListener('DOMContentLoaded', () => {
   const urlLang0 = location.pathname.replace(/^\/+/, '').split('/')[0];
   window.applyLang(URL_LANGS.includes(urlLang0) ? urlLang0 : 'en');
 
+  /* Make the lightbox tiles reachable without a mouse.
+     The certificate and logo tiles open a full-screen viewer on click, but
+     they are plain <div>s: no tab stop, no role, nothing announced, and Enter
+     or Space did nothing. Rather than rewrite the markup the generators
+     produce, they are given the button contract here — and re-given it
+     whenever new tiles arrive, since both grids are rebuilt at runtime. */
+  const makeTilesReachable = () => {
+    document.querySelectorAll('#certGrid > *:not(.gallery-loading), .logo-chip').forEach((tile) => {
+      if (tile.dataset.bqKeyed === '1' || tile.tagName === 'BUTTON' || tile.tagName === 'A') return;
+      tile.dataset.bqKeyed = '1';
+      tile.setAttribute('role', 'button');
+      tile.setAttribute('tabindex', '0');
+      const label = (tile.querySelector('img')?.getAttribute('alt')
+        || tile.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 90);
+      if (label && !tile.getAttribute('aria-label')) tile.setAttribute('aria-label', label);
+      tile.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ' && event.key !== 'Spacebar') return;
+        event.preventDefault();
+        tile.click();
+      });
+    });
+  };
+  makeTilesReachable();
+  window.__bqMakeTilesReachable = makeTilesReachable;
+  ['bq:gallery-built', 'bq:certs-built', 'bq:logos-built'].forEach((name) => {
+    window.addEventListener(name, makeTilesReachable);
+  });
+  /* Coalesced to one pass per frame. An observer on the whole body that ran
+     the sweep on every mutation would fire hundreds of times while eighty
+     cards are being placed. */
+  let tileSweep = 0;
+  new MutationObserver(() => {
+    if (tileSweep) return;
+    tileSweep = requestAnimationFrame(() => { tileSweep = 0; makeTilesReachable(); });
+  }).observe(document.body, { childList: true, subtree: true });
+
   /* ---------- ROUTER (room switcher + deep-links) ---------- */
   const rooms = document.querySelectorAll('.room');
   const routeLinks = document.querySelectorAll('[data-route]');

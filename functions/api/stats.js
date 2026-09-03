@@ -8,6 +8,8 @@
      2) Cloudflare D1 (fallback) — bind a database as DB (filled by /api/hit).
 */
 
+import { hasSession } from './_session.js';
+
 function json(obj, status) {
   return new Response(JSON.stringify(obj), {
     status: status || 200,
@@ -28,11 +30,18 @@ async function umami(env, path, params) {
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  const token = new URL(request.url).searchParams.get('token') || '';
+  /* Out of the URL. A query string travels into browser history, the service
+     worker's Cache Storage, referrer headers and every proxy log along the
+     way, so a secret placed there is a secret published. The header is read
+     first; the query is still accepted so an older open dashboard tab keeps
+     working, and the page has been changed to stop sending it. */
+  const url = new URL(request.url);
+  const token = request.headers.get('x-stats-token') || url.searchParams.get('token') || '';
+  const authed = (!!env.STATS_TOKEN && token === env.STATS_TOKEN) || await hasSession(request, env);
 
   /* ---- Preferred: Umami Cloud (same numbers as the Umami dashboard) ---- */
   if (env.UMAMI_API_KEY) {
-    if (!env.STATS_TOKEN || token !== env.STATS_TOKEN) return json({ ok: false, error: 'unauthorized' }, 401);
+    if (!authed) return json({ ok: false, error: 'unauthorized' }, 401);
     try {
       const now = Date.now();
       const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
@@ -69,7 +78,7 @@ export async function onRequestGet(context) {
 
   /* ---- Fallback: custom Cloudflare D1 analytics (filled by /api/hit) ---- */
   if (!env.DB) return json({ ok: false, error: 'no-db' });
-  if (!env.STATS_TOKEN || token !== env.STATS_TOKEN) return json({ ok: false, error: 'unauthorized' }, 401);
+  if (!authed) return json({ ok: false, error: 'unauthorized' }, 401);
 
   const DB = env.DB;
   const start = new Date(); start.setHours(0, 0, 0, 0);

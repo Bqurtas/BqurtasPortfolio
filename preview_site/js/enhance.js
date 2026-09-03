@@ -946,7 +946,7 @@
           localizeChrome();
           return;
         }
-        fetch('/api/2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: twoFAPin, action: 'verify', id: twoFAId, code: val }) })
+        fetch('/api/2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ pin: twoFAPin, action: 'verify', id: twoFAId, code: val }) })
           .then(r => r.json()).then(d => {
             if (d.ok) { doUnlock(); return; }
             hint.textContent = DT('twoWrong');
@@ -1612,7 +1612,11 @@
       }
       view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i><br>${DT('vLoading')}</p>`;
       let d;
-      try { d = await (await fetch('/api/stats?token=' + encodeURIComponent(token))).json(); }
+      /* The token travels in a header now, not the query string: a URL
+         carrying a secret ends up in history, in the service worker's cache and
+         in every log between here and the edge. Credentials are sent so the
+         signed admin session goes with it. */
+      try { d = await (await fetch('/api/stats', { headers: { 'x-stats-token': token }, credentials: 'same-origin' })).json(); }
       catch (e) { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>Can't reach analytics — this works on the live site only, not local preview.</p>`; return; }
 
       if (!d.ok) {
@@ -1923,11 +1927,23 @@
     $('#dashAi')?.addEventListener('click', () => openTool(renderAssistant, DT('tAi')));
     $('#dashAddAdmin')?.addEventListener('click', () => openTool(renderAdmins, DT('tAddAdmin')));
     // Log out — lock the console again
-    $('#dashLogout')?.addEventListener('click', () => {
+    $('#dashLogout')?.addEventListener('click', async () => {
       if (!confirm(DT('logoutAsk'))) return;
       unlocked = false;
       clearTwoFA();
       try { sessionStorage.removeItem('bq_dash_ok'); } catch (e) {}
+      /* Tell the server as well. Clearing a flag in this tab left the signed
+         session valid on every other device it had been opened on, and the
+         edit token sitting in localStorage untouched. */
+      try {
+        await fetch('/api/2fa', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ action: 'logout' })
+        });
+      } catch (e) {}
+      try { localStorage.removeItem('bq_edit_token'); localStorage.removeItem('bq_stats_token'); } catch (e) {}
       dash.classList.remove('is-full'); main.hidden = true; gate.hidden = false;
       closeDash();
     });

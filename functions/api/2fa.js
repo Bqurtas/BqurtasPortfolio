@@ -22,6 +22,8 @@
    method is missing, authentication fails closed and the dashboard stays
    locked.                                                                    */
 
+import { issueSession, clearSession } from './_session.js';
+
 function json(obj, status, extraHeaders) {
   return new Response(JSON.stringify(obj), {
     status: status || 200,
@@ -215,7 +217,9 @@ export async function onRequestPost(context) {
       if (!hasTOTP) return json({ ok: false, error: 'expired' }, 410);
       const valid = await totpValid(env.TOTP_SECRET, body.code);
       if (valid) await clearRateSlot(env.DB, verifyBucket);
-      return json(valid ? { ok: true } : { ok: false, error: 'wrong-code' }, valid ? 200 : 401);
+      if (!valid) return json({ ok: false, error: 'wrong-code' }, 401);
+      const cookie = await issueSession(env);
+      return json({ ok: true }, 200, cookie ? { 'Set-Cookie': cookie } : undefined);
     }
     if (!env.DB) return json({ ok: false, error: 'no-db' }, 503);
     await ensure(env.DB);
@@ -225,7 +229,14 @@ export async function onRequestPost(context) {
     if (!(await secretEqual(await sha(String(body.code || '')), row.code))) { await env.DB.prepare('UPDATE twofa SET tries=tries+1 WHERE id=?').bind(row.id).run(); return json({ ok: false, error: 'wrong-code' }, 401); }
     await env.DB.prepare('DELETE FROM twofa WHERE id=?').bind(row.id).run();
     await clearRateSlot(env.DB, verifyBucket);
-    return json({ ok: true });
+    const cookie = await issueSession(env);
+    return json({ ok: true }, 200, cookie ? { 'Set-Cookie': cookie } : undefined);
+  }
+
+  /* Signing out has to reach the server too — a flag cleared in the tab left
+     the session valid everywhere else. */
+  if (body.action === 'logout') {
+    return json({ ok: true }, 200, { 'Set-Cookie': clearSession() });
   }
 
   return json({ ok: false, error: 'bad-action' }, 400);

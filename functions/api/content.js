@@ -6,6 +6,8 @@
    EDIT_TOKEN you set in Cloudflare (Settings → Environment variables) — it is
    never stored in the source. The table is auto-created on first use. */
 
+import { hasSession } from './_session.js';
+
 function json(obj, status) {
   return new Response(JSON.stringify(obj), {
     status: status || 200,
@@ -19,9 +21,12 @@ async function ensure(DB) {
   ).run();
 }
 
-function authed(env, request) {
+async function authed(env, request) {
   const t = request.headers.get('x-edit-token') || '';
-  return !!env.EDIT_TOKEN && t === env.EDIT_TOKEN;
+  if (!!env.EDIT_TOKEN && t === env.EDIT_TOKEN) return true;
+  /* A token in localStorage outlives a logout and never knew whether the
+     second factor was passed. A session the server signed does both. */
+  return hasSession(request, env);
 }
 
 function shape(r) {
@@ -47,7 +52,7 @@ export async function onRequestGet(context) {
 export async function onRequestPost(context) {
   const { request, env } = context;
   if (!env.DB) return json({ ok: false, error: 'no-db' });
-  if (!authed(env, request)) return json({ ok: false, error: 'unauthorized' }, 401);
+  if (!await authed(env, request)) return json({ ok: false, error: 'unauthorized' }, 401);
   let p;
   try { p = await request.json(); } catch (e) { return json({ ok: false, error: 'bad-json' }, 400); }
   if (!p || !String(p.title || '').trim()) return json({ ok: false, error: 'title-required' }, 400);
@@ -69,7 +74,7 @@ export async function onRequestPost(context) {
 export async function onRequestDelete(context) {
   const { request, env } = context;
   if (!env.DB) return json({ ok: false, error: 'no-db' });
-  if (!authed(env, request)) return json({ ok: false, error: 'unauthorized' }, 401);
+  if (!await authed(env, request)) return json({ ok: false, error: 'unauthorized' }, 401);
   const id = new URL(request.url).searchParams.get('id');
   if (!id) return json({ ok: false, error: 'id-required' }, 400);
   await ensure(env.DB);

@@ -4804,3 +4804,56 @@ html:root[data-theme][data-theme] body.menu-open .bq-page-stage > .main,
 html:root[data-theme][data-theme] body.menu-closing .bq-page-stage > .main {
   transform: none !important;
 }
+
+/* ==========================================================================
+   Accessibility: contrast, whole words, and things a keyboard can reach.
+   ========================================================================== */
+
+/* A work's title is the one thing on the card that has to be readable, and it
+   was being cut with an ellipsis on a single nowrap line. Two lines, wrapped,
+   no ellipsis — the caption grows by a line rather than losing the name. */
+:root[data-theme] #design #grid .card-caption .card-title,
+html body #design #grid .card-caption .card-title {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow-wrap: anywhere;
+}
+
+/* Small print at 46% of the ink colour lands near 2.8:1 against the paper —
+   under the 4.5:1 that body-sized text needs. These are the labels, dates and
+   captions, the text a reader most often has to squint at. */
+html body #design .card-caption .card-tag,
+html body #design .service-showcase .service-sub,
+html body #bio .tl-date,
+html body #bio .tl-org,
+html body #bio .tl-loc,
+html body #bio .tl-skills,
+html body #bio .bio-social-eyebrow,
+html body #bio .bio-social-handle,
+html body #contact .qc-card .mono,
+html body .room .room-hero-num {
+  opacity: 1 !important;
+  color: var(--ink-muted, #5c5c5c) !important;
+}
+html body .footer .footer-bottom,
+html body .footer .footer-stage .mono {
+  color: rgba(255, 255, 255, .82) !important;
+}
+
+/* The certificate and logo tiles open a lightbox. They were plain divs, so a
+   keyboard could not reach them and a screen reader had nothing to announce. */
+html body #bio .cert-grid > *,
+html body #design .logo-chip {
+  cursor: pointer;
+}
+html body #bio .cert-grid > *:focus-visible,
+html body #design .logo-chip:focus-visible,
+html body #design #grid .card-open:focus-visible {
+  outline: 2px solid var(--ink, #141414) !important;
+  outline-offset: 3px !important;
+  border-radius: 4px;
+}
