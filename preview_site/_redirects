@@ -4,7 +4,6 @@ https://www.bqurtas.com/*  https://bqurtas.com/:splat  301!
 # Some scanners and clients still look for the legacy root path.
 /security.txt  /.well-known/security.txt  301
 
-# SPA fallback — serve the app shell for client-side routes so deep-links
-# (/design, /design/logo, /blog, /bio, /contact) load even if the Pages
-# Function isn't active. Static files and Functions take precedence over this.
-/*  /index.html  200
+# Deep links are served by functions/[[route]].js. Do not add a wildcard
+# index.html fallback here: it would turn missing scripts, images and arbitrary
+# extension URLs into misleading 200 HTML responses.

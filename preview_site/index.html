@@ -11,7 +11,7 @@
        same-origin script (no SRI needed → full Subresource-Integrity pass).
        The tracker still posts events to Umami cloud (gateway.umami.is/api/send,
        its built-in default), so the dashboard keeps receiving data. -->
-  <script defer src="js/umami.js?v=248" data-website-id="f58c1ade-02c7-4c2e-95b3-2bcbf2e354fa"></script>
+  <script defer src="js/umami.js?v=c8af63dd9b16" data-website-id="f58c1ade-02c7-4c2e-95b3-2bcbf2e354fa"></script>
 
   <!-- Google Analytics REMOVED 2026-06-18 — it was redundant with Umami (and
        showed no data in Semrush). gtag.js can't carry SRI, so dropping it gives
@@ -62,7 +62,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon-512.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <link rel="manifest" href="/site.webmanifest?v=333" />
+  <link rel="manifest" href="/site.webmanifest?v=19c5c4b9ee48" />
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
@@ -591,7 +591,7 @@
       } catch (e) {}
     }());
   </script>
-  <link rel="preload" href="assets/portrait.webp?v=2" as="image" fetchpriority="high">
+  <link rel="preload" href="assets/portrait.webp?v=56f25216a1e1" as="image" fetchpriority="high">
   <link rel="preload" href="assets/fonts/Liana.otf" as="font" type="font/otf" crossorigin fetchpriority="high">
   <link rel="preload" href="assets/fonts/CSRk4ydQnPyaDxEXLFF6LZVLKrodrOMFFg.woff2" as="font" type="font/woff2" crossorigin>
 
@@ -616,9 +616,9 @@
     @media (max-width:1024px){.rail{display:none!important}.mobilebar{display:flex!important}.main,[dir=rtl] .main{margin-left:0!important;margin-right:0!important;padding-top:0!important}.design-cta{display:none!important}}
     html.bq-compact .rail{display:none!important}html.bq-compact .mobilebar{display:flex!important}html.bq-compact .main,[dir=rtl] html.bq-compact .main{margin-left:0!important;margin-right:0!important}
   </style>
-  <link rel="preload" as="style" href="css/style.v417.min.css?v=470" data-href="css/style.v417.min.css?v=470" fetchpriority="high" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.css?v=209">
-  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=470"></noscript>
+  <link rel="preload" as="style" href="css/style.v417.min.css?v=16633f93b573" data-href="css/style.v417.min.css?v=16633f93b573" fetchpriority="high" id="bqFullCss">
+  <link rel="stylesheet" href="css/modern-framer.min.css?v=ed22d11bfa00">
+  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=16633f93b573"></noscript>
   <script>
     (function () {
       var root = document.documentElement;
@@ -715,10 +715,10 @@
       window.__bqApplyFullCss = apply;
     }());
   </script>
-  <link rel="stylesheet" href="css/fonts.css?v=447">
-  <link rel="stylesheet" href="css/experience.css?v=145">
-  <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315" media="print" id="faCss">
-  <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=315"></noscript>
+  <link rel="stylesheet" href="css/fonts.css?v=69cf74d1bd04">
+  <link rel="stylesheet" href="css/experience.min.css?v=11bc8e4e3529">
+  <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=a65cc728586a" media="print" id="faCss">
+  <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=a65cc728586a"></noscript>
 
   <!-- Supabase powers the journal and subscription form. -->
   <link rel="preconnect" href="https://dcnkhzrishphpismmxuu.supabase.co" crossorigin>
@@ -726,7 +726,7 @@
 </head>
 <body>
 
-  <a class="skip-link" href="#design" data-i18n="a11y.skip">Skip to content</a>
+  <a class="skip-link" href="#top" data-skip-link data-i18n="a11y.skip">Skip to content</a>
 
   <!-- Grain overlay -->
   <div class="grain" aria-hidden="true"></div>
@@ -796,11 +796,11 @@
 
       <!-- Language hover-menu -->
       <div class="lang-hover" id="langHover">
-        <button class="lang-current" id="langCurrentBtn" aria-haspopup="true" aria-expanded="false" aria-controls="langFlyout" aria-label="Change language">
+        <button class="lang-current" id="langCurrentBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="langFlyout" aria-label="Change language">
           <span id="langCurrentCode">EN</span>
         </button>
         <span class="tool-tip" data-i18n="tip.lang">Language</span>
-        <div class="lang-flyout" id="langFlyout" role="menu">
+        <div class="lang-flyout" id="langFlyout" role="menu" aria-hidden="true" inert>
           <div class="lang-head mono" data-i18n="lang.select">Select your language</div>
           <button class="lang-opt" data-lang="en" role="menuitem"><span>EN</span><small data-i18n="lang.en">English</small><i class="fa-solid fa-check lang-check"></i></button>
           <button class="lang-opt" data-lang="ku" role="menuitem"><span>KU</span><small data-i18n="lang.ku">Sorani Kurdish</small><i class="fa-solid fa-check lang-check"></i></button>
@@ -814,10 +814,10 @@
 
       <!-- Social dropdown -->
       <div class="social-hover" id="socialHover">
-        <button class="social-current" id="socialCurrentBtn" aria-haspopup="true" aria-expanded="false" aria-controls="socialFlyout" aria-label="Connect" data-i18n-aria="a11y.connect">
+        <button class="social-current" id="socialCurrentBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="socialFlyout" aria-label="Connect" data-i18n-aria="a11y.connect">
           <i class="fa-solid fa-share-nodes"></i>
         </button>
-        <div class="social-flyout" id="socialFlyout" role="menu">
+        <div class="social-flyout" id="socialFlyout" role="menu" aria-hidden="true" inert>
           <button class="social-opt social-opt--share share-page-btn" role="menuitem" aria-label="Share this page" data-i18n-aria="a11y.sharePage"><i class="fa-solid fa-arrow-up-from-bracket"></i><small data-i18n="share.page">Share page</small></button>
           <a class="social-opt" href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener" role="menuitem" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i><small>LinkedIn</small></a>
           <a class="social-opt" href="https://instagram.com/bqurtas" target="_blank" rel="noopener" role="menuitem" aria-label="Instagram"><i class="fa-brands fa-instagram"></i><small>Instagram</small></a>
@@ -875,15 +875,15 @@
 
   <!-- ===== MOBILE BOTTOM BAR ===== -->
   <nav class="mobilebar" aria-label="Toolbar" data-i18n-aria="a11y.toolbar">
-    <button class="mobilebar-btn menu-toggle-btn" id="menuToggle" aria-label="Open menu" data-i18n-aria="a11y.menuOpen" aria-controls="mobileMenu" aria-expanded="false">
+    <button type="button" class="mobilebar-btn menu-toggle-btn" id="menuToggle" aria-label="Open menu" data-i18n-aria="a11y.menuOpen" aria-controls="mobileMenu" aria-expanded="false">
       <svg class="menu-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M4 7h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         <path d="M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         <path d="M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       </svg>
     </button>
-    <button class="mobilebar-btn" id="railLatestM" aria-label="Latest"><i class="fa-solid fa-bell"></i><span class="rail-latest-badge" id="railLatestBadgeM" hidden></span></button>
-    <button class="mobilebar-btn" id="railChatM" aria-label="Chat with assistant"><i class="fa-solid fa-comment-dots"></i><span class="rail-chat-dot" aria-hidden="true"></span></button>
+    <button type="button" class="mobilebar-btn" id="railLatestM" aria-label="Latest"><i class="fa-solid fa-bell"></i><span class="rail-latest-badge" id="railLatestBadgeM" hidden></span></button>
+    <button type="button" class="mobilebar-btn" id="railChatM" aria-label="Chat with assistant"><i class="fa-solid fa-comment-dots"></i><span class="rail-chat-dot" aria-hidden="true"></span></button>
     <a href="/contact" class="mobilebar-cta" data-route="contact" aria-label="Let's work together">
       <span class="design-cta-dot" aria-hidden="true"></span>
       <span class="mobilebar-cta-txt" data-i18n="cta.float">Let's work together</span>
@@ -891,35 +891,35 @@
     </a>
 
     <div class="mobilebar-pop-wrap">
-      <button class="mobilebar-btn" id="langPopBtn" aria-haspopup="true" aria-expanded="false" aria-label="EN — Language"><span id="langCurrentCodeM">EN</span></button>
-      <div class="mobilebar-pop mobilebar-pop--lang" id="langPop">
-        <button class="mobile-lang" data-lang="en" aria-label="EN">EN</button>
-        <button class="mobile-lang" data-lang="ku" aria-label="KU">KU</button>
-        <button class="mobile-lang" data-lang="kmr" aria-label="KMR">KMR</button>
-        <button class="mobile-lang" data-lang="ar" aria-label="AR">AR</button>
-        <button class="mobile-lang" data-lang="fr" aria-label="FR">FR</button>
-        <button class="mobile-lang" data-lang="tr" aria-label="TR">TR</button>
-        <button class="mobile-lang" data-lang="sv" aria-label="SV">SV</button>
+      <button type="button" class="mobilebar-btn" id="langPopBtn" aria-haspopup="menu" aria-controls="langPop" aria-expanded="false" aria-label="EN — Language"><span id="langCurrentCodeM">EN</span></button>
+      <div class="mobilebar-pop mobilebar-pop--lang" id="langPop" role="menu" aria-hidden="true" inert>
+        <button type="button" class="mobile-lang" data-lang="en" role="menuitem" aria-label="EN">EN</button>
+        <button type="button" class="mobile-lang" data-lang="ku" role="menuitem" aria-label="KU">KU</button>
+        <button type="button" class="mobile-lang" data-lang="kmr" role="menuitem" aria-label="KMR">KMR</button>
+        <button type="button" class="mobile-lang" data-lang="ar" role="menuitem" aria-label="AR">AR</button>
+        <button type="button" class="mobile-lang" data-lang="fr" role="menuitem" aria-label="FR">FR</button>
+        <button type="button" class="mobile-lang" data-lang="tr" role="menuitem" aria-label="TR">TR</button>
+        <button type="button" class="mobile-lang" data-lang="sv" role="menuitem" aria-label="SV">SV</button>
       </div>
     </div>
 
-    <button class="mobilebar-btn theme-btn" id="themeToggleM" role="switch" aria-checked="false" aria-label="Toggle dark mode">
+    <button type="button" class="mobilebar-btn theme-btn" id="themeToggleM" role="switch" aria-checked="false" aria-label="Toggle dark mode">
       <i class="fa-solid fa-sun theme-icon-sun" aria-hidden="true"></i>
       <i class="fa-solid fa-moon theme-icon-moon" aria-hidden="true"></i>
     </button>
 
     <div class="mobilebar-pop-wrap mobilebar-social-wrap">
-      <button class="mobilebar-btn" id="socialPopBtn" aria-haspopup="true" aria-expanded="false" aria-label="Connect"><i class="fa-solid fa-share-nodes"></i></button>
-      <div class="mobilebar-pop mobilebar-pop--social" id="socialPop">
-        <button class="share-page-btn" aria-label="Share this page"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
-        <a href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-        <a href="https://instagram.com/bqurtas" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-        <a href="https://facebook.com/bqurtas" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-        <a href="https://twitter.com/bqurtas" target="_blank" rel="noopener" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
-        <a href="https://www.behance.net/bqurtas" target="_blank" rel="noopener" aria-label="Behance"><i class="fa-brands fa-behance"></i></a>
-        <a href="https://wa.me/9647517884985" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-        <a href="https://t.me/bqurtas" target="_blank" rel="noopener" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
-        <!--email_off--><a href="mailto:hello@bqurtas.com" aria-label="Email"><i class="fa-solid fa-envelope"></i></a><!--/email_off-->
+      <button type="button" class="mobilebar-btn" id="socialPopBtn" aria-haspopup="menu" aria-controls="socialPop" aria-expanded="false" aria-label="Connect"><i class="fa-solid fa-share-nodes"></i></button>
+      <div class="mobilebar-pop mobilebar-pop--social" id="socialPop" role="menu" aria-hidden="true" inert>
+        <button type="button" class="share-page-btn" role="menuitem" aria-label="Share this page"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
+        <a href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener" role="menuitem" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="https://instagram.com/bqurtas" target="_blank" rel="noopener" role="menuitem" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://facebook.com/bqurtas" target="_blank" rel="noopener" role="menuitem" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="https://twitter.com/bqurtas" target="_blank" rel="noopener" role="menuitem" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="https://www.behance.net/bqurtas" target="_blank" rel="noopener" role="menuitem" aria-label="Behance"><i class="fa-brands fa-behance"></i></a>
+        <a href="https://wa.me/9647517884985" target="_blank" rel="noopener" role="menuitem" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="https://t.me/bqurtas" target="_blank" rel="noopener" role="menuitem" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
+        <!--email_off--><a href="mailto:hello@bqurtas.com" role="menuitem" aria-label="Email"><i class="fa-solid fa-envelope"></i></a><!--/email_off-->
       </div>
     </div>
   </nav>
@@ -1017,7 +1017,7 @@
 
         <div class="hero-inner">
           <h1 class="hero-title">
-            <span class="hero-portrait" id="heroPortrait"><img src="assets/portrait.webp?v=2" alt="Barakat Qurtas" width="400" height="600" loading="eager" decoding="async" fetchpriority="high" /></span>
+            <span class="hero-portrait" id="heroPortrait"><img src="assets/portrait.webp?v=56f25216a1e1" alt="Barakat Qurtas" width="400" height="600" loading="eager" decoding="async" fetchpriority="high" /></span>
           </h1>
           <div class="hero-sign">
             <span class="hero-sign-first" data-i18n="name.first">Barakat</span>
@@ -1216,7 +1216,7 @@
       <div class="bio-teaser">
         <div class="bio-teaser-grid">
           <figure class="bio-teaser-portrait" data-motion>
-            <img src="assets/portrait.webp?v=2" alt="Barakat Qurtas — multidisciplinary designer in Hewlêr, Kurdistan" width="400" height="600" loading="lazy" decoding="async" />
+            <img src="assets/portrait.webp?v=56f25216a1e1" alt="Barakat Qurtas — multidisciplinary designer in Hewlêr, Kurdistan" width="400" height="600" loading="lazy" decoding="async" />
             <figcaption>
               <span class="mono" data-i18n="krg">Hewlêr · KRG</span>
               <span class="mono">36.19° N · 44.01° E</span>
@@ -2158,7 +2158,7 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script defer src="js/i18n.v420.min.js?v=456"></script>
+  <script defer src="js/i18n.v420.min.js?v=aefcc7b910c0"></script>
   <!-- Non-English visitors need the extra dictionaries before first render;
        English (the default + PSI) never loads them, keeping the parse light.
        applyLang() can also fetch this on its own, but starting it here — in
@@ -2175,7 +2175,7 @@
       var lang=u;
       if(lang && lang!=='en'){
         window.__i18nMoreLoading=true; window.__i18nMoreCbs=window.__i18nMoreCbs||[];
-        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=425'; s.async=false;
+        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=e15513e777fc'; s.async=false;
         s.onload=function(){
           window.__i18nMoreLoaded=true; window.__i18nMoreLoading=false;
           var cbs=(window.__i18nMoreCbs||[]).slice(); window.__i18nMoreCbs=[];
@@ -2186,8 +2186,8 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=535"></script>
-  <script defer src="js/gallery.v420.min.js?v=455"></script>
+  <script defer src="js/main.v420.min.js?v=59672afc0a39"></script>
+  <script defer src="js/gallery.v420.min.js?v=70da87fe43cb"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
        still receive them immediately. This removes their database/GitHub work
@@ -2206,7 +2206,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=455';
+        s.src = 'js/enhance.v420.min.js?v=778a7839de90';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -2245,13 +2245,13 @@
       }, true);
     }());
   </script>
-  <script defer src="js/lux.min.js?v=359"></script>
-  <script defer src="js/motion.min.js?v=419"></script>
+  <script defer src="js/lux.min.js?v=4687eeaa96da"></script>
+  <script defer src="js/motion.min.js?v=282b683a1d19"></script>
   <!-- The chatbot knowledge base is loaded only when a visitor shows intent. -->
   <script>
     (function () {
       var modules = {
-        chat: 'js/chat-kb.min.js?v=309'
+        chat: 'js/chat-kb.min.js?v=4c5bd2b4c5ec'
       };
       var loaded = {};
       function load(name) {
@@ -2333,7 +2333,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=98af769fe9', { updateViaCache: 'none' })
+            .register('/sw.js?v=d9c079f53e82', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

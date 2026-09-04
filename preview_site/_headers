@@ -32,13 +32,21 @@
 # pins the homepage too.
 /
   Access-Control-Allow-Origin: https://bqurtas.com
-  Cache-Control: private, no-cache, max-age=0, must-revalidate
+  Cache-Control: no-store, max-age=0
   CDN-Cache-Control: no-store
+  Cloudflare-CDN-Cache-Control: no-store
+
+/index.html
+  Access-Control-Allow-Origin: https://bqurtas.com
+  Cache-Control: no-store, max-age=0
+  CDN-Cache-Control: no-store
+  Cloudflare-CDN-Cache-Control: no-store
 
 /site.webmanifest
   Content-Type: application/manifest+json
   Cache-Control: no-store
   CDN-Cache-Control: no-store
+  Cloudflare-CDN-Cache-Control: no-store
 
 /favicon.ico
   Content-Type: image/x-icon
@@ -48,11 +56,13 @@
   Content-Type: application/xml; charset=utf-8
   Cache-Control: no-store
   CDN-Cache-Control: no-store
+  Cloudflare-CDN-Cache-Control: no-store
 
 /robots.txt
   Content-Type: text/plain; charset=utf-8
   Cache-Control: no-store
   CDN-Cache-Control: no-store
+  Cloudflare-CDN-Cache-Control: no-store
 
 /sw.js
   # The one file that must never be edge-cached. Every other asset carries a
@@ -63,11 +73,13 @@
   Content-Type: text/javascript; charset=utf-8
   Cache-Control: no-store
   CDN-Cache-Control: no-store
+  Cloudflare-CDN-Cache-Control: no-store
 
 /llms.txt
   Content-Type: text/plain; charset=utf-8
   Cache-Control: no-store
   CDN-Cache-Control: no-store
+  Cloudflare-CDN-Cache-Control: no-store
 
 # Many portfolio images keep stable filenames between releases, so revalidate
 # them daily instead of pinning an old visual in a visitor's cache for a year.
@@ -110,10 +122,3 @@
   Content-Type: text/xml; charset=utf-8
   Cache-Control: public, max-age=3600
   X-Robots-Tag: noindex
-
-# robots/llms must never linger stale at the edge (an old cached copy kept
-# failing Lighthouse's robots.txt audit after the fix deployed)
-/robots.txt
-  Cache-Control: public, max-age=120
-/llms.txt
-  Cache-Control: public, max-age=120

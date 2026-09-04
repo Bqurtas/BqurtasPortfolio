@@ -169,14 +169,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const urlLang0 = location.pathname.replace(/^\/+/, '').split('/')[0];
   window.applyLang(URL_LANGS.includes(urlLang0) ? urlLang0 : 'en');
 
-  /* Make the lightbox tiles reachable without a mouse.
-     The certificate and logo tiles open a full-screen viewer on click, but
-     they are plain <div>s: no tab stop, no role, nothing announced, and Enter
-     or Space did nothing. Rather than rewrite the markup the generators
-     produce, they are given the button contract here — and re-given it
-     whenever new tiles arrive, since both grids are rebuilt at runtime. */
+  /* Keep legacy lightbox tiles reachable without a mouse. New gallery builds
+     use native buttons; this fallback covers a stale cached gallery bundle
+     without turning the decorative client-logo marquee into fake controls. */
   const makeTilesReachable = () => {
-    document.querySelectorAll('#certGrid > *:not(.gallery-loading), .logo-chip').forEach((tile) => {
+    document.querySelectorAll('#certGrid .cert-item, .logos-grid .logo-mark--img').forEach((tile) => {
       if (tile.dataset.bqKeyed === '1' || tile.tagName === 'BUTTON' || tile.tagName === 'A') return;
       tile.dataset.bqKeyed = '1';
       tile.setAttribute('role', 'button');
@@ -196,14 +193,17 @@ document.addEventListener('DOMContentLoaded', () => {
   ['bq:gallery-built', 'bq:certs-built', 'bq:logos-built'].forEach((name) => {
     window.addEventListener(name, makeTilesReachable);
   });
-  /* Coalesced to one pass per frame. An observer on the whole body that ran
-     the sweep on every mutation would fire hundreds of times while eighty
-     cards are being placed. */
+  /* Watch only the two interactive grids. Observing the whole document made
+     unrelated dashboard and journal updates trigger redundant accessibility
+     sweeps. */
   let tileSweep = 0;
-  new MutationObserver(() => {
+  const tileObserver = new MutationObserver(() => {
     if (tileSweep) return;
     tileSweep = requestAnimationFrame(() => { tileSweep = 0; makeTilesReachable(); });
-  }).observe(document.body, { childList: true, subtree: true });
+  });
+  [document.getElementById('certGrid'), document.querySelector('.logos-grid')]
+    .filter(Boolean)
+    .forEach((root) => tileObserver.observe(root, { childList: true, subtree: true }));
 
   /* ---------- ROUTER (room switcher + deep-links) ---------- */
   const rooms = document.querySelectorAll('.room');
@@ -305,6 +305,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
   window.__bqShowRoom = showRoom;
+
+  /* The skip link follows the active SPA room. A static #design target sends
+     keyboard users into a hidden section after navigating to Blog/Bio/Contact. */
+  document.querySelector('[data-skip-link]')?.addEventListener('click', (event) => {
+    event.preventDefault();
+    const room = document.getElementById(document.body.dataset.room || 'design');
+    const destination = room?.querySelector('.room-hero-title, h1, h2') || room || document.getElementById('top');
+    if (!destination) return;
+    if (typeof window.__bqGoDocumentTop === 'function') window.__bqGoDocumentTop('auto');
+    else window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    destination.setAttribute('tabindex', '-1');
+    try { destination.focus({ preventScroll: true }); } catch (e) { destination.focus(); }
+    destination.addEventListener('blur', () => destination.removeAttribute('tabindex'), { once: true });
+  });
 
   let roomTransitionTimer = null;
   const shouldDelayRoomSwapForCurtain = (id) => {
@@ -592,38 +606,51 @@ document.addEventListener('DOMContentLoaded', () => {
   const socialPop = document.getElementById('socialPop');
   const langPopBtn = document.getElementById('langPopBtn');
   const socialPopBtn = document.getElementById('socialPopBtn');
-  const setPopExpanded = (name, open) => {
+  const setPopState = (name, open) => {
     const button = name === 'lang' ? langPopBtn : socialPopBtn;
+    const panel = name === 'lang' ? langPop : socialPop;
     button?.setAttribute('aria-expanded', String(open));
+    if (!panel) return;
+    panel.classList.toggle('is-open', open);
+    panel.setAttribute('aria-hidden', String(!open));
+    panel.toggleAttribute('inert', !open);
   };
   const closePops = (except) => {
-    if (langPop && except !== 'lang') {
-      langPop.classList.remove('is-open');
-      setPopExpanded('lang', false);
-    }
-    if (socialPop && except !== 'social') {
-      socialPop.classList.remove('is-open');
-      setPopExpanded('social', false);
-    }
+    if (except !== 'lang') setPopState('lang', false);
+    if (except !== 'social') setPopState('social', false);
   };
   window.__bqPanels.lang = () => closePops('social');
   window.__bqPanels.social = () => closePops('lang');
   langPopBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
     window.__bqExclusive('lang');
-    const open = Boolean(langPop?.classList.toggle('is-open'));
-    setPopExpanded('lang', open);
+    setPopState('lang', !langPop?.classList.contains('is-open'));
   });
   socialPopBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
     window.__bqExclusive('social');
-    const open = Boolean(socialPop?.classList.toggle('is-open'));
-    setPopExpanded('social', open);
+    setPopState('social', !socialPop?.classList.contains('is-open'));
   });
   langPop?.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => {
-    langPop.classList.remove('is-open');
-    setPopExpanded('lang', false);
+    setPopState('lang', false);
   }));
+  socialPop?.querySelectorAll('a, button').forEach((item) => item.addEventListener('click', () => setPopState('social', false)));
+  const bindPopoverKeys = (panel) => panel?.addEventListener('keydown', (e) => {
+    const items = [...panel.querySelectorAll('[role="menuitem"]')].filter((item) => !item.hidden);
+    if (!items.length) return;
+    const current = Math.max(0, items.indexOf(document.activeElement));
+    let next = current;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') next = (current + 1) % items.length;
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') next = (current - 1 + items.length) % items.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = items.length - 1;
+    else return;
+    e.preventDefault();
+    items[next].focus();
+  });
+  bindPopoverKeys(langPop);
+  bindPopoverKeys(socialPop);
+  closePops();
   document.addEventListener('click', (e) => { if (!e.target.closest('.mobilebar-pop-wrap')) closePops(); });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
@@ -642,9 +669,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.lang-hover, .social-hover').forEach((wrap) => {
       let timer;
       const trigger = wrap.querySelector(':scope > button[aria-haspopup]');
+      const menu = wrap.querySelector(':scope > [role="menu"]');
       const setOpen = (open) => {
         wrap.classList.toggle('is-hovering', open);
         trigger?.setAttribute('aria-expanded', String(open));
+        menu?.setAttribute('aria-hidden', String(!open));
+        menu?.toggleAttribute('inert', !open);
       };
       const openIt = () => {
         clearTimeout(timer);
@@ -666,6 +696,7 @@ document.addEventListener('DOMContentLoaded', () => {
       wrap.addEventListener('mouseleave', closeIt);
       wrap.addEventListener('focusin', openIt);
       wrap.addEventListener('focusout', closeIt);
+      setOpen(false);
       trigger?.addEventListener('click', () => {
         if (wrap.classList.contains('is-flyout-dismissed')) openIt();
       });
@@ -1456,11 +1487,18 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- INDEX LAYOUT (interactive hover preview) ---------- */
   /* highlight one word in the title with gold italic */
   const highlightTitle = (title) => {
-    const words = title.split(' ');
-    if (words.length < 2) return title;
+    /* Titles can come from the CMS. Escape every word before adding the one
+       presentation-only span so highlighting can never turn authored text
+       into executable markup. */
+    const escapeTitle = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[character]));
+    const words = String(title ?? '').split(' ');
+    if (words.length < 2) return escapeTitle(words[0] || '');
     const i = Math.floor(words.length / 2);
-    words[i] = `<span class="hl">${words[i]}</span>`;
-    return words.join(' ');
+    return words.map((word, index) => index === i
+      ? `<span class="hl">${escapeTitle(word)}</span>`
+      : escapeTitle(word)).join(' ');
   };
 
   const initIndex = (rootId, ghostId, render) => {

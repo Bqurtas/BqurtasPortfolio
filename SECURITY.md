@@ -19,5 +19,8 @@ You can expect an acknowledgement within a few business days. Fixes are prioriti
 ## Scope notes
 
 - Public content APIs (read-only Supabase keys, Umami) are intentional and not secret credentials.
-- Studio / 2FA endpoints require a private edit token; do not attempt to brute-force them.
+- Studio login requires the private PIN plus a real second factor and a signed,
+  short-lived server session. Privileged content, analytics and assistant APIs
+  additionally require their independent edit/statistics token. Do not attempt
+  to brute-force any authentication endpoint.
 - Out of scope: social-engineering of personal accounts, physical office access, and third-party services we do not control.

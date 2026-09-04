@@ -1,245 +1,284 @@
-/* Two-factor login for the studio console. Two ways to turn it on:
+/* Two-factor login for the Studio console. Authentication succeeds only when
+   DASH_PIN, a real second factor, D1 rate limiting and an independent
+   SESSION_SECRET are all configured. */
 
-   FREE — emailed code (recommended, no app needed):
-     Default recipient is hello@bqurtas.com. Optional backup recipient is selected
-     by the dashboard without exposing the address in the UI. For a separate
-     Web3Forms inbox, set WEB3FORMS_BACKUP_KEY to an access key for that inbox.
-     using the SAME free Web3Forms key the contact form already uses (no new
-     service, no secret). Needs the D1 binding (DB). Optional: WEB3FORMS_KEY to
-     override the key.
+import {
+  clearRateLimit,
+  clearSession,
+  hasSession,
+  inputErrorResponse,
+  isSameOrigin,
+  issueSession,
+  json,
+  keyedDigest,
+  rateKey,
+  readJson,
+  secretEqual,
+  sessionConfigured,
+  takeRateLimit
+} from './_session.js';
 
-   FREE — authenticator app (TOTP, e.g. Google Authenticator):
-     Variables → TOTP_SECRET = a base32 secret (generate it in the dashboard
-     Settings → "Set up 2FA"). Nothing is sent; you read the 6-digit code from
-     the app. No cost, no SMS.
+const PIN_LIMIT = { limit: 8, windowMs: 15 * 60 * 1000, durable: true };
+const SEND_LIMIT = { limit: 5, windowMs: 15 * 60 * 1000, durable: true };
+const VERIFY_LIMIT = { limit: 8, windowMs: 15 * 60 * 1000, durable: true };
 
-   Paid — SMS via Twilio:
-     Variables → TWILIO_SID / TWILIO_TOKEN / TWILIO_FROM (+ optional
-     OWNER_PHONE, default +9647517884985). Uses D1 (binding DB) to hold codes.
+function rateResponse(slot) {
+  if (slot.unavailable) return json({ ok: false, error: 'rate-limit-unavailable' }, 503);
+  return json(
+    { ok: false, error: 'rate-limited', retryAfter: slot.retryAfter },
+    429,
+    { 'Retry-After': String(slot.retryAfter) }
+  );
+}
 
-   Every call is gated behind DASH_PIN and a D1 DB rate limiter. There is
-   deliberately no built-in PIN: if DB, DASH_PIN, or a second-factor delivery
-   method is missing, authentication fails closed and the dashboard stays
-   locked.                                                                    */
-
-import { issueSession, clearSession } from './_session.js';
-
-function json(obj, status, extraHeaders) {
-  return new Response(JSON.stringify(obj), {
-    status: status || 200,
-    headers: {
-      'Content-Type': 'application/json',
-      'Cache-Control': 'no-store',
-      ...(extraHeaders || {})
+/* RFC 6238, SHA-1, six digits, with the standard adjacent-window allowance. */
+function base32decode(value) {
+  const source = String(value || '').replace(/=+$/, '').toUpperCase().replace(/\s/g, '');
+  if (!/^[A-Z2-7]{16,}$/.test(source)) throw new Error('invalid-totp-secret');
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  let bits = 0;
+  let current = 0;
+  const output = [];
+  for (const character of source) {
+    current = (current << 5) | alphabet.indexOf(character);
+    bits += 5;
+    if (bits >= 8) {
+      output.push((current >>> (bits - 8)) & 0xff);
+      bits -= 8;
     }
-  });
-}
-
-const encoder = new TextEncoder();
-
-/* Compare fixed-length digests so a wrong PIN does not short-circuit on the
-   first differing character. Workers that expose timingSafeEqual use it;
-   other runtimes get a constant-work XOR fallback over the same 32 bytes. */
-async function secretEqual(supplied, expected) {
-  const [a, b] = await Promise.all([
-    crypto.subtle.digest('SHA-256', encoder.encode(String(supplied ?? ''))),
-    crypto.subtle.digest('SHA-256', encoder.encode(String(expected ?? '')))
-  ]);
-  if (typeof crypto.subtle.timingSafeEqual === 'function') {
-    return crypto.subtle.timingSafeEqual(a, b);
   }
-  const aa = new Uint8Array(a), bb = new Uint8Array(b);
-  let mismatch = aa.length ^ bb.length;
-  for (let i = 0; i < aa.length; i++) mismatch |= aa[i] ^ bb[i];
-  return mismatch === 0;
+  return new Uint8Array(output);
 }
 
-/* ---- TOTP (RFC 6238, SHA-1, 6 digits) — verified against the RFC vectors ---- */
-function base32decode(s) {
-  s = String(s || '').replace(/=+$/, '').toUpperCase().replace(/\s/g, '');
-  const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-  let bits = 0, val = 0; const out = [];
-  for (const c of s) { const i = A.indexOf(c); if (i < 0) continue; val = (val << 5) | i; bits += 5; if (bits >= 8) { out.push((val >>> (bits - 8)) & 0xff); bits -= 8; } }
-  return new Uint8Array(out);
-}
-async function totpAt(secret, t) {
-  const counter = Math.floor(t / 1000 / 30);
-  const buf = new ArrayBuffer(8); const dv = new DataView(buf);
-  dv.setUint32(0, Math.floor(counter / 2 ** 32)); dv.setUint32(4, counter >>> 0);
+async function totpAt(secret, time) {
+  const counter = Math.floor(time / 1000 / 30);
+  const buffer = new ArrayBuffer(8);
+  const view = new DataView(buffer);
+  view.setUint32(0, Math.floor(counter / 2 ** 32));
+  view.setUint32(4, counter >>> 0);
   const key = await crypto.subtle.importKey('raw', base32decode(secret), { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']);
-  const sig = new Uint8Array(await crypto.subtle.sign('HMAC', key, buf));
-  const off = sig[sig.length - 1] & 0xf;
-  const code = ((sig[off] & 0x7f) << 24 | sig[off + 1] << 16 | sig[off + 2] << 8 | sig[off + 3]) % 1000000;
-  return String(code).padStart(6, '0');
+  const signature = new Uint8Array(await crypto.subtle.sign('HMAC', key, buffer));
+  const offset = signature[signature.length - 1] & 0x0f;
+  const number = ((signature[offset] & 0x7f) << 24
+    | signature[offset + 1] << 16
+    | signature[offset + 2] << 8
+    | signature[offset + 3]) % 1_000_000;
+  return String(number).padStart(6, '0');
 }
-async function totpValid(secret, code) {
+
+async function totpValid(secret, supplied) {
   const now = Date.now();
   let valid = false;
-  for (const dt of [-30000, 0, 30000]) {
-    if (await secretEqual(String(code || ''), await totpAt(secret, now + dt))) valid = true;
+  for (const shift of [-30_000, 0, 30_000]) {
+    if (await secretEqual(supplied, await totpAt(secret, now + shift))) valid = true;
   }
   return valid;
 }
 
-async function ensure(DB) { await DB.prepare('CREATE TABLE IF NOT EXISTS twofa (id TEXT PRIMARY KEY, code TEXT, exp INTEGER, tries INTEGER DEFAULT 0)').run(); }
-async function sha(s) { const b = await crypto.subtle.digest('SHA-256', encoder.encode(s)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
-async function ensureRateLimit(DB) {
-  await DB.prepare('CREATE TABLE IF NOT EXISTS twofa_rate (bucket TEXT PRIMARY KEY, count INTEGER NOT NULL, reset INTEGER NOT NULL)').run();
+async function ensureChallenges(DB) {
+  await DB.prepare('CREATE TABLE IF NOT EXISTS twofa (id TEXT PRIMARY KEY, code TEXT NOT NULL, exp INTEGER NOT NULL, tries INTEGER NOT NULL DEFAULT 0)').run();
 }
-async function takeRateSlot(DB, bucket, now, maxSlots, windowMs) {
-  await ensureRateLimit(DB);
-  await DB.prepare('DELETE FROM twofa_rate WHERE reset <= ?').bind(now).run();
-  const result = await DB.prepare(`
-    INSERT INTO twofa_rate (bucket,count,reset) VALUES (?,1,?)
-    ON CONFLICT(bucket) DO UPDATE SET
-      count=CASE WHEN twofa_rate.reset <= ? THEN 1 ELSE twofa_rate.count+1 END,
-      reset=CASE WHEN twofa_rate.reset <= ? THEN excluded.reset ELSE twofa_rate.reset END
-    WHERE twofa_rate.reset <= ? OR twofa_rate.count < ?
-  `).bind(bucket, now + windowMs, now, now, now, maxSlots).run();
-  const changed = Number((result.meta && result.meta.changes) ?? result.changes ?? 0);
-  if (changed > 0) return { ok: true };
-  const row = (await DB.prepare('SELECT reset FROM twofa_rate WHERE bucket=?').bind(bucket).all()).results[0];
-  return { ok: false, retryAfter: Math.max(1, Math.ceil((((row && row.reset) || now + windowMs) - now) / 1000)) };
-}
-async function clearRateSlot(DB, bucket) { await DB.prepare('DELETE FROM twofa_rate WHERE bucket=?').bind(bucket).run(); }
-function clientIp(request) {
-  return String(request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || 'unknown').split(',')[0].trim();
-}
+
 function secureSixDigitCode() {
-  const range = 900000;
-  const ceiling = 0x100000000 - (0x100000000 % range);
+  const range = 900_000;
+  const ceiling = 0x1_0000_0000 - (0x1_0000_0000 % range);
   const values = new Uint32Array(1);
   do { crypto.getRandomValues(values); } while (values[0] >= ceiling);
-  return String(100000 + (values[0] % range));
-}
-function emailRecipient(env, choice) {
-  const key = String(choice || 'primary').toLowerCase() === 'backup' ? 'backup' : 'primary';
-  const primary = String(env.TWOFA_EMAIL_PRIMARY || 'Hello@bqurtas.com').trim();
-  const backup = String(env.TWOFA_EMAIL_BACKUP || env.TWOFA_BACKUP_EMAIL || 'Bqurtas@gmail.com').trim();
-  return {
-    key,
-    email: key === 'backup' ? backup : primary,
-    formKey: key === 'backup' && env.WEB3FORMS_BACKUP_KEY ? env.WEB3FORMS_BACKUP_KEY : (env.WEB3FORMS_KEY || 'cd575d52-8847-4286-af53-efa296c04686')
-  };
+  return String(100_000 + (values[0] % range));
 }
 
-export async function onRequestPost(context) {
-  const { request, env } = context;
+function validEmail(value) {
+  return /^[^\s@]{1,64}@[^\s@]{1,190}$/.test(String(value || ''));
+}
+
+function emailDelivery(env, choice) {
+  const recipient = choice === 'backup' ? 'backup' : 'primary';
+  const accessKey = recipient === 'backup' ? env.WEB3FORMS_BACKUP_KEY : env.WEB3FORMS_KEY;
+  const sender = String(env.TWOFA_SENDER_EMAIL || '').trim();
+  if (!accessKey || !validEmail(sender)) return null;
+  return { recipient, accessKey: String(accessKey), sender };
+}
+
+function smsConfigured(env) {
+  const phone = String(env.OWNER_PHONE || '');
+  const hasDestination = /^\+[1-9]\d{7,14}$/.test(phone);
+  const infobip = env.INFOBIP_API_KEY && env.INFOBIP_BASE_URL && env.INFOBIP_FROM;
+  const twilio = env.TWILIO_SID && env.TWILIO_TOKEN && env.TWILIO_FROM;
+  return !!(hasDestination && (infobip || twilio));
+}
+
+function totpConfigured(env) {
+  return /^[A-Z2-7]{16,}$/.test(String(env.TOTP_SECRET || '').replace(/=+$/, '').toUpperCase().replace(/\s/g, ''));
+}
+
+function secondFactorConfigured(env) {
+  const emailAllowed = String(env.TWOFA_EMAIL_DISABLED || '').trim() !== '1';
+  return totpConfigured(env)
+    || (emailAllowed && !!(emailDelivery(env, 'primary') || emailDelivery(env, 'backup')))
+    || smsConfigured(env);
+}
+
+async function sendEmail(env, delivery, code) {
+  const response = await fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({
+      access_key: delivery.accessKey,
+      subject: `Pencemor Studio login code ${code}`,
+      from_name: 'Pencemor Studio',
+      email: delivery.sender,
+      message: `Your Studio login code is ${code}. It expires in 5 minutes.`
+    }),
+    signal: AbortSignal.timeout(10_000)
+  });
+  return response.ok;
+}
+
+async function sendSms(env, code) {
+  const to = String(env.OWNER_PHONE);
+  const text = `Pencemor Studio login code: ${code}`;
+  if (env.INFOBIP_API_KEY && env.INFOBIP_BASE_URL && env.INFOBIP_FROM) {
+    const host = String(env.INFOBIP_BASE_URL).replace(/^https?:\/\//, '').replace(/\/+$/, '');
+    if (!/^[A-Za-z0-9.-]+$/.test(host)) return false;
+    const response = await fetch(`https://${host}/sms/2/text/advanced`, {
+      method: 'POST',
+      headers: { Authorization: `App ${env.INFOBIP_API_KEY}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ messages: [{ destinations: [{ to: to.replace(/^\+/, '') }], from: env.INFOBIP_FROM, text }] }),
+      signal: AbortSignal.timeout(10_000)
+    });
+    return response.ok;
+  }
+  const form = new URLSearchParams({ To: to, From: String(env.TWILIO_FROM), Body: text });
+  const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(env.TWILIO_SID)}/Messages.json`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${btoa(`${env.TWILIO_SID}:${env.TWILIO_TOKEN}`)}`,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: form.toString(),
+    signal: AbortSignal.timeout(10_000)
+  });
+  return response.ok;
+}
+
+export async function onRequestGet({ request, env }) {
+  return json({
+    ok: true,
+    configured: !!(env.DASH_PIN && env.DB && sessionConfigured(env) && secondFactorConfigured(env)),
+    authenticated: await hasSession(request, env)
+  });
+}
+
+export async function onRequestPost({ request, env }) {
   let body;
-  try { body = await request.json(); } catch (e) { return json({ ok: false, error: 'bad-json' }, 400); }
+  try { body = await readJson(request, 4_096); } catch (error) { return inputErrorResponse(error); }
 
-  /* Signing out comes before every gate. Throwing away your own cookie needs
-     no PIN, no database and no rate slot — and a logout that answers 503
-     because the DB is briefly unreachable is a logout that leaves the session
-     alive, which is the one outcome that matters here. */
-  if (body && body.action === 'logout') {
+  /* Logout remains available during a DB or provider outage. */
+  if (body.action === 'logout') {
+    if (!isSameOrigin(request)) return json({ ok: false, error: 'forbidden-origin' }, 403);
     return json({ ok: true }, 200, { 'Set-Cookie': clearSession() });
   }
 
   const dashboardPin = String(env.DASH_PIN || '');
   if (!dashboardPin) return json({ ok: false, error: 'not-configured' }, 503);
+  if (!sessionConfigured(env)) return json({ ok: false, error: 'session-not-configured' }, 503);
   if (!env.DB) return json({ ok: false, error: 'no-db' }, 503);
+  if (!isSameOrigin(request)) return json({ ok: false, error: 'forbidden-origin' }, 403);
+  if (!['send', 'verify'].includes(body.action)) return json({ ok: false, error: 'bad-action' }, 400);
+  if (typeof body.pin !== 'string' || body.pin.length > 128) return json({ ok: false, error: 'bad-pin' }, 401);
 
-  /* Reserve a per-IP attempt before comparing the short dashboard PIN. The
-     reservation is removed after a correct PIN, so normal send/verify calls do
-     not accumulate failures; eight wrong attempts lock that IP for 15 minutes. */
-  const requesterIp = clientIp(request);
-  const authBucket = await sha('twofa-pin:' + requesterIp);
-  const authSlot = await takeRateSlot(env.DB, authBucket, Date.now(), 8, 15 * 60 * 1000);
-  if (!authSlot.ok) return json({ ok: false, error: 'rate-limited', retryAfter: authSlot.retryAfter }, 429, { 'Retry-After': String(authSlot.retryAfter) });
+  const pinBucket = await rateKey(request, env, 'twofa-pin');
+  const pinSlot = await takeRateLimit(env, pinBucket, PIN_LIMIT);
+  if (!pinSlot.ok) return rateResponse(pinSlot);
   if (!(await secretEqual(body.pin, dashboardPin))) return json({ ok: false, error: 'bad-pin' }, 401);
-  await clearRateSlot(env.DB, authBucket);
+  await clearRateLimit(env, pinBucket);
 
-  const hasTOTP = !!env.TOTP_SECRET;
-  const hasEmail = String(env.TWOFA_EMAIL_DISABLED || '').trim() !== '1';
-  const hasInfobip = env.INFOBIP_API_KEY && env.INFOBIP_BASE_URL && env.INFOBIP_FROM;
-  const hasTwilio = env.TWILIO_SID && env.TWILIO_TOKEN && env.TWILIO_FROM;
-  const hasSMS = hasInfobip || hasTwilio;
-  if (!hasTOTP && !hasSMS && !hasEmail) return json({ ok: false, error: 'not-configured' }, 503);
+  const hasTotp = totpConfigured(env);
+  const emailAllowed = String(env.TWOFA_EMAIL_DISABLED || '').trim() !== '1';
+  const delivery = emailAllowed ? emailDelivery(env, body.recipient) : null;
+  const hasSms = smsConfigured(env);
+  if (!hasTotp && !delivery && !hasSms) return json({ ok: false, error: 'not-configured' }, 503);
 
-  /* begin a challenge */
   if (body.action === 'send') {
-    if (hasTOTP) return json({ ok: true, id: 'totp' });          // free: just ask for the app code
-    if (!env.DB) return json({ ok: false, error: 'no-db' }, 503);
-    await ensure(env.DB);
+    if (body.recipient && !['primary', 'backup'].includes(body.recipient)) return json({ ok: false, error: 'bad-recipient' }, 400);
+    /* Honour the email destination selected by the current dashboard. TOTP is
+       the delivery-free fallback when that inbox has not been configured. */
+    if (!delivery && hasTotp) return json({ ok: true, id: 'totp', via: 'totp' });
+
+    const sendBucket = await rateKey(request, env, 'twofa-send');
+    const sendSlot = await takeRateLimit(env, sendBucket, SEND_LIMIT);
+    if (!sendSlot.ok) return rateResponse(sendSlot);
+
     const now = Date.now();
-    await env.DB.prepare('DELETE FROM twofa WHERE exp < ?').bind(now).run();
-    const bucket = await sha('twofa-send:' + requesterIp);
-    const slot = await takeRateSlot(env.DB, bucket, now, 5, 15 * 60 * 1000);
-    if (!slot.ok) return json({ ok: false, error: 'rate-limited', retryAfter: slot.retryAfter }, 429, { 'Retry-After': String(slot.retryAfter) });
     const code = secureSixDigitCode();
     const id = crypto.randomUUID();
-    await env.DB.prepare('INSERT INTO twofa (id,code,exp,tries) VALUES (?,?,?,0)').bind(id, await sha(code), now + 5 * 60 * 1000).run();
-
-    /* EMAIL (free) — addresses are chosen server-side, so the dashboard can show
-       "Primary" / "Backup" without exposing the real inboxes in the UI. */
-    if (hasEmail) {
-      const recipient = emailRecipient(env, body.recipient);
-      let er;
-      try {
-        er = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({
-            access_key: recipient.formKey,
-            subject: 'Pencemor Studio — login code ' + code,
-            from_name: 'Pencemor Studio',
-            email: recipient.email,
-            replyto: recipient.email,
-            message: 'Your studio login code is ' + code + '.\n\nIt expires in 5 minutes. If this wasn’t you, you can ignore this email.'
-          })
-        });
-      } catch (e) { return json({ ok: false, error: 'email-failed' }, 502); }
-      if (!er.ok) { const ed = await er.text(); return json({ ok: false, error: 'email-failed', detail: ed.slice(0, 160) }, 502); }
-      return json({ ok: true, id, via: 'email', recipient: recipient.key });
+    const digest = await keyedDigest(env.SESSION_SECRET, `twofa-code|${code}`);
+    try {
+      await ensureChallenges(env.DB);
+      await env.DB.prepare('DELETE FROM twofa WHERE exp < ?').bind(now).run();
+      await env.DB.prepare('INSERT INTO twofa (id,code,exp,tries) VALUES (?,?,?,0)').bind(id, digest, now + 5 * 60 * 1000).run();
+    } catch (error) {
+      return json({ ok: false, error: 'twofa-unavailable' }, 503);
     }
 
-    const to = env.OWNER_PHONE || '+9647517884985';
-    const text = 'Pencemor studio login code: ' + code;
-    let tr;
     try {
-      if (hasInfobip) {
-        // Infobip SMS — INFOBIP_BASE_URL looks like https://xxxxx.api.infobip.com (scheme optional)
-        const host = String(env.INFOBIP_BASE_URL).replace(/^https?:\/\//, '').replace(/\/+$/, '');
-        tr = await fetch('https://' + host + '/sms/2/text/advanced', {
-          method: 'POST',
-          headers: { Authorization: 'App ' + env.INFOBIP_API_KEY, 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ messages: [{ destinations: [{ to: to.replace(/^\+/, '') }], from: env.INFOBIP_FROM, text }] })
-        });
-      } else {
-        const form = new URLSearchParams({ To: to, From: env.TWILIO_FROM, Body: text });
-        tr = await fetch('https://api.twilio.com/2010-04-01/Accounts/' + env.TWILIO_SID + '/Messages.json', {
-          method: 'POST', headers: { Authorization: 'Basic ' + btoa(env.TWILIO_SID + ':' + env.TWILIO_TOKEN), 'Content-Type': 'application/x-www-form-urlencoded' }, body: form.toString()
-        });
+      if (delivery) {
+        if (!(await sendEmail(env, delivery, code))) throw new Error('delivery');
+        return json({ ok: true, id, via: 'email', recipient: delivery.recipient });
       }
-    } catch (e) { return json({ ok: false, error: 'sms-failed' }, 502); }
-    if (!tr.ok) { const td = await tr.text(); return json({ ok: false, error: 'sms-failed', detail: td.slice(0, 160) }, 502); }
-    return json({ ok: true, id });
+      if (!(await sendSms(env, code))) throw new Error('delivery');
+      return json({ ok: true, id, via: 'sms' });
+    } catch (error) {
+      try { await env.DB.prepare('DELETE FROM twofa WHERE id=?').bind(id).run(); } catch (cleanupError) { /* challenge expires */ }
+      return json({ ok: false, error: delivery ? 'email-failed' : 'sms-failed' }, 502);
+    }
   }
 
-  /* verify a code */
   if (body.action === 'verify') {
-    const verifyBucket = await sha('twofa-verify:' + requesterIp);
-    const verifySlot = await takeRateSlot(env.DB, verifyBucket, Date.now(), 8, 15 * 60 * 1000);
-    if (!verifySlot.ok) return json({ ok: false, error: 'rate-limited', retryAfter: verifySlot.retryAfter }, 429, { 'Retry-After': String(verifySlot.retryAfter) });
+    if (!/^\d{6}$/.test(String(body.code || ''))) return json({ ok: false, error: 'wrong-code' }, 401);
+    const verifyBucket = await rateKey(request, env, 'twofa-verify');
+    const verifySlot = await takeRateLimit(env, verifyBucket, VERIFY_LIMIT);
+    if (!verifySlot.ok) return rateResponse(verifySlot);
+
+    let valid = false;
     if (body.id === 'totp') {
-      if (!hasTOTP) return json({ ok: false, error: 'expired' }, 410);
-      const valid = await totpValid(env.TOTP_SECRET, body.code);
-      if (valid) await clearRateSlot(env.DB, verifyBucket);
-      if (!valid) return json({ ok: false, error: 'wrong-code' }, 401);
-      const cookie = await issueSession(env);
-      return json({ ok: true }, 200, cookie ? { 'Set-Cookie': cookie } : undefined);
+      if (!hasTotp) return json({ ok: false, error: 'expired' }, 410);
+      try { valid = await totpValid(env.TOTP_SECRET, String(body.code)); } catch (error) {
+        return json({ ok: false, error: 'not-configured' }, 503);
+      }
+    } else {
+      const id = String(body.id || '');
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return json({ ok: false, error: 'expired' }, 410);
+      let row;
+      try {
+        await ensureChallenges(env.DB);
+        row = await env.DB.prepare('SELECT id,code,exp,tries FROM twofa WHERE id=?').bind(id).first();
+      } catch (error) {
+        return json({ ok: false, error: 'twofa-unavailable' }, 503);
+      }
+      if (!row || row.exp < Date.now()) {
+        if (row) try { await env.DB.prepare('DELETE FROM twofa WHERE id=?').bind(id).run(); } catch (error) { /* expired */ }
+        return json({ ok: false, error: 'expired' }, 410);
+      }
+      if (row.tries >= 5) {
+        try { await env.DB.prepare('DELETE FROM twofa WHERE id=?').bind(id).run(); } catch (error) { /* expired */ }
+        return json({ ok: false, error: 'too-many' }, 429);
+      }
+      const suppliedDigest = await keyedDigest(env.SESSION_SECRET, `twofa-code|${body.code}`);
+      valid = await secretEqual(suppliedDigest, String(row.code));
+      try {
+        if (!valid) await env.DB.prepare('UPDATE twofa SET tries=tries+1 WHERE id=?').bind(id).run();
+        else await env.DB.prepare('DELETE FROM twofa WHERE id=?').bind(id).run();
+      } catch (error) {
+        return json({ ok: false, error: 'twofa-unavailable' }, 503);
+      }
     }
-    if (!env.DB) return json({ ok: false, error: 'no-db' }, 503);
-    await ensure(env.DB);
-    const row = (await env.DB.prepare('SELECT * FROM twofa WHERE id=?').bind(String(body.id || '')).all()).results[0];
-    if (!row || row.exp < Date.now()) { if (row) await env.DB.prepare('DELETE FROM twofa WHERE id=?').bind(row.id).run(); return json({ ok: false, error: 'expired' }, 410); }
-    if (row.tries >= 5) { await env.DB.prepare('DELETE FROM twofa WHERE id=?').bind(row.id).run(); return json({ ok: false, error: 'too-many' }, 429); }
-    if (!(await secretEqual(await sha(String(body.code || '')), row.code))) { await env.DB.prepare('UPDATE twofa SET tries=tries+1 WHERE id=?').bind(row.id).run(); return json({ ok: false, error: 'wrong-code' }, 401); }
-    await env.DB.prepare('DELETE FROM twofa WHERE id=?').bind(row.id).run();
-    await clearRateSlot(env.DB, verifyBucket);
+
+    if (!valid) return json({ ok: false, error: 'wrong-code' }, 401);
+    await clearRateLimit(env, verifyBucket);
     const cookie = await issueSession(env);
-    return json({ ok: true }, 200, cookie ? { 'Set-Cookie': cookie } : undefined);
+    if (!cookie) return json({ ok: false, error: 'session-not-configured' }, 503);
+    return json({ ok: true }, 200, { 'Set-Cookie': cookie });
   }
 
   return json({ ok: false, error: 'bad-action' }, 400);

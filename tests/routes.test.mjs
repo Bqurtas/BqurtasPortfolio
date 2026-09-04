@@ -28,12 +28,58 @@ test('unknown document routes are real noindex 404 responses', async () => {
   const response = await runRoute('/this-page-does-not-exist');
   assert.equal(response.status, 404);
   assert.equal(response.headers.get('x-robots-tag'), 'noindex, nofollow');
+  assert.match(response.headers.get('cache-control') || '', /no-store/);
+  assert.equal(response.headers.get('cloudflare-cdn-cache-control'), 'no-store');
+  assert.equal(response.headers.get('strict-transport-security'), 'max-age=31536000; includeSubDomains; preload');
+});
+
+test('blog IDs are finite positive decimal strings without number coercion', async () => {
+  for (const path of ['/blog/0', '/blog/01', '/blog/-1', '/blog/1234567890123456789']) {
+    assert.equal((await runRoute(path)).status, 404, `${path} should not enter the blog lookup route`);
+  }
+  assert.equal((await runRoute('/blog/123456789012345678')).status, 204);
+});
+
+test('blog lookup distinguishes a confirmed missing post from an upstream outage', async () => {
+  const originalFetch = globalThis.fetch;
+  const assets = { fetch: async () => new Response('<!doctype html><title>404</title>') };
+  try {
+    globalThis.fetch = async () => new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json' } });
+    const missing = await onRequest({
+      request: new Request('https://bqurtas.com/blog/42', { headers: { Accept: 'text/html' } }),
+      env: { ASSETS: assets },
+      next: () => new Response(null, { status: 204 })
+    });
+    assert.equal(missing.status, 404);
+
+    globalThis.fetch = async () => new Response('upstream unavailable', { status: 503 });
+    const unavailable = await onRequest({
+      request: new Request('https://bqurtas.com/blog/42', { headers: { Accept: 'text/html' } }),
+      env: { ASSETS: assets },
+      next: () => new Response(null, { status: 204 })
+    });
+    assert.equal(unavailable.status, 503);
+    assert.equal(unavailable.headers.get('retry-after'), '60');
+    assert.equal(unavailable.headers.get('x-robots-tag'), 'noindex, nofollow');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test('known app routes and static files continue to Pages', async () => {
   assert.equal((await runRoute('/blog/12')).status, 204);
   assert.equal((await runRoute('/assets/avatar.webp', 'image/avif,image/webp,*/*')).status, 204);
   assert.equal((await runRoute('/sitemap-images.xml', 'application/xml')).status, 204);
+});
+
+test('document routes reject state-changing HTTP methods', async () => {
+  const response = await onRequest({
+    request: new Request('https://bqurtas.com/bio', { method: 'POST' }),
+    env: {},
+    next: () => new Response(null, { status: 204 })
+  });
+  assert.equal(response.status, 405);
+  assert.equal(response.headers.get('allow'), 'GET, HEAD');
 });
 
 test('every canonical sitemap page is handled by the application router', async () => {
@@ -82,4 +128,12 @@ test('two-factor authentication fails closed without server secrets', async () =
   });
   assert.equal(response.status, 503);
   assert.deepEqual(await response.json(), { ok: false, error: 'not-configured' });
+});
+
+test('route CSP permits only the external origins used by translation and gallery fallback', async () => {
+  const source = await readFile(new URL('../functions/[[route]].js', import.meta.url), 'utf8');
+  assert.match(source, /connect-src[^\n]*https:\/\/translate\.googleapis\.com/);
+  assert.match(source, /img-src[^\n]*https:\/\/cdn\.statically\.io/);
+  assert.match(source, /media-src[^\n]*https:\/\/cdn\.statically\.io/);
+  assert.doesNotMatch(source, /bq_fresh=1/);
 });

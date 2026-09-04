@@ -608,6 +608,42 @@
     ];
     const FALLBACK = "I'm not sure about that one — but Barakat can help directly. Try the <b>Contact</b> room, or ask me about <i>services, pricing, timelines, or languages</i>.";
 
+    /* Bot copy intentionally uses a very small formatting vocabulary. Chat
+       history lives in localStorage, which users/extensions can modify, so
+       restore only that allowlist and never replay arbitrary saved markup. */
+    const safeChatHTML = (html) => {
+      const template = document.createElement('template');
+      template.innerHTML = String(html ?? '');
+      const allowed = new Set(['B', 'STRONG', 'I', 'EM', 'BR', 'A', 'SPAN']);
+      template.content.querySelectorAll('*').forEach((node) => {
+        if (!allowed.has(node.tagName)) {
+          node.replaceWith(document.createTextNode(node.textContent || ''));
+          return;
+        }
+        const href = node.tagName === 'A' ? node.getAttribute('href') : '';
+        const typingClass = node.tagName === 'SPAN' && node.classList.contains('chat-typing');
+        Array.from(node.attributes).forEach((attribute) => node.removeAttribute(attribute.name));
+        if (typingClass) node.className = 'chat-typing';
+        if (node.tagName === 'A') {
+          let target;
+          try { target = new URL(href || '', location.href); } catch (e) {}
+          if (!target || !['https:', 'mailto:'].includes(target.protocol)) {
+            node.replaceWith(...Array.from(node.childNodes));
+            return;
+          }
+          node.setAttribute('href', target.href);
+          node.setAttribute('rel', 'noopener noreferrer');
+          if (target.protocol === 'https:') node.setAttribute('target', '_blank');
+        }
+      });
+      return template.innerHTML;
+    };
+    const legacyChatText = (html) => {
+      const decoder = document.createElement('textarea');
+      decoder.innerHTML = String(html ?? '');
+      return decoder.value;
+    };
+
     /* language-aware knowledge base */
     const chatTr = () => (window.CHAT_I18N && window.CHAT_I18N[document.documentElement.dataset.lang || 'en']) || null;
     const getKB = () => { const t = chatTr(); return (t && t.kb) || KB; };
@@ -634,14 +670,19 @@
     const persist = () => {
       try {
         const msgs = Array.from(body.querySelectorAll('.chat-msg:not(.is-typing)'))
-          .map(el => ({ who: el.classList.contains('chat-msg--me') ? 'me' : 'bot', html: el.innerHTML }));
+          .map((el) => {
+            const who = el.classList.contains('chat-msg--me') ? 'me' : 'bot';
+            return { who, content: who === 'me' ? el.textContent : safeChatHTML(el.innerHTML) };
+          });
         localStorage.setItem(HKEY, JSON.stringify({ ts: Date.now(), msgs: msgs.slice(-100) }));
       } catch (e) {}
     };
-    const add = (who, html, noPersist) => {
+    const add = (who, content, noPersist) => {
       const el = document.createElement('div');
-      el.className = `chat-msg chat-msg--${who}`;
-      el.innerHTML = html;
+      const safeWho = who === 'me' ? 'me' : 'bot';
+      el.className = `chat-msg chat-msg--${safeWho}`;
+      if (safeWho === 'me') el.textContent = String(content ?? '');
+      else el.innerHTML = safeChatHTML(content);
       body.appendChild(el);
       body.scrollTop = body.scrollHeight;
       if (!noPersist) persist();
@@ -654,7 +695,13 @@
       const fresh = data && Array.isArray(data.msgs) && (Date.now() - (data.ts || 0) < HMAXAGE);
       const msgs = fresh ? data.msgs : null;
       if (!msgs) { try { localStorage.removeItem(HKEY); } catch (e) {} return false; }
-      msgs.forEach(m => add(m.who, m.html, true));
+      msgs.forEach((m) => {
+        const who = m && m.who === 'me' ? 'me' : 'bot';
+        const content = m && Object.prototype.hasOwnProperty.call(m, 'content')
+          ? m.content
+          : (who === 'me' ? legacyChatText(m && m.html) : (m && m.html));
+        add(who, content, true);
+      });
       return msgs.length > 0;
     };
     const typing = () => {
@@ -666,7 +713,7 @@
       const t = typing();
       setTimeout(() => {
         t.classList.remove('is-typing');
-        t.innerHTML = reply(msg);
+        t.innerHTML = safeChatHTML(reply(msg));
         body.scrollTop = body.scrollHeight;
         persist();
       }, 550 + Math.random() * 400);
@@ -688,7 +735,7 @@
     };
 
     const send = (text, display) => {
-      add('me', (display || text).replace(/</g, '&lt;'));
+      add('me', display || text);
       botReply(text);
     };
 
@@ -780,12 +827,20 @@
     if (!dash) return;
     const gate = $('#dashGate'), main = $('#dashMain'), view = $('#dashView');
     const hint = $('#dashHint');
-    let unlocked = sessionStorage.getItem('bq_dash_ok') === '1';
+    /* Publishing and analytics tokens are tab-scoped secrets. Older builds
+       persisted them indefinitely in localStorage; remove that residue and
+       require a fresh entry after the tab/browser session ends. */
+    try {
+      localStorage.removeItem('bq_edit_token');
+      localStorage.removeItem('bq_stats_token');
+    } catch (e) {}
+    let unlocked = false;
+    try { unlocked = sessionStorage.getItem('bq_dash_ok') === '1'; } catch (e) {}
 
     /* ---- Dashboard translations (follows the site language) ---- */
     const DASH_I18N = {
       en: { overview:'Overview', visitors:'Visitors', works:'Works', latest:'Latest', leads:'Leads', profile:'Profile', settings:'Settings', content:'Content', cases:'Projects', assistant:'Assistant',
-        gateTitle:'Enter access code', gatePrivate:'This console is private.', gatePh:'Access code', unlock:'Unlock', wrong:'✗ Wrong access code.', twoTitle:'Enter the email code', twoNote:'A 6-digit code was emailed to the selected inbox. Check spam too.', twoChoose:'Send code to', twoPrimary:'Primary inbox', twoBackup:'Backup inbox', twoPh:'6-digit code', twoWrong:'✗ Wrong or expired code.', twoSending:'Sending code…', twoSetupBtn:'Set up 2FA (authenticator)', twoSetup1:'1) In Cloudflare set TOTP_SECRET to this (then Retry deployment):', twoSetup2:'2) Add the same key to Google Authenticator (manual entry: "Pencemor Studio"). Tap the key to copy.', twoSetupLink:'open in app',
+        gateTitle:'Enter access code', gatePrivate:'This console is private.', gatePh:'Access code', unlock:'Unlock', wrong:'✗ Wrong access code.', twoTitle:'Enter the verification code', twoNote:'A 6-digit code was emailed to the selected inbox. Check spam too.', twoChoose:'Send code to', twoPrimary:'Primary inbox', twoBackup:'Backup inbox', twoPh:'6-digit code', twoWrong:'✗ Wrong or expired code.', twoSending:'Sending code…', twoSetupBtn:'Set up 2FA (authenticator)', twoSetup1:'1) In Cloudflare set TOTP_SECRET to this (then Retry deployment):', twoSetup2:'2) Add the same key to Google Authenticator (manual entry: "Pencemor Studio"). Tap the key to copy.', twoSetupLink:'open in app',
         oTotal:'Total works', oColl:'Collections', oLeads:'Leads stored', oLangs:'Languages', oBlogs:'Blog posts', oAdmins:'Admins', oWelcome:'Welcome back — your studio console is private to you; data lives in this browser.',
         lEmpty:'No leads yet. Pitches from the Contact form appear here.', lClear:'Clear all leads', lConfirm:'Delete all stored leads?',
         pName:'Name', pTitle:'Title / role', pAvatar:'Avatar URL', pSave:'Save profile', pSaved:'✓ Saved', pNote:'Adding more admins needs a backend login system — that arrives with the content manager. For now this profile is yours, kept privately in this browser.',
@@ -794,7 +849,7 @@
         tAi:'AI', tLang:'Language', tTheme:'Theme', tAddAdmin:'Add admin', tLogout:'Log out', tClose:'Close',
         admYou:'Owner', admName:'Name', admEmail:'Email', admRole:'Role', admAdd:'Add admin', admEmpty:'No additional admins yet.', admRemove:'Remove', admNote:'Shared login across devices needs the backend login system; for now these admins are saved privately in this browser.', logoutAsk:'Log out of the console?' },
       ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', latest:'نوێترین', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن', content:'ناوەڕۆک', cases:'پڕۆژەکان', assistant:'یاریدەدەر',
-        gateTitle:'کۆدی چوونەژوورەوە بنووسە', gatePrivate:'ئەم کۆنسۆڵە تایبەتە.', gatePh:'کۆدی چوونەژوورەوە', unlock:'کردنەوە', wrong:'✗ کۆدەکە هەڵەیە.', twoTitle:'کۆدی ئیمێڵ بنووسە', twoNote:'کۆدێکی ٦ ژمارەیی بۆ سندووقی هەڵبژێردراو نێردرا. سپامیش بپشکنە.', twoChoose:'کۆد بنێرە بۆ', twoPrimary:'سندووقی سەرەکی', twoBackup:'سندووقی یەدەک', twoPh:'کۆدی ٦ ژمارەیی', twoWrong:'✗ کۆد هەڵەیە یان بەسەرچووە.', twoSending:'ناردنی کۆد…', twoSetupBtn:'ڕێکخستنی 2FA (ئەپی ئۆتێنتیکەیتەر)', twoSetup1:'١) لە Cloudflare، TOTP_SECRET بکە بەمە (پاشان Retry deployment):', twoSetup2:'٢) هەمان کلیل بخە ناو Google Authenticator (داخڵکردنی دەستی: «Pencemor Studio»). کلیک لە کلیلەکە بکە بۆ کۆپی.', twoSetupLink:'لە ئەپ بیکەرەوە',
+        gateTitle:'کۆدی چوونەژوورەوە بنووسە', gatePrivate:'ئەم کۆنسۆڵە تایبەتە.', gatePh:'کۆدی چوونەژوورەوە', unlock:'کردنەوە', wrong:'✗ کۆدەکە هەڵەیە.', twoTitle:'کۆدی پشتڕاستکردنەوە بنووسە', twoNote:'کۆدێکی ٦ ژمارەیی بۆ سندووقی هەڵبژێردراو نێردرا. سپامیش بپشکنە.', twoChoose:'کۆد بنێرە بۆ', twoPrimary:'سندووقی سەرەکی', twoBackup:'سندووقی یەدەک', twoPh:'کۆدی ٦ ژمارەیی', twoWrong:'✗ کۆد هەڵەیە یان بەسەرچووە.', twoSending:'ناردنی کۆد…', twoSetupBtn:'ڕێکخستنی 2FA (ئەپی ئۆتێنتیکەیتەر)', twoSetup1:'١) لە Cloudflare، TOTP_SECRET بکە بەمە (پاشان Retry deployment):', twoSetup2:'٢) هەمان کلیل بخە ناو Google Authenticator (داخڵکردنی دەستی: «Pencemor Studio»). کلیک لە کلیلەکە بکە بۆ کۆپی.', twoSetupLink:'لە ئەپ بیکەرەوە',
         oTotal:'کۆی کارەکان', oColl:'کۆکراوەکان', oLeads:'داواکاری هەڵگیراو', oLangs:'زمانەکان', oBlogs:'بابەتی بلۆگ', oAdmins:'بەڕێوەبەران', oWelcome:'بەخێربێیتەوە — کۆنسۆڵی ستۆدیۆ تەنها بۆ تۆیە؛ زانیارییەکان لەم وێبگەڕەدا دەمێننەوە.',
         lEmpty:'هێشتا داواکاری نییە. پرۆژەکانی فۆڕمی پەیوەندی لێرە دەردەکەون.', lClear:'سڕینەوەی هەموو داواکارییەکان', lConfirm:'هەموو داواکارییە هەڵگیراوەکان بسڕێتەوە؟',
         pName:'ناو', pTitle:'پلە / ڕۆڵ', pAvatar:'بەستەری وێنە', pSave:'پاشەکەوتکردنی پرۆفایل', pSaved:'✓ پاشەکەوتکرا', pNote:'زیادکردنی ئەدمینی زیاتر پێویستی بە سیستەمی چوونەژوورەوەی سێرڤەر هەیە — لەگەڵ بەڕێوەبەری ناوەڕۆکدا دێت. ئێستا ئەم پرۆفایلە هی تۆیە، بە تایبەتی لەم وێبگەڕەدا پارێزراوە.',
@@ -803,7 +858,7 @@
         tAi:'AI', tLang:'زمان', tTheme:'ڕووکار', tAddAdmin:'زیادکردنی ئەدمین', tLogout:'چوونەدەرەوە', tClose:'داخستن',
         admYou:'خاوەن', admName:'ناو', admEmail:'ئیمەیل', admRole:'ڕۆڵ', admAdd:'زیادکردنی ئەدمین', admEmpty:'هێشتا ئەدمینی زیاتر نییە.', admRemove:'لابردن', admNote:'چوونەژوورەوەی هاوبەش لەنێوان ئامێرەکان پێویستی بە سیستەمی سێرڤەرە؛ ئێستا ئەم ئەدمینانە بە تایبەتی لەم وێبگەڕەدا هەڵگیراون.', logoutAsk:'لە کۆنسۆڵ بچیتە دەرەوە؟' },
       ar: { overview:'نظرة عامة', visitors:'الزوار', works:'الأعمال', leads:'الطلبات', profile:'الملف', settings:'الإعدادات', content:'المحتوى', cases:'المشاريع', assistant:'المساعد',
-        gateTitle:'أدخل رمز الدخول', gatePrivate:'هذه اللوحة خاصة.', gatePh:'رمز الدخول', unlock:'فتح', wrong:'✗ رمز خاطئ.', twoTitle:'أدخل رمز البريد', twoNote:'تم إرسال رمز من ٦ أرقام إلى الصندوق المختار. افحص البريد المزعج أيضاً.', twoChoose:'أرسل الرمز إلى', twoPrimary:'الصندوق الأساسي', twoBackup:'الصندوق الاحتياطي', twoPh:'رمز من ٦ أرقام', twoWrong:'✗ رمز خاطئ أو منتهٍ.', twoSending:'جار إرسال الرمز…', twoSetupBtn:'إعداد 2FA (تطبيق المصادقة)', twoSetup1:'١) في Cloudflare اضبط TOTP_SECRET على هذا (ثم Retry deployment):', twoSetup2:'٢) أضف نفس المفتاح إلى Google Authenticator (إدخال يدوي: «Pencemor Studio»). انقر المفتاح للنسخ.', twoSetupLink:'افتح في التطبيق',
+        gateTitle:'أدخل رمز الدخول', gatePrivate:'هذه اللوحة خاصة.', gatePh:'رمز الدخول', unlock:'فتح', wrong:'✗ رمز خاطئ.', twoTitle:'أدخل رمز التحقق', twoNote:'تم إرسال رمز من ٦ أرقام إلى الصندوق المختار. افحص البريد المزعج أيضاً.', twoChoose:'أرسل الرمز إلى', twoPrimary:'الصندوق الأساسي', twoBackup:'الصندوق الاحتياطي', twoPh:'رمز من ٦ أرقام', twoWrong:'✗ رمز خاطئ أو منتهٍ.', twoSending:'جار إرسال الرمز…', twoSetupBtn:'إعداد 2FA (تطبيق المصادقة)', twoSetup1:'١) في Cloudflare اضبط TOTP_SECRET على هذا (ثم Retry deployment):', twoSetup2:'٢) أضف نفس المفتاح إلى Google Authenticator (إدخال يدوي: «Pencemor Studio»). انقر المفتاح للنسخ.', twoSetupLink:'افتح في التطبيق',
         oTotal:'إجمالي الأعمال', oColl:'المجموعات', oLeads:'الطلبات المحفوظة', oLangs:'اللغات', oWelcome:'أهلاً بعودتك — لوحة الاستوديو خاصة بك؛ البيانات تبقى في هذا المتصفح.',
         lEmpty:'لا طلبات بعد. تظهر هنا مشاريع نموذج التواصل.', lClear:'مسح كل الطلبات', lConfirm:'حذف كل الطلبات المحفوظة؟',
         pName:'الاسم', pTitle:'اللقب / الدور', pAvatar:'رابط الصورة', pSave:'حفظ الملف', pSaved:'✓ تم الحفظ', pNote:'إضافة مزيد من المشرفين تتطلب نظام تسجيل دخول خلفي — يأتي مع مدير المحتوى. حالياً هذا الملف خاص بك، محفوظ في هذا المتصفح.',
@@ -812,7 +867,7 @@
         tAi:'AI', tLang:'اللغة', tTheme:'المظهر', tAddAdmin:'إضافة مشرف', tLogout:'تسجيل الخروج', tClose:'إغلاق',
         admYou:'المالك', admName:'الاسم', admEmail:'البريد', admRole:'الدور', admAdd:'إضافة مشرف', admEmpty:'لا مشرفين إضافيين بعد.', admRemove:'إزالة', admNote:'تسجيل الدخول المشترك بين الأجهزة يحتاج نظام الخادم؛ حالياً هؤلاء المشرفون محفوظون في هذا المتصفح فقط.', logoutAsk:'تسجيل الخروج من اللوحة؟' },
       kmr: { overview:'Giştî', visitors:'Mêvan', works:'Kar', leads:'Daxwaz', profile:'Profîl', settings:'Mîheng', content:'Naverok', cases:'Proje', assistant:'Alîkar',
-        gateTitle:'Koda gihiştinê binivîse', gatePrivate:'Ev konsol taybet e.', gatePh:'Koda gihiştinê', unlock:'Veke', wrong:'✗ Koda çewt.', twoTitle:'Koda e-nameyê binivîse', twoNote:'Koda 6-hejmarî ji qutiya hilbijartî re hate şandin. Spam jî kontrol bike.', twoChoose:'Kodê bişîne bo', twoPrimary:'Qutiya sereke', twoBackup:'Qutiya piştgir', twoPh:'Koda 6-hejmarî', twoWrong:'✗ Koda çewt an qediyayî.', twoSending:'Kod tê şandin…', twoSetupBtn:'Sazkirina 2FA (sepana erêkirinê)', twoSetup1:'1) Li Cloudflare TOTP_SECRET wiha saz bike (paşê Retry deployment):', twoSetup2:'2) Heman mifte têxe Google Authenticator (têketina destî: "Pencemor Studio"). Li mifte bitikîne ji bo kopî.', twoSetupLink:'di sepanê de veke',
+        gateTitle:'Koda gihiştinê binivîse', gatePrivate:'Ev konsol taybet e.', gatePh:'Koda gihiştinê', unlock:'Veke', wrong:'✗ Koda çewt.', twoTitle:'Koda piştrastkirinê binivîse', twoNote:'Koda 6-hejmarî ji qutiya hilbijartî re hate şandin. Spam jî kontrol bike.', twoChoose:'Kodê bişîne bo', twoPrimary:'Qutiya sereke', twoBackup:'Qutiya piştgir', twoPh:'Koda 6-hejmarî', twoWrong:'✗ Koda çewt an qediyayî.', twoSending:'Kod tê şandin…', twoSetupBtn:'Sazkirina 2FA (sepana erêkirinê)', twoSetup1:'1) Li Cloudflare TOTP_SECRET wiha saz bike (paşê Retry deployment):', twoSetup2:'2) Heman mifte têxe Google Authenticator (têketina destî: "Pencemor Studio"). Li mifte bitikîne ji bo kopî.', twoSetupLink:'di sepanê de veke',
         oTotal:'Tevahiya karan', oColl:'Berhevok', oLeads:'Daxwazên tomarkirî', oLangs:'Ziman', oWelcome:'Bi xêr hatî — konsola studyoyê taybet e ji te re; dane di vê gerokê de dimînin.',
         lEmpty:'Hêj daxwaz tune. Pêşniyarên forma têkiliyê li vir xuya dibin.', lClear:'Hemû daxwazan paqij bike', lConfirm:'Hemû daxwazên tomarkirî werin jêbirin?',
         pName:'Nav', pTitle:'Sernav / rol', pAvatar:'Girêdana wêneyê', pSave:'Profîlê tomar bike', pSaved:'✓ Tomar bû', pNote:'Zêdekirina admînên din pêdivî bi sîstema têketinê ya backend heye — ew bi rêveberê naverokê re tê. Niha ev profîl ya te ye, bi taybetî di vê gerokê de tê parastin.',
@@ -821,7 +876,7 @@
         tAi:'AI', tLang:'Ziman', tTheme:'Tema', tAddAdmin:'Admîn zêde bike', tLogout:'Derkeve', tClose:'Bigire',
         admYou:'Xwedî', admName:'Nav', admEmail:'E-name', admRole:'Rol', admAdd:'Admîn zêde bike', admEmpty:'Hêj admînên din tune.', admRemove:'Rake', admNote:'Têketina hevpar a di navbera amûran de pêdivî bi sîstema backend heye; niha ev admîn bi taybetî di vê gerokê de tên parastin.', logoutAsk:'Ji konsolê derkevî?' },
       fr: { overview:'Aperçu', visitors:'Visiteurs', works:'Travaux', leads:'Demandes', profile:'Profil', settings:'Réglages', content:'Contenu', cases:'Projets', assistant:'Assistant',
-        gateTitle:"Entrez le code d'accès", gatePrivate:'Cette console est privée.', gatePh:"Code d'accès", unlock:'Déverrouiller', wrong:'✗ Code incorrect.', twoTitle:'Entrez le code e-mail', twoNote:'Un code à 6 chiffres a été envoyé à la boîte choisie. Vérifiez aussi les spams.', twoChoose:'Envoyer le code à', twoPrimary:'Boîte principale', twoBackup:'Boîte de secours', twoPh:'Code à 6 chiffres', twoWrong:'✗ Code incorrect ou expiré.', twoSending:'Envoi du code…', twoSetupBtn:'Configurer la 2FA (authentification)', twoSetup1:'1) Dans Cloudflare, définissez TOTP_SECRET sur ceci (puis Retry deployment) :', twoSetup2:'2) Ajoutez la même clé à Google Authenticator (saisie manuelle : « Pencemor Studio »). Cliquez la clé pour copier.', twoSetupLink:'ouvrir dans l’app',
+        gateTitle:"Entrez le code d'accès", gatePrivate:'Cette console est privée.', gatePh:"Code d'accès", unlock:'Déverrouiller', wrong:'✗ Code incorrect.', twoTitle:'Saisissez le code de vérification', twoNote:'Un code à 6 chiffres a été envoyé à la boîte choisie. Vérifiez aussi les spams.', twoChoose:'Envoyer le code à', twoPrimary:'Boîte principale', twoBackup:'Boîte de secours', twoPh:'Code à 6 chiffres', twoWrong:'✗ Code incorrect ou expiré.', twoSending:'Envoi du code…', twoSetupBtn:'Configurer la 2FA (authentification)', twoSetup1:'1) Dans Cloudflare, définissez TOTP_SECRET sur ceci (puis Retry deployment) :', twoSetup2:'2) Ajoutez la même clé à Google Authenticator (saisie manuelle : « Pencemor Studio »). Cliquez la clé pour copier.', twoSetupLink:'ouvrir dans l’app',
         oTotal:'Total des travaux', oColl:'Collections', oLeads:'Demandes enregistrées', oLangs:'Langues', oWelcome:'Bon retour — votre console studio est privée ; les données restent dans ce navigateur.',
         lEmpty:'Aucune demande pour l’instant. Les projets du formulaire de contact apparaissent ici.', lClear:'Effacer toutes les demandes', lConfirm:'Supprimer toutes les demandes enregistrées ?',
         pName:'Nom', pTitle:'Titre / rôle', pAvatar:"URL de l'avatar", pSave:'Enregistrer le profil', pSaved:'✓ Enregistré', pNote:'Ajouter d’autres admins nécessite un système de connexion backend — il arrive avec le gestionnaire de contenu. Pour l’instant ce profil est le vôtre, gardé dans ce navigateur.',
@@ -829,6 +884,33 @@
         vConnect:'Connectez vos analyses', vEnter:'Saisissez le STATS_TOKEN défini dans Cloudflare.', vTokenPh:'Jeton de stats', vConnectBtn:'Connecter', vLoading:'Chargement des données visiteurs…',
         tAi:'IA', tLang:'Langue', tTheme:'Thème', tAddAdmin:'Ajouter admin', tLogout:'Déconnexion', tClose:'Fermer',
         admYou:'Propriétaire', admName:'Nom', admEmail:'E-mail', admRole:'Rôle', admAdd:'Ajouter admin', admEmpty:'Aucun admin supplémentaire.', admRemove:'Retirer', admNote:'Une connexion partagée entre appareils nécessite le système backend ; pour l’instant ces admins sont enregistrés dans ce navigateur.', logoutAsk:'Se déconnecter de la console ?' }
+    };
+    const TWOFA_VIA_NOTES = {
+      en: {
+        email: 'A 6-digit code was emailed to the selected inbox. Check spam too.',
+        totp: 'Enter the current 6-digit code from your authenticator app.',
+        sms: 'A 6-digit code was sent to your phone.'
+      },
+      ku: {
+        email: 'کۆدێکی ٦ ژمارەیی بۆ سندووقی هەڵبژێردراو نێردرا. سپامیش بپشکنە.',
+        totp: 'کۆدی ٦ ژمارەیی ئێستای ئەپی ئۆتێنتیکەیتەرەکەت بنووسە.',
+        sms: 'کۆدێکی ٦ ژمارەیی بۆ مۆبایلەکەت نێردرا.'
+      },
+      kmr: {
+        email: 'Koda 6-hejmarî ji qutiya hilbijartî re hate şandin. Spam jî kontrol bike.',
+        totp: 'Koda 6-hejmarî ya niha ji sepana erêkirinê binivîse.',
+        sms: 'Koda 6-hejmarî ji telefona te re hate şandin.'
+      },
+      ar: {
+        email: 'تم إرسال رمز من ٦ أرقام إلى الصندوق المختار. افحص البريد المزعج أيضاً.',
+        totp: 'أدخل الرمز الحالي المكوّن من ٦ أرقام من تطبيق المصادقة.',
+        sms: 'تم إرسال رمز من ٦ أرقام إلى هاتفك.'
+      },
+      fr: {
+        email: 'Un code à 6 chiffres a été envoyé à la boîte choisie. Vérifiez aussi les spams.',
+        totp: 'Saisissez le code actuel à 6 chiffres de votre application d’authentification.',
+        sms: 'Un code à 6 chiffres a été envoyé à votre téléphone.'
+      }
     };
     /* extra strings for the Visitors view (kept here so the long lang blocks above stay readable) */
     Object.assign(DASH_I18N.en,  { vViews:'Page views', vVisitors:'Visitors', vViewsToday:'Views today', vVisToday:'Visitors today', v14:'Last 14 days', vTop:'Top pages', vCountries:'Countries', vRef:'Referrers', vDevices:'Devices', vRecent:'Recent visits', vNoVisits:'No visits yet', vNoData:'No data yet', vRefresh:'Refresh' });
@@ -840,6 +922,8 @@
     const DT = (k) => (DASH_I18N[curLang()][k] ?? DASH_I18N.en[k] ?? k);
     const LANG_LABELS = { en: 'English', ku: 'کوردیی سۆرانی', kmr: 'Kurmancî', ar: 'العربية', fr: 'Français', tr: 'Türkçe', sv: 'Svenska' };
     const curSiteLang = () => document.documentElement.getAttribute('lang') || document.documentElement.dataset.lang || 'en';
+    let twoFAId = null, twoFAPin = '', twoFAClearTimer = 0, twoFAVia = '';
+    const twoFANote = () => TWOFA_VIA_NOTES[curLang()]?.[twoFAVia] || DT('twoNote');
     const selected2FARecipient = () => $('#dash2faChoice input[name="dashCodeTarget"]:checked')?.value || 'primary';
     const ensure2FAChoice = () => {
       const form = $('#dashLoginForm');
@@ -869,9 +953,10 @@
     const localizeChrome = () => {
       $$('.dash-tab').forEach(t => { const ic = t.querySelector('i'); t.innerHTML = (ic ? ic.outerHTML + ' ' : '') + DT(t.dataset.dash); });
       const g = $('#dashGate'); if (g) {
-        const h = g.querySelector('h3'); if (h) h.textContent = DT('gateTitle');
-        const p = g.querySelector('p.mono'); if (p) p.textContent = DT('gatePrivate');
-        const k = $('#dashKey'); if (k) k.placeholder = DT('gatePh');
+        const inChallenge = Boolean(twoFAId);
+        const h = g.querySelector('h3'); if (h) h.textContent = DT(inChallenge ? 'twoTitle' : 'gateTitle');
+        const p = g.querySelector('p.mono'); if (p) p.textContent = inChallenge ? twoFANote() : DT('gatePrivate');
+        const k = $('#dashKey'); if (k) k.placeholder = DT(inChallenge ? 'twoPh' : 'gatePh');
         const b = g.querySelector('button[type="submit"]'); if (b) b.innerHTML = DT('unlock') + ' <i class="fa-solid fa-arrow-right"></i>';
         ensure2FAChoice();
       }
@@ -885,18 +970,58 @@
       if (mc && act) mc.textContent = DT(act.dataset.dash);
     };
 
-    let twoFAId = null, twoFAPin = '', twoFAClearTimer = 0;
     const clearTwoFA = () => {
       twoFAId = null;
       twoFAPin = '';
+      twoFAVia = '';
       clearTimeout(twoFAClearTimer);
       twoFAClearTimer = 0;
     };
-    const openDash = () => {
+    const showGate = () => {
+      dash.classList.remove('is-full');
+      gate.hidden = false;
+      main.hidden = true;
+    };
+    const invalidateDashboardSession = () => {
+      unlocked = false;
+      try { sessionStorage.removeItem('bq_dash_ok'); } catch (e) {}
+      clearTwoFA();
+      showGate();
+      localizeChrome();
+    };
+    let sessionCheck = null;
+    const hasServerSession = () => {
+      if (!unlocked) return Promise.resolve(false);
+      if (sessionCheck) return sessionCheck;
+      sessionCheck = fetch('/api/2fa', {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: { Accept: 'application/json' }
+      }).then((response) => response.json())
+        .then((data) => Boolean(data && data.ok === true && data.authenticated === true))
+        .catch(() => false)
+        .then((valid) => {
+          if (!valid) invalidateDashboardSession();
+          return valid;
+        })
+        .finally(() => { sessionCheck = null; });
+      return sessionCheck;
+    };
+    const openDash = async () => {
       dash.classList.add('is-open');
       dash.setAttribute('aria-hidden', 'false');
       localizeChrome();
-      if (unlocked) showConsole(); else { dash.classList.remove('is-full'); gate.hidden = false; main.hidden = true; setTimeout(() => $('#dashKey')?.focus(), 200); }
+      if (unlocked) {
+        /* A tab flag is only a display hint. Keep privileged content hidden
+           until the HttpOnly signed cookie has been confirmed by the server. */
+        showGate();
+        const valid = await hasServerSession();
+        if (valid && unlocked && dash.classList.contains('is-open')) showConsole();
+        else if (dash.classList.contains('is-open')) setTimeout(() => $('#dashKey')?.focus(), 50);
+        return;
+      }
+      showGate();
+      setTimeout(() => $('#dashKey')?.focus(), 200);
     };
     const closeDash = () => {
       clearTwoFA();
@@ -922,14 +1047,19 @@
 
     const doUnlock = () => {
       unlocked = true;
-      sessionStorage.setItem('bq_dash_ok', '1');
+      /* Storage can be unavailable in strict/private browser modes. The
+         signed HttpOnly cookie is the authority, so a failed display hint
+         must not interrupt a successful server-authenticated login. */
+      try { sessionStorage.setItem('bq_dash_ok', '1'); } catch (e) {}
       clearTwoFA();
       showConsole();
     };
-    const enter2FA = () => {
+    const enter2FA = (via) => {
+      twoFAVia = ['email', 'totp', 'sms'].includes(via) ? via : '';
       const g = $('#dashGate'); if (!g) return;
       const h = g.querySelector('h3'); if (h) h.textContent = DT('twoTitle');
-      const p = g.querySelector('p.mono'); if (p) p.textContent = DT('twoNote');
+      const p = g.querySelector('p.mono');
+      if (p) p.textContent = twoFANote();
       ensure2FAChoice();
       const k = $('#dashKey'); if (k) { k.value = ''; k.placeholder = DT('twoPh'); setTimeout(() => k.focus(), 50); }
       hint.textContent = '';
@@ -975,7 +1105,7 @@
               hint.textContent = DT('twoWrong');
               const key = $('#dashKey'); if (key) key.value = '';
             }, 5 * 60 * 1000);
-            enter2FA();
+            enter2FA(d.via);
             return;
           }
           clearTwoFA();
@@ -1006,8 +1136,7 @@
         <p class="dash-note mono">${DT('oWelcome')}</p>`;
     };
     const wkApi = (payload) => {
-      const SB = window.BQ_SUPA || {};
-      return fetch(SB.url + '/functions/v1/work-upload', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SB.key, Authorization: 'Bearer ' + SB.key, 'x-edit-token': editToken() }, body: JSON.stringify(payload) }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
+      return fetch('/api/studio/work-upload', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'x-edit-token': editToken() }, body: JSON.stringify(payload) }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
     };
     const WK_I18N = {
       en:  { note:'Upload a finished design — it is auto-resized, converted to WebP and pushed to its folder on GitHub. It shows in the gallery shortly.', cat:'Category / folder', file:'Choose image (any size or format)', upload:'Publish to gallery', reading:'Preparing…', ready:'Ready — click Publish', pick:'Choose an image first.', uploading:'Publishing to GitHub…', done:'Published ✓ — it appears in the gallery shortly.', updating:'updating gallery counts…', updated:'gallery and tab counts updated.', propagating:'refresh once if the new file is still propagating.', noToken:'A GitHub token isn’t set yet — add it once to turn publishing on.', connect:'Connect the editor first (Content tab).', fail:'Could not publish (works on the live site only).' },
@@ -1081,10 +1210,10 @@
         const folder = wkMgFolder.value;
         wkGrid.innerHTML = `<p class="dash-dim mono">${W.loading || 'Loading…'}</p>`;
         wkApi({ action: 'list', folder }).then((d) => {
-          if (!d || !d.ok) { wkGrid.innerHTML = `<p class="dash-dim mono">✗ ${(d && (d.detail || d.error)) || (W.connect || 'Could not load')}</p>`; return; }
+          if (!d || !d.ok) { wkGrid.innerHTML = `<p class="dash-dim mono">✗ ${esc((d && (d.detail || d.error)) || (W.connect || 'Could not load'))}</p>`; return; }
           if (!d.files.length) { wkGrid.innerHTML = `<p class="dash-dim mono">${W.mgEmpty || 'No images in this folder yet.'}</p>`; return; }
           wkGrid.innerHTML = `<p class="dash-dim mono">${d.files.length} ${W.mgCount || 'images'}</p><div class="wk-grid-inner">` + d.files.map((f) =>
-            `<div class="wk-cell" data-path="${esc(f.path)}" data-sha="${esc(f.sha)}"><img loading="lazy" src="${mgThumb(f.path)}" data-raw="${mgRaw(f.path)}" alt=""><button class="wk-del" type="button" aria-label="Delete"><i class="fa-solid fa-trash-can"></i></button></div>`).join('') + `</div>`;
+            `<div class="wk-cell" data-path="${esc(f.path)}" data-sha="${esc(f.sha)}"><img loading="lazy" src="${esc(mgThumb(f.path))}" data-raw="${esc(mgRaw(f.path))}" alt=""><button class="wk-del" type="button" aria-label="Delete"><i class="fa-solid fa-trash-can"></i></button></div>`).join('') + `</div>`;
           wkGrid.querySelectorAll('.wk-cell img').forEach((img) => img.addEventListener('error', () => { if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = img.dataset.raw; } }));
           wkGrid.querySelectorAll('.wk-del').forEach((b) => b.addEventListener('click', () => {
             const cell = b.closest('.wk-cell'); const path = cell.dataset.path, sha = cell.dataset.sha;
@@ -1109,10 +1238,10 @@
       const pager = dashPager(all.length, leadsPage, (n) => { leadsPage = n; renderLeads(); });
       view.innerHTML = `<div class="dash-leads">` + all.slice(start, start + DASH_PER).map(l =>
         `<div class="dash-lead">
-           <div class="dash-lead-top"><strong>${esc(l.name)}</strong><span class="mono">${l.type || ''}</span></div>
+           <div class="dash-lead-top"><strong>${esc(l.name)}</strong><span class="mono">${esc(l.type || '')}</span></div>
            <span class="mono dash-lead-mail">${esc(l.email)}</span>
            <p>${esc(l.message || '')}</p>
-           <span class="mono dash-lead-meta">${l.budget || '—'} · ${l.timeline || '—'} · ${new Date(l.at).toLocaleDateString()}</span>
+           <span class="mono dash-lead-meta">${esc(l.budget || '—')} · ${esc(l.timeline || '—')} · ${esc(new Date(l.at).toLocaleDateString())}</span>
          </div>`).join('') + `</div>${pager.html}
          <button class="dash-btn dash-btn--danger" id="dashClearLeads"><i class="fa-solid fa-trash"></i> ${DT('lClear')}</button>`;
       $('#dashClearLeads')?.addEventListener('click', () => {
@@ -1177,7 +1306,6 @@
       });
       // The dashboard PIN is server-managed through Cloudflare's DASH_PIN secret.
       // Only the separate editor publishing password is changeable from this UI.
-      const SBset = window.BQ_SUPA || {};
       $('#setTokGen')?.addEventListener('click', () => {
         const A = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
         const r = crypto.getRandomValues(new Uint8Array(22)); let s = 'bqedit_';
@@ -1189,9 +1317,9 @@
         if (nt.length < 4) { m.textContent = S.min4; return; }
         if (!editToken()) { m.textContent = S.edConnect; return; }
         m.textContent = '…';
-        fetch(SBset.url + '/functions/v1/set-token', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SBset.key, Authorization: 'Bearer ' + SBset.key, 'x-edit-token': editToken() }, body: JSON.stringify({ new_token: nt }) })
+        fetch('/api/studio/set-token', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'x-edit-token': editToken() }, body: JSON.stringify({ new_token: nt }) })
           .then(r => r.json()).then(d => {
-            if (d && d.ok) { try { localStorage.setItem('bq_edit_token', nt); } catch (e) {} m.textContent = S.edDone; $('#setNewTok').value = ''; }
+            if (d && d.ok) { try { sessionStorage.setItem('bq_edit_token', nt); } catch (e) {} m.textContent = S.edDone; $('#setNewTok').value = ''; }
             else if (d && d.error === 'unauthorized') { m.textContent = S.edWrong; }
             else { m.textContent = '✗ ' + ((d && (d.detail || d.error)) || 'failed'); }
           }).catch(() => { m.textContent = S.edFail; });
@@ -1221,6 +1349,20 @@
 
     /* ---- Owner profile (stored privately in this browser) ---- */
     const PROFILE_DEFAULT = { name: 'Barakat Qurtas', title: 'Founder · Studio Pencemor', avatar: '/assets/avatar.webp' };
+    const safeAvatarUrl = (value) => {
+      const raw = String(value || '').trim();
+      if (!raw || raw.length > 2048) return '';
+      try {
+        const parsed = new URL(raw, location.href);
+        return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '';
+      } catch (e) { return ''; }
+    };
+    const setAvatarBackground = (element, value) => {
+      if (!element) return false;
+      const url = safeAvatarUrl(value);
+      element.style.backgroundImage = url ? `url(${JSON.stringify(url)})` : '';
+      return Boolean(url);
+    };
     const profile = () => { try { return Object.assign({}, PROFILE_DEFAULT, JSON.parse(localStorage.getItem('bq_profile') || '{}')); } catch (e) { return Object.assign({}, PROFILE_DEFAULT); } };
     const syncHeaderProfile = () => {
       const p = profile();
@@ -1228,7 +1370,7 @@
       const sub = $('#dashHeadSub'); if (sub) sub.textContent = p.title || 'Studio Console';
       [ $('#dashSideAv'), $('#dashMbarAv') ].forEach((av) => {
         if (!av) return;
-        if (p.avatar) { av.style.backgroundImage = `url("${p.avatar}")`; av.classList.add('has-av'); av.textContent = ''; }
+        if (setAvatarBackground(av, p.avatar)) { av.classList.add('has-av'); av.textContent = ''; }
         else { av.style.backgroundImage = ''; av.classList.remove('has-av'); av.textContent = 'BQ'; }
       });
     };
@@ -1236,7 +1378,7 @@
       const p = profile();
       view.innerHTML = `
         <div class="dash-prof-card">
-          <span class="dash-prof-av" data-css="background-image:url('${esc(p.avatar)}')"></span>
+          <span class="dash-prof-av" id="dashProfAvatar"></span>
           <div><strong>${esc(p.name)}</strong><span class="mono">${esc(p.title)}</span></div>
         </div>
         <div class="dash-set">
@@ -1247,6 +1389,7 @@
           <span class="mono dash-prof-saved" id="prfSaved" hidden>${DT('pSaved')}</span>
         </div>
         <p class="dash-note mono">${DT('pNote')}</p>`;
+      setAvatarBackground($('#dashProfAvatar'), p.avatar);
       $('#prfSave')?.addEventListener('click', () => {
         const np = { name: $('#prfName').value.trim() || PROFILE_DEFAULT.name, title: $('#prfTitle').value.trim(), avatar: $('#prfAvatar').value.trim() };
         try { localStorage.setItem('bq_profile', JSON.stringify(np)); } catch (e) {}
@@ -1263,7 +1406,7 @@
       const p = profile(); const admins = getAdmins();
       view.innerHTML = `
         <div class="dash-prof-card">
-          <span class="dash-prof-av" data-css="background-image:url('${esc(p.avatar)}')"></span>
+          <span class="dash-prof-av" id="dashAdminOwnerAvatar"></span>
           <div><strong>${esc(p.name)}</strong><span class="mono">${DT('admYou')} · ${esc(p.title)}</span></div>
         </div>
         <div class="dash-admin-list" id="admList">${admins.length ? admins.map((a, i) => `
@@ -1275,6 +1418,7 @@
           <button class="dash-btn" type="submit"><i class="fa-solid fa-user-plus"></i> ${DT('admAdd')}</button>
         </form>
         <p class="dash-note mono">${DT('admNote')}</p>`;
+      setAvatarBackground($('#dashAdminOwnerAvatar'), p.avatar);
       $('#admForm')?.addEventListener('submit', (e) => {
         e.preventDefault();
         const name = $('#admName').value.trim(); if (!name) return;
@@ -1293,12 +1437,12 @@
       kmr: { gate:'Li blogê biweşîne', note:'Ji bo nivîsîn, guhertin û weşandinê tokena xwe binivîse.', tokPh:'Tokena guhertinê', conn:'Girêde', newBtn:'Nivîsa nû binivîse', editBtn:'Biguhere', delBtn:'Jê bibe', delAsk:'Ev nivîs bi temamî were jêbirin?', fTitle:'Sernav', fSub:'Bin-sernav', fTag:'Etîket', fCover:'Girêdana wêneyê', fCoverPh:'https://…  her girêdana wêneyê', fAccent:'Reng', fMin:'Xwendin (deq)', fBody:'Nivîs', fBodyPh:'Nivîsa xwe li vir binivîse…  Rêzeke vala di navbera paragrafan de bihêle.', fPub:'Weşandî — li ser malperê xuya ye', save:'Biweşîne', update:'Nûve bike', saving:'Tê weşandin…', updating:'Tê nûvekirin…', translating:'Ji bo hemû zimanan tê wergerandin…', savedMsg:'Hat tomarkirin — niha li ser blogê ye.', cancel:'Betal', back:'Hemû nivîs', loading:'Nivîsên te tên barkirin…', empty:'Hêj nivîs tune — ya yekem binivîse.', err:'Negihîşt xizmeta blogê (li ser malpera zindî dixebite).', needTitle:'Ji kerema xwe sernavekê zêde bike.', posts:'nivîs', draft:'reşnivîs', studio:'Pêşketî (database)' },
       fr: { gate:'Publier sur votre blog', note:"Saisissez votre jeton d'édition pour écrire, modifier et publier.", tokPh:"Jeton d'édition", conn:'Connecter', newBtn:'Écrire un article', editBtn:'Modifier', delBtn:'Supprimer', delAsk:'Supprimer définitivement cet article ?', fTitle:'Titre', fSub:'Sous-titre', fTag:'Étiquette', fCover:"Lien de l'image", fCoverPh:"https://…  collez un lien d'image", fAccent:'Couleur', fMin:'Lecture (min)', fBody:'Texte', fBodyPh:'Écrivez votre article ici…  Laissez une ligne vide entre les paragraphes.', fPub:'Publié — visible sur le site', save:'Publier', update:'Mettre à jour', saving:'Publication…', updating:'Mise à jour…', translating:'Traduction dans toutes les langues…', savedMsg:"Enregistré — c'est sur votre blog.", cancel:'Annuler', back:'Tous les articles', loading:'Chargement de vos articles…', empty:'Aucun article — écrivez le premier.', err:'Service du blog inaccessible (fonctionne sur le site en ligne).', needTitle:'Veuillez ajouter un titre.', posts:'articles', draft:'brouillon', studio:'Avancé (base de données)' }
     };
-    const editToken = () => { try { return localStorage.getItem('bq_edit_token') || ''; } catch (e) { return ''; } };
-        const cmsApi = (payload) => {
-      const SB = window.BQ_SUPA || {};
-      return fetch(SB.url + '/functions/v1/blog-admin', {
+    const editToken = () => { try { return sessionStorage.getItem('bq_edit_token') || ''; } catch (e) { return ''; } };
+    const cmsApi = (payload) => {
+      return fetch('/api/studio/blog-admin', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', apikey: SB.key, Authorization: 'Bearer ' + SB.key, 'x-edit-token': editToken() },
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', 'x-edit-token': editToken() },
         body: JSON.stringify(payload)
       }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
     };
@@ -1378,7 +1522,7 @@
         <i class="fa-solid fa-feather-pointed dash-gate-icon"></i>
         <h3>${t.gate}</h3><p class="mono">${t.note}</p>
         <form id="ctTokForm" class="dash-login"><input type="password" id="ctTok" placeholder="${t.tokPh}" autocomplete="off"><button type="submit">${t.conn} <i class="fa-solid fa-arrow-right"></i></button></form></div>`;
-      $('#ctTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#ctTok').value.trim(); if (!v) return; try { localStorage.setItem('bq_edit_token', v); } catch (x) {} renderContent(); });
+      $('#ctTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#ctTok').value.trim(); if (!v) return; try { sessionStorage.setItem('bq_edit_token', v); } catch (x) {} renderContent(); });
     };
     let cmsPage = 1;
     const drawCms = () => {
@@ -1392,12 +1536,12 @@
         const i = start + idx;                                   // global index (reorder-safe)
         const dd = p.date || (p.created_at ? new Date(p.created_at).toLocaleDateString('en', { month: 'short', year: 'numeric' }) : '');
         const up = i === 0 ? ' disabled' : '', dn = i === total - 1 ? ' disabled' : '';
-        return `<div class="cms-row" data-id="${p.id}">
+        return `<div class="cms-row" data-id="${esc(String(p.id ?? ''))}">
             <span class="dash-reorder"><button class="dash-ord" data-mv="-1" data-i="${i}"${up} aria-label="Up"><i class="fa-solid fa-chevron-up"></i></button><button class="dash-ord" data-mv="1" data-i="${i}"${dn} aria-label="Down"><i class="fa-solid fa-chevron-down"></i></button></span>
             <span class="cms-row-t"><strong>${esc(p.title || '')}</strong><span class="mono">${esc(p.tag || 'Note')} · ${esc(dd)}${p.published === false ? ' · ' + t.draft : ''}</span></span>
             <span class="cms-row-act">
-              <button class="cms-mini" data-act="edit" data-id="${p.id}" title="${t.editBtn}"><i class="fa-solid fa-pen"></i></button>
-              <button class="cms-mini cms-mini--del" data-act="del" data-id="${p.id}" title="${t.delBtn}"><i class="fa-solid fa-trash-can"></i></button>
+              <button class="cms-mini" data-act="edit" data-id="${esc(String(p.id ?? ''))}" title="${t.editBtn}"><i class="fa-solid fa-pen"></i></button>
+              <button class="cms-mini cms-mini--del" data-act="del" data-id="${esc(String(p.id ?? ''))}" title="${t.delBtn}"><i class="fa-solid fa-trash-can"></i></button>
             </span></div>`;
       }).join('') : `<p class="dash-dim mono">${t.empty}</p>`;
       view.innerHTML = `
@@ -1426,7 +1570,7 @@
       const t = CT_I18N[curLang()] || CT_I18N.en;
       view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i><br>${t.loading}</p>`;
       cmsApi({ action: 'list' }).then(d => {
-        if (d && d.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
+        if (d && d.error === 'unauthorized') { try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
         if (!d || !d.ok) { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${t.err}</p><button class="dash-btn" id="ctRetry"><i class="fa-solid fa-rotate"></i> ${t.conn}</button>`; const rb = $('#ctRetry'); if (rb) rb.addEventListener('click', cmsList); return; }
         CMS_POSTS = Array.isArray(d.posts) ? d.posts : [];
         cmsPage = 1;
@@ -1437,7 +1581,7 @@
       const t = CT_I18N[curLang()] || CT_I18N.en;
       if (!window.confirm(t.delAsk)) return;
       cmsApi({ action: 'delete', id: Number(id) }).then((d) => {
-        if (d && d.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
+        if (d && d.error === 'unauthorized') { try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
         try { if (window.__bqReloadBlog) window.__bqReloadBlog(); } catch (x) {}
         cmsList();
       });
@@ -1494,7 +1638,7 @@
           const b64 = await cmsResize(file, 1600, 0.82);
           const d = await cmsApi({ action: 'upload', filename: file.name, contentType: 'image/webp', dataB64: b64 });
           if (d && d.ok && d.url) { coverHidden.value = d.url; prev.hidden = false; prev.querySelector('img').src = d.url; upmsg.textContent = t.uploaded; }
-          else if (d && d.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); }
+          else if (d && d.error === 'unauthorized') { try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); }
           else { upmsg.textContent = '✗ ' + ((d && d.error) || ''); }
         } catch (err) { upmsg.textContent = '✗ ' + err; }
       });
@@ -1520,7 +1664,7 @@
         msg.textContent = (p.id ? (t.updating || t.saving) : t.saving);
         cmsApi(payload).then((d) => {
           btn.disabled = false;
-          if (d && d.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
+          if (d && d.error === 'unauthorized') { try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
           if (!d || !d.ok) { msg.textContent = '✗ ' + ((d && d.error) || ''); return; }
           msg.textContent = t.savedMsg;
           try { if (window.__bqReloadBlog) window.__bqReloadBlog(); } catch (x) {}
@@ -1549,7 +1693,7 @@
           <i class="fa-solid fa-robot dash-gate-icon"></i>
           <h3>${t.gate}</h3><p class="mono">${t.note}</p>
           <form id="asTokForm" class="dash-login"><input type="password" id="asTok" placeholder="${t.tokPh}" autocomplete="off"><button type="submit">${t.conn} <i class="fa-solid fa-arrow-right"></i></button></form></div>`;
-        $('#asTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#asTok').value.trim(); if (!v) return; try { localStorage.setItem('bq_edit_token', v); } catch (x) {} renderAssistant(); });
+        $('#asTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#asTok').value.trim(); if (!v) return; try { sessionStorage.setItem('bq_edit_token', v); } catch (x) {} renderAssistant(); });
         return;
       }
       let hist = []; try { hist = JSON.parse(localStorage.getItem('bq_assist') || '[]'); } catch (e) {}
@@ -1577,7 +1721,7 @@
         fetch('/api/assistant', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-edit-token': token }, body: JSON.stringify({ messages: hist.map(m => ({ role: m.role, content: m.content })) }) })
           .then(r => r.json()).then(d => {
             if (d.ok) { hist.push({ role: 'assistant', content: d.text }); save(); paint(); }
-            else if (d.error === 'unauthorized') { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} renderAssistant(); }
+            else if (d.error === 'unauthorized') { try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {} renderAssistant(); }
             else { typing.classList.remove('asst-typing'); typing.textContent = (d.error === 'no-key' || d.error === 'no-ai') ? t.errKey : ('✗ ' + (d.error || '')); }
           }).catch(() => { typing.classList.remove('asst-typing'); typing.textContent = t.err; });
       });
@@ -1590,15 +1734,23 @@
       if (s < 3600) return Math.floor(s / 60) + 'm ago';
       if (s < 86400) return Math.floor(s / 3600) + 'h ago';
       return Math.floor(s / 86400) + 'd ago'; };
+    const safeCount = (value) => {
+      const count = Number(value);
+      return Number.isFinite(count) && count >= 0 ? Math.min(Math.floor(count), 1_000_000_000) : 0;
+    };
     const bars = (rows, fmt) => {
-      if (!rows || !rows.length) return `<p class="dash-dim mono">${DT('vNoData')}</p>`;
-      const max = Math.max(...rows.map(x => x.c), 1);
-      return rows.map(r => `<div class="dash-bar-row"><span class="dash-bar-label">${fmt(r)}</span><span class="dash-bar"><span class="dash-bar-fill" data-css="width:${(r.c / max * 100).toFixed(0)}%"></span></span><span class="dash-bar-n mono">${r.c}</span></div>`).join('');
+      const cleanRows = Array.isArray(rows) ? rows : [];
+      if (!cleanRows.length) return `<p class="dash-dim mono">${DT('vNoData')}</p>`;
+      const max = Math.max(...cleanRows.map(x => safeCount(x && x.c)), 1);
+      return cleanRows.map((r) => {
+        const count = safeCount(r && r.c);
+        return `<div class="dash-bar-row"><span class="dash-bar-label">${fmt(r || {})}</span><span class="dash-bar"><span class="dash-bar-fill" data-css="width:${(count / max * 100).toFixed(0)}%"></span></span><span class="dash-bar-n mono">${count}</span></div>`;
+      }).join('');
     };
 
     const renderVisitors = async () => {
       let token = '';
-      try { token = localStorage.getItem('bq_stats_token') || ''; } catch (e) {}
+      try { token = sessionStorage.getItem('bq_stats_token') || ''; } catch (e) {}
       if (!token) {
         view.innerHTML = `<div class="dash-gate-inline">
           <i class="fa-solid fa-chart-line dash-gate-icon"></i>
@@ -1607,7 +1759,7 @@
           <form id="stTokForm" class="dash-login"><input type="password" id="stTok" placeholder="${DT('vTokenPh')}" autocomplete="off"><button type="submit">${DT('vConnectBtn')} <i class="fa-solid fa-arrow-right"></i></button></form></div>`;
         $('#stTokForm').addEventListener('submit', (e) => { e.preventDefault();
           const v = $('#stTok').value.trim(); if (!v) return;
-          try { localStorage.setItem('bq_stats_token', v); } catch (x) {} renderVisitors(); });
+          try { sessionStorage.setItem('bq_stats_token', v); } catch (x) {} renderVisitors(); });
         return;
       }
       view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i><br>${DT('vLoading')}</p>`;
@@ -1620,23 +1772,27 @@
       catch (e) { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>Can't reach analytics — this works on the live site only, not local preview.</p>`; return; }
 
       if (!d.ok) {
-        if (d.error === 'unauthorized') { try { localStorage.removeItem('bq_stats_token'); } catch (x) {}
+        if (d.error === 'unauthorized') { try { sessionStorage.removeItem('bq_stats_token'); } catch (x) {}
           view.innerHTML = `<p class="dash-empty mono">Wrong token.</p><button class="dash-btn" id="stRetry">Try again</button>`;
           $('#stRetry').addEventListener('click', renderVisitors); return; }
         if (d.error === 'no-db') { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-database"></i><br>Analytics database not connected yet.<br><small>Create a Cloudflare D1 database and bind it as <b>DB</b>.</small></p>`; return; }
         view.innerHTML = `<p class="dash-empty mono">Analytics error: ${esc(d.error || '')}</p>`; return;
       }
 
-      const sMax = Math.max(...(d.series || []).map(s => s.c), 1);
-      const chart = (d.series || []).map(s =>
-        `<span class="viz-day" title="${s.d} · ${s.c} views"><span class="viz-day-fill" data-css="height:${Math.max(8, (s.c / sMax * 100)).toFixed(0)}%"></span></span>`).join('');
+      const series = (Array.isArray(d.series) ? d.series : []).map((point) => ({
+        d: String((point && point.d) || '').slice(0, 32),
+        c: safeCount(point && point.c)
+      }));
+      const sMax = Math.max(...series.map(s => s.c), 1);
+      const chart = series.map(s =>
+        `<span class="viz-day" title="${esc(s.d)} · ${s.c} views"><span class="viz-day-fill" data-css="height:${Math.max(8, (s.c / sMax * 100)).toFixed(0)}%"></span></span>`).join('');
 
       view.innerHTML = `
         <div class="dash-cards">
-          <div class="dash-card"><span class="dash-card-n">${d.views}</span><span class="mono">${DT('vViews')}</span></div>
-          <div class="dash-card"><span class="dash-card-n">${d.visitors}</span><span class="mono">${DT('vVisitors')}</span></div>
-          <div class="dash-card"><span class="dash-card-n">${d.viewsToday}</span><span class="mono">${DT('vViewsToday')}</span></div>
-          <div class="dash-card"><span class="dash-card-n">${d.visitorsToday}</span><span class="mono">${DT('vVisToday')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${safeCount(d.views)}</span><span class="mono">${DT('vViews')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${safeCount(d.visitors)}</span><span class="mono">${DT('vVisitors')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${safeCount(d.viewsToday)}</span><span class="mono">${DT('vViewsToday')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${safeCount(d.visitorsToday)}</span><span class="mono">${DT('vVisToday')}</span></div>
         </div>
         ${chart ? `<div class="viz-wrap"><span class="dash-dim mono">${DT('v14')}</span><div class="viz-chart">${chart}</div></div>` : ''}
         <div class="dash-grid2">
@@ -1646,7 +1802,7 @@
           <div><h4 class="dash-h mono">${DT('vDevices')}</h4>${bars(d.devices, r => esc(r.device || '—'))}</div>
         </div>
         <h4 class="dash-h mono">${DT('vRecent')}</h4>
-        <div class="dash-recent">${(d.recent || []).length ? d.recent.map(r =>
+        <div class="dash-recent">${(Array.isArray(d.recent) ? d.recent : []).length ? d.recent.map(r =>
           `<div class="dash-recent-row mono"><span class="dash-recent-flag">${flag(r.country)}</span><span class="dash-recent-path">${esc(r.path)}</span><span class="dash-dim">${esc(r.device)}</span><span class="dash-dim">${ago(r.ts)}</span></div>`).join('')
           : `<p class="dash-dim mono">${DT('vNoVisits')}</p>`}</div>
         <button class="dash-btn" id="stRefresh"><i class="fa-solid fa-rotate"></i> ${DT('vRefresh')}</button>`;
@@ -1655,10 +1811,10 @@
 
     /* ---- Latest: hand-pin an important work to the homepage bell for a week ---- */
     const latestApi = (payload) => {
-      const SB = window.BQ_SUPA || {};
-      return fetch(SB.url + '/functions/v1/latest-admin', {
+      return fetch('/api/studio/latest-admin', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', apikey: SB.key, Authorization: 'Bearer ' + SB.key, 'x-edit-token': editToken() },
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', 'x-edit-token': editToken() },
         body: JSON.stringify(payload)
       }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
     };
@@ -1714,7 +1870,7 @@
           const i = start + idx;                                   // global index (reorder-safe)
           const left = Math.max(0, 7 - Math.floor((Date.now() - new Date(it.created_at).getTime()) / 86400000));
           const up = i === 0 ? ' disabled' : '', dn = i === total - 1 ? ' disabled' : '';
-          return `<div class="dash-latest-row"><span class="dash-reorder"><button class="dash-ord" data-mv="-1" data-i="${i}"${up} aria-label="Up"><i class="fa-solid fa-chevron-up"></i></button><button class="dash-ord" data-mv="1" data-i="${i}"${dn} aria-label="Down"><i class="fa-solid fa-chevron-down"></i></button></span><span class="dash-latest-tag mono">${esc((it.link && tabName(it.link)) || it.tag || 'Featured')}</span><strong>${esc(it.title)}</strong><span class="mono dash-latest-left">${left}d</span><button class="dash-latest-del" data-id="${it.id}" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button></div>`;
+          return `<div class="dash-latest-row"><span class="dash-reorder"><button class="dash-ord" data-mv="-1" data-i="${i}"${up} aria-label="Up"><i class="fa-solid fa-chevron-up"></i></button><button class="dash-ord" data-mv="1" data-i="${i}"${dn} aria-label="Down"><i class="fa-solid fa-chevron-down"></i></button></span><span class="dash-latest-tag mono">${esc((it.link && tabName(it.link)) || it.tag || 'Featured')}</span><strong>${esc(it.title)}</strong><span class="mono dash-latest-left">${left}d</span><button class="dash-latest-del" data-id="${esc(String(it.id ?? ''))}" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button></div>`;
         }).join('') + pager.html;
         list.querySelectorAll('.dash-latest-del').forEach(b => b.addEventListener('click', () => { latestApi({ action: 'delete', id: Number(b.dataset.id) }).then(() => { loadList(); if (window.__bqReloadLatest) window.__bqReloadLatest(); }); }));
         list.querySelectorAll('.dash-ord').forEach(b => b.addEventListener('click', () => {
@@ -1770,7 +1926,8 @@
     };
     Object.keys(PR_EXTRA).forEach(l => Object.assign(PR_I18N[l] || PR_I18N.en, PR_EXTRA[l]));
     const PT = (k) => (PR_I18N[curLang()] || PR_I18N.en)[k] || PR_I18N.en[k] || k;
-    const prjApi = (payload) => { const SB = window.BQ_SUPA || {}; return fetch(SB.url + '/functions/v1/projects-admin', { method:'POST', headers:{ 'Content-Type':'application/json', apikey:SB.key, Authorization:'Bearer ' + SB.key, 'x-edit-token':editToken() }, body:JSON.stringify(payload) }).then(r => r.json().catch(() => ({ error:'bad_response' }))); };
+    const prjApi = (payload) => fetch('/api/studio/projects-admin', { method:'POST', credentials:'same-origin', headers:{ 'Content-Type':'application/json', 'x-edit-token':editToken() }, body:JSON.stringify(payload) }).then(r => r.json().catch(() => ({ error:'bad_response' })));
+    const projectAccent = (value) => /^#[0-9a-f]{6}$/i.test(String(value || '').trim()) ? String(value).trim() : '#bd4a2c';
     const parsePalette = (txt) => String(txt || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => { const m = l.match(/(#[0-9a-fA-F]{3,8})\s*$/); const hex = m ? m[1] : ''; const name = (m ? l.slice(0, m.index) : l).replace(/[,:\s]+$/, '').trim(); return hex ? { name: name || hex, hex } : null; }).filter(Boolean);
     const paletteToText = (arr) => (Array.isArray(arr) ? arr : []).map(s => (s.name ? s.name + ' ' : '') + (s.hex || '')).join('\n');
     const projectGallery = (p) => (Array.isArray(p.gallery) ? p.gallery : []).map(x => typeof x === 'string' ? { url:x } : x).filter(x => x && x.url);
@@ -1790,21 +1947,22 @@
     const prjGate = () => {
       view.innerHTML = `<div class="cms-gate"><h3>${esc(PT('gate'))}</h3><p class="dash-note mono">${esc(PT('note'))}</p>
         <form id="prjTokForm" class="cms-tokform"><input id="prjTok" type="password" placeholder="${esc(PT('tokPh'))}" autocomplete="off"><button class="dash-btn dash-btn--go" type="submit">${esc(PT('conn'))}</button></form></div>`;
-      $('#prjTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#prjTok').value.trim(); if (!v) return; try { localStorage.setItem('bq_edit_token', v); } catch (x) {} renderCases(); });
+      $('#prjTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#prjTok').value.trim(); if (!v) return; try { sessionStorage.setItem('bq_edit_token', v); } catch (x) {} renderCases(); });
     };
     const prjList = () => {
       view.innerHTML = `<div class="cms-head"><span class="mono cms-status">${esc(PT('loading'))}</span><button class="dash-btn dash-btn--go" id="prjNew"><i class="fa-solid fa-plus"></i> ${esc(PT('newBtn'))}</button></div><div id="prjRows"></div>`;
       $('#prjNew').addEventListener('click', () => prjForm({}));
       prjApi({ action:'list' }).then((d) => {
-        if (d && (d.error === 'unauthorized' || d.error === 'missing_token')) { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} prjGate(); return; }
+        if (d && (d.error === 'unauthorized' || d.error === 'missing_token')) { try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {} prjGate(); return; }
         const rows = (d && d.projects) || [];
         $('.cms-status').textContent = rows.length ? '' : PT('empty');
         $('#prjRows').innerHTML = rows.map(p => {
           const thumb = projectThumb(p);
           const galN = projectGallery(p).length + (p.cover ? 1 : 0);
-          return `<div class="cms-row cms-row--project"><span class="cms-row-thumb" data-css="--accent:${esc(p.accent || '#bd4a2c')}">${thumb ? `<img src="${esc(pickThumb(thumb, 180))}" alt="">` : `<i class="fa-solid fa-image"></i>`}</span>
-          <div class="cms-row-t"><strong>${esc(p.title)}</strong><span class="mono">${esc([p.client, p.year].filter(Boolean).join(' · '))}${p.published ? '' : ' · draft'}</span><span class="mono cms-row-meta"><span class="cms-row-dot" data-css="background:${esc(p.accent || '#bd4a2c')}"></span>${galN ? esc(galleryCountLabel(galN)) : esc(PT('noImage'))}</span></div>
-          <div class="cms-row-act"><button class="dash-btn" data-edit="${p.id}"><i class="fa-solid fa-pen"></i> ${esc(PT('edit'))}</button><button class="dash-btn dash-btn--danger" data-del="${p.id}"><i class="fa-solid fa-trash"></i></button></div></div>`;
+          const accent = projectAccent(p.accent);
+          return `<div class="cms-row cms-row--project"><span class="cms-row-thumb" data-css="--accent:${accent}">${thumb ? `<img src="${esc(pickThumb(thumb, 180))}" alt="">` : `<i class="fa-solid fa-image"></i>`}</span>
+          <div class="cms-row-t"><strong>${esc(p.title)}</strong><span class="mono">${esc([p.client, p.year].filter(Boolean).join(' · '))}${p.published ? '' : ' · draft'}</span><span class="mono cms-row-meta"><span class="cms-row-dot" data-css="background:${accent}"></span>${galN ? esc(galleryCountLabel(galN)) : esc(PT('noImage'))}</span></div>
+          <div class="cms-row-act"><button class="dash-btn" data-edit="${esc(String(p.id ?? ''))}"><i class="fa-solid fa-pen"></i> ${esc(PT('edit'))}</button><button class="dash-btn dash-btn--danger" data-del="${esc(String(p.id ?? ''))}"><i class="fa-solid fa-trash"></i></button></div></div>`;
         }).join('');
         $('#prjRows').querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => prjForm(rows.find(x => String(x.id) === b.getAttribute('data-edit')) || {})));
         $('#prjRows').querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm(PT('delAsk'))) return; prjApi({ action:'delete', id: Number(b.getAttribute('data-del')) }).then(() => { if (window.__bqReloadWork) window.__bqReloadWork(); prjList(); }); }));
@@ -1823,7 +1981,7 @@
           <label class="dash-field"><span class="mono">${esc(PT('fYear'))}</span><input id="pf_year" value="${esc(p.year || '')}"></label>
           <label class="dash-field"><span class="mono">${esc(PT('fRole'))}</span><input id="pf_role" value="${esc(p.role || '')}"></label>
           <label class="dash-field"><span class="mono">${esc(PT('fTag'))}</span><input id="pf_tag" value="${esc(p.tag || 'Brand Identity')}"></label>
-          <label class="dash-field"><span class="mono">${esc(PT('fAccent'))}</span><input id="pf_accent" type="color" value="${esc(p.accent || '#bd4a2c')}" class="cms-color"></label>
+          <label class="dash-field"><span class="mono">${esc(PT('fAccent'))}</span><input id="pf_accent" type="color" value="${projectAccent(p.accent)}" class="cms-color"></label>
         </div>
         <label class="dash-field"><span class="mono">${esc(PT('fCover'))}</span><input id="pf_coverfile" type="file" accept="image/*" class="cms-file"><span class="dash-note mono" id="pf_upmsg"></span></label>
         <label class="dash-field"><span class="mono">${esc(PT('fCoverUrl'))}</span><input id="pf_cover_url" type="url" value="${esc(p.cover || '')}" placeholder="https://…"></label>
@@ -1877,7 +2035,7 @@
         msg.textContent = p.id ? PT('saving') : PT('saving');
         prjApi({ action:'upsert', project: proj, i18n }).then((d) => {
           btn.disabled = false;
-          if (d && (d.error === 'unauthorized' || d.error === 'missing_token')) { try { localStorage.removeItem('bq_edit_token'); } catch (x) {} prjGate(); return; }
+          if (d && (d.error === 'unauthorized' || d.error === 'missing_token')) { try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {} prjGate(); return; }
           if (!d || !d.ok) { msg.textContent = '✗ ' + ((d && d.error) || ''); return; }
           msg.textContent = PT('saved');
           if (window.__bqReloadWork) window.__bqReloadWork();
@@ -1943,7 +2101,7 @@
           body: JSON.stringify({ action: 'logout' })
         });
       } catch (e) {}
-      try { localStorage.removeItem('bq_edit_token'); localStorage.removeItem('bq_stats_token'); } catch (e) {}
+      try { sessionStorage.removeItem('bq_edit_token'); sessionStorage.removeItem('bq_stats_token'); } catch (e) {}
       dash.classList.remove('is-full'); main.hidden = true; gate.hidden = false;
       closeDash();
     });
@@ -1980,7 +2138,13 @@
     if (!layout || !list) return;
     const IMG = (p) => CDN ? `${CDN}/${p}` : '';
     const AUTHOR = 'Barakat Qurtas';
-    const hl = window.__bqHighlightTitle || ((s) => s);
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+    const hl = window.__bqHighlightTitle || ((s) => esc(s));
+    const safeAccent = (value) => /^#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(String(value || '').trim())
+      ? String(value).trim()
+      : '';
 
     /* A post without a cover must not leave src="" / src="undefined" behind:
        an empty src re-requests the page itself and "undefined" 404s, and both
@@ -2037,7 +2201,7 @@
       const q = L(p);
       els.card.classList.add('swapping');
       if (els.ghost) els.ghost.textContent = p.num;
-      if (p.accent) els.card.style.background = p.accent;
+      els.card.style.background = safeAccent(p.accent);
       setTimeout(() => {
         if (els.img)  setCover(els.img, q.img);
         if (els.tag)  els.tag.textContent = q.tag;
@@ -2071,7 +2235,7 @@
       const cats = []; const seen = {};
       POSTS.forEach(p => { const c = (L(p).tag || '').trim(); const k = catNorm(c); if (c && !seen[k]) { seen[k] = 1; cats.push(c); } });
       const allLabel = (window.BQ_DICT && window.BQ_DICT['blog.all']) || 'All';
-      const chip = (label, val, active) => `<button class="blog-filter${active ? ' is-active' : ''}" data-cat="${catNorm(val)}">${label}</button>`;
+      const chip = (label, val, active) => `<button class="blog-filter${active ? ' is-active' : ''}" data-cat="${esc(catNorm(val))}">${esc(label)}</button>`;
       bar.innerHTML = chip(allLabel, 'all', curCat === 'all') + cats.map(c => chip(c, c, catNorm(c) === curCat)).join('');
       bar.querySelectorAll('.blog-filter').forEach(b => b.addEventListener('click', () => {
         curCat = b.getAttribute('data-cat'); page = 1; renderPage();
@@ -2094,9 +2258,9 @@
         a.href = blogBase() + '/' + (p.slug || slugify(p.title));
         a.className = 'index-row' + (i === 0 ? ' is-active' : '');
         a.innerHTML =
-          `<span class="mono index-row-num">${p.num} / ${String(FP.length).padStart(2,'0')}</span>
-           <span class="index-row-title">${q.title}</span>
-           <span class="mono index-row-tag">${q.tag}</span>`;
+          `<span class="mono index-row-num">${esc(p.num)} / ${esc(String(FP.length).padStart(2,'0'))}</span>
+           <span class="index-row-title">${esc(q.title)}</span>
+           <span class="mono index-row-tag">${esc(q.tag)}</span>`;
         a.addEventListener('mouseenter', () => { setActive(a); preview(p); });
         a.addEventListener('click', (e) => {
           e.preventDefault();
@@ -2111,11 +2275,11 @@
           const panel = document.createElement('div');
           panel.className = 'index-inline';
           panel.innerHTML =
-            `${q.img ? `<img class="index-inline-img" src="${q.img}" alt="" loading="lazy">` : ''}` +
-            `<span class="mono index-inline-tag">${q.tag} · ${q.date || ''}</span>` +
-            `<h4 class="index-inline-title">${q.title}</h4>` +
+            `${q.img ? `<img class="index-inline-img" src="${esc(q.img)}" alt="" loading="lazy">` : ''}` +
+            `<span class="mono index-inline-tag">${esc(q.tag)} · ${esc(q.date || '')}</span>` +
+            `<h4 class="index-inline-title">${esc(q.title)}</h4>` +
             `<p class="index-inline-sub">${esc(sum)}</p>` +
-            `<button class="index-inline-more" type="button">${dT('blog.readMore', 'Read more')} →</button>`;
+            `<button class="index-inline-more" type="button">${esc(dT('blog.readMore', 'Read more'))} →</button>`;
           a.after(panel);
           panel.querySelector('.index-inline-more').addEventListener('click', () => openReader(p));
           scrollTarget(panel, { behavior: 'smooth', block: 'nearest' });
@@ -2168,7 +2332,6 @@
     const cmKey = (n) => `bq_blog_cmts_${n}`;
     const baseLikes = (n) => 11 + (parseInt(n, 10) * 7) % 30;
     const getComments = (n) => { try { return JSON.parse(localStorage.getItem(cmKey(n)) || '[]'); } catch (e) { return []; } };
-    const esc = (s) => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
     /* real, shared likes + comments on published posts (Supabase); built-in demo notes stay on localStorage */
     const SBE = () => window.BQ_SUPA || {};
     const sbHeaders = () => ({ apikey: SBE().key, Authorization: 'Bearer ' + SBE().key, 'Content-Type': 'application/json' });
@@ -2187,7 +2350,7 @@
       const empty = (window.BQ_DICT && window.BQ_DICT['blog.noComments']) || 'No comments yet — be the first to write one.';
       rd.comments.innerHTML = l.length ? l.map(c =>
         `<div class="reader-comment"><div class="reader-comment-head"><strong>${esc(c.name)}</strong><span class="mono">${new Date(c.at).toLocaleDateString()}</span></div><p>${esc(c.text)}</p></div>`).join('')
-        : `<p class="reader-comment-empty">${empty}</p>`;
+        : `<p class="reader-comment-empty">${esc(empty)}</p>`;
     };
     const loadEngagement = (p) => {
       if (p && p.id != null && SBE().url) {
@@ -2210,13 +2373,13 @@
       curPostObj = p;
       curSlug = p.slug || slugify(p.title);
       const q = L(p);
-      if (rd.img) { setCover(rd.img, q.img); rd.img.alt = q.title; }
+      if (rd.img) { setCover(rd.img, q.img); rd.img.alt = String(q.title || ''); }
       if (rd.tag) rd.tag.textContent = q.tag;
-      if (rd.title) rd.title.innerHTML = q.title;
+      if (rd.title) rd.title.textContent = q.title;
       if (rd.date) rd.date.textContent = (q.date || '').toUpperCase();
       if (rd.read) rd.read.textContent = dT('blog.minRead', '{n} MIN READ').replace('{n}', p.read);
       if (rd.highlight) rd.highlight.textContent = q.sub || p.sub || '';
-      if (rd.text) rd.text.innerHTML = q.body.map(x => `<p>${x}</p>`).join('');
+      if (rd.text) rd.text.innerHTML = (Array.isArray(q.body) ? q.body : [q.body]).map(x => `<p>${esc(x)}</p>`).join('');
       if (rd.cName && !rd.cName.value) { const pn = profile().name; if (pn) rd.cName.value = pn; }   // prefill from the saved profile
       loadEngagement(p);
       renderMore(p);
@@ -2382,11 +2545,11 @@
       if (reader && reader.classList.contains('is-open') && curPostObj) {
         const q = L(curPostObj);
         if (rd.tag) rd.tag.textContent = q.tag;
-        if (rd.title) rd.title.innerHTML = q.title;
+        if (rd.title) rd.title.textContent = q.title;
         if (rd.date) rd.date.textContent = (q.date || '').toUpperCase();
         if (rd.read) rd.read.textContent = dT('blog.minRead', '{n} MIN READ').replace('{n}', curPostObj.read);
-        if (rd.text) rd.text.innerHTML = q.body.map(x => `<p>${x}</p>`).join('');
-        if (rd.img) rd.img.alt = q.title;
+        if (rd.text) rd.text.innerHTML = (Array.isArray(q.body) ? q.body : [q.body]).map(x => `<p>${esc(x)}</p>`).join('');
+        if (rd.img) rd.img.alt = String(q.title || '');
         loadEngagement(curPostObj);
       }
     });
@@ -2442,7 +2605,9 @@
   if (!panel || !list) return;
   const bell = $('#railLatest'), bellM = $('#railLatestM');
   const badge = $('#railLatestBadge'), badgeM = $('#railLatestBadgeM');
-  const esc = (s) => String(s || '').replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
   const WEEK = 7 * 24 * 60 * 60 * 1000;
   // launch baseline — Latest only surfaces blogs/works added from here on, so the
   // migrated/built-in posts don't show. After a week the rolling 7-day window takes over.
@@ -2453,6 +2618,14 @@
   let items = [], workItems = [], pinItems = [];
   const GH = 'https://api.github.com/repos/Bqurtas/BqurtasPortfolio';
   const CDN = (window.BQ_GALLERY && window.BQ_GALLERY.CDN_BASE) || '';
+  const normalizeWorkItems = (rows) => (Array.isArray(rows) ? rows : []).slice(0, 100).map((row) => {
+    const count = Number(row && row.count);
+    return {
+      cat: String((row && row.cat) || '').slice(0, 64),
+      count: Number.isFinite(count) && count >= 0 ? Math.min(Math.floor(count), 100_000) : 0,
+      thumb: String((row && row.thumb) || '').slice(0, 2048)
+    };
+  }).filter((row) => row.cat);
 
   /* a quiet minute with no interaction → Latest closes itself */
   let idleT = null;
@@ -2476,7 +2649,7 @@
     }).join('');
     const workHtml = workItems.map((w) => {
       const name = dict()['tab.' + w.cat] || w.cat;
-      return `<button class="latest-item" data-kind="work" data-cat="${esc(w.cat)}">${w.thumb ? `<img class="latest-item-img" src="${esc(w.thumb)}" alt="" loading="lazy">` : ''}<span class="latest-item-body"><span class="latest-item-tag"><span class="latest-item-new"></span>${esc(name)}</span><span class="latest-item-title">${w.count} ${esc(newWord)}</span></span></button>`;
+      return `<button class="latest-item" data-kind="work" data-cat="${esc(w.cat)}">${w.thumb ? `<img class="latest-item-img" src="${esc(w.thumb)}" alt="" loading="lazy">` : ''}<span class="latest-item-body"><span class="latest-item-tag"><span class="latest-item-new"></span>${esc(name)}</span><span class="latest-item-title">${esc(String(w.count))} ${esc(newWord)}</span></span></button>`;
     }).join('');
     const blogHtml = items.map((p) => {
       const tr = (p.i18n && p.i18n[L]) || {};
@@ -2500,8 +2673,12 @@
       };
       const goTab = (cat) => {
         afterRoom('design', () => {
-          const tb = document.querySelector('.tab[data-filter="' + cat + '"]');
-          if (tb) tb.click();
+          /* A pinned item is CMS-authored. Compare its category as data
+             rather than interpolating it into a CSS selector. */
+          const tb = Array.from(document.querySelectorAll('.tab[data-filter]'))
+            .find((tab) => tab.dataset.filter === String(cat || ''));
+          if (!tb) return;
+          tb.click();
           const w = document.querySelector('.section.work');
           scrollTarget(w, { behavior: 'smooth', block: 'start' });
         });
@@ -2510,8 +2687,7 @@
         goTab(b.getAttribute('data-cat'));
       } else if (kind === 'pin') {
         const link = b.getAttribute('data-link') || '';
-        if (/^https?:\/\//.test(link)) { window.open(link, '_blank', 'noopener'); }
-        else if (link) { goTab(link); }
+        if (link) { goTab(link); }
         else { goRoom('design'); }
       } else {
         const id = b.getAttribute('data-id');
@@ -2540,7 +2716,7 @@
     try {
       const CK = 'bq_latest_works';
       const cached = sessionStorage.getItem(CK);
-      if (cached) { const o = JSON.parse(cached); if (Date.now() - o.t < 1800000) { workItems = o.w || []; setBadge(); render(); return; } }
+      if (cached) { const o = JSON.parse(cached); if (o && Number.isFinite(Number(o.t)) && Date.now() - Number(o.t) < 1800000) { workItems = normalizeWorkItems(o.w); setBadge(); render(); return; } }
       const fc = {}, cols = (window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS) || {};
       Object.keys(cols).forEach((k) => { fc[cols[k].folder] = cols[k].cat; });
       const sinceISO = sinceStamp();
@@ -2560,7 +2736,7 @@
         if (!byCat[cat]) byCat[cat] = { count: 0, thumb: CDN + '/' + f.filename };
         byCat[cat].count++;
       });
-      workItems = Object.keys(byCat).map((cat) => ({ cat, count: byCat[cat].count, thumb: byCat[cat].thumb }));
+      workItems = normalizeWorkItems(Object.keys(byCat).map((cat) => ({ cat, count: byCat[cat].count, thumb: byCat[cat].thumb })));
       sessionStorage.setItem(CK, JSON.stringify({ t: Date.now(), w: workItems }));
       setBadge(); render();
     } catch (e) {}

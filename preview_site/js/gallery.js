@@ -375,19 +375,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (certGrid) {
     document.getElementById('certLoading')?.remove();
     window.BQ_GALLERY.items('certificate').forEach(item => {
-      const div = document.createElement('div');
+      const div = document.createElement('button');
       const dispTitle = galTitle('certificate', item.index, item.titlePrefix);
+      div.type = 'button';
       div.className = 'cert-item';
       div.dataset.coll  = 'certificate';
       div.dataset.idx   = item.index;
       div.dataset.full  = item.url;
       div.dataset.title = dispTitle;
       div.dataset.type  = 'image';
+      div.setAttribute('aria-label', galViewLabel(dispTitle));
       div.innerHTML = `
-        <div class="cert-img-wrap">
+        <span class="cert-img-wrap">
           <img loading="lazy" decoding="async" width="${item.width || 640}" height="${item.height || 880}" src="${window.BQ_GALLERY.thumb(item.url, 320)}" data-full="${item.url}" data-raw="${item.rawUrl}" alt="${dispTitle}" />
-          <div class="cert-zoom"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
-        </div>
+          <span class="cert-zoom"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+        </span>
         <span class="mono cert-label">${dispTitle}</span>`;
       div.addEventListener('error', () => div.remove(), { once: true });
       certGrid.appendChild(div);
@@ -457,6 +459,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       div.dataset.title = title;
       const lbl = div.querySelector('.cert-label'); if (lbl) lbl.textContent = title;
       const img = div.querySelector('img'); if (img) img.alt = title;
+      div.setAttribute('aria-label', galViewLabel(title));
     });
   };
   window.__bqLangCb = window.__bqLangCb || [];
@@ -489,9 +492,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     logosGrid.removeAttribute('data-logos-empty');
     logosGrid.innerHTML = logos.map((item, idx) => {
       const src = item.url;
-      return `<div class="logo-mark logo-mark--img logo-mark--ticker" data-full="${src}">
+      return `<button type="button" class="logo-mark logo-mark--img logo-mark--ticker" data-full="${src}" aria-label="View logo ${idx + 1}">
          <img src="${window.BQ_GALLERY.thumb(src, 180)}" data-full="${src}" data-raw="${item.rawUrl}" alt="Logo ${idx + 1}" loading="lazy" decoding="async" width="180" height="135" />
-       </div>`
+       </button>`
     }).join('');
     logosGrid.querySelectorAll('img').forEach(img =>
       img.addEventListener('error', () => {

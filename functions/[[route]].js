@@ -106,7 +106,10 @@ function resolve(pathname) {
     if (seg.length === 2 && TABS.includes(tab)) return { lang, key: tab, canon: SITE + prefix + '/design/' + tab };
     return null;
   }
-  if (first === 'blog' && seg.length === 2 && /^\d+$/.test(seg[1])) return { lang, key: 'blogpost', slug: seg[1], canon: SITE + prefix + '/blog/' + seg[1] };
+  /* Supabase IDs are positive integers. Keep them as strings so a large ID is
+     never rounded by JavaScript, and put a finite ceiling on the route space
+     so arbitrary digit strings cannot become crawlable application pages. */
+  if (first === 'blog' && seg.length === 2 && /^[1-9]\d{0,17}$/.test(seg[1])) return { lang, key: 'blogpost', slug: seg[1], canon: SITE + prefix + '/blog/' + seg[1] };
   if (seg.length === 1 && ROOMS.includes(first)) return { lang, key: first, canon: SITE + prefix + '/' + first };
   return null;
 }
@@ -141,11 +144,30 @@ function isPassthroughPath(pathname, request) {
   return !acceptsHtml && /\.[a-z0-9]{2,10}$/i.test(pathname);
 }
 
+const documentSecurityHeaders = () => ({
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'SAMEORIGIN',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=(), interest-cohort=()',
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+  'X-Permitted-Cross-Domain-Policies': 'none',
+  'Cross-Origin-Opener-Policy': 'same-origin-allow-popups'
+});
+
+const noStoreDocumentHeaders = (extra = {}) => new Headers({
+  ...documentSecurityHeaders(),
+  'Cache-Control': 'no-store, max-age=0',
+  'CDN-Cache-Control': 'no-store',
+  'Cloudflare-CDN-Cache-Control': 'no-store',
+  'Pragma': 'no-cache',
+  'Content-Security-Policy': "default-src 'none'; base-uri 'none'; frame-ancestors 'none'",
+  ...extra
+});
+
 async function serveNotFound(request, url, env) {
-  const headers = new Headers({
+  const headers = noStoreDocumentHeaders({
     'Content-Type': 'text/html; charset=UTF-8',
-    'Cache-Control': 'no-store',
-    'X-Content-Type-Options': 'nosniff',
+    'Content-Security-Policy': "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:",
     'X-Robots-Tag': 'noindex, nofollow'
   });
   if (request.method === 'HEAD') return new Response(null, { status: 404, headers });
@@ -156,6 +178,19 @@ async function serveNotFound(request, url, env) {
     } catch (e) {}
   }
   return new Response('<!doctype html><title>Not found</title><h1>404 — Not found</h1>', { status: 404, headers });
+}
+
+function serveUnavailable(request) {
+  const headers = noStoreDocumentHeaders({
+    'Content-Type': 'text/html; charset=UTF-8',
+    'Content-Security-Policy': "default-src 'none'; base-uri 'none'; frame-ancestors 'none'",
+    'Retry-After': '60',
+    'X-Robots-Tag': 'noindex, nofollow'
+  });
+  const body = request.method === 'HEAD'
+    ? null
+    : '<!doctype html><meta name="robots" content="noindex,nofollow"><title>Temporarily unavailable</title><h1>503 — Temporarily unavailable</h1>';
+  return new Response(body, { status: 503, headers });
 }
 
 function localizedUrl(lang, r) {
@@ -182,12 +217,13 @@ function blogPostSitemapBlocks(posts) {
   }).concat('    <xhtml:link rel="alternate" hreflang="x-default" href="' + xmlEsc(localizedUrl('en', { key: 'blogpost', slug: id })) + '" />').join('\n');
   return posts.map((p) => {
     const id = String(p && p.id != null ? p.id : '').trim();
-    if (!id || seen.has(id)) return '';
+    if (!/^[1-9]\d{0,17}$/.test(id) || seen.has(id)) return '';
     seen.add(id);
     /* This table has no updated_at column. Asking for one made PostgREST
      reject the whole query, the error was swallowed, and every blog post fell
      out of the sitemap. */
-  const lastmod = String((p.created_at || '')).slice(0, 10) || '2026-07-01';
+    const rawDate = String(p.created_at || '').slice(0, 10);
+    const lastmod = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : '2026-07-01';
     return langs.map((lang) => {
       const loc = localizedUrl(lang, { key: 'blogpost', slug: id });
       return [
@@ -204,6 +240,7 @@ function blogPostSitemapBlocks(posts) {
 }
 
 const sitemapHeaders = () => new Headers({
+  ...documentSecurityHeaders(),
   'Content-Type': 'application/xml; charset=UTF-8',
   'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
   'CDN-Cache-Control': 'no-store',
@@ -216,6 +253,12 @@ async function serveSitemap(url, env, next) {
   if (!env || !env.ASSETS) return next();
   const base = await env.ASSETS.fetch(new URL('/sitemap.xml', url.origin));
   let body = await base.text();
+  // Never expose the old generated numeric entries if the live lookup fails.
+  // Omitting a post briefly is safer than advertising known soft-404 URLs.
+  body = body.replace(
+    /[ \t]*<url>(?:(?!<\/url>)[\s\S])*?<loc>[^<]*\/blog\/\d+<\/loc>[\s\S]*?<\/url>\s*/gi,
+    ''
+  );
   try {
     const res = await fetch(SUPA + '/rest/v1/posts?select=id,created_at&published=eq.true&order=created_at.desc', {
       headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY }
@@ -229,10 +272,6 @@ async function serveSitemap(url, env, next) {
          handed a thousand URLs that 404, and the only real post could still be
          missing. Every existing <url> block whose <loc> is a /blog/<id> comes
          out, and the current published rows go back in. */
-      body = body.replace(
-        /[ \t]*<url>(?:(?!<\/url>)[\s\S])*?<loc>[^<]*\/blog\/\d+<\/loc>[\s\S]*?<\/url>\s*/gi,
-        ''
-      );
       const blocks = blogPostSitemapBlocks(live);
       if (blocks) {
         body = body.replace(/\s*<\/urlset>\s*$/i, '\n' + blocks + '\n</urlset>\n');
@@ -299,6 +338,7 @@ const MAIL_AUTOCONFIG_XML = `<?xml version="1.0" encoding="utf-8"?>
 
 function mailXmlHeaders(type) {
   return {
+    ...documentSecurityHeaders(),
     'Content-Type': type,
     'Cache-Control': 'public, max-age=3600',
     'X-Content-Type-Options': 'nosniff',
@@ -308,7 +348,7 @@ function mailXmlHeaders(type) {
 
 function mailAutodiscoverXml(login) {
   const user = String(login || 'hello@bqurtas.com').trim() || 'hello@bqurtas.com';
-  const safe = user.replace(/[<>&'"]/g, '');
+  const safe = xmlEsc(user);
   return `<?xml version="1.0" encoding="utf-8"?>
 <Autodiscover xmlns="http://schemas.microsoft.com/exchange/autodiscover/responseschema/2006">
   <Response xmlns="http://schemas.microsoft.com/exchange/autodiscover/outlook/responseschema/2006a">
@@ -344,10 +384,19 @@ async function serveAutodiscover(request) {
   if (request.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: mailXmlHeaders('text/xml; charset=utf-8') });
   }
+  if (!['GET', 'HEAD', 'POST'].includes(request.method)) {
+    return new Response(null, {
+      status: 405,
+      headers: { ...mailXmlHeaders('text/plain; charset=utf-8'), Allow: 'GET, HEAD, POST, OPTIONS' }
+    });
+  }
   let login = 'hello@bqurtas.com';
   if (request.method === 'POST') {
     try {
+      const declared = Number(request.headers.get('Content-Length') || 0);
+      if (declared > 16_384) return new Response(null, { status: 413, headers: mailXmlHeaders('text/plain; charset=utf-8') });
       const body = await request.text();
+      if (body.length > 16_384) return new Response(null, { status: 413, headers: mailXmlHeaders('text/plain; charset=utf-8') });
       const m = body.match(/<EMailAddress>\s*([^<]+)\s*<\/EMailAddress>/i);
       if (m && /@bqurtas\.com$/i.test(m[1].trim())) login = m[1].trim();
     } catch (e) {}
@@ -364,6 +413,12 @@ async function serveAutodiscover(request) {
 }
 
 function serveAutoconfig(request) {
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method)) {
+    return new Response(null, {
+      status: 405,
+      headers: { ...mailXmlHeaders('text/plain; charset=utf-8'), Allow: 'GET, HEAD, OPTIONS' }
+    });
+  }
   if (request.method === 'OPTIONS' || request.method === 'HEAD') {
     return new Response(null, {
       status: request.method === 'OPTIONS' ? 204 : 200,
@@ -394,12 +449,18 @@ export async function onRequest(context) {
   if (url.pathname === '/googlece435b444cb43243.html') {
     return new Response('google-site-verification: googlece435b444cb43243.html', {
       status: 200,
-      headers: { 'Content-Type': 'text/html; charset=UTF-8', 'Cache-Control': 'no-store' }
+      headers: noStoreDocumentHeaders({ 'Content-Type': 'text/html; charset=UTF-8' })
     });
   }
   if (url.hostname === 'www.bqurtas.com') {
     url.hostname = 'bqurtas.com';
     return Response.redirect(url.toString(), 301);
+  }
+  if (!['GET', 'HEAD'].includes(request.method)) {
+    return new Response(null, {
+      status: 405,
+      headers: noStoreDocumentHeaders({ Allow: 'GET, HEAD' })
+    });
   }
   if (url.pathname === '/sitemap.xml') return serveSitemap(url, env, next);
   // The image sitemap is a static file, but the CDN edge kept serving stale
@@ -425,23 +486,22 @@ export async function onRequest(context) {
   let postJsonLd = '';   // per-post BlogPosting schema (filled for real blog posts)
   if (r.key === 'blogpost') {
     // a single blog post — fetch it from Supabase so the share shows ITS cover + title
-    const id = parseInt(r.slug, 10);
+    const id = r.slug;
     let post = null;
     let lookupFailed = false;
-    if (id) {
-      try {
-        const res = await fetch(SUPA + '/rest/v1/posts?id=eq.' + id + '&published=eq.true&select=title,subtitle,cover,i18n&limit=1',
-          { headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY } });
-        if (res.ok) { const rows = await res.json(); post = Array.isArray(rows) ? rows[0] : null; }
-        else { lookupFailed = true; console.warn('blogpost lookup', id, res.status); }
-      } catch (e) { lookupFailed = true; console.warn('blogpost lookup threw', id, String(e)); }
-    }
+    try {
+      const res = await fetch(SUPA + '/rest/v1/posts?id=eq.' + encodeURIComponent(id) + '&published=eq.true&select=title,subtitle,cover,i18n&limit=1',
+        { headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY } });
+      if (res.ok) { const rows = await res.json(); post = Array.isArray(rows) ? rows[0] : null; }
+      else { lookupFailed = true; console.warn('blogpost lookup', id, res.status); }
+    } catch (e) { lookupFailed = true; console.warn('blogpost lookup threw', id, String(e)); }
     /* A post id that does not exist, or is not published, is not a page.
        /blog/999999999999 was answering 200 with index,follow, which invites
        Google to index an unbounded number of empty URLs. Only a lookup that
-       actually failed is allowed through to the generic Journal meta — a
-       database hiccup should not delete a real post from the index. */
+       actually failed receives a temporary, noindex 503 — returning a generic
+       200 would turn an outage into a soft 404 and teach crawlers bad state. */
     if (!post && !lookupFailed) return serveNotFound(request, url, env);
+    if (!post && lookupFailed) return serveUnavailable(request);
     if (post) {
       const tr = (post.i18n && post.i18n[r.lang]) || {};
       const blogD = (OG[r.lang] && OG[r.lang].blog && OG[r.lang].blog.d) || OG.en.blog.d;
@@ -475,10 +535,9 @@ export async function onRequest(context) {
     img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=3';
   }
 
-  // Revalidate the HTML on every navigation while still allowing the browser's
-  // back/forward cache. The edge remains no-store below; fingerprinted assets
-  // keep their own long immutable cache.
-  const FRESH = 'private, no-cache, max-age=0, must-revalidate';
+  // A unique CSP nonce is meaningful only when the HTML response itself is not
+  // reused. Fingerprinted assets retain their own long immutable cache.
+  const FRESH = 'no-store, max-age=0';
   /* Per-request nonce -> a strong, XSS-effective Content-Security-Policy with NO
      'unsafe-inline' and NO 'unsafe-eval'. Every <script> in the shell gets this
      nonce below; 'strict-dynamic' then trusts scripts loaded by those nonce'd
@@ -491,14 +550,15 @@ export async function onRequest(context) {
     "script-src 'nonce-" + nonce + "' 'strict-dynamic' 'self'",
     "style-src 'nonce-" + nonce + "' 'self'",
     "font-src 'self' data:",
-    "img-src 'self' data: blob: https://cdn.jsdelivr.net https://raw.githubusercontent.com https://images.weserv.nl https://*.supabase.co",
-    "media-src 'self' blob: https://cdn.jsdelivr.net https://raw.githubusercontent.com",
-    "connect-src 'self' https://cloud.umami.is https://api.umami.is https://gateway.umami.is https://*.supabase.co https://api.github.com https://api.web3forms.com https://cdn.jsdelivr.net https://data.jsdelivr.com https://images.weserv.nl https://raw.githubusercontent.com",
+    "img-src 'self' data: blob: https://cdn.jsdelivr.net https://cdn.statically.io https://raw.githubusercontent.com https://images.weserv.nl https://*.supabase.co",
+    "media-src 'self' blob: https://cdn.jsdelivr.net https://cdn.statically.io https://raw.githubusercontent.com",
+    "connect-src 'self' https://cloud.umami.is https://api.umami.is https://gateway.umami.is https://*.supabase.co https://api.github.com https://api.web3forms.com https://translate.googleapis.com https://cdn.jsdelivr.net https://data.jsdelivr.com https://images.weserv.nl https://raw.githubusercontent.com",
     "frame-src 'self'",
     "worker-src 'self' blob:"
   ].join('; ');
   const withFresh = (res) => {
     const headers = new Headers(res.headers);
+    for (const [name, value] of Object.entries(documentSecurityHeaders())) headers.set(name, value);
     headers.set('Cache-Control', FRESH);
     headers.set('CDN-Cache-Control', 'no-store');   // Cloudflare edge: don't cache the HTML shell
     /* Cloudflare reads its own vendor directive ahead of CDN-Cache-Control and
@@ -508,19 +568,12 @@ export async function onRequest(context) {
        two and a half hours old and still advertising main?v=531 while the build
        had moved to 533. Every deploy was invisible. */
     headers.set('Cloudflare-CDN-Cache-Control', 'no-store');
-    headers.set('Vary', 'Cookie');
+    headers.set('Pragma', 'no-cache');
     headers.set('Content-Security-Policy', CSP);
     // env.ASSETS.fetch returns the shell with Pages' default wildcard CORS; the
     // _headers override only applies to directly-served files, not this internal
     // fetch — so pin it here too. The HTML shell is same-origin only; no wildcard.
     headers.set('Access-Control-Allow-Origin', 'https://bqurtas.com');
-    // The zone's "Cache Everything" cache rule ignores no-store and was pinning
-    // the HTML shell at the edge for its whole TTL — visitors kept getting a
-    // build that was several deploys old. A response that sets a cookie is not
-    // edge-cached (the rule doesn't ignore Set-Cookie), so this harmless,
-    // short-lived technical cookie guarantees every HTML request reaches this
-    // function and deploys show up instantly.
-    headers.append('Set-Cookie', 'bq_fresh=1; Path=/; Max-Age=60; SameSite=Lax; Secure');
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
   };
   const addNonce = { element(el) { el.setAttribute('nonce', nonce); } };

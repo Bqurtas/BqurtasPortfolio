@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS hits (
   country TEXT    DEFAULT '',      -- 2-letter country code
   device  TEXT    DEFAULT '',      -- mobile / tablet / desktop
   lang    TEXT    DEFAULT '',      -- site language at the time
-  vid     TEXT    DEFAULT ''       -- daily one-way visitor hash (not personal)
+  vid     TEXT    DEFAULT ''       -- keyed pseudonymous visitor hash; raw IP/UA are never stored
 );
 CREATE INDEX IF NOT EXISTS idx_hits_ts   ON hits(ts);
 CREATE INDEX IF NOT EXISTS idx_hits_path ON hits(path);
