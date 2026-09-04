@@ -11466,7 +11466,10 @@ body,
   margin: 0 !important;
   flex: 1 1 auto !important;
   font-size: 14px !important;
-  line-height: 1.5 !important;
+  /* Noto Kufi draws a 27px line box at 14px — 1.93em — and the clamp below
+     sizes the card by line-height, so anything under that slices the descenders
+     off the last line. Match the font's own box. */
+  line-height: 1.95 !important;
   color: color-mix(in srgb, var(--ink) 58%, transparent) !important;
   display: -webkit-box !important;
   -webkit-line-clamp: 3 !important;
