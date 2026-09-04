@@ -461,6 +461,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       const img = div.querySelector('img'); if (img) img.alt = title;
       div.setAttribute('aria-label', galViewLabel(title));
     });
+    document.querySelectorAll('.logos-grid .logo-mark--ticker').forEach(mark => {
+      const title = galTitle('tickerlogo', mark.dataset.idx, 'Ticker Logo');
+      mark.dataset.title = title;
+      mark.setAttribute('aria-label', galViewLabel(title));
+      const img = mark.querySelector('img'); if (img) img.alt = title;
+    });
   };
   window.__bqLangCb = window.__bqLangCb || [];
   window.__bqLangCb.push(() => window.__bqRelocalizeGallery());
@@ -492,8 +498,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     logosGrid.removeAttribute('data-logos-empty');
     logosGrid.innerHTML = logos.map((item, idx) => {
       const src = item.url;
-      return `<button type="button" class="logo-mark logo-mark--img logo-mark--ticker" data-full="${src}" aria-label="View logo ${idx + 1}">
-         <img src="${window.BQ_GALLERY.thumb(src, 180)}" data-full="${src}" data-raw="${item.rawUrl}" alt="Logo ${idx + 1}" loading="lazy" decoding="async" width="180" height="135" />
+      /* Same localized name the cards get, so the label, the alt text and the
+         lightbox caption all read in the visitor's language — and so the
+         relocalize pass below can find and update them on a language switch. */
+      const title = galTitle('tickerlogo', idx + 1, 'Ticker Logo');
+      return `<button type="button" class="logo-mark logo-mark--img logo-mark--ticker" data-full="${src}" data-coll="tickerlogo" data-idx="${idx + 1}" data-title="${title}" aria-label="${galViewLabel(title)}">
+         <img src="${window.BQ_GALLERY.thumb(src, 180)}" data-full="${src}" data-raw="${item.rawUrl}" alt="${title}" loading="lazy" decoding="async" width="180" height="135" />
        </button>`
     }).join('');
     logosGrid.querySelectorAll('img').forEach(img =>
@@ -507,7 +517,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const mark = e.target.closest('.logo-mark--img');
       if (!mark || !window.__bqOpenLightboxPool) return;
       const all   = [...logosGrid.querySelectorAll('.logo-mark--img')];
-      const pool  = all.map(m => ({ full: m.dataset.full, title: '', type: 'image' }));
+      const pool  = all.map(m => ({ full: m.dataset.full, title: m.dataset.title || '', type: 'image' }));
       window.__bqOpenLightboxPool(pool, all.indexOf(mark));
     });
   }

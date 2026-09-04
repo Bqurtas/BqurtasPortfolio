@@ -12,7 +12,7 @@
       instead of being pinned for the life of the installed worker.
    ========================================================= */
 
-const SW_VERSION = 'd9c079f53e82'; // generated from this worker and the app shell
+const SW_VERSION = '5a08153b4b31'; // generated from this worker and the app shell
 const CACHE_NAME = `bqurtas-cache-${SW_VERSION}`;
 const DOC_FALLBACK = '/index.html';
 
@@ -22,12 +22,12 @@ const DOC_FALLBACK = '/index.html';
    remain network-first, so this copy is only an offline fallback. */
 const PRECACHE_ASSETS = [
   '/index.html',
-  '/css/modern-framer.min.css?v=ed22d11bfa00',
+  '/css/modern-framer.min.css?v=ed16d208b166',
   '/css/style.v417.min.css?v=16633f93b573',
   '/css/fonts.css?v=69cf74d1bd04',
   '/css/experience.min.css?v=11bc8e4e3529',
   '/js/main.v420.min.js?v=59672afc0a39',
-  '/js/gallery.v420.min.js?v=70da87fe43cb',
+  '/js/gallery.v420.min.js?v=79bda16c7ed9',
   '/js/i18n.v420.min.js?v=aefcc7b910c0',
   '/js/motion.min.js?v=282b683a1d19',
   '/js/lux.min.js?v=4687eeaa96da',
