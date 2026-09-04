@@ -4,6 +4,7 @@
 
 # Editor / tooling
 .claude/
+.vscode/
 node_modules/
 *.log
 
