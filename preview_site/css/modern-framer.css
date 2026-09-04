@@ -14314,20 +14314,6 @@ body.menu-open .mobilebar {
   backdrop-filter: none !important;
   pointer-events: auto !important;
 }
-
-/* On mobile that same element is sticky (top: 0, z 40), so stripping its bed
-   above left the tabs floating with the gallery scrolling through the gaps
-   between the chips. Give the sticky bar its paper back — mobile only, so the
-   desktop rail stays chrome-free as intended. */
-@media (max-width: 820px) {
-  #design#design.paper-stack .work-head .tabs-wrap {
-    padding: 8px 0 10px !important;
-    background: var(--bq-paper-work, var(--bg)) !important;
-    border-bottom: 1px solid color-mix(in srgb, var(--ink) 8%, transparent) !important;
-    box-shadow: 0 10px 24px -22px rgba(0, 0, 0, .35) !important;
-  }
-}
-
 #design#design.paper-stack .work-head .tabs-wrap::before,
 #design#design.paper-stack .work-head .tabs-wrap::after,
 #design#design.paper-stack .work-head .tabs::before,
