@@ -1135,9 +1135,7 @@
         </div>
         <p class="dash-note mono">${DT('oWelcome')}</p>`;
     };
-    const wkApi = (payload) => {
-      return fetch('/api/studio/work-upload', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'x-edit-token': editToken() }, body: JSON.stringify(payload) }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
-    };
+    const wkApi = (payload) => studioCall('work-upload', payload);
     const WK_I18N = {
       en:  { note:'Upload a finished design — it is auto-resized, converted to WebP and pushed to its folder on GitHub. It shows in the gallery shortly.', cat:'Category / folder', file:'Choose image (any size or format)', upload:'Publish to gallery', reading:'Preparing…', ready:'Ready — click Publish', pick:'Choose an image first.', uploading:'Publishing to GitHub…', done:'Published ✓ — it appears in the gallery shortly.', updating:'updating gallery counts…', updated:'gallery and tab counts updated.', propagating:'refresh once if the new file is still propagating.', noToken:'A GitHub token isn’t set yet — add it once to turn publishing on.', connect:'Connect the editor first (Content tab).', fail:'Could not publish (works on the live site only).' },
       ku:  { note:'دیزاینێکی تەواوکراو ئەپلۆد بکە — خۆکارانە ڕیسایز دەکرێت، دەکرێتە WebP و دەنێردرێت بۆ فۆڵدەرەکەی لە گیتهاب. بەمزووانە لە گەلەری دەردەکەوێت.', cat:'کاتگۆری / فۆڵدەر', file:'وێنە هەڵبژێرە (هەر سایز و فۆرماتێک)', upload:'بڵاوکردنەوە بۆ گەلەری', reading:'ئامادەکردن…', ready:'ئامادەیە — کلیکی بڵاوکردنەوە بکە', pick:'سەرەتا وێنەیەک هەڵبژێرە.', uploading:'بڵاو دەکرێتەوە بۆ گیتهاب…', done:'بڵاوکرایەوە ✓ — بەمزووانە لە گەلەری دەردەکەوێت.', updating:'ژمارەکانی گەلەری نوێ دەکرێنەوە…', updated:'گەلەری و ژمارەی تابەکان نوێکرانەوە.', propagating:'ئەگەر فایلە نوێیەکە هێشتا بڵاو نەبووبێتەوە جارێک نوێی بکەوە.', noToken:'تۆکنی گیتهاب دانەنراوە — جارێک دایبنێ بۆ چالاککردنی بڵاوکردنەوە.', connect:'سەرەتا ئەدیتەرەکە ببەستەوە (تابی ناوەڕۆک).', fail:'نەتوانرا بڵاو بکرێتەوە (تەنیا سایتی زیندوو).' },
@@ -1317,8 +1315,8 @@
         if (nt.length < 4) { m.textContent = S.min4; return; }
         if (!editToken()) { m.textContent = S.edConnect; return; }
         m.textContent = '…';
-        fetch('/api/studio/set-token', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'x-edit-token': editToken() }, body: JSON.stringify({ new_token: nt }) })
-          .then(r => r.json()).then(d => {
+        studioCall('set-token', { new_token: nt })
+          .then(d => {
             if (d && d.ok) { try { sessionStorage.setItem('bq_edit_token', nt); } catch (e) {} m.textContent = S.edDone; $('#setNewTok').value = ''; }
             else if (d && d.error === 'unauthorized') { m.textContent = S.edWrong; }
             else { m.textContent = '✗ ' + ((d && (d.detail || d.error)) || 'failed'); }
@@ -1438,14 +1436,46 @@
       fr: { gate:'Publier sur votre blog', note:"Saisissez votre jeton d'édition pour écrire, modifier et publier.", tokPh:"Jeton d'édition", conn:'Connecter', newBtn:'Écrire un article', editBtn:'Modifier', delBtn:'Supprimer', delAsk:'Supprimer définitivement cet article ?', fTitle:'Titre', fSub:'Sous-titre', fTag:'Étiquette', fCover:"Lien de l'image", fCoverPh:"https://…  collez un lien d'image", fAccent:'Couleur', fMin:'Lecture (min)', fBody:'Texte', fBodyPh:'Écrivez votre article ici…  Laissez une ligne vide entre les paragraphes.', fPub:'Publié — visible sur le site', save:'Publier', update:'Mettre à jour', saving:'Publication…', updating:'Mise à jour…', translating:'Traduction dans toutes les langues…', savedMsg:"Enregistré — c'est sur votre blog.", cancel:'Annuler', back:'Tous les articles', loading:'Chargement de vos articles…', empty:'Aucun article — écrivez le premier.', err:'Service du blog inaccessible (fonctionne sur le site en ligne).', needTitle:'Veuillez ajouter un titre.', posts:'articles', draft:'brouillon', studio:'Avancé (base de données)' }
     };
     const editToken = () => { try { return sessionStorage.getItem('bq_edit_token') || ''; } catch (e) { return ''; } };
-    const cmsApi = (payload) => {
-      return fetch('/api/studio/blog-admin', {
+
+    /* Every privileged Studio call goes through the same-origin proxy first, so
+       the credential the Edge Functions check stays on the server. A deployment
+       that has not been given the Pages secrets answers 503
+       studio-proxy-not-configured — there we fall back to calling the Edge
+       Function directly with the token the editor already holds, which is how
+       the dashboard worked before the proxy existed. Without this the whole
+       dashboard is dead on such a deployment. The flag latches so one probe is
+       enough per session. */
+    let studioDirect = false;
+    const studioCall = async (service, payload) => {
+      const token = editToken();
+      if (!studioDirect) {
+        try {
+          const res = await fetch('/api/studio/' + service, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', 'x-edit-token': token },
+            body: JSON.stringify(payload)
+          });
+          const body = await res.json().catch(() => ({ error: 'bad_response' }));
+          if (!(res.status === 503 && body && body.error === 'studio-proxy-not-configured')) return body;
+          studioDirect = true;
+        } catch (e) { studioDirect = true; }
+      }
+      const SB = window.BQ_SUPA || {};
+      if (!SB.url || !SB.key) return { error: 'bad_response' };
+      return fetch(SB.url + '/functions/v1/' + service, {
         method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json', 'x-edit-token': editToken() },
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: SB.key,
+          Authorization: 'Bearer ' + SB.key,
+          'x-edit-token': token
+        },
         body: JSON.stringify(payload)
       }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
     };
+
+    const cmsApi = (payload) => studioCall('blog-admin', payload);
 
     /* ---- Auto-translate in the BROWSER ----
        Google's free translate endpoint blocks data-center IPs (so the Supabase
@@ -1810,14 +1840,7 @@
     };
 
     /* ---- Latest: hand-pin an important work to the homepage bell for a week ---- */
-    const latestApi = (payload) => {
-      return fetch('/api/studio/latest-admin', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json', 'x-edit-token': editToken() },
-        body: JSON.stringify(payload)
-      }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
-    };
+    const latestApi = (payload) => studioCall('latest-admin', payload);
     const LATEST_TABS = [['logo','Logos'],['book','Book Covers'],['image','Photography'],['posters','Posters'],['social','Social'],['events','Events'],['stationery','Stationery'],['official','Official'],['video','Video'],['other','Other'],['','']];
     const TAB_EN = Object.fromEntries(LATEST_TABS);
     const LA_I18N = {
@@ -1926,7 +1949,7 @@
     };
     Object.keys(PR_EXTRA).forEach(l => Object.assign(PR_I18N[l] || PR_I18N.en, PR_EXTRA[l]));
     const PT = (k) => (PR_I18N[curLang()] || PR_I18N.en)[k] || PR_I18N.en[k] || k;
-    const prjApi = (payload) => fetch('/api/studio/projects-admin', { method:'POST', credentials:'same-origin', headers:{ 'Content-Type':'application/json', 'x-edit-token':editToken() }, body:JSON.stringify(payload) }).then(r => r.json().catch(() => ({ error:'bad_response' })));
+    const prjApi = (payload) => studioCall('projects-admin', payload);
     const projectAccent = (value) => /^#[0-9a-f]{6}$/i.test(String(value || '').trim()) ? String(value).trim() : '#bd4a2c';
     const parsePalette = (txt) => String(txt || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => { const m = l.match(/(#[0-9a-fA-F]{3,8})\s*$/); const hex = m ? m[1] : ''; const name = (m ? l.slice(0, m.index) : l).replace(/[,:\s]+$/, '').trim(); return hex ? { name: name || hex, hex } : null; }).filter(Boolean);
     const paletteToText = (arr) => (Array.isArray(arr) ? arr : []).map(s => (s.name ? s.name + ' ' : '') + (s.hex || '')).join('\n');

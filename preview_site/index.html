@@ -2206,7 +2206,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=778a7839de90';
+        s.src = 'js/enhance.v420.min.js?v=4545e9124e29';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -2333,7 +2333,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=4000c6d9c8c3', { updateViaCache: 'none' })
+            .register('/sw.js?v=81c8ee7edda5', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

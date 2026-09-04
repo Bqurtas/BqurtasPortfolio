@@ -47,9 +47,19 @@ test('built dashboard sends every privileged Supabase mutation through Pages', a
     readFile(new URL('../preview_site/js/enhance.v420.min.js', import.meta.url), 'utf8')
   ]);
   for (const source of files) {
+    /* No service may be wired straight to an Edge Function: the only direct
+       call left is the templated fallback inside the shared helper. */
     assert.doesNotMatch(source, /functions\/v1\/(?:work-upload|set-token|blog-admin|latest-admin|projects-admin)/);
+
+    /* The proxy is the path every call takes first... */
+    assert.match(source, /\/api\/studio\//);
+
+    /* ...and the direct call is reachable only after the proxy has said it is
+       not configured, so a configured deployment never leaves the origin. */
+    assert.match(source, /studio-proxy-not-configured/);
+
     for (const service of ['work-upload', 'set-token', 'blog-admin', 'latest-admin', 'projects-admin']) {
-      assert.match(source, new RegExp(`/api/studio/${service}`));
+      assert.match(source, new RegExp(`['"]${service}['"]`));
     }
   }
 });
