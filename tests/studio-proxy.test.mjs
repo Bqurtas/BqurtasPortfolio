@@ -114,12 +114,43 @@ test('Studio proxy only permits known services, actions and safe work folders', 
   });
   assert.equal(unsafe.status, 400);
 
-  const sharedToken = await studioPost({
-    request: request('blog-admin', 'same-secret', { action: 'list' }, { Cookie: await cookie() }),
-    env: { ...BASE_ENV, EDIT_TOKEN: 'same-secret', SUPABASE_EDIT_TOKEN: 'same-secret' },
+});
+
+test('Studio proxy still runs, and still gates, without a separate upstream secret', async (t) => {
+  let forwarded;
+  t.mock.method(globalThis, 'fetch', async (url, init) => {
+    forwarded = { url, init };
+    return new Response(JSON.stringify({ ok: true, posts: [] }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  });
+  const { SUPABASE_EDIT_TOKEN, ...noUpstream } = BASE_ENV;
+
+  /* Falls back to EDIT_TOKEN rather than failing closed, so the dashboard keeps
+     working on a deployment that has not set the second secret yet. */
+  const ok = await studioPost({
+    request: request('blog-admin', 'browser-edit-secret', { action: 'list' }, { Cookie: await cookie() }),
+    env: noUpstream,
     params: { service: 'blog-admin' }
   });
-  assert.equal(sharedToken.status, 503);
+  assert.equal(ok.status, 200);
+  assert.equal(forwarded.init.headers['x-edit-token'], 'browser-edit-secret');
+
+  /* The session and the browser token are still both mandatory. */
+  const noSession = await studioPost({
+    request: request('blog-admin', 'browser-edit-secret', { action: 'list' }),
+    env: noUpstream,
+    params: { service: 'blog-admin' }
+  });
+  assert.equal(noSession.status, 401);
+
+  const wrongToken = await studioPost({
+    request: request('blog-admin', 'guessed', { action: 'list' }, { Cookie: await cookie() }),
+    env: noUpstream,
+    params: { service: 'blog-admin' }
+  });
+  assert.equal(wrongToken.status, 401);
 });
 
 test('editor password rotation stays local, stores only a digest and retires the bootstrap token', async (t) => {

@@ -153,14 +153,23 @@ async function authorized(request, env) {
   return session && token;
 }
 
+/* The credential Pages presents to the Edge Functions. A separate server-only
+   SUPABASE_EDIT_TOKEN is the stronger setup: the browser then never holds a
+   secret that can mutate Studio data on its own. Where that is not set we fall
+   back to EDIT_TOKEN rather than refuse to run — the Edge Functions already
+   accept it, so calling them through here is no weaker than calling them
+   directly, and the proxy still adds the signed session and the same-origin
+   check on top. Set SUPABASE_EDIT_TOKEN to a different value to close the
+   remaining gap. */
+function upstreamEditToken(env) {
+  return String(env.SUPABASE_EDIT_TOKEN || '') || String(env.EDIT_TOKEN || '');
+}
+
 function configured(env) {
-  const browserToken = String(env.EDIT_TOKEN || '');
-  const upstreamToken = String(env.SUPABASE_EDIT_TOKEN || '');
   return sessionConfigured(env)
     && !!env.DB
-    && browserToken.length > 0
-    && upstreamToken.length > 0
-    && upstreamToken !== browserToken;
+    && String(env.EDIT_TOKEN || '').length > 0
+    && upstreamEditToken(env).length > 0;
 }
 
 export async function onRequestPost({ request, env, params }) {
@@ -200,7 +209,7 @@ export async function onRequestPost({ request, env, params }) {
         Accept: 'application/json',
         apikey: publishableKey,
         Authorization: `Bearer ${publishableKey}`,
-        'x-edit-token': String(env.SUPABASE_EDIT_TOKEN)
+        'x-edit-token': upstreamEditToken(env)
       },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(60_000)
