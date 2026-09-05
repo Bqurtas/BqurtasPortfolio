@@ -723,7 +723,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- TABS + PAGINATION + SECTION HEADER ---------- */
   const tabs = document.querySelectorAll('.tab');
-  const PAGE_SIZE = 80;
+  /* 40, not 80. A batch is one transformed reel: at 80 it stood ~15,000px tall
+     with 80 images and 80 shadows, and the whole layer moves every frame, which
+     is what made the portfolio heavy on a phone. Halving the batch halves that
+     layer. "Load more" still reaches every work. */
+  const PAGE_SIZE = 40;
   let currentFilter = 'all';
   let currentShown  = 0;
   let correctScrollAfterGallery = false;
@@ -1242,7 +1246,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* The deck re-shuffles on every page load and tab switch — that stays.
-     The gallery shows one batch (PAGE_SIZE = 80) at a time; the reader
+     The gallery shows one batch (PAGE_SIZE = 40) at a time; the reader
      taps "Load more" to reveal the next batch. No auto-infinite-scroll — the works
      never all load at once, and nothing swaps under the reader as they scroll. */
 
