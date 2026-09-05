@@ -1945,7 +1945,27 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     };
     const readPin = () => (cachedPin === null ? refreshPin() : cachedPin);
 
+    /* Last values actually written per sheet. Re-writing a custom property with
+       the identical string still invalidates style for that sheet's whole
+       subtree, and this ran for all 22 sheets on every scroll frame even though
+       only the one or two mid-transition ever change. Measured on a desktop it
+       cost 6-9ms a frame; on a phone that is the whole frame budget and more,
+       which is why the portfolio scroll felt heavy there. */
+    let coverCache = new WeakMap();
+
+    /* Every room runs its own stack, so the three that are hidden at any moment
+       were each landing here on every scroll frame and re-zeroing all of their
+       sheets — 63 style writes per hidden room, per frame, to set values that
+       were already zero. Reset once on the way out and stay quiet until the
+       room is actually rendered again. */
+    let visualsReset = false;
+
     const resetVisuals = () => {
+      if (visualsReset) return;
+      visualsReset = true;
+      /* These writes go straight to the sheets, so the cache must forget what
+         it thinks is on them or the next frame would skip re-applying. */
+      coverCache = new WeakMap();
       sheets.forEach((sheet) => {
         sheet.style.setProperty('--bq-out', '0');
         sheet.style.setProperty('--bq-fade', '0');
@@ -1961,6 +1981,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         resetVisuals();
         return;
       }
+      /* Rendering again, so the next exit owes another reset. */
+      visualsReset = false;
 
       const vh = Math.max(window.innerHeight || 0, 1);
       const pin = readPin();
@@ -1993,21 +2015,23 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
       const applyCoverage = (curr, nextTop) => {
         const fullyCovered = nextTop <= pin + 0.75;
-        curr.style.setProperty('--bq-push-y', '0px');
-
         const raw = coverProgress(nextTop, pin, vh);
-        curr.inert = fullyCovered;
-        if (motionOff) {
-          curr.style.setProperty('--bq-out', '0');
-          curr.style.setProperty('--bq-fade', '0');
+        const out = motionOff ? '0' : ease(raw).toFixed(4);
+        const fade = motionOff ? '0' : fadeFrom(raw).toFixed(4);
+
+        /* Nothing below changes the pixels unless one of these three did, so a
+           settled sheet costs a WeakMap lookup and no style invalidation. */
+        const was = coverCache.get(curr);
+        if (was && was.out === out && was.fade === fade && was.covered === fullyCovered) return;
+        coverCache.set(curr, { out, fade, covered: fullyCovered });
+
+        if (!was) curr.style.setProperty('--bq-push-y', '0px');
+        if (!was || was.out !== out) curr.style.setProperty('--bq-out', out);
+        if (!was || was.fade !== fade) curr.style.setProperty('--bq-fade', fade);
+        if (!was || was.covered !== fullyCovered) {
+          curr.inert = fullyCovered;
           curr.classList.toggle('is-paper-gone', fullyCovered);
-          return;
         }
-        const out = ease(raw);
-        const fade = fadeFrom(raw);
-        curr.style.setProperty('--bq-out', out.toFixed(4));
-        curr.style.setProperty('--bq-fade', fade.toFixed(4));
-        curr.classList.toggle('is-paper-gone', fullyCovered);
       };
 
       for (let i = 0; i < sheets.length - 1; i += 1) {
