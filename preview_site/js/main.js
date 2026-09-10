@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (postWork && y >= __absTop(postWork)) {
         path = base;                                              // below portfolio → plain home link
       } else if (work && y >= __absTop(work)) {
-        path = prefix + '/design';                                // portfolio section → /design, even when a tab is active
+        path = prefix + '/design' + (currentFilter && currentFilter !== 'all' ? '/' + currentFilter : '');
       }
       const cur  = (location.pathname.replace(/\/+$/, '') || '/');
       const want = (path.replace(/\/+$/, '') || '/');
@@ -1327,11 +1327,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (t0) activateTab(t0);
   }
   if (normalizedStartRoom === 'design') {
-    // a shared /design link lands on the Design Room section, not the hero.
-    // A tab link (/design/events) lands on that tab's own title/count header.
-    setTimeout(() => {
-      scrollToGridTop('auto');
-    }, 80);
+    // Wait for the full sheet before resolving a deep link. A fixed 80 ms
+    // timer can run while the critical-CSS gate still hides the gallery.
+    let restored = false;
+    const restorePortfolio = () => {
+      if (restored || document.documentElement.classList.contains('bq-css-pending')) return;
+      restored = true;
+      requestAnimationFrame(() => {
+        if (document.body.dataset.room !== 'design') return;
+        if (window.__bqResetWorkReel) window.__bqResetWorkReel();
+        else scrollToGridTop('auto');
+      });
+    };
+    window.addEventListener('bq:css-ready', restorePortfolio, { once: true });
+    window.addEventListener('load', restorePortfolio, { once: true });
+    setTimeout(restorePortfolio, 80);
   }
   routerReady = true;   // from here on, language switches update the URL prefix
   triggerReveals();
@@ -1348,144 +1358,241 @@ document.addEventListener('DOMContentLoaded', () => {
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-modal', 'true');
     overlay.setAttribute('aria-hidden', 'true');
+    overlay.setAttribute('aria-describedby', 'lbCaption');
+    overlay.inert = true;
     overlay.innerHTML = `
       <div class="lb-img-wrap" id="lbWrap">
-        <button class="lb-close" id="lbClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
-        <span class="lb-caption" id="lbCaption"></span>
+        <button type="button" class="lb-close" id="lbClose" aria-label="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        <span class="lb-status" id="lbStatus" role="status" aria-live="polite"></span>
+        <button type="button" class="lb-retry" id="lbRetry" hidden>Try again</button>
+        <span class="lb-caption" id="lbCaption" aria-live="polite"></span>
+        <span class="lb-counter" id="lbCounter" aria-hidden="true"></span>
       </div>
-      <button class="lb-prev" id="lbPrev" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></button>
-      <button class="lb-next" id="lbNext" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button>
+      <button type="button" class="lb-prev" id="lbPrev" aria-label="Previous"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+      <button type="button" class="lb-next" id="lbNext" aria-label="Next"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
     `;
     document.body.appendChild(overlay);
 
+    const wrap = document.getElementById('lbWrap');
+    const caption = document.getElementById('lbCaption');
+    const counter = document.getElementById('lbCounter');
+    const status = document.getElementById('lbStatus');
+    const closeBtn = document.getElementById('lbClose');
+    const prevBtn = document.getElementById('lbPrev');
+    const nextBtn = document.getElementById('lbNext');
+    const retryBtn = document.getElementById('lbRetry');
+    let pool = [], cur = 0, lbMedia = null, lastFocus = null;
+    let releaseFallback = null, savedOverflow = '', loadTimer = null;
+    const backgroundState = new Map();
+    const isOpen = () => overlay.classList.contains('is-open');
+    const locale = () => document.documentElement.dataset.lang || 'en';
+    const message = (key) => {
+      const messages = {
+        en: ['Preview unavailable. Please try again.', 'Try again'],
+        ku: ['پێشبینین بەردەست نییە. تکایە دووبارە هەوڵ بدەرەوە.', 'دووبارە هەوڵ بدەرەوە'],
+        ar: ['المعاينة غير متاحة. يرجى المحاولة مرة أخرى.', 'حاول مرة أخرى'],
+        kmr: ['Pêşdîtin ne berdest e. Dîsa biceribîne.', 'Dîsa biceribîne'],
+        fr: ['Aperçu indisponible. Veuillez réessayer.', 'Réessayer'],
+        tr: ['Önizleme kullanılamıyor. Lütfen tekrar deneyin.', 'Tekrar dene'],
+        sv: ['Förhandsvisningen är inte tillgänglig. Försök igen.', 'Försök igen'],
+      };
+      return (messages[locale()] || messages.en)[key === 'retry' ? 1 : 0];
+    };
     const syncLightboxA11y = () => {
       const dict = window.BQ_DICT || {};
       overlay.setAttribute('aria-label', dict['a11y.preview'] || 'Portfolio preview');
-      document.getElementById('lbClose')?.setAttribute('aria-label', dict['a11y.close'] || 'Close');
-      document.getElementById('lbPrev')?.setAttribute('aria-label', dict['a11y.previous'] || 'Previous');
-      document.getElementById('lbNext')?.setAttribute('aria-label', dict['a11y.next'] || 'Next');
+      closeBtn.setAttribute('aria-label', dict['a11y.close'] || 'Close');
+      prevBtn.setAttribute('aria-label', dict['a11y.previous'] || 'Previous');
+      nextBtn.setAttribute('aria-label', dict['a11y.next'] || 'Next');
+      retryBtn.textContent = message('retry');
+      if (isOpen()) {
+        const item = pool[cur];
+        const title = item.sourceEl?.dataset.title || item.title || '';
+        caption.textContent = title;
+        if (lbMedia?.tagName === 'IMG') lbMedia.alt = title;
+        const position = `${cur + 1} / ${pool.length}`;
+        counter.textContent = /^(ku|ar)$/.test(locale())
+          ? position.replace(/[0-9]/g, digit => '٠١٢٣٤٥٦٧٨٩'[digit]) : position;
+        if (!retryBtn.hidden) status.textContent = message('error');
+      }
     };
     syncLightboxA11y();
     window.__bqLangCb = window.__bqLangCb || [];
     window.__bqLangCb.push(syncLightboxA11y);
 
-    const wrap      = document.getElementById('lbWrap');
-    const lbCaption = document.getElementById('lbCaption');
-    let pool = [], cur = 0, lbMedia = null, lastFocus = null;
-
-    const getPool = () => Array.from(document.querySelectorAll('#grid .card--photo:not(.is-hidden)'));
-
     const clearMedia = () => {
-      if (lbMedia) {
-        if (lbMedia.tagName === 'VIDEO') { lbMedia.pause(); lbMedia.src = ''; }
-        lbMedia.remove();
-        lbMedia = null;
+      clearTimeout(loadTimer);
+      releaseFallback?.();
+      releaseFallback = null;
+      if (!lbMedia) return;
+      const previous = lbMedia;
+      lbMedia = null;
+      previous.onload = previous.onloadeddata = previous.onloadedmetadata = previous.onerror = null;
+      if (previous.tagName === 'VIDEO') {
+        previous.pause();
+        previous.removeAttribute('src');
+        previous.load();
       }
+      previous.remove();
     };
-
-    const show = (idx) => {
-      syncLightboxA11y();
-      pool = getPool();
-      if (!pool.length) return;
-      if (!overlay.classList.contains('is-open')) lastFocus = document.activeElement;
-      cur  = ((idx % pool.length) + pool.length) % pool.length;
-      const card = pool[cur];
-      const src  = card.dataset.full || '';
-      const type = card.dataset.type || 'image';
-      const title= card.dataset.title || '';
-
+    const restoreBackground = () => {
+      backgroundState.forEach((wasInert, element) => { element.inert = wasInert; });
+      backgroundState.clear();
+    };
+    const close = () => {
+      if (!isOpen()) return;
+      overlay.classList.remove('is-open');
       clearMedia();
-
-      if (type === 'video') {
-        lbMedia = document.createElement('video');
-        lbMedia.controls = true;
-        lbMedia.autoplay  = true;
-        lbMedia.playsInline = true;
-        lbMedia.src = src;
-      } else {
-        lbMedia = document.createElement('img');
-        lbMedia.alt = title;
-        lbMedia.style.opacity = '0';
-        lbMedia.src = src;
-        lbMedia.onload = () => { lbMedia.style.opacity = '1'; };
+      document.body.style.overflow = savedOverflow;
+      restoreBackground();
+      if (lastFocus?.isConnected && typeof lastFocus.focus === 'function') {
+        lastFocus.focus({ preventScroll: true });
+      } else if (overlay.contains(document.activeElement)) {
+        document.activeElement.blur();
       }
-      wrap.insertBefore(lbMedia, lbCaption);
-      lbCaption.textContent = title;
+      overlay.setAttribute('aria-hidden', 'true');
+      overlay.inert = true;
+      lastFocus = null;
+    };
+    const show = (index, focus = false) => {
+      if (!pool.length) return;
+      const opening = !isOpen();
+      if (opening) {
+        lastFocus = document.activeElement;
+        savedOverflow = document.body.style.overflow;
+        Array.from(document.body.children).forEach(element => {
+          if (element === overlay || /^(SCRIPT|STYLE|LINK)$/.test(element.tagName)) return;
+          backgroundState.set(element, element.inert);
+          element.inert = true;
+        });
+        document.dispatchEvent(new CustomEvent('bq:lightbox-open'));
+      }
+      cur = ((index % pool.length) + pool.length) % pool.length;
+      clearMedia();
+      overlay.inert = false;
       overlay.classList.add('is-open');
       overlay.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
-      requestAnimationFrame(() => document.getElementById('lbClose')?.focus());
-    };
+      prevBtn.hidden = nextBtn.hidden = pool.length < 2;
+      retryBtn.hidden = true;
+      wrap.setAttribute('aria-busy', 'true');
+      status.textContent = (window.BQ_DICT || {})['cert.loading'] || 'Loading…';
+      status.hidden = false;
+      syncLightboxA11y();
 
-    const close = () => {
-      overlay.classList.remove('is-open');
-      overlay.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-      clearMedia();
-      if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
-      lastFocus = null;
+      const item = pool[cur];
+      const media = document.createElement(item.type === 'video' ? 'video' : 'img');
+      lbMedia = media;
+      media.style.opacity = '0';
+      const ready = () => {
+        // A slow response from an earlier slide must never mutate the new one.
+        if (lbMedia !== media || !isOpen()) return;
+        clearTimeout(loadTimer);
+        media.style.opacity = '1';
+        status.hidden = true;
+        retryBtn.hidden = true;
+        wrap.setAttribute('aria-busy', 'false');
+      };
+      const failed = () => {
+        if (lbMedia !== media || !isOpen()) return;
+        clearTimeout(loadTimer);
+        wrap.setAttribute('aria-busy', 'false');
+        status.textContent = message('error');
+        status.hidden = false;
+        retryBtn.hidden = false;
+      };
+      if (item.type === 'video') {
+        media.controls = true;
+        media.autoplay = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+        media.playsInline = true;
+        media.preload = 'metadata';
+        media.title = item.title || '';
+        media.onloadedmetadata = ready;
+        media.onloadeddata = ready;
+      } else {
+        media.alt = item.sourceEl?.dataset.title || item.title || '';
+        media.decoding = 'async';
+        media.onload = ready;
+      }
+      const gallery = window.BQ_GALLERY;
+      const raw = item.raw || (gallery && item.full.startsWith(gallery.CDN_BASE + '/')
+        ? gallery.RAW_BASE + item.full.slice(gallery.CDN_BASE.length) : '');
+      if (gallery?.bindMediaFallback) {
+        releaseFallback = gallery.bindMediaFallback(media, [raw], failed);
+      } else media.onerror = failed;
+      wrap.insertBefore(media, status);
+      media.src = item.full;
+      // A stalled connection leaves a usable retry control instead of an
+      // indefinite blank modal. A later successful load still clears it.
+      loadTimer = setTimeout(failed, 20000);
+      if (opening || focus) requestAnimationFrame(() => { if (isOpen()) closeBtn.focus({ preventScroll: true }); });
     };
-
-    document.getElementById('lbClose').addEventListener('click', close);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
-    document.getElementById('lbPrev').addEventListener('click', () => show(cur - 1));
-    document.getElementById('lbNext').addEventListener('click', () => show(cur + 1));
-    document.addEventListener('keydown', (e) => {
-      if (!overlay.classList.contains('is-open')) return;
-      if (e.key === 'Escape')     close();
-      if (e.key === 'ArrowLeft')  show(cur - 1);
-      if (e.key === 'ArrowRight') show(cur + 1);
-      if (e.key === 'Tab') {
-        const focusable = Array.from(overlay.querySelectorAll('button:not([disabled]), video[controls]'));
-        if (!focusable.length) return;
+    const openPool = (items, index = 0) => {
+      if (!Array.isArray(items) || !items.length) return;
+      const nextPool = items.filter(item => item && typeof item.full === 'string' && item.full);
+      if (!nextPool.length) return;
+      pool = nextPool;
+      show(Number.isFinite(Number(index)) ? Math.trunc(Number(index)) : 0, true);
+    };
+    window.__bqOpenLightboxPool = openPool;
+    closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+    prevBtn.addEventListener('click', () => show(cur - 1));
+    nextBtn.addEventListener('click', () => show(cur + 1));
+    retryBtn.addEventListener('click', () => show(cur, true));
+    document.addEventListener('bq:route', close);
+    document.addEventListener('keydown', event => {
+      if (!isOpen()) return;
+      if (event.key === 'Escape') { event.preventDefault(); close(); return; }
+      const isRTL = document.documentElement.dir === 'rtl';
+      // The arrow keys retain their native seeking behavior on video controls.
+      if (!event.target.closest('video') && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+        event.preventDefault();
+        const direction = event.key === 'ArrowRight' ? 1 : -1;
+        show(cur + (isRTL ? -direction : direction));
+      }
+      if (event.key === 'Tab') {
+        const focusable = Array.from(overlay.querySelectorAll('button:not([disabled]), video[controls]'))
+          .filter(element => !element.hidden && element.getClientRects().length);
         const first = focusable[0], last = focusable[focusable.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        if (!first) return;
+        if (event.shiftKey && (document.activeElement === first || !overlay.contains(document.activeElement))) {
+          event.preventDefault(); last.focus();
+        } else if (!event.shiftKey && (document.activeElement === last || !overlay.contains(document.activeElement))) {
+          event.preventDefault(); first.focus();
+        }
       }
     });
 
-    document.addEventListener('click', (e) => {
-      const card = e.target.closest('#grid .card--photo');
-      if (!card) return;
-      pool = getPool();
-      const idx = pool.indexOf(card);
-      show(idx >= 0 ? idx : 0);
-    });
+    let touchStart = null;
+    wrap.addEventListener('touchstart', event => {
+      touchStart = event.touches.length === 1 && !event.target.closest('video, button')
+        ? { x: event.touches[0].clientX, y: event.touches[0].clientY } : null;
+    }, { passive: true });
+    wrap.addEventListener('touchend', event => {
+      if (!touchStart || !event.changedTouches.length) return;
+      const dx = event.changedTouches[0].clientX - touchStart.x;
+      const dy = event.changedTouches[0].clientY - touchStart.y;
+      touchStart = null;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        const next = dx < 0 ? 1 : -1;
+        show(cur + (document.documentElement.dir === 'rtl' ? -next : next));
+      }
+    }, { passive: true });
+    wrap.addEventListener('touchcancel', () => { touchStart = null; }, { passive: true });
 
-    /* Allow external callers (e.g. cert gallery) to open lightbox with a custom pool */
-    window.__bqOpenLightboxPool = (items, startIdx) => {
-      if (!Array.isArray(items) || !items.length) return;
-      if (!overlay.classList.contains('is-open')) lastFocus = document.activeElement;
-      pool = items;
-      cur  = ((startIdx % items.length) + items.length) % items.length;
-      clearMedia();
-      const item = pool[cur];
-      lbMedia = document.createElement('img');
-      lbMedia.alt = item.title || '';
-      lbMedia.style.opacity = '0';
-      lbMedia.src = item.full || '';
-      lbMedia.onload = () => { lbMedia.style.opacity = '1'; };
-      wrap.insertBefore(lbMedia, lbCaption);
-      lbCaption.textContent = item.title || '';
-      overlay.classList.add('is-open');
-      document.body.style.overflow = 'hidden';
-      requestAnimationFrame(() => document.getElementById('lbClose')?.focus());
-      /* override show for this pool so arrows navigate within it */
-      const localShow = (i) => {
-        cur = ((i % pool.length) + pool.length) % pool.length;
-        clearMedia();
-        const it = pool[cur];
-        lbMedia = document.createElement('img');
-        lbMedia.alt = it.title || '';
-        lbMedia.style.opacity = '0';
-        lbMedia.src = it.full || '';
-        lbMedia.onload = () => { lbMedia.style.opacity = '1'; };
-        wrap.insertBefore(lbMedia, lbCaption);
-        lbCaption.textContent = it.title || '';
-      };
-      document.getElementById('lbPrev').onclick = () => localShow(cur - 1);
-      document.getElementById('lbNext').onclick = () => localShow(cur + 1);
-    };
+    document.addEventListener('click', event => {
+      const card = event.target.closest('#grid .card--photo');
+      if (!card) return;
+      // Masonry columns rearrange the DOM. Follow catalogue order so previous
+      // and next remain predictable after filtering or changing screen width.
+      const cards = matchingCards().map(entry => entry.el).filter(element => element?.isConnected);
+      const items = cards.map(element => ({
+        full: element.dataset.full, title: element.dataset.title,
+        type: element.dataset.type || 'image', sourceEl: element,
+      }));
+      openPool(items, Math.max(0, cards.indexOf(card)));
+    });
   };
 
   /* ---------- INDEX LAYOUT (interactive hover preview) ---------- */
@@ -1570,8 +1677,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('pitchForm');
   const status = document.getElementById('pitchStatus');
   if (form) {
-    form.addEventListener('submit', (e) => {
+    const pitchCopy = {
+      en: { missing: 'Please add your name, email and a short message.', email: 'Please enter a valid email address.', sending: 'Sending your pitch…', success: 'Thank you — your pitch has been sent. I reply within 48 hours.', failure: 'Your pitch could not be sent. Your text is saved here; please try again or email hello@bqurtas.com.', timeout: 'Sending took too long to confirm. Your text is saved here; contact hello@bqurtas.com if you need help.' },
+      ku: { missing: 'تکایە ناو، ئیمەیڵ و پەیامێکی کورت بنووسە.', email: 'تکایە ناونیشانێکی دروستی ئیمەیڵ بنووسە.', sending: 'پەیامەکەت دەنێردرێت…', success: 'سوپاس — پەیامەکەت نێردرا. لە ماوەی ٤٨ کاتژمێردا وەڵام دەدەمەوە.', failure: 'پەیامەکەت نەنێردرا. دەقەکەت لێرە ماوەتەوە؛ تکایە دووبارە هەوڵ بدەوە یان ئیمەیڵ بنێرە بۆ hello@bqurtas.com.', timeout: 'پشتڕاستکردنەوەی ناردن زۆری خایاند. دەقەکەت لێرە ماوەتەوە؛ بۆ یارمەتی ئیمەیڵ بنێرە بۆ hello@bqurtas.com.' },
+      kmr: { missing: 'Ji kerema xwe nav, e-name û peyameke kurt binivîse.', email: 'Ji kerema xwe navnîşaneke e-nameyê ya derbasdar binivîse.', sending: 'Peyama te tê şandin…', success: 'Spas — peyama te hat şandin. Ez di nav 48 saetan de bersiv didim.', failure: 'Peyama te nehat şandin. Nivîsa te li vir maye; dîsa biceribîne an e-nameyê bişîne hello@bqurtas.com.', timeout: 'Piştrastkirina şandinê pir dirêj kir. Nivîsa te li vir maye; ji bo alîkariyê binivîse hello@bqurtas.com.' },
+      ar: { missing: 'يرجى إدخال اسمك وبريدك الإلكتروني ورسالة قصيرة.', email: 'يرجى إدخال عنوان بريد إلكتروني صالح.', sending: 'جارٍ إرسال رسالتك…', success: 'شكراً — تم إرسال رسالتك. سأرد خلال ٤٨ ساعة.', failure: 'تعذر إرسال رسالتك. ما زال نصك هنا؛ حاول مجدداً أو راسل hello@bqurtas.com.', timeout: 'استغرق تأكيد الإرسال وقتاً طويلاً. ما زال نصك هنا؛ للمساعدة راسل hello@bqurtas.com.' },
+      fr: { missing: 'Indiquez votre nom, votre adresse e-mail et un court message.', email: 'Indiquez une adresse e-mail valide.', sending: 'Envoi de votre message…', success: 'Merci — votre message a été envoyé. Je réponds sous 48 heures.', failure: 'Votre message n’a pas pu être envoyé. Votre texte est conservé ici ; réessayez ou écrivez à hello@bqurtas.com.', timeout: 'L’envoi n’a pas pu être confirmé à temps. Votre texte est conservé ici ; contactez hello@bqurtas.com si besoin.' },
+      tr: { missing: 'Lütfen adınızı, e-posta adresinizi ve kısa bir mesaj yazın.', email: 'Lütfen geçerli bir e-posta adresi girin.', sending: 'Mesajınız gönderiliyor…', success: 'Teşekkürler — mesajınız gönderildi. 48 saat içinde yanıt vereceğim.', failure: 'Mesajınız gönderilemedi. Metniniz burada duruyor; tekrar deneyin veya hello@bqurtas.com adresine yazın.', timeout: 'Gönderimin onaylanması çok uzun sürdü. Metniniz burada duruyor; yardım için hello@bqurtas.com adresine yazın.' },
+      sv: { missing: 'Ange ditt namn, din e-postadress och ett kort meddelande.', email: 'Ange en giltig e-postadress.', sending: 'Skickar ditt meddelande…', success: 'Tack — ditt meddelande har skickats. Jag svarar inom 48 timmar.', failure: 'Ditt meddelande kunde inte skickas. Din text finns kvar här; försök igen eller skriv till hello@bqurtas.com.', timeout: 'Det tog för lång tid att bekräfta sändningen. Din text finns kvar här; kontakta hello@bqurtas.com om du behöver hjälp.' }
+    };
+    const showPitchStatus = (kind) => {
+      if (!status) return;
+      const copy = pitchCopy[currentLang] || pitchCopy.en;
+      status.style.color = ['sending', 'success'].includes(kind) ? 'var(--gold)' : 'var(--ember)';
+      const icon = document.createElement('i');
+      icon.className = `fa-solid ${kind === 'sending' ? 'fa-spinner fa-spin' : kind === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}`;
+      icon.setAttribute('aria-hidden', 'true');
+      status.replaceChildren(icon, document.createTextNode(` ${copy[kind]}`));
+    };
+    let pitchSending = false;
+    form.addEventListener('input', (event) => {
+      if (event.target && event.target.removeAttribute) event.target.removeAttribute('aria-invalid');
+    });
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (pitchSending) return;
       // Safe readers: optional brief fields may be hidden or absent in older cached markup.
       const val = (sel) => { const el = form.querySelector(sel); return el ? el.value.trim() : ''; };
       const chk = (sel) => { const el = form.querySelector(sel); return !!(el && el.checked); };
@@ -1579,19 +1709,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = val('#pEmail');
       const message = val('#pMessage');
       const type = val('#pType') || 'Project enquiry';   // optional now
-      if (!name || !email || !message) {
-        status.style.color = 'var(--ember)';
-        status.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Please add your name, email and a short message.';
+      const required = [['#pName', name], ['#pEmail', email], ['#pMessage', message]];
+      const invalidEmail = !!email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      const invalid = required.filter(([selector, value]) => !value || (selector === '#pEmail' && invalidEmail));
+      required.forEach(([selector]) => {
+        const field = form.querySelector(selector);
+        if (field) field.setAttribute('aria-invalid', invalid.some(([id]) => id === selector) ? 'true' : 'false');
+      });
+      if (invalid.length) {
+        showPitchStatus(!name || !email || !message ? 'missing' : 'email');
+        const first = form.querySelector(invalid[0][0]);
+        if (first) first.focus();
         return;
       }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        status.style.color = 'var(--ember)';
-        status.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Please enter a valid email address.';
-        return;
-      }
-      // Reliable delivery: paste a free Web3Forms access key (web3forms.com, tied
-      // to hello@bqurtas.com) below and every pitch is auto-emailed to you. Until
-      // then it falls back to opening a prefilled mail in the visitor's mail app.
+      // This is the public Web3Forms form identifier, not a private server token.
       const WEB3FORMS_KEY = 'cd575d52-8847-4286-af53-efa296c04686'; // delivers each pitch to hello@bqurtas.com
       const fields = {
         company:      val('#pCompany'),
@@ -1603,33 +1734,46 @@ document.addEventListener('DOMContentLoaded', () => {
         references:   val('#pRefs'),
         nda:          chk('#pNDA') ? 'Yes' : 'No'
       };
-
-      if (WEB3FORMS_KEY) {
-        status.style.color = 'var(--gold)';
-        status.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
-        fetch('https://api.web3forms.com/submit', {
+      const submit = form.querySelector('[type="submit"]');
+      const wasDisabled = !!(submit && submit.disabled);
+      // Keep every draft field if the visitor edits anything while delivery is pending.
+      const snapshot = Array.from(form.elements).filter(el => /^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName))
+        .map(el => ({ el, value: el.value, checked: el.checked }));
+      const controller = new AbortController();
+      let timedOut = false;
+      let timeout;
+      pitchSending = true;
+      form.setAttribute('aria-busy', 'true');
+      if (submit) submit.disabled = true;
+      showPitchStatus('sending');
+      try {
+        const deadline = new Promise((resolve, reject) => {
+          timeout = setTimeout(() => {
+            timedOut = true;
+            controller.abort();
+            reject(new Error('pitch-timeout'));
+          }, 15_000);
+        });
+        const delivery = fetch('https://api.web3forms.com/submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: `New pitch — ${type} — ${name}`, name, email, message, ...fields })
-        }).then(r => r.json()).then(d => {
-          status.style.color = d.success ? 'var(--gold)' : 'var(--ember)';
-          status.innerHTML = d.success
-            ? '<i class="fa-solid fa-circle-check"></i> Thank you — your pitch has been sent. I reply within 48 hours.'
-            : '<i class="fa-solid fa-circle-exclamation"></i> Could not send — please write directly to hello@bqurtas.com.';
-          if (d.success) form.reset();
-        }).catch(() => {
-          status.style.color = 'var(--ember)';
-          status.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Could not send — please write directly to hello@bqurtas.com.';
+          body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: `New pitch — ${type} — ${name}`, name, email, message, ...fields }),
+          signal: controller.signal
+        }).then(async response => {
+          if (!response.ok) throw new Error('pitch-http-error');
+          const result = await response.json();
+          if (!result || result.success !== true) throw new Error('pitch-rejected');
         });
-      } else {
-        const subject = encodeURIComponent(`Pitch — ${type} — ${name}`);
-        const body = encodeURIComponent(
-          `Name: ${name}\nEmail: ${email}\nCompany: ${fields.company}\nPhone: ${fields.phone}\nProject type: ${type}\nBudget: ${fields.budget}\nTimeline: ${fields.timeline}\nReferences: ${fields.references}\nHeard about: ${fields.heard_about}\nNDA: ${fields.nda}\n\n---\n${message}`
-        );
-        window.location.href = `mailto:hello@bqurtas.com?subject=${subject}&body=${body}`;
-        status.style.color = 'var(--gold)';
-        status.innerHTML = '<i class="fa-solid fa-circle-check"></i> Pitch prepared. Your mail client will open — or write directly to hello@bqurtas.com.';
-        form.reset();
+        await Promise.race([delivery, deadline]);
+        showPitchStatus('success');
+        if (snapshot.every(({ el, value, checked }) => el.value === value && el.checked === checked)) form.reset();
+      } catch (error) {
+        showPitchStatus(timedOut ? 'timeout' : 'failure');
+      } finally {
+        clearTimeout(timeout);
+        pitchSending = false;
+        form.removeAttribute('aria-busy');
+        if (submit) submit.disabled = wasDisabled;
       }
     });
   }
@@ -1721,9 +1865,10 @@ document.addEventListener('DOMContentLoaded', () => {
    ========================================================= */
 (function scrollCues() {
   const glide = (cue) => {
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
     const hero = cue.closest('.hero, .room-hero, .pencemor-hero');
     const nextPaper = hero?.nextElementSibling;
-    if (nextPaper && window.__bqScrollPaperTarget?.(nextPaper, { behavior: 'smooth', block: 'start' })) {
+    if (nextPaper && window.__bqScrollPaperTarget?.(nextPaper, { behavior, block: 'start' })) {
       window.__bqNoSnap = true;
       setTimeout(() => { window.__bqNoSnap = false; }, 1100);
       return;
@@ -1731,7 +1876,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const top = hero ? Math.max(0, hero.getBoundingClientRect().bottom + window.scrollY - 2)
                      : window.scrollY + window.innerHeight * 0.9;
     window.__bqNoSnap = true;                       // don't let the hero-snap fight this deliberate scroll-down
-    window.scrollTo({ top, behavior: 'smooth' });
+    window.scrollTo({ top, behavior });
     setTimeout(() => { window.__bqNoSnap = false; }, 900);
   };
   document.querySelectorAll('.hero-meta--br, .hero-scrolldown, .room-hero-scroll').forEach((cue) => {
@@ -1739,6 +1884,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cue.setAttribute('role', 'button');
     cue.setAttribute('tabindex', '0');
     cue.removeAttribute('aria-hidden');
+    cue.setAttribute('data-i18n-aria', 'hero.scroll');
     cue.setAttribute('aria-label', (window.BQ_DICT && window.BQ_DICT['hero.scroll']) || 'Scroll down');
     cue.addEventListener('click', () => glide(cue));
     cue.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); glide(cue); } });

@@ -74,7 +74,21 @@ HTML، `sw.js`، sitemap و API نابێت بە یاسای **Cache Everything** 
 3. یەک جار `Purge Everything` بکە تا HTML و Service Worker ـی کۆن لە edge
    نەمێننەوە.
 4. `/` و `/sw.js` بپشکنە: `CF-Cache-Status` دەبێت `BYPASS` یان `DYNAMIC`
-   بێت و `Cloudflare-CDN-Cache-Control: no-store` هەبێت.
+   بێت و `Cache-Control` ڕێگە بە هەڵگرتنی وەشانی کۆن نەدات.
+   Cloudflare هێدەری `Cloudflare-CDN-Cache-Control` لە وەڵامی گەیشتوو بە
+   براوزەر لادەبات؛ نەبوونی ئەو هێدەرە بە تەنها نیشانەی هەڵە نییە.
+5. لە `Caching` > `Configuration`، `Browser Cache TTL` بکە بە
+   **Respect Existing Headers** تا `no-store` ـی Service Worker بپارێزرێت.
+
+لە ٢٠٢٦-٠٩-١٠ یاسای ٧ ڕۆژەی گشتی گۆڕدرا بۆ
+**Static assets - respect origin cache headers** بە مەرجی ئەم ڕێڕەوانە:
+
+```text
+(starts_with(http.request.uri.path, "/assets/") or starts_with(http.request.uri.path, "/css/") or starts_with(http.request.uri.path, "/js/") or starts_with(http.request.uri.path, "/vendor/"))
+```
+
+`Edge TTL` = **Use cache-control header if present, bypass cache if not**؛
+`Browser Cache TTL` = **Respect Existing Headers**.
 
 هێدەرەکانی ناو repo بە تەنها ناتوانن یاسایەک بشکێنن کە بە ئەنقەست
 `Cache-Control` نادیدە دەگرێت؛ بۆیە ئەم هەنگاوە لە داشبۆرد پێویستە.

@@ -716,7 +716,7 @@
     }());
   </script>
   <link rel="stylesheet" href="css/fonts.css?v=69cf74d1bd04">
-  <link rel="stylesheet" href="css/experience.min.css?v=0388aed31499">
+  <link rel="stylesheet" href="css/experience.min.css?v=349515ee7bec">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=a65cc728586a" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=a65cc728586a"></noscript>
 
@@ -882,9 +882,9 @@
         <path d="M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       </svg>
     </button>
-    <button type="button" class="mobilebar-btn" id="railLatestM" aria-label="Latest"><i class="fa-solid fa-bell"></i><span class="rail-latest-badge" id="railLatestBadgeM" hidden></span></button>
-    <button type="button" class="mobilebar-btn" id="railChatM" aria-label="Chat with assistant"><i class="fa-solid fa-comment-dots"></i><span class="rail-chat-dot" aria-hidden="true"></span></button>
-    <a href="/contact" class="mobilebar-cta" data-route="contact" aria-label="Let's work together">
+    <button type="button" class="mobilebar-btn" id="railLatestM" data-i18n-aria="tip.latest" aria-label="Latest"><i class="fa-solid fa-bell"></i><span class="rail-latest-badge" id="railLatestBadgeM" hidden></span></button>
+    <button type="button" class="mobilebar-btn" id="railChatM" data-i18n-aria="chat.title" aria-label="Chat with assistant"><i class="fa-solid fa-comment-dots"></i><span class="rail-chat-dot" aria-hidden="true"></span></button>
+    <a href="/contact" class="mobilebar-cta" data-route="contact" data-i18n-aria="cta.float" aria-label="Let's work together">
       <span class="design-cta-dot" aria-hidden="true"></span>
       <span class="mobilebar-cta-txt" data-i18n="cta.float">Let's work together</span>
       <i class="fa-solid fa-arrow-right"></i>
@@ -903,15 +903,15 @@
       </div>
     </div>
 
-    <button type="button" class="mobilebar-btn theme-btn" id="themeToggleM" role="switch" aria-checked="false" aria-label="Toggle dark mode">
+    <button type="button" class="mobilebar-btn theme-btn" id="themeToggleM" data-i18n-aria="a11y.theme" role="switch" aria-checked="false" aria-label="Toggle dark mode">
       <i class="fa-solid fa-sun theme-icon-sun" aria-hidden="true"></i>
       <i class="fa-solid fa-moon theme-icon-moon" aria-hidden="true"></i>
     </button>
 
     <div class="mobilebar-pop-wrap mobilebar-social-wrap">
-      <button type="button" class="mobilebar-btn" id="socialPopBtn" aria-haspopup="menu" aria-controls="socialPop" aria-expanded="false" aria-label="Connect"><i class="fa-solid fa-share-nodes"></i></button>
+      <button type="button" class="mobilebar-btn" id="socialPopBtn" data-i18n-aria="a11y.connect" aria-haspopup="menu" aria-controls="socialPop" aria-expanded="false" aria-label="Connect"><i class="fa-solid fa-share-nodes"></i></button>
       <div class="mobilebar-pop mobilebar-pop--social" id="socialPop" role="menu" aria-hidden="true" inert>
-        <button type="button" class="share-page-btn" role="menuitem" aria-label="Share this page"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
+        <button type="button" class="share-page-btn" role="menuitem" aria-label="Share this page" data-i18n-aria="a11y.sharePage"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
         <a href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener" role="menuitem" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
         <a href="https://instagram.com/bqurtas" target="_blank" rel="noopener" role="menuitem" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
         <a href="https://facebook.com/bqurtas" target="_blank" rel="noopener" role="menuitem" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
@@ -1009,6 +1009,10 @@
 
       <!-- Hero — brand, lede, CTA, portrait -->
       <div class="hero">
+        <div class="hero-edition mono">
+          <span class="hero-edition-place"><span class="hero-edition-dot" aria-hidden="true"></span><span data-i18n="hero.place">Based in Erbil</span></span>
+          <span data-i18n="hero.since">Established 2014</span>
+        </div>
         <div class="hero-radial" aria-hidden="true"></div>
         <div class="hero-corners" aria-hidden="true" hidden>
           <span class="hero-corner hero-corner--bl" data-i18n="hero.place">Based in Erbil</span>
@@ -1016,16 +1020,16 @@
         </div>
 
         <div class="hero-inner">
-          <h1 class="hero-title">
+          <div class="hero-title">
             <span class="hero-portrait" id="heroPortrait"><img src="assets/portrait.webp?v=56f25216a1e1" alt="Barakat Qurtas" width="400" height="600" loading="eager" decoding="async" fetchpriority="high" /></span>
-          </h1>
-          <div class="hero-sign">
+          </div>
+          <h1 class="hero-sign">
             <span class="hero-sign-first" data-i18n="name.first">Barakat</span>
             <span class="hero-sign-last" data-i18n="name.last">Qurtas</span>
-          </div>
+          </h1>
           <p class="hero-lede" data-i18n="hero.lede">I'm Barakat Qurtas — a graphic &amp; motion designer crafting brand identities and editorial systems for over a decade</p>
 
-          <a class="hero-cta" href="#grid" data-hero-cta role="button">
+          <a class="hero-cta" href="#grid" data-hero-cta>
             <span class="hero-cta-txt" data-i18n="hero.cta">View the work</span>
             <i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
           </a>
@@ -1857,22 +1861,22 @@
             <div class="row-2">
               <div class="field">
                 <label for="pName"><i class="fa-solid fa-user"></i> <span data-i18n="cf.name">Full name</span></label>
-                <input id="pName" name="name" type="text" required placeholder="Your name" data-i18n-ph="cf.name.ph" />
+                <input id="pName" name="name" type="text" autocomplete="name" maxlength="120" aria-describedby="pitchStatus" required placeholder="Your name" data-i18n-ph="cf.name.ph" />
               </div>
               <div class="field">
                 <label for="pCompany"><i class="fa-solid fa-building"></i> <span data-i18n="cf.company">Company / Organization</span></label>
-                <input id="pCompany" name="company" type="text" placeholder="Optional" data-i18n-ph="cf.company.ph" />
+                <input id="pCompany" name="company" type="text" autocomplete="organization" maxlength="160" placeholder="Optional" data-i18n-ph="cf.company.ph" />
               </div>
             </div>
 
             <div class="row-2">
               <div class="field">
                 <label for="pEmail"><i class="fa-solid fa-envelope"></i> <span data-i18n="cf.email">Email</span></label>
-                <input id="pEmail" name="email" type="email" required placeholder="you@domain.com" />
+                <input id="pEmail" name="email" type="email" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" maxlength="254" aria-describedby="pitchStatus" required placeholder="you@domain.com" />
               </div>
               <div class="field">
                 <label for="pPhone"><i class="fa-solid fa-phone"></i> <span data-i18n="cf.phone">Phone (optional)</span></label>
-                <input id="pPhone" name="phone" type="tel" placeholder="+964 ..." />
+                <input id="pPhone" name="phone" type="tel" autocomplete="tel" maxlength="40" dir="ltr" placeholder="+964 ..." />
               </div>
             </div>
 
@@ -1936,12 +1940,12 @@
 
             <div class="field">
               <label for="pRefs"><i class="fa-solid fa-link"></i> <span data-i18n="cf.refs">References / previous examples</span></label>
-              <input id="pRefs" name="references" type="url" placeholder="Links, moodboard, or previous work you like" data-i18n-ph="cf.refs.ph" />
+              <input id="pRefs" name="references" type="text" maxlength="2000" placeholder="Links, moodboard, or previous work you like" data-i18n-ph="cf.refs.ph" />
             </div>
 
             <div class="field">
               <label for="pMessage"><i class="fa-solid fa-pen"></i> <span data-i18n="cf.message">Tell me about your project</span></label>
-              <textarea id="pMessage" name="message" rows="6" required placeholder="A short brief — what is the project, who is it for, what does success look like?" data-i18n-ph="cf.message.ph"></textarea>
+              <textarea id="pMessage" name="message" rows="6" maxlength="10000" aria-describedby="pitchStatus" required placeholder="A short brief — what is the project, who is it for, what does success look like?" data-i18n-ph="cf.message.ph"></textarea>
             </div>
 
             <div class="field">
@@ -1956,7 +1960,7 @@
               <span data-i18n="contact.submit">Send the pitch</span>
               <i class="fa-solid fa-arrow-right"></i>
             </button>
-            <p class="contact-status" id="pitchStatus" aria-live="polite"></p>
+            <p class="contact-status" id="pitchStatus" role="status" aria-live="polite" aria-atomic="true"></p>
           </form>
         </div>
         </div>
@@ -2158,7 +2162,7 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script defer src="js/i18n.v420.min.js?v=aefcc7b910c0"></script>
+  <script defer src="js/i18n.v420.min.js?v=1e77fb510a2d"></script>
   <!-- Non-English visitors need the extra dictionaries before first render;
        English (the default + PSI) never loads them, keeping the parse light.
        applyLang() can also fetch this on its own, but starting it here — in
@@ -2186,8 +2190,8 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=8fe8dace3a6b"></script>
-  <script defer src="js/gallery.v420.min.js?v=79bda16c7ed9"></script>
+  <script defer src="js/main.v420.min.js?v=cc722224dcb1"></script>
+  <script defer src="js/gallery.v420.min.js?v=c8074cd76993"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
        still receive them immediately. This removes their database/GitHub work
@@ -2279,9 +2283,8 @@
       }, true);
     }());
   </script>
-  <!-- Scroll authority. The go-up button scrolls to the top of the CURRENT
-       room — it must NOT switch rooms. Only a genuine re-entry (reload /
-       bfcache) resets to the home hero. -->
+  <!-- Explicit go-up controls own their scroll. Initial portfolio deep links
+       belong to the router, so load/pageshow must not overwrite them. -->
   <script>
     (function () {
       try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}
@@ -2315,13 +2318,12 @@
         var y = window.scrollY + work.getBoundingClientRect().top + 1;
         window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
       }, true);
-      // first paint + bfcache restore → top of the home hero
-      window.addEventListener('load', hardTop);
+      // Keep the fresh homepage at its hero. A shared gallery URL has its own
+      // destination; resetting it after the router runs breaks deep links.
+      var initialHome = document.documentElement.dataset.initialRoute === 'home';
+      window.addEventListener('load', function () { if (initialHome) hardTop(); });
       window.addEventListener('pageshow', function (e) {
-        if (e.persisted) {
-          try { if (typeof window.__bqResetToHomeHero === 'function') window.__bqResetToHomeHero(); } catch (er) {}
-        }
-        hardTopRepeated();
+        if (!e.persisted && initialHome) hardTopRepeated();
       });
       window.addEventListener('load', function () {
         if ('serviceWorker' in navigator) {
@@ -2333,7 +2335,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=8f59a6b19d0d', { updateViaCache: 'none' })
+            .register('/sw.js?v=22052c39f899', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

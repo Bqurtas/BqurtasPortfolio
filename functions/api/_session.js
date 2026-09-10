@@ -203,13 +203,43 @@ export class RequestInputError extends Error {
   }
 }
 
+/* Enforce the limit while reading, including chunked requests with no length
+   header. Reading the entire body first lets a tiny JSON endpoint exhaust the
+   worker's memory before its payload-too-large check can run. */
+export async function readRequestBytes(request, maxBytes = 16_384) {
+  const declared = Number(request.headers.get('Content-Length'));
+  if (Number.isFinite(declared) && declared > maxBytes) throw new RequestInputError('payload-too-large', 413);
+  if (!request.body) return new Uint8Array();
+  const reader = request.body.getReader();
+  const chunks = [];
+  let length = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      length += value.byteLength;
+      if (length > maxBytes) {
+        await reader.cancel().catch(() => {});
+        throw new RequestInputError('payload-too-large', 413);
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(length);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
+}
+
 export async function readJson(request, maxBytes = 16_384) {
   const contentType = (request.headers.get('Content-Type') || '').toLowerCase();
   if (!/^application\/json(?:\s*;|$)/.test(contentType)) throw new RequestInputError('unsupported-media-type', 415);
-  const declared = Number(request.headers.get('Content-Length'));
-  if (Number.isFinite(declared) && declared > maxBytes) throw new RequestInputError('payload-too-large', 413);
-  const bytes = new Uint8Array(await request.arrayBuffer());
-  if (bytes.byteLength > maxBytes) throw new RequestInputError('payload-too-large', 413);
+  const bytes = await readRequestBytes(request, maxBytes);
   try {
     const parsed = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('shape');

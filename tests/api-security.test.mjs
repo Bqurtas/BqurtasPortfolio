@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { hasSession, issueSession } from '../functions/api/_session.js';
+import { hasSession, issueSession, readJson } from '../functions/api/_session.js';
 import { onRequestGet as twoFactorStatus, onRequestPost as twoFactorPost } from '../functions/api/2fa.js';
 import { onRequestPost as contentPost } from '../functions/api/content.js';
 import { onRequestGet as statsGet } from '../functions/api/stats.js';
@@ -171,4 +171,47 @@ test('hit collection fails closed without its private analytics salt', async () 
   });
   assert.equal(response.status, 204);
   assert.match(response.headers.get('cloudflare-cdn-cache-control'), /no-store/);
+});
+
+test('JSON payload limits stop chunked bodies before reading the complete upload', async () => {
+  let canceled = false;
+  let readCount = 0;
+  const body = new ReadableStream({
+    pull(controller) {
+      readCount += 1;
+      controller.enqueue(new Uint8Array(32));
+      if (readCount === 100) controller.close();
+    },
+    cancel() { canceled = true; }
+  });
+  const request = new Request(`${ORIGIN}/api/2fa`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body, duplex: 'half'
+  });
+  await assert.rejects(readJson(request, 64), (error) => error.status === 413);
+  assert.equal(canceled, true);
+  assert.ok(readCount < 10, `read ${readCount} chunks before enforcing the limit`);
+});
+
+test('JSON input validates actual UTF-8 bytes, fragmented characters and object shape', async () => {
+  const source = new TextEncoder().encode(JSON.stringify({ title: 'کوردستان' }));
+  const fragmented = new ReadableStream({
+    start(controller) {
+      for (const byte of source) controller.enqueue(new Uint8Array([byte]));
+      controller.close();
+    }
+  });
+  assert.deepEqual(await readJson(new Request(`${ORIGIN}/api/content`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: fragmented, duplex: 'half'
+  }), source.length), { title: 'کوردستان' });
+
+  for (const body of ['null', '[]', new Uint8Array([0xff])]) {
+    const request = new Request(`${ORIGIN}/api/content`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body
+    });
+    await assert.rejects(readJson(request), (error) => error.code === 'bad-json');
+  }
+  const oversized = new Request(`${ORIGIN}/api/content`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': '1' }, body: source
+  });
+  await assert.rejects(readJson(oversized, source.length - 1), (error) => error.status === 413);
 });

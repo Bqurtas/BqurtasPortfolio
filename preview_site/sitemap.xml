@@ -211,6 +211,20 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/design/other" />
   </url>
   <url>
+    <loc>https://bqurtas.com/design/certificate</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bqurtas.com/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ckb" href="https://bqurtas.com/ku/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ku" href="https://bqurtas.com/kmr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bqurtas.com/ar/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bqurtas.com/fr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/design/certificate" />
+  </url>
+  <url>
     <loc>https://bqurtas.com/ku</loc>
     <lastmod>2026-08-31</lastmod>
     <changefreq>weekly</changefreq>
@@ -419,6 +433,20 @@
     <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/design/other" />
     <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/design/other" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/design/other" />
+  </url>
+  <url>
+    <loc>https://bqurtas.com/ku/design/certificate</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bqurtas.com/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ckb" href="https://bqurtas.com/ku/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ku" href="https://bqurtas.com/kmr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bqurtas.com/ar/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bqurtas.com/fr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/design/certificate" />
   </url>
   <url>
     <loc>https://bqurtas.com/kmr</loc>
@@ -631,6 +659,20 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/design/other" />
   </url>
   <url>
+    <loc>https://bqurtas.com/kmr/design/certificate</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bqurtas.com/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ckb" href="https://bqurtas.com/ku/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ku" href="https://bqurtas.com/kmr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bqurtas.com/ar/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bqurtas.com/fr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/design/certificate" />
+  </url>
+  <url>
     <loc>https://bqurtas.com/ar</loc>
     <lastmod>2026-08-31</lastmod>
     <changefreq>weekly</changefreq>
@@ -839,6 +881,20 @@
     <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/design/other" />
     <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/design/other" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/design/other" />
+  </url>
+  <url>
+    <loc>https://bqurtas.com/ar/design/certificate</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bqurtas.com/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ckb" href="https://bqurtas.com/ku/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ku" href="https://bqurtas.com/kmr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bqurtas.com/ar/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bqurtas.com/fr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/design/certificate" />
   </url>
   <url>
     <loc>https://bqurtas.com/fr</loc>
@@ -1051,6 +1107,20 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/design/other" />
   </url>
   <url>
+    <loc>https://bqurtas.com/fr/design/certificate</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bqurtas.com/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ckb" href="https://bqurtas.com/ku/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ku" href="https://bqurtas.com/kmr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bqurtas.com/ar/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bqurtas.com/fr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/design/certificate" />
+  </url>
+  <url>
     <loc>https://bqurtas.com/tr</loc>
     <lastmod>2026-08-31</lastmod>
     <changefreq>weekly</changefreq>
@@ -1261,6 +1331,20 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/design/other" />
   </url>
   <url>
+    <loc>https://bqurtas.com/tr/design/certificate</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bqurtas.com/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ckb" href="https://bqurtas.com/ku/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ku" href="https://bqurtas.com/kmr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bqurtas.com/ar/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bqurtas.com/fr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/design/certificate" />
+  </url>
+  <url>
     <loc>https://bqurtas.com/sv</loc>
     <lastmod>2026-08-31</lastmod>
     <changefreq>weekly</changefreq>
@@ -1469,5 +1553,19 @@
     <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/design/other" />
     <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/design/other" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/design/other" />
+  </url>
+  <url>
+    <loc>https://bqurtas.com/sv/design/certificate</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bqurtas.com/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ckb" href="https://bqurtas.com/ku/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ku" href="https://bqurtas.com/kmr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bqurtas.com/ar/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bqurtas.com/fr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/design/certificate" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/design/certificate" />
   </url>
 </urlset>

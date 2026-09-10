@@ -7,6 +7,7 @@ import {
   isSameOrigin,
   keyedDigest,
   noContent,
+  readRequestBytes,
   takeRateLimit
 } from './_session.js';
 
@@ -30,11 +31,9 @@ function isBot(userAgent) {
 }
 
 async function readBeacon(request) {
-  const declared = Number(request.headers.get('Content-Length'));
-  if (Number.isFinite(declared) && declared > 1_024) return null;
-  const raw = await request.text();
-  if (raw.length > 1_024) return null;
   try {
+    const bytes = await readRequestBytes(request, 1_024);
+    const raw = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
     const body = JSON.parse(raw || '{}');
     return body && typeof body === 'object' && !Array.isArray(body) ? body : null;
   } catch (error) {

@@ -66,6 +66,7 @@ async function loadServiceWorker({
   failAsset = '',
   offline = false,
   cachePutFails = false,
+  cacheReadFails = false,
   cachedAssetUrl = '',
   basicNetworkResponse = false
 } = {}) {
@@ -75,12 +76,20 @@ async function loadServiceWorker({
   let skipped = false;
   let fetchCount = 0;
   let putCount = 0;
+  let matchCount = 0;
   const cache = {
     async add(asset) {
       added.push(asset);
       if (asset === failAsset) throw new Error('simulated missing asset');
     },
     async keys() { return []; },
+    async match(request) {
+      matchCount += 1;
+      if (cacheReadFails) throw new Error('simulated cache read failure');
+      const key = typeof request === 'string' ? request : request.url;
+      if (key === '/index.html') return offlinePage.clone();
+      return key === cachedAssetUrl ? new Response('cached asset') : undefined;
+    },
     async put() {
       putCount += 1;
       if (cachePutFails) throw new Error('simulated cache write failure');
@@ -91,11 +100,7 @@ async function loadServiceWorker({
     async open() { return cache; },
     async keys() { return []; },
     async delete() { return true; },
-    async match(request) {
-      const key = typeof request === 'string' ? request : request.url;
-      if (key === '/index.html') return offlinePage.clone();
-      return key === cachedAssetUrl ? new Response('cached asset') : undefined;
-    }
+    async match() { throw new Error('must never read another release cache'); }
   };
   const context = {
     URL,
@@ -107,7 +112,7 @@ async function loadServiceWorker({
     fetch: async () => {
       fetchCount += 1;
       if (offline) throw new Error('offline');
-      const response = new Response('network');
+      const response = new Response('network', { headers: { 'Content-Type': 'text/html' } });
       if (basicNetworkResponse) Object.defineProperty(response, 'type', { value: 'basic' });
       return response;
     },
@@ -125,7 +130,8 @@ async function loadServiceWorker({
     added,
     get skipped() { return skipped; },
     get fetchCount() { return fetchCount; },
-    get putCount() { return putCount; }
+    get putCount() { return putCount; },
+    get matchCount() { return matchCount; }
   };
 }
 
@@ -190,6 +196,82 @@ test('service worker does not fetch an immutable fingerprint that is already cac
   assert.equal(worker.fetchCount, 0);
 });
 
+test('service worker leaves non-app documents and live metadata to the network', async () => {
+  const worker = await loadServiceWorker({ basicNetworkResponse: true });
+  for (const pathname of ['/404.html', '/missing-page', '/blog/0', '/autodiscover/autodiscover.xml', '/sitemap-gallery.xml', '/llms.txt']) {
+    for (const mode of ['navigate', 'cors']) {
+      worker.handlers.fetch({
+        request: { method: 'GET', url: `https://bqurtas.com${pathname}`, headers: new Headers({ Accept: mode === 'navigate' ? 'text/html' : '*/*' }), mode },
+        respondWith() { assert.fail(`must not intercept ${pathname} (${mode})`); },
+        waitUntil() {}
+      });
+    }
+  }
+  assert.equal(worker.putCount, 0);
+});
+
+test('service worker returns a network error cleanly when offline storage is unavailable', async () => {
+  const worker = await loadServiceWorker({ offline: true, cacheReadFails: true });
+  let responsePromise;
+  worker.handlers.fetch({
+    request: { method: 'GET', url: 'https://bqurtas.com/ku/bio', headers: new Headers({ Accept: 'text/html' }), mode: 'navigate' },
+    respondWith(value) { responsePromise = value; },
+    waitUntil() {}
+  });
+  const response = await responsePromise;
+  assert.equal(response.type, 'error');
+});
+
+test('explicit asset refresh returns the network copy and updates the release cache', async () => {
+  for (const cache of ['reload', 'no-cache']) {
+    for (const version of ['403', '012345abcdef']) {
+      const assetUrl = `https://bqurtas.com/assets/gallery-manifest.json?v=${version}`;
+      const worker = await loadServiceWorker({ cachedAssetUrl: assetUrl });
+      let responsePromise;
+      worker.handlers.fetch({
+        request: { method: 'GET', url: assetUrl, headers: new Headers(), mode: 'cors', cache },
+        respondWith(value) { responsePromise = value; },
+        waitUntil() { assert.fail('explicit refresh must wait for the fresh response'); }
+      });
+      assert.equal(await (await responsePromise).text(), 'network');
+      assert.equal(worker.fetchCount, 1);
+      assert.equal(worker.putCount, 1);
+    }
+  }
+});
+
+test('explicit asset refresh can use its release cache when the network is offline', async () => {
+  const assetUrl = 'https://bqurtas.com/assets/gallery-manifest.json?v=403';
+  const worker = await loadServiceWorker({ cachedAssetUrl: assetUrl, offline: true });
+  let responsePromise;
+  worker.handlers.fetch({
+    request: { method: 'GET', url: assetUrl, headers: new Headers(), mode: 'cors', cache: 'reload' },
+    respondWith(value) { responsePromise = value; },
+    waitUntil() {}
+  });
+  assert.equal(await (await responsePromise).text(), 'cached asset');
+  assert.equal(worker.fetchCount, 1);
+  assert.equal(worker.putCount, 0);
+});
+
+test('no-store assets never read or write Cache Storage, even when an old copy exists', async () => {
+  const assetUrl = 'https://bqurtas.com/assets/gallery-manifest.json?v=012345abcdef';
+  for (const offline of [false, true]) {
+    const worker = await loadServiceWorker({ cachedAssetUrl: assetUrl, offline });
+    let responsePromise;
+    worker.handlers.fetch({
+      request: { method: 'GET', url: assetUrl, headers: new Headers(), mode: 'cors', cache: 'no-store' },
+      respondWith(value) { responsePromise = value; },
+      waitUntil() { assert.fail('no-store requests must not schedule cache updates'); }
+    });
+    if (offline) await assert.rejects(responsePromise, /offline/);
+    else assert.equal(await (await responsePromise).text(), 'network');
+    assert.equal(worker.fetchCount, 1);
+    assert.equal(worker.putCount, 0);
+    assert.equal(worker.matchCount, 0);
+  }
+});
+
 test('dev-server path resolution rejects traversal, malformed escapes and escaping symlinks', async () => {
   const parent = await mkdtemp(path.join(os.tmpdir(), 'bq-dev-'));
   const root = path.join(parent, 'site');
@@ -216,6 +298,7 @@ test('dev-server path resolution rejects traversal, malformed escapes and escapi
 test('dev server stays on loopback and only falls back for known application routes', async () => {
   assert.equal(DEFAULT_HOST, '127.0.0.1');
   assert.equal(isSpaRoute('/ku/design/stationery'), true);
+  assert.equal(isSpaRoute('/ar/design/certificate'), true);
   assert.equal(isSpaRoute('/blog/12'), true);
   assert.equal(isSpaRoute('/blog/0'), false);
   assert.equal(isSpaRoute('/missing-file.js'), false);

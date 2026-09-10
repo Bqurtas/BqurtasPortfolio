@@ -72,6 +72,18 @@ test('known app routes and static files continue to Pages', async () => {
   assert.equal((await runRoute('/sitemap-images.xml', 'application/xml')).status, 204);
 });
 
+test('every visible gallery category has a working localized deep link', async () => {
+  const html = await readFile(new URL('../preview_site/index.html', import.meta.url), 'utf8');
+  const filters = [...new Set([...html.matchAll(/data-filter="([^"]+)"/g)].map(match => match[1]))];
+  assert.ok(filters.includes('certificate'));
+  for (const lang of ['', '/ku', '/kmr', '/ar', '/fr', '/tr', '/sv']) {
+    for (const filter of filters) {
+      const path = `${lang}/design${filter === 'all' ? '' : '/' + filter}`;
+      assert.equal((await runRoute(path)).status, 204, path);
+    }
+  }
+});
+
 test('document routes reject state-changing HTTP methods', async () => {
   const response = await onRequest({
     request: new Request('https://bqurtas.com/bio', { method: 'POST' }),
@@ -136,4 +148,67 @@ test('route CSP permits only the external origins used by translation and galler
   assert.match(source, /img-src[^\n]*https:\/\/cdn\.statically\.io/);
   assert.match(source, /media-src[^\n]*https:\/\/cdn\.statically\.io/);
   assert.doesNotMatch(source, /bq_fresh=1/);
+});
+
+test('rewritten routes discard static validators and return bodyless HEAD responses', async (t) => {
+  const originalRewriter = globalThis.HTMLRewriter;
+  globalThis.HTMLRewriter = class {
+    on() { return this; }
+    transform(response) { return response; }
+  };
+  t.after(() => {
+    if (originalRewriter === undefined) delete globalThis.HTMLRewriter;
+    else globalThis.HTMLRewriter = originalRewriter;
+  });
+  for (const method of ['GET', 'HEAD']) {
+    const response = await onRequest({
+      request: new Request('https://bqurtas.com/ku/bio', { method }),
+      env: { ASSETS: { fetch: async () => new Response('<html>shell</html>', { headers: {
+        'Content-Type': 'text/html', 'Content-Length': '18', ETag: '"static-shell"',
+        'Last-Modified': 'Wed, 09 Sep 2026 12:00:00 GMT', Age: '300', 'CF-Cache-Status': 'HIT'
+      } }) } },
+      next: () => new Response(null, { status: 204 })
+    });
+    assert.equal(response.status, 200);
+    for (const name of ['Content-Length', 'ETag', 'Last-Modified', 'Age', 'CF-Cache-Status']) {
+      assert.equal(response.headers.get(name), null, `${name} must not describe the pre-rewrite shell`);
+    }
+    assert.equal(response.headers.get('content-language'), 'ckb');
+    assert.match(response.headers.get('content-security-policy'), /script-src 'nonce-/);
+    assert.equal(await response.text(), method === 'HEAD' ? '' : '<html>shell</html>');
+  }
+});
+
+test('malformed successful blog lookups are temporary failures, not confirmed missing posts', async (t) => {
+  for (const payload of [{ message: 'temporarily unavailable' }, [null], ['invalid-row']]) {
+    t.mock.method(globalThis, 'fetch', async () => Response.json(payload));
+    const response = await onRequest({
+      request: new Request('https://bqurtas.com/blog/42'),
+      env: { ASSETS: { fetch: async () => new Response('shell') } },
+      next: () => new Response(null, { status: 204 })
+    });
+    assert.equal(response.status, 503);
+    assert.equal(response.headers.get('retry-after'), '60');
+  }
+});
+
+test('sitemaps and ownership verification obey HEAD and reject missing source assets', async (t) => {
+  t.mock.method(globalThis, 'fetch', async () => Response.json([]));
+  for (const path of ['/sitemap.xml', '/sitemap-images.xml', '/googlece435b444cb43243.html']) {
+    const response = await onRequest({
+      request: new Request(`https://bqurtas.com${path}`, { method: 'HEAD' }),
+      env: { ASSETS: { fetch: async () => new Response('<urlset></urlset>') } },
+      next: () => new Response(null, { status: 204 })
+    });
+    assert.equal(response.status, 200);
+    assert.equal(await response.text(), '');
+  }
+  for (const path of ['/bio', '/sitemap.xml', '/sitemap-images.xml']) {
+    const response = await onRequest({
+      request: new Request(`https://bqurtas.com${path}`),
+      env: { ASSETS: { fetch: async () => new Response('Missing asset', { status: 404 }) } },
+      next: () => new Response(null, { status: 204 })
+    });
+    assert.equal(response.status, 503, `missing source for ${path} must not be published as success`);
+  }
 });

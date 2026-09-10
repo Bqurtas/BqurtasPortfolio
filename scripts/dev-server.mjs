@@ -12,7 +12,7 @@ const LANGUAGES = new Set(['ku', 'kmr', 'ar', 'fr', 'tr', 'sv']);
 const ROOMS = new Set(['blog', 'bio', 'contact']);
 const DESIGN_TABS = new Set([
   'logo', 'official', 'book', 'posters', 'social', 'events',
-  'stationery', 'image', 'video', 'other'
+  'stationery', 'image', 'video', 'other', 'certificate'
 ]);
 
 const MIME_TYPES = {

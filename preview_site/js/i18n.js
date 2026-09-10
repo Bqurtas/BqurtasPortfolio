@@ -1797,3 +1797,11 @@ window.BQ_IDENTITY_COPY = {
     window.I18N[lang] = Object.assign(window.I18N[lang] || {}, window.BQ_IDENTITY_COPY[lang]);
   });
 })();
+
+/* Preserve small hero labels when an on-demand dictionary replaces its stub. */
+Object.keys(window.BQ_UI_I18N).forEach(function (lang) {
+  Object.assign(window.BQ_UI_I18N[lang], {
+    'hero.place': window.I18N[lang]['hero.place'],
+    'hero.since': window.I18N[lang]['hero.since']
+  });
+});

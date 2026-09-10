@@ -17,7 +17,7 @@ const SUPA = 'https://dcnkhzrishphpismmxuu.supabase.co';             // blog pos
 const SUPA_KEY = 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3';   // publishable (read-only, safe in client)
 const LANGS = ['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];                 // en = no prefix
 const ROOMS = ['blog', 'bio', 'contact'];
-const TABS  = ['logo','official','book','posters','social','events','stationery','image','video','other'];
+const TABS  = ['logo','official','book','posters','social','events','stationery','image','video','other','certificate'];
 const LOCALE = { en:'en_US', ku:'ckb_IQ', kmr:'kmr_TR', ar:'ar_IQ', fr:'fr_FR', tr:'tr_TR', sv:'sv_SE' };
 // The author's name written in each language's own script — so AI engines and
 // Google read & recognise him correctly per language on every blog post.
@@ -41,6 +41,17 @@ const HOME_SEO = {
   sv: { t: 'Grafisk designer i Erbil, Kurdistan | Barakat Qurtas', d: 'Barakat Qurtas är en kurdisk grafisk designer i Erbil, irakiska Kurdistan, specialiserad på varumärken, logotyper, affischer, böcker, reklam och motion design.' }
 };
 Object.keys(HOME_SEO).forEach((lang) => { if (OG[lang]) OG[lang].home = HOME_SEO[lang]; });
+
+const CERTIFICATE_SEO = {
+  en: { t: 'Certificates — Barakat Qurtas', d: 'Certificates, recognition and professional credentials from the studio archive.' },
+  ku: { t: 'بڕوانامەکان — بەرەکات قورتاس', d: 'بڕوانامەکان و پێزانینە پیشەییەکان لە ئەرشیفی ستۆدیۆ.' },
+  kmr: { t: 'Sertîfîka — Barakat Qurtas', d: 'Sertîfîka û nasnameyên pîşeyî ji arşîva stûdyoyê.' },
+  ar: { t: 'الشهادات — بركات قرطاس', d: 'الشهادات والتقدير والمؤهلات المهنية من أرشيف الاستوديو.' },
+  fr: { t: 'Certificats — Barakat Qurtas', d: 'Certificats, distinctions et qualifications professionnelles des archives du studio.' },
+  tr: { t: 'Sertifikalar — Barakat Qurtas', d: 'Stüdyo arşivinden sertifikalar, takdir belgeleri ve mesleki yeterlilikler.' },
+  sv: { t: 'Certifikat — Barakat Qurtas', d: 'Certifikat, utmärkelser och yrkesmeriter från studions arkiv.' }
+};
+Object.entries(CERTIFICATE_SEO).forEach(([lang, meta]) => { OG[lang].certificate = meta; });
 
 const HOME_KEYWORDS = {
   en: 'graphic designer Erbil, graphic designer Kurdistan, Kurdish graphic designer, graphic designer Iraq, logo designer Erbil, branding Kurdistan, motion designer Iraq, Barakat Qurtas, Bqurtas',
@@ -249,9 +260,10 @@ const sitemapHeaders = () => new Headers({
   'X-Content-Type-Options': 'nosniff'
 });
 
-async function serveSitemap(url, env, next) {
+async function serveSitemap(request, url, env, next) {
   if (!env || !env.ASSETS) return next();
   const base = await env.ASSETS.fetch(new URL('/sitemap.xml', url.origin));
+  if (!base.ok) return serveUnavailable(request);
   let body = await base.text();
   // Never expose the old generated numeric entries if the live lookup fails.
   // Omitting a post briefly is safer than advertising known soft-404 URLs.
@@ -261,7 +273,8 @@ async function serveSitemap(url, env, next) {
   );
   try {
     const res = await fetch(SUPA + '/rest/v1/posts?select=id,created_at&published=eq.true&order=created_at.desc', {
-      headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY }
+      headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY },
+      signal: AbortSignal.timeout(8_000)
     });
     if (res.ok) {
       const posts = await res.json();
@@ -284,7 +297,7 @@ async function serveSitemap(url, env, next) {
      leaving here is not the body that came out of ASSETS — blog posts get
      appended — so the asset's ETag and Content-Length describe something else,
      and its Age / CF-Cache-Status describe a fetch the client never made. */
-  return new Response(body, { status: 200, headers: sitemapHeaders() });
+  return new Response(request.method === 'HEAD' ? null : body, { status: 200, headers: sitemapHeaders() });
 }
 
 const setContent = (v) => ({ element(el) { el.setAttribute('content', v); } });
@@ -447,7 +460,10 @@ export async function onRequest(context) {
   // Pages' pretty-URL normalisation 308-redirects any static *.html path,
   // and Google's verifier requires a plain 200 at the exact URL.
   if (url.pathname === '/googlece435b444cb43243.html') {
-    return new Response('google-site-verification: googlece435b444cb43243.html', {
+    if (!['GET', 'HEAD'].includes(request.method)) {
+      return new Response(null, { status: 405, headers: noStoreDocumentHeaders({ Allow: 'GET, HEAD' }) });
+    }
+    return new Response(request.method === 'HEAD' ? null : 'google-site-verification: googlece435b444cb43243.html', {
       status: 200,
       headers: noStoreDocumentHeaders({ 'Content-Type': 'text/html; charset=UTF-8' })
     });
@@ -462,13 +478,14 @@ export async function onRequest(context) {
       headers: noStoreDocumentHeaders({ Allow: 'GET, HEAD' })
     });
   }
-  if (url.pathname === '/sitemap.xml') return serveSitemap(url, env, next);
+  if (url.pathname === '/sitemap.xml') return serveSitemap(request, url, env, next);
   // The image sitemap is a static file, but the CDN edge kept serving stale
   // HITs after deploys (Google would read an old copy). Serve it through the
   // function with no-store — freshness over speed, same policy as sitemap.xml.
   if ((url.pathname === '/sitemap-images.xml' || url.pathname === '/sitemap-media.xml' || url.pathname === '/sitemap-gallery.xml') && env && env.ASSETS) {
     const r = await env.ASSETS.fetch(new URL('/sitemap-images.xml', url.origin));
-    return new Response(r.body, { status: 200, headers: sitemapHeaders() });
+    if (!r.ok) return serveUnavailable(request);
+    return new Response(request.method === 'HEAD' ? null : r.body, { status: 200, headers: sitemapHeaders() });
   }
   const redirectPath = retiredRedirectPath(url.pathname);
   if (redirectPath) {
@@ -491,8 +508,13 @@ export async function onRequest(context) {
     let lookupFailed = false;
     try {
       const res = await fetch(SUPA + '/rest/v1/posts?id=eq.' + encodeURIComponent(id) + '&published=eq.true&select=title,subtitle,cover,i18n&limit=1',
-        { headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY } });
-      if (res.ok) { const rows = await res.json(); post = Array.isArray(rows) ? rows[0] : null; }
+        { headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY }, signal: AbortSignal.timeout(8_000) });
+      if (res.ok) {
+        const rows = await res.json();
+        if (!Array.isArray(rows) || rows.some((row) => !row || typeof row !== 'object' || Array.isArray(row))) {
+          lookupFailed = true;
+        } else post = rows[0] || null;
+      }
       else { lookupFailed = true; console.warn('blogpost lookup', id, res.status); }
     } catch (e) { lookupFailed = true; console.warn('blogpost lookup threw', id, String(e)); }
     /* A post id that does not exist, or is not published, is not a page.
@@ -558,6 +580,9 @@ export async function onRequest(context) {
   ].join('; ');
   const withFresh = (res) => {
     const headers = new Headers(res.headers);
+    /* These values describe the untouched static shell. The route, language,
+       nonce and metadata change its representation on every request. */
+    for (const name of ['ETag', 'Last-Modified', 'Content-Length', 'Content-MD5', 'Age', 'CF-Cache-Status']) headers.delete(name);
     for (const [name, value] of Object.entries(documentSecurityHeaders())) headers.set(name, value);
     headers.set('Cache-Control', FRESH);
     headers.set('CDN-Cache-Control', 'no-store');   // Cloudflare edge: don't cache the HTML shell
@@ -574,12 +599,14 @@ export async function onRequest(context) {
     // _headers override only applies to directly-served files, not this internal
     // fetch — so pin it here too. The HTML shell is same-origin only; no wildcard.
     headers.set('Access-Control-Allow-Origin', 'https://bqurtas.com');
-    return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+    headers.set('Content-Language', BCP47[r.lang] || r.lang);
+    return new Response(request.method === 'HEAD' ? null : res.body, { status: res.status, statusText: res.statusText, headers });
   };
   const addNonce = { element(el) { el.setAttribute('nonce', nonce); } };
 
   try {
     const shell = await env.ASSETS.fetch(new URL('/index.html', url.origin));
+    if (!shell.ok) return serveUnavailable(request);
     const rewriter = new HTMLRewriter()
       .on('script',                           addNonce)
       .on('style',                            addNonce)
@@ -650,6 +677,7 @@ export async function onRequest(context) {
   } catch (e) {
     try {
       const shell = await env.ASSETS.fetch(new URL('/index.html', url.origin));
+      if (!shell.ok) return serveUnavailable(request);
       return withFresh(new HTMLRewriter()
         .on('script', addNonce)
         .on('style', addNonce)
