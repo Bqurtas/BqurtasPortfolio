@@ -30,27 +30,65 @@
     const toTop    = $('#toTop');
     const ring     = $('#toTopProg');
     const C = 2 * Math.PI * 20;            // circumference of r=20
-    if (ring) { ring.style.strokeDasharray = C; ring.style.strokeDashoffset = C; }
+    const coreOwnsProgress = () => window.__bqDeckRing && typeof window.__bqCoreGoUpUpdate === 'function';
+    if (ring && !coreOwnsProgress()) { ring.style.strokeDasharray = C; ring.style.strokeDashoffset = C; }
+    let railVisible = false, maxScroll = 1, progressFrame = 0;
+    let lastRailHeight = '', lastRingOffset = null, lastShown = null;
 
-    const onScroll = () => {
+    const paintProgress = () => {
+      progressFrame = 0;
+      const delegated = coreOwnsProgress();
+      if (delegated && !railVisible) return;
       const h = document.documentElement;
       // window.scrollY is reliable on mobile; documentElement.scrollTop can read 0 there
       const st = window.scrollY || (document.scrollingElement || h).scrollTop || 0;
-      const max = (h.scrollHeight - h.clientHeight) || 1;
-      const p = Math.min(Math.max(st / max, 0), 1);
-      if (railFill) railFill.style.height = (p * 100) + '%';
-      /* main.js owns the ring now — it counts sheets rather than pixels, and
-         writing the pixel value here every scroll would undo that each frame. */
-      if (ring && !window.__bqDeckRing) ring.style.strokeDashoffset = C * (1 - p);
-      /* hidden at the very top; shown once you've scrolled down — in every room. */
-      if (toTop) toTop.classList.toggle('is-shown', st > 200);
+      const p = Math.min(Math.max(st / maxScroll, 0), 1);
+      const railHeight = (p * 100) + '%';
+      if (railVisible && railHeight !== lastRailHeight) {
+        railFill.style.height = railHeight;
+        lastRailHeight = railHeight;
+      }
+      if (delegated) return;
+      const offset = C * (1 - p);
+      if (ring && offset !== lastRingOffset) {
+        ring.style.strokeDashoffset = offset;
+        lastRingOffset = offset;
+      }
+      const shown = st > 200;
+      if (toTop && shown !== lastShown) {
+        toTop.classList.toggle('is-shown', shown);
+        lastShown = shown;
+      }
+    };
+    const onScroll = () => {
+      // The core updater is queued and owns the deck ring and button. Do not
+      // read layout or paint over it from scroll, touchmove or the old sampler.
+      if (coreOwnsProgress()) {
+        window.__bqCoreGoUpUpdate();
+        if (!railVisible) return;
+      }
+      if (!progressFrame) progressFrame = requestAnimationFrame(paintProgress);
+    };
+    const refreshProgressMetrics = () => {
+      railVisible = !!(railFill && railFill.getClientRects().length);
+      if (railVisible || !coreOwnsProgress()) {
+        const h = document.documentElement;
+        maxScroll = Math.max(1, h.scrollHeight - h.clientHeight);
+      }
+      onScroll();
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('touchmove', onScroll, { passive: true });   // some mobile browsers throttle 'scroll'
-    window.addEventListener('resize', onScroll);
+    window.addEventListener('resize', refreshProgressMetrics);
+    window.addEventListener('bq:css-ready', refreshProgressMetrics);
+    window.addEventListener('bq:gallery-built', refreshProgressMetrics);
+    document.addEventListener('bq:route', refreshProgressMetrics);
+    if (typeof ResizeObserver === 'function') {
+      new ResizeObserver(refreshProgressMetrics).observe(document.body);
+    }
     window.addEventListener('popstate', () => setTimeout(onScroll, 140)); // re-check after back/forward room change
     window.__bqOnScroll = onScroll;                                       // router calls this after navigating
-    onScroll();
+    refreshProgressMetrics();
 
     /* In-app browsers (Google app, Gmail, Instagram webviews) sometimes DON'T
        update CSS `dvh` when their toolbar collapses/expands, leaving the hero
@@ -58,9 +96,13 @@
        into a `--app-vh` custom property; the hero CSS uses it with a `100dvh`
        fallback, so normal browsers are unchanged and webviews get the right
        height that tracks the toolbar. */
+    let lastAppHeight = 0;
     const setAppVh = () => {
       const h = window.innerHeight;
-      if (h > 200) document.documentElement.style.setProperty('--app-vh', h + 'px');
+      if (h > 200 && h !== lastAppHeight) {
+        document.documentElement.style.setProperty('--app-vh', h + 'px');
+        lastAppHeight = h;
+      }
     };
     setAppVh();
     /* re-measure a few times across the moment the viewport settles (toolbars
@@ -144,6 +186,7 @@
        requestAnimationFrame loop for the entire lifetime of the page. */
     let lastWatchY = -1, scrollWatchFrame = 0, scrollWatchUntil = 0;
     const sampleScroll = (now) => {
+      if (coreOwnsProgress()) { scrollWatchFrame = 0; return; }
       const y = window.scrollY || (document.scrollingElement || document.documentElement).scrollTop || 0;
       if (y !== lastWatchY) {
         lastWatchY = y;
@@ -154,6 +197,7 @@
       else scrollWatchFrame = 0;
     };
     const watchScrollBriefly = (ms) => {
+      if (coreOwnsProgress()) return;
       scrollWatchUntil = Math.max(scrollWatchUntil, performance.now() + (ms || 700));
       if (!scrollWatchFrame && !document.hidden) scrollWatchFrame = requestAnimationFrame(sampleScroll);
     };

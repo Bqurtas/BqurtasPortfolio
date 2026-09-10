@@ -913,7 +913,7 @@ document.addEventListener('DOMContentLoaded', () => {
     buildColumns(colCountForWidth());
     const matching = matchingCards();
     const target = Math.max(0, Math.min(n, matching.length));
-    matching.slice(0, target).forEach((entry, idx) => placeCard(entry, idx));
+    placeCards(matching.slice(0, target));
     currentShown = target;
     updateTabHeader(currentFilter, matching.length);
     updateLoadMore(matching.length);
@@ -1011,7 +1011,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const placeCard = (entry, rank) => {
+  const placeCard = (entry, rank, colWidth) => {
     let card = entry && entry.el;
     if (!card && entry && entry.item && window.__bqBuildGalleryCard) {
       card = window.__bqBuildGalleryCard(entry.item);
@@ -1030,11 +1030,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const source = entry.item || {};
     const mediaWidth = Number(source.width) || Number(media && media.getAttribute('width')) || 4;
     const mediaHeight = Number(source.height) || Number(media && media.getAttribute('height')) || 5;
-    const gridWidth = gridEl.clientWidth || window.innerWidth;
-    const colWidth = Math.max(1, (gridWidth - CARD_GAP * Math.max(0, cols.length - 1)) / Math.max(1, cols.length));
     heights[i] += Math.round(colWidth * mediaHeight / mediaWidth) + CAPTION_EST + CARD_GAP;
 
     prepPortfolioReveal(card, i, media, rank);
+  };
+
+  // The column width is identical throughout a batch. Reading it after every
+  // append forces layout once per card, which stalls a phone on "Load more".
+  const placeCards = (entries, startRank = 0) => {
+    if (!entries.length || !mCols.length) return;
+    const gridWidth = gridEl.clientWidth || window.innerWidth;
+    const colWidth = Math.max(1, (gridWidth - CARD_GAP * Math.max(0, mCols.length - 1)) / mCols.length);
+    entries.forEach((entry, index) => placeCard(entry, startRank + index, colWidth));
   };
 
   const matchingCards = () => {
@@ -1092,7 +1099,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
     const batch = matching.slice(currentShown, currentShown + PAGE_SIZE);
-    batch.forEach((entry, idx) => placeCard(entry, currentShown + idx));
+    placeCards(batch, currentShown);
     currentShown += batch.length;
     updateTabHeader(currentFilter, matching.length);
     updateLoadMore(matching.length);
@@ -1196,7 +1203,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const shown = currentShown;
       buildColumns(colCountForWidth());
       currentShown = 0;
-      matchingCards().slice(0, shown).forEach((entry, idx) => { placeCard(entry, idx); currentShown++; });
+      const entries = matchingCards().slice(0, shown);
+      placeCards(entries);
+      currentShown = entries.length;
       updateLoadMore(matchingCards().length);
     }, 200);
   });
@@ -2635,6 +2644,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     };
     let lastY = 0;
     let holdY = null;
+    let trackDocumentTop = 0;
+    let paintedY = null, paintedHeadY = null;
     let workReadingState = { active: false };
     const measure = () => {
       readGutter();
@@ -2678,6 +2689,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
          the card unpins — a plain sticky rise, no pull-up, no occlusion, no cut. */
       const next = nextSheet();
       if (next) next.style.setProperty('margin-top', (-cardH) + 'px', 'important');
+      trackDocumentTop = track.getBoundingClientRect().top + window.scrollY;
     };
     /* getComputedStyle is a style-recalc barrier; this was being called several
        times per scroll event for a value that only changes on resize. Cached,
@@ -2748,10 +2760,11 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
        synchronous relayout, several times per scroll event. */
     const drive = () => {
       raf = 0;
+      if (document.body.dataset.room !== 'design') return;
 
       /* ---- reads ---- */
       const g = gutter();
-      const trackTop = track.getBoundingClientRect().top;
+      const trackTop = trackDocumentTop - window.scrollY;
       const cardTop = card.getBoundingClientRect().top;
       const local = g - trackTop;
       let y = Math.min(overflow, Math.max(0, local));
@@ -2779,11 +2792,15 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
       /* ---- writes ---- */
       lastY = y;
-      reel.style.transform = 'translate3d(0,' + (-y) + 'px,0)';
+      if (y !== paintedY) {
+        reel.style.transform = 'translate3d(0,' + (-y) + 'px,0)';
+        paintedY = y;
+      }
       /* slide the head up until the tabs reach the top, then hold — the heading
          scrolls away while ONLY the tabs stay pinned (owner). */
-      if (headY !== null && headEl) {
+      if (headY !== null && headEl && headY !== paintedHeadY) {
         headEl.style.transform = 'translate3d(0,' + headY + 'px,0)';
+        paintedHeadY = headY;
       }
       applyCovered(cardTop, g);
       rememberReading(local);
@@ -2792,6 +2809,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       if (!raf) raf = requestAnimationFrame(drive);
     };
     const remeasure = () => {
+      paintedHeadY = null;
       if (track.dataset.holdTrack === '1') {
         if (track.dataset.trackHLock) {
           track.style.setProperty('--work-track-h', track.dataset.trackHLock);
@@ -2876,23 +2894,29 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       window.scrollTo({ top: windowTarget, behavior: resolvedBehavior });
       return true;
     };
+    // Mobile browser chrome can emit both resize events in the same frame.
+    // Gallery/font observers can join them: measure once after they settle.
+    let workMeasureFrame = 0;
+    const queueRemeasure = () => {
+      if (workMeasureFrame) return;
+      workMeasureFrame = requestAnimationFrame(() => {
+        workMeasureFrame = 0;
+        remeasure();
+      });
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', remeasure, { passive: true });
-    window.visualViewport?.addEventListener('resize', remeasure, { passive: true });
-    window.addEventListener('bq:gallery-built', remeasure);
-    window.addEventListener('bq:gallery-counts', remeasure);
-    document.addEventListener('bq:language', remeasure);
+    window.addEventListener('resize', queueRemeasure, { passive: true });
+    window.visualViewport?.addEventListener('resize', queueRemeasure, { passive: true });
+    window.addEventListener('bq:gallery-built', queueRemeasure);
+    window.addEventListener('bq:gallery-counts', queueRemeasure);
+    window.addEventListener('bq:css-ready', queueRemeasure);
+    document.addEventListener('bq:language', queueRemeasure);
     if (typeof ResizeObserver === 'function') {
       /* Gallery images land one by one, each resizing the reel. Un-coalesced
          that is one full remeasure — and possibly a scrollTo — per image. */
-      let roFrame = 0;
-      const queueRemeasure = () => {
-        if (roFrame) return;
-        roFrame = requestAnimationFrame(() => { roFrame = 0; remeasure(); });
-      };
       try { new ResizeObserver(queueRemeasure).observe(reel); } catch (e) {}
     }
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure, () => {});
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(queueRemeasure, () => {});
     remeasure();
   })();
 
@@ -2963,6 +2987,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   let frame = 0;
 
+  let lastProgress, lastMix, lastArriving, lastEntered;
+
   const render = () => {
     frame = 0;
     const vh = Math.max(window.innerHeight || 0, 1);
@@ -2973,10 +2999,15 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const eased = raw * raw * (3 - 2 * raw);
     const progress = reduced.matches ? (raw >= .5 ? 1 : 0) : eased;
 
-    root.style.setProperty('--bq-footer-progress', progress.toFixed(4));
-    root.style.setProperty('--bq-footer-mix', (progress * 100).toFixed(2) + '%');
-    body.classList.toggle('footer-arriving', raw > .001);
-    body.classList.toggle('footer-entered', raw > .72);
+    // These inherited variables affect the entire page. During the gallery
+    // both are zero: do not invalidate every card's styles on every frame.
+    const nextProgress = progress.toFixed(4);
+    const nextMix = (progress * 100).toFixed(2) + '%';
+    const arriving = raw > .001, entered = raw > .72;
+    if (nextProgress !== lastProgress) root.style.setProperty('--bq-footer-progress', lastProgress = nextProgress);
+    if (nextMix !== lastMix) root.style.setProperty('--bq-footer-mix', lastMix = nextMix);
+    if (arriving !== lastArriving) body.classList.toggle('footer-arriving', lastArriving = arriving);
+    if (entered !== lastEntered) body.classList.toggle('footer-entered', lastEntered = entered);
   };
 
   const queue = () => {
@@ -3030,7 +3061,30 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
      and how far the next one has risen over it — makes one sheet worth one step
      whatever its track is worth in pixels. Falls back to document scroll for
      any page that is not a deck. */
-  const deckProgress = () => {
+  const designDeck = document.getElementById('design');
+  let gallerySheets = [], galleryPin = 10;
+  const measureGalleryProgress = () => {
+    gallerySheets = Array.from(designDeck?.querySelectorAll(':scope > .paper-sheet') || [])
+      .map(sheet => sheet.querySelector(':scope > .paper-scroll'));
+    if (gallerySheets[0]) galleryPin = parseFloat(getComputedStyle(gallerySheets[0]).top) || 0;
+  };
+  measureGalleryProgress();
+
+  const deckProgress = (top) => {
+    // The paper stack already measures normal-flow offsets whenever content
+    // or the viewport changes. Scrolling the gallery needs only arithmetic,
+    // not computed styles and a forced rectangle read for every sheet.
+    if (document.body.dataset.room === 'design') {
+      const starts = gallerySheets.map(scroller => Number(scroller?.dataset.paperStart));
+      if (starts.length < 2 || starts.some(start => !Number.isFinite(start))) return null;
+      let index = 0;
+      for (let i = 0; i < starts.length; i++) if (starts[i] <= top + 1) index = i;
+      const nextTop = starts[index + 1] + galleryPin - top;
+      const within = index + 1 < starts.length
+        ? Math.min(1, Math.max(0, (window.innerHeight - nextTop) / Math.max(1, window.innerHeight - galleryPin - 1)))
+        : 1;
+      return Math.min(1, Math.max(0, (index + within) / starts.length));
+    }
     const room = document.querySelector('.room:not(.is-hidden).paper-stack');
     if (!room) return null;
     const sheets = room.querySelectorAll(':scope > .paper-sheet');
@@ -3051,11 +3105,11 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     return Math.min(1, Math.max(0, (index + within) / count));
   };
 
-  let shownNow = null;
+  let shownNow = null, lastRingOffset;
   const update = () => {
     const top = window.scrollY || document.scrollingElement?.scrollTop || 0;
     if (!cachedMax) readMax();
-    const deck = deckProgress();
+    const deck = deckProgress(top);
     const progress = deck === null
       ? Math.min(Math.max(top / cachedMax, 0), 1)
       : deck;
@@ -3064,20 +3118,24 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       shownNow = shown;
       control.classList.toggle('is-shown', shown);
     }
-    if (ring) ring.style.strokeDashoffset = String(circumference * (1 - progress));
+    const offset = String(circumference * (1 - progress));
+    if (ring && offset !== lastRingOffset) ring.style.strokeDashoffset = lastRingOffset = offset;
   };
   let ringFrame = 0;
   const queueUpdate = () => {
     if (ringFrame) return;
     ringFrame = requestAnimationFrame(() => { ringFrame = 0; update(); });
   };
-  const onResize = () => { readMax(); queueUpdate(); };
+  const onResize = () => { readMax(); measureGalleryProgress(); queueUpdate(); };
 
   window.addEventListener('scroll', queueUpdate, { passive: true });
   window.addEventListener('touchmove', queueUpdate, { passive: true });
   window.addEventListener('resize', onResize, { passive: true });
+  window.addEventListener('bq:css-ready', onResize);
+  window.addEventListener('bq:gallery-built', onResize);
+  document.addEventListener('bq:route', onResize);
   window.addEventListener('pageshow', update);
-  window.__bqCoreGoUpUpdate = update;
+  window.__bqCoreGoUpUpdate = queueUpdate;
 
   if (!window.__bqTopClickBound) {
     control.addEventListener('click', () => {

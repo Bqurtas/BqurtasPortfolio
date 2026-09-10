@@ -184,6 +184,65 @@ window.BQ_GALLERY = {
     return () => media.removeEventListener('error', advance);
   },
 
+  createVideoPreviews() {
+    const playing = new Set();
+    const hydrate = (video, allowDetached = false) => {
+      // An intersection record can arrive after a category change detached
+      // the card. Wait for its next appearance before starting that request.
+      if (!video || (!video.isConnected && !allowDetached) || video.dataset.mediaExhausted) return false;
+      if (!video.src && video.dataset.src) video.src = video.dataset.src + '#t=0.1';
+      return !!video.src;
+    };
+    const stopWatchingPlayback = (video) => {
+      playing.delete(video);
+      playbackWatcher?.unobserve(video);
+    };
+    const pause = (video) => {
+      if (!video) return;
+      stopWatchingPlayback(video);
+      if (!video.paused) video.pause();
+    };
+    const canObserve = typeof IntersectionObserver === 'function';
+    // Keep the existing prefetch distance so the same first frame is ready
+    // before the card enters. A hydrated video no longer needs scroll work.
+    const preloadWatcher = canObserve ? new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && hydrate(entry.target)) observer.unobserve(entry.target);
+      });
+    }, { rootMargin: '1200px 0px' }) : null;
+    // Only the currently playing previews need visibility notifications.
+    // Paused video covers keep their source/frame without further observers.
+    const playbackWatcher = canObserve ? new IntersectionObserver(entries => {
+      entries.forEach(entry => { if (!entry.isIntersecting) pause(entry.target); });
+    }) : null;
+    const pauseAll = () => Array.from(playing).forEach(pause);
+    return {
+      observe(video) {
+        video.addEventListener('pause', () => { if (video.paused) stopWatchingPlayback(video); });
+        if (preloadWatcher) preloadWatcher.observe(video);
+        else hydrate(video, true);
+      },
+      play(video) {
+        if (!hydrate(video) || !video.paused) return;
+        preloadWatcher?.unobserve(video);
+        playing.add(video);
+        playbackWatcher?.observe(video);
+        video.play().catch(() => { if (video.paused) stopWatchingPlayback(video); });
+      },
+      pause,
+      pauseAll,
+      forget(video) {
+        preloadWatcher?.unobserve(video);
+        pause(video);
+      },
+      reset() {
+        pauseAll();
+        preloadWatcher?.disconnect();
+        playbackWatcher?.disconnect();
+      },
+    };
+  },
+
   all() {
     const list = [];
     for (const k of Object.keys(this.COLLECTIONS)) list.push(...this.items(k));
@@ -234,28 +293,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     'flex','video','other','certificate'
   ];
 
-  /* Attach a video's own source as its card nears the viewport, so the first
-     frame can paint as the cover. Falls back to hydrating everything at once
-     where IntersectionObserver is missing. */
-  const hydrateVideo = (vid) => {
-    if (!vid || vid.src || !vid.dataset.src) return;
-    vid.src = vid.dataset.src + '#t=0.1';
-  };
-  const videoWatcher = typeof IntersectionObserver === 'function'
-    ? new IntersectionObserver((entries, obs) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) { entry.target.pause(); return; }
-          hydrateVideo(entry.target);
-        });
-      }, /* A film fetches its moov atom and a media segment before it can paint
-             a frame, and 400px of lead was not enough of a head start: cards
-             arrived on screen as empty plates and filled a second or two later.
-             Measured, every hydrated video does reach a frame — it just needs
-             to start sooner. 1200px is a little over one screen of warning on
-             a phone, which loads roughly two screens of films at a time rather
-             than the whole category. */
-         { rootMargin: '1200px 0px' })
-    : null;
+  const videoPreviews = window.BQ_GALLERY.createVideoPreviews();
 
   const buildCard = (item) => {
     const article = document.createElement('article');
@@ -314,22 +352,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     /* Preserve the catalogue and masonry position even if a CDN is down. */
     const media = article.querySelector('img, video');
     const markReady = () => article.classList.add('card--media-ready');
-    media.addEventListener('load', markReady);
-    media.addEventListener('loadeddata', markReady);
+    media.addEventListener(item.type === 'video' ? 'loadeddata' : 'load', markReady);
     if (media.tagName === 'IMG' && media.complete && media.naturalHeight) markReady();
     window.BQ_GALLERY.bindMediaFallback(media, [item.url, item.rawUrl], () => {
       article.classList.add('card--media-error');
       article.classList.remove('card--media-ready');
-      if (videoWatcher && media.tagName === 'VIDEO') videoWatcher.unobserve(media);
+      if (media.tagName === 'VIDEO') videoPreviews.forget(media);
       const status = document.createElement('span');
       status.className = 'card-media-status';
       status.textContent = unavailableLabel();
       article.querySelector('.card-art').appendChild(status);
     });
-    if (media.tagName === 'VIDEO') {
-      if (videoWatcher) videoWatcher.observe(media);
-      else hydrateVideo(media);
-    }
+    if (media.tagName === 'VIDEO') videoPreviews.observe(media);
     return article;
   };
 
@@ -355,15 +389,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
   const syncGalleryCounts = () => {
     const counts = computeGalleryCounts();
-    const setCount = (filter, n) => {
-      document.querySelectorAll(`.tab[data-filter="${filter}"]`).forEach(tab => {
-        tab.dataset.workCount = String(n);
-        const el = tab.querySelector('.tab-count');
-        if (el) el.textContent = fmtCount(n);
-      });
-    };
-    setCount('all', counts.total);
-    Object.entries(counts.cats).forEach(([cat, n]) => setCount(cat, n));
+    document.querySelectorAll('.tab[data-filter]').forEach(tab => {
+      const n = tab.dataset.filter === 'all' ? counts.total : counts.cats[tab.dataset.filter];
+      if (n === undefined) return;
+      if (tab.dataset.workCount !== String(n)) tab.dataset.workCount = String(n);
+      const el = tab.querySelector('.tab-count');
+      const label = fmtCount(n);
+      if (el && el.textContent !== label) el.textContent = label;
+    });
     try { window.dispatchEvent(new CustomEvent('bq:gallery-counts', { detail: counts })); } catch (e) {}
     return counts;
   };
@@ -392,8 +425,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   })();
   window.__bqRefreshGalleryFromManifest = async () => {
     await window.BQ_GALLERY.loadManifest({ force: true });
-    (window.BQ_ALL_CARDS || []).forEach(entry => entry.el?.querySelector('video')?.pause());
-    videoWatcher?.disconnect();
+    videoPreviews.reset();
     const counts = buildGalleryCards();
     if (window.__bqInitLightbox) window.__bqInitLightbox();
     if (window.__bqRenderGallery) window.__bqRenderGallery(true);
@@ -449,26 +481,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   grid.addEventListener('mouseover', e => {
     if (!hoverMotion.matches || navigator.connection?.saveData) return;
     const card = e.target.closest('.card--photo');
-    if (!card || card.contains(e.relatedTarget)) return;
+    if (!card || card.dataset.type !== 'video' || card.contains(e.relatedTarget)) return;
     const vid  = card?.querySelector('video');
     if (!vid || vid.dataset.mediaExhausted) return;
-    hydrateVideo(vid);
-    if (vid.paused) vid.play().catch(() => {});
+    videoPreviews.play(vid);
   });
   grid.addEventListener('mouseout', e => {
     const card = e.target.closest('.card--photo');
-    if (!card || card.contains(e.relatedTarget)) return;
+    if (!card || card.dataset.type !== 'video' || card.contains(e.relatedTarget)) return;
     const vid  = card?.querySelector('video');
-    if (vid) vid.pause();
+    videoPreviews.pause(vid);
   });
-  const pausePreviews = () => (window.BQ_ALL_CARDS || []).forEach(entry => entry.el?.querySelector('video')?.pause());
+  const pausePreviews = () => videoPreviews.pauseAll();
   document.addEventListener('visibilitychange', () => { if (document.hidden) pausePreviews(); });
   document.addEventListener('bq:route', pausePreviews);
   document.addEventListener('bq:lightbox-open', pausePreviews);
   hoverMotion.addEventListener?.('change', () => { if (!hoverMotion.matches) pausePreviews(); });
-
-  /* Tab counts */
-  syncGalleryCounts();
 
   /* Lightbox, then render the gallery via the masonry engine in main.js */
   if (window.__bqInitLightbox)  window.__bqInitLightbox();

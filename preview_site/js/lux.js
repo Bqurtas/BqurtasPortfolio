@@ -12,7 +12,9 @@
   var curtainDoneMs = 1660;
   window.__bqRouteCurtainCoverMs = curtainCoverMs;
 
-  /* ---- B&W → colour on the gallery cards ---- */
+  /* The portfolio explicitly paints media in full colour. Preserve the colour
+     reveal for other cards without observing or marking every masonry item. */
+  var colorSelector = '.card:not([data-lux]):not(#grid .card)';
   var colorObs = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
       if (e.isIntersecting) { e.target.classList.add('is-color'); colorObs.unobserve(e.target); }
@@ -20,22 +22,28 @@
   }, { threshold: 0.12, rootMargin: '0px 0px -7% 0px' });
 
   function scanCards() {
-    document.querySelectorAll('.card:not([data-lux])').forEach(function (c) {
+    document.querySelectorAll(colorSelector).forEach(function (c) {
       c.dataset.lux = '1';
       c.classList.add('lux-gray');
       if (reduce) { c.classList.add('is-color'); return; }
       colorObs.observe(c);
     });
   }
-  // Debounce: only observe AFTER the masonry has positioned the cards — otherwise
-  // every freshly-injected card is briefly stacked at the top, reads as "in view",
-  // and colours at once (so the B&W → colour-on-scroll effect is never seen).
+  // Coalesce newly inserted cards outside the portfolio.
   var scanTimer;
   function queueScan() { clearTimeout(scanTimer); scanTimer = setTimeout(scanCards, 280); }
   queueScan();
 
-  var grid = document.getElementById('grid');
-  if (grid) new MutationObserver(queueScan).observe(grid, { childList: true, subtree: true });
+  if (typeof MutationObserver !== 'undefined') new MutationObserver(function (records) {
+    var addedCard = records.some(function (record) {
+      if (record.target.closest?.('#grid')) return false;
+      return Array.from(record.addedNodes).some(function (node) {
+        if (node.nodeType !== 1 || node.id === 'grid' || node.closest?.('#grid')) return false;
+        return node.matches(colorSelector) || node.querySelector(colorSelector);
+      });
+    });
+    if (addedCard) queueScan();
+  }).observe(document.body, { childList: true, subtree: true });
 
   /* ---- reveal-on-scroll (runs even with Reduce Motion — a gentle fade keeps the
      page from feeling dead; the heavier continuous motion stays gated) ---- */

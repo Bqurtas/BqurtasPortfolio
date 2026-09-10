@@ -2190,8 +2190,8 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=cc722224dcb1"></script>
-  <script defer src="js/gallery.v420.min.js?v=c8074cd76993"></script>
+  <script defer src="js/main.v420.min.js?v=c85d2080100c"></script>
+  <script defer src="js/gallery.v420.min.js?v=31193c255c08"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
        still receive them immediately. This removes their database/GitHub work
@@ -2210,7 +2210,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=4545e9124e29';
+        s.src = 'js/enhance.v420.min.js?v=8ffde861675c';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -2249,7 +2249,7 @@
       }, true);
     }());
   </script>
-  <script defer src="js/lux.min.js?v=4687eeaa96da"></script>
+  <script defer src="js/lux.min.js?v=492e87a6ffdc"></script>
   <script defer src="js/motion.min.js?v=282b683a1d19"></script>
   <!-- The chatbot knowledge base is loaded only when a visitor shows intent. -->
   <script>
@@ -2335,7 +2335,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=22052c39f899', { updateViaCache: 'none' })
+            .register('/sw.js?v=34a1628d15a2', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });
