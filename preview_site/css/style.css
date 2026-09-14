@@ -13672,8 +13672,10 @@ body::before{ display:none !important; content:none !important; }
   filter:none !important;
   transition:none !important;
   will-change:auto !important;
-  content-visibility:auto;
-  contain-intrinsic-size:auto 340px;
+  /* Captions and aspect ratios must keep the reel's height stable while
+     scrolling. Skip only media descendants, never a guessed card height. */
+  content-visibility:visible;
+  contain-intrinsic-size:none;
 }
 #grid .card.card--photo *{ cursor:inherit; }
 #grid .card-open{
@@ -13707,6 +13709,10 @@ body::before{ display:none !important; content:none !important; }
   will-change:auto !important;
 }
 #grid .card.card--plate .card-art{ background:#e8e9eb !important; }
+#grid .card.card--photo .card-art{
+  content-visibility:auto;
+  contain-intrinsic-size:none;
+}
 #grid .card .card-art img,
 #grid .card .card-art video,
 #grid .card.portfolio-scroll-card .card-art img,

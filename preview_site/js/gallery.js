@@ -184,8 +184,10 @@ window.BQ_GALLERY = {
     return () => media.removeEventListener('error', advance);
   },
 
-  createVideoPreviews() {
+  createVideoPreviews({ root = null } = {}) {
     const playing = new Set();
+    const preloadVideos = new Map();
+    const preloadTargets = new Map();
     const hydrate = (video, allowDetached = false) => {
       // An intersection record can arrive after a category change detached
       // the card. Wait for its next appearance before starting that request.
@@ -203,13 +205,23 @@ window.BQ_GALLERY = {
       if (!video.paused) video.pause();
     };
     const canObserve = typeof IntersectionObserver === 'function';
+    const stopWatchingPrefetch = (video) => {
+      const target = preloadTargets.get(video);
+      if (!target) return;
+      preloadWatcher?.unobserve(target);
+      preloadTargets.delete(video);
+      preloadVideos.delete(target);
+    };
     // Keep the existing prefetch distance so the same first frame is ready
-    // before the card enters. A hydrated video no longer needs scroll work.
-    const preloadWatcher = canObserve ? new IntersectionObserver((entries, observer) => {
+    // before the card enters the clipped work viewport. Observe the sized
+    // frame so content-visibility cannot defer geometry for its child video.
+    // A hydrated video no longer needs scroll work.
+    const preloadWatcher = canObserve ? new IntersectionObserver(entries => {
       entries.forEach(entry => {
-        if (entry.isIntersecting && hydrate(entry.target)) observer.unobserve(entry.target);
+        const video = preloadVideos.get(entry.target);
+        if (entry.isIntersecting && hydrate(video)) stopWatchingPrefetch(video);
       });
-    }, { rootMargin: '1200px 0px' }) : null;
+    }, { root, rootMargin: '1200px 0px' }) : null;
     // Only the currently playing previews need visibility notifications.
     // Paused video covers keep their source/frame without further observers.
     const playbackWatcher = canObserve ? new IntersectionObserver(entries => {
@@ -219,12 +231,18 @@ window.BQ_GALLERY = {
     return {
       observe(video) {
         video.addEventListener('pause', () => { if (video.paused) stopWatchingPlayback(video); });
-        if (preloadWatcher) preloadWatcher.observe(video);
+        if (preloadWatcher) {
+          stopWatchingPrefetch(video);
+          const target = video.closest?.('.card-art') || video;
+          preloadVideos.set(target, video);
+          preloadTargets.set(video, target);
+          preloadWatcher.observe(target);
+        }
         else hydrate(video, true);
       },
       play(video) {
         if (!hydrate(video) || !video.paused) return;
-        preloadWatcher?.unobserve(video);
+        stopWatchingPrefetch(video);
         playing.add(video);
         playbackWatcher?.observe(video);
         video.play().catch(() => { if (video.paused) stopWatchingPlayback(video); });
@@ -232,12 +250,14 @@ window.BQ_GALLERY = {
       pause,
       pauseAll,
       forget(video) {
-        preloadWatcher?.unobserve(video);
+        stopWatchingPrefetch(video);
         pause(video);
       },
       reset() {
         pauseAll();
         preloadWatcher?.disconnect();
+        preloadVideos.clear();
+        preloadTargets.clear();
         playbackWatcher?.disconnect();
       },
     };
@@ -293,7 +313,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     'flex','video','other','certificate'
   ];
 
-  const videoPreviews = window.BQ_GALLERY.createVideoPreviews();
+  const videoPreviews = window.BQ_GALLERY.createVideoPreviews({ root: grid.closest('.work-vp') });
 
   const buildCard = (item) => {
     const article = document.createElement('article');

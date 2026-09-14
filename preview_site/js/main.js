@@ -517,6 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
           window.scrollTo({ top: restore, left: 0, behavior: 'auto' });
         }
         menuScrollY = 0;
+        document.dispatchEvent(new CustomEvent('bq:menu-closed'));
       }, 840);   /* matches the .8s Voxo slide-home */
       if (lastMenuTrigger && document.contains(lastMenuTrigger)) {
         try { lastMenuTrigger.focus({ preventScroll: true }); } catch (e) { lastMenuTrigger.focus(); }
@@ -970,32 +971,37 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   let portfolioRevealObserver = null;
+  let portfolioRevealFrame = 0;
+  const pendingPortfolioReveals = new Map();
   const prepPortfolioReveal = (card, colIndex, media, rank) => {
     if (!card) return;
     card.classList.remove('portfolio-in');
     card.classList.add('portfolio-scroll-card');
     card.style.setProperty('--portfolio-delay', '0ms');
 
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
-      requestAnimationFrame(() => card.classList.add('portfolio-in'));
-      return;
-    }
-
-    const observeCard = () => {
-      if (!card.isConnected) return;
-      if (!portfolioRevealObserver) {
-        portfolioRevealObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            entry.target.classList.add('portfolio-in');
-            portfolioRevealObserver.unobserve(entry.target);
-          });
-        }, { threshold: 0.01, rootMargin: '0px 0px 18% 0px' });
-      }
-      portfolioRevealObserver.observe(card);
-    };
-
-    requestAnimationFrame(observeCard);
+    pendingPortfolioReveals.set(card, matchMedia('(prefers-reduced-motion: reduce)').matches
+      || !('IntersectionObserver' in window));
+    if (portfolioRevealFrame) return;
+    // All cards placed in this turn share one frame; registration still waits
+    // until masonry has connected them and preserves the existing reveal mode.
+    portfolioRevealFrame = requestAnimationFrame(() => {
+      portfolioRevealFrame = 0;
+      pendingPortfolioReveals.forEach((immediate, pendingCard) => {
+        if (immediate) { pendingCard.classList.add('portfolio-in'); return; }
+        if (!pendingCard.isConnected) return;
+        if (!portfolioRevealObserver) {
+          portfolioRevealObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add('portfolio-in');
+              portfolioRevealObserver.unobserve(entry.target);
+            });
+          }, { threshold: 0.01, rootMargin: '0px 0px 18% 0px' });
+        }
+        portfolioRevealObserver.observe(pendingCard);
+      });
+      pendingPortfolioReveals.clear();
+    });
   };
 
   const buildColumns = (n) => {
@@ -1229,6 +1235,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.getElementById('loadMoreBtn')?.addEventListener('click', () => {
+    window.__bqPrepareWorkAppend?.();
     clearWorkOverflowFloor();
     window.__bqRenderGallery(false);
   });
@@ -1947,8 +1954,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     return meter;
   };
 
-  const updatePaperMeter = (sheet, scroller, overflow, { measure = false } = {}) => {
-    const meter = ensurePaperMeter(sheet);
+  const updatePaperMeter = (sheet, scroller, overflow, { measure = false, metrics = null } = {}) => {
+    const meter = metrics ? metrics.meter : ensurePaperMeter(sheet);
     if (!meter) return;
     const active = overflow > 0;
     sheet.classList.toggle('has-paper-overflow', active);
@@ -1962,16 +1969,18 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     }
     let trackHeight = Number(meter.dataset.trackHeight);
     let thumbHeight = Number(meter.dataset.thumbHeight);
-    if (measure || !Number.isFinite(trackHeight) || !Number.isFinite(thumbHeight)) {
-      trackHeight = Math.max(1, meter.clientHeight || sheet.clientHeight - 112);
-      thumbHeight = Math.min(trackHeight, Math.max(30, trackHeight * (scroller.clientHeight / scroller.scrollHeight)));
+    if (metrics || measure || !Number.isFinite(trackHeight) || !Number.isFinite(thumbHeight)) {
+      trackHeight = metrics ? metrics.trackHeight : Math.max(1, meter.clientHeight || sheet.clientHeight - 112);
+      thumbHeight = metrics ? metrics.thumbHeight
+        : Math.min(trackHeight, Math.max(30, trackHeight * (scroller.clientHeight / scroller.scrollHeight)));
       meter.dataset.trackHeight = String(trackHeight);
       meter.dataset.thumbHeight = String(thumbHeight);
       meter.style.setProperty('--bq-meter-h', `${thumbHeight.toFixed(2)}px`);
     }
-    const progress = overflow > 0 ? Math.min(1, Math.max(0, scroller.scrollTop / overflow)) : 0;
+    const scrollTop = metrics ? metrics.scrollTop : scroller.scrollTop;
+    const progress = overflow > 0 ? Math.min(1, Math.max(0, scrollTop / overflow)) : 0;
     meter.style.setProperty('--bq-meter-y', `${((trackHeight - thumbHeight) * progress).toFixed(2)}px`);
-    sheet.classList.toggle('is-paper-reading', scroller.scrollTop > 1 && scroller.scrollTop < overflow - 1);
+    sheet.classList.toggle('is-paper-reading', scrollTop > 1 && scrollTop < overflow - 1);
   };
 
   const ensurePaperSpacer = (sheet, scroller) => {
@@ -2071,6 +2080,10 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const target = event.target;
     if (!target?.closest) return;
     if (target.closest('.section.work > .paper-scroll')) {
+      // A tap already targets visible content. If it loads another batch,
+      // following that button on the next frame jumps past the new cards.
+      // Keep automatic reveal for keyboard focus, where it is needed.
+      if (!target.matches(':focus-visible')) return;
       requestAnimationFrame(() => {
         window.__bqScrollWorkTarget?.(target, { behavior: 'auto', block: 'nearest' });
       });
@@ -2136,6 +2149,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
     const render = () => {
       frame = 0;
+      if (document.body.classList.contains('menu-open') || document.body.classList.contains('menu-closing')) return;
       if (inactive()) {
         resetVisuals();
         return;
@@ -2240,6 +2254,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
     const measure = () => {
       measureFrame = 0;
+      if (document.body.classList.contains('menu-open') || document.body.classList.contains('menu-closing')) return;
       if (inactive()) {
         resetVisuals();
         return;
@@ -2256,33 +2271,40 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       const rootSheets = sheets.filter((sheet) => sheet.parentElement === root);
       const tailSheet = rootSheets[rootSheets.length - 1] || null;
       let tailTrack = 0;
-      sheets.forEach((sheet) => {
+      const measurements = sheets.map((sheet) => {
         const scroller = sheet.querySelector(':scope > .paper-scroll');
-        if (!scroller) return;
+        if (!scroller) return null;
         const allowInner = allowsInnerScroll(sheet);
         const readingSpacer = allowInner
           ? scroller.querySelector(':scope > .paper-reading-spacer')
           : null;
-        /* The absolute breathing spacer defines a minimum track via max(), not
-           addition. Measure the authored content once without it so a genuine
-           20–80px overflow is never mistaken for spacer-only travel. */
+        return { sheet, scroller, allowInner, readingSpacer, meter: ensurePaperMeter(sheet) };
+      }).filter(Boolean);
+      /* Hide every breathing spacer before the first size read. Alternating
+         hide/read/restore for each sheet forced layout twice per sheet. */
+      measurements.forEach(({ readingSpacer }) => {
         if (readingSpacer) readingSpacer.style.setProperty('display', 'none', 'important');
-        const naturalOverflow = allowInner
+      });
+      measurements.forEach((entry) => {
+        const { scroller, allowInner } = entry;
+        entry.naturalOverflow = allowInner
           ? Math.max(0, scroller.scrollHeight - scroller.clientHeight)
           : 0;
+      });
+      measurements.forEach(({ readingSpacer }) => {
         if (readingSpacer) readingSpacer.style.removeProperty('display');
-        const rawOverflow = allowInner
-          ? Math.max(0, scroller.scrollHeight - scroller.clientHeight)
-          : 0;
+      });
+      measurements.forEach((entry) => {
+        const { sheet, scroller, allowInner, naturalOverflow } = entry;
         /* Hold a card only for reading its OWN content. This used to measure
-           rawOverflow — the authored content plus the breathing spacer — so a
+           the authored content plus the breathing spacer — so a
            page whose content fit comfortably still held for ~80px of scroll,
            which reads as an inner scroll on a page that has nothing to scroll.
            Measuring the authored content alone means a card that fits simply
            hands over to the next one. Sub-pixel/font rounding is ignored. */
         const overflow = naturalOverflow > 12 ? Math.ceil(naturalOverflow) : 0;
         const hasNaturalOverflow = overflow > 0;
-        void rawOverflow;
+        entry.overflow = overflow;
 
         /* Hold the paper for exactly its interior reading distance. Native
            window scroll then advances the content and releases the next card. */
@@ -2312,9 +2334,20 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
           scroller.removeAttribute('role');
           scroller.removeAttribute('aria-label');
         }
-        updatePaperMeter(sheet, scroller, overflow, { measure: true });
+        // Establish meter visibility before measuring all meters together.
+        sheet.classList.toggle('has-paper-overflow', hasNaturalOverflow);
         if (allowInner) sheet.dataset.paperScroll = 'inner';
         else delete sheet.dataset.paperScroll;
+      });
+      measurements.forEach((entry) => {
+        const { sheet, scroller, meter, overflow } = entry;
+        if (!meter || !overflow) { entry.meterMetrics = { meter }; return; }
+        const trackHeight = Math.max(1, meter.clientHeight || sheet.clientHeight - 112);
+        const thumbHeight = Math.min(trackHeight, Math.max(30, trackHeight * (scroller.clientHeight / scroller.scrollHeight)));
+        entry.meterMetrics = { meter, trackHeight, thumbHeight, scrollTop: scroller.scrollTop };
+      });
+      measurements.forEach(({ sheet, scroller, overflow, meterMetrics }) => {
+        updatePaperMeter(sheet, scroller, overflow, { metrics: meterMetrics });
       });
 
       /* Give the final card a real sibling to travel against. Padding on the
@@ -2419,6 +2452,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       queueMeasure();
     });
     document.addEventListener('bq:language', queueMeasure);
+    document.addEventListener('bq:menu-closed', queueMeasure);
 
     const resizeObserver = typeof ResizeObserver === 'function'
       ? new ResizeObserver(queueMeasure)
@@ -2644,7 +2678,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     };
     let lastY = 0;
     let holdY = null;
-    let trackDocumentTop = 0;
+    let pendingAppendOffset = null;
     let paintedY = null, paintedHeadY = null;
     let workReadingState = { active: false };
     const measure = () => {
@@ -2689,7 +2723,6 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
          the card unpins — a plain sticky rise, no pull-up, no occlusion, no cut. */
       const next = nextSheet();
       if (next) next.style.setProperty('margin-top', (-cardH) + 'px', 'important');
-      trackDocumentTop = track.getBoundingClientRect().top + window.scrollY;
     };
     /* getComputedStyle is a style-recalc barrier; this was being called several
        times per scroll event for a value that only changes on resize. Cached,
@@ -2761,10 +2794,13 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const drive = () => {
       raf = 0;
       if (document.body.dataset.room !== 'design') return;
+      if (document.body.classList.contains('menu-open') || document.body.classList.contains('menu-closing')) return;
 
       /* ---- reads ---- */
       const g = gutter();
-      const trackTop = trackDocumentTop - window.scrollY;
+      // The menu temporarily transforms the page stage. Its screen position
+      // cannot be cached across a resize while that transition is in progress.
+      const trackTop = track.getBoundingClientRect().top;
       const cardTop = card.getBoundingClientRect().top;
       const local = g - trackTop;
       let y = Math.min(overflow, Math.max(0, local));
@@ -2809,6 +2845,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       if (!raf) raf = requestAnimationFrame(drive);
     };
     const remeasure = () => {
+      if (document.body.dataset.room !== 'design') return;
+      if (document.body.classList.contains('menu-open') || document.body.classList.contains('menu-closing')) return;
       paintedHeadY = null;
       if (track.dataset.holdTrack === '1') {
         if (track.dataset.trackHLock) {
@@ -2819,12 +2857,15 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       const oldSpan = overflow + cardH;
       const liveLocal = gutter() - track.getBoundingClientRect().top;
       const tolerance = Math.max(48, cardH * .25);
-      const saved = workReadingState.active
+      const saved = pendingAppendOffset !== null
+        ? { phase: 'reel', offset: pendingAppendOffset }
+        : workReadingState.active
         && document.body.dataset.room === 'design'
         && liveLocal >= -tolerance
         && liveLocal <= oldSpan + tolerance
         ? { ...workReadingState }
         : null;
+      pendingAppendOffset = null;
       if (track.dataset.skipChrome !== '1') placeChrome();
       measure();
       if (saved) {
@@ -2856,6 +2897,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     window.__bqResetWorkReel = () => {
       lastY = 0;
       holdY = null;
+      pendingAppendOffset = null;
       const trackTop = track.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({ top: Math.max(0, trackTop - gutter()), left: 0, behavior: 'auto' });
       drive();
@@ -2904,12 +2946,21 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         remeasure();
       });
     };
+    window.__bqPrepareWorkAppend = () => {
+      // The load button remains visible during the handoff hold. Growing the
+      // reel must keep the images here, rather than preserve the NEW reel end.
+      pendingAppendOffset = lastY;
+      holdY = null;
+      queueRemeasure();
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', queueRemeasure, { passive: true });
     window.visualViewport?.addEventListener('resize', queueRemeasure, { passive: true });
     window.addEventListener('bq:gallery-built', queueRemeasure);
     window.addEventListener('bq:gallery-counts', queueRemeasure);
     window.addEventListener('bq:css-ready', queueRemeasure);
+    document.addEventListener('bq:route', queueRemeasure);
+    document.addEventListener('bq:menu-closed', queueRemeasure);
     document.addEventListener('bq:language', queueRemeasure);
     if (typeof ResizeObserver === 'function') {
       /* Gallery images land one by one, each resizing the reel. Un-coalesced
@@ -3064,9 +3115,9 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   const designDeck = document.getElementById('design');
   let gallerySheets = [], galleryPin = 10;
   const measureGalleryProgress = () => {
-    gallerySheets = Array.from(designDeck?.querySelectorAll(':scope > .paper-sheet') || [])
-      .map(sheet => sheet.querySelector(':scope > .paper-scroll'));
-    if (gallerySheets[0]) galleryPin = parseFloat(getComputedStyle(gallerySheets[0]).top) || 0;
+    const sheets = Array.from(designDeck?.querySelectorAll(':scope > .paper-sheet') || []);
+    gallerySheets = sheets.map(sheet => sheet.querySelector(':scope > .paper-scroll'));
+    if (sheets[0]) galleryPin = parseFloat(getComputedStyle(sheets[0]).top) || 0;
   };
   measureGalleryProgress();
 

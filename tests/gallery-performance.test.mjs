@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 const source = await readFile(new URL('../preview_site/js/gallery.js', import.meta.url), 'utf8');
 
-function setup({ observers = true } = {}) {
+function setup({ observers = true, root = null } = {}) {
   const instances = [];
   class Observer {
     constructor(callback, options) { this.callback = callback; this.options = options; this.targets = new Set(); instances.push(this); }
@@ -18,7 +18,7 @@ function setup({ observers = true } = {}) {
   const context = { window, document: { addEventListener() {} } };
   if (observers) context.IntersectionObserver = Observer;
   vm.runInNewContext(source, context);
-  return { controller: window.BQ_GALLERY.createVideoPreviews(), instances, window };
+  return { controller: window.BQ_GALLERY.createVideoPreviews({ root }), instances, window };
 }
 
 function video(index = 1) {
@@ -34,6 +34,24 @@ function video(index = 1) {
 }
 
 const intersects = target => ({ target, isIntersecting: true });
+
+test('video prefetch uses the clipped gallery root and its sized card frame', () => {
+  const root = {};
+  const { controller, instances: [prefetch, playback] } = setup({ root });
+  const media = video();
+  const frame = {};
+  media.closest = selector => selector === '.card-art' ? frame : null;
+  controller.observe(media);
+  assert.equal(prefetch.options.root, root, 'prefetch margin must extend the gallery viewport instead of being clipped by it');
+  assert.equal(prefetch.options.rootMargin, '1200px 0px');
+  assert.equal(prefetch.targets.has(frame), true, 'the sized frame remains observable while its video contents are skipped');
+  assert.equal(prefetch.targets.has(media), false);
+  assert.equal(playback.options?.root ?? null, null, 'playback visibility must still use the browser viewport');
+  prefetch.emit([intersects(frame)]);
+  assert.equal(media.src, `${media.dataset.src}#t=0.1`);
+  assert.equal(prefetch.targets.size, 0, 'the frame is unobserved after its video hydrates');
+  assert.equal(playback.targets.size, 0, 'prefetch must not start playback tracking');
+});
 
 test('hydrated video covers leave the prefetch observer without changing their first-frame source', () => {
   const { controller, instances: [prefetch, playback] } = setup();
@@ -52,15 +70,50 @@ test('hydrated video covers leave the prefetch observer without changing their f
 test('stale intersection records do not fetch detached cards and returning cards still hydrate', () => {
   const { controller, instances: [prefetch] } = setup();
   const media = video();
+  const frame = {};
+  media.closest = () => frame;
   controller.observe(media);
   media.isConnected = false;
-  prefetch.emit([intersects(media)]);
+  prefetch.emit([intersects(frame)]);
   assert.equal(media.src, '');
-  assert.equal(prefetch.targets.has(media), true);
+  assert.equal(prefetch.targets.has(frame), true);
   media.isConnected = true;
-  prefetch.emit([intersects(media)]);
+  prefetch.emit([intersects(frame)]);
   assert.equal(media.src, `${media.dataset.src}#t=0.1`);
-  assert.equal(prefetch.targets.has(media), false);
+  assert.equal(prefetch.targets.has(frame), false);
+});
+
+test('playing a preview removes its frame prefetch and observes only the video for playback', () => {
+  const { controller, instances: [prefetch, playback] } = setup({ root: {} });
+  const media = video();
+  const frame = {};
+  media.closest = () => frame;
+  controller.observe(media);
+  controller.play(media);
+  assert.equal(prefetch.targets.size, 0);
+  assert.equal(playback.targets.has(media), true);
+  assert.equal(playback.targets.has(frame), false);
+  assert.equal(media.plays, 1);
+  playback.emit([{ target: media, isIntersecting: false }]);
+  assert.equal(media.paused, true);
+  assert.equal(playback.targets.size, 0);
+});
+
+test('forgetting or resetting a card discards queued frame-prefetch records', () => {
+  for (const operation of ['forget', 'reset']) {
+    const { controller, instances: [prefetch] } = setup();
+    const media = video();
+    const frame = {};
+    media.closest = () => frame;
+    controller.observe(media);
+    controller[operation](media);
+    assert.equal(prefetch.targets.size, 0, `${operation} must remove frame observation`);
+    prefetch.emit([intersects(frame)]);
+    assert.equal(media.src, '', `${operation} must discard its target-to-video mapping`);
+    controller.observe(media);
+    prefetch.emit([intersects(frame)]);
+    assert.equal(media.src, `${media.dataset.src}#t=0.1`, 'a returning card can be observed again');
+  }
 });
 
 test('only actively playing previews need viewport checks or global pause work', () => {
