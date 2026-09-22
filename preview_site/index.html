@@ -616,9 +616,9 @@
     @media (max-width:1024px){.rail{display:none!important}.mobilebar{display:flex!important}.main,[dir=rtl] .main{margin-left:0!important;margin-right:0!important;padding-top:0!important}.design-cta{display:none!important}}
     html.bq-compact .rail{display:none!important}html.bq-compact .mobilebar{display:flex!important}html.bq-compact .main,[dir=rtl] html.bq-compact .main{margin-left:0!important;margin-right:0!important}
   </style>
-  <link rel="preload" as="style" href="css/style.v417.min.css?v=e8fbc1bbf0ea" data-href="css/style.v417.min.css?v=e8fbc1bbf0ea" fetchpriority="high" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.min.css?v=63cb4022d6c4">
-  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=e8fbc1bbf0ea"></noscript>
+  <link rel="preload" as="style" href="css/style.v417.min.css?v=9c485c05bc5f" data-href="css/style.v417.min.css?v=9c485c05bc5f" fetchpriority="high" id="bqFullCss">
+  <link rel="stylesheet" href="css/modern-framer.min.css?v=eb5d7a15f86f">
+  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=9c485c05bc5f"></noscript>
   <script>
     (function () {
       var root = document.documentElement;
@@ -717,6 +717,8 @@
   </script>
   <link rel="stylesheet" href="css/fonts.css?v=69cf74d1bd04">
   <link rel="stylesheet" href="css/experience.min.css?v=349515ee7bec">
+  <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
+  <link rel="stylesheet" href="css/polish.css?v=41f2e7a3e4f6">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=a65cc728586a" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=a65cc728586a"></noscript>
 
@@ -2335,7 +2337,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=4aba60f09e67', { updateViaCache: 'none' })
+            .register('/sw.js?v=e5324f94b80a', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

@@ -1,25 +1,23 @@
 /* Final presentation layer: native scrolling, a static curved work panel,
    and one precise centre line for the full-screen menu. */
 :root {
-  --bq-accent: #8b5e45;
-  --bq-accent-soft: #6f4a36;
-  --bq-accent-light: #a8785c;
+  --bq-accent: #141414;
+  --bq-accent-soft: #141414;
+  --bq-accent-light: #2a2a2a;
 }
 
 ::selection {
-  background: var(--bq-accent);
+  background: var(--ink, #141414);
   color: #fff;
 }
 
-.rail-dot {
-  background: var(--bq-accent-light) !important;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--bq-accent-light) 18%, transparent) !important;
-}
-
+.rail-dot,
 .design-cta-dot,
-.mobilebar-cta .design-cta-dot {
-  background: var(--accent, #8b5e45) !important;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #8b5e45) 22%, transparent) !important;
+.mobilebar-cta .design-cta-dot,
+.rail-chat-dot,
+.profile-card-dot {
+  background: #2fbf6b !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, #2fbf6b 22%, transparent) !important;
 }
 
 /* The hero is a pinned backdrop: it sticks to the top of the viewport while
@@ -105,7 +103,7 @@
 :root[data-theme="light"] #design > .section.work {
   background:
     radial-gradient(circle, rgba(0, 0, 0, .05) 1px, transparent 1.4px) 0 0 / 26px 26px,
-    radial-gradient(circle at 90% 0%, rgba(139, 94, 69, .06), transparent 26rem),
+    radial-gradient(circle at 90% 0%, rgba(0, 0, 0, .06), transparent 26rem),
     #e8e9eb !important;
   border: 1px solid rgba(20, 20, 20, .12);
   border-bottom: 0;
