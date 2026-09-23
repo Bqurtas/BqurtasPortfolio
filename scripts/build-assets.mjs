@@ -109,7 +109,12 @@ export function stripStaticBlogPosts(sitemap) {
 async function compileJavaScript() {
   for (const [input, output] of jsBundles) {
     const source = await readFile(path.join(siteRoot, input), 'utf8');
-    const result = await minify(source, {
+    // The CDN may retain a stable manifest URL across deployments. Tie the
+    // shipped gallery loader to the exact catalogue used to build this release.
+    const versionedSource = input === 'js/gallery.js'
+      ? await fingerprintVersionedLocalAssets(source)
+      : source;
+    const result = await minify(versionedSource, {
       ecma: 2020,
       compress: { passes: 2 },
       mangle: true,

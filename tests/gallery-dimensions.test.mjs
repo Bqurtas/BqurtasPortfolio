@@ -2,10 +2,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
+import { createHash } from 'node:crypto';
 import { webpDimensions, withOriginalImageDimensions } from '../scripts/generate-gallery-manifest.mjs';
 
 const source = await readFile(new URL('../preview_site/js/gallery.js', import.meta.url), 'utf8');
 const manifest = JSON.parse(await readFile(new URL('../preview_site/assets/gallery-manifest.json', import.meta.url), 'utf8'));
+
+test('the shipped gallery requests the exact manifest for this release instead of a stale CDN key', async () => {
+  const bytes = await readFile(new URL('../preview_site/assets/gallery-manifest.json', import.meta.url));
+  const hash = createHash('sha256').update(bytes).digest('hex').slice(0, 12);
+  const built = await readFile(new URL('../preview_site/js/gallery.v420.min.js', import.meta.url), 'utf8');
+  const requests = [], window = {};
+  vm.runInNewContext(built, {
+    window, document: { addEventListener() {} }, AbortController, setTimeout, clearTimeout,
+    fetch: async url => { requests.push(url); return { ok: true, json: async () => manifest }; },
+  });
+  assert.equal(await window.BQ_GALLERY.loadManifest(), true);
+  assert.deepEqual(requests, [`assets/gallery-manifest.json?v=${hash}`]);
+});
 
 function riff(type, payload) {
   const bytes = Buffer.alloc(20 + payload.length + payload.length % 2);
