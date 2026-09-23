@@ -108,14 +108,17 @@ html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art
     0 0 0 1px color-mix(in srgb, var(--ink) 8%, transparent) !important;
 }
 
-html body #design #grid .card:hover .card-art img,
-html body #design #grid .card:hover .card-art video,
-html body #design #grid .card:focus-within .card-art img,
-html body #design #grid .card:focus-within .card-art video,
-html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art img,
-html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art video {
-  transform: scale(1.07) !important;
-  filter: saturate(1.06) contrast(1.04) !important;
+/* Touch scrolling must not leave a tapped image zoomed and filtered. */
+@media (hover: hover) and (pointer: fine) {
+  html body #design #grid .card:hover .card-art img,
+  html body #design #grid .card:hover .card-art video,
+  html body #design #grid .card:focus-within .card-art img,
+  html body #design #grid .card:focus-within .card-art video,
+  html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art img,
+  html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art video {
+    transform: scale(1.07) !important;
+    filter: saturate(1.06) contrast(1.04) !important;
+  }
 }
 
 html body #design #grid .card-caption .card-tag {

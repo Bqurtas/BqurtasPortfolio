@@ -211,6 +211,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const validRooms = ['design','blog','bio','contact'];
   let restoringHistory = false;
 
+  // Real anchors keep their authored destination (home versus /design) while
+  // sharing the router's language prefix for copied links and new tabs.
+  const routeHrefPaths = new Map();
+  const languagePrefix = new RegExp('^/(?:' + URL_LANGS.join('|') + ')(?=/|$)');
+  routeLinks.forEach(link => {
+    if (link.tagName !== 'A' || !validRooms.includes(link.dataset.route)) return;
+    const href = link.getAttribute('href') || '';
+    if (href === '#') routeHrefPaths.set(link, '/');
+    else if (/^\/(?!\/)/.test(href)) routeHrefPaths.set(link, href.replace(languagePrefix, '') || '/');
+  });
+  const syncRouteHrefs = () => {
+    const language = window.__bqDesiredLang || currentLang;
+    const prefix = URL_LANGS.includes(language) ? '/' + language : '';
+    routeHrefPaths.forEach((path, link) => {
+      link.setAttribute('href', path === '/' ? (prefix || '/') : prefix + path);
+    });
+  };
+  document.addEventListener('bq:language', syncRouteHrefs);
+  syncRouteHrefs();
+
   let triggerReveals = () => {};
   let moveUnderline  = () => {};
 
@@ -251,6 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuWasOpen = Boolean(
       document.getElementById('mobileMenu')?.classList.contains('is-open')
       || document.getElementById('mobileMenu')?.classList.contains('is-ready')
+      || document.getElementById('mobileMenu')?.classList.contains('is-closing')
     );
     rooms.forEach(r => r.classList.toggle('is-hidden', r.id !== id));
     rooms.forEach(r => {
@@ -281,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(() => triggerReveals());
     syncURL(push);
     setDocTitle();
-    if (window.__bqPanels && window.__bqPanels.menu) window.__bqPanels.menu();
+    if (window.__bqPanels && window.__bqPanels.menu) window.__bqPanels.menu({ restoreScroll: false });
     else {
       document.getElementById('mobileMenu')?.classList.remove('is-open', 'is-ready', 'is-closing');
       document.body.classList.remove('menu-open');
@@ -390,9 +411,11 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('scroll', () => {
     queueCta();
     if (document.body.dataset.room !== 'design') return;
+    if (document.body.classList.contains('menu-open') || document.body.classList.contains('menu-closing')) return;
     clearTimeout(__urlResetT);
     __urlResetT = setTimeout(() => {
       if (document.body.dataset.room !== 'design') return;
+      if (document.body.classList.contains('menu-open') || document.body.classList.contains('menu-closing')) return;
       const prefix = (currentLang && currentLang !== 'en') ? '/' + currentLang : '';
       const base = prefix || '/';
       const work = document.querySelector('.section.work');       // "01 — Design Room" + grid
@@ -414,6 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   routeLinks.forEach(a => {
     a.addEventListener('click', (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       const route = a.dataset.route;
       if (!route) return;
       // allow language buttons to keep their own behavior — they don't have data-route
@@ -468,11 +492,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   let menuScrollY = 0;
-  const setMenu = (open, trigger) => {
+  let menuCloseTimer = 0;
+  let menuRestoreScroll = true;
+  const setMenu = (open, trigger, { restoreScroll = true } = {}) => {
     if (!mobileMenu) return;
     if (open && window.__bqExclusive) window.__bqExclusive('menu');   // opening the menu closes chat/Latest/popovers
     cancelAnimationFrame(menuFrame);
     const wasOpen = mobileMenu.classList.contains('is-open') || mobileMenu.classList.contains('is-ready');
+    const wasClosing = mobileMenu.classList.contains('is-closing');
+    if (!open && !restoreScroll) menuRestoreScroll = false;
+    // A route can change beneath the curtain before the menu's close finishes.
+    // Cancel its old scroll destination without removing the transition guards.
+    if (!open && wasClosing) return;
     if (!open && !wasOpen) {
       mobileMenu.classList.remove('is-open', 'is-ready', 'is-closing');
       document.body.classList.remove('menu-open', 'menu-revealed', 'menu-closing');
@@ -482,6 +513,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     if (open) {
+      window.clearTimeout(menuCloseTimer);
+      menuCloseTimer = 0;
       lastMenuTrigger = trigger || document.activeElement;
       const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
       /* Remember where the reader was. body gets overflow:hidden below, and on
@@ -490,8 +523,9 @@ document.addEventListener('DOMContentLoaded', () => {
          page, looking at the hero. The offset was already being written to a
          custom property for the CSS to compensate with; it was never read back
          when the menu closed. */
-      menuScrollY = scrollY;
-      document.body.style.setProperty('--bq-menu-scroll-shift', (-scrollY) + 'px');
+      if ((!wasOpen && !wasClosing) || !menuRestoreScroll) menuScrollY = scrollY;
+      menuRestoreScroll = true;
+      document.body.style.setProperty('--bq-menu-scroll-shift', (-menuScrollY) + 'px');
       mobileMenu.classList.remove('is-closing');
       document.body.classList.remove('menu-closing');
       mobileMenu.classList.add('is-open');
@@ -506,14 +540,15 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.add('menu-closing');
       mobileMenu.classList.remove('is-ready', 'is-open');
       mobileMenu.classList.add('is-closing');
-      /* Put the reader back before the overflow lock lifts, so the page is
-         already in the right place when it can move again. */
-      const restore = menuScrollY;
-      window.setTimeout(() => {
+      // Read the destination at completion: a route selected while this menu
+      // is closing must replace the old page's saved reading position.
+      menuCloseTimer = window.setTimeout(() => {
+        menuCloseTimer = 0;
+        const restore = menuRestoreScroll ? menuScrollY : 0;
         mobileMenu.classList.remove('is-closing');
         document.body.classList.remove('menu-open', 'menu-closing');
         document.body.style.removeProperty('--bq-menu-scroll-shift');
-        if (restore > 0 && Math.abs(window.scrollY - restore) > 2) {
+        if (Math.abs(window.scrollY - restore) > 2) {
           window.scrollTo({ top: restore, left: 0, behavior: 'auto' });
         }
         menuScrollY = 0;
@@ -528,7 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
     syncMenuA11y(open);
   };
   window.__bqPanels = window.__bqPanels || {};
-  window.__bqPanels.menu = () => setMenu(false);
+  window.__bqPanels.menu = (options) => setMenu(false, null, options);
   menuBtn?.addEventListener('click', (event) => setMenu(!mobileMenu?.classList.contains('is-open'), event.currentTarget));
   railMenuBtn?.addEventListener('click', (event) => setMenu(!mobileMenu?.classList.contains('is-open'), event.currentTarget));
   menuCloseBtn?.addEventListener('click', () => setMenu(false));
@@ -554,7 +589,10 @@ document.addEventListener('DOMContentLoaded', () => {
       first.focus();
     }
   });
-  mobileMenu?.querySelectorAll('.mm-link, .mm-touch, .mm-logo').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+  mobileMenu?.querySelectorAll('.mm-link, .mm-touch, .mm-logo').forEach((a) => a.addEventListener('click', (event) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    setMenu(false, null, { restoreScroll: !a.dataset.route });
+  }));
 
   /* Voxo behaviour: while the menu is open the receded page sheet is itself a
      close target — one click anywhere on it slides everything home. */
@@ -1091,6 +1129,10 @@ document.addEventListener('DOMContentLoaded', () => {
        begins below everything already on the page and the reader scrolls
        forward to meet it, every time. */
     if (!reset && currentShown > 0 && mCols.length) {
+      // Loaded fallback media can correct a card's ratio after placement.
+      // Read every column before writing spacers so the next batch uses the
+      // rendered floor without forcing layout between individual cards.
+      mHeights = mCols.map(col => col.offsetHeight);
       const floor = Math.max(...mHeights);
       mCols.forEach((col, i) => {
         const need = floor - mHeights[i];
@@ -2368,25 +2410,10 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       } else if (tailSpacer) {
         tailSpacer.remove();
       }
-      /* The spacer lengthens the room, which is the whole point — but the
-         footer follows the room in flow, so it was being pushed down by the
-         same amount and the reader met 460px of bare bed between the last card
-         and the footer. Pulling the footer back up by exactly the spacer's
-         height puts it where it always was on screen: nothing moves, and the
-         last card still has the travel to stand on. This is the same idiom
-         measure() uses for the portfolio's next sheet. */
-      /* Whatever the tail spacer's height, the incoming paper must not be
-         pushed down by it or a strip of bare bed opens between them. */
-      const tailTerminal = terminalSheet
-        || sheets.filter((sheet) => sheet.parentElement !== root).pop()
-        || null;
-      if (tailTerminal) {
-        if (tailTrack > 0) {
-          tailTerminal.style.setProperty('margin-top', `${-tailTrack}px`, 'important');
-        } else {
-          tailTerminal.style.removeProperty('margin-top');
-        }
-      }
+      /* The footer must follow this added reading distance in normal flow.
+         Cancelling it with a negative margin covers a long final card before
+         its interior reaches the end (including the contact submit button).
+         The final card stays pinned across the spacer, so no blank gap opens. */
 
       /* Build stable normal-flow offsets instead of reading `offsetTop` from a
          sticky element (Chromium reports its painted/stuck position there). */
@@ -2480,6 +2507,10 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         updatePaperMeter(sheet, scroller, Number(scroller.dataset.paperOverflow) || 0);
       }, { passive: true });
       if (scroller && resizeObserver) {
+        // The gallery card stays viewport-sized while its outer track grows.
+        // Observe that real flow height so later papers are measured after the
+        // portfolio has applied new media dimensions or appended a batch.
+        if (sheet.classList.contains('work')) resizeObserver.observe(sheet);
         resizeObserver.observe(scroller);
         [...scroller.children]
           .filter((child) => !child.classList.contains('paper-reading-spacer'))
@@ -2856,6 +2887,10 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       }
       const oldSpan = overflow + cardH;
       const liveLocal = gutter() - track.getBoundingClientRect().top;
+      // Mobile browser chrome can resize before the scroll event from the
+      // same gesture is painted. Preserve that new position, not the previous
+      // frame's reading offset, or scrollTo cancels the native movement.
+      if (raf && pendingAppendOffset === null) rememberReading(liveLocal);
       const tolerance = Math.max(48, cardH * .25);
       const saved = pendingAppendOffset !== null
         ? { phase: 'reel', offset: pendingAppendOffset }
@@ -2958,6 +2993,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     window.visualViewport?.addEventListener('resize', queueRemeasure, { passive: true });
     window.addEventListener('bq:gallery-built', queueRemeasure);
     window.addEventListener('bq:gallery-counts', queueRemeasure);
+    window.addEventListener('bq:gallery-dimensions', queueRemeasure);
     window.addEventListener('bq:css-ready', queueRemeasure);
     document.addEventListener('bq:route', queueRemeasure);
     document.addEventListener('bq:menu-closed', queueRemeasure);

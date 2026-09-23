@@ -616,9 +616,9 @@
     @media (max-width:1024px){.rail{display:none!important}.mobilebar{display:flex!important}.main,[dir=rtl] .main{margin-left:0!important;margin-right:0!important;padding-top:0!important}.design-cta{display:none!important}}
     html.bq-compact .rail{display:none!important}html.bq-compact .mobilebar{display:flex!important}html.bq-compact .main,[dir=rtl] html.bq-compact .main{margin-left:0!important;margin-right:0!important}
   </style>
-  <link rel="preload" as="style" href="css/style.v417.min.css?v=9c485c05bc5f" data-href="css/style.v417.min.css?v=9c485c05bc5f" fetchpriority="high" id="bqFullCss">
+  <link rel="preload" as="style" href="css/style.v417.min.css?v=fb8c952a043a" data-href="css/style.v417.min.css?v=fb8c952a043a" fetchpriority="high" id="bqFullCss">
   <link rel="stylesheet" href="css/modern-framer.min.css?v=eb5d7a15f86f">
-  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=9c485c05bc5f"></noscript>
+  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=fb8c952a043a"></noscript>
   <script>
     (function () {
       var root = document.documentElement;
@@ -718,7 +718,7 @@
   <link rel="stylesheet" href="css/fonts.css?v=69cf74d1bd04">
   <link rel="stylesheet" href="css/experience.min.css?v=349515ee7bec">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.css?v=41f2e7a3e4f6">
+  <link rel="stylesheet" href="css/polish.css?v=b768a1647669">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=a65cc728586a" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=a65cc728586a"></noscript>
 
@@ -2192,8 +2192,8 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=661fee18fee4"></script>
-  <script defer src="js/gallery.v420.min.js?v=2df3acd4c98c"></script>
+  <script defer src="js/main.v420.min.js?v=bc11a3ced97e"></script>
+  <script defer src="js/gallery.v420.min.js?v=4610097b892a"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
        still receive them immediately. This removes their database/GitHub work
@@ -2212,7 +2212,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=8ffde861675c';
+        s.src = 'js/enhance.v420.min.js?v=17d929f3647e';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -2251,7 +2251,7 @@
       }, true);
     }());
   </script>
-  <script defer src="js/lux.min.js?v=492e87a6ffdc"></script>
+  <script defer src="js/lux.min.js?v=b10aaa8c59c6"></script>
   <script defer src="js/motion.min.js?v=282b683a1d19"></script>
   <!-- The chatbot knowledge base is loaded only when a visitor shows intent. -->
   <script>
@@ -2337,7 +2337,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=e5324f94b80a', { updateViaCache: 'none' })
+            .register('/sw.js?v=0a292e7df748', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

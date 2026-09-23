@@ -123,13 +123,9 @@
     window.addEventListener('focus', setAppVhSoon);
     window.addEventListener('load', setAppVhSoon);
 
-    /* ---- Always (re)open at the TOP / the hero ----
-       When the browser is closed and reopened, it restores the old scroll
-       position — so the visitor lands deep in a section instead of the hero.
-       Take control of scroll restoration and reset to the very top on every
-       (re)open: fresh load, refresh, and bfcache/session restore. And when the
-       site was backgrounded and reopened with no reload, go back to the home
-       hero after a short desktop pause or a longer mobile pause. */
+    /* ---- Return to the hero after a long pause in this document ----
+       Fresh loads keep their requested route. A restored or backgrounded tab
+       returns to the home hero only after the five-minute away timer. */
     if ('scrollRestoration' in history) { try { history.scrollRestoration = 'manual'; } catch (e) {} }
     const bqToTop  = () => { try { window.scrollTo(0, 0); } catch (e) {} };
     const bqToHero = () => {
@@ -166,6 +162,9 @@
       bqHiddenAt = 0;
       try { sessionStorage.removeItem(BQ_AWAY_KEY); } catch (e) {}
     };
+    // This script can load after pageshow. A new document must never inherit
+    // the previous document's away timer; bfcache preserves this script's state.
+    bqClearAway();
     const bqResumeHome = () => { bqClearAway(); bqToHero(); };
     const bqResumeIfAway = () => {
       const at = bqHiddenAt || bqStoredAwayAt();
@@ -179,7 +178,10 @@
     window.addEventListener('pagehide', bqStoreAway);
     window.addEventListener('blur', bqStoreAway);
     window.addEventListener('focus', bqResumeIfAway);
-    window.addEventListener('pageshow', () => setTimeout(bqResumeIfAway, 60));
+    window.addEventListener('pageshow', (event) => {
+      if (!event.persisted) { bqClearAway(); return; }
+      setTimeout(bqResumeIfAway, 60);
+    });
 
     /* Some in-app browsers swallow 'scroll' events while their toolbar moves.
        Sample during short interaction bursts instead of running a permanent
@@ -2330,6 +2332,7 @@
            <span class="mono index-row-tag">${esc(q.tag)}</span>`;
         a.addEventListener('mouseenter', () => { setActive(a); preview(p); });
         a.addEventListener('click', (e) => {
+          if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
           e.preventDefault();
           if (!window.matchMedia('(max-width: 1024px)').matches) { openReader(p); return; }
           // Mobile: a tap opens an inline preview under the row; "Read more" opens the full post.
@@ -2567,7 +2570,7 @@
       }).join('');
       grid.querySelectorAll('.blog-card').forEach((c) => {
         c.addEventListener('click', (e) => {
-          if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return; // let new-tab work
+          if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
           e.preventDefault(); const p = findPostBySlug(c.getAttribute('data-slug')); if (p) openReader(p);
         });
       });

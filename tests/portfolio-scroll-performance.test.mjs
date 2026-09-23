@@ -235,6 +235,45 @@ test('resetting the gallery clears a pending append reading position', () => {
   assert.equal(page.reel.style.transform, 'translate3d(0,0px,0)');
 });
 
+for (const { from, to, reelY, phase } of [
+  { from: 1484, to: 1564, reelY: 580, phase: 'reading' },
+  { from: 2964, to: 3034, reelY: 2000, phase: 'entering the end hold' },
+  { from: 1484, to: 5000, reelY: 2000, phase: 'leaving the gallery' },
+]) test(`a viewport resize cannot rewind native scrolling while ${phase}`, () => {
+  const page = workFixture();
+  page.scrollTo(from);
+  page.window.visualViewport.fire('resize');
+  // Browser chrome can resize before the scroll event from the same touch
+  // movement. The pending remeasure must not restore the last painted offset.
+  page.window.scrollY = to;
+  page.window.fire('scroll');
+  page.flush();
+  assert.equal(page.window.scrollY, to);
+  assert.equal(page.reel.style.transform, `translate3d(0,-${reelY}px,0)`);
+  assert.deepEqual(page.scrollCalls, [], 'unchanged geometry must leave native scroll momentum alone');
+});
+
+test('a layout resize still preserves the reading image when no native scroll is pending', () => {
+  const page = workFixture();
+  page.scrollTo(1484);
+  page.setDocumentTop(1200);
+  page.window.visualViewport.fire('resize');
+  page.flush();
+  assert.equal(page.window.scrollY, 1684);
+  assert.equal(page.reel.style.transform, 'translate3d(0,-500px,0)');
+});
+
+test('a corrected gallery media size refreshes the reel height without moving the reader', () => {
+  const page = workFixture();
+  page.scrollTo(1484);
+  page.reel.scrollHeight = 2800;
+  page.window.fire('bq:gallery-dimensions');
+  page.flush();
+  assert.equal(page.track.style['--work-track-h'], '3400px');
+  assert.equal(page.window.scrollY, 1484);
+  assert.equal(page.reel.style.transform, 'translate3d(0,-500px,0)');
+});
+
 test('menu transitions freeze portfolio geometry and refresh it after closure', () => {
   const page = workFixture();
   page.scrollTo(1484);

@@ -63,6 +63,7 @@
     });
     // reveal anything a room-switch brings into view
     document.addEventListener('click', function (ev) {
+      if (ev.defaultPrevented || ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
       if (!ev.target.closest('[data-route]')) return;
       setTimeout(function () {
         document.querySelectorAll('.room:not(.is-hidden) .lux-reveal:not(.lux-in)').forEach(function (el) {
@@ -115,6 +116,7 @@
     };
     window.__bqPlayRoomCurtain = playCurtain;
     document.addEventListener('click', function (ev) {
+      if (ev.defaultPrevented || ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
       var link = ev.target.closest('[data-route]');
       if (!link) return;
       var route = link.getAttribute('data-route');

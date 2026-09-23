@@ -100,9 +100,8 @@ window.BQ_GALLERY = {
   },
 
   /* ── First-party gallery manifest ─────────────────────────────────────
-     The manifest is generated with the exact dimensions of every thumbnail
-     and video. That lets the browser reserve each pin's final height before
-     it loads, eliminating masonry jumps without an external GitHub API call. */
+     Original image/video dimensions reserve the exact authored aspect ratio
+     before thumbnails load. Thumbnail pixel rounding never shapes the frame. */
   async loadManifest({ force = false } = {}) {
     // Concurrent callers must wait for the same manifest, not build from the
     // static catalogue while the first request is still in flight.
@@ -182,6 +181,35 @@ window.BQ_GALLERY = {
     };
     media.addEventListener('error', advance);
     return () => media.removeEventListener('error', advance);
+  },
+
+  syncCardDimensions(card, media, item) {
+    const video = media.tagName === 'VIDEO';
+    const width = video ? media.videoWidth : media.naturalWidth;
+    const height = video ? media.videoHeight : media.naturalHeight;
+    if (!Number.isFinite(width) || width <= 0 || !Number.isFinite(height) || height <= 0) return false;
+    const known = Number.isFinite(item.width) && item.width > 0
+      && Number.isFinite(item.height) && item.height > 0;
+    if (known) {
+      const source = (media.currentSrc || media.src || '').split('#')[0];
+      // A 320px thumbnail can round by half a pixel. Keep the exact original
+      // manifest ratio rather than resizing every card as its thumbnail lands.
+      if (!video && source !== item.url && source !== item.rawUrl) return false;
+      if (Math.abs(height - width * item.height / item.width) <= 0.5) return false;
+    }
+    item.width = width;
+    item.height = height;
+    card.style.setProperty('--card-ratio', `${width} / ${height}`);
+    media.setAttribute('width', String(width));
+    media.setAttribute('height', String(height));
+    // Missing metadata, or a changed original reached through a fallback,
+    // needs one geometry update. Repeated load/metadata events are no-ops.
+    try {
+      window.dispatchEvent(new CustomEvent('bq:gallery-dimensions', {
+        detail: { coll: item.coll, index: item.index, width, height },
+      }));
+    } catch (e) {}
+    return true;
   },
 
   createVideoPreviews({ root = null } = {}) {
@@ -324,7 +352,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const plate = /\.png(\?|$)/i.test(item.url || '') || !!PLATE_CATS[item.cat];
     article.className = 'card card--photo card--pending-media' + (plate ? ' card--plate' : '');
     const fallbackRatio = item.type === 'video' ? '16 / 9' : '4 / 5';
-    const dims = item.width && item.height
+    const dims = Number.isFinite(item.width) && item.width > 0 && Number.isFinite(item.height) && item.height > 0
       ? { width: item.width, height: item.height }
       : window.BQ_GALLERY.dimsFromRatio(fallbackRatio, item.type === 'video' ? 1280 : 320);
     const cardRatio = `${dims.width} / ${dims.height}`;
@@ -371,7 +399,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     /* Preserve the catalogue and masonry position even if a CDN is down. */
     const media = article.querySelector('img, video');
-    const markReady = () => article.classList.add('card--media-ready');
+    const syncDimensions = () => window.BQ_GALLERY.syncCardDimensions(article, media, item);
+    const markReady = () => {
+      syncDimensions();
+      article.classList.add('card--media-ready');
+    };
+    if (item.type === 'video') media.addEventListener('loadedmetadata', syncDimensions);
     media.addEventListener(item.type === 'video' ? 'loadeddata' : 'load', markReady);
     if (media.tagName === 'IMG' && media.complete && media.naturalHeight) markReady();
     window.BQ_GALLERY.bindMediaFallback(media, [item.url, item.rawUrl], () => {

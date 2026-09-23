@@ -117,3 +117,91 @@ test('paper measurement batches spacer reads and paints meters without further s
   assert.equal(events.filter(event => event.endsWith(':scrollHeight')).length, 5,
     'three authored-size reads plus two active-meter reads; no unused rawOverflow reads');
 });
+
+test('a growing work track refreshes following paper anchors even when its viewport stays fixed', () => {
+  const observers = [], frames = [];
+  class Observer {
+    constructor(callback) { this.callback = callback; this.targets = new Set(); observers.push(this); }
+    observe(target) { this.targets.add(target); }
+    resized(target) { if (this.targets.has(target)) this.callback([{ target }]); }
+  }
+  const root = { getBoundingClientRect: () => ({ top: 0 }) };
+  const sheets = [600, 3200, 600].map((height, index) => {
+    const scroller = {
+      dataset: {}, children: [], addEventListener() {}, clientHeight: 600,
+    };
+    const sheet = {
+      parentElement: root, classList: classList(), offsetHeight: height,
+      querySelector: () => scroller, scroller,
+    };
+    if (index === 1) sheet.classList.add('work');
+    return sheet;
+  });
+  const work = sheets[1], following = sheets[2];
+  const offsets = section('      const rootStyle = getComputedStyle(root);', '\n      hasMeasured = true;');
+  const registration = section("    const resizeObserver = typeof ResizeObserver === 'function'", '\n    document.fonts?.ready?.then(queueMeasure');
+  const context = {
+    root, sheets, pin: 16, window: { scrollY: 0 }, ResizeObserver: Observer,
+    getComputedStyle: () => ({ borderTopWidth: '0px', paddingTop: '0px', marginTop: '0px', marginBottom: '0px' }),
+    updatePaperMeter() {},
+    queueMeasure() { frames.push(() => vm.runInNewContext(`{${offsets}}`, context)); },
+  };
+  vm.runInNewContext(registration, context);
+  context.queueMeasure();
+  while (frames.length) frames.shift()();
+  assert.equal(following.scroller.dataset.paperStart, '3784');
+  work.offsetHeight = 5200;
+  observers[0].resized(work);
+  while (frames.length) frames.shift()();
+  assert.equal(work.scroller.clientHeight, 600, 'the pinned card has not resized');
+  assert.equal(following.scroller.dataset.paperStart, '5784', 'the next sheet must follow the new track end');
+  assert.equal(observers[0].targets.has(sheets[0]), false, 'ordinary sheets do not need extra outer-box observers');
+  assert.equal(observers[0].targets.has(following), false);
+});
+
+test('the footer waits for the entire final paper reading distance before covering its controls', () => {
+  const source = section('      /* Give the final card', '\n      hasMeasured = true;');
+  for (const includeFooter of [false, true]) {
+    let spacer = null;
+    const style = () => ({
+      setProperty(name, value) { this[name] = value; },
+      removeProperty(name) { delete this[name]; },
+    });
+    const root = {
+      querySelector: () => spacer,
+      appendChild(node) { spacer = node; this.lastElementChild = node; },
+      getBoundingClientRect: () => ({ top: 10 }),
+      get offsetHeight() { return 2502 + (parseFloat(spacer?.style.height) || 0); },
+    };
+    const sheets = [824, 824, 824].map(height => ({
+      parentElement: root, offsetHeight: height, style: style(), scroller: { dataset: {} },
+      querySelector() { return this.scroller; },
+    }));
+    const footer = {
+      parentElement: {}, offsetHeight: 424, style: style(), scroller: { dataset: {} },
+      querySelector() { return this.scroller; },
+    };
+    const context = {
+      root, sheets: includeFooter ? [...sheets, footer] : sheets,
+      terminalSheet: includeFooter ? null : footer, tailTrack: 1117,
+      pin: 10, window: { scrollY: 0 },
+      document: { createElement: () => ({ style: style(), setAttribute() {}, remove() { spacer = null; } }) },
+      getComputedStyle: node => ({
+        borderTopWidth: '0px', paddingTop: '0px',
+        marginTop: node.style?.['margin-top'] || '0px', marginBottom: '10px',
+      }),
+    };
+    const measure = () => vm.runInNewContext(`{${source}}`, context);
+    measure();
+    const finalStart = Number(sheets[2].scroller.dataset.paperStart);
+    const footerTopAt = y => 10 + root.offsetHeight + 10 + (parseFloat(footer.style['margin-top']) || 0) - y;
+    assert.equal(finalStart, 1668);
+    assert.ok(footerTopAt(finalStart + 442) > 844, 'footer must stay below the viewport while the form is still being read');
+    assert.equal(footerTopAt(finalStart + 1117), 854, 'footer arrives one normal gutter after the final content is exposed');
+    if (includeFooter) assert.equal(footer.scroller.dataset.paperStart, '3629');
+    context.tailTrack = 0;
+    measure();
+    assert.equal(spacer, null, 'a shorter translated or resized final paper releases its old reading track');
+    assert.equal(footerTopAt(finalStart), 854, 'fitting content retains the same normal handoff gap');
+  }
+});

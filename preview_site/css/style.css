@@ -13724,7 +13724,9 @@ body::before{ display:none !important; content:none !important; }
   display:block;
   width:100% !important;
   height:100% !important;
-  object-fit:cover;
+  /* The frame follows the original asset's ratio; never trim its edges to
+     compensate for thumbnail rounding or a temporarily missing dimension. */
+  object-fit:contain !important;
   opacity:1 !important;
   transform:none !important;
   animation:none !important;
