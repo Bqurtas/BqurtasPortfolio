@@ -5500,3 +5500,49 @@ html body .lb-overlay .lb-caption { color: #ededed !important; }
   html body #contact#contact .pitch-form .checkbox { white-space: normal !important; }
   html body #contact#contact .pitch-submit { min-height: 50px !important; }
 }
+
+/* Keep the live document behind the menu. A relative stage still collapses
+   the document if an older menu layer gives it height:100dvh and clips it.
+   Full flow preserves the native scroll offset and the sticky paper positions. */
+html:has(body:is(.menu-open, .menu-revealed, .menu-closing)) {
+  overflow: hidden !important;
+}
+/* The root locks scrolling. A second overflow:hidden on body would become
+   an unscrolled sticky ancestor and pull the gallery's pinned card offscreen. */
+html body:is(.menu-open, .menu-revealed, .menu-closing) {
+  overflow: clip !important;
+}
+html:root[data-theme][data-theme] body.menu-open .bq-page-stage,
+html:root[data-theme][data-theme] body.menu-revealed .bq-page-stage,
+html:root[data-theme][data-theme] body.menu-closing .bq-page-stage,
+html:root[data-theme][data-theme][dir="rtl"] body.menu-open .bq-page-stage,
+html:root[data-theme][data-theme][dir="rtl"] body.menu-revealed .bq-page-stage,
+html:root[data-theme][data-theme][dir="rtl"] body.menu-closing .bq-page-stage {
+  height: auto !important;
+  min-height: 100dvh !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+@media (min-width: 821px) {
+  /* Scale around the currently visible slice of the full-height document.
+     Keep the same origin after menu classes clear so the return animation
+     does not pivot back toward the hero. The next opening refreshes it. */
+  html body .bq-page-stage,
+  html:root[data-theme][data-theme] body.menu-open .bq-page-stage,
+  html:root[data-theme][data-theme] body.menu-revealed .bq-page-stage,
+  html:root[data-theme][data-theme] body.menu-closing .bq-page-stage,
+  html:root[data-theme][data-theme][dir="rtl"] body.menu-open .bq-page-stage,
+  html:root[data-theme][data-theme][dir="rtl"] body.menu-revealed .bq-page-stage,
+  html:root[data-theme][data-theme][dir="rtl"] body.menu-closing .bq-page-stage {
+    transform-origin: 50% calc(var(--bq-menu-scroll-y, 0px) + 50vh) !important;
+  }
+
+  /* Return while the menu's measurement guards are still active. Waiting for
+     the closing classes to clear starts the return too late: the paper stack
+     would measure scaled document coordinates when bq:menu-closed fires. */
+  html:root[data-theme][data-theme] body.menu-closing .bq-page-stage,
+  html:root[data-theme][data-theme][dir="rtl"] body.menu-closing .bq-page-stage {
+    transform: none !important;
+  }
+}

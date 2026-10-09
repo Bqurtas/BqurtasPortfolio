@@ -35,7 +35,7 @@ function element(id) {
     querySelector: () => null, querySelectorAll: () => [], focus() {},
   };
 }
-function fixture() {
+function fixture({ clampMenuScroll = true } = {}) {
   let now = 0, nextTimer = 0;
   const timers = new Map(), closed = [], historyChanges = [];
   const schedule = (callback, delay = 0) => { const id = ++nextTimer; timers.set(id, { at: now + delay, callback }); return id; };
@@ -86,7 +86,12 @@ function fixture() {
   vm.runInNewContext(section('  /* ---------- MOBILE MENU', '\n  window.__bqGoDocumentTop = '), context);
   return {
     window, document, ids, bioLink, body, location, closed, historyChanges, advance,
-    open() { ids.menuToggle.fire('click'); advance(16); window.scrollY = 0; window.fire('scroll'); },
+    open() {
+      ids.menuToggle.fire('click');
+      advance(16);
+      if (clampMenuScroll) window.scrollY = 0;
+      window.fire('scroll');
+    },
   };
 }
 
@@ -104,6 +109,20 @@ test('ordinary menu dismissal restores the reading position once and keeps close
   assert.equal(page.body.classList.contains('menu-open'), false);
 });
 
+test('the desktop preview keeps the visible document slice through closing and refreshes it on the next opening', () => {
+  const page = fixture({ clampMenuScroll: false });
+  page.open();
+  assert.equal(page.window.scrollY, 5239, 'opening must leave the native reading position unchanged');
+  assert.equal(page.body.style['--bq-menu-scroll-y'], '5239px');
+  page.ids.mobileMenuClose.fire('click');
+  page.advance(840);
+  assert.equal(page.window.scrollY, 5239);
+  assert.equal(page.body.style['--bq-menu-scroll-y'], '5239px', 'the scale return must retain the same viewport-centered pivot after menu classes clear');
+  page.window.scrollTo({ top: 1800 });
+  page.open();
+  assert.equal(page.body.style['--bq-menu-scroll-y'], '1800px', 'a later opening must use the current reading position');
+});
+
 test('a room selected beneath the curtain starts at its hero instead of restoring the old gallery offset', () => {
   const page = fixture();
   page.open();
@@ -112,6 +131,7 @@ test('a room selected beneath the curtain starts at its hero instead of restorin
   assert.equal(page.body.dataset.room, 'bio');
   assert.equal(page.location.pathname, '/ku/bio');
   assert.equal(page.window.scrollY, 0);
+  assert.equal(page.body.style['--bq-menu-scroll-y'], '0px', 'the new room must scale around its hero instead of the old gallery offset');
   assert.equal(page.body.classList.contains('menu-closing'), true, 'the room swap must not end the menu animation early');
   page.advance(160);
   assert.equal(page.window.scrollY, 0);
@@ -130,6 +150,7 @@ test('reopening during dismissal cancels the old close timer and keeps the origi
   assert.equal(page.body.style.overflow, 'hidden');
   assert.equal(page.closed.length, 0, 'a stale close timer must not unlock a reopened menu');
   assert.equal(page.window.scrollY, 0);
+  assert.equal(page.body.style['--bq-menu-scroll-y'], '5239px', 'reopening must retain the saved slice even if a browser lost its native offset');
   page.ids.mobileMenuClose.fire('click');
   page.advance(840);
   assert.equal(page.window.scrollY, 5239);

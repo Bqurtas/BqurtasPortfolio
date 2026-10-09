@@ -31,9 +31,12 @@ function frames() {
     cancel(key) { queued.delete(key); },
     flush() {
       for (let pass = 0; queued.size && pass < 10; pass++) {
-        const pending = [...queued.values()];
-        queued.clear();
-        pending.forEach(callback => callback(16 * (pass + 1)));
+        const pending = [...queued.keys()];
+        pending.forEach(key => {
+          const callback = queued.get(key);
+          queued.delete(key);
+          callback?.(16 * (pass + 1));
+        });
       }
       assert.equal(queued.size, 0, 'scroll work should settle without a permanent animation loop');
     }
@@ -104,6 +107,7 @@ test('gallery progress uses the outer sticky pin and matches its visible handoff
 function workFixture() {
   const animation = frames();
   const scrollCalls = [];
+  const reads = { track: 0, card: 0 };
   let visualShift = 0, documentTop = 1000;
   const window = {
     ...eventTarget(), scrollY: 0, innerHeight: 632, visualViewport: eventTarget(),
@@ -118,14 +122,14 @@ function workFixture() {
   const track = {
     dataset: {}, style: style(), parentElement: design, classList: classList(['paper-sheet', 'work']),
     nextElementSibling: { style: style(), classList: classList(['paper-sheet']) },
-    getBoundingClientRect: () => ({ top: documentTop - window.scrollY + visualShift }),
+    getBoundingClientRect() { reads.track++; return { top: documentTop - window.scrollY + visualShift }; },
     closest: () => design
   };
   const card = {
     dataset: {}, style: style(), clientHeight: 600, classList: classList(),
     parentElement: track,
     querySelector: selector => selector.includes('.work-vp') ? viewport : null,
-    getBoundingClientRect: () => ({ top: Math.max(16, documentTop - window.scrollY) + visualShift })
+    getBoundingClientRect() { reads.card++; return { top: Math.max(16, documentTop - window.scrollY) + visualShift }; }
   };
   track.querySelector = () => card;
   const document = {
@@ -140,13 +144,36 @@ function workFixture() {
     performance: { now: () => 0 }, setTimeout: () => 1, clearTimeout() {}
   });
   return {
-    window, document, body, stage, design, track, reel, scrollCalls,
+    window, document, body, stage, design, track, reel, scrollCalls, reads,
     flush: () => animation.flush(),
     requestFrame: callback => animation.request(callback),
     setVisualShift(value) { visualShift = value; },
     setDocumentTop(value) { documentTop = value; },
     scrollTo(top) { window.scrollY = top; window.fire('scroll'); animation.flush(); }
   };
+}
+
+for (const resizeFirst of [true, false]) {
+  test(`mobile resize and scroll share one portfolio paint with ${resizeFirst ? 'resize' : 'scroll'} first`, () => {
+    const page = workFixture();
+    page.scrollTo(1484);
+    page.reads.track = 0;
+    page.reads.card = 0;
+    page.window.scrollY = 1564;
+    const resize = () => page.window.visualViewport.fire('resize');
+    const scroll = () => page.window.fire('scroll');
+    if (resizeFirst) { resize(); scroll(); }
+    else { scroll(); resize(); }
+    // Window resize and a media correction may join the same mobile frame.
+    page.window.fire('resize');
+    page.window.fire('bq:gallery-dimensions');
+    page.flush();
+    assert.equal(page.reads.card, 1, 'visibility and reel motion must use one paint pass');
+    assert.equal(page.reads.track, 3, 'one preservation read, one updated origin, and one scroll paint');
+    assert.equal(page.reel.style.transform, 'translate3d(0,-580px,0)');
+    assert.equal(page.window.scrollY, 1564, 'coalescing must preserve live native scroll momentum');
+    assert.deepEqual(page.scrollCalls, []);
+  });
 }
 
 function focusedGalleryControl({ keyboard }) {
@@ -306,6 +333,26 @@ test('menu transitions freeze portfolio geometry and refresh it after closure', 
   page.scrollTo(1564);
   assert.equal(page.reel.style.transform, 'translate3d(0,-580px,0)', 'the reel must not retain a rectangle measured while the menu was transformed');
 });
+
+for (const menuState of ['menu-open', 'menu-closing']) {
+  test(`a scroll frame cancelled while ${menuState} cannot replace the saved gallery reading offset`, () => {
+    const page = workFixture();
+    page.scrollTo(1484);
+    page.body.classList.add(menuState);
+    page.window.fire('scroll');
+    page.window.fire('resize');
+    page.flush();
+    // A viewport/layout change while the menu is visible moves the track.
+    // Its ignored scroll event must not survive into the close measurement.
+    page.setDocumentTop(1200);
+    page.body.classList.remove(menuState);
+    page.document.fire('bq:menu-closed');
+    page.flush();
+    assert.equal(page.window.scrollY, 1684);
+    assert.equal(page.reel.style.transform, 'translate3d(0,-500px,0)');
+    assert.deepEqual(page.scrollCalls, [1684], 'closing must restore the same image after the origin changed');
+  });
+}
 
 test('returning to design refreshes work offsets without waiting for a ResizeObserver', () => {
   const page = workFixture();

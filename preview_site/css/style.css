@@ -13787,6 +13787,9 @@ body::before{ display:none !important; content:none !important; }
 #grid .card-zoom-icon{ display:none !important; }
 @supports (animation-timeline:view()){
   #grid .card,
+  #grid .card.portfolio-scroll-card,
+  #grid .card.portfolio-scroll-card .card-art img,
+  #grid .card.portfolio-scroll-card .card-art video,
   #grid .card .card-art img,
   #grid .card .card-art video{
     view-timeline:none !important;

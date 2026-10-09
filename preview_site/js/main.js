@@ -500,7 +500,11 @@ document.addEventListener('DOMContentLoaded', () => {
     cancelAnimationFrame(menuFrame);
     const wasOpen = mobileMenu.classList.contains('is-open') || mobileMenu.classList.contains('is-ready');
     const wasClosing = mobileMenu.classList.contains('is-closing');
-    if (!open && !restoreScroll) menuRestoreScroll = false;
+    if (!open && !restoreScroll) {
+      menuRestoreScroll = false;
+      // A newly selected room starts at its hero beneath the route curtain.
+      document.body.style.setProperty('--bq-menu-scroll-y', '0px');
+    }
     // A route can change beneath the curtain before the menu's close finishes.
     // Cancel its old scroll destination without removing the transition guards.
     if (!open && wasClosing) return;
@@ -517,15 +521,13 @@ document.addEventListener('DOMContentLoaded', () => {
       menuCloseTimer = 0;
       lastMenuTrigger = trigger || document.activeElement;
       const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
-      /* Remember where the reader was. body gets overflow:hidden below, and on
-         this site that loses the scroll position outright — open the menu from
-         the portfolio and close it again and you are back at the top of the
-         page, looking at the hero. The offset was already being written to a
-         custom property for the CSS to compensate with; it was never read back
-         when the menu closed. */
+      /* Keep the native document position and scale its visible slice. The
+         origin offset survives closing so returning from scale(.8) to 1 does
+         not suddenly pivot around the top of a long document. */
       if ((!wasOpen && !wasClosing) || !menuRestoreScroll) menuScrollY = scrollY;
       menuRestoreScroll = true;
       document.body.style.setProperty('--bq-menu-scroll-shift', (-menuScrollY) + 'px');
+      document.body.style.setProperty('--bq-menu-scroll-y', menuScrollY + 'px');
       mobileMenu.classList.remove('is-closing');
       document.body.classList.remove('menu-closing');
       mobileMenu.classList.add('is-open');
@@ -2786,10 +2788,6 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       coveredNow = covered;
       card.style.visibility = covered ? 'hidden' : 'visible';
     };
-    const setCovered = () => {
-      const g = gutter();
-      applyCovered(card.getBoundingClientRect().top, g);
-    };
     const rememberReading = (local) => {
       const span = overflow + cardH;
       const active = document.body.dataset.room === 'design'
@@ -2819,11 +2817,15 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       }
     };
     let raf = 0;
+    let workMeasureFrame = 0;
+    let scrollPending = false;
     /* One frame = read everything, then write everything. Interleaving them is
        what made this scroll stutter: each read that followed a write forced a
        synchronous relayout, several times per scroll event. */
     const drive = () => {
+      if (raf) cancelAnimationFrame(raf);
       raf = 0;
+      scrollPending = false;
       if (document.body.dataset.room !== 'design') return;
       if (document.body.classList.contains('menu-open') || document.body.classList.contains('menu-closing')) return;
 
@@ -2873,13 +2875,21 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       rememberReading(local);
     };
     const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(drive);
+      scrollPending = true;
+      if (!raf && !workMeasureFrame) raf = requestAnimationFrame(drive);
     };
     const remeasure = () => {
-      if (document.body.dataset.room !== 'design') return;
-      if (document.body.classList.contains('menu-open') || document.body.classList.contains('menu-closing')) return;
+      if (document.body.dataset.room !== 'design'
+        || document.body.classList.contains('menu-open') || document.body.classList.contains('menu-closing')) {
+        // A cancelled scroll frame would have discarded movement while the
+        // gallery was inactive. Do the same here so reopening does not treat
+        // an old event as new movement and replace the saved reading offset.
+        scrollPending = false;
+        return;
+      }
       paintedHeadY = null;
       if (track.dataset.holdTrack === '1') {
+        scrollPending = false;
         if (track.dataset.trackHLock) {
           track.style.setProperty('--work-track-h', track.dataset.trackHLock);
         }
@@ -2890,7 +2900,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       // Mobile browser chrome can resize before the scroll event from the
       // same gesture is painted. Preserve that new position, not the previous
       // frame's reading offset, or scrollTo cancels the native movement.
-      if (raf && pendingAppendOffset === null) rememberReading(liveLocal);
+      if (scrollPending && pendingAppendOffset === null) rememberReading(liveLocal);
       const tolerance = Math.max(48, cardH * .25);
       const saved = pendingAppendOffset !== null
         ? { phase: 'reel', offset: pendingAppendOffset }
@@ -2920,7 +2930,6 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
           window.scrollTo({ top: targetY, left: 0, behavior: 'auto' });
         }
       }
-      setCovered();
       drive();
     };
     /* Sending the reel home. remeasure() restores the saved reading position
@@ -2973,9 +2982,13 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     };
     // Mobile browser chrome can emit both resize events in the same frame.
     // Gallery/font observers can join them: measure once after they settle.
-    let workMeasureFrame = 0;
     const queueRemeasure = () => {
       if (workMeasureFrame) return;
+      // Measurement finishes with drive(), so it also owns any scroll paint
+      // already queued for this frame. Keep scrollPending for reading-position
+      // preservation without running a second set of geometry reads.
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
       workMeasureFrame = requestAnimationFrame(() => {
         workMeasureFrame = 0;
         remeasure();
