@@ -2650,10 +2650,17 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       sheet.dataset.paper = `${id}-${index + 1}`;
       sheet.style.setProperty('--bq-paper-z', String((index + 1) * 10));
 
-      /* Room chapters use their own clipped reading surface only when their
-         copy exceeds one card. The hero never becomes a nested scroller. */
-      if (sheet.classList.contains('section')) sheet.dataset.paperScroll = 'inner';
-      else delete sheet.dataset.paperScroll;
+      /* Room chapters, like the home papers, are drawn to fit their card
+         (fitPaper) instead of reading inside it; the inner reading track is
+         only the fallback below the smallest legible size. The hero never
+         becomes a nested scroller. */
+      if (sheet.classList.contains('section')) {
+        sheet.dataset.paperScroll = 'inner';
+        sheet.dataset.paperFit = '';
+      } else {
+        delete sheet.dataset.paperScroll;
+        delete sheet.dataset.paperFit;
+      }
 
       wrapPaperScroll(sheet);
     });

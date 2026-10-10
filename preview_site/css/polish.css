@@ -592,7 +592,8 @@ html body #contact#contact .pitch-wrap {
    the sheet never needs an inner scroll. At ordinary phone and desktop sizes
    the layouts below already fit and the factor stays 1.
    ========================================================================== */
-html body #design.paper-stack > .paper-sheet[data-paper-fit] > .paper-scroll > :not(.paper-reading-spacer) {
+html body #design.paper-stack > .paper-sheet[data-paper-fit] > .paper-scroll > :not(.paper-reading-spacer),
+html body .room.paper-stack:not(#design) > .paper-sheet[data-paper-fit] > .paper-scroll > :not(.paper-reading-spacer) {
   zoom: var(--bq-paper-fit, 1);
 }
 
@@ -601,7 +602,10 @@ html body #design.paper-stack > .paper-sheet[data-paper-fit] > .paper-scroll > :
    pixels low would read as content that does not fit. The transition goes
    too, or the switch would only begin at the next frame and the read would
    still see the parked offset. */
-html body #design#design#design#design.paper-stack > .paper-sheet.is-paper-measuring > .paper-scroll * {
+html body #design#design#design#design.paper-stack > .paper-sheet.is-paper-measuring > .paper-scroll *,
+html body #bio#bio#bio#bio.paper-stack > .paper-sheet.is-paper-measuring > .paper-scroll *,
+html body #blog#blog#blog#blog.paper-stack > .paper-sheet.is-paper-measuring > .paper-scroll *,
+html body #contact#contact#contact#contact.paper-stack > .paper-sheet.is-paper-measuring > .paper-scroll * {
   transform: none !important;
   translate: none !important;
   scale: none !important;
@@ -613,8 +617,28 @@ html body #design#design#design#design.paper-stack > .paper-sheet.is-paper-measu
    Fitting happens while a sheet is still below the fold, so it lays the
    real content out for the length of the read. */
 html body #design#design#design#design.paper-stack > .paper-sheet.is-paper-measuring,
-html body #design#design#design#design.paper-stack > .paper-sheet.is-paper-measuring * {
+html body #design#design#design#design.paper-stack > .paper-sheet.is-paper-measuring *,
+html body :is(#bio, #blog, #contact).paper-stack > .paper-sheet.is-paper-measuring,
+html body :is(#bio, #blog, #contact).paper-stack > .paper-sheet.is-paper-measuring * {
   content-visibility: visible !important;
+}
+
+/* A fitted room chapter keeps its copy in flow: the old max-height:100% on
+   .sheet-mid let text spill past it unmeasured, into the strip the dock
+   covers, so the card could "fit" with its last lines under the menu. */
+html body #bio#bio#bio.paper-stack > .paper-sheet[data-paper-fit] > .paper-scroll > .sheet-mid,
+html body #blog#blog#blog.paper-stack > .paper-sheet[data-paper-fit] > .paper-scroll > .sheet-mid,
+html body #contact#contact#contact.paper-stack > .paper-sheet[data-paper-fit] > .paper-scroll > .sheet-mid {
+  max-height: none !important;
+  flex: 0 0 auto !important;
+}
+
+/* A field whose rendered text drops under 16px makes iOS Safari zoom the
+   page when it is tapped. In a fitted room the controls keep 16px on screen
+   while the rest of the card scales. */
+html body #contact#contact#contact#contact.paper-stack > .paper-sheet[data-paper-fit] :is(input, select, textarea),
+html body #blog#blog#blog#blog.paper-stack > .paper-sheet[data-paper-fit] :is(input, select, textarea) {
+  font-size: max(16px, calc(16px / var(--bq-paper-fit, 1))) !important;
 }
 
 /* ============================================================================
@@ -1436,5 +1460,171 @@ html body #design#design > .hero .hero-scrolldown .mouse-wheel {
   html[dir="rtl"] body.nav-compact:not(.menu-open) .rail {
     transform: translateX(-50%) scale(.9) !important;
     transform-origin: 50% 100% !important;
+  }
+}
+
+/* ============================================================================
+   CONTACT — the pitch reads as one compact letter on every screen.
+
+   One field per row with ruled dividers made the form 1,700px on a phone —
+   three screens of card. Pairs share a row everywhere, the rules go, and the
+   controls are a calm 44px; the form now fits its card (fitPaper scales the
+   rest), while inputs keep 16px on screen so iOS never zooms on focus.
+   ========================================================================== */
+html body #contact#contact#contact .contact-pitch-sheet .pitch-head.pitch-head--compact {
+  gap: 8px !important;
+  margin-block-end: clamp(14px, 2.4vh, 26px) !important;
+}
+
+html body #contact#contact#contact .contact-pitch-sheet .pitch-head.pitch-head--compact h3 {
+  font-size: clamp(22px, min(6.2vw, 4.2vh), 38px) !important;
+  line-height: 1.18 !important;
+}
+
+html body #contact#contact#contact .contact-pitch-sheet .pitch-head.pitch-head--compact .section-lede {
+  font-size: clamp(13px, 1.7vh, 15px) !important;
+  line-height: 1.6 !important;
+}
+
+html body #contact#contact#contact .pitch-form {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-items: end !important;
+  gap: clamp(10px, 1.5vh, 14px) clamp(10px, 1.6vw, 16px) !important;
+}
+
+html body #contact#contact#contact .pitch-form .row-2 {
+  display: contents !important;
+}
+
+html body #contact#contact#contact .pitch-form .field {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  gap: 6px !important;
+  min-inline-size: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+html body #contact#contact#contact .pitch-form .field::after,
+html body #contact#contact#contact .pitch-form .field::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* Paired fields take one column each (an older phone rule forced every field
+   full-width, which is what stretched the form to three screens). */
+html body #contact#contact#contact .pitch-form .row-2 > .field {
+  grid-column: auto !important;
+}
+
+/* Single-control rows, the consent line, the button and the status span both columns. */
+html body #contact#contact#contact .pitch-form > .field,
+html body #contact#contact#contact .pitch-form > .pitch-submit,
+html body #contact#contact#contact .pitch-form > .contact-status {
+  grid-column: 1 / -1 !important;
+}
+
+html body #contact#contact#contact .pitch-form .field > label:not(.checkbox) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  font-size: 10.5px !important;
+  line-height: 1.35 !important;
+  letter-spacing: .1em !important;
+  color: color-mix(in srgb, var(--ink) 70%, transparent) !important;
+}
+
+html body #contact#contact#contact .pitch-form .field > label:not(.checkbox) i {
+  flex: none !important;
+  font-size: 10px !important;
+  opacity: .8 !important;
+}
+
+html body #contact#contact#contact .pitch-form :is(input:not([type="checkbox"]), select) {
+  block-size: 44px !important;
+  min-block-size: 44px !important;
+  padding-block: 0 !important;
+  padding-inline: 12px !important;
+  border-radius: 12px !important;
+  line-height: 1.2 !important;
+}
+
+html body #contact#contact#contact .pitch-form textarea {
+  block-size: clamp(84px, 13vh, 132px) !important;
+  min-block-size: 84px !important;
+  padding: 10px 12px !important;
+  border-radius: 12px !important;
+  line-height: 1.5 !important;
+  resize: vertical !important;
+}
+
+html body #contact#contact#contact .pitch-form .checkbox {
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+}
+
+html body #contact#contact#contact .pitch-form .pitch-submit {
+  justify-content: center !important;
+  min-block-size: 48px !important;
+  margin: 2px 0 0 !important;
+}
+
+html body #contact#contact#contact .pitch-form .contact-status:empty {
+  display: none !important;
+}
+
+html[dir="rtl"] body #contact#contact#contact .pitch-form .field > label:not(.checkbox) {
+  letter-spacing: 0 !important;
+  font-size: 12px !important;
+}
+
+/* ============================================================================
+   JOURNAL — the list breathes and the newsletter reads as its own block.
+   ========================================================================== */
+html body #blog#blog#blog .blog-index-sheet .index-row {
+  padding-inline-end: clamp(14px, 3vw, 24px) !important;
+}
+
+html body #blog#blog#blog .blog-index-sheet .index-row .index-row-title {
+  font-size: clamp(18px, min(5.2vw, 3vh), 30px) !important;
+  line-height: 1.25 !important;
+  letter-spacing: -.01em !important;
+  overflow-wrap: anywhere;
+}
+
+html[dir="rtl"] body #blog#blog#blog .blog-index-sheet .index-row .index-row-title {
+  line-height: 1.5 !important;
+  letter-spacing: 0 !important;
+}
+
+html body #blog#blog#blog .blog-index-sheet .subscribe {
+  margin-block-start: clamp(14px, 2.6vh, 28px) !important;
+  padding-block-start: clamp(14px, 2.6vh, 28px) !important;
+  border-block-start: 1px solid var(--line) !important;
+}
+
+/* Wide screens set the eight short fields as two rows of four. */
+@media (min-width: 1024px) {
+  html body #contact#contact#contact .pitch-form {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Fitted controls never shrink below a 36px tap target on screen. */
+html body #contact#contact#contact#contact.paper-stack > .paper-sheet[data-paper-fit] .pitch-form :is(input:not([type="checkbox"]), select),
+html body #blog#blog#blog#blog.paper-stack > .paper-sheet[data-paper-fit] :is(input:not([type="checkbox"]), select) {
+  block-size: max(44px, calc(36px / var(--bq-paper-fit, 1))) !important;
+  min-block-size: max(44px, calc(36px / var(--bq-paper-fit, 1))) !important;
+}
+
+/* Very short screens (iPhone SE class): the intro line repeats what the
+   fields ask, and dropping it lets the whole letter fit without scrolling. */
+@media (max-height: 640px) {
+  html body #contact#contact#contact .contact-pitch-sheet .pitch-head.pitch-head--compact .section-lede {
+    display: none !important;
   }
 }
