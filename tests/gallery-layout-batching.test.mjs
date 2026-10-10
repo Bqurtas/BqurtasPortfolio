@@ -102,6 +102,8 @@ test('paper measurement batches spacer reads and paints meters without further s
   const context = {
     sheets, root, ensurePaperMeter: sheet => sheet.meter,
     allowsInnerScroll: () => true, paperLabel: () => 'Reading section',
+    // These sheets are not home papers marked data-paper-fit; fitting is a no-op.
+    fitPaper: () => {},
   };
   vm.runInNewContext(meterSource + measurementSource + '\nglobalThis.finalTailTrack = tailTrack;', context);
   assert.deepEqual(sheets.map(sheet => sheet.scroller.dataset.paperOverflow), ['20', '0', '400']);

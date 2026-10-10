@@ -44,6 +44,27 @@ for (const file of ['sitemap.xml', 'sitemap-images.xml']) {
   if (!/^<\?xml[\s\S]*<urlset\b[\s\S]*<\/urlset>\s*$/i.test(xml)) failures.push(`${file} is not a complete urlset`);
 }
 
+/* The image/video sitemap is generated (scripts/generate-image-sitemap.mjs).
+   Google credits images to a host it can verify, so every URL in it must be
+   on bqurtas.com, and a single raw '&' makes the whole file unreadable. */
+{
+  const xml = readFileSync(resolve(root, 'sitemap-images.xml'), 'utf8');
+  if (!xml.includes('xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"')
+      || !xml.includes('xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"')) {
+    failures.push('sitemap-images.xml must declare the image and video namespaces');
+  }
+  for (const match of xml.matchAll(/<(loc|image:loc|video:content_loc|video:thumbnail_loc)>([^<]*)</g)) {
+    if (!match[2].startsWith('https://bqurtas.com/') && match[2] !== 'https://bqurtas.com') {
+      failures.push(`sitemap-images.xml lists an off-site URL: ${match[2]}`);
+    }
+  }
+  if (/<image:(?:title|caption)>/.test(xml)) failures.push('sitemap-images.xml uses deprecated image:title/image:caption');
+  if (/&(?!(?:amp|lt|gt|quot|apos);)/.test(xml)) failures.push('sitemap-images.xml contains an unescaped ampersand');
+  for (const match of xml.matchAll(/<video:thumbnail_loc>https:\/\/bqurtas\.com\/([^<]+)</g)) {
+    if (!existsSync(resolve(root, match[1]))) failures.push(`missing video poster: ${match[1]}`);
+  }
+}
+
 for (const forbidden of [
   '107502',
   'bq_dash_pin',

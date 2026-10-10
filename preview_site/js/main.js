@@ -1644,6 +1644,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', event => {
       const card = event.target.closest('#grid .card--photo');
       if (!card) return;
+      /* .card-open is a link to the work's own page. A plain click stays in
+         the lightbox; a new-tab / new-window click is left to the browser. */
+      if (event.target.closest('a.card-open')) {
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+      }
       // Masonry columns rearrange the DOM. Follow catalogue order so previous
       // and next remain predictable after filtering or changing screen width.
       const cards = matchingCards().map(entry => entry.el).filter(element => element?.isConnected);
@@ -1975,6 +1981,60 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       || sheet?.classList?.contains('room-sheet--scroll')
       || sheet?.dataset?.paperScroll === 'inner'
     );
+  };
+
+  /* Home papers never read inside their own frame — only the portfolio does.
+     A sheet marked data-paper-fit whose copy is taller than its frame is drawn
+     smaller instead: --bq-paper-fit drives a CSS zoom on the frame's content
+     (polish.css). zoom reflows the type at the same width, so the fitted
+     height is not linear in the factor; a short bisection finds the largest
+     size that fits. Below PAPER_FIT_MIN the remainder falls back to the inner
+     reading track rather than shrinking type out of legibility. */
+  const PAPER_FIT_MIN = 0.5;
+  const paperFits = (scroller) => scroller.scrollHeight - scroller.clientHeight <= 2;
+
+  /* The service index opens one row at a time and its descriptions differ in
+     length. The open row reserves the tallest of them, so neither the fitted
+     size nor the rows around it move as the reader goes from row to row. */
+  const reserveTallestPanel = (scroller) => {
+    const accordion = scroller.querySelector('.service-accordion');
+    if (!accordion) return;
+    accordion.style.removeProperty('--bq-open-panel-h');
+    let tallest = 0;
+    accordion.querySelectorAll('.service-detail-inner').forEach((inner) => {
+      tallest = Math.max(tallest, inner.scrollHeight);
+    });
+    if (tallest > 0) accordion.style.setProperty('--bq-open-panel-h', `${Math.ceil(tallest)}px`);
+  };
+
+  const fitPaper = (sheet, scroller) => {
+    if (!sheet.hasAttribute('data-paper-fit')) return;
+    const apply = (fit) => {
+      sheet.style.setProperty('--bq-paper-fit', fit === 1 ? '1' : fit.toFixed(4));
+      reserveTallestPanel(scroller);
+    };
+    /* Entrance motion parks copy a few pixels low with transforms, which the
+       browser counts as scrollable overflow; measure the settled layout. */
+    sheet.classList.add('is-paper-measuring');
+    let fit = 1;
+    apply(fit);
+    if (!paperFits(scroller)) {
+      let low = PAPER_FIT_MIN;
+      let high = 1;
+      apply(low);
+      if (paperFits(scroller)) {
+        for (let step = 0; step < 7; step += 1) {
+          const mid = (low + high) / 2;
+          apply(mid);
+          if (paperFits(scroller)) low = mid;
+          else high = mid;
+        }
+      }
+      fit = low;
+      apply(fit);
+    }
+    // The caller reads the final overflow before lifting is-paper-measuring.
+    sheet.classList.toggle('is-paper-fitted', fit < 1);
   };
 
   const paperLabel = (sheet, scroller) => {
@@ -2330,10 +2390,12 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         if (readingSpacer) readingSpacer.style.setProperty('display', 'none', 'important');
       });
       measurements.forEach((entry) => {
-        const { scroller, allowInner } = entry;
+        const { sheet, scroller, allowInner } = entry;
+        if (allowInner) fitPaper(sheet, scroller);
         entry.naturalOverflow = allowInner
           ? Math.max(0, scroller.scrollHeight - scroller.clientHeight)
           : 0;
+        sheet.classList.remove('is-paper-measuring');
       });
       measurements.forEach(({ readingSpacer }) => {
         if (readingSpacer) readingSpacer.style.removeProperty('display');
@@ -2547,8 +2609,15 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         sheet.classList.add('paper-sheet');
         sheet.dataset.paper = paperNames[i] || `sheet-${i + 1}`;
         sheet.style.setProperty('--bq-paper-z', String((i + 2) * 10));
-        if (sheet.classList.contains('work')) delete sheet.dataset.paperScroll;
-        else sheet.dataset.paperScroll = 'inner';
+        if (sheet.classList.contains('work')) {
+          delete sheet.dataset.paperScroll;
+          delete sheet.dataset.paperFit;
+        } else {
+          sheet.dataset.paperScroll = 'inner';
+          /* Only the portfolio reads inside its card; every other home
+             paper is drawn to fit its frame (fitPaper). */
+          sheet.dataset.paperFit = '';
+        }
         wrapPaperScroll(sheet);
       });
 

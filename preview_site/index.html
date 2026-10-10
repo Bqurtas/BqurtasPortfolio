@@ -718,7 +718,7 @@
   <link rel="stylesheet" href="css/fonts.css?v=69cf74d1bd04">
   <link rel="stylesheet" href="css/experience.min.css?v=3b27e924e74d">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.css?v=d364a0b53c4c">
+  <link rel="stylesheet" href="css/polish.css?v=1f5a9f804a79">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=a65cc728586a" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=a65cc728586a"></noscript>
 
@@ -1223,11 +1223,6 @@
         <div class="bio-teaser-grid">
           <figure class="bio-teaser-portrait" data-motion>
             <img src="assets/portrait.webp?v=56f25216a1e1" alt="Barakat Qurtas — multidisciplinary designer in Hewlêr, Kurdistan" width="400" height="600" loading="lazy" decoding="async" />
-            <figcaption>
-              <span class="mono" data-i18n="krg">Hewlêr · KRG</span>
-              <span class="mono">36.19° N · 44.01° E</span>
-            </figcaption>
-          
               <span class="portrait-orbit" aria-hidden="true"><i class="fa-solid fa-pen-nib orbit-ic orbit-ic--1"></i><i class="fa-solid fa-palette orbit-ic orbit-ic--2"></i><i class="fa-solid fa-camera-retro orbit-ic orbit-ic--3"></i><i class="fa-solid fa-film orbit-ic orbit-ic--4"></i><i class="fa-solid fa-code orbit-ic orbit-ic--5"></i><i class="fa-solid fa-bezier-curve orbit-ic orbit-ic--6"></i></span>
             </figure>
           <div class="bio-teaser-text">
@@ -2192,8 +2187,8 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=914064c971d8"></script>
-  <script defer src="js/gallery.v420.min.js?v=7dda52d41904"></script>
+  <script defer src="js/main.v420.min.js?v=ca5cadfbfaa8"></script>
+  <script defer src="js/gallery.v420.min.js?v=fa1e31007f6a"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
        still receive them immediately. This removes their database/GitHub work
@@ -2212,7 +2207,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=17d929f3647e';
+        s.src = 'js/enhance.v420.min.js?v=079d8531d5bf';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -2337,7 +2332,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=f58d34c12a94', { updateViaCache: 'none' })
+            .register('/sw.js?v=9c969515df7a', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

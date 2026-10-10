@@ -12,6 +12,8 @@
      /ku/blog         /ar/design/logo         /fr/bio
    ========================================================= */
 
+import { parseWorkPath, serveWorkPage } from './_work-page.js';
+
 const SITE = 'https://bqurtas.com';
 const SUPA = 'https://dcnkhzrishphpismmxuu.supabase.co';             // blog posts live here
 const SUPA_KEY = 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3';   // publishable (read-only, safe in client)
@@ -491,6 +493,22 @@ export async function onRequest(context) {
   if (redirectPath) {
     url.pathname = redirectPath;
     return Response.redirect(url.toString(), 301);
+  }
+  /* One server-rendered page per work: /design/book/7. Language-prefixed and
+     trailing-slash variants fold into the single English canonical URL. */
+  const work = parseWorkPath(url.pathname);
+  if (work) {
+    if (work.redirect) {
+      url.pathname = work.redirect;
+      return Response.redirect(url.toString(), 301);
+    }
+    if (work.status === 404) return serveNotFound(request, url, env);
+    return serveWorkPage(request, url, env, work, {
+      next,
+      notFound: () => serveNotFound(request, url, env),
+      unavailable: () => serveUnavailable(request),
+      securityHeaders: documentSecurityHeaders
+    });
   }
   const r = resolve(url.pathname);
   if (!r) {

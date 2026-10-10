@@ -964,6 +964,16 @@
     Object.assign(DASH_I18N.kmr, { vViews:'Dîtin', vVisitors:'Mêvan', vViewsToday:'Dîtinên îro', vVisToday:'Mêvanên îro', v14:'14 rojên dawî', vTop:'Rûpelên jor', vCountries:'Welat', vRef:'Çavkanî', vDevices:'Amûr', vRecent:'Seredanên dawî', vNoVisits:'Hêj seredan tune', vNoData:'Hêj dane tune', vRefresh:'Nûke' });
     Object.assign(DASH_I18N.ar,  { vViews:'المشاهدات', vVisitors:'الزوار', vViewsToday:'مشاهدات اليوم', vVisToday:'زوار اليوم', v14:'آخر ١٤ يوماً', vTop:'أهم الصفحات', vCountries:'الدول', vRef:'المصادر', vDevices:'الأجهزة', vRecent:'الزيارات الأخيرة', vNoVisits:'لا زيارات بعد', vNoData:'لا بيانات بعد', vRefresh:'تحديث' });
     Object.assign(DASH_I18N.fr,  { vViews:'Pages vues', vVisitors:'Visiteurs', vViewsToday:"Vues aujourd'hui", vVisToday:"Visiteurs aujourd'hui", v14:'14 derniers jours', vTop:'Pages populaires', vCountries:'Pays', vRef:'Référents', vDevices:'Appareils', vRecent:'Visites récentes', vNoVisits:'Aucune visite', vNoData:'Aucune donnée', vRefresh:'Actualiser' });
+    /* Said when the server has no login configured (DASH_PIN, SESSION_SECRET,
+       the D1 binding or a second factor missing on Pages). "Wrong code" was
+       shown instead, which sent the owner hunting for a code that could
+       never have worked. */
+    Object.assign(DASH_I18N.en,  { notSetup:'Login is not set up on the server yet — add DASH_PIN, SESSION_SECRET, TOTP_SECRET and the D1 "DB" binding in Cloudflare Pages, then redeploy.' });
+    Object.assign(DASH_I18N.ku,  { notSetup:'چوونەژوورەوە هێشتا لەسەر سێرڤەر ڕێکنەخراوە — لە Cloudflare Pages ئەمانە زیاد بکە: DASH_PIN و SESSION_SECRET و TOTP_SECRET و D1 بە ناوی «DB»، پاشان Retry deployment بکە.' });
+    Object.assign(DASH_I18N.kmr, { notSetup:'Têketin hêj li ser serverê nehatiye sazkirin — li Cloudflare Pages DASH_PIN, SESSION_SECRET, TOTP_SECRET û D1 "DB" zêde bike, paşê dîsa deploy bike.' });
+    Object.assign(DASH_I18N.ar,  { notSetup:'تسجيل الدخول غير مُعدّ على الخادم بعد — أضف DASH_PIN وSESSION_SECRET وTOTP_SECRET وربط D1 باسم "DB" في Cloudflare Pages ثم أعد النشر.' });
+    Object.assign(DASH_I18N.fr,  { notSetup:'La connexion n’est pas encore configurée sur le serveur — ajoutez DASH_PIN, SESSION_SECRET, TOTP_SECRET et la liaison D1 « DB » dans Cloudflare Pages, puis redéployez.' });
+    const SERVER_NOT_SET = ['not-configured', 'session-not-configured', 'no-db', 'twofa-unavailable', 'rate-limit-unavailable'];
     const curLang = () => { const l = document.documentElement.getAttribute('lang') || document.documentElement.dataset.lang || 'en'; return DASH_I18N[l] ? l : 'en'; };
     const DT = (k) => (DASH_I18N[curLang()][k] ?? DASH_I18N.en[k] ?? k);
     const LANG_LABELS = { en: 'English', ku: 'کوردیی سۆرانی', kmr: 'Kurmancî', ar: 'العربية', fr: 'Français', tr: 'Türkçe', sv: 'Svenska' };
@@ -1068,6 +1078,11 @@
       }
       showGate();
       setTimeout(() => $('#dashKey')?.focus(), 200);
+      /* Say up front when no code can work on this deployment. */
+      fetch('/api/2fa', { method: 'GET', credentials: 'same-origin', headers: { Accept: 'application/json' } })
+        .then((response) => response.json())
+        .then((data) => { if (data && data.ok === true && data.configured === false && !twoFAId) hint.textContent = DT('notSetup'); })
+        .catch(() => {});
     };
     const closeDash = () => {
       clearTwoFA();
@@ -1125,7 +1140,7 @@
         fetch('/api/2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ pin: twoFAPin, action: 'verify', id: twoFAId, code: val }) })
           .then(r => r.json()).then(d => {
             if (d.ok) { doUnlock(); return; }
-            hint.textContent = DT('twoWrong');
+            hint.textContent = SERVER_NOT_SET.includes(d.error) ? DT('notSetup') : DT('twoWrong');
             $('#dashKey').value = '';
             if (['expired', 'too-many', 'bad-pin', 'not-configured'].includes(d.error)) {
               clearTwoFA();
@@ -1155,7 +1170,7 @@
             return;
           }
           clearTwoFA();
-          hint.textContent = DT(d.error === 'bad-pin' ? 'wrong' : 'twoWrong');
+          hint.textContent = DT(d.error === 'bad-pin' ? 'wrong' : SERVER_NOT_SET.includes(d.error) ? 'notSetup' : 'twoWrong');
         })
         .catch(() => { clearTwoFA(); hint.textContent = DT('twoWrong'); });
     });

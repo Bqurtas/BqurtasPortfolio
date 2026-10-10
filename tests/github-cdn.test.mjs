@@ -18,10 +18,14 @@ test('the live gallery keeps the canonical GitHub path', async () => {
   assert.match(enhance, new RegExp(API.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 });
 
-test('the sitemap and README keep the same GitHub route', async () => {
+test('the media endpoint, sitemap and README keep the same GitHub route', async () => {
+  // Search engines get same-origin /media URLs; the repository stays the origin.
   const sitemap = await readFile(new URL('../preview_site/sitemap-images.xml', import.meta.url), 'utf8');
-  assert.match(sitemap, new RegExp(RAW.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-  assert.doesNotMatch(sitemap, /githubusercontent\.com\/(?!Bqurtas\/BqurtasPortfolio)/);
+  assert.doesNotMatch(sitemap, /githubusercontent\.com|cdn\.jsdelivr\.net/);
+  assert.match(sitemap, /<image:loc>https:\/\/bqurtas\.com\/media\//);
+  const media = await readFile(new URL('../functions/media/[[path]].js', import.meta.url), 'utf8');
+  assert.ok(media.includes(`'${CDN}/'`), 'media endpoint must read from the canonical jsDelivr route');
+  assert.ok(media.includes(`'${RAW}/'`), 'media endpoint must fall back to the canonical raw route');
 
   const readme = await readFile(new URL('../README.md', import.meta.url), 'utf8');
   assert.match(readme, /github\.com\/Bqurtas\/BqurtasPortfolio/);
