@@ -1628,3 +1628,133 @@ html body #blog#blog#blog#blog.paper-stack > .paper-sheet[data-paper-fit] :is(in
     display: none !important;
   }
 }
+
+/* ============================================================================
+   BIOGRAPHY — one type scale for every chapter.
+
+   The chapters had grown their own sizes: titles from 15px to 34px (and a
+   180px ghost numeral), item titles 14–24px, body 10.8–15px, labels 8.7–11px.
+   Four steps now carry the whole room, and main.js fits every chapter with
+   the same factor (data-paper-fit-group="bio"), so a heading on one sheet is
+   the same size as the heading on the next.
+   ========================================================================== */
+html body #bio#bio#bio {
+  --bio-t1: clamp(24px, min(6.2vw, 3.4vh), 34px);
+  --bio-t2: clamp(16px, min(4.3vw, 2.3vh), 20px);
+  --bio-body: clamp(13.5px, min(3.6vw, 1.95vh), 15.5px);
+  --bio-meta: 11px;
+}
+
+/* 1 — chapter titles */
+html body #bio#bio#bio > .paper-sheet .section-title,
+html body #bio#bio#bio > .paper-sheet .bio-block-title {
+  margin: 0 0 clamp(10px, 1.8vh, 18px) !important;
+  font-size: var(--bio-t1) !important;
+  line-height: 1.15 !important;
+  letter-spacing: -.02em !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+}
+
+html body #bio#bio#bio > .paper-sheet .bio-block-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: .45em !important;
+}
+
+html body #bio#bio#bio > .paper-sheet .bio-block-title i {
+  flex: none !important;
+  font-size: .62em !important;
+  opacity: .75 !important;
+}
+
+html body #bio#bio#bio > .paper-sheet .bio-block-title span {
+  font-size: inherit !important;
+  letter-spacing: inherit !important;
+}
+
+/* 2 — item titles */
+html body #bio#bio#bio > .paper-sheet :is(.tl-card h4, .bio-card h4, .lang-item h4, .bio-social-title, .index-card-title, .index-row-title, .bio-phil-label) {
+  margin: 0 !important;
+  font-size: var(--bio-t2) !important;
+  line-height: 1.3 !important;
+  letter-spacing: -.01em !important;
+  font-weight: 600 !important;
+}
+
+html body #bio#bio#bio > .paper-sheet :is(.index-card-title, .bio-social-title, .bio-phil-label) :is(em, .hl) {
+  font-size: inherit !important;
+}
+
+/* 3 — reading copy */
+html body #bio#bio#bio > .paper-sheet :is(.section-lede, .bio-phil-text p, .bio-phil-text, .bio-block-lede, .tl-desc, .tl-org, .tl-loc, .bio-sub, .bio-card p, .lang-item p, .index-card-sub, .bio-social-desc, .tools-typing) {
+  font-size: var(--bio-body) !important;
+  line-height: 1.65 !important;
+  letter-spacing: 0 !important;
+}
+
+html body #bio#bio#bio > .paper-sheet .bio-phil-quote {
+  font-size: calc(var(--bio-body) * 1.2) !important;
+  line-height: 1.5 !important;
+}
+
+/* 4 — labels, dates and captions */
+html body #bio#bio#bio > .paper-sheet :is(.section-num, .tl-date, .tools-cat, .tool-name, .index-row-num, .index-row-tag, .index-card-vol, .bio-social-eyebrow, .bio-social-handle, .bio-social-go, .bio-phil-eyebrow, .tl-skills, .bio-card .mono) {
+  font-size: var(--bio-meta) !important;
+  line-height: 1.45 !important;
+}
+
+/* Ornaments stay ornaments: in proportion with the copy, not over it. */
+html body #bio#bio#bio > .paper-sheet .dropcap {
+  font-size: calc(var(--bio-body) * 3.6) !important;
+  line-height: .85 !important;
+}
+
+html body #bio#bio#bio > .paper-sheet .index-ghost {
+  font-size: clamp(64px, min(18vw, 12vh), 112px) !important;
+}
+
+html body #bio#bio#bio > .paper-sheet .index-card-big {
+  font-size: var(--bio-t2) !important;
+}
+
+html body #bio#bio#bio > .paper-sheet .bio-phil-sign {
+  font-size: calc(var(--bio-t2) * 1.35) !important;
+}
+
+/* Icon marks share one size per role. */
+html body #bio#bio#bio > .paper-sheet .lang-item > i,
+html body #bio#bio#bio > .paper-sheet .bio-social-mark i {
+  font-size: 15px !important;
+}
+
+/* Arabic script needs taller lines and no tracking. */
+html[dir="rtl"] body #bio#bio#bio > .paper-sheet :is(.section-title, .bio-block-title) {
+  line-height: 1.4 !important;
+  letter-spacing: 0 !important;
+}
+
+html[dir="rtl"] body #bio#bio#bio > .paper-sheet :is(.tl-card h4, .bio-card h4, .lang-item h4, .bio-social-title, .index-card-title, .index-row-title, .bio-phil-label) {
+  line-height: 1.55 !important;
+  letter-spacing: 0 !important;
+}
+
+html[dir="rtl"] body #bio#bio#bio > .paper-sheet :is(.section-lede, .bio-phil-text p, .bio-phil-text, .bio-block-lede, .tl-desc, .tl-org, .tl-loc, .bio-sub, .bio-card p, .lang-item p, .index-card-sub, .bio-social-desc, .tools-typing) {
+  line-height: 1.85 !important;
+}
+
+/* One rhythm between entries: the timeline kept 36px under each job plus a
+   16px margin on the next, which read as a missing entry. */
+html body #bio#bio#bio > .paper-sheet .timeline .tl-item {
+  margin: 0 !important;
+  padding-block-end: clamp(14px, 2.2vh, 22px) !important;
+}
+
+html body #bio#bio#bio > .paper-sheet .timeline .tl-item:last-child {
+  padding-block-end: 0 !important;
+}
+
+/* List rows keep air at their reading edge. */
+html body #bio#bio#bio > .paper-sheet .index-row {
+  padding-inline-end: clamp(14px, 3vw, 24px) !important;
+}

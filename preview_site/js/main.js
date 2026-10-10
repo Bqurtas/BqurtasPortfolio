@@ -2037,6 +2037,29 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     sheet.classList.toggle('is-paper-fitted', fit < 1);
   };
 
+  /* Chapters of one group (the Biography) share the smallest fit, so a
+     heading on one card is the size of the heading on the next. A chapter
+     that cannot fit even at the floor keeps its own reading track and does
+     not drag the rest down to it. */
+  const fitGroups = (entries) => {
+    const smallest = new Map();
+    entries.forEach(({ sheet }) => {
+      const group = sheet.dataset.paperFitGroup;
+      if (!group || !sheet.hasAttribute('data-paper-fit')) return;
+      const fit = parseFloat(sheet.style.getPropertyValue('--bq-paper-fit')) || 1;
+      if (fit <= PAPER_FIT_MIN + 0.001) return;
+      smallest.set(group, Math.min(smallest.has(group) ? smallest.get(group) : 1, fit));
+    });
+    entries.forEach(({ sheet }) => {
+      const fit = smallest.get(sheet.dataset.paperFitGroup);
+      if (fit == null || !sheet.hasAttribute('data-paper-fit')) return;
+      const own = parseFloat(sheet.style.getPropertyValue('--bq-paper-fit')) || 1;
+      if (own <= PAPER_FIT_MIN + 0.001) return;
+      sheet.style.setProperty('--bq-paper-fit', fit === 1 ? '1' : fit.toFixed(4));
+      sheet.classList.toggle('is-paper-fitted', fit < 1);
+    });
+  };
+
   const paperLabel = (sheet, scroller) => {
     const heading = scroller?.querySelector('h1, h2, h3, .section-title, .room-hero-title');
     const fallback = String(sheet?.dataset?.paper || 'Scrollable section')
@@ -2389,9 +2412,12 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       measurements.forEach(({ readingSpacer }) => {
         if (readingSpacer) readingSpacer.style.setProperty('display', 'none', 'important');
       });
+      measurements.forEach(({ sheet, scroller, allowInner }) => {
+        if (allowInner) fitPaper(sheet, scroller);
+      });
+      fitGroups(measurements);
       measurements.forEach((entry) => {
         const { sheet, scroller, allowInner } = entry;
-        if (allowInner) fitPaper(sheet, scroller);
         entry.naturalOverflow = allowInner
           ? Math.max(0, scroller.scrollHeight - scroller.clientHeight)
           : 0;
@@ -2657,6 +2683,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       if (sheet.classList.contains('section')) {
         sheet.dataset.paperScroll = 'inner';
         sheet.dataset.paperFit = '';
+        // The Biography reads as one document: its chapters share one scale.
+        if (id === 'bio') sheet.dataset.paperFitGroup = 'bio';
       } else {
         delete sheet.dataset.paperScroll;
         delete sheet.dataset.paperFit;
