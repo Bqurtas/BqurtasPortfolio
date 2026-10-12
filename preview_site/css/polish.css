@@ -1,14 +1,401 @@
 /* ============================================================================
-   bq-polish — draft visual overlay.
+   bq-polish — final visual and responsive adjustments.
 
-   Loaded last, after experience.css. Production (main / bqurtas.com) is
-   untouched until this branch is merged. To roll back: drop this file and
-   its <link> in index.html, or close the draft PR.
+   Loaded last, after experience.css. Keep scoped rules here so the current
+   section composition owns its cascade across languages and screen sizes.
+   To roll back this visual layer, remove its stylesheet link in index.html.
    ========================================================================== */
 
 html:root {
   --bq-polish-ease: cubic-bezier(.22, 1, .36, 1);
   --bq-polish-ink: color-mix(in srgb, var(--ink) 88%, transparent);
+}
+
+/* Content chapters keep their full height; the document supplies the reading
+   distance when a chapter is taller than its paper frame. */
+html body #bio.room.paper-stack > .section.paper-sheet > .paper-scroll,
+html body #contact.room.paper-stack > .section.paper-sheet > .paper-scroll,
+html body #design#design > #services#services > .paper-scroll,
+html body #design#design > .section.practice-note > .paper-scroll {
+  justify-content: flex-start !important;
+}
+
+html body #bio.room.paper-stack > .section.paper-sheet > .paper-scroll > .sheet-mid,
+html body #contact.room.paper-stack > .section.paper-sheet > .paper-scroll > .sheet-mid,
+html body #design#design > .section.practice-note > .paper-scroll > .sheet-mid {
+  display: block !important;
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+/* Services: a readable introduction and four complete, ruled chapters. */
+html body #design#design #services#services .service-showcase-layout {
+  display: grid !important;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.25fr) !important;
+  grid-template-rows: auto !important;
+  align-items: start !important;
+  gap: clamp(32px, 5vw, 72px) !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+html body #design#design #services#services .service-showcase-head {
+  display: flex !important;
+  flex-direction: column !important;
+  position: static !important;
+  align-items: flex-start !important;
+  gap: 20px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html body #design#design #services#services .section-title {
+  font-size: clamp(30px, 3.4vw, 46px) !important;
+  line-height: 1.2 !important;
+  max-width: 19ch !important;
+  margin: 12px 0 18px !important;
+  color: var(--ink) !important;
+  overflow-wrap: break-word;
+}
+
+html body #design#design #services#services .section-lede {
+  font-size: 15px !important;
+  line-height: 1.75 !important;
+  margin: 0 !important;
+  max-width: 44ch !important;
+  color: color-mix(in srgb, var(--ink) 80%, transparent) !important;
+  opacity: 1 !important;
+}
+
+html body #design#design #services#services .service-signature {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px 14px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 16px 0 !important;
+  border-block: 1px solid var(--line) !important;
+  background: none !important;
+  color: var(--ink) !important;
+}
+
+html body #design#design #services#services .service-signature strong,
+html body #design#design #services#services .service-signature small {
+  display: block !important;
+  font-size: 12px !important;
+  line-height: 1.65 !important;
+  color: inherit !important;
+  white-space: normal !important;
+}
+
+html body #design#design #services#services .service-signature > .mono {
+  flex-basis: 100%;
+  color: color-mix(in srgb, var(--ink) 72%, transparent) !important;
+}
+
+html body #design#design #services#services .service-accordion {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-self: start !important;
+  gap: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+html body #design#design #services#services .service-panel {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-top: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+html body #design#design #services#services .service-trigger {
+  display: grid !important;
+  grid-template-columns: 24px minmax(0, 1fr) 32px !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  gap: 6px 12px !important;
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 20px 0 !important;
+  text-align: start !important;
+  overflow: visible !important;
+}
+
+html body #design#design #services#services .service-index { display: none !important; }
+html body #design#design #services#services .service-icon {
+  grid-column: 1 !important;
+  grid-row: 1 / span 2 !important;
+  width: 24px !important;
+  height: 24px !important;
+  opacity: 1 !important;
+  color: var(--ink) !important;
+  background: none !important;
+}
+html body #design#design #services#services .service-icon i,
+html body #design#design #services#services .service-toggle i {
+  color: var(--ink) !important;
+  opacity: 1 !important;
+}
+html body #design#design #services#services .service-name {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  min-width: 0 !important;
+  font-size: 18px !important;
+  font-family: Manrope, 'Noto Kufi Arabic', sans-serif !important;
+  font-weight: 650 !important;
+  line-height: 1.4 !important;
+  margin: 0 !important;
+  color: var(--ink) !important;
+  opacity: 1 !important;
+  background: none !important;
+  border: 0 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  overflow-wrap: break-word;
+}
+html body #design#design #services#services .service-sub {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+  margin: 0 !important;
+  color: color-mix(in srgb, var(--ink) 76%, transparent) !important;
+  opacity: 1 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+}
+html body #design#design #services#services .service-toggle {
+  grid-column: 3 !important;
+  grid-row: 1 / span 2 !important;
+  position: static !important;
+  inset: auto !important;
+  width: 32px !important;
+  height: 32px !important;
+  margin: 0 !important;
+  transform: none !important;
+  color: var(--ink) !important;
+  opacity: 1 !important;
+  background: none !important;
+  border: 1px solid var(--line) !important;
+}
+html body #design#design #services#services .service-panel.is-active .service-detail {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+html body #design#design #services#services .service-detail-inner {
+  width: auto !important;
+  min-width: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 0 24px 36px !important;
+  font-size: 14px !important;
+  line-height: 1.75 !important;
+  color: var(--ink) !important;
+}
+html[dir="rtl"] body #design#design #services#services .service-detail-inner {
+  padding: 0 36px 24px 0 !important;
+}
+html body #design#design #services#services .service-detail-inner p {
+  font-size: 14px !important;
+  line-height: 1.75 !important;
+  margin: 0 0 16px !important;
+  color: color-mix(in srgb, var(--ink) 84%, transparent) !important;
+}
+html body #design#design #services#services .service-detail-inner ul {
+  display: grid !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+html body #design#design #services#services .service-detail-inner li.svc-line {
+  font-size: 13px !important;
+  line-height: 1.65 !important;
+  padding: 0 !important;
+  color: var(--ink) !important;
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Practice: portrait and story share a row; the figures form its full-width
+   closing band instead of competing with the text column. */
+html body #design#design > .section.practice-note .bio-teaser.bio-teaser {
+  display: block !important;
+  height: auto !important;
+  max-height: none !important;
+}
+html body #design#design > .section.practice-note .bio-teaser-grid {
+  display: grid !important;
+  grid-template-columns: minmax(180px, .65fr) minmax(0, 1.35fr) !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  gap: 32px clamp(28px, 5vw, 64px) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+html body #design#design > .section.practice-note .bio-teaser-portrait.bio-teaser-portrait {
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  align-content: start !important;
+  aspect-ratio: auto !important;
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  justify-items: center !important;
+  gap: 14px !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+html body #design#design > .section.practice-note .bio-teaser-portrait.bio-teaser-portrait > img {
+  width: min(100%, 260px) !important;
+  height: auto !important;
+  aspect-ratio: 1 !important;
+  object-fit: cover !important;
+  object-position: center 28% !important;
+  border-radius: 50% !important;
+}
+html body #design#design > .section.practice-note .bio-teaser-portrait figcaption {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 4px 12px !important;
+  position: static !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 10px !important;
+  line-height: 1.7 !important;
+  color: color-mix(in srgb, var(--ink) 72%, transparent) !important;
+  background: none !important;
+}
+html body #design#design > .section.practice-note .portrait-orbit { display: none !important; }
+html body #design#design > .section.practice-note .bio-teaser-text {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  min-width: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+}
+html body #design#design > .section.practice-note .bio-teaser-title {
+  max-width: 24ch !important;
+  font-size: clamp(28px, 3.2vw, 42px) !important;
+  line-height: 1.25 !important;
+  margin: 12px 0 16px !important;
+  color: var(--ink) !important;
+}
+html body #design#design > .section.practice-note .bio-teaser-text > p {
+  font-size: 15px !important;
+  line-height: 1.75 !important;
+  color: color-mix(in srgb, var(--ink) 82%, transparent) !important;
+  margin: 0 0 20px !important;
+}
+html body #design#design > .section.practice-note .stats {
+  grid-column: 1 / -1 !important;
+  grid-row: 2 !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-template-rows: auto !important;
+  gap: 0 !important;
+  height: auto !important;
+  flex-shrink: 0 !important;
+  border-block: 1px solid var(--line) !important;
+}
+html body #design#design > .section.practice-note .stats .stat {
+  min-width: 0 !important;
+  height: auto !important;
+  padding: 20px 16px !important;
+  gap: 8px !important;
+  border: 0 !important;
+  border-inline-start: 1px solid var(--line) !important;
+}
+html body #design#design > .section.practice-note .stats .stat:first-child { border-inline-start: 0 !important; }
+html body #design#design > .section.practice-note .stats .stat .stat-num {
+  font-size: clamp(28px, 3vw, 36px) !important;
+  line-height: 1.25 !important;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+html[dir="rtl"] body #design#design > .section.practice-note .stats .stat .stat-num { text-align: right !important; }
+html body #design#design > .section.practice-note .stats .stat .stat-label {
+  font-size: 12px !important;
+  line-height: 1.6 !important;
+  letter-spacing: .025em !important;
+  color: color-mix(in srgb, var(--ink) 82%, transparent) !important;
+}
+
+@media (max-width: 1000px) {
+  html body #design#design #services#services .service-showcase-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 28px !important;
+  }
+  html body #design#design #services#services .section-title { max-width: 24ch !important; }
+  html body #design#design #services#services .section-lede { max-width: 60ch !important; }
+}
+@media (max-width: 700px) {
+  html body #design#design > .section.practice-note .bio-teaser-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto auto !important;
+    gap: 24px !important;
+  }
+  html body #design#design > .section.practice-note .bio-teaser-portrait.bio-teaser-portrait {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+  html body #design#design > .section.practice-note .bio-teaser-portrait.bio-teaser-portrait > img { width: 176px !important; }
+  html body #design#design > .section.practice-note .bio-teaser-text {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+  }
+  html body #design#design > .section.practice-note .stats {
+    grid-row: 3 !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: auto auto !important;
+  }
+  html body #design#design > .section.practice-note .stats .stat { padding: 16px 12px !important; }
+  html body #design#design > .section.practice-note .stats .stat:nth-child(3) { border-inline-start: 0 !important; }
+  html body #design#design > .section.practice-note .stats .stat:nth-child(n+3) { border-top: 1px solid var(--line) !important; }
+  html body #design#design #services#services .service-name { font-size: 16px !important; }
+}
+
+.gallery-archive-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 8px;
+  margin-top: 16px;
+  color: var(--ink);
+  text-underline-offset: 5px;
 }
 
 /* Shared focus: one quiet ring instead of mixed browser outlines. */

@@ -12,6 +12,8 @@
      /ku/blog         /ar/design/logo         /fr/bio
    ========================================================= */
 
+import { MEDIA_ARCHIVE_ROUTES } from './_media-archive-routes.js';
+
 const SITE = 'https://bqurtas.com';
 const SUPA = 'https://dcnkhzrishphpismmxuu.supabase.co';             // blog posts live here
 const SUPA_KEY = 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3';   // publishable (read-only, safe in client)
@@ -150,7 +152,7 @@ function retiredRedirectPath(pathname) {
 
 function isPassthroughPath(pathname, request) {
   if (/^\/(?:api|assets|css|js|vendor|\.well-known|mail|autodiscover)(?:\/|$)/i.test(pathname)) return true;
-  if (['/index.html', '/404.html', '/favicon.ico', '/llms.txt', '/robots.txt', '/security.txt', '/site.webmanifest', '/sitemap-images.xml'].includes(pathname)) return true;
+  if (['/index.html', '/404.html', '/favicon.ico', '/llms.txt', '/robots.txt', '/security.txt', '/site.webmanifest', '/sitemap-images.xml', '/sitemap-videos.xml', '/sitemap-gallery.xml', '/sitemap-media.xml'].includes(pathname)) return true;
   const acceptsHtml = /(?:^|,)\s*text\/html(?:\s*;|\s*,|$)/i.test(request.headers.get('Accept') || '');
   return !acceptsHtml && /\.[a-z0-9]{2,10}$/i.test(pathname);
 }
@@ -482,10 +484,25 @@ export async function onRequest(context) {
   // The image sitemap is a static file, but the CDN edge kept serving stale
   // HITs after deploys (Google would read an old copy). Serve it through the
   // function with no-store — freshness over speed, same policy as sitemap.xml.
-  if ((url.pathname === '/sitemap-images.xml' || url.pathname === '/sitemap-media.xml' || url.pathname === '/sitemap-gallery.xml') && env && env.ASSETS) {
-    const r = await env.ASSETS.fetch(new URL('/sitemap-images.xml', url.origin));
+  if (['/sitemap-images.xml', '/sitemap-media.xml', '/sitemap-gallery.xml', '/sitemap-videos.xml'].includes(url.pathname) && env && env.ASSETS) {
+    // Retain the old media alias, but each generated sitemap has its own body.
+    const sitemapPath = url.pathname === '/sitemap-media.xml' ? '/sitemap-images.xml' : url.pathname;
+    const r = await env.ASSETS.fetch(new URL(sitemapPath, url.origin));
     if (!r.ok) return serveUnavailable(request);
     return new Response(request.method === 'HEAD' ? null : r.body, { status: 200, headers: sitemapHeaders() });
+  }
+  // Only generated archive pages may reach static delivery. An unknown path
+  // must remain a real 404 even if Pages' fallback policy changes later.
+  if (/^\/(?:archive|watch)(?:\/|$)/i.test(url.pathname)) {
+    const candidate = url.pathname.endsWith('/index.html')
+      ? url.pathname.slice(0, -'index.html'.length)
+      : url.pathname.replace(/\/?$/, '/');
+    if (!MEDIA_ARCHIVE_ROUTES.has(candidate)) return serveNotFound(request, url, env);
+    if (url.pathname !== candidate) {
+      url.pathname = candidate;
+      return Response.redirect(url.toString(), 301);
+    }
+    return next();
   }
   const redirectPath = retiredRedirectPath(url.pathname);
   if (redirectPath) {

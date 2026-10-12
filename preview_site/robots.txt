@@ -36,3 +36,5 @@ Allow: /
 
 Sitemap: https://bqurtas.com/sitemap.xml
 Sitemap: https://bqurtas.com/sitemap-images.xml
+Sitemap: https://bqurtas.com/sitemap-gallery.xml
+Sitemap: https://bqurtas.com/sitemap-videos.xml

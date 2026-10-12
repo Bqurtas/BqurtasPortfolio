@@ -39,7 +39,7 @@ for (const [index, match] of [...html.matchAll(/<script\s+type="application\/ld\
   catch (error) { failures.push(`structured data block ${index + 1} is not valid JSON: ${error.message}`); }
 }
 
-for (const file of ['sitemap.xml', 'sitemap-images.xml']) {
+for (const file of ['sitemap.xml', 'sitemap-images.xml', 'sitemap-gallery.xml', 'sitemap-videos.xml']) {
   const xml = readFileSync(resolve(root, file), 'utf8');
   if (!/^<\?xml[\s\S]*<urlset\b[\s\S]*<\/urlset>\s*$/i.test(xml)) failures.push(`${file} is not a complete urlset`);
 }

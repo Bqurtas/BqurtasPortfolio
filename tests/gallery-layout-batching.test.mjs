@@ -104,18 +104,18 @@ test('paper measurement batches spacer reads and paints meters without further s
     allowsInnerScroll: () => true, paperLabel: () => 'Reading section',
   };
   vm.runInNewContext(meterSource + measurementSource + '\nglobalThis.finalTailTrack = tailTrack;', context);
-  assert.deepEqual(sheets.map(sheet => sheet.scroller.dataset.paperOverflow), ['20', '0', '400']);
+  assert.deepEqual(sheets.map(sheet => sheet.scroller.dataset.paperOverflow), ['20', '8', '400']);
   assert.equal(context.finalTailTrack, 400);
   assert.equal(sheets[0].meter.style['--bq-meter-h'], '171.43px', 'meter keeps its original ratio using restored scroller height');
-  assert.equal(sheets[1].meter.dataset.trackHeight, undefined, 'fitting content keeps its meter inactive');
+  assert.equal(sheets[1].meter.dataset.trackHeight, '200', 'even 8px of real overflow must remain reachable');
   const firstRestore = events.findIndex(event => event.endsWith(':remove:display'));
   const naturalReads = events.map((event, index) => event.includes(':natural:') ? index : -1).filter(index => index >= 0);
   assert.ok(naturalReads.every(index => index < firstRestore));
   const firstMeterWrite = events.findIndex(event => /^meter\d+:/.test(event));
   assert.ok(events.slice(firstMeterWrite).every(event => !/:(scrollHeight|clientHeight|scrollTop|meterHeight)$/.test(event)),
     'painting meters must not force another measurement between sheets');
-  assert.equal(events.filter(event => event.endsWith(':scrollHeight')).length, 5,
-    'three authored-size reads plus two active-meter reads; no unused rawOverflow reads');
+  assert.equal(events.filter(event => event.endsWith(':scrollHeight')).length, 6,
+    'three authored-size reads plus three active-meter reads; no unused rawOverflow reads');
 });
 
 test('a growing work track refreshes following paper anchors even when its viewport stays fixed', () => {

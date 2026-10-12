@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { minify } from 'terser';
 import { minify as minifyCss } from 'csso';
 import { generateGalleryManifest } from './generate-gallery-manifest.mjs';
+import { generateMediaArchive } from './generate-media-archive.mjs';
 
 const projectRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const siteRoot = path.join(projectRoot, 'preview_site');
@@ -141,7 +142,8 @@ async function compileStylesheets() {
 }
 
 export async function buildAssets() {
-  await generateGalleryManifest();
+  const manifest = await generateGalleryManifest();
+  await generateMediaArchive({ manifest });
   await compileJavaScript();
   await compileStylesheets();
 

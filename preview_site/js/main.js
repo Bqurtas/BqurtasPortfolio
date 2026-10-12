@@ -2081,7 +2081,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const liveOverflow = allowInner
       ? Math.max(0, scroller.scrollHeight - scroller.clientHeight)
       : 0;
-    const innerMax = liveOverflow > 12 ? Math.ceil(liveOverflow) : 0;
+    const innerMax = liveOverflow > 1 ? Math.ceil(liveOverflow) : 0;
     if (!Number.isFinite(sheetStart)) return false;
     /* Non-portfolio targets only need the sheet brought to its document anchor. */
     if (!allowInner) {
@@ -2346,7 +2346,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
            which reads as an inner scroll on a page that has nothing to scroll.
            Measuring the authored content alone means a card that fits simply
            hands over to the next one. Sub-pixel/font rounding is ignored. */
-        const overflow = naturalOverflow > 12 ? Math.ceil(naturalOverflow) : 0;
+        const overflow = naturalOverflow > 1 ? Math.ceil(naturalOverflow) : 0;
         const hasNaturalOverflow = overflow > 0;
         entry.overflow = overflow;
 
@@ -2517,6 +2517,12 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         [...scroller.children]
           .filter((child) => !child.classList.contains('paper-reading-spacer'))
           .forEach((child) => resizeObserver.observe(child));
+        if (sheet.classList.contains('service-showcase')) {
+          // The layout can stay viewport-sized while an accordion detail
+          // grows inside it. Track those boxes as well so opening a panel,
+          // font changes and translated copy extend the reading distance.
+          scroller.querySelectorAll('.service-detail').forEach((detail) => resizeObserver.observe(detail));
+        }
         mutationObserver?.observe(scroller, { childList: true, subtree: true });
       }
     });
