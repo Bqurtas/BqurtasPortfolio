@@ -68,7 +68,7 @@
 
 # The archive index is standalone HTML with no executable scripts.
 /archive/*
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: public, max-age=0, must-revalidate, no-transform
   Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'
 
 /robots.txt

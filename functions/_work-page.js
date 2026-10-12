@@ -17,9 +17,9 @@ import {
   SITE, PERSON_ID, AUTHOR, COLLECTIONS, collectionLabel, collectionPath, describe, displayTitle,
   isoDuration, loadCatalog, mediaPath, mediaType, mediaUrl, pad2, workPath, workUrl
 } from './_gallery-catalog.js';
+import { KUFI_FACES } from './_font-faces.js';
 
 const LANG_PREFIXES = ['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];
-const KUFI = '/assets/fonts/noto-kufi-CSRk4ydQnPyaDxEXLFF6LZVLKrodnOEPEWKo.woff2';
 const SIBLINGS = 12;
 
 const esc = (value) => String(value == null ? '' : value)
@@ -115,7 +115,7 @@ function structuredData(item, copy, canon, list) {
 }
 
 const STYLE = `
-@font-face{font-family:'Noto Kufi Arabic';font-style:normal;font-weight:400 700;font-display:swap;src:url(${KUFI}) format('woff2')}
+${KUFI_FACES}
 :root{--bed:#0b0b0c;--paper:#f3f3f3;--plate:#fff;--ink:#141414;--ink-2:#2c2c2c;--muted:#6a6a6a;--line:rgba(20,20,20,.12);--bed-ink:#f3f3f3;--bed-muted:rgba(243,243,243,.58);--sans:'Noto Kufi Arabic',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--mono:ui-monospace,'SFMono-Regular','SF Mono',Menlo,Consolas,'Liberation Mono',monospace;color-scheme:dark}
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}

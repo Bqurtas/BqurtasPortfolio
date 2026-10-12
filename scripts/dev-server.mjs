@@ -3,6 +3,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { loadCatalog, mediaType } from '../functions/_gallery-catalog.js';
+import { parseWorkPath, serveWorkPage } from '../functions/_work-page.js';
+import { mediaKeyFromPath } from '../functions/media/[[path]].js';
 
 const projectRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 export const DEFAULT_ROOT = path.join(projectRoot, 'preview_site');
@@ -115,11 +118,76 @@ function sendText(res, status, message) {
   res.end(body);
 }
 
+/* Production answers two routes from Pages Functions rather than files:
+   /media/<Folder>/<file> (the repository's original artwork, allowlisted by
+   the gallery manifest) and one rendered page per work, /design/<coll>/<n>.
+   The preview runs the same code against local files, so the archive cards,
+   their images and the pages they open all work here too. */
+function localAssets(root) {
+  return {
+    fetch: async (input) => {
+      const target = resolveRequestTarget(new URL(input.url || input).pathname, root);
+      if (target.status !== 200 || target.spaFallback) return new Response('Not Found', { status: 404 });
+      return new Response(fs.readFileSync(target.filePath), {
+        headers: { 'Content-Type': MIME_TYPES[path.extname(target.filePath).toLowerCase()] || 'application/octet-stream' }
+      });
+    }
+  };
+}
+
+async function sendResponse(req, res, response) {
+  const headers = Object.fromEntries([...response.headers].filter(([name]) => name !== 'content-encoding'));
+  const body = req.method === 'HEAD' || !response.body ? undefined : Buffer.from(await response.arrayBuffer());
+  res.writeHead(response.status, { ...headers, 'Cache-Control': 'no-store' });
+  res.end(body);
+}
+
+async function serveFunctionRoute(req, res, root, assets) {
+  const url = new URL(req.url, 'http://localhost');
+  const env = { ASSETS: assets };
+  const mediaKey = url.pathname.startsWith('/media/') ? mediaKeyFromPath(url.pathname) : null;
+  if (mediaKey !== null) {
+    const catalog = await loadCatalog(env, url.origin);
+    const file = path.resolve(path.dirname(path.resolve(root)), mediaKey);
+    if (!mediaKey || !mediaType(mediaKey) || (!catalog.byPath.has(mediaKey) && !catalog.extra.has(mediaKey)) || !fs.existsSync(file)) {
+      sendText(res, 404, 'Not Found');
+    } else {
+      const data = fs.readFileSync(file);
+      res.writeHead(200, { 'Content-Type': mediaType(mediaKey), 'Content-Length': data.length, 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
+      res.end(req.method === 'HEAD' ? undefined : data);
+    }
+    return true;
+  }
+  const work = parseWorkPath(url.pathname);
+  if (!work) return false;
+  if (work.redirect || work.status === 404) {
+    if (work.redirect) { res.writeHead(301, { Location: work.redirect + url.search }); res.end(); }
+    else sendText(res, 404, 'Not Found');
+    return true;
+  }
+  const request = new Request(new URL(url.pathname + url.search, 'http://localhost'), { method: req.method });
+  await sendResponse(req, res, await serveWorkPage(request, url, env, work, {
+    next: () => new Response('Not Found', { status: 404 }),
+    notFound: () => new Response('Not Found', { status: 404 }),
+    unavailable: () => new Response('Catalogue unavailable', { status: 503 }),
+    securityHeaders: () => ({})
+  }));
+  return true;
+}
+
 export function createRequestHandler(root = DEFAULT_ROOT) {
-  return (req, res) => {
+  const assets = localAssets(root);
+  return async (req, res) => {
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       res.setHeader('Allow', 'GET, HEAD');
       sendText(res, 405, 'Method Not Allowed');
+      return;
+    }
+
+    try {
+      if (await serveFunctionRoute(req, res, root, assets)) return;
+    } catch {
+      if (!res.headersSent) sendText(res, 500, 'Function route failed');
       return;
     }
 

@@ -19,16 +19,18 @@ const pageURL = (slug, page = 1) => `/archive/${slug}/${page === 1 ? '' : `${pag
 
 // The archive is independent of the animated application: native links and
 // media remain usable without JavaScript, and never load on the main page.
-const STYLE = `
-@font-face{font-family:Manrope;src:url('/assets/fonts/manrope-full.woff2') format('woff2');font-display:swap}
+// Manrope comes from the same split faces as the main site (fonts.css), so a
+// page fetches its 34 KB core face, not the 54 KB file with Greek/Cyrillic.
+const STYLE = (fontFaces) => `
+${fontFaces}
 :root{color-scheme:light dark;--paper:#f3f3ef;--ink:#171719;--muted:#626260;--line:#d5d5d0;--card:#fff}
 *{box-sizing:border-box}html{background:var(--paper);color:var(--ink)}body{margin:0;font-family:Manrope,Arial,sans-serif;line-height:1.6}a{color:inherit;text-underline-offset:.22em}a:focus-visible{outline:3px solid currentColor;outline-offset:5px}a:hover{text-decoration-thickness:2px}.skip{position:absolute;left:20px;top:-80px;background:var(--card);padding:12px;z-index:2}.skip:focus{top:12px}
-.shell{width:min(1240px,100% - 64px);margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px 0;border-bottom:1px solid var(--line)}.brand{font-weight:800;text-decoration:none;letter-spacing:-.03em}.top nav{display:flex;gap:24px;flex-wrap:wrap}.eyebrow{text-transform:uppercase;letter-spacing:.18em;font-size:11px;font-weight:700;color:var(--muted)}.intro{padding:64px 0 32px;max-width:900px}h1{font-size:clamp(36px,6vw,76px);line-height:1.07;letter-spacing:-.065em;margin:12px 0 24px;font-weight:700}.intro p{max-width:640px;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:24px;margin:24px 0 40px}.card{margin:0;min-width:0;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:var(--card)}.media{display:flex;align-items:center;justify-content:center;aspect-ratio:4/3;background:var(--card);overflow:hidden}.media img{display:block;width:100%;height:100%;object-fit:contain}.caption{padding:18px 20px 22px;border-top:1px solid var(--line)}.caption h2{font-size:16px;margin:0 0 4px}.caption p{margin:0;color:var(--muted);font-size:13px}.category-link{display:flex;justify-content:space-between;gap:20px;padding:26px;font-size:18px;font-weight:700;text-decoration:none}.category-link span{color:var(--muted);font-size:13px;white-space:nowrap}.pagination{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:32px 0 56px}.pagination a,.pagination span{display:inline-flex;min-width:44px;min-height:44px;align-items:center;justify-content:center;padding:8px 14px;border:1px solid var(--line);border-radius:999px;text-decoration:none}.pagination [aria-current]{color:var(--paper);background:var(--ink);border-color:var(--ink)}.crumb{font-size:13px;margin-top:28px;color:var(--muted)}footer{border-top:1px solid var(--line);padding:28px 0 40px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.shell{width:min(1240px,100% - 64px);margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px 0;border-bottom:1px solid var(--line)}.brand{font-weight:800;text-decoration:none;letter-spacing:-.03em}.top nav{display:flex;gap:24px;flex-wrap:wrap}.eyebrow{text-transform:uppercase;letter-spacing:.18em;font-size:11px;font-weight:700;color:var(--muted)}.intro{padding:64px 0 32px;max-width:900px}h1{font-size:clamp(36px,6vw,76px);line-height:1.07;letter-spacing:-.065em;word-spacing:.1em;margin:12px 0 24px;font-weight:700}.intro p{max-width:640px;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:24px;margin:24px 0 40px}.card{margin:0;min-width:0;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:var(--card)}.media{display:flex;align-items:center;justify-content:center;aspect-ratio:4/3;background:var(--card);overflow:hidden}.media img{display:block;width:100%;height:100%;object-fit:contain}.caption{padding:18px 20px 22px;border-top:1px solid var(--line)}.caption h2{font-size:16px;margin:0 0 4px}.caption p{margin:0;color:var(--muted);font-size:13px}.category-link{display:flex;justify-content:space-between;gap:20px;padding:26px;font-size:18px;font-weight:700;text-decoration:none}.category-link span{color:var(--muted);font-size:13px;white-space:nowrap}.pagination{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:32px 0 56px}.pagination a,.pagination span{display:inline-flex;min-width:44px;min-height:44px;align-items:center;justify-content:center;padding:8px 14px;border:1px solid var(--line);border-radius:999px;text-decoration:none}.pagination [aria-current]{color:var(--paper);background:var(--ink);border-color:var(--ink)}.crumb{font-size:13px;margin-top:28px;color:var(--muted)}footer{border-top:1px solid var(--line);padding:28px 0 40px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
 @media(prefers-color-scheme:dark){:root{--paper:#101011;--ink:#f3f3ef;--muted:#b4b4af;--line:#38383b;--card:#1b1b1d}}
 @media(max-width:600px){.shell{width:calc(100% - 32px)}.top{gap:16px;align-items:flex-start;flex-direction:column;padding:20px 0}.top nav{gap:18px;font-size:14px}.intro{padding:40px 0 16px}.grid{gap:18px}.caption{padding:16px}.pagination{gap:8px}.category-link{padding:22px}}
 `;
 
-function documentHTML({ title, description, route, content, image }) {
+function documentHTML({ title, description, route, content, image, fontFaces }) {
   return `<!doctype html>
 ${GENERATED}
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -37,7 +39,7 @@ ${GENERATED}
 <link rel="canonical" href="${SITE}${route}"><link rel="icon" href="/favicon.ico">
 <meta property="og:type" content="website"><meta property="og:title" content="${escape(title)} — Barakat Qurtas"><meta property="og:description" content="${escape(description)}"><meta property="og:url" content="${SITE}${route}">
 ${image ? `<meta property="og:image" content="${escape(image)}">` : ''}
-<style>${STYLE}</style></head><body><a class="skip" href="#content">Skip to content</a><div class="shell">
+<style>${STYLE(fontFaces)}</style></head><body><a class="skip" href="#content">Skip to content</a><div class="shell">
 <header class="top"><a class="brand" href="/">Barakat Qurtas<span aria-hidden="true">®</span></a><nav aria-label="Main navigation"><a href="/design">Portfolio</a><a href="/archive/">Archive</a><a href="/contact">Contact</a></nav></header>
 <main id="content">${content}</main>
 <footer><span>Barakat Qurtas · Design, printing &amp; advertising</span><a href="/design">Back to the portfolio</a></footer></div></body></html>\n`;
@@ -53,16 +55,30 @@ function pagination(slug, current, count) {
   return `<nav class="pagination" aria-label="Archive pages">${links}</nav>`;
 }
 
-function card(item, index, label) {
+/* Card width per layout (see .grid/.shell): one column up to 608 px, then
+   2/3/4 columns of minmax(260px, 1fr) in min(1240px, 100% - 64px). */
+const CARD_SIZES = '(max-width: 600px) calc(100vw - 34px), (max-width: 608px) calc(100vw - 66px), (max-width: 891px) calc(50vw - 46px), (max-width: 1175px) calc(33.4vw - 39px), (max-width: 1303px) calc(25vw - 36px), 292px';
+
+/* The gallery's 320 px thumbnail is a srcset candidate next to the original:
+   a standard-density desktop downloads ~10 KB per card instead of the full
+   file, while src stays the original for crawlers and dense screens. */
+function srcset(owner, source, thumbs) {
+  const thumb = thumbs.get(owner.path);
+  if (!thumb || thumb.width >= owner.width) return '';
+  return ` srcset="${escape(thumb.url)} ${thumb.width}w, ${escape(source)} ${owner.width}w" sizes="${CARD_SIZES}"`;
+}
+
+function card(item, index, label, thumbs) {
   const owner = item.canonical || item;
   const href = workPath(owner.coll, owner.index);
   const source = item.type === 'image' ? mediaPath(owner.path) : item.poster;
   const title = displayTitle(item.coll, item.index);
-  const image = source ? `<a class="media" href="${escape(href)}" tabindex="-1" aria-hidden="true"><img src="${escape(source)}" alt="${escape(describe(owner).alt)}" width="${item.width}" height="${item.height}" loading="${index < 2 ? 'eager' : 'lazy'}" decoding="async"></a>` : '';
+  const set = item.type === 'image' ? srcset(owner, source, thumbs) : '';
+  const image = source ? `<a class="media" href="${escape(href)}" tabindex="-1" aria-hidden="true"><img src="${escape(source)}"${set} alt="${escape(describe(owner).alt)}" width="${item.width}" height="${item.height}" loading="${index < 2 ? 'eager' : 'lazy'}" decoding="async"></a>` : '';
   return `<article class="card" id="work-${item.coll}-${item.index}">${image}<div class="caption"><h2><a href="${escape(href)}">${escape(title)}${item.type === 'video' ? ' · Watch' : ''}</a></h2><p>${escape(label)} · Barakat Qurtas portfolio</p></div></article>`;
 }
 
-export function buildMediaArchive(manifest, { pageSize = 24 } = {}) {
+export function buildMediaArchive(manifest, { pageSize = 24, thumbs = new Map(), fontFaces = '' } = {}) {
   if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100) throw new Error('Invalid archive page size');
   const catalog = catalogFromManifest(manifest);
   // The upstream catalogue owns indexing, media URLs and duplicate detection.
@@ -71,7 +87,7 @@ export function buildMediaArchive(manifest, { pageSize = 24 } = {}) {
   for (const coll of Object.keys(COLLECTIONS)) if (!ARCHIVES[coll]) throw new Error(`Collection missing from archive: ${coll}`);
   const files = new Map(), pages = [], categories = [];
   const addPage = (route, values) => {
-    files.set(`${route.slice(1)}index.html`, documentHTML({ ...values, route }));
+    files.set(`${route.slice(1)}index.html`, documentHTML({ ...values, route, fontFaces }));
     pages.push(route);
   };
   for (const [coll, [slug, label]] of Object.entries(ARCHIVES)) {
@@ -89,7 +105,7 @@ export function buildMediaArchive(manifest, { pageSize = 24 } = {}) {
       const navigation = pagination(slug, page, totalPages);
       const first = batch[0].canonical || batch[0];
       addPage(route, { title, description, image: first.type === 'image' ? mediaUrl(first.path) : first.poster ? SITE + first.poster : null,
-        content: `<p class="crumb"><a href="/archive/">Archive</a> / ${escape(label)}</p><section class="intro"><p class="eyebrow">Works ${range} / ${collection.length}</p><h1>${escape(label)}</h1><p>${coll === 'video' ? 'Films and motion work from the portfolio. Choose a video to watch.' : 'Images from the portfolio. Select a work to explore it in detail.'}</p></section>${navigation}<div class="grid">${batch.map((item, index) => card(item, index, label)).join('\n')}</div>${navigation}` });
+        content: `<p class="crumb"><a href="/archive/">Archive</a> / ${escape(label)}</p><section class="intro"><p class="eyebrow">Works ${range} / ${collection.length}</p><h1>${escape(label)}</h1><p>${coll === 'video' ? 'Films and motion work from the portfolio. Choose a video to watch.' : 'Images from the portfolio. Select a work to explore it in detail.'}</p></section>${navigation}<div class="grid">${batch.map((item, index) => card(item, index, label, thumbs)).join('\n')}</div>${navigation}` });
     }
   }
   addPage('/archive/', { title: 'Work Archive', description: `Browse ${manifest.images.length} images and ${manifest.videos.length} videos from Barakat Qurtas’s design portfolio.`,
@@ -97,6 +113,42 @@ export function buildMediaArchive(manifest, { pageSize = 24 } = {}) {
   files.set('sitemap-gallery.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map(route => `  <url><loc>${SITE}${route}</loc></url>`).join('\n')}\n</urlset>\n`);
   const routeModule = `// Generated by scripts/generate-media-archive.mjs; do not edit.\nexport const MEDIA_ARCHIVE_ROUTES = new Set(${JSON.stringify([...pages].sort(), null, 2)});\n`;
   return { files, pages, routeModule, imageCount: manifest.images.length, videoCount: manifest.videos.length };
+}
+
+function webpWidth(bytes) {
+  if (bytes.toString('latin1', 0, 4) !== 'RIFF' || bytes.toString('latin1', 8, 12) !== 'WEBP') return 0;
+  const chunk = bytes.toString('latin1', 12, 16);
+  if (chunk === 'VP8 ') return bytes.readUInt16LE(26) & 0x3fff;
+  if (chunk === 'VP8L') return (bytes.readUInt32LE(21) & 0x3fff) + 1;
+  if (chunk === 'VP8X') return bytes.readUIntLE(24, 3) + 1;
+  return 0;
+}
+
+/* Inputs the archive takes from the built site: the gallery thumbnails that
+   exist (with their real widths) and the Manrope faces from fonts.css. The
+   faces keep only src + unicode-range, so the archive renders as before. */
+export async function archiveAssets(siteRoot = path.join(projectRoot, 'preview_site')) {
+  const thumbs = new Map();
+  const base = path.join(siteRoot, 'assets/thumbs');
+  let folders = [];
+  try { folders = await readdir(base); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+  for (const folder of folders) {
+    let files = [];
+    try { files = await readdir(path.join(base, folder)); } catch { continue; }
+    for (const file of files.filter((name) => name.endsWith('.webp'))) {
+      const handle = await readFile(path.join(base, folder, file));
+      const width = webpWidth(handle);
+      if (width) thumbs.set(`${folder}/${file}`, { url: `/assets/thumbs/${folder}/${encodeURIComponent(file)}`, width });
+    }
+  }
+  const css = await readFile(path.join(siteRoot, 'css/fonts.css'), 'utf8');
+  const fontFaces = [...css.matchAll(/@font-face \{[^}]*font-family: 'Manrope';[^}]*\}/g)].map(([face]) => {
+    const src = face.match(/src: (url\([^)]+\) format\('woff2'\))/)[1];
+    const range = face.match(/unicode-range: ([^;]+);/)[1];
+    return `@font-face{font-family:Manrope;src:${src};font-display:swap;unicode-range:${range}}`;
+  }).join('\n');
+  if (!fontFaces) throw new Error('Manrope faces not found in fonts.css');
+  return { thumbs, fontFaces };
 }
 
 async function writeIfChanged(file, body) {
@@ -107,7 +159,7 @@ async function writeIfChanged(file, body) {
 
 export async function generateMediaArchive({ root = projectRoot, manifest, siteRoot = path.join(root, 'preview_site') } = {}) {
   manifest ||= JSON.parse(await readFile(path.join(siteRoot, 'assets/gallery-manifest.json'), 'utf8'));
-  const result = buildMediaArchive(manifest);
+  const result = buildMediaArchive(manifest, await archiveAssets(siteRoot));
   // Remove only our generated HTML when collections shrink; never authored files.
   let entries = [];
   try { entries = await readdir(path.join(siteRoot, 'archive'), { recursive: true }); } catch (error) { if (error.code !== 'ENOENT') throw error; }

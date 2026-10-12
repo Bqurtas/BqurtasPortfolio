@@ -14,6 +14,7 @@
 
 import { MEDIA_ARCHIVE_ROUTES } from './_media-archive-routes.js';
 import { parseWorkPath, serveWorkPage } from './_work-page.js';
+import { untransformedDocument } from './_untransformed.js';
 
 const SITE = 'https://bqurtas.com';
 const SUPA = 'https://dcnkhzrishphpismmxuu.supabase.co';             // blog posts live here
@@ -503,7 +504,7 @@ export async function onRequest(context) {
       url.pathname = candidate;
       return Response.redirect(url.toString(), 301);
     }
-    return next();
+    return untransformedDocument(request, await next());
   }
   const redirectPath = retiredRedirectPath(url.pathname);
   if (redirectPath) {
@@ -519,12 +520,12 @@ export async function onRequest(context) {
       return Response.redirect(url.toString(), 301);
     }
     if (work.status === 404) return serveNotFound(request, url, env);
-    return serveWorkPage(request, url, env, work, {
+    return untransformedDocument(request, await serveWorkPage(request, url, env, work, {
       next,
       notFound: () => serveNotFound(request, url, env),
       unavailable: () => serveUnavailable(request),
       securityHeaders: documentSecurityHeaders
-    });
+    }));
   }
   const r = resolve(url.pathname);
   if (!r) {

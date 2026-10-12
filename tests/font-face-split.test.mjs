@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { FONTS_CSS, SPLITS } from '../scripts/split-font-faces.mjs';
+import { FACE_MODULE, FONTS_CSS, SPLITS, faceModule } from '../scripts/split-font-faces.mjs';
 import { woff2Codepoints } from '../scripts/woff2-cmap.mjs';
 
 const root = path.resolve(new URL('..', import.meta.url).pathname);
@@ -54,4 +54,11 @@ test('the page preloads the Noto Kufi Latin face at its exact @font-face URL', (
   const latin = facesOf('Noto Kufi Arabic').find((face) => face.src.includes('-latin.'));
   const preloads = [...html.matchAll(/<link rel="preload" href="([^"]+)" as="font" type="font\/woff2" crossorigin>/g)].map((match) => match[1]);
   assert.deepEqual(preloads, [latin.src]);
+});
+
+test('work pages inline exactly the Noto Kufi faces of fonts.css', async () => {
+  assert.equal(await readFile(path.join(root, FACE_MODULE), 'utf8'), faceModule(css));
+  const workPage = await readFile(path.join(root, 'functions/_work-page.js'), 'utf8');
+  assert.match(workPage, /\$\{KUFI_FACES\}/);
+  assert.doesNotMatch(workPage, /noto-kufi-CSRk4/);
 });

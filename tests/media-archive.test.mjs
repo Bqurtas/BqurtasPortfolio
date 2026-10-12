@@ -3,14 +3,17 @@ import assert from 'node:assert/strict';
 import { readFile, stat, mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
-import { buildMediaArchive, generateMediaArchive } from '../scripts/generate-media-archive.mjs';
+import { archiveAssets, buildMediaArchive, generateMediaArchive } from '../scripts/generate-media-archive.mjs';
 import { catalogFromManifest, mediaPath, workPath } from '../functions/_gallery-catalog.js';
 import { onRequest } from '../functions/[[route]].js';
-import { resolveRequestTarget } from '../scripts/dev-server.mjs';
+import { createRequestHandler, resolveRequestTarget } from '../scripts/dev-server.mjs';
+import http from 'node:http';
+import zlib from 'node:zlib';
 
 const root = path.resolve(new URL('..', import.meta.url).pathname);
 const manifest = JSON.parse(await readFile(path.join(root, 'preview_site/assets/gallery-manifest.json'), 'utf8'));
-const generated = buildMediaArchive(manifest);
+const assets = await archiveAssets(path.join(root, 'preview_site'));
+const generated = buildMediaArchive(manifest, assets);
 const catalog = catalogFromManifest(manifest);
 
 test('every catalogue work is listed once and links to its canonical work page', () => {
@@ -32,7 +35,34 @@ test('archive images stay first-party so the archive CSP can stay img-src self',
   for (const [name, html] of generated.files) {
     if (!name.endsWith('.html')) continue;
     for (const [, src] of html.matchAll(/<img\b[^>]*\bsrc="([^"]+)"/g)) assert.match(src, /^\/(?:media|assets)\//, `${name}: ${src}`);
+    for (const [, set] of html.matchAll(/\bsrcset="([^"]+)"/g)) for (const candidate of set.split(', ')) assert.match(candidate, /^\/(?:media|assets)\/\S+ \d+w$/, `${name}: ${candidate}`);
   }
+});
+
+test('cards offer the existing thumbnail at its real width and keep the original as src', async () => {
+  let cards = 0;
+  for (const [name, html] of generated.files) {
+    for (const [tag] of html.matchAll(/<img\b[^>]*>/g)) {
+      const set = tag.match(/srcset="([^"]+)"/)?.[1];
+      if (!set) continue;
+      cards += 1;
+      const [thumb, original] = set.split(', ');
+      const [thumbUrl, thumbWidth] = thumb.split(' ');
+      assert.equal(original.split(' ')[0], tag.match(/src="([^"]+)"/)[1], `${name}: src stays the original`);
+      const bytes = await readFile(path.join(root, 'preview_site', decodeURIComponent(thumbUrl)));
+      assert.ok(bytes.length > 0 && parseInt(thumbWidth, 10) > 0 && parseInt(thumbWidth, 10) < parseInt(original.split(' ')[1], 10), `${name}: ${thumb}`);
+      assert.match(tag, /sizes="\(max-width: 600px\)/);
+    }
+  }
+  assert.ok(cards >= manifest.images.length - 5, `${cards} cards carry a thumbnail candidate`);
+});
+
+test('the archive uses the split Manrope faces from fonts.css, not the full file', async () => {
+  const page = generated.files.get('archive/index.html');
+  assert.doesNotMatch(page, /manrope-full/);
+  const faces = [...page.matchAll(/@font-face\{font-family:Manrope;src:url\(([^)]+)\) format\('woff2'\);font-display:swap;unicode-range:[^}]+\}/g)];
+  assert.equal(faces.length, 2);
+  for (const [, url] of faces) assert.ok((await readFile(path.join(root, 'preview_site', url))).length > 0, url);
 });
 
 test('all archive pages are reachable by HTML links without script or button interactions', () => {
@@ -73,6 +103,8 @@ test('generation is deterministic and removes only obsolete generated pages', as
   t.after(() => rm(temp, { recursive: true, force: true }));
   const siteRoot = path.join(temp, 'preview_site');
   await mkdir(path.join(siteRoot, 'archive/manual'), { recursive: true });
+  await mkdir(path.join(siteRoot, 'css'), { recursive: true });
+  await writeFile(path.join(siteRoot, 'css/fonts.css'), await readFile(path.join(root, 'preview_site/css/fonts.css')));
   await writeFile(path.join(siteRoot, 'archive/manual/index.html'), '<h1>Authored archive page</h1>');
   const sample = { images: [manifest.images[0], manifest.images.at(-1)], videos: [] };
   await generateMediaArchive({ root: temp, manifest: sample });
@@ -83,6 +115,43 @@ test('generation is deterministic and removes only obsolete generated pages', as
   await generateMediaArchive({ root: temp, manifest: { images: [sample.images[0]], videos: [] } });
   await assert.rejects(stat(path.join(siteRoot, 'archive/ticker-logos/index.html')), { code: 'ENOENT' });
   assert.match(await readFile(path.join(siteRoot, 'archive/manual/index.html'), 'utf8'), /Authored archive page/);
+});
+
+test('archive and work pages tell Cloudflare not to inject scripts, and arrive gzipped instead', async () => {
+  const work = '/design/general/1';
+  const manifestBody = await readFile(path.join(root, 'preview_site/assets/gallery-manifest.json'));
+  const env = { ASSETS: { fetch: async () => new Response(manifestBody, { headers: { 'Content-Type': 'application/json' } }) } };
+  for (const [route, context] of [['/archive/books/2/', { env: {}, next: () => new Response('<!doctype html><p>static archive</p>', { headers: { 'Cache-Control': 'public, max-age=0, must-revalidate', ETag: '"abc"' } }) }], [work, { env, next: () => new Response('incorrect fallback') }]]) {
+    const plain = await onRequest({ ...context, request: new Request(`https://bqurtas.com${route}`, { headers: { Accept: 'text/html' } }) });
+    assert.equal(plain.status, 200, route);
+    assert.match(plain.headers.get('cache-control'), /no-transform/, route);
+    assert.equal(plain.headers.get('content-encoding'), null);
+    const unNonce = (html) => html.replace(/nonce-?[="']*[0-9a-f]{32}/g, 'nonce');
+    const identity = unNonce(await plain.text());
+    const zipped = await onRequest({ ...context, request: new Request(`https://bqurtas.com${route}`, { headers: { Accept: 'text/html', 'Accept-Encoding': 'br, gzip' } }) });
+    assert.equal(zipped.headers.get('content-encoding'), 'gzip', route);
+    assert.match(zipped.headers.get('vary'), /Accept-Encoding/);
+    assert.equal(unNonce(zlib.gunzipSync(Buffer.from(await zipped.arrayBuffer())).toString()), identity, route);
+    if (zipped.headers.get('etag')) assert.match(zipped.headers.get('etag'), /^W\//);
+  }
+  const headers = await readFile(path.join(root, 'preview_site/_headers'), 'utf8');
+  assert.match(headers, /\/archive\/\*\n  Cache-Control: [^\n]*no-transform/);
+});
+
+test('the local preview serves archive images and the work pages the cards open', async t => {
+  const server = http.createServer(createRequestHandler(path.join(root, 'preview_site')));
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => server.close());
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const image = await fetch(`${base}/media/GeneralDesign/GDesign1.webp`);
+  assert.equal(image.status, 200);
+  assert.equal(image.headers.get('content-type'), 'image/webp');
+  assert.equal((await fetch(`${base}/media/GeneralDesign/not-in-the-manifest.webp`)).status, 404);
+  assert.equal((await fetch(`${base}/media/..%2Fpackage.json`)).status, 404);
+  const page = await fetch(`${base}/design/general/1`);
+  assert.equal(page.status, 200);
+  assert.match(await page.text(), /\/media\/GeneralDesign\/GDesign1\.webp/);
+  assert.equal((await fetch(`${base}/design/general/99999`)).status, 404);
 });
 
 test('edge and local server preserve standalone archive pages instead of returning the application shell', async () => {
