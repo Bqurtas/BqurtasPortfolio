@@ -718,7 +718,7 @@
   <link rel="stylesheet" href="css/fonts.css?v=69cf74d1bd04">
   <link rel="stylesheet" href="css/experience.min.css?v=3b27e924e74d">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.css?v=b2eeb1f0a56d">
+  <link rel="stylesheet" href="css/polish.css?v=6f36196b5f13">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=a65cc728586a" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=a65cc728586a"></noscript>
 
@@ -2160,7 +2160,7 @@
   <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
        safe in the client; row-level security lets visitors only read posts. -->
   <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
-  <script defer src="js/i18n.v420.min.js?v=1e77fb510a2d"></script>
+  <script defer src="js/i18n.v420.min.js?v=d2f12601ce49"></script>
   <!-- Non-English visitors need the extra dictionaries before first render;
        English (the default + PSI) never loads them, keeping the parse light.
        applyLang() can also fetch this on its own, but starting it here — in
@@ -2188,7 +2188,7 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=ca6f6ae042da"></script>
+  <script defer src="js/main.v420.min.js?v=a84ac6f73cc1"></script>
   <script defer src="js/gallery.v420.min.js?v=fa1e31007f6a"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2333,7 +2333,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=6bdb01bbbc16', { updateViaCache: 'none' })
+            .register('/sw.js?v=daa91c8c314e', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });
