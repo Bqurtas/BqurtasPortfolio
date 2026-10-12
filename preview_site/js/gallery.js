@@ -331,6 +331,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     return `${pfx} ${galDigits(String(i).padStart(2, '0'))}`;
   };
   const galViewLabel = (title) => `${(window.BQ_DICT && window.BQ_DICT['a11y.view']) || 'View'} ${title}`;
+  /* The alt text also names the author, so an image met on its own (image
+     search, a saved copy) still says whose work it is. */
+  const galAlt = (title) => `${title} — ${({ ku: 'بەرەکات قورتاس', ar: 'بركات قرطاس' })[galLang()] || 'Barakat Qurtas'}`;
   const unavailableLabel = () => ({
     ku: 'پێشبینین بەردەست نییە', ar: 'المعاينة غير متاحة', kmr: 'Pêşdîtin ne berdest e',
     fr: 'Aperçu indisponible', tr: 'Önizleme kullanılamıyor', sv: 'Förhandsvisning saknas',
@@ -382,20 +385,30 @@ document.addEventListener('DOMContentLoaded', async () => {
        connections at once. */
     const mediaHtml = item.type === 'video'
       ? `<video muted loop playsinline preload="metadata" data-src="${item.url}" title="${dispTitle}" width="${dims.width}" height="${dims.height}"></video>`
-      : `<img loading="lazy" decoding="async" fetchpriority="low" src="${imgSrc}" alt="${dispTitle}" width="${dims.width}" height="${dims.height}" />`;
+      : `<img loading="lazy" decoding="async" fetchpriority="low" src="${imgSrc}" alt="${galAlt(dispTitle)}" width="${dims.width}" height="${dims.height}" />`;
 
+    /* A real link to the work's own page (/design/book/7), so crawlers can
+       reach every work. A plain click still opens the lightbox (main.js
+       prevents the navigation); a modified or middle click opens the page. */
     article.innerHTML = `
-      <button class="card-open" type="button" aria-label="${galViewLabel(dispTitle)}">
+      <a class="card-open" href="/design/${item.coll}/${item.index}" aria-label="${galViewLabel(dispTitle)}">
         <span class="card-art card-art--photo">
           ${mediaHtml}
           ${item.type === 'video' ? '<span class="card-video-badge" aria-hidden="true"><i class="fa-solid fa-play"></i></span>' : ''}
           <span class="card-hover-shade" aria-hidden="true"></span>
         </span>
-      </button>
+      </a>
       <div class="card-caption">
         <h3 class="card-title">${dispTitle}</h3>
         <span class="card-tag">${dispTag}</span>
       </div>`;
+
+    // Keep the keyboard parity the <button> had: Space opens the work too.
+    article.querySelector('.card-open')?.addEventListener('keydown', (event) => {
+      if (event.key !== ' ' && event.key !== 'Spacebar') return;
+      event.preventDefault();
+      event.currentTarget.click();
+    });
 
     /* Preserve the catalogue and masonry position even if a CDN is down. */
     const media = article.querySelector('img, video');
@@ -503,7 +516,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       div.setAttribute('aria-label', galViewLabel(dispTitle));
       div.innerHTML = `
         <span class="cert-img-wrap">
-          <img loading="lazy" decoding="async" width="${item.width || 640}" height="${item.height || 880}" src="${window.BQ_GALLERY.thumb(item.url, 320)}" data-full="${item.url}" data-raw="${item.rawUrl}" alt="${dispTitle}" />
+          <img loading="lazy" decoding="async" width="${item.width || 640}" height="${item.height || 880}" src="${window.BQ_GALLERY.thumb(item.url, 320)}" data-full="${item.url}" data-raw="${item.rawUrl}" alt="${galAlt(dispTitle)}" />
           <span class="cert-zoom"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
         </span>
         <span class="mono cert-label">${dispTitle}</span>`;
@@ -567,7 +580,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const tt = card.querySelector('.card-title'); if (tt) tt.textContent = title;
       const open = card.querySelector('.card-open'); if (open) open.setAttribute('aria-label', galViewLabel(title));
       const media = card.querySelector('img, video');
-      if (media) { if (media.tagName === 'IMG') media.alt = title; else media.title = title; }
+      if (media) { if (media.tagName === 'IMG') media.alt = galAlt(title); else media.title = title; }
       const status = card.querySelector('.card-media-status');
       if (status) status.textContent = unavailableLabel();
     });
@@ -575,7 +588,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const title = galTitle('certificate', div.dataset.idx, 'Certificate');
       div.dataset.title = title;
       const lbl = div.querySelector('.cert-label'); if (lbl) lbl.textContent = title;
-      const img = div.querySelector('img'); if (img) img.alt = title;
+      const img = div.querySelector('img'); if (img) img.alt = galAlt(title);
       div.setAttribute('aria-label', galViewLabel(title));
     });
     document.querySelectorAll('.logos-grid .logo-mark--ticker').forEach(mark => {

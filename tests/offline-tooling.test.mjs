@@ -198,7 +198,9 @@ test('service worker does not fetch an immutable fingerprint that is already cac
 
 test('service worker leaves non-app documents and live metadata to the network', async () => {
   const worker = await loadServiceWorker({ basicNetworkResponse: true });
-  for (const pathname of ['/404.html', '/missing-page', '/blog/0', '/autodiscover/autodiscover.xml', '/sitemap-gallery.xml', '/llms.txt']) {
+  for (const pathname of ['/404.html', '/missing-page', '/blog/0', '/autodiscover/autodiscover.xml', '/sitemap-gallery.xml', '/llms.txt',
+    // Work pages and same-origin media always come from the network.
+    '/design/book/7', '/ku/design/book/7', '/media/Book/BookCover7.webp', '/media/Videos/Videos26.mp4']) {
     for (const mode of ['navigate', 'cors']) {
       worker.handlers.fetch({
         request: { method: 'GET', url: `https://bqurtas.com${pathname}`, headers: new Headers({ Accept: mode === 'navigate' ? 'text/html' : '*/*' }), mode },

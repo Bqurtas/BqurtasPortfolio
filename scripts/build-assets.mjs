@@ -6,6 +6,7 @@ import { minify } from 'terser';
 import { minify as minifyCss } from 'csso';
 import { generateGalleryManifest } from './generate-gallery-manifest.mjs';
 import { generateMediaArchive } from './generate-media-archive.mjs';
+import { generateImageSitemap } from './generate-image-sitemap.mjs';
 
 const projectRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const siteRoot = path.join(projectRoot, 'preview_site');
@@ -174,6 +175,10 @@ export async function buildAssets() {
   if (await writeIfChanged(swPath, sw)) console.log(`sw.js -> ${stamp}`);
   if (await writeIfChanged(htmlPath, html)) console.log('index.html -> content fingerprints');
   if (await writeIfChanged(notFoundPath, notFound)) console.log('404.html -> content fingerprints');
+
+  // Homepage image URLs include fingerprints; generate only after index.html
+  // carries the release's final values, so a single build is self-consistent.
+  if ((await generateImageSitemap()).changed) console.log('sitemap-images.xml -> regenerated from the gallery manifest');
 
   const sitemapPath = path.join(siteRoot, 'sitemap.xml');
   const sitemap = await readFile(sitemapPath, 'utf8');

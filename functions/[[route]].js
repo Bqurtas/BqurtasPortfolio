@@ -13,6 +13,7 @@
    ========================================================= */
 
 import { MEDIA_ARCHIVE_ROUTES } from './_media-archive-routes.js';
+import { parseWorkPath, serveWorkPage } from './_work-page.js';
 
 const SITE = 'https://bqurtas.com';
 const SUPA = 'https://dcnkhzrishphpismmxuu.supabase.co';             // blog posts live here
@@ -152,7 +153,7 @@ function retiredRedirectPath(pathname) {
 
 function isPassthroughPath(pathname, request) {
   if (/^\/(?:api|assets|css|js|vendor|\.well-known|mail|autodiscover)(?:\/|$)/i.test(pathname)) return true;
-  if (['/index.html', '/404.html', '/favicon.ico', '/llms.txt', '/robots.txt', '/security.txt', '/site.webmanifest', '/sitemap-images.xml', '/sitemap-videos.xml', '/sitemap-gallery.xml', '/sitemap-media.xml'].includes(pathname)) return true;
+  if (['/index.html', '/404.html', '/favicon.ico', '/llms.txt', '/robots.txt', '/security.txt', '/site.webmanifest', '/sitemap-images.xml', '/sitemap-gallery.xml', '/sitemap-media.xml'].includes(pathname)) return true;
   const acceptsHtml = /(?:^|,)\s*text\/html(?:\s*;|\s*,|$)/i.test(request.headers.get('Accept') || '');
   return !acceptsHtml && /\.[a-z0-9]{2,10}$/i.test(pathname);
 }
@@ -484,7 +485,7 @@ export async function onRequest(context) {
   // The image sitemap is a static file, but the CDN edge kept serving stale
   // HITs after deploys (Google would read an old copy). Serve it through the
   // function with no-store — freshness over speed, same policy as sitemap.xml.
-  if (['/sitemap-images.xml', '/sitemap-media.xml', '/sitemap-gallery.xml', '/sitemap-videos.xml'].includes(url.pathname) && env && env.ASSETS) {
+  if (['/sitemap-images.xml', '/sitemap-media.xml', '/sitemap-gallery.xml'].includes(url.pathname) && env && env.ASSETS) {
     // Retain the old media alias, but each generated sitemap has its own body.
     const sitemapPath = url.pathname === '/sitemap-media.xml' ? '/sitemap-images.xml' : url.pathname;
     const r = await env.ASSETS.fetch(new URL(sitemapPath, url.origin));
@@ -493,7 +494,7 @@ export async function onRequest(context) {
   }
   // Only generated archive pages may reach static delivery. An unknown path
   // must remain a real 404 even if Pages' fallback policy changes later.
-  if (/^\/(?:archive|watch)(?:\/|$)/i.test(url.pathname)) {
+  if (/^\/archive(?:\/|$)/i.test(url.pathname)) {
     const candidate = url.pathname.endsWith('/index.html')
       ? url.pathname.slice(0, -'index.html'.length)
       : url.pathname.replace(/\/?$/, '/');
@@ -508,6 +509,22 @@ export async function onRequest(context) {
   if (redirectPath) {
     url.pathname = redirectPath;
     return Response.redirect(url.toString(), 301);
+  }
+  /* One server-rendered page per work: /design/book/7. Language-prefixed and
+     trailing-slash variants fold into the single English canonical URL. */
+  const work = parseWorkPath(url.pathname);
+  if (work) {
+    if (work.redirect) {
+      url.pathname = work.redirect;
+      return Response.redirect(url.toString(), 301);
+    }
+    if (work.status === 404) return serveNotFound(request, url, env);
+    return serveWorkPage(request, url, env, work, {
+      next,
+      notFound: () => serveNotFound(request, url, env),
+      unavailable: () => serveUnavailable(request),
+      securityHeaders: documentSecurityHeaders
+    });
   }
   const r = resolve(url.pathname);
   if (!r) {
