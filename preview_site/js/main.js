@@ -1991,6 +1991,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
      size that fits. Below PAPER_FIT_MIN the remainder falls back to the inner
      reading track rather than shrinking type out of legibility. */
   const PAPER_FIT_MIN = 0.5;
+  const PAPER_FIT_STEP = (1 - PAPER_FIT_MIN) / 128; // seven halvings of [MIN, 1]
+  const lastPaperFit = new WeakMap();
   const paperFits = (scroller) => scroller.scrollHeight - scroller.clientHeight <= 2;
 
   /* The service index opens one row at a time and its descriptions differ in
@@ -2016,23 +2018,41 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     /* Entrance motion parks copy a few pixels low with transforms, which the
        browser counts as scrollable overflow; measure the settled layout. */
     sheet.classList.add('is-paper-measuring');
+    /* The bisection always lands on the largest PAPER_FIT_STEP size that
+       fits. Most re-measures (a font arriving, an observer echo) change
+       nothing, so first confirm the previous answer: if it still fits and the
+       next step up does not, it is still the answer — two layouts instead of
+       ten. Anything else runs the full search. */
+    const previous = lastPaperFit.get(sheet);
     let fit = 1;
-    apply(fit);
-    if (!paperFits(scroller)) {
-      let low = PAPER_FIT_MIN;
-      let high = 1;
-      apply(low);
-      if (paperFits(scroller)) {
-        for (let step = 0; step < 7; step += 1) {
-          const mid = (low + high) / 2;
-          apply(mid);
-          if (paperFits(scroller)) low = mid;
-          else high = mid;
-        }
+    let confirmed = false;
+    if (previous >= PAPER_FIT_MIN && previous < 1) {
+      apply(previous + PAPER_FIT_STEP);
+      if (!paperFits(scroller)) {
+        apply(previous);
+        confirmed = paperFits(scroller);
+        if (confirmed) fit = previous;
       }
-      fit = low;
-      apply(fit);
     }
+    if (!confirmed) {
+      apply(fit);
+      if (!paperFits(scroller)) {
+        let low = PAPER_FIT_MIN;
+        let high = 1;
+        apply(low);
+        if (paperFits(scroller)) {
+          for (let step = 0; step < 7; step += 1) {
+            const mid = (low + high) / 2;
+            apply(mid);
+            if (paperFits(scroller)) low = mid;
+            else high = mid;
+          }
+        }
+        fit = low;
+        apply(fit);
+      }
+    }
+    lastPaperFit.set(sheet, fit);
     // The caller reads the final overflow before lifting is-paper-measuring.
     sheet.classList.toggle('is-paper-fitted', fit < 1);
   };
