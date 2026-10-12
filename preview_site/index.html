@@ -593,7 +593,7 @@
   </script>
   <link rel="preload" href="assets/portrait.webp?v=56f25216a1e1" as="image" fetchpriority="high">
   <link rel="preload" href="assets/fonts/Liana.otf" as="font" type="font/otf" crossorigin fetchpriority="high">
-  <link rel="preload" href="assets/fonts/CSRk4ydQnPyaDxEXLFF6LZVLKrodrOMFFg.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/noto-kufi-latin.0d62bfd83ff9.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Critical mobile + desktop shell/hero CSS is generated from the stable
        cascade. The pending gate keeps every non-critical room/overlay out
@@ -715,12 +715,12 @@
       window.__bqApplyFullCss = apply;
     }());
   </script>
-  <link rel="stylesheet" href="css/fonts.css?v=69cf74d1bd04">
+  <link rel="stylesheet" href="css/fonts.css?v=e4845663cb6a">
   <link rel="stylesheet" href="css/experience.min.css?v=3b27e924e74d">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
   <link rel="stylesheet" href="css/polish.css?v=6f36196b5f13">
-  <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=a65cc728586a" media="print" id="faCss">
-  <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=a65cc728586a"></noscript>
+  <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=d102bb86e515" media="print" id="faCss">
+  <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=d102bb86e515"></noscript>
 
   <!-- Supabase powers the journal and subscription form. -->
   <link rel="preconnect" href="https://dcnkhzrishphpismmxuu.supabase.co" crossorigin>
@@ -2333,7 +2333,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=daa91c8c314e', { updateViaCache: 'none' })
+            .register('/sw.js?v=f9f79c8a6987', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });
