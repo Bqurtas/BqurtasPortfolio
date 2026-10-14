@@ -1993,7 +1993,10 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   const PAPER_FIT_MIN = 0.5;
   const PAPER_FIT_STEP = (1 - PAPER_FIT_MIN) / 128; // seven halvings of [MIN, 1]
   const lastPaperFit = new WeakMap();
-  const paperFits = (scroller) => scroller.scrollHeight - scroller.clientHeight <= 2;
+  const paperFits = (scroller) => (
+    scroller.scrollHeight - scroller.clientHeight <= 2
+    && scroller.scrollWidth - scroller.clientWidth <= 2
+  );
 
   /* The service index opens one row at a time and its descriptions differ in
      length. The open row reserves the tallest of them, so neither the fitted
@@ -2063,18 +2066,18 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
      not drag the rest down to it. */
   const fitGroups = (entries) => {
     const smallest = new Map();
-    entries.forEach(({ sheet }) => {
+    entries.forEach(({ sheet, scroller }) => {
       const group = sheet.dataset.paperFitGroup;
       if (!group || !sheet.hasAttribute('data-paper-fit')) return;
       const fit = parseFloat(sheet.style.getPropertyValue('--bq-paper-fit')) || 1;
-      if (fit <= PAPER_FIT_MIN + 0.001) return;
+      if (fit <= PAPER_FIT_MIN + 0.001 && !paperFits(scroller)) return;
       smallest.set(group, Math.min(smallest.has(group) ? smallest.get(group) : 1, fit));
     });
-    entries.forEach(({ sheet }) => {
+    entries.forEach(({ sheet, scroller }) => {
       const fit = smallest.get(sheet.dataset.paperFitGroup);
       if (fit == null || !sheet.hasAttribute('data-paper-fit')) return;
       const own = parseFloat(sheet.style.getPropertyValue('--bq-paper-fit')) || 1;
-      if (own <= PAPER_FIT_MIN + 0.001) return;
+      if (own <= PAPER_FIT_MIN + 0.001 && !paperFits(scroller)) return;
       sheet.style.setProperty('--bq-paper-fit', fit === 1 ? '1' : fit.toFixed(4));
       sheet.classList.toggle('is-paper-fitted', fit < 1);
     });
@@ -2432,9 +2435,13 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       measurements.forEach(({ readingSpacer }) => {
         if (readingSpacer) readingSpacer.style.setProperty('display', 'none', 'important');
       });
-      measurements.forEach(({ sheet, scroller, allowInner }) => {
-        if (allowInner) fitPaper(sheet, scroller);
-      });
+      /* Fitting is independent of reading ownership: the heroes and shared
+         footer also have a viewport-sized frame, but never own inner scroll.
+         A secondary room has that footer outside its root, so measure its
+         terminal frame along with the active room's papers. */
+      measurements.forEach(({ sheet, scroller }) => fitPaper(sheet, scroller));
+      const terminalScroller = terminalSheet?.querySelector(':scope > .paper-scroll');
+      if (terminalScroller) fitPaper(terminalSheet, terminalScroller);
       fitGroups(measurements);
       measurements.forEach((entry) => {
         const { sheet, scroller, allowInner } = entry;
@@ -2443,6 +2450,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
           : 0;
         sheet.classList.remove('is-paper-measuring');
       });
+      terminalSheet?.classList.remove('is-paper-measuring');
       measurements.forEach(({ readingSpacer }) => {
         if (readingSpacer) readingSpacer.style.removeProperty('display');
       });
@@ -2647,6 +2655,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       hero.classList.remove('is-hero-pinned', 'is-hero-covered');
       hero.classList.add('paper-sheet');
       hero.dataset.paper = 'hero';
+      hero.dataset.paperFit = '';
       hero.style.setProperty('--bq-paper-z', '1');
       wrapPaperScroll(hero);
 
@@ -2670,6 +2679,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       if (footer) {
         footer.classList.add('paper-sheet', 'paper-sheet--footer');
         footer.dataset.paper = 'footer';
+        footer.dataset.paperFit = '';
         delete footer.dataset.paperScroll;
         footer.style.setProperty('--bq-paper-z', '70');
         wrapPaperScroll(footer);
@@ -2681,6 +2691,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
   /* ---- Blog / Bio / Contact — the same paper deck as the main room ---- */
   const sharedFooter = document.querySelector('.footer.footer-v249');
+  if (sharedFooter) sharedFooter.dataset.paperFit = '';
   ['blog', 'bio', 'contact'].forEach((id) => {
     const room = document.getElementById(id);
     if (!room) return;
@@ -2707,7 +2718,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         if (id === 'bio') sheet.dataset.paperFitGroup = 'bio';
       } else {
         delete sheet.dataset.paperScroll;
-        delete sheet.dataset.paperFit;
+        sheet.dataset.paperFit = '';
       }
 
       wrapPaperScroll(sheet);

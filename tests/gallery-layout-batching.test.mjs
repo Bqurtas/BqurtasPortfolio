@@ -100,7 +100,7 @@ test('paper measurement batches spacer reads and paints meters without further s
   const meterSource = section('  const updatePaperMeter = ', '  const ensurePaperSpacer = ');
   const measurementSource = section('      const rootSheets = sheets.filter', '      /* Give the final card');
   const context = {
-    sheets, root, ensurePaperMeter: sheet => sheet.meter,
+    sheets, root, terminalSheet: null, ensurePaperMeter: sheet => sheet.meter,
     allowsInnerScroll: () => true, paperLabel: () => 'Reading section',
     // These sheets are not home papers marked data-paper-fit; fitting is a no-op.
     fitPaper: () => {},

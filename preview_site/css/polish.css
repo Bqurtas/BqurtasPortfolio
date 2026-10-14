@@ -1761,3 +1761,154 @@ html body #bio#bio#bio > .paper-sheet .index-row {
 
 /* Full catalogue navigation remains available without loading every card. */
 .gallery-archive-link { display:inline-flex; align-items:center; min-height:44px; gap:8px; margin-top:16px; color:var(--ink); text-underline-offset:5px; }
+
+/* Fit visible content, never its sticky carrier. Heroes and the shared
+   footer use the same measured scale as chapters when height changes. */
+html body .footer.paper-sheet[data-paper-fit] > .paper-scroll > :not(.paper-reading-spacer) {
+  zoom: var(--bq-paper-fit, 1);
+}
+html body .footer.footer.paper-sheet.is-paper-measuring > .paper-scroll * {
+  transform: none !important;
+  translate: none !important;
+  scale: none !important;
+  transition: none !important;
+}
+html body .footer.footer.paper-sheet.is-paper-measuring,
+html body .footer.footer.paper-sheet.is-paper-measuring * {
+  content-visibility: visible !important;
+}
+
+html body #design#design#design.paper-stack > .hero.paper-sheet > .paper-scroll,
+html body :is(#bio, #blog, #contact).paper-stack > .room-hero.paper-sheet > .paper-scroll {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: safe center !important;
+  align-items: center !important;
+  padding: clamp(36px, 6svh, 56px) clamp(18px, 4vw, 64px) clamp(76px, 12svh, 108px) !important;
+}
+html body #design#design#design.paper-stack .hero-inner,
+html body :is(#bio, #blog, #contact).paper-stack .room-hero-inner {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  max-width: 100% !important;
+  transform: none !important;
+}
+html body .footer.footer.paper-sheet[data-paper-fit] > .paper-scroll > .footer-stage {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+@media (max-height: 640px) {
+  html body .footer.footer.footer.footer-v249.paper-sheet {
+    height: calc(100svh - (var(--bq-deck-gutter, 10px) * 2)) !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+  html body .footer.footer.footer.footer-v249.paper-sheet > .paper-scroll {
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+  }
+  html body .footer #footerCtaTitle {
+    font-size: clamp(28px, 10svh, 56px) !important;
+    line-height: 1.1 !important;
+    margin-block: 12px 16px !important;
+  }
+  html body .footer.footer.footer.footer-v249.paper-sheet .footer-stage.footer-stage {
+    padding: 0 !important;
+    justify-content: center !important;
+  }
+  html body .footer.footer.footer.footer-v249 .footer-email { font-size: clamp(18px, 6svh, 28px) !important; }
+  html body .footer.footer.footer.footer-v249.paper-sheet .footer-bottom.footer-bottom {
+    height: auto !important;
+    min-height: 0 !important;
+    margin-top: clamp(12px, 3svh, 20px) !important;
+    padding-block: clamp(10px, 3svh, 18px) 0 !important;
+    font-size: 10px !important;
+    line-height: 1.65 !important;
+  }
+  html body #design#design#design.paper-stack > .hero.paper-sheet > .paper-scroll,
+  html body :is(#bio, #blog, #contact).paper-stack > .room-hero.paper-sheet > .paper-scroll {
+    padding-block: clamp(24px, 7svh, 40px) clamp(66px, 13svh, 80px) !important;
+  }
+  html body #design#design#design.paper-stack .hero-scrolldown,
+  html body :is(#bio, #blog, #contact) .room-hero-ghost {
+    display: none !important;
+  }
+  html body #design#design#design.paper-stack .hero-cta { margin-top: 14px !important; }
+  html body .room .room-hero-inner { gap: 12px !important; }
+  html body .room .room-hero-sub { margin-top: 12px !important; }
+
+  /* Keep the floating menu reachable without spending a fixed 94px of a
+     short reading frame on lower padding. */
+  html body #design#design#design.paper-stack > .section:not(.work) > .paper-scroll,
+  html body :is(#bio, #blog, #contact).paper-stack > .section.paper-sheet > .paper-scroll {
+    padding-block: clamp(14px, 4svh, 26px) clamp(64px, 14svh, 82px) !important;
+  }
+  html body .footer.footer.paper-sheet > .paper-scroll {
+    padding-block: clamp(20px, 5svh, 32px) clamp(68px, 15svh, 88px) !important;
+  }
+  html body #mobileMenu#mobileMenu .mm-nav { gap: clamp(10px, 3svh, 20px) !important; }
+  html body #mobileMenu#mobileMenu .mm-nav .mm-link .mm-link-text {
+    font-size: clamp(18px, 8svh, 42px) !important;
+  }
+}
+
+@media (max-height: 480px) {
+  html body #design#design#design.paper-stack .hero-portrait {
+    width: clamp(68px, 26svh, 124px) !important;
+    height: auto !important;
+    margin-bottom: 8px !important;
+  }
+  html body #design#design#design.paper-stack .hero-sign {
+    font-size: clamp(28px, 12svh, 58px) !important;
+    margin-block: 0 8px !important;
+  }
+  html body #design#design#design.paper-stack .hero-lede {
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    margin-block: 0 !important;
+  }
+  html body .room .room-hero-title {
+    font-size: clamp(28px, 12svh, 58px) !important;
+    line-height: 1.15 !important;
+  }
+  html body .room .room-hero-num { margin-bottom: 10px !important; }
+  html body .room .room-hero-sub { font-size: 14px !important; line-height: 1.6 !important; }
+}
+
+/* The twelve desktop filters form one column. Its circles and gaps follow
+   height together so the top and bottom categories stay inside the frame. */
+@media (min-width: 1025px) and (max-height: 700px) {
+  html body #design#design#design.paper-stack .work-head .tabs,
+  html body #design#design#design.paper-stack .work-head .tabs-row {
+    gap: clamp(2px, .8svh, 6px) !important;
+    padding-block: 4px !important;
+  }
+  html body #design#design#design.paper-stack .work-head .tab {
+    width: clamp(16px, 4.5svh, 34px) !important;
+    height: clamp(16px, 4.5svh, 34px) !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+  html body #design#design#design.paper-stack .work-head .tab i { font-size: clamp(8px, 1.8svh, 13px) !important; }
+}
+@media (max-width: 1024px) and (max-height: 700px) {
+  html body #design#design#design.paper-stack .paper-scroll.work-head-flow > .work-head .tabs {
+    row-gap: clamp(8px, 3svh, 20px) !important;
+    padding-bottom: clamp(12px, 4svh, 24px) !important;
+  }
+  html body #design#design#design.paper-stack .work-head .tabs-row { gap: clamp(3px, 1.4vw, 8px) !important; }
+  html body #design#design#design.paper-stack .work-head .tab {
+    width: clamp(24px, 9svh, 44px) !important;
+    height: clamp(24px, 9svh, 44px) !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+  html body #design#design#design.paper-stack .work-head .tab i { font-size: clamp(10px, 3svh, 16px) !important; }
+}
