@@ -2,8 +2,21 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
+import { createHash } from 'node:crypto';
 
 const motion = await readFile(new URL('../preview_site/js/motion.js', import.meta.url), 'utf8');
+
+test('motion uses a content-named release path so an older CDN response cannot collide', async () => {
+  const html = await readFile(new URL('../preview_site/index.html', import.meta.url), 'utf8');
+  const match = html.match(/src="(js\/motion\.([a-f0-9]{12})\.min\.js)\?v=([a-f0-9]{12})"/);
+  assert.ok(match, 'the shipped motion script uses its content hash in the filename');
+  const bytes = await readFile(new URL(`../preview_site/${match[1]}`, import.meta.url));
+  const digest = createHash('sha256').update(bytes).digest('hex').slice(0, 12);
+  assert.equal(match[2], digest);
+  assert.equal(match[3], digest);
+  const sw = await readFile(new URL('../preview_site/sw.js', import.meta.url), 'utf8');
+  assert.ok(sw.includes(`/${match[1]}?v=${digest}`), 'offline preload requests the same release');
+});
 function slice(from, to) {
   const start = motion.indexOf(from), end = motion.indexOf(to, start);
   assert.ok(start >= 0 && end > start);

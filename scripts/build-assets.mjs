@@ -148,6 +148,17 @@ export async function buildAssets() {
   await compileJavaScript();
   await compileStylesheets();
 
+  /* A previous response can remain cached under a query-only fingerprint
+     while Pages propagates a deployment. Give motion a content-named path
+     too: a new release can never reuse an older successful asset response.
+     Keep older files available for clients still using the previous page. */
+  const motion = await readFile(path.join(siteRoot, 'js/motion.min.js'), 'utf8');
+  const motionReference = `js/motion.${contentHash(motion)}.min.js`;
+  if (await writeIfChanged(path.join(siteRoot, motionReference), motion)) {
+    console.log(`js/motion.min.js -> ${motionReference}`);
+  }
+  const motionPath = /js\/motion(?:\.[a-f0-9]{12})?\.min\.js/g;
+
   const htmlPath = path.join(siteRoot, 'index.html');
   let html = await readFile(htmlPath, 'utf8');
 
@@ -155,7 +166,8 @@ export async function buildAssets() {
      cascade-preserving minified files. Re-running the build is idempotent. */
   html = html
     .replace(/css\/modern-framer(?:\.min)?\.css/g, 'css/modern-framer.min.css')
-    .replace(/css\/experience(?:\.min)?\.css/g, 'css/experience.min.css');
+    .replace(/css\/experience(?:\.min)?\.css/g, 'css/experience.min.css')
+    .replace(motionPath, motionReference);
   html = await fingerprintQuotedAssets(html);
   html = await fingerprintVersionedLocalAssets(html);
 
@@ -165,6 +177,7 @@ export async function buildAssets() {
 
   const swPath = path.join(siteRoot, 'sw.js');
   let sw = await readFile(swPath, 'utf8');
+  sw = sw.replace(motionPath, motionReference);
   sw = await fingerprintQuotedAssets(sw);
   sw = await fingerprintVersionedLocalAssets(sw);
   const stamp = serviceWorkerVersion(sw, html);
