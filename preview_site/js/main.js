@@ -34,6 +34,30 @@
   } catch (e) {}
 })();
 
+/* Width and height are independent: a wide, shallow window needs the same
+   proportional reduction as a narrow one. Keep the value numeric for CSS and
+   the gallery's physical-pixel scroll mapper. No work runs on scroll. */
+(function viewportContentScale() {
+  /* svh follows window resizing and orientation, while staying fixed as a
+     phone's address bar opens/closes. Using innerHeight alone would resize
+     the entire reel in the middle of a native swipe. The hidden probe lives
+     outside the transformed page stage and never participates in flow. */
+  const probe = document.createElement('span');
+  probe.className = 'bq-viewport-measure';
+  probe.setAttribute('aria-hidden', 'true');
+  probe.style.cssText = 'position:fixed;inset:0 auto auto 0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none;contain:strict;';
+  (document.body || document.documentElement).appendChild(probe);
+  const update = () => {
+    const height = probe.getBoundingClientRect().height || window.innerHeight || 720;
+    const scale = Math.max(.5, Math.min(1, height / 720));
+    if (window.__bqViewportScale === scale) return;
+    window.__bqViewportScale = scale;
+    document.documentElement.style.setProperty('--bq-viewport-scale', String(scale));
+  };
+  update();
+  window.addEventListener('resize', update, { passive: true });
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- THEME (dark / light) — toggle switch ---------- */
@@ -1991,8 +2015,17 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
      size that fits. Below PAPER_FIT_MIN the remainder falls back to the inner
      reading track rather than shrinking type out of legibility. */
   const PAPER_FIT_MIN = 0.5;
-  const PAPER_FIT_STEP = (1 - PAPER_FIT_MIN) / 128; // seven halvings of [MIN, 1]
+  const PAPER_FIT_STEPS = 7;
   const lastPaperFit = new WeakMap();
+  /* Section content follows the viewport's height even while it comfortably
+     fits. Heroes and the footer retain their existing intrinsic fitting;
+     their type and artwork already use height-aware sizes in the stylesheet. */
+  const paperFitCeiling = (sheet) => {
+    if (!sheet.classList.contains('section')) return 1;
+    const viewportScale = Number(window.__bqViewportScale)
+      || ((window.innerHeight || 720) / 720);
+    return Math.min(1, Math.max(PAPER_FIT_MIN, viewportScale));
+  };
   const paperFits = (scroller) => (
     scroller.scrollHeight - scroller.clientHeight <= 2
     && scroller.scrollWidth - scroller.clientWidth <= 2
@@ -2021,16 +2054,20 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     /* Entrance motion parks copy a few pixels low with transforms, which the
        browser counts as scrollable overflow; measure the settled layout. */
     sheet.classList.add('is-paper-measuring');
-    /* The bisection always lands on the largest PAPER_FIT_STEP size that
-       fits. Most re-measures (a font arriving, an observer echo) change
+    /* The bisection always lands on the largest step within this viewport's
+       ceiling that fits. Most re-measures (a font arriving, an observer echo) change
        nothing, so first confirm the previous answer: if it still fits and the
        next step up does not, it is still the answer — two layouts instead of
-       ten. Anything else runs the full search. */
-    const previous = lastPaperFit.get(sheet);
-    let fit = 1;
+       ten. A different height changes the search interval, so it receives a
+       fresh search and restores the original scale as the window grows. */
+    const ceiling = paperFitCeiling(sheet);
+    const fitStep = (ceiling - PAPER_FIT_MIN) / (2 ** PAPER_FIT_STEPS);
+    const previousAnswer = lastPaperFit.get(sheet);
+    const previous = previousAnswer?.fit;
+    let fit = ceiling;
     let confirmed = false;
-    if (previous >= PAPER_FIT_MIN && previous < 1) {
-      apply(previous + PAPER_FIT_STEP);
+    if (previousAnswer?.ceiling === ceiling && previous >= PAPER_FIT_MIN && previous < ceiling) {
+      apply(previous + fitStep);
       if (!paperFits(scroller)) {
         apply(previous);
         confirmed = paperFits(scroller);
@@ -2041,10 +2078,10 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       apply(fit);
       if (!paperFits(scroller)) {
         let low = PAPER_FIT_MIN;
-        let high = 1;
+        let high = ceiling;
         apply(low);
         if (paperFits(scroller)) {
-          for (let step = 0; step < 7; step += 1) {
+          for (let step = 0; step < PAPER_FIT_STEPS; step += 1) {
             const mid = (low + high) / 2;
             apply(mid);
             if (paperFits(scroller)) low = mid;
@@ -2055,7 +2092,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         apply(fit);
       }
     }
-    lastPaperFit.set(sheet, fit);
+    lastPaperFit.set(sheet, { fit, ceiling });
     // The caller reads the final overflow before lifting is-paper-measuring.
     sheet.classList.toggle('is-paper-fitted', fit < 1);
   };
@@ -2848,6 +2885,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     let holdY = null;
     let pendingAppendOffset = null;
     let paintedY = null, paintedHeadY = null;
+    let contentScale = 1;
     let workReadingState = { active: false };
     const measure = () => {
       readGutter();
@@ -2859,6 +2897,12 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         return;
       }
       cardH = card.clientHeight;
+      const nextScale = Number(window.__bqViewportScale) || 1;
+      if (nextScale !== contentScale) {
+        contentScale = nextScale;
+        paintedY = paintedHeadY = null;
+        holdY = null;
+      }
       /* Mobile: the head holds the section-head heading + the tabs. On scroll the
          head slides up by collapseDist so the HEADING scrolls away and ONLY the
          tabs stay pinned at the top (owner). The reel starts below the full head.
@@ -2866,15 +2910,23 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       if (Number(track.dataset.overflowFloor) > 0) {
         /* keep collapseDist / --work-head-h as last measured */
       } else if (card.classList.contains('work-head-flow') && headEl && tabsWrap) {
-        collapseDist = Math.max(0, tabsWrap.offsetTop - 6);
+        collapseDist = Math.max(0, (tabsWrap.offsetTop - 6) * contentScale);
         card.style.setProperty('--work-head-h', headEl.offsetHeight + 'px');
       } else {
         collapseDist = 0;
         card.style.removeProperty('--work-head-h');
-        if (headEl) headEl.style.transform = '';
+        if (headEl) {
+          const headX = (card.clientWidth || 0) * (1 - contentScale) / 2;
+          // Twelve filters can exceed even a wide card's vertical space.
+          // Keep their whole rail visible, centred beside the scaled work.
+          const filterScale = Math.min(contentScale, Math.max(.1, (cardH - 16) / (tabsWrap?.scrollHeight || 1)));
+          headEl.style.transform = filterScale === 1 ? '' : `translate3d(${headX}px,0,0) scale(${filterScale})`;
+        }
       }
       const vpH = vp.clientHeight;
-      const reelH = reel.scrollHeight;
+      // The layout remains at its original width, preserving every image's
+      // ratio and masonry order. Its visible height shrinks with the content.
+      const reelH = reel.scrollHeight * contentScale;
       overflow = Math.max(0, reelH - vpH);
       const floor = Number(track.dataset.overflowFloor);
       if (Number.isFinite(floor) && floor > 0) overflow = Math.max(overflow, floor);
@@ -2997,13 +3049,13 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       /* ---- writes ---- */
       lastY = y;
       if (y !== paintedY) {
-        reel.style.transform = 'translate3d(0,' + (-y) + 'px,0)';
+        reel.style.transform = 'translate3d(0,' + (-y) + 'px,0)' + (contentScale === 1 ? '' : ` scale(${contentScale})`);
         paintedY = y;
       }
       /* slide the head up until the tabs reach the top, then hold — the heading
          scrolls away while ONLY the tabs stay pinned (owner). */
       if (headY !== null && headEl && headY !== paintedHeadY) {
-        headEl.style.transform = 'translate3d(0,' + headY + 'px,0)';
+        headEl.style.transform = 'translate3d(0,' + headY + 'px,0)' + (contentScale === 1 ? '' : ` scale(${contentScale})`);
         paintedHeadY = headY;
       }
       applyCovered(cardTop, g);
@@ -3031,6 +3083,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         return;
       }
       const oldSpan = overflow + cardH;
+      const oldScale = contentScale;
+      const nativeMovement = scrollPending;
       const liveLocal = gutter() - track.getBoundingClientRect().top;
       // Mobile browser chrome can resize before the scroll event from the
       // same gesture is painted. Preserve that new position, not the previous
@@ -3057,7 +3111,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         const newLocal = saved.phase === 'hold'
           ? overflow + (cardH * saved.progress)
           : Number.isFinite(saved.offset)
-            ? Math.min(overflow, Math.max(0, saved.offset))
+            ? Math.min(overflow, Math.max(0, saved.offset * (nativeMovement ? 1 : contentScale / oldScale)))
             : overflow * saved.progress;
         const trackTop = track.getBoundingClientRect().top + window.scrollY;
         const targetY = Math.max(0, trackTop - gutter() + newLocal);

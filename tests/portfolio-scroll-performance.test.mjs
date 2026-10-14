@@ -104,13 +104,13 @@ test('gallery progress uses the outer sticky pin and matches its visible handoff
     'reading a long gallery keeps the same sheet step until the next sheet arrives');
 });
 
-function workFixture() {
+function workFixture({ scale = 1 } = {}) {
   const animation = frames();
   const scrollCalls = [];
   const reads = { track: 0, card: 0 };
   let visualShift = 0, documentTop = 1000;
   const window = {
-    ...eventTarget(), scrollY: 0, innerHeight: 632, visualViewport: eventTarget(),
+    ...eventTarget(), scrollY: 0, innerHeight: 632, visualViewport: eventTarget(), __bqViewportScale: scale,
     matchMedia: () => ({ matches: false }),
     scrollTo(options) { scrollCalls.push(options.top); this.scrollY = options.top; }
   };
@@ -152,6 +152,86 @@ function workFixture() {
     scrollTo(top) { window.scrollY = top; window.fire('scroll'); animation.flush(); }
   };
 }
+
+test('viewport height scales content and restores it without scroll-time writes', () => {
+  const writes = [];
+  let smallViewportHeight = 720;
+  const window = { ...eventTarget(), innerHeight: 720 };
+  const probe = { style: {}, setAttribute() {}, getBoundingClientRect: () => ({ height: smallViewportHeight }) };
+  const document = {
+    createElement: () => probe,
+    body: { appendChild() {} },
+    documentElement: { style: { setProperty: (name, value) => writes.push([name, value]) } }
+  };
+  vm.runInNewContext(moduleSource('viewportContentScale'), { window, document });
+  assert.equal(window.__bqViewportScale, 1);
+  window.innerHeight = smallViewportHeight = 480;
+  window.fire('resize');
+  assert.equal(window.__bqViewportScale, 2 / 3);
+  window.fire('resize');
+  window.fire('scroll');
+  assert.equal(writes.length, 2, 'unchanged dimensions and native scrolling do not write styles');
+  window.innerHeight = 560;
+  window.fire('resize');
+  assert.equal(window.__bqViewportScale, 2 / 3, 'hiding phone browser chrome keeps the existing scale');
+  assert.equal(writes.length, 2, 'chrome-only resize cannot rescale the reel after a scroll frame');
+  window.innerHeight = smallViewportHeight = 320;
+  window.fire('resize');
+  assert.equal(window.__bqViewportScale, .5, 'the short-screen floor keeps controls usable');
+  window.innerHeight = smallViewportHeight = 900;
+  window.fire('resize');
+  assert.equal(window.__bqViewportScale, 1, 'expanding restores the original composition');
+});
+
+test('a scaled gallery scrolls one physical pixel per native pixel and reaches its real end', () => {
+  const page = workFixture({ scale: .5 });
+  assert.equal(page.track.style['--work-track-h'], '1900px', '2600 logical pixels draw as 1300 physical pixels');
+  page.scrollTo(1484);
+  assert.equal(page.reel.style.transform, 'translate3d(0,-500px,0) scale(0.5)');
+  page.scrollTo(1734);
+  assert.equal(page.reel.style.transform, 'translate3d(0,-700px,0) scale(0.5)', 'the reel stops after its last visible pixel');
+});
+
+test('height shrink and restore preserve the same logical gallery reading position', () => {
+  const page = workFixture();
+  page.scrollTo(1484);
+  page.window.__bqViewportScale = .5;
+  page.window.fire('resize');
+  page.flush();
+  assert.equal(page.window.scrollY, 1234);
+  assert.equal(page.reel.style.transform, 'translate3d(0,-250px,0) scale(0.5)');
+  page.window.__bqViewportScale = 1;
+  page.window.fire('resize');
+  page.flush();
+  assert.equal(page.window.scrollY, 1484);
+  assert.equal(page.reel.style.transform, 'translate3d(0,-500px,0)');
+});
+
+test('scaling during native movement does not rewind mobile scrolling', () => {
+  const page = workFixture();
+  page.scrollTo(1484);
+  page.window.__bqViewportScale = .75;
+  page.window.scrollY = 1564;
+  page.window.fire('resize');
+  page.window.fire('scroll');
+  page.flush();
+  assert.equal(page.window.scrollY, 1564);
+  assert.equal(page.reel.style.transform, 'translate3d(0,-580px,0) scale(0.75)');
+  assert.deepEqual(page.scrollCalls, [], 'browser chrome changes must not interrupt momentum');
+});
+
+test('Load more preserves the reading offset at a reduced height', () => {
+  const page = workFixture({ scale: .5 });
+  page.scrollTo(1734); // 50px into the end hold after the scaled 700px reel.
+  page.window.__bqPrepareWorkAppend();
+  page.reel.scrollHeight = 4600;
+  page.flush();
+  assert.equal(page.track.style['--work-track-h'], '2900px');
+  assert.equal(page.window.scrollY, 1684);
+  assert.equal(page.reel.style.transform, 'translate3d(0,-700px,0) scale(0.5)');
+  page.scrollTo(1934);
+  assert.equal(page.reel.style.transform, 'translate3d(0,-950px,0) scale(0.5)');
+});
 
 for (const resizeFirst of [true, false]) {
   test(`mobile resize and scroll share one portfolio paint with ${resizeFirst ? 'resize' : 'scroll'} first`, () => {

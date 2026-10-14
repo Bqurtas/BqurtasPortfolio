@@ -1455,6 +1455,17 @@ html body #design#design > .hero .hero-scrolldown .mouse-wheel {
   }
 }
 
+/* Fitted short phone chapters leave less physical width for typing. Keep
+   the form's 16px field text readable by giving each control its own row. */
+@media (max-width: 820px) and (max-height: 640px) {
+  html body #contact#contact#contact#contact .pitch-form {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  html body #contact#contact#contact#contact .pitch-form .row-2 > .field {
+    grid-column: 1 / -1 !important;
+  }
+}
+
 @media (min-width: 1025px) {
   html body.nav-compact:not(.menu-open) .rail,
   html[dir="rtl"] body.nav-compact:not(.menu-open) .rail {
@@ -1881,34 +1892,54 @@ html body .footer.footer.paper-sheet[data-paper-fit] > .paper-scroll > .footer-s
   html body .room .room-hero-sub { font-size: 14px !important; line-height: 1.6 !important; }
 }
 
-/* The twelve desktop filters form one column. Its circles and gaps follow
-   height together so the top and bottom categories stay inside the frame. */
-@media (min-width: 1025px) and (max-height: 700px) {
-  html body #design#design#design.paper-stack .work-head .tabs,
-  html body #design#design#design.paper-stack .work-head .tabs-row {
-    gap: clamp(2px, .8svh, 6px) !important;
-    padding-block: 4px !important;
-  }
-  html body #design#design#design.paper-stack .work-head .tab {
-    width: clamp(16px, 4.5svh, 34px) !important;
-    height: clamp(16px, 4.5svh, 34px) !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-  }
-  html body #design#design#design.paper-stack .work-head .tab i { font-size: clamp(8px, 1.8svh, 13px) !important; }
+/* Shrink the complete gallery composition with viewport height. The sticky
+   paper and its clipping viewport keep their physical size; main.js maps the
+   scaled reel height back to native scrolling. */
+html body #design#design#design.paper-stack .work-vp > .work-reel {
+  transform-origin: 50% 0 !important;
 }
-@media (max-width: 1024px) and (max-height: 700px) {
-  html body #design#design#design.paper-stack .paper-scroll.work-head-flow > .work-head .tabs {
-    row-gap: clamp(8px, 3svh, 20px) !important;
-    padding-bottom: clamp(12px, 4svh, 24px) !important;
+html body #design#design#design.paper-stack .paper-scroll > .work-head {
+  transform-origin: 0 50% !important;
+}
+html body #design#design#design.paper-stack .paper-scroll.work-head-flow > .work-head {
+  transform-origin: 50% 0 !important;
+}
+
+/* CSS zoom normally gives a child extra logical width as it shrinks. Bound
+   that width too, so chapter artwork, columns and type reduce together and
+   remain centred instead of stretching back across the original paper. */
+html body #design#design#design#design#design#design.paper-stack > .section[data-paper-fit] > .paper-scroll > :not(.paper-reading-spacer),
+html body :is(#bio#bio#bio#bio, #blog#blog#blog#blog, #contact#contact#contact#contact).paper-stack > .section[data-paper-fit] > .paper-scroll > :not(.paper-reading-spacer) {
+  max-inline-size: min(var(--bq-paper-content-max, 1280px), calc(100% * var(--bq-paper-fit, 1))) !important;
+  min-inline-size: 0 !important;
+  margin-inline: auto !important;
+}
+html body #design :is(.service-showcase, .practice-note) {
+  --bq-paper-content-max: 1160px;
+}
+html body :is(#bio, #blog, #contact).paper-stack > .section[data-paper-fit] {
+  --bq-paper-content-max: 1100px;
+}
+
+/* The entire dock scales, including its icons and text. Its bottom anchor and
+   centering remain fixed, and the existing scroll compaction compounds with
+   the viewport factor rather than replacing it. */
+html body .rail.rail,
+html[dir="rtl"] body .rail.rail,
+html body .mobilebar.mobilebar,
+html[dir="rtl"] body .mobilebar.mobilebar {
+  transform: translateX(-50%) scale(var(--bq-viewport-scale, 1)) !important;
+  transform-origin: 50% 100% !important;
+}
+@media (min-width: 1025px) {
+  html body.nav-compact:not(.menu-open) .rail.rail,
+  html[dir="rtl"] body.nav-compact:not(.menu-open) .rail.rail {
+    transform: translateX(-50%) scale(calc(var(--bq-viewport-scale, 1) * .9)) !important;
   }
-  html body #design#design#design.paper-stack .work-head .tabs-row { gap: clamp(3px, 1.4vw, 8px) !important; }
-  html body #design#design#design.paper-stack .work-head .tab {
-    width: clamp(24px, 9svh, 44px) !important;
-    height: clamp(24px, 9svh, 44px) !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
+}
+@media (max-width: 1024px) {
+  html body.nav-compact:not(.menu-open) .mobilebar.mobilebar,
+  html[dir="rtl"] body.nav-compact:not(.menu-open) .mobilebar.mobilebar {
+    transform: translateX(-50%) scale(calc(var(--bq-viewport-scale, 1) * .86)) !important;
   }
-  html body #design#design#design.paper-stack .work-head .tab i { font-size: clamp(10px, 3svh, 16px) !important; }
 }

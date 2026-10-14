@@ -10,11 +10,11 @@ assert.ok(start > 0 && end > start);
 const source = main.slice(start, end);
 
 // A paper whose copy fits once the applied zoom is at or below `limit`.
-function paper(limit, widthLimit = Infinity) {
+function paper(limit, widthLimit = Infinity, { section = true } = {}) {
   const state = { limit, widthLimit, applied: 1, layouts: 0 };
   const sheet = {
     hasAttribute: () => true,
-    classList: { add() {}, toggle() {} },
+    classList: { add() {}, toggle() {}, contains: name => section && name === 'section' },
     style: { setProperty(_, value) { state.applied = Number(value); } },
   };
   const scroller = {
@@ -28,15 +28,16 @@ function paper(limit, widthLimit = Infinity) {
 }
 
 // The search as it was before the warm start, for comparison.
-function bisect(limit) {
+function bisect(limit, ceiling = 1) {
   const fits = (f) => Number(f === 1 ? '1' : f.toFixed(4)) <= limit;
-  if (fits(1)) return 1;
-  let low = 0.5, high = 1;
+  if (fits(ceiling)) return ceiling;
+  let low = 0.5, high = ceiling;
   if (fits(low)) for (let step = 0; step < 7; step += 1) { const mid = (low + high) / 2; if (fits(mid)) low = mid; else high = mid; }
   return low;
 }
 
-const fitPaper = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap });
+const fitWindow = { innerHeight: 720 };
+const fitPaper = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: fitWindow });
 const limits = [1.2, 1, 0.9999, 0.97, 0.9141, 0.85, 0.8086, 0.7, 0.6, 0.5021, 0.5, 0.4, 0.1];
 
 test('a re-measure confirms the previous fit in two layouts and returns the same size', () => {
@@ -71,6 +72,56 @@ test('height and width changes choose the largest scale that fits both dimension
     const expected = bisect(Math.min(height, width));
     assert.equal(state.applied, Number(expected === 1 ? 1 : expected.toFixed(4)));
   }
+});
+
+test('all section content shrinks continuously with viewport height even when it fits', () => {
+  const viewport = { innerHeight: 720 };
+  const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: viewport });
+  const { sheet, scroller, state } = paper(1.2);
+  for (const height of [720, 660, 600, 480, 360, 240, 600, 900]) {
+    viewport.innerHeight = height;
+    fit(sheet, scroller);
+    assert.equal(state.applied, Number(Math.min(1, Math.max(0.5, height / 720)).toFixed(4)), `${height}px window`);
+  }
+});
+
+test('a changing viewport ceiling performs a fresh fit search and restores warm fitting', () => {
+  const viewport = { innerHeight: 720 };
+  const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: viewport });
+  const { sheet, scroller, state } = paper(0.71);
+  for (const height of [720, 576, 648, 432, 720]) {
+    viewport.innerHeight = height;
+    const ceiling = Math.min(1, Math.max(0.5, height / 720));
+    fit(sheet, scroller);
+    assert.equal(state.applied, Number(bisect(state.limit, ceiling).toFixed(4)), `${height}px cold fit`);
+    state.layouts = 0;
+    fit(sheet, scroller);
+    assert.equal(state.applied, Number(bisect(state.limit, ceiling).toFixed(4)), `${height}px warm fit`);
+    assert.equal(state.layouts, state.limit >= ceiling ? 1 : 2, 'a settled fit avoids an unnecessary full search');
+  }
+});
+
+test('the shared viewport scale is used for sections while heroes retain their intrinsic fitting', () => {
+  const viewport = { innerHeight: 720, __bqViewportScale: 0.75 };
+  const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: viewport });
+  const section = paper(1.2), hero = paper(1.2, Infinity, { section: false });
+  fit(section.sheet, section.scroller);
+  fit(hero.sheet, hero.scroller);
+  assert.equal(section.state.applied, 0.75);
+  assert.equal(hero.state.applied, 1);
+  viewport.__bqViewportScale = undefined;
+  viewport.innerHeight = 432;
+  fit(section.sheet, section.scroller);
+  assert.equal(section.state.applied, 0.6, 'the height fallback agrees with the shared scale');
+});
+
+test('short viewport content that exceeds the minimum remains at the readable floor for the reading fallback', () => {
+  const viewport = { innerHeight: 240 };
+  const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: viewport });
+  const { sheet, scroller, state } = paper(0.4);
+  fit(sheet, scroller);
+  assert.equal(state.applied, 0.5);
+  assert.ok(scroller.scrollHeight > scroller.clientHeight, 'the measurement still exposes the remainder to the reading track');
 });
 
 const groupStart = main.indexOf('  const fitGroups = (entries) => {');
