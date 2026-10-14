@@ -82,15 +82,15 @@ window.BQ_GALLERY = {
     const out = [];
     for (let i = 1; i <= n; i++) {
       const fname = c.files ? c.files[i - 1] : null;
+      const metadata = c.dimensions?.[fname || `${c.prefix}${i}.${c.ext}`];
       const type  = fname ? (/\.(mp4|webm|mov)$/i.test(fname) ? 'video' : 'image')
                           : (c.ext === 'mp4' ? 'video' : 'image');
       out.push({ coll, cat, index: i, type,
         url:    this.url(coll, i),
         rawUrl: this.rawUrl(coll, i),
-        width:  c.dimensions && c.dimensions[fname || `${c.prefix}${i}.${c.ext}`]
-                  ? c.dimensions[fname || `${c.prefix}${i}.${c.ext}`].width : 0,
-        height: c.dimensions && c.dimensions[fname || `${c.prefix}${i}.${c.ext}`]
-                  ? c.dimensions[fname || `${c.prefix}${i}.${c.ext}`].height : 0,
+        width: metadata?.width || 0,
+        height: metadata?.height || 0,
+        poster: metadata?.poster || '',
         title:  `${c.title} ${String(i).padStart(2, '0')}`,
         titlePrefix: c.title,
         tag: c.tag, icon: c.icon,
@@ -137,6 +137,9 @@ window.BQ_GALLERY = {
           file,
           width: record.width,
           height: record.height,
+          // Only the exact first-party frame generated for this film is used.
+          poster: record.poster === `/assets/thumbs/${record.path.replace(/\.(mp4|webm|mov)$/i, '.jpg')}`
+            ? record.poster : '',
         });
       });
       if (records.length && !seen.size) throw new Error('gallery manifest has no valid media');
@@ -216,11 +219,17 @@ window.BQ_GALLERY = {
     const playing = new Set();
     const preloadVideos = new Map();
     const preloadTargets = new Map();
+    const posterLoads = new WeakMap();
+    const posterReady = new WeakMap();
+    const pauseBound = new WeakSet();
     const hydrate = (video, allowDetached = false) => {
       // An intersection record can arrive after a category change detached
       // the card. Wait for its next appearance before starting that request.
       if (!video || (!video.isConnected && !allowDetached) || video.dataset.mediaExhausted) return false;
-      if (!video.src && video.dataset.src) video.src = video.dataset.src + '#t=0.1';
+      if (!video.src && video.dataset.src) {
+        video.preload = 'metadata';
+        video.src = video.dataset.src + '#t=0.1';
+      }
       return !!video.src;
     };
     const stopWatchingPlayback = (video) => {
@@ -240,14 +249,42 @@ window.BQ_GALLERY = {
       preloadTargets.delete(video);
       preloadVideos.delete(target);
     };
-    // Keep the existing prefetch distance so the same first frame is ready
-    // before the card enters the clipped work viewport. Observe the sized
-    // frame so content-visibility cannot defer geometry for its child video.
-    // A hydrated video no longer needs scroll work.
+    /* A real poster needs a small JPEG, rather than an MP4 request and a
+       native video decoder, to show its first frame. Keep the existing nearby
+       prefetch distance and fall back to video metadata if that JPEG fails.
+       Its intrinsic dimensions never replace the film's exact frame ratio. */
+    const preview = (video, allowDetached = false) => {
+      if (!video || (!video.isConnected && !allowDetached) || video.dataset.mediaExhausted) return false;
+      const existing = posterLoads.get(video);
+      if (video.dataset.poster && existing !== 'failed') {
+        if (existing === 'ready') return true;
+        if (existing) return false;
+        const poster = document.createElement('img');
+        posterLoads.set(video, poster);
+        poster.decoding = 'async';
+        poster.fetchPriority = 'low';
+        poster.addEventListener('load', () => {
+          posterLoads.set(video, 'ready');
+          video.poster = video.dataset.poster;
+          if (!video.dataset.mediaExhausted) posterReady.get(video)?.();
+          stopWatchingPrefetch(video);
+        }, { once: true });
+        poster.addEventListener('error', () => {
+          posterLoads.set(video, 'failed');
+          // A removed/reset card must not start a late network request.
+          if ((allowDetached || preloadTargets.has(video)) && hydrate(video, allowDetached)) stopWatchingPrefetch(video);
+        }, { once: true });
+        poster.src = video.dataset.poster;
+        return false;
+      }
+      return hydrate(video, allowDetached);
+    };
+    // Observe the sized frame, whose geometry remains available while the
+    // media contents are skipped. A ready preview leaves the observer.
     const preloadWatcher = canObserve ? new IntersectionObserver(entries => {
       entries.forEach(entry => {
         const video = preloadVideos.get(entry.target);
-        if (entry.isIntersecting && hydrate(video)) stopWatchingPrefetch(video);
+        if (entry.isIntersecting && preview(video)) stopWatchingPrefetch(video);
       });
     }, { root, rootMargin: '1200px 0px' }) : null;
     // Only the currently playing previews need visibility notifications.
@@ -257,8 +294,12 @@ window.BQ_GALLERY = {
     }) : null;
     const pauseAll = () => Array.from(playing).forEach(pause);
     return {
-      observe(video) {
-        video.addEventListener('pause', () => { if (video.paused) stopWatchingPlayback(video); });
+      observe(video, onPosterReady) {
+        if (onPosterReady) posterReady.set(video, onPosterReady);
+        if (!pauseBound.has(video)) {
+          pauseBound.add(video);
+          video.addEventListener('pause', () => { if (video.paused) stopWatchingPlayback(video); });
+        }
         if (preloadWatcher) {
           stopWatchingPrefetch(video);
           const target = video.closest?.('.card-art') || video;
@@ -266,7 +307,7 @@ window.BQ_GALLERY = {
           preloadTargets.set(video, target);
           preloadWatcher.observe(target);
         }
-        else hydrate(video, true);
+        else preview(video, true);
       },
       play(video) {
         if (!hydrate(video) || !video.paused) return;
@@ -374,17 +415,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // zoom lightbox (data-full) still use the ORIGINAL full file, so quality is
     // untouched where it shows big. Cuts multi-MB originals to small thumbnails.
     const imgSrc = (item.type !== 'video') ? window.BQ_GALLERY.thumb(item.url, 320) : item.url;
-    /* No poster. Every video used to wear assets/covers/en-video.jpg — the
-       social-share card for the /design/video route — so twelve different
-       films showed the reader one identical picture, and on a phone, where
-       there is no hover to trigger playback, that picture was all they ever
-       saw. A film's own first frame is its cover. preload="metadata" plus the
-       #t=0.1 media fragment is what makes the browser fetch enough to paint
-       that frame; the source itself is attached only once the card nears the
-       viewport, so a category of thirty films does not open thirty
-       connections at once. */
+    /* Each film has its own exported frame, rather than the old generic
+       social-share cover. Fetch that small image near the viewport; the MP4
+       stays untouched until playback, or a missing frame needs a fallback. */
     const mediaHtml = item.type === 'video'
-      ? `<video muted loop playsinline preload="metadata" data-src="${item.url}" title="${dispTitle}" width="${dims.width}" height="${dims.height}"></video>`
+      ? `<video muted loop playsinline preload="none" data-src="${item.url}"${item.poster ? ` data-poster="${item.poster}"` : ''} title="${dispTitle}" width="${dims.width}" height="${dims.height}"></video>`
       : `<img loading="lazy" decoding="async" fetchpriority="low" src="${imgSrc}" alt="${galAlt(dispTitle)}" width="${dims.width}" height="${dims.height}" />`;
 
     /* A real link to the work's own page (/design/book/7), so crawlers can
@@ -429,7 +464,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       status.textContent = unavailableLabel();
       article.querySelector('.card-art').appendChild(status);
     });
-    if (media.tagName === 'VIDEO') videoPreviews.observe(media);
+    if (media.tagName === 'VIDEO') videoPreviews.observe(media, () => article.classList.add('card--media-ready'));
     return article;
   };
 
@@ -545,7 +580,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   /* Play video on card hover (event delegation survives masonry re-layout) */
   const hoverMotion = matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
   grid.addEventListener('mouseover', e => {
-    if (!hoverMotion.matches || navigator.connection?.saveData) return;
+    // Scrolling can move several covers under a stationary mouse. That is
+    // not playback intent and must not start a decoder for every passing film.
+    if (!hoverMotion.matches || navigator.connection?.saveData
+      || document.documentElement.classList.contains('bq-scrolling')) return;
     const card = e.target.closest('.card--photo');
     if (!card || card.dataset.type !== 'video' || card.contains(e.relatedTarget)) return;
     const vid  = card?.querySelector('video');

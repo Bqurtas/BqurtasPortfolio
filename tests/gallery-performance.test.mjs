@@ -6,7 +6,7 @@ import vm from 'node:vm';
 const source = await readFile(new URL('../preview_site/js/gallery.js', import.meta.url), 'utf8');
 
 function setup({ observers = true, root = null } = {}) {
-  const instances = [];
+  const instances = [], posters = [];
   class Observer {
     constructor(callback, options) { this.callback = callback; this.options = options; this.targets = new Set(); instances.push(this); }
     observe(target) { this.targets.add(target); }
@@ -15,10 +15,22 @@ function setup({ observers = true, root = null } = {}) {
     emit(entries) { this.callback(entries, this); }
   }
   const window = {};
-  const context = { window, document: { addEventListener() {} } };
+  const context = { window, document: {
+    addEventListener() {},
+    createElement(tag) {
+      assert.equal(tag, 'img');
+      const listeners = new Map();
+      const poster = { src: '',
+        addEventListener(name, callback) { listeners.set(name, callback); },
+        emit(name) { listeners.get(name)?.(); },
+      };
+      posters.push(poster);
+      return poster;
+    },
+  } };
   if (observers) context.IntersectionObserver = Observer;
   vm.runInNewContext(source, context);
-  return { controller: window.BQ_GALLERY.createVideoPreviews({ root }), instances, window };
+  return { controller: window.BQ_GALLERY.createVideoPreviews({ root }), instances, posters, window };
 }
 
 function video(index = 1) {
@@ -34,6 +46,77 @@ function video(index = 1) {
 }
 
 const intersects = target => ({ target, isIntersecting: true });
+
+test('a film cover loads only its own nearby poster, leaving MP4 and playback untouched', () => {
+  const { controller, instances: [prefetch, playback], posters } = setup({ root: {} });
+  const media = video();
+  const frame = {};
+  let ready = 0;
+  media.dataset.poster = '/assets/thumbs/Videos/Videos1.jpg';
+  media.closest = () => frame;
+  controller.observe(media, () => ready++);
+  assert.equal(posters.length, 0, 'offscreen cards do not request their frame');
+  prefetch.emit([intersects(frame)]);
+  prefetch.emit([intersects(frame)]);
+  assert.equal(posters.length, 1, 'repeated intersections share one poster load');
+  assert.equal(posters[0].src, media.dataset.poster);
+  assert.equal(media.src, '', 'a poster must not start an MP4 request or decoder');
+  posters[0].emit('load');
+  assert.equal(media.poster, media.dataset.poster);
+  assert.equal(ready, 1);
+  assert.equal(prefetch.targets.size, 0);
+  assert.equal(playback.targets.size, 0);
+  assert.equal(media.plays, 0);
+  controller.play(media);
+  assert.equal(media.src, `${media.dataset.src}#t=0.1`, 'actual playback hydrates the original film');
+  assert.equal(media.preload, 'metadata');
+  assert.equal(media.plays, 1);
+});
+
+test('a failed frame falls back once to the film, including after a detached card returns', () => {
+  for (const detached of [false, true]) {
+    const { controller, instances: [prefetch], posters } = setup();
+    const media = video();
+    media.dataset.poster = '/assets/thumbs/Videos/Videos1.jpg';
+    controller.observe(media);
+    prefetch.emit([intersects(media)]);
+    media.isConnected = !detached;
+    posters[0].emit('error');
+    assert.equal(media.src, detached ? '' : `${media.dataset.src}#t=0.1`);
+    media.isConnected = true;
+    prefetch.emit([intersects(media)]);
+    assert.equal(media.src, `${media.dataset.src}#t=0.1`);
+    assert.equal(posters.length, 1, 'a broken poster is not retried during scrolling');
+    assert.equal(prefetch.targets.size, 0);
+  }
+});
+
+test('a stale failed poster cannot fetch a forgotten or reset video', () => {
+  for (const operation of ['forget', 'reset']) {
+    const { controller, instances: [prefetch], posters } = setup();
+    const media = video();
+    media.dataset.poster = '/assets/thumbs/Videos/Videos1.jpg';
+    controller.observe(media);
+    prefetch.emit([intersects(media)]);
+    controller[operation](media);
+    posters[0].emit('error');
+    assert.equal(media.src, '', operation);
+    assert.equal(prefetch.targets.size, 0);
+  }
+});
+
+test('late poster success does not pause or stop tracking a preview already playing', () => {
+  const { controller, instances: [prefetch, playback], posters } = setup();
+  const media = video();
+  media.dataset.poster = '/assets/thumbs/Videos/Videos1.jpg';
+  controller.observe(media);
+  prefetch.emit([intersects(media)]);
+  controller.play(media);
+  posters[0].emit('load');
+  assert.equal(media.paused, false);
+  assert.equal(playback.targets.has(media), true);
+  assert.equal(media.plays, 1);
+});
 
 test('video prefetch uses the clipped gallery root and its sized card frame', () => {
   const root = {};

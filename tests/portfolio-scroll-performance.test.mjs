@@ -65,21 +65,23 @@ function style() {
   };
 }
 
-test('gallery progress uses the outer sticky pin and matches its visible handoff', () => {
+for (const room of ['design', 'bio', 'blog', 'contact']) test(`${room} progress uses measured anchors without scroll-time geometry reads`, () => {
   const animation = frames();
   const pin = 16, height = 800;
   const starts = [0, 1000, 3000, 4500];
   const outerSheets = starts.map(start => ({
     top: `${pin}px`,
     scroller: { top: 'auto', dataset: { paperStart: String(start) } },
-    querySelector() { return this.scroller; }
+    querySelector() { return this.scroller; },
+    getBoundingClientRect() { throw new Error('progress must not force sheet layout'); }
   }));
+  let styleReads = 0;
   const ring = { style: style() };
   const button = { ...eventTarget(), classList: classList() };
   const root = { scrollHeight: 6000, clientHeight: height };
   const document = {
-    ...eventTarget(), documentElement: root, body: { dataset: { room: 'design' } },
-    getElementById: id => ({ toTop: button, toTopProg: ring, design: { querySelectorAll: () => outerSheets } })[id],
+    ...eventTarget(), documentElement: root, body: { dataset: { room } },
+    getElementById: id => ({ toTop: button, toTopProg: ring, [room]: { querySelectorAll: () => outerSheets } })[id],
     querySelector: () => null
   };
   const window = {
@@ -88,7 +90,7 @@ test('gallery progress uses the outer sticky pin and matches its visible handoff
   };
   vm.runInNewContext(moduleSource('globalGoUp'), {
     window, document, requestAnimationFrame: callback => animation.request(callback),
-    getComputedStyle: element => ({ top: element.top, getPropertyValue: () => String(pin) })
+    getComputedStyle: element => { styleReads++; return { top: element.top, getPropertyValue: () => String(pin) }; }
   });
 
   // The incoming sheet is at y=366. Its 434px reveal occupies 434/783 of
@@ -102,6 +104,7 @@ test('gallery progress uses the outer sticky pin and matches its visible handoff
   animation.flush();
   assert.ok(Math.abs(1 - Number(ring.style.strokeDashoffset) / (2 * Math.PI * 20) - .25) < 1e-10,
     'reading a long gallery keeps the same sheet step until the next sheet arrives');
+  assert.equal(styleReads, 1, 'style is read only when the deck is measured');
 });
 
 function workFixture({ scale = 1 } = {}) {
@@ -183,6 +186,34 @@ test('viewport height scales content and restores it without scroll-time writes'
   assert.equal(window.__bqViewportScale, 1, 'expanding restores the original composition');
 });
 
+test('scroll blur suspension includes floating controls and survives gallery refresh', () => {
+  const timers = new Map();
+  let id = 0;
+  const controls = [{ style: style() }, { style: style() }];
+  const window = eventTarget();
+  const document = { ...eventTarget(), documentElement: { classList: classList() },
+    querySelectorAll(selector) {
+      assert.ok(selector.includes('.to-top') && selector.includes('.tab-card') && selector.includes('.load-more-btn'));
+      return controls;
+    }
+  };
+  const start = main.indexOf('  (function scrollState() {');
+  const end = main.indexOf('\n\n  (function portfolioMagicScroll()', start);
+  vm.runInNewContext(main.slice(start, end), {
+    window, document,
+    setTimeout: callback => { timers.set(++id, callback); return id; },
+    clearTimeout: key => timers.delete(key)
+  });
+  window.fire('wheel');
+  assert.ok(controls.every(el => el.style['backdrop-filter'] === 'none'));
+  controls.push({ style: style() });
+  window.fire('bq:gallery-built');
+  assert.ok(controls.every(el => el.style['backdrop-filter'] === 'none'), 'new controls remain unblurred during the same gesture');
+  [...timers.values()].forEach(callback => callback());
+  assert.ok(controls.every(el => !el.style['backdrop-filter']), 'the authored glass returns only at rest');
+  assert.equal(document.documentElement.classList.contains('bq-scrolling'), false);
+});
+
 test('a scaled gallery scrolls one physical pixel per native pixel and reaches its real end', () => {
   const page = workFixture({ scale: .5 });
   assert.equal(page.track.style['--work-track-h'], '1900px', '2600 logical pixels draw as 1300 physical pixels');
@@ -248,8 +279,8 @@ for (const resizeFirst of [true, false]) {
     page.window.fire('resize');
     page.window.fire('bq:gallery-dimensions');
     page.flush();
-    assert.equal(page.reads.card, 1, 'visibility and reel motion must use one paint pass');
-    assert.equal(page.reads.track, 3, 'one preservation read, one updated origin, and one scroll paint');
+    assert.equal(page.reads.card, 0, 'visibility uses the measured sticky bounds');
+    assert.equal(page.reads.track, 2, 'only resize preservation and the new origin need layout');
     assert.equal(page.reel.style.transform, 'translate3d(0,-580px,0)');
     assert.equal(page.window.scrollY, 1564, 'coalescing must preserve live native scroll momentum');
     assert.deepEqual(page.scrollCalls, []);
@@ -289,6 +320,24 @@ test('pointer focus does not follow Load more after appended cards move the butt
   page.flush();
   assert.equal(page.window.scrollY, 2484, 'pointer activation must keep the current gallery reading position');
   assert.deepEqual(page.scrollCalls, [], 'pointer focus must not issue a second scroll to the moved Load more button');
+});
+
+for (const scale of [1, .5]) test(`native gallery scrolling at scale ${scale} uses no geometry reads and preserves its handoff`, () => {
+  const page = workFixture({ scale });
+  page.reads.track = page.reads.card = 0;
+  const overflow = 2600 * scale - 600;
+  for (let offset = 0; offset <= overflow; offset += 50) {
+    page.scrollTo(984 + offset);
+    assert.equal(page.track.querySelector().style.visibility, 'visible');
+    assert.equal(page.reel.style.transform, `translate3d(0,${-offset}px,0)${scale === 1 ? '' : ` scale(${scale})`}`);
+  }
+  page.scrollTo(984 + overflow + 599);
+  assert.equal(page.track.querySelector().style.visibility, 'visible', 'the card remains pinned through the next paper rise');
+  page.scrollTo(984 + overflow + 610);
+  assert.equal(page.track.querySelector().style.visibility, 'hidden', 'the carrier hides only after it unpins');
+  page.scrollTo(984 + overflow + 300);
+  assert.equal(page.track.querySelector().style.visibility, 'visible', 'reverse scrolling restores the held gallery');
+  assert.deepEqual(page.reads, { track: 0, card: 0 }, 'the hot scroll path performs arithmetic only');
 });
 
 test('keyboard focus still maps an offscreen gallery control into view', () => {
@@ -340,6 +389,19 @@ test('resetting the gallery clears a pending append reading position', () => {
   page.flush();
   assert.equal(page.window.scrollY, 984, 'a category reset must retain the start of the reel');
   assert.equal(page.reel.style.transform, 'translate3d(0,0px,0)');
+});
+
+test('Load more preserves native movement that has not reached its animation frame', () => {
+  const page = workFixture();
+  page.scrollTo(1484);
+  page.window.scrollY = 1564;
+  page.window.fire('scroll');
+  page.window.__bqPrepareWorkAppend();
+  page.reel.scrollHeight = 4600;
+  page.flush();
+  assert.equal(page.window.scrollY, 1564, 'append must not rewind the latest native movement to the previous frame');
+  assert.equal(page.reel.style.transform, 'translate3d(0,-580px,0)');
+  assert.deepEqual(page.scrollCalls, []);
 });
 
 for (const { from, to, reelY, phase } of [

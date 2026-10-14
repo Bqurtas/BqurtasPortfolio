@@ -2145,13 +2145,16 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const meter = metrics ? metrics.meter : ensurePaperMeter(sheet);
     if (!meter) return;
     const active = overflow > 0;
-    sheet.classList.toggle('has-paper-overflow', active);
+    const previous = meter.__bqPaint || {};
+    if (previous.active !== active) sheet.classList.toggle('has-paper-overflow', active);
     if (!active) {
+      if (previous.active === false) return;
       sheet.classList.remove('is-paper-reading');
       meter.style.removeProperty('--bq-meter-h');
       meter.style.removeProperty('--bq-meter-y');
       delete meter.dataset.trackHeight;
       delete meter.dataset.thumbHeight;
+      meter.__bqPaint = { active: false };
       return;
     }
     let trackHeight = Number(meter.dataset.trackHeight);
@@ -2162,12 +2165,17 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         : Math.min(trackHeight, Math.max(30, trackHeight * (scroller.clientHeight / scroller.scrollHeight)));
       meter.dataset.trackHeight = String(trackHeight);
       meter.dataset.thumbHeight = String(thumbHeight);
-      meter.style.setProperty('--bq-meter-h', `${thumbHeight.toFixed(2)}px`);
+      const height = `${thumbHeight.toFixed(2)}px`;
+      if (height !== previous.height) meter.style.setProperty('--bq-meter-h', height);
+      previous.height = height;
     }
     const scrollTop = metrics ? metrics.scrollTop : scroller.scrollTop;
     const progress = overflow > 0 ? Math.min(1, Math.max(0, scrollTop / overflow)) : 0;
-    meter.style.setProperty('--bq-meter-y', `${((trackHeight - thumbHeight) * progress).toFixed(2)}px`);
-    sheet.classList.toggle('is-paper-reading', scrollTop > 1 && scrollTop < overflow - 1);
+    const y = `${((trackHeight - thumbHeight) * progress).toFixed(2)}px`;
+    const reading = scrollTop > 1 && scrollTop < overflow - 1;
+    if (y !== previous.y) meter.style.setProperty('--bq-meter-y', y);
+    if (reading !== previous.reading) sheet.classList.toggle('is-paper-reading', reading);
+    meter.__bqPaint = { active, height: previous.height, y, reading };
   };
 
   const ensurePaperSpacer = (sheet, scroller) => {
@@ -2348,19 +2356,15 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       const pin = readPin();
       const motionOff = reduced.matches;
 
-      /* Every long paper follows the Portfolio model: one native document
-         scroll owns momentum while the pinned card's interior advances. */
-      sheets.forEach((sheet) => {
+      /* Gather reading positions before writing any scroll offsets or meters. */
+      const reading = sheets.map((sheet) => {
         const scroller = sheet.querySelector(':scope > .paper-scroll');
         const sheetStart = Number(scroller?.dataset.paperStart);
         const overflow = Number(scroller?.dataset.paperOverflow) || 0;
-        if (!scroller || !allowsInnerScroll(sheet) || overflow <= 0 || !Number.isFinite(sheetStart)) return;
+        if (!scroller || !allowsInnerScroll(sheet) || overflow <= 0 || !Number.isFinite(sheetStart)) return null;
         const innerY = Math.min(overflow, Math.max(0, window.scrollY - sheetStart));
-        if (Math.abs(scroller.scrollTop - innerY) > 0.5) scroller.scrollTop = innerY;
-        updatePaperMeter(sheet, scroller, overflow);
-      });
-
-      if (sheets.length < 2 && !terminalSheet) return;
+        return { sheet, scroller, overflow, innerY, scrollTop: scroller.scrollTop };
+      }).filter(Boolean);
 
       /* Read every geometry value together before writing transforms. */
       const metrics = sheets.map((sheet) => {
@@ -2372,6 +2376,17 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
             : sheet.getBoundingClientRect().top,
         };
       });
+      const lastSheet = sheets[sheets.length - 1];
+      const terminalTop = terminalSheet ? Math.max(pin, terminalSheet.getBoundingClientRect().top) : null;
+      const lastExited = terminalSheet ? lastSheet.getBoundingClientRect().bottom <= pin + 0.75 : false;
+
+      /* Every long paper follows one native document scroll. All geometry
+         above is read before scroll offsets and coverage change the frame. */
+      reading.forEach(({ sheet, scroller, overflow, innerY, scrollTop }) => {
+        if (Math.abs(scrollTop - innerY) > 0.5) scroller.scrollTop = innerY;
+        updatePaperMeter(sheet, scroller, overflow);
+      });
+      if (sheets.length < 2 && !terminalSheet) return;
 
       const applyCoverage = (curr, nextTop) => {
         const fullyCovered = nextTop <= pin + 0.75;
@@ -2398,14 +2413,11 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         applyCoverage(sheets[i], Math.max(pin, metrics[i + 1].naturalTop));
       }
 
-      const lastSheet = sheets[sheets.length - 1];
       if (terminalSheet) {
         /* The shared footer is outside secondary room roots, but it is still
            their final incoming paper. A short footer may never reach the pin
            before the last sticky card exits above the viewport, so either a
            complete cover or a complete exit retires that card from focus. */
-        const terminalTop = Math.max(pin, terminalSheet.getBoundingClientRect().top);
-        const lastExited = lastSheet.getBoundingClientRect().bottom <= pin + 0.75;
         applyCoverage(lastSheet, lastExited ? pin : terminalTop);
       } else {
         /* The final card has no incoming paper and must always remain live. */
@@ -2783,7 +2795,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
      ======================================================= */
   (function scrollState() {
     const root = document.documentElement;
-    const SELECTOR = '.tab, .hero-cta, .rail, .mobilebar, .design-cta';
+    const SELECTOR = '.tab, .hero-cta, .rail, .mobilebar, .design-cta, .to-top, .tab-card, .load-more-btn, .cookie-card';
     /* Applied inline rather than through a class: the authored blur is set at
        two-id specificity in several places, and an inline !important is the
        one thing that reliably outranks all of them without starting a
@@ -2825,7 +2837,11 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     window.addEventListener('wheel', onMove, { passive: true });
     window.addEventListener('blur', stop);
     /* The gallery rebuilds its chrome on a tab switch or a language change. */
-    const forget = () => { restore(); blurred = null; };
+    const forget = () => {
+      restore();
+      blurred = null;
+      if (moving) suspend();
+    };
     window.addEventListener('bq:gallery-built', forget);
     document.addEventListener('bq:language', forget);
   }());
@@ -2886,6 +2902,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     let pendingAppendOffset = null;
     let paintedY = null, paintedHeadY = null;
     let contentScale = 1;
+    let trackOrigin = 0;
     let workReadingState = { active: false };
     const measure = () => {
       readGutter();
@@ -2897,6 +2914,9 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         return;
       }
       cardH = card.clientHeight;
+      // Content, route and viewport changes refresh the document origin.
+      // Native scrolling can then advance the reel without a layout read.
+      trackOrigin = track.getBoundingClientRect().top + window.scrollY;
       const nextScale = Number(window.__bqViewportScale) || 1;
       if (nextScale !== contentScale) {
         contentScale = nextScale;
@@ -2955,7 +2975,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const gutter = () => (cachedGutter === null ? readGutter() : cachedGutter);
     const reelState = () => {
       const g = gutter();
-      const trackTop = track.getBoundingClientRect().top;
+      const trackTop = trackOrigin - window.scrollY;
       const local = g - trackTop;
       const y = Math.min(overflow, Math.max(0, local));
       return { g, y, local };
@@ -3018,10 +3038,12 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
 
       /* ---- reads ---- */
       const g = gutter();
-      // The menu temporarily transforms the page stage. Its screen position
-      // cannot be cached across a resize while that transition is in progress.
-      const trackTop = track.getBoundingClientRect().top;
-      const cardTop = card.getBoundingClientRect().top;
+      // The sticky carrier pins until the reel and its handoff hold finish.
+      // Its bounds are known from measure(), so no rectangle/style read is
+      // needed after another scroll module has written its own transforms.
+      // Menu motion is excluded above; closure remeasures the real origin.
+      const trackTop = trackOrigin - window.scrollY;
+      const cardTop = Math.min(Math.max(g, trackTop), trackTop + cardH + overflow);
       const local = g - trackTop;
       let y = Math.min(overflow, Math.max(0, local));
       /* Latch the reel the instant the hold begins — the hold IS the next
@@ -3113,8 +3135,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
           : Number.isFinite(saved.offset)
             ? Math.min(overflow, Math.max(0, saved.offset * (nativeMovement ? 1 : contentScale / oldScale)))
             : overflow * saved.progress;
-        const trackTop = track.getBoundingClientRect().top + window.scrollY;
-        const targetY = Math.max(0, trackTop - gutter() + newLocal);
+        const targetY = Math.max(0, trackOrigin - gutter() + newLocal);
         if (Math.abs(targetY - window.scrollY) > 0.75) {
           window.scrollTo({ top: targetY, left: 0, behavior: 'auto' });
         }
@@ -3186,7 +3207,9 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     window.__bqPrepareWorkAppend = () => {
       // The load button remains visible during the handoff hold. Growing the
       // reel must keep the images here, rather than preserve the NEW reel end.
-      pendingAppendOffset = lastY;
+      const liveLocal = gutter() + window.scrollY - trackOrigin;
+      pendingAppendOffset = liveLocal >= overflow && holdY !== null
+        ? holdY : Math.min(overflow, Math.max(0, liveLocal));
       holdY = null;
       queueRemeasure();
     };
@@ -3350,48 +3373,28 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
      and how far the next one has risen over it — makes one sheet worth one step
      whatever its track is worth in pixels. Falls back to document scroll for
      any page that is not a deck. */
-  const designDeck = document.getElementById('design');
-  let gallerySheets = [], galleryPin = 10;
+  let progressSheets = [], progressPin = 10;
   const measureGalleryProgress = () => {
-    const sheets = Array.from(designDeck?.querySelectorAll(':scope > .paper-sheet') || []);
-    gallerySheets = sheets.map(sheet => sheet.querySelector(':scope > .paper-scroll'));
-    if (sheets[0]) galleryPin = parseFloat(getComputedStyle(sheets[0]).top) || 0;
+    const activeDeck = document.getElementById(document.body.dataset.room || 'design');
+    const sheets = Array.from(activeDeck?.querySelectorAll(':scope > .paper-sheet') || []);
+    progressSheets = sheets.map(sheet => sheet.querySelector(':scope > .paper-scroll'));
+    if (sheets[0]) progressPin = parseFloat(getComputedStyle(sheets[0]).top) || 0;
   };
   measureGalleryProgress();
 
   const deckProgress = (top) => {
     // The paper stack already measures normal-flow offsets whenever content
-    // or the viewport changes. Scrolling the gallery needs only arithmetic,
+    // or the viewport changes. Scrolling any room needs only arithmetic,
     // not computed styles and a forced rectangle read for every sheet.
-    if (document.body.dataset.room === 'design') {
-      const starts = gallerySheets.map(scroller => Number(scroller?.dataset.paperStart));
-      if (starts.length < 2 || starts.some(start => !Number.isFinite(start))) return null;
-      let index = 0;
-      for (let i = 0; i < starts.length; i++) if (starts[i] <= top + 1) index = i;
-      const nextTop = starts[index + 1] + galleryPin - top;
-      const within = index + 1 < starts.length
-        ? Math.min(1, Math.max(0, (window.innerHeight - nextTop) / Math.max(1, window.innerHeight - galleryPin - 1)))
-        : 1;
-      return Math.min(1, Math.max(0, (index + within) / starts.length));
-    }
-    const room = document.querySelector('.room:not(.is-hidden).paper-stack');
-    if (!room) return null;
-    const sheets = room.querySelectorAll(':scope > .paper-sheet');
-    const count = sheets.length;
-    if (count < 2) return null;
-    const pin = (parseFloat(getComputedStyle(document.documentElement)
-      .getPropertyValue('--bq-deck-gutter')) || 10) + 1;
+    const starts = progressSheets.map(scroller => Number(scroller?.dataset.paperStart));
+    if (starts.length < 2 || starts.some(start => !Number.isFinite(start))) return null;
     let index = 0;
-    for (let i = 0; i < count; i += 1) {
-      if (sheets[i].getBoundingClientRect().top <= pin) index = i;
-    }
-    let within = 1;
-    const next = sheets[index + 1];
-    if (next) {
-      const span = Math.max(1, window.innerHeight - pin);
-      within = Math.min(1, Math.max(0, (window.innerHeight - next.getBoundingClientRect().top) / span));
-    }
-    return Math.min(1, Math.max(0, (index + within) / count));
+    for (let i = 0; i < starts.length; i++) if (starts[i] <= top + 1) index = i;
+    const nextTop = starts[index + 1] + progressPin - top;
+    const within = index + 1 < starts.length
+      ? Math.min(1, Math.max(0, (window.innerHeight - nextTop) / Math.max(1, window.innerHeight - progressPin - 1)))
+      : 1;
+    return Math.min(1, Math.max(0, (index + within) / starts.length));
   };
 
   let shownNow = null, lastRingOffset;

@@ -121,6 +121,34 @@ test('paper measurement batches spacer reads and paints meters without further s
     'three authored-size reads plus two active-meter reads; no unused rawOverflow reads');
 });
 
+test('settled paper meters perform no repeated paint or geometry work', () => {
+  const writes = [];
+  const meter = { dataset: { trackHeight: '200', thumbHeight: '60' }, style: {
+    setProperty: (name, value) => writes.push([name, value]),
+    removeProperty: name => writes.push([name, null]),
+  }, get clientHeight() { throw new Error('scrolling must not measure the meter'); } };
+  const sheet = { classList: {
+    toggle: (name, on) => writes.push([name, on]), remove: name => writes.push([name, false]),
+  } };
+  const scroller = { scrollTop: 0,
+    get clientHeight() { throw new Error('scrolling must not measure content'); },
+    get scrollHeight() { throw new Error('scrolling must not measure content'); },
+  };
+  const context = { sheet, scroller, ensurePaperMeter: () => meter };
+  vm.runInNewContext(section('  const updatePaperMeter = ', '  const ensurePaperSpacer = ')
+    + '\nglobalThis.paint = () => updatePaperMeter(sheet, scroller, 400);', context);
+  context.paint();
+  writes.length = 0;
+  for (let frame = 0; frame < 60; frame++) context.paint();
+  assert.deepEqual(writes, [], 'a paper parked before its reading start stays quiet');
+  scroller.scrollTop = 200;
+  context.paint();
+  assert.deepEqual(writes, [['--bq-meter-y', '70.00px'], ['is-paper-reading', true]]);
+  writes.length = 0;
+  for (let frame = 0; frame < 60; frame++) context.paint();
+  assert.deepEqual(writes, [], 'a stationary thumb never repaints on another sheet’s scroll');
+});
+
 test('a growing work track refreshes following paper anchors even when its viewport stays fixed', () => {
   const observers = [], frames = [];
   class Observer {

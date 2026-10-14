@@ -155,6 +155,8 @@
         var frame = 0;
         var checkRise = function () {
           frame = 0;
+          if (document.hidden || document.body.classList.contains('menu-open')
+            || document.body.classList.contains('menu-closing')) return;
           /* Gate on the SHEET, never on the items. The deck stacks its sheets at
              the same pinned position, so every item reports itself on screen from
              the very top of the page and the whole choreography would burn off
@@ -165,6 +167,8 @@
              next sheet's rect to re-run layout */
           var arrived = [];
           for (var i = pending.length - 1; i >= 0; i--) {
+            var room = pending[i].sheet.closest('.room');
+            if (room && room.classList.contains('is-hidden')) continue;
             if (pending[i].sheet.getBoundingClientRect().top < limit) arrived.push(i);
           }
           for (var a = 0; a < arrived.length; a++) {
@@ -175,6 +179,9 @@
           if (!pending.length) {
             removeEventListener('scroll', queueRise);
             removeEventListener('resize', queueRise);
+            document.removeEventListener('bq:route', queueRise);
+            document.removeEventListener('bq:menu-closed', queueRise);
+            document.removeEventListener('visibilitychange', queueRise);
           }
         };
         var queueRise = function () {
@@ -182,6 +189,9 @@
         };
         addEventListener('scroll', queueRise, { passive: true });
         addEventListener('resize', queueRise, { passive: true });
+        document.addEventListener('bq:route', queueRise);
+        document.addEventListener('bq:menu-closed', queueRise);
+        document.addEventListener('visibilitychange', queueRise);
         queueRise();
       }
     }
@@ -335,21 +345,40 @@
     }
 
     /* ---- slow section-title drift gives long pages a soft depth cue ---- */
-    var compact = matchMedia('(max-width: 1024px)').matches
-      || matchMedia('(hover: none), (pointer: coarse)').matches;
+    var driftCompact = matchMedia('(max-width: 1024px), (hover: none), (pointer: coarse)');
+    var compact = driftCompact.matches;
     if (!reduce && !compact) {
       var driftItems = Array.from(document.querySelectorAll(
         '.service-showcase-title, .bio-teaser-title, .software-title, .latest-blog-title, .room-hero-title, .pj-room-title'
       ));
       var driftFrame = 0;
       var driftValues = [];
+      var driftPainted = [];
+      var driftReduced = matchMedia('(prefers-reduced-motion: reduce)');
       var updateDrift = function () {
         driftFrame = 0;
+        /* A desktop window can become compact after this layer started. Clear
+           its desktop offset once, then stay idle as on an ordinary phone. */
+        if (driftCompact.matches || driftReduced.matches) {
+          for (var r = 0; r < driftItems.length; r++) {
+            if (driftPainted[r] == null) continue;
+            driftItems[r].style.removeProperty('--motion-drift');
+            driftPainted[r] = null;
+          }
+          return;
+        }
+        if (document.hidden || document.body.classList.contains('menu-open')
+          || document.body.classList.contains('menu-closing')) return;
         var vh = innerHeight;
         /* read every rect first — a write in between forces the next read to
            re-run layout, which is what made this the most expensive thing on
            the page during a scroll */
         for (var i = 0; i < driftItems.length; i++) {
+          var room = driftItems[i].closest('.room');
+          if (room && room.classList.contains('is-hidden')) {
+            driftValues[i] = null;
+            continue;
+          }
           var rect = driftItems[i].getBoundingClientRect();
           driftValues[i] = (rect.bottom < -80 || rect.top > vh + 80)
             ? null
@@ -358,8 +387,10 @@
         /* then write */
         for (var j = 0; j < driftItems.length; j++) {
           if (driftValues[j] === null) continue;
-          driftItems[j].style.setProperty(
-            '--motion-drift', ((driftValues[j] - 0.5) * 14).toFixed(2) + 'px');
+          var value = ((driftValues[j] - 0.5) * 14).toFixed(2) + 'px';
+          if (value === driftPainted[j]) continue;
+          driftItems[j].style.setProperty('--motion-drift', value);
+          driftPainted[j] = value;
         }
       };
       var queueDrift = function () {
@@ -368,6 +399,11 @@
       updateDrift();
       addEventListener('scroll', queueDrift, { passive: true });
       addEventListener('resize', queueDrift);
+      document.addEventListener('bq:route', queueDrift);
+      document.addEventListener('bq:menu-closed', queueDrift);
+      document.addEventListener('visibilitychange', queueDrift);
+      driftCompact.addEventListener?.('change', queueDrift);
+      driftReduced.addEventListener?.('change', queueDrift);
     }
 
     /* Infinite marquees only run while on-screen; pause in background tabs. */

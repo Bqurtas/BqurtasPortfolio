@@ -14,6 +14,26 @@ function loadGallery(fetchImpl = async () => response(), doc = { addEventListene
   return window.BQ_GALLERY;
 }
 
+test('passing video covers during scrolling do not start hover playback', () => {
+  let moving = true, playCalls = 0, hover;
+  const video = { dataset: {} };
+  const card = { dataset: { type: 'video' }, contains: () => false, querySelector: () => video };
+  const start = gallerySource.indexOf('  /* Play video on card hover');
+  const end = gallerySource.indexOf("  grid.addEventListener('mouseout'", start);
+  vm.runInNewContext(gallerySource.slice(start, end), {
+    grid: { addEventListener: (_type, callback) => { hover = callback; } },
+    matchMedia: () => ({ matches: true }), navigator: {},
+    document: { documentElement: { classList: { contains: () => moving } } },
+    videoPreviews: { play: () => { playCalls++; } }
+  });
+  const event = { target: { closest: () => card }, relatedTarget: null };
+  for (let passed = 0; passed < 20; passed++) hover(event);
+  assert.equal(playCalls, 0, 'native scrolling does not request passing MP4 files');
+  moving = false;
+  hover(event);
+  assert.equal(playCalls, 1, 'deliberate hover at rest still previews the film');
+});
+
 test('concurrent gallery consumers wait for one validated manifest', async () => {
   let resolveFetch, fetches = 0;
   const gallery = loadGallery(() => { fetches++; return new Promise(resolve => { resolveFetch = resolve; }); });
@@ -45,6 +65,21 @@ test('manifest refresh revalidates and preserves usable content if a response is
   await gallery.loadManifest({ force: true });
   assert.equal(gallery.items('general').length, 0);
   assert.equal(gallery._manifestPromise, null);
+});
+
+test('video catalogue keeps its exact dimensions and only its own first-party frame poster', async () => {
+  const gallery = loadGallery(async () => response({ images: [], videos: [
+    { path: 'Videos/Videos1.mp4', width: 406, height: 720, poster: '/assets/thumbs/Videos/Videos1.jpg' },
+    { path: 'Videos/Videos2.mp4', width: 720, height: 406, poster: 'https://outside.example/Videos2.jpg' },
+    { path: 'Videos/Videos3.mp4', width: 720, height: 720, poster: '/assets/thumbs/Videos/Videos1.jpg' },
+  ] }));
+  await gallery.loadManifest();
+  const items = gallery.items('video');
+  assert.equal(items[0].poster, '/assets/thumbs/Videos/Videos1.jpg');
+  assert.equal(items[0].width, 406);
+  assert.equal(items[0].height, 720);
+  assert.equal(items[1].poster, '', 'unrelated origins must not introduce card requests');
+  assert.equal(items[2].poster, '', 'another film’s frame must not stand in for this film');
 });
 
 test('an initial manifest outage can be retried without discarding the fallback catalogue', async () => {

@@ -1773,6 +1773,13 @@ html body #bio#bio#bio > .paper-sheet .index-row {
 /* Full catalogue navigation remains available without loading every card. */
 .gallery-archive-link { display:inline-flex; align-items:center; min-height:44px; gap:8px; margin-top:16px; color:var(--ink); text-underline-offset:5px; }
 
+/* These editorial surfaces sit on opaque paper. An inherited glass blur
+   redraws the same flat paper on every scroll frame without changing it. */
+html body :is(#design#design#design, #bio#bio#bio, #blog#blog#blog, #contact#contact#contact) .paper-scroll :is(.service-detail-inner, .stat, .tl-card, .blog-card, .qc-card, .pitch-wrap, .bio-card, .bio-block) {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
 /* Fit visible content, never its sticky carrier. Heroes and the shared
    footer use the same measured scale as chapters when height changes. */
 html body .footer.paper-sheet[data-paper-fit] > .paper-scroll > :not(.paper-reading-spacer) {
