@@ -208,53 +208,6 @@
     addEventListener('scroll', setScrolled, { passive: true });
 
     if (fine && !reduce) {
-      /* ---- magnetic controls (uses the independent `translate` property) ---- */
-      var magnetic = document.querySelectorAll(
-        '.rail-menu, #railChat, #railLatest, #themeToggle, .social-current, .lang-current, ' +
-        '.pencemor-hero-btn, .pj-room-btn, .pitch-submit, .service-cta, .software-link, .bio-doc-btn, ' +
-        '.footer-cta-btn, .footer-email, .footer-top-btn, .hero-cta, .load-more-btn, .mobilebar-cta, ' +
-        '.mm-touch, .tab, .blog-more, .latest-blog-all, .bio-teaser-link'
-      );
-      magnetic.forEach(function (el) {
-        el.classList.add('motion-magnetic');
-        el.addEventListener('pointermove', function (event) {
-          var rect = el.getBoundingClientRect();
-          var x = (event.clientX - rect.left) / rect.width - 0.5;
-          var y = (event.clientY - rect.top) / rect.height - 0.5;
-          el.style.translate = (x * 7).toFixed(2) + 'px ' + (y * 6).toFixed(2) + 'px';
-        });
-        el.addEventListener('pointerleave', function () { el.style.translate = '0 0'; });
-      });
-
-      /* ---- restrained card tilt ---- */
-      document.querySelectorAll('.feature-card, .latest-blog-grid .blog-card, .work-card, .studio-card, .studio-step, #grid .card').forEach(function (card) {
-        card.classList.add('motion-tilt');
-        card.addEventListener('pointermove', function (event) {
-          var rect = card.getBoundingClientRect();
-          var px = (event.clientX - rect.left) / rect.width - 0.5;
-          var py = (event.clientY - rect.top) / rect.height - 0.5;
-          card.style.setProperty('--tilt-x', (-py * 3.5).toFixed(2) + 'deg');
-          card.style.setProperty('--tilt-y', (px * 4).toFixed(2) + 'deg');
-          card.style.setProperty('--shine-x', (px + 0.5) * 100 + '%');
-          card.style.setProperty('--shine-y', (py + 0.5) * 100 + '%');
-        });
-        card.addEventListener('pointerleave', function () {
-          card.style.setProperty('--tilt-x', '0deg');
-          card.style.setProperty('--tilt-y', '0deg');
-          card.style.setProperty('--shine-x', '50%');
-          card.style.setProperty('--shine-y', '50%');
-        });
-      });
-
-      /* ---- soft spotlight across stacked homepage sheets ---- */
-      document.querySelectorAll('#design > .section.section').forEach(function (sheet) {
-        sheet.addEventListener('pointermove', function (event) {
-          var rect = sheet.getBoundingClientRect();
-          sheet.style.setProperty('--bq-spot-x', (event.clientX - rect.left) + 'px');
-          sheet.style.setProperty('--bq-spot-y', (event.clientY - rect.top) + 'px');
-        });
-      });
-
       /* ---- menu preview follows room focus / hover ---- */
       var menu = document.getElementById('mobileMenu');
       if (menu) {
@@ -333,14 +286,6 @@
         }
       }
 
-      /* ---- biography spotlight follows the pointer without moving layout ---- */
-      document.querySelectorAll('#bio .bio-block').forEach(function (card) {
-        card.addEventListener('pointermove', function (event) {
-          var rect = card.getBoundingClientRect();
-          card.style.setProperty('--bio-x', event.clientX - rect.left + 'px');
-          card.style.setProperty('--bio-y', event.clientY - rect.top + 'px');
-        });
-      });
 
     }
 
@@ -349,7 +294,7 @@
     var compact = driftCompact.matches;
     if (!reduce && !compact) {
       var driftItems = Array.from(document.querySelectorAll(
-        '.service-showcase-title, .bio-teaser-title, .software-title, .latest-blog-title, .room-hero-title, .pj-room-title'
+        '.service-showcase-title, .bio-teaser-title, .software-title, .latest-blog-title, .pj-room-title'
       ));
       var driftFrame = 0;
       var driftValues = [];
@@ -359,7 +304,8 @@
         driftFrame = 0;
         /* A desktop window can become compact after this layer started. Clear
            its desktop offset once, then stay idle as on an ordinary phone. */
-        if (driftCompact.matches || driftReduced.matches) {
+        var mode = document.documentElement?.dataset?.motionMode;
+        if (driftCompact.matches || mode === 'reduced' || (mode !== 'full' && driftReduced.matches)) {
           for (var r = 0; r < driftItems.length; r++) {
             if (driftPainted[r] == null) continue;
             driftItems[r].style.removeProperty('--motion-drift');
@@ -404,6 +350,7 @@
       document.addEventListener('visibilitychange', queueDrift);
       driftCompact.addEventListener?.('change', queueDrift);
       driftReduced.addEventListener?.('change', queueDrift);
+      document.addEventListener('bq:motion-preference', queueDrift);
     }
 
     /* Infinite marquees only run while on-screen; pause in background tabs. */
@@ -422,6 +369,182 @@
     syncPaused();
     document.addEventListener('visibilitychange', syncPaused);
   });
+})();
+
+/* Leaf layers move inside stationary paper. Native scrolling, gallery sizing
+   and the original image frames stay under main.js's control. */
+(function reactiveSceneMotion() {
+  'use strict';
+  function init() {
+    var root = document.documentElement;
+    var reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    var pointer = matchMedia('(hover: hover) and (pointer: fine)');
+    var override = '';
+    try { override = localStorage.getItem('bq_motion') || ''; } catch (_) {}
+    var enabled = false, frame = 0, awake = true;
+    var x = 0, y = 0, wantedX = 0, wantedY = 0;
+    var scene = null, layers = [], surface = null, surfaceRect = null;
+    var clientX = 0, clientY = 0, surfaceDirty = false;
+    var clamp = function (value, min, max) { return Math.max(min, Math.min(max, value)); };
+    var scenes = Array.from(document.querySelectorAll('.room > .hero, .room > .room-hero'));
+    var home = document.querySelector('#design > .hero');
+    var lightbox = document.querySelector('.lb-overlay');
+    var button = null;
+    var props = ['--scene-x', '--scene-y', '--scene-rx', '--scene-ry'];
+    function resetLayers() {
+      layers.forEach(function (layer) { props.forEach(function (name) { layer.style.removeProperty(name); }); });
+    }
+    function clearSurface() {
+      if (!surface) return;
+      surface.classList.remove('bq-motion-surface');
+      surface.style.removeProperty('--scene-light-x');
+      surface.style.removeProperty('--scene-light-y');
+      surface = surfaceRect = null;
+      surfaceDirty = false;
+    }
+    function blocked() {
+      return !enabled || !awake || document.hidden
+        || document.body.classList.contains('menu-open')
+        || document.body.classList.contains('menu-closing')
+        || !!(lightbox && lightbox.classList.contains('is-open'));
+    }
+    function stop() {
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
+      x = y = wantedX = wantedY = 0;
+      resetLayers();
+      clearSurface();
+    }
+    function write(layer, name, value) {
+      if (layer.style.getPropertyValue(name) !== value) layer.style.setProperty(name, value);
+    }
+    function queue() { if (!frame && !blocked()) frame = requestAnimationFrame(paint); }
+    function paint() {
+      frame = 0;
+      if (blocked()) { stop(); return; }
+      // Read the one active hover surface before any writes. Scroll frames use
+      // the paper's cached document origin and never measure the gallery.
+      if (surfaceDirty && surface && !surfaceRect) surfaceRect = surface.getBoundingClientRect();
+      var start = scene && scene.scroller && Number(scene.scroller.dataset.paperStart);
+      var progress = scene ? clamp((window.scrollY - (Number.isFinite(start) ? start : 0)) / Math.max(1, innerHeight), 0, 1) : 1;
+      var active = progress < 1 && scene;
+      var targetX = active && pointer.matches ? wantedX : 0;
+      var targetY = active && pointer.matches ? wantedY : 0;
+      x += (targetX - x) * .2;
+      y += (targetY - y) * .2;
+      if (Math.abs(targetX - x) < .002) x = targetX;
+      if (Math.abs(targetY - y) < .002) y = targetY;
+      if (scene) {
+        var depth = pointer.matches ? 1 : .55;
+        scene.layers.forEach(function (layer) {
+          var portrait = layer.classList.contains('hero-portrait');
+          var ghost = layer.classList.contains('room-hero-ghost');
+          var amount = portrait ? 12 : ghost ? -10 : -5;
+          write(layer, '--scene-x', (x * amount).toFixed(2) + 'px');
+          write(layer, '--scene-y', (y * amount * .6 - progress * (portrait ? 26 : ghost ? -12 : 12) * depth).toFixed(2) + 'px');
+          if (portrait) {
+            write(layer, '--scene-rx', (-y * 1.8).toFixed(2) + 'deg');
+            write(layer, '--scene-ry', (x * 2.4).toFixed(2) + 'deg');
+          }
+        });
+      }
+      if (surfaceDirty && surface && surfaceRect && surfaceRect.width && surfaceRect.height) {
+        write(surface, '--scene-light-x', (clamp((clientX - surfaceRect.left) / surfaceRect.width, 0, 1) * 100).toFixed(1) + '%');
+        write(surface, '--scene-light-y', (clamp((clientY - surfaceRect.top) / surfaceRect.height, 0, 1) * 100).toFixed(1) + '%');
+      }
+      surfaceDirty = false;
+      if (x !== targetX || y !== targetY) queue();
+    }
+    function chooseScene() {
+      stop();
+      var element = scenes.find(function (item) { return !item.closest('.room').classList.contains('is-hidden'); });
+      var leaves = element ? Array.from(element.querySelectorAll('.hero-portrait, .hero-sign, .room-hero-title, .room-hero-ghost')) : [];
+      scene = element ? { element: element, scroller: element.querySelector('.paper-scroll'), layers: leaves } : null;
+      layers = leaves;
+      queue();
+    }
+    function label() {
+      if (!button) return;
+      var lang = (root.lang || 'en').toLowerCase();
+      var labels = {
+        en: ['Motion on', 'Motion off', 'Reduce motion', 'Enable motion'],
+        ku: ['جوڵە چالاکە', 'جوڵە ناچالاکە', 'جوڵە کەم بکەرەوە', 'جوڵە چالاک بکە'],
+        ar: ['الحركة مفعّلة', 'الحركة متوقفة', 'تقليل الحركة', 'تفعيل الحركة'],
+        kmr: ['Tevger vekirî', 'Tevger girtî', 'Tevgerê kêm bike', 'Tevgerê veke'],
+        fr: ['Animations actives', 'Animations désactivées', 'Réduire les animations', 'Activer les animations'],
+        tr: ['Hareket açık', 'Hareket kapalı', 'Hareketi azalt', 'Hareketi etkinleştir'],
+        sv: ['Rörelse på', 'Rörelse av', 'Minska rörelse', 'Aktivera rörelse']
+      };
+      var words = labels[lang === 'ckb' ? 'ku' : lang] || labels.en;
+      button.textContent = words[enabled ? 0 : 1];
+      button.setAttribute('aria-label', words[enabled ? 2 : 3]);
+      button.setAttribute('aria-pressed', String(enabled));
+    }
+    function preference() {
+      enabled = override === 'on' || (override !== 'off' && !reduced.matches);
+      root.classList.toggle('bq-reactive-motion', enabled);
+      root.dataset.motionMode = enabled ? 'full' : 'reduced';
+      label();
+      stop();
+      document.dispatchEvent(new CustomEvent('bq:motion-preference'));
+      queue();
+    }
+    if (home) {
+      button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'scene-motion-toggle mono';
+      button.addEventListener('click', function () {
+        override = enabled ? 'off' : 'on';
+        try { localStorage.setItem('bq_motion', override); } catch (_) {}
+        preference();
+      });
+      (home.querySelector('.paper-scroll') || home).appendChild(button);
+    }
+    document.addEventListener('pointermove', function (event) {
+      if (event.pointerType !== 'mouse' || !pointer.matches || blocked()) return;
+      clientX = event.clientX; clientY = event.clientY;
+      wantedX = clamp(clientX / Math.max(1, innerWidth) * 2 - 1, -1, 1);
+      wantedY = clamp(clientY / Math.max(1, innerHeight) * 2 - 1, -1, 1);
+      var next = root.classList.contains('bq-scrolling') ? null : event.target.closest('#grid .card');
+      if (next !== surface) {
+        clearSurface(); surface = next;
+        if (surface) surface.classList.add('bq-motion-surface');
+      }
+      surfaceDirty = !!surface;
+      queue();
+    }, { passive: true });
+    document.addEventListener('pointerout', function (event) {
+      if (event.relatedTarget) return;
+      wantedX = wantedY = 0;
+      clearSurface(); queue();
+    }, { passive: true });
+    document.addEventListener('pointerdown', function (event) {
+      if (event.pointerType !== 'mouse') { wantedX = wantedY = 0; clearSurface(); queue(); }
+    }, { passive: true });
+    addEventListener('scroll', function () { clearSurface(); queue(); }, { passive: true });
+    addEventListener('resize', function () { stop(); queue(); }, { passive: true });
+    addEventListener('blur', function () { awake = false; stop(); });
+    addEventListener('focus', function () { awake = true; queue(); });
+    document.addEventListener('visibilitychange', function () { if (document.hidden) stop(); else queue(); });
+    document.addEventListener('bq:route', chooseScene);
+    document.addEventListener('bq:lightbox-open', stop);
+    document.addEventListener('bq:menu-closed', queue);
+    document.addEventListener('bq:language', label);
+    window.addEventListener('bq:css-ready', chooseScene);
+    reduced.addEventListener('change', preference);
+    pointer.addEventListener('change', function () { stop(); queue(); });
+    addEventListener('storage', function (event) {
+      if (event.key !== 'bq_motion' && event.key !== null) return;
+      override = event.newValue || ''; preference();
+    });
+    if (typeof MutationObserver === 'function') {
+      new MutationObserver(function () { if (blocked()) stop(); }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    }
+    chooseScene();
+    preference();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
+  else init();
 })();
 
 /* =========================================================
@@ -463,11 +586,11 @@
    ========================================================= */
 (function customCursor() {
   'use strict';
-  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-  if (matchMedia('(max-width: 900px)').matches) return;
   if (document.querySelector('.cursor-dot')) return;
 
-  var reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  var root = document.documentElement;
+  var fine = matchMedia('(hover: hover) and (pointer: fine)');
+  var desktop = matchMedia('(min-width: 900px)');
 
   var dot = document.createElement('div');
   dot.className = 'cursor-dot';
@@ -484,15 +607,18 @@
 
   document.body.appendChild(ring);
   document.body.appendChild(dot);
-  document.documentElement.classList.add('bq-cursor-on');
 
   /* Park both marks off-screen until the pointer first reports in, so neither
      flashes in the top-left corner on load. */
   var px = -100, py = -100;
   var rx = px, ry = py;
   var magnetX = 0, magnetY = 0;
-  var seen = false;
   var frame = 0;
+  var focused = true, visible = false, hasPointer = false;
+  var target = null, resolvedTarget = null, hit = null, action = '', magnetic = false;
+  var rectTarget = null, targetRect = null, rectDirty = true, inputPending = false;
+  var lastText = 'Open', lastAction = null, lastState = null;
+  var lastDot = '', lastRing = '';
 
   dot.style.opacity = '0';
   ring.style.opacity = '0';
@@ -518,72 +644,134 @@
     return (window.BQ_DICT && window.BQ_DICT['cursor.' + action]) || fallback[action] || '';
   }
 
+  function allowed() {
+    return fine.matches && desktop.matches && focused && !document.hidden
+      && root.classList.contains('bq-reactive-motion')
+      && !document.body.classList.contains('menu-open')
+      && !document.body.classList.contains('menu-closing');
+  }
+
+  function setVisible(on) {
+    if (visible === on) return;
+    visible = on;
+    dot.style.opacity = on ? '1' : '0';
+    ring.style.opacity = on ? '1' : '0';
+    root.classList.toggle('bq-cursor-on', on);
+  }
+
+  /* Pointer events only replace the pending sample. Geometry and semantic
+     writes happen once in its animation frame, before transform writes. A
+     settling spring never re-reads its target or rewrites unchanged labels. */
+  function resolvePointer() {
+    if (target !== resolvedTarget) {
+      resolvedTarget = target;
+      hit = target && target.closest && target.closest(HOVER);
+      action = cursorAction(target);
+      magnetic = !!(hit && hit.matches('.mm-link, .hero-cta, .service-cta, .bio-teaser-link, .pitch-submit, .footer-email'));
+    }
+    if (magnetic) {
+      if (hit !== rectTarget || rectDirty) {
+        targetRect = hit.getBoundingClientRect();
+        rectTarget = hit;
+        rectDirty = false;
+      }
+      magnetX = clamp((targetRect.left + targetRect.width / 2 - px) * 0.12, -10, 10);
+      magnetY = clamp((targetRect.top + targetRect.height / 2 - py) * 0.12, -10, 10);
+    } else {
+      magnetX = magnetY = 0;
+    }
+    var text = actionLabel(action);
+    if (text !== lastText) { label.textContent = text; lastText = text; }
+    if (action !== lastAction) { ring.dataset.cursorAction = action; lastAction = action; }
+    var state = action + '|' + !!hit + '|' + magnetic;
+    if (state !== lastState) {
+      ring.classList.toggle('is-open', action === 'view');
+      ring.classList.toggle('has-label', !!action && action !== 'view');
+      ring.classList.toggle('is-hover', !!hit && !action);
+      ring.classList.toggle('is-magnet', magnetic);
+      lastState = state;
+    }
+    inputPending = false;
+  }
+
   function paint() {
     frame = 0;
+    if (!allowed() || !hasPointer) { suspend(); return; }
+    if (inputPending) resolvePointer();
     /* The ring eases toward the pointer; the dot is already there. A single
        lerp per frame is what produces the trail — no library needed. */
-    var k = reduced.matches ? 1 : 0.18;
     var tx = px + magnetX;
     var ty = py + magnetY;
-    rx += (tx - rx) * k;
-    ry += (ty - ry) * k;
-    dot.style.transform = 'translate(' + px + 'px,' + py + 'px) translate(-50%,-50%)';
-    ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px) translate(-50%,-50%)';
+    rx += (tx - rx) * 0.18;
+    ry += (ty - ry) * 0.18;
+    var unsettled = Math.abs(tx - rx) > 0.1 || Math.abs(ty - ry) > 0.1;
+    if (!unsettled) { rx = tx; ry = ty; }
+    var dotTransform = 'translate(' + px + 'px,' + py + 'px) translate(-50%,-50%)';
+    var ringTransform = 'translate(' + rx.toFixed(2) + 'px,' + ry.toFixed(2) + 'px) translate(-50%,-50%)';
+    if (dotTransform !== lastDot) { dot.style.transform = dotTransform; lastDot = dotTransform; }
+    if (ringTransform !== lastRing) { ring.style.transform = ringTransform; lastRing = ringTransform; }
+    setVisible(true);
     /* Keep animating while the ring still has ground to cover. */
-    if (Math.abs(tx - rx) > 0.1 || Math.abs(ty - ry) > 0.1) queue();
+    if (unsettled) queue();
   }
 
   function queue() {
-    if (!frame) frame = requestAnimationFrame(paint);
+    if (!frame && allowed() && hasPointer) frame = requestAnimationFrame(paint);
   }
 
-  document.addEventListener('pointermove', function (e) {
-    if (e.pointerType && e.pointerType !== 'mouse') return;
+  function move(e) {
+    if (e.pointerType && e.pointerType !== 'mouse') { suspend(); return; }
+    if (!allowed()) { suspend(); return; }
+    if (!Number.isFinite(e.clientX) || !Number.isFinite(e.clientY)) return;
     px = e.clientX;
     py = e.clientY;
-    if (!seen) {
-      seen = true;
+    if (!hasPointer) {
       rx = px; ry = py;
-      dot.style.opacity = '1';
-      ring.style.opacity = '1';
     }
+    hasPointer = true;
+    target = e.target;
+    inputPending = true;
     queue();
+  }
+  document.addEventListener('pointermove', move, { passive: true });
+  document.addEventListener('pointerover', move, { passive: true });
 
-    var t = e.target;
-    var hit = t && t.closest && t.closest(HOVER);
-    var action = cursorAction(t);
-    var magnetic = hit && hit.matches('.mm-link, .hero-cta, .service-cta, .bio-teaser-link, .pitch-submit, .footer-email');
-    if (magnetic) {
-      var rect = hit.getBoundingClientRect();
-      magnetX = clamp((rect.left + rect.width / 2 - px) * 0.12, -10, 10);
-      magnetY = clamp((rect.top + rect.height / 2 - py) * 0.12, -10, 10);
-    } else {
-      magnetX = 0;
-      magnetY = 0;
-    }
-    label.textContent = actionLabel(action);
-    ring.dataset.cursorAction = action;
-    ring.classList.toggle('is-open', action === 'view');
-    ring.classList.toggle('has-label', !!action && action !== 'view');
-    ring.classList.toggle('is-hover', !!hit && !action);
-    ring.classList.toggle('is-magnet', !!magnetic);
-  }, { passive: true });
-
-  /* Leaving the window, or a context menu / tab switch, should take the marks
-     with it — otherwise they sit frozen wherever the pointer left. */
-  function hide() { dot.style.opacity = '0'; ring.style.opacity = '0'; }
-  function show() { if (seen) { dot.style.opacity = '1'; ring.style.opacity = '1'; } }
-  document.addEventListener('pointerleave', hide);
-  document.addEventListener('pointerenter', show);
-  window.addEventListener('blur', hide);
-  window.addEventListener('focus', show);
-  document.addEventListener('visibilitychange', function () { document.hidden ? hide() : show(); });
+  function invalidateGeometry() { rectDirty = true; }
+  function suspend() {
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+    inputPending = hasPointer = false;
+    target = resolvedTarget = rectTarget = targetRect = null;
+    rectDirty = true;
+    magnetX = magnetY = 0;
+    setVisible(false);
+  }
+  document.addEventListener('pointerleave', suspend);
+  window.addEventListener('blur', function () { focused = false; suspend(); });
+  window.addEventListener('focus', function () { focused = true; });
+  document.addEventListener('visibilitychange', suspend);
+  document.addEventListener('bq:route', suspend);
+  document.addEventListener('bq:menu-closed', suspend);
+  document.addEventListener('bq:motion-preference', suspend);
+  document.addEventListener('bq:language', function () {
+    if (hasPointer && allowed()) { inputPending = true; queue(); }
+  });
+  window.addEventListener('scroll', invalidateGeometry, { passive: true });
+  window.addEventListener('resize', invalidateGeometry, { passive: true });
+  window.addEventListener('pagehide', suspend);
+  window.addEventListener('pageshow', suspend);
+  fine.addEventListener?.('change', suspend);
+  desktop.addEventListener?.('change', suspend);
+  if (typeof MutationObserver === 'function') {
+    new MutationObserver(function () {
+      if (document.body.classList.contains('menu-open') || document.body.classList.contains('menu-closing')) suspend();
+    }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  }
 
   /* A pen or finger on a hybrid machine hands control back to the real cursor. */
   document.addEventListener('pointerdown', function (e) {
     if (e.pointerType && e.pointerType !== 'mouse') {
-      hide();
-      document.documentElement.classList.remove('bq-cursor-on');
+      suspend();
     }
   }, { passive: true });
 })();

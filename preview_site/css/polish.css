@@ -90,15 +90,14 @@ html body #design > .hero .hero-cta:focus-visible i {
 }
 
 /* ============================================================================
-   GALLERY — the caption comes forward; the plate lifts like a print.
+   GALLERY — the caption comes forward inside the original print frame.
    ========================================================================== */
 html body #design #grid .card-art,
 html body #design #grid .card-art--photo {
   border-radius: 16px !important;
 }
 
-/* The work sheet clips overflow, so a lift is invisible. The hover stays
-   inside the plate: a tighter crop, a richer print, and a paper ring. */
+/* Keep the complete artwork visible inside a quiet paper ring. */
 html body #design #grid .card:hover .card-art,
 html body #design #grid .card:focus-within .card-art,
 html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art {
@@ -106,19 +105,6 @@ html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art
   box-shadow:
     inset 0 0 0 1px color-mix(in srgb, var(--ink) 14%, transparent),
     0 0 0 1px color-mix(in srgb, var(--ink) 8%, transparent) !important;
-}
-
-/* Touch scrolling must not leave a tapped image zoomed and filtered. */
-@media (hover: hover) and (pointer: fine) {
-  html body #design #grid .card:hover .card-art img,
-  html body #design #grid .card:hover .card-art video,
-  html body #design #grid .card:focus-within .card-art img,
-  html body #design #grid .card:focus-within .card-art video,
-  html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art img,
-  html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art video {
-    transform: scale(1.07) !important;
-    filter: saturate(1.06) contrast(1.04) !important;
-  }
 }
 
 html body #design #grid .card-caption .card-tag {
@@ -1949,4 +1935,95 @@ html[dir="rtl"] body .mobilebar.mobilebar {
   html[dir="rtl"] body.nav-compact:not(.menu-open) .mobilebar.mobilebar {
     transform: translateX(-50%) scale(calc(var(--bq-viewport-scale, 1) * .86)) !important;
   }
+}
+
+/* Pointer and native-scroll depth belongs to leaf artwork, never the fitted
+   paper, sticky gallery reel or image aspect-ratio frames. */
+html.bq-reactive-motion body #design#design > .hero .hero-portrait {
+  transform: perspective(1000px) translate3d(var(--scene-x, 0px), var(--scene-y, 0px), 0) rotateX(var(--scene-rx, 0deg)) rotateY(var(--scene-ry, 0deg)) !important;
+  transform-origin: 50% 55% !important;
+  transition: none !important;
+}
+html.bq-reactive-motion body #design#design > .hero .hero-sign,
+html.bq-reactive-motion body :is(#bio#bio, #blog#blog, #contact#contact) > .room-hero :is(.room-hero-title, .room-hero-ghost) {
+  transform: translate3d(var(--scene-x, 0px), var(--scene-y, 0px), 0) !important;
+  translate: none !important;
+  transition: none !important;
+}
+
+/* A reflection moves over the complete artwork; the artwork itself keeps its
+   original scale, so even the edges of a book or poster remain visible. */
+html body #design #grid .card .card-art :is(img, video),
+html body #design #grid .card:hover .card-art :is(img, video),
+html body #design #grid .card:focus-within .card-art :is(img, video),
+html body #design #grid .card.portfolio-scroll-card.portfolio-in:hover .card-art :is(img, video) {
+  transform: none !important;
+  object-fit: contain !important;
+  filter: none !important;
+}
+html body #design #grid .card .card-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(ellipse at var(--scene-light-x, 50%) var(--scene-light-y, 50%), rgb(255 255 255 / .2), transparent 62%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .16);
+  transition: opacity .24s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  html.bq-reactive-motion:not(.bq-scrolling) body #design #grid .bq-motion-surface .card-art::after { opacity: 1; }
+}
+.scene-motion-toggle {
+  position: absolute;
+  inset-block-start: 76px;
+  inset-inline-end: 44px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-block-size: 44px;
+  max-inline-size: min(220px, 44%);
+  padding: 8px 13px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  color: var(--ink, #26231e);
+  background: transparent;
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: .04em;
+  cursor: pointer;
+  opacity: .7;
+}
+.scene-motion-toggle::before {
+  content: '';
+  flex: 0 0 5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .3;
+}
+.scene-motion-toggle[aria-pressed="true"]::before { opacity: 1; }
+.scene-motion-toggle:hover, .scene-motion-toggle:focus-visible { opacity: 1; }
+.scene-motion-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+@media (max-width: 640px) {
+  .scene-motion-toggle { inset-block-start: 60px; inset-inline-end: 14px; padding-inline: 10px; font-size: 9px; }
+}
+@media (max-height: 480px) {
+  .scene-motion-toggle { inset-block-start: 12px; }
+}
+@media (hover: hover) and (pointer: fine) and (min-width: 900px) {
+  html.bq-reactive-motion.bq-cursor-on :is(.cursor-dot, .cursor-ring) { display: block; }
+}
+/* The visitor's choice also pauses the existing decorative loops. Entrance
+   reveals remain readable and native page scrolling remains available. */
+html[data-motion-mode="reduced"] body :is(.software-track, .hero-marquee-track, .logo-marquee-track, .footer-marquee-track, .pj2-marquee-track, .hero-spark svg),
+html[data-motion-mode="reduced"] body #design#design#design .mouse-wheel,
+html[data-motion-mode="reduced"] body #design#design#design > .section.practice-note .bio-teaser-portrait .portrait-orbit,
+html[data-motion-mode="reduced"] body #design#design#design > .section.practice-note .bio-teaser-portrait .orbit-ic::before {
+  animation-play-state: paused !important;
 }
