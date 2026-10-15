@@ -238,13 +238,16 @@ test('media is served from jsDelivr with first-party headers and the query ignor
   assert.equal(calls.at(-1).url, 'https://cdn.jsdelivr.net/gh/Bqurtas/BqurtasPortfolio@main/WebsitePortfolio/websiteLogo%26tab.webp');
 });
 
-test('video byte ranges pass through, and raw GitHub covers what jsDelivr refuses', async (t) => {
+test('videos use raw GitHub directly for byte ranges and HEAD without waiting for jsDelivr', async (t) => {
   const calls = [];
   t.mock.method(globalThis, 'fetch', async (url, init) => {
     calls.push({ url: String(url), range: init.headers.get('Range'), method: init.method });
-    if (String(url).startsWith('https://cdn.jsdelivr.net/')) return new Response('too large', { status: 403 });
+    if (String(url).startsWith('https://cdn.jsdelivr.net/')) return new Response('unexpected CDN request', { status: 500 });
     return new Response(init.method === 'HEAD' ? null : 'abc', {
-      status: 206, headers: { 'Content-Range': 'bytes 0-2/24269001', 'Content-Length': '3', 'Content-Type': 'text/plain' }
+      status: init.method === 'HEAD' ? 200 : 206,
+      headers: init.method === 'HEAD'
+        ? { 'Content-Length': '24269001', 'Content-Type': 'text/plain' }
+        : { 'Content-Range': 'bytes 0-2/24269001', 'Content-Length': '3', 'Content-Type': 'text/plain' }
     });
   });
   const response = await media('/media/Videos/Videos26.mp4', { headers: { Range: 'bytes=0-2' } });
@@ -255,14 +258,44 @@ test('video byte ranges pass through, and raw GitHub covers what jsDelivr refuse
   assert.equal(response.headers.get('accept-ranges'), 'bytes');
   assert.equal(response.headers.get('content-length'), '3');
   assert.deepEqual(calls.map((call) => [call.url, call.range]), [
-    ['https://cdn.jsdelivr.net/gh/Bqurtas/BqurtasPortfolio@main/Videos/Videos26.mp4', 'bytes=0-2'],
     ['https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Videos/Videos26.mp4', 'bytes=0-2']
   ]);
 
   const head = await media('/media/Videos/Videos26.mp4', { method: 'HEAD' });
-  assert.equal(head.status, 206);
+  assert.equal(head.status, 200);
   assert.equal(await head.text(), '');
+  assert.equal(head.headers.get('content-length'), '24269001');
+  assert.equal(calls.length, 2, 'successful GET and HEAD each use exactly one upstream request');
+  assert.equal(calls.at(-1).url, 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Videos/Videos26.mp4');
   assert.equal(calls.at(-1).method, 'HEAD');
+});
+
+test('video requests retain their byte range and condition when raw GitHub needs a CDN fallback', async (t) => {
+  for (const failure of ['server', 'network']) {
+    const calls = [];
+    t.mock.method(globalThis, 'fetch', async (url, init) => {
+      calls.push({ url: String(url), range: init.headers.get('Range'), condition: init.headers.get('If-Range') });
+      if (String(url).startsWith('https://raw.githubusercontent.com/')) {
+        if (failure === 'network') throw new Error('raw origin unavailable');
+        return new Response('raw origin unavailable', { status: 503 });
+      }
+      return new Response('abc', { status: 206, headers: {
+        'Content-Range': 'bytes 0-2/24269001', 'Content-Length': '3', ETag: '"film"'
+      } });
+    });
+    const response = await media('/media/Videos/Videos26.mp4', { headers: { Range: 'bytes=0-2', 'If-Range': '"film"' } });
+    assert.equal(response.status, 206, failure);
+    assert.equal(await response.text(), 'abc');
+    assert.equal(response.headers.get('content-type'), 'video/mp4');
+    assert.equal(response.headers.get('content-range'), 'bytes 0-2/24269001');
+    assert.equal(response.headers.get('content-length'), '3');
+    assert.equal(response.headers.get('etag'), '"film"');
+    assert.equal(response.headers.get('x-robots-tag'), null);
+    assert.deepEqual(calls, [
+      { url: 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Videos/Videos26.mp4', range: 'bytes=0-2', condition: '"film"' },
+      { url: 'https://cdn.jsdelivr.net/gh/Bqurtas/BqurtasPortfolio@main/Videos/Videos26.mp4', range: 'bytes=0-2', condition: '"film"' }
+    ], failure);
+  }
 });
 
 test('upstream failures are uncached, noindex errors', async (t) => {

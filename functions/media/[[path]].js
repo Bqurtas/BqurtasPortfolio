@@ -117,18 +117,22 @@ export async function onRequest(context) {
   catch (e) { return failure(503, request.method, { 'Retry-After': '60' }); }
   if (!catalog.byPath.has(key) && !catalog.extra.has(key)) return failure(404, request.method);
 
-  /* jsDelivr first (it is what the lightbox already uses); it refuses files
-     over 20 MB, so anything it does not answer comes from raw GitHub. */
-  let upstream = await fetchUpstream(CDN_BASE, key, request);
+  /* Several films stall at jsDelivr until the upstream timeout expires.
+     Read videos from raw GitHub first; keep jsDelivr as their fallback and
+     retain the existing CDN-first path for images. */
+  const video = mediaType(key).startsWith('video/');
+  const primary = video ? RAW_BASE : CDN_BASE;
+  const secondary = video ? CDN_BASE : RAW_BASE;
+  let upstream = await fetchUpstream(primary, key, request);
   let missing = !!upstream && upstream.status === 404;
   if (!upstream || !FINAL.has(upstream.status)) {
     discard(upstream);
-    const raw = await fetchUpstream(RAW_BASE, key, request);
-    if (raw && FINAL.has(raw.status)) upstream = raw;
+    const fallback = await fetchUpstream(secondary, key, request);
+    if (fallback && FINAL.has(fallback.status)) upstream = fallback;
     else {
       // Only a file both mirrors deny is gone; anything else is an outage.
-      missing = missing && !!raw && raw.status === 404;
-      discard(raw);
+      missing = missing && !!fallback && fallback.status === 404;
+      discard(fallback);
       upstream = null;
     }
   }
