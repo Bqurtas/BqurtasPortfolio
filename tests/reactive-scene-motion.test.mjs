@@ -62,7 +62,9 @@ function fixture({ reducedMotion = false, finePointer = true, stored = null } = 
       : selector === '.lb-overlay' ? lightbox
       : selector === '.lb-overlay.is-open' && lightbox.classList.contains('is-open') ? lightbox : null,
     createElement() {
-      return { ...events(), attributes: {}, setAttribute(name, value) { this.attributes[name] = value; } };
+      const item = { ...events(), attributes: {}, setAttribute(name, value) { this.attributes[name] = value; } };
+      created.push(item);
+      return item;
     },
   };
   document.dispatchEvent = event => { dispatched.push(event.type); document.fire(event.type, event); };
@@ -84,7 +86,6 @@ function fixture({ reducedMotion = false, finePointer = true, stored = null } = 
     MutationObserver: class { constructor(callback) { observers.push(callback); } observe() {} },
   };
   vm.runInNewContext(source, context);
-  const toggle = created[0];
   function card() {
     const item = {
       reads: 0, style: style(), classList: classes(),
@@ -94,7 +95,7 @@ function fixture({ reducedMotion = false, finePointer = true, stored = null } = 
     return item;
   }
   return {
-    window, document, root, reduced, pointer, storage, dispatched, frames, toggle,
+    window, document, root, reduced, pointer, storage, dispatched, frames, created,
     design, bio, home, biography, portrait, signature, title, ghost, card,
     pointerMove(target, x = 1000, y = 650, pointerType = 'mouse') {
       document.fire('pointermove', {
@@ -116,19 +117,21 @@ function fixture({ reducedMotion = false, finePointer = true, stored = null } = 
   };
 }
 
-test('system reduced motion is the default and manual on/off/reset preferences remain persisted', () => {
+test('motion creates no controls and retains saved on/off preferences and system defaults', () => {
   const page = fixture({ reducedMotion: true });
   assert.equal(page.root.dataset.motionMode, 'reduced');
   assert.equal(page.root.classList.contains('bq-reactive-motion'), false);
-  assert.equal(page.toggle.attributes['aria-pressed'], 'false');
+  assert.equal(page.created.length, 0);
+  assert.equal(fixture().created.length, 0, 'full motion also creates no controls');
   assert.equal(page.frames.size, 0);
-  page.toggle.fire('click'); page.settle();
+  page.storage.set('bq_motion', 'on');
+  page.window.fire('storage', { key: 'bq_motion', newValue: 'on' }); page.settle();
   assert.equal(page.storage.get('bq_motion'), 'on');
   assert.equal(page.root.dataset.motionMode, 'full');
-  assert.equal(page.toggle.attributes['aria-pressed'], 'true');
   const restored = fixture({ reducedMotion: true, stored: page.storage.get('bq_motion') });
   assert.equal(restored.root.dataset.motionMode, 'full', 'an explicit saved choice takes precedence over the system');
-  page.toggle.fire('click');
+  page.storage.set('bq_motion', 'off');
+  page.window.fire('storage', { key: 'bq_motion', newValue: 'off' });
   assert.equal(page.storage.get('bq_motion'), 'off');
   assert.equal(page.root.dataset.motionMode, 'reduced');
   assert.equal(fixture({ reducedMotion: false, stored: page.storage.get('bq_motion') }).root.dataset.motionMode, 'reduced',
@@ -244,14 +247,4 @@ test('a live switch to a coarse pointer clears desktop hover decoration and sett
   assert.equal(page.portrait.style.getPropertyValue('--scene-rx'), '0.00deg');
   page.pointerMove(card);
   assert.equal(page.frames.size, 0);
-});
-
-test('motion preferences update the accessible toggle label for the current language', () => {
-  const page = fixture();
-  page.root.lang = 'ckb'; page.document.fire('bq:language');
-  assert.equal(page.toggle.textContent, 'جوڵە چالاکە');
-  assert.equal(page.toggle.attributes['aria-label'], 'جوڵە کەم بکەرەوە');
-  page.toggle.fire('click');
-  assert.equal(page.toggle.textContent, 'جوڵە ناچالاکە');
-  assert.equal(page.toggle.attributes['aria-label'], 'جوڵە چالاک بکە');
 });

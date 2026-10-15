@@ -1976,46 +1976,6 @@ html body #design #grid .card .card-art::after {
 @media (hover: hover) and (pointer: fine) {
   html.bq-reactive-motion:not(.bq-scrolling) body #design #grid .bq-motion-surface .card-art::after { opacity: 1; }
 }
-.scene-motion-toggle {
-  position: absolute;
-  inset-block-start: 76px;
-  inset-inline-end: 44px;
-  z-index: 5;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-block-size: 44px;
-  max-inline-size: min(220px, 44%);
-  padding: 8px 13px;
-  border: 1px solid currentColor;
-  border-radius: 999px;
-  color: var(--ink, #26231e);
-  background: transparent;
-  font-size: 10px;
-  line-height: 1.5;
-  letter-spacing: .04em;
-  cursor: pointer;
-  opacity: .7;
-}
-.scene-motion-toggle::before {
-  content: '';
-  flex: 0 0 5px;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: .3;
-}
-.scene-motion-toggle[aria-pressed="true"]::before { opacity: 1; }
-.scene-motion-toggle:hover, .scene-motion-toggle:focus-visible { opacity: 1; }
-.scene-motion-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
-@media (max-width: 640px) {
-  .scene-motion-toggle { inset-block-start: 60px; inset-inline-end: 14px; padding-inline: 10px; font-size: 9px; }
-}
-@media (max-height: 480px) {
-  .scene-motion-toggle { inset-block-start: 12px; }
-}
 @media (hover: hover) and (pointer: fine) and (min-width: 900px) {
   html.bq-reactive-motion.bq-cursor-on :is(.cursor-dot, .cursor-ring) { display: block; }
 }

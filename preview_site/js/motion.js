@@ -387,9 +387,7 @@
     var clientX = 0, clientY = 0, surfaceDirty = false;
     var clamp = function (value, min, max) { return Math.max(min, Math.min(max, value)); };
     var scenes = Array.from(document.querySelectorAll('.room > .hero, .room > .room-hero'));
-    var home = document.querySelector('#design > .hero');
     var lightbox = document.querySelector('.lb-overlay');
-    var button = null;
     var props = ['--scene-x', '--scene-y', '--scene-rx', '--scene-ry'];
     function resetLayers() {
       layers.forEach(function (layer) { props.forEach(function (name) { layer.style.removeProperty(name); }); });
@@ -463,42 +461,13 @@
       layers = leaves;
       queue();
     }
-    function label() {
-      if (!button) return;
-      var lang = (root.lang || 'en').toLowerCase();
-      var labels = {
-        en: ['Motion on', 'Motion off', 'Reduce motion', 'Enable motion'],
-        ku: ['جوڵە چالاکە', 'جوڵە ناچالاکە', 'جوڵە کەم بکەرەوە', 'جوڵە چالاک بکە'],
-        ar: ['الحركة مفعّلة', 'الحركة متوقفة', 'تقليل الحركة', 'تفعيل الحركة'],
-        kmr: ['Tevger vekirî', 'Tevger girtî', 'Tevgerê kêm bike', 'Tevgerê veke'],
-        fr: ['Animations actives', 'Animations désactivées', 'Réduire les animations', 'Activer les animations'],
-        tr: ['Hareket açık', 'Hareket kapalı', 'Hareketi azalt', 'Hareketi etkinleştir'],
-        sv: ['Rörelse på', 'Rörelse av', 'Minska rörelse', 'Aktivera rörelse']
-      };
-      var words = labels[lang === 'ckb' ? 'ku' : lang] || labels.en;
-      button.textContent = words[enabled ? 0 : 1];
-      button.setAttribute('aria-label', words[enabled ? 2 : 3]);
-      button.setAttribute('aria-pressed', String(enabled));
-    }
     function preference() {
       enabled = override === 'on' || (override !== 'off' && !reduced.matches);
       root.classList.toggle('bq-reactive-motion', enabled);
       root.dataset.motionMode = enabled ? 'full' : 'reduced';
-      label();
       stop();
       document.dispatchEvent(new CustomEvent('bq:motion-preference'));
       queue();
-    }
-    if (home) {
-      button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'scene-motion-toggle mono';
-      button.addEventListener('click', function () {
-        override = enabled ? 'off' : 'on';
-        try { localStorage.setItem('bq_motion', override); } catch (_) {}
-        preference();
-      });
-      (home.querySelector('.paper-scroll') || home).appendChild(button);
     }
     document.addEventListener('pointermove', function (event) {
       if (event.pointerType !== 'mouse' || !pointer.matches || blocked()) return;
@@ -529,7 +498,6 @@
     document.addEventListener('bq:route', chooseScene);
     document.addEventListener('bq:lightbox-open', stop);
     document.addEventListener('bq:menu-closed', queue);
-    document.addEventListener('bq:language', label);
     window.addEventListener('bq:css-ready', chooseScene);
     reduced.addEventListener('change', preference);
     pointer.addEventListener('change', function () { stop(); queue(); });
