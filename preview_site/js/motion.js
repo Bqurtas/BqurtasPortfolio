@@ -294,7 +294,7 @@
     var compact = driftCompact.matches;
     if (!reduce && !compact) {
       var driftItems = Array.from(document.querySelectorAll(
-        '.service-showcase-title, .bio-teaser-title, .software-title, .latest-blog-title, .pj-room-title'
+        '.pj-room-title'
       ));
       var driftFrame = 0;
       var driftValues = [];
@@ -387,6 +387,16 @@
     var clientX = 0, clientY = 0, surfaceDirty = false;
     var clamp = function (value, min, max) { return Math.max(min, Math.min(max, value)); };
     var scenes = Array.from(document.querySelectorAll('.room > .hero, .room > .room-hero'));
+    /* Reuse the paper deck's measured starts. Only existing heading leaves
+       settle into place; the frame, reading track and artwork never move. */
+    var chapters = Array.from(document.querySelectorAll('.room .section:not(.work)')).map(function (sheet) {
+      var items = Array.from(sheet.querySelectorAll(
+        '.section-title, .service-showcase-title, .bio-teaser-title, .software-title, .logos-title, ' +
+        '.latest-blog-title, .bio-block-title, .bio-social-title, .pitch-head > h3, .subscribe-title'
+      ));
+      items.forEach(function (item) { item.classList.add('bq-chapter-title'); });
+      return { room: sheet.closest('.room'), scroller: sheet.querySelector(':scope > .paper-scroll'), items: items, painted: '' };
+    }).filter(function (chapter) { return chapter.scroller && chapter.items.length; });
     var lightbox = document.querySelector('.lb-overlay');
     var props = ['--scene-x', '--scene-y', '--scene-rx', '--scene-ry'];
     function resetLayers() {
@@ -412,17 +422,47 @@
       x = y = wantedX = wantedY = 0;
       resetLayers();
       clearSurface();
+      chapters.forEach(function (chapter) {
+        if (!chapter.painted) return;
+        chapter.items.forEach(function (item) {
+          item.style.removeProperty('--chapter-y');
+          item.style.removeProperty('--chapter-opacity');
+        });
+        chapter.painted = '';
+      });
     }
     function write(layer, name, value) {
       if (layer.style.getPropertyValue(name) !== value) layer.style.setProperty(name, value);
     }
     function queue() { if (!frame && !blocked()) frame = requestAnimationFrame(paint); }
+    function paintChapters() {
+      var vh = Math.max(1, innerHeight);
+      var amplitude = pointer.matches ? 18 : 10;
+      chapters.forEach(function (chapter) {
+        if (chapter.room.classList.contains('is-hidden')) return;
+        var rawStart = chapter.scroller.dataset.paperStart;
+        var start = Number(rawStart);
+        if (rawStart == null || !Number.isFinite(start)) return;
+        var progress = clamp((window.scrollY - start + vh * .78) / (vh * .58), 0, 1);
+        var eased = progress * progress * (3 - 2 * progress);
+        var shift = ((1 - eased) * amplitude).toFixed(2) + 'px';
+        var opacity = (.76 + .24 * eased).toFixed(3);
+        var value = shift + '|' + opacity;
+        if (chapter.painted === value) return;
+        chapter.items.forEach(function (item) {
+          write(item, '--chapter-y', shift);
+          write(item, '--chapter-opacity', opacity);
+        });
+        chapter.painted = value;
+      });
+    }
     function paint() {
       frame = 0;
       if (blocked()) { stop(); return; }
       // Read the one active hover surface before any writes. Scroll frames use
       // the paper's cached document origin and never measure the gallery.
       if (surfaceDirty && surface && !surfaceRect) surfaceRect = surface.getBoundingClientRect();
+      paintChapters();
       var start = scene && scene.scroller && Number(scene.scroller.dataset.paperStart);
       var progress = scene ? clamp((window.scrollY - (Number.isFinite(start) ? start : 0)) / Math.max(1, innerHeight), 0, 1) : 1;
       var active = progress < 1 && scene;
@@ -499,6 +539,10 @@
     document.addEventListener('bq:lightbox-open', stop);
     document.addEventListener('bq:menu-closed', queue);
     window.addEventListener('bq:css-ready', chooseScene);
+    window.addEventListener('bq:gallery-built', queue);
+    window.addEventListener('bq:gallery-dimensions', queue);
+    document.addEventListener('bq:language', queue);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(queue);
     reduced.addEventListener('change', preference);
     pointer.addEventListener('change', function () { stop(); queue(); });
     addEventListener('storage', function (event) {

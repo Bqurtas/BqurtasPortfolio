@@ -1987,3 +1987,14 @@ html[data-motion-mode="reduced"] body #design#design#design > .section.practice-
 html[data-motion-mode="reduced"] body #design#design#design > .section.practice-note .bio-teaser-portrait .orbit-ic::before {
   animation-play-state: paused !important;
 }
+
+/* Existing chapter headings settle before their paper reaches its reading
+   position. Their final typography, colour, dimensions and placement are the
+   authored ones. The four-ID measuring reset above still takes precedence. */
+html.bq-reactive-motion body :is(#design#design, #bio#bio, #blog#blog, #contact#contact) .section:not(.work) .bq-chapter-title {
+  transform: translate3d(0, var(--chapter-y, 0px), 0) !important;
+  translate: none !important;
+  opacity: var(--chapter-opacity, 1) !important;
+  clip-path: none !important;
+  transition: none !important;
+}

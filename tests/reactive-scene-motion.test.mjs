@@ -53,11 +53,33 @@ function fixture({ reducedMotion = false, finePointer = true, stored = null } = 
     };
   }
   const home = hero(design, [portrait, signature], 0), biography = hero(bio, [title, ghost], 2000);
+  function chapter(room, paperStart, work = false) {
+    const items = [layer('section-title'), layer('logos-title')];
+    const scroller = { dataset: { paperStart: String(paperStart) } };
+    return {
+      items, scroller, classList: classes('section', ...(work ? ['work'] : [])),
+      closest: () => room,
+      querySelector(selector) {
+        assert.equal(selector, ':scope > .paper-scroll');
+        return scroller;
+      },
+      querySelectorAll(selector) {
+        assert.equal(selector, '.section-title, .service-showcase-title, .bio-teaser-title, .software-title, .logos-title, .latest-blog-title, .bio-block-title, .bio-social-title, .pitch-head > h3, .subscribe-title');
+        return items;
+      },
+      getBoundingClientRect() { throw new Error('chapter scroll must use cached paper metadata'); },
+    };
+  }
+  const homeChapter = chapter(design, 1000), bioChapter = chapter(bio, 3000), gallery = chapter(design, 800, true);
   const body = { classList: classes() };
   const lightbox = { classList: classes('lb-overlay') };
   const document = {
     ...events(), readyState: 'complete', hidden: false, documentElement: root, body,
-    querySelectorAll: () => [home, biography],
+    querySelectorAll(selector) {
+      if (selector === '.room > .hero, .room > .room-hero') return [home, biography];
+      if (selector === '.room .section:not(.work)') return [homeChapter, bioChapter];
+      assert.fail(`Unexpected reactive-motion selector: ${selector}`);
+    },
     querySelector: selector => selector === '#design > .hero' ? home
       : selector === '.lb-overlay' ? lightbox
       : selector === '.lb-overlay.is-open' && lightbox.classList.contains('is-open') ? lightbox : null,
@@ -97,6 +119,7 @@ function fixture({ reducedMotion = false, finePointer = true, stored = null } = 
   return {
     window, document, root, reduced, pointer, storage, dispatched, frames, created,
     design, bio, home, biography, portrait, signature, title, ghost, card,
+    homeChapter, bioChapter, gallery,
     pointerMove(target, x = 1000, y = 650, pointerType = 'mouse') {
       document.fire('pointermove', {
         target, clientX: x, clientY: y, pointerType,
@@ -247,4 +270,104 @@ test('a live switch to a coarse pointer clears desktop hover decoration and sett
   assert.equal(page.portrait.style.getPropertyValue('--scene-rx'), '0.00deg');
   page.pointerMove(card);
   assert.equal(page.frames.size, 0);
+});
+
+function assertChapterPaint(chapter, y, opacity) {
+  for (const item of chapter.items) {
+    const offset = item.style.getPropertyValue('--chapter-y');
+    const alpha = item.style.getPropertyValue('--chapter-opacity');
+    assert.notEqual(offset, '', 'an arriving heading receives a local offset');
+    assert.notEqual(alpha, '', 'an arriving heading receives a local opacity');
+    assert.ok(Math.abs(Number(offset.replace('px', '')) - y) < .01, `${offset} should be approximately ${y}px`);
+    assert.ok(Math.abs(Number(alpha) - opacity) < .001, `${alpha} should be approximately ${opacity}`);
+  }
+}
+
+function chapterWrites(page) {
+  return [...page.homeChapter.items, ...page.bioChapter.items, ...page.gallery.items]
+    .reduce((total, item) => total + item.style.writes, 0);
+}
+
+test('incoming chapter titles settle with native scroll while remaining readable and leaving the gallery unchanged', () => {
+  const page = fixture();
+  page.settle();
+  page.window.scrollY = 376; page.window.fire('scroll'); page.settle();
+  assertChapterPaint(page.homeChapter, 18, .76);
+  page.window.scrollY = 608; page.window.fire('scroll'); page.settle();
+  assertChapterPaint(page.homeChapter, 9, .88);
+  page.window.scrollY = 840; page.window.fire('scroll'); page.settle();
+  assertChapterPaint(page.homeChapter, 0, 1);
+  page.window.scrollY = 1200; page.window.fire('scroll'); page.settle();
+  assertChapterPaint(page.homeChapter, 0, 1);
+  for (const item of page.homeChapter.items) assert.equal(item.classList.contains('bq-chapter-title'), true);
+  for (const item of [...page.bioChapter.items, ...page.gallery.items]) {
+    assert.equal(item.style.getPropertyValue('--chapter-y'), '', 'hidden rooms and gallery titles are not animated');
+    assert.equal(item.style.getPropertyValue('--chapter-opacity'), '');
+  }
+  assert.equal(page.window.scrollY, 1200, 'the effect decorates the browser\'s existing scroll position');
+});
+
+test('chapter motion reuses paper metadata, refreshes shifted origins, and stops writing when progress is unchanged', () => {
+  const page = fixture();
+  page.settle();
+  page.window.scrollY = 840;
+  for (let count = 0; count < 20; count++) page.window.fire('scroll');
+  assert.equal(page.frames.size, 1, 'scroll bursts share the existing paint queue');
+  page.settle();
+  assertChapterPaint(page.homeChapter, 0, 1);
+  const before = chapterWrites(page);
+  page.window.fire('scroll'); page.settle();
+  assert.equal(chapterWrites(page), before, 'settled unchanged titles do not invalidate their styles');
+  page.homeChapter.scroller.dataset.paperStart = '1200';
+  page.window.fire('bq:gallery-dimensions'); page.settle();
+  const progress = (840 - 1200 + 800 * .78) / (800 * .58);
+  const eased = progress * progress * (3 - 2 * progress);
+  assertChapterPaint(page.homeChapter, 18 * (1 - eased), .76 + .24 * eased);
+  assert.equal(page.window.scrollY, 840, 'gallery remeasurement never repositions the visitor');
+  const refreshed = chapterWrites(page);
+  page.window.fire('bq:gallery-dimensions'); page.settle();
+  assert.equal(chapterWrites(page), refreshed, 'a repeated layout signal does no unchanged work');
+});
+
+test('chapter title motion resets for hidden tabs, menus, reduced motion, and room changes', () => {
+  const page = fixture();
+  page.window.scrollY = 608; page.window.fire('scroll'); page.settle();
+  assertChapterPaint(page.homeChapter, 9, .88);
+  for (const state of ['menu-open', 'hidden', 'blur', 'reduced']) {
+    if (state === 'menu-open') page.menu(state);
+    else if (state === 'hidden') { page.document.hidden = true; page.document.fire('visibilitychange'); }
+    else if (state === 'blur') page.window.fire('blur');
+    else { page.reduced.matches = true; page.reduced.fire('change'); }
+    assert.equal(page.frames.size, 0, `${state} cancels pending chapter work`);
+    for (const item of page.homeChapter.items) {
+      assert.equal(item.style.getPropertyValue('--chapter-y'), '', `${state} clears the offset`);
+      assert.equal(item.style.getPropertyValue('--chapter-opacity'), '', `${state} restores full text visibility`);
+    }
+    if (state === 'menu-open') { page.menu(null); page.document.fire('bq:menu-closed'); }
+    else if (state === 'hidden') { page.document.hidden = false; page.document.fire('visibilitychange'); }
+    else if (state === 'blur') page.window.fire('focus');
+    else { page.reduced.matches = false; page.reduced.fire('change'); }
+    page.settle();
+    assertChapterPaint(page.homeChapter, 9, .88);
+  }
+  page.design.classList.add('is-hidden'); page.bio.classList.remove('is-hidden');
+  page.window.scrollY = 2608; page.document.fire('bq:route'); page.settle();
+  for (const item of page.homeChapter.items) assert.equal(item.style.getPropertyValue('--chapter-y'), '');
+  assertChapterPaint(page.bioChapter, 9, .88);
+});
+
+test('phone chapter titles use smaller scroll offsets without reacting to pointer movement', () => {
+  const page = fixture({ finePointer: false });
+  page.settle();
+  page.window.scrollY = 608; page.window.fire('scroll'); page.settle();
+  assertChapterPaint(page.homeChapter, 5, .88);
+  const before = chapterWrites(page);
+  const card = page.card();
+  page.pointerMove(card, 100, 200, 'touch');
+  page.pointerMove(card, 300, 400, 'mouse');
+  assert.equal(page.frames.size, 0);
+  assert.equal(chapterWrites(page), before);
+  assert.equal(card.reads, 0);
+  page.window.scrollY = 840; page.window.fire('scroll'); page.settle();
+  assertChapterPaint(page.homeChapter, 0, 1);
 });
