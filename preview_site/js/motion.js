@@ -77,6 +77,18 @@
     });
 
     /* ---- reveal choreography ---- */
+    /* A phone's note is a reading surface. Do not mask its paragraph and
+       figures while the sticky paper is being fitted or the browser chrome
+       changes height. Desktop keeps the authored staggered entrance. */
+    var noteEntranceMedia = matchMedia('(max-width: 820px), (hover: none), (pointer: coarse)');
+    var noteEntrances = [];
+    var registerNoteEntrance = function (el, visibleClass) {
+      if (!el.closest('#design > .practice-note')) return false;
+      noteEntrances.push({ el: el, visibleClass: visibleClass });
+      if (!noteEntranceMedia.matches) return false;
+      el.classList.add(visibleClass);
+      return true;
+    };
     var revealItems = Array.from(document.querySelectorAll(
       '[data-motion], .latest-blog-grid .blog-card, #contact .qc-card, #contact .pitch-wrap, ' +
       '.bio-doc-btn, .footer-stage-copy, .footer-main-v249 > *, .practice-note .software-head, ' +
@@ -85,6 +97,7 @@
     revealItems.forEach(function (el, index) {
       el.classList.add('motion-reveal');
       el.style.setProperty('--motion-delay', Math.min(index % 4, 3) * 80 + 'ms');
+      registerNoteEntrance(el, 'motion-in');
     });
     if ('IntersectionObserver' in window) {
       var revealObserver = new IntersectionObserver(function (entries) {
@@ -94,7 +107,9 @@
           revealObserver.unobserve(entry.target);
         });
       }, { threshold: 0.12, rootMargin: '0px 0px -7% 0px' });
-      revealItems.forEach(function (el) { revealObserver.observe(el); });
+      revealItems.forEach(function (el) {
+        if (!el.classList.contains('motion-in')) revealObserver.observe(el);
+      });
     } else {
       revealItems.forEach(function (el) { el.classList.add('motion-in'); });
     }
@@ -136,7 +151,7 @@
           /* 70ms reads as one continuous move; more and it becomes a queue. */
           el.style.setProperty('--bq-rise-delay', step * 70 + 'ms');
           step += 1;
-          items.push(el);
+          if (!registerNoteEntrance(el, 'is-risen')) items.push(el);
         });
       });
       if (items.length) riseSheets.push({ sheet: sheet, items: items });
@@ -167,6 +182,10 @@
              next sheet's rect to re-run layout */
           var arrived = [];
           for (var i = pending.length - 1; i >= 0; i--) {
+            if (pending[i].items.every(function (el) { return el.classList.contains('is-risen'); })) {
+              arrived.push(i);
+              continue;
+            }
             var room = pending[i].sheet.closest('.room');
             if (room && room.classList.contains('is-hidden')) continue;
             if (pending[i].sheet.getBoundingClientRect().top < limit) arrived.push(i);
@@ -195,6 +214,14 @@
         queueRise();
       }
     }
+    noteEntranceMedia.addEventListener('change', function () {
+      if (!noteEntranceMedia.matches) return;
+      noteEntrances.forEach(function (item) {
+        item.el.classList.add(item.visibleClass);
+        if (item.visibleClass === 'motion-in' && revealObserver) revealObserver.unobserve(item.el);
+      });
+      if (typeof queueRise === 'function') queueRise();
+    });
 
     /* ---- top bar hierarchy on scroll ---- */
     var scrolledNow = null;
@@ -531,7 +558,7 @@
       if (event.pointerType !== 'mouse') { wantedX = wantedY = 0; clearSurface(); queue(); }
     }, { passive: true });
     addEventListener('scroll', function () { clearSurface(); queue(); }, { passive: true });
-    addEventListener('resize', function () { stop(); queue(); }, { passive: true });
+    addEventListener('resize', function () { clearSurface(); queue(); }, { passive: true });
     addEventListener('blur', function () { awake = false; stop(); });
     addEventListener('focus', function () { awake = true; queue(); });
     document.addEventListener('visibilitychange', function () { if (document.hidden) stop(); else queue(); });

@@ -1992,6 +1992,18 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   const clamp01 = (n) => Math.min(1, Math.max(0, n));
   const ease = (t) => t * t * (3 - 2 * t);
   const paperStacks = [];
+  let shellDomReady = document.readyState === 'complete';
+  document.addEventListener('DOMContentLoaded', () => { shellDomReady = true; }, { once: true });
+  const signalPaperShellReady = () => {
+    const html = document.documentElement;
+    if (html.dataset.bqShellReady === '1') return;
+    /* A warm core bundle can run before a cold stylesheet finishes. Reveal
+       only the measured, styled paper shell, never its pre-wrapper layout. */
+    if (!shellDomReady || !document.getElementById('bqFullCss')?.sheet) return;
+    html.dataset.bqShellReady = '1';
+    window.__bqShellReady = true;
+    window.dispatchEvent(new CustomEvent('bq:shell-ready'));
+  };
   /* The portfolio gallery is driven by the tall-track "magic scroll" below
      (page-scroll → reel translate), NOT by the input router's nested scrollTop,
      so no sheet claims router-owned inner scroll. */
@@ -2438,6 +2450,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         lastSheet.inert = false;
         lastSheet.classList.remove('is-paper-gone');
       }
+      if (hasMeasured) signalPaperShellReady();
     };
 
     const queue = () => {
@@ -2653,6 +2666,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     window.addEventListener('pageshow', queueMeasure);
     window.addEventListener('load', queueMeasure, { once: true });
     window.addEventListener('bq:css-ready', queueMeasure);
+    document.addEventListener('DOMContentLoaded', queueMeasure, { once: true });
+    document.getElementById('bqFullCss')?.addEventListener('load', queueMeasure, { once: true });
     window.visualViewport?.addEventListener('resize', queueMeasure, { passive: true });
     reduced.addEventListener?.('change', queue);
     document.addEventListener('bq:route', () => {

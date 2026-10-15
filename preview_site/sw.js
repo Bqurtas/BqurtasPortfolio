@@ -12,7 +12,7 @@
       instead of being pinned for the life of the installed worker.
    ========================================================= */
 
-const SW_VERSION = 'e003dd844588'; // generated from this worker and the app shell
+const SW_VERSION = '8be8e95ed0da'; // generated from this worker and the app shell
 const CACHE_NAME = `bqurtas-cache-${SW_VERSION}`;
 const DOC_FALLBACK = '/index.html';
 
@@ -39,10 +39,10 @@ const PRECACHE_ASSETS = [
   '/css/style.v417.min.css?v=567f31564044',
   '/css/fonts.css?v=ab564d35bc14',
   '/css/experience.min.css?v=3b27e924e74d',
-  '/js/main.v420.min.js?v=b0d938154ab7',
+  '/js/main.v420.min.js?v=abe682c2792f',
   '/js/gallery.v420.min.js?v=5ed141a93167',
   '/js/i18n.v420.min.js?v=d2f12601ce49',
-  '/js/motion.9e3428a59c0d.min.js?v=9e3428a59c0d',
+  '/js/motion.68f1db2fbe9d.min.js?v=68f1db2fbe9d',
   '/js/lux.min.js?v=b10aaa8c59c6',
   '/site.webmanifest?v=19c5c4b9ee48',
   '/favicon.ico',

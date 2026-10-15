@@ -27,6 +27,7 @@ const riseStart = motion.indexOf('        var pending = riseSheets.slice();');
 const riseEnd = motion.indexOf('        queueRise();', riseStart) + '        queueRise();'.length;
 assert.ok(riseStart > 0 && riseEnd > riseStart);
 const riseSource = motion.slice(riseStart, riseEnd);
+const entranceSource = slice('    /* ---- reveal choreography ---- */', '    /* ---- top bar hierarchy on scroll ---- */');
 
 function eventTarget() {
   const handlers = new Map();
@@ -166,4 +167,78 @@ test('home reveal does not measure during menu transitions and resumes on menu c
   page.document.body.classList.remove('menu-open');
   page.document.fire('bq:menu-closed'); page.flush();
   assert.equal(page.visible.classList.contains('is-risen'), true);
+});
+
+function entranceFixture(compactMode) {
+  const frames = new Map(), observed = new Set();
+  let frameId = 0;
+  const compact = { ...eventTarget(), matches: compactMode };
+  const room = { classList: classes() };
+  const leaf = note => ({
+    dataset: {}, classList: classes(), style: { setProperty() {} },
+    closest: selector => selector === '#design > .practice-note' && note ? noteSheet : null,
+  });
+  const noteReveal = leaf(true), serviceReveal = leaf(false);
+  const noteRise = leaf(true), serviceRise = leaf(false);
+  function sheet(top, firstSelector, item) {
+    return {
+      reads: 0,
+      closest: () => room,
+      querySelectorAll: selector => selector === firstSelector ? [item] : [],
+      getBoundingClientRect() { this.reads++; return { top }; },
+    };
+  }
+  const noteSheet = sheet(1100, '.bio-teaser-text .section-num', noteRise);
+  const serviceSheet = sheet(1100, '.service-showcase-head .section-num', serviceRise);
+  const document = {
+    ...eventTarget(), hidden: false, body: { classList: classes() },
+    querySelectorAll: () => [noteReveal, serviceReveal],
+    querySelector: selector => selector === '#design > .practice-note' ? noteSheet : serviceSheet,
+  };
+  const window = { ...eventTarget(), innerHeight: 800 };
+  const IntersectionObserver = class {
+    observe(item) { observed.add(item); }
+    unobserve(item) { observed.delete(item); }
+  };
+  window.IntersectionObserver = IntersectionObserver;
+  vm.runInNewContext(entranceSource, {
+    document, window, IntersectionObserver, reduce: false,
+    matchMedia: () => compact,
+    requestAnimationFrame(callback) { frames.set(++frameId, callback); return frameId; },
+    addEventListener: window.addEventListener, removeEventListener: window.removeEventListener,
+  });
+  return {
+    compact, noteReveal, serviceReveal, noteRise, serviceRise, noteSheet, serviceSheet, observed,
+    flush() { const pending = [...frames.values()]; frames.clear(); pending.forEach(callback => callback()); },
+  };
+}
+
+test('compact note content is readable immediately without waiting for a clipped or observer entrance', () => {
+  const page = entranceFixture(true);
+  assert.equal(page.noteReveal.classList.contains('motion-in'), true);
+  assert.equal(page.noteRise.classList.contains('is-risen'), true);
+  assert.equal(page.observed.has(page.noteReveal), false);
+  assert.equal(page.observed.has(page.serviceReveal), true, 'other authored sections retain their existing entrance');
+  assert.equal(page.serviceRise.classList.contains('is-risen'), false);
+  page.flush();
+  assert.equal(page.noteSheet.reads, 0, 'compact note text never waits for a sticky-sheet visibility measurement');
+  assert.equal(page.serviceSheet.reads, 1);
+});
+
+test('desktop note choreography remains pending, and switching to compact settles it without remasking', () => {
+  const page = entranceFixture(false);
+  assert.equal(page.noteReveal.classList.contains('motion-in'), false);
+  assert.equal(page.noteRise.classList.contains('is-risen'), false);
+  assert.equal(page.observed.has(page.noteReveal), true);
+  page.flush();
+  assert.equal(page.noteSheet.reads, 1);
+  page.compact.matches = true; page.compact.fire('change');
+  assert.equal(page.noteReveal.classList.contains('motion-in'), true);
+  assert.equal(page.noteRise.classList.contains('is-risen'), true);
+  assert.equal(page.observed.has(page.noteReveal), false);
+  page.flush();
+  assert.equal(page.noteSheet.reads, 1, 'the completed note reveal is removed without another layout read');
+  page.compact.matches = false; page.compact.fire('change');
+  assert.equal(page.noteReveal.classList.contains('motion-in'), true);
+  assert.equal(page.noteRise.classList.contains('is-risen'), true, 'a visible note never becomes hidden again after resizing');
 });

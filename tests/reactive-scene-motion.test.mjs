@@ -371,3 +371,18 @@ test('phone chapter titles use smaller scroll offsets without reacting to pointe
   page.window.scrollY = 840; page.window.fire('scroll'); page.settle();
   assertChapterPaint(page.homeChapter, 0, 1);
 });
+
+test('mobile viewport resize retains the visible chapter paint until the queued redraw', () => {
+  const page = fixture({ finePointer: false });
+  page.window.scrollY = 608; page.window.fire('scroll'); page.settle();
+  assertChapterPaint(page.homeChapter, 5, .88);
+  const before = chapterWrites(page);
+  for (let count = 0; count < 20; count++) page.window.fire('resize');
+  assert.equal(page.frames.size, 1, 'browser chrome resize bursts share one redraw');
+  assertChapterPaint(page.homeChapter, 5, .88);
+  assert.equal(chapterWrites(page), before, 'resize must not briefly restore full opacity or remove the current offset');
+  page.settle();
+  assertChapterPaint(page.homeChapter, 5, .88);
+  assert.equal(chapterWrites(page), before, 'an unchanged viewport paint does not invalidate settled text');
+  assert.equal(page.window.scrollY, 608);
+});
