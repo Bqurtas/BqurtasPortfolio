@@ -1,6 +1,8 @@
 import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
+import { minify } from 'terser';
 import { SITE, COLLECTIONS, catalogFromManifest, describe, displayTitle, mediaPath, mediaUrl, workPath } from '../functions/_gallery-catalog.js';
 import { ARCHIVE_STYLE } from './archive-style.mjs';
 
@@ -34,7 +36,7 @@ const pageURL = (slug, page = 1) => `/archive/${slug}/${page === 1 ? '' : `${pag
 // page fetches its 34 KB core face, not the 54 KB file with Greek/Cyrillic.
 const STYLE = fontFaces => `${fontFaces}\n${ARCHIVE_STYLE}`;
 
-function documentHTML({ title, description, route, content, image, fontFaces }) {
+function documentHTML({ title, description, route, content, image, fontFaces, motionScript }) {
   return `<!doctype html>
 ${GENERATED}
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -43,7 +45,7 @@ ${GENERATED}
 <link rel="canonical" href="${SITE}${route}"><link rel="icon" href="/favicon.ico">
 <meta property="og:type" content="website"><meta property="og:title" content="${escape(title)} — Barakat Qurtas"><meta property="og:description" content="${escape(description)}"><meta property="og:url" content="${SITE}${route}">
 ${image ? `<meta property="og:image" content="${escape(image)}">` : ''}
-<style>${STYLE(fontFaces)}</style></head><body><a class="skip" href="#content">Skip to content</a><div class="shell">
+<style>${STYLE(fontFaces)}</style>${motionScript ? `<script defer src="/${motionScript.path}"></script>` : ''}</head><body><a class="skip" href="#content">Skip to content</a><div class="shell">
 <header class="top"><a class="brand" href="/">Barakat Qurtas<span class="brand-mark" aria-hidden="true">®</span></a><nav aria-label="Main navigation"><a href="/design">Portfolio</a><a href="/archive/" aria-current="page">Archive</a><a href="/contact">Contact <span aria-hidden="true">↗</span></a></nav></header>
 <main id="content">${content}</main>
 <footer><div class="footer-top"><div><p class="eyebrow">A connected creative practice</p><a class="brand" href="/">Barakat Qurtas<span class="brand-mark" aria-hidden="true">®</span></a></div><a class="text-link" href="/contact">Have something in mind? Let’s talk <span aria-hidden="true">↗</span></a></div><div class="footer-bottom"><span class="footer-note">Independent designer &amp; creative technologist · Hewlêr</span><a href="/design">Back to the portfolio <span aria-hidden="true">↗</span></a></div></footer></div></body></html>\n`;
@@ -96,7 +98,7 @@ function collectionNavigation(catalog, active) {
   return `<nav class="collection-nav" aria-label="Collections"><a href="/archive/">All collections</a>${Object.entries(ARCHIVES).filter(([coll]) => catalog.byColl[coll].length).map(([coll, [slug, label]]) => `<a href="${pageURL(slug)}"${coll === active ? ' class="is-active" aria-current="true"' : ''}>${escape(label)}<span>${catalog.byColl[coll].length}</span></a>`).join('')}</nav>`;
 }
 
-export function buildMediaArchive(manifest, { pageSize = 24, thumbs = new Map(), fontFaces = '' } = {}) {
+export function buildMediaArchive(manifest, { pageSize = 24, thumbs = new Map(), fontFaces = '', motionScript } = {}) {
   if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100) throw new Error('Invalid archive page size');
   const catalog = catalogFromManifest(manifest);
   // The upstream catalogue owns indexing, media URLs and duplicate detection.
@@ -104,8 +106,9 @@ export function buildMediaArchive(manifest, { pageSize = 24, thumbs = new Map(),
   if (catalog.byPath.size !== manifest.images.length + manifest.videos.length) throw new Error('Invalid or duplicate archive media');
   for (const coll of Object.keys(COLLECTIONS)) if (!ARCHIVES[coll]) throw new Error(`Collection missing from archive: ${coll}`);
   const files = new Map(), pages = [], categories = [];
+  if (motionScript) files.set(motionScript.path, motionScript.body);
   const addPage = (route, values) => {
-    files.set(`${route.slice(1)}index.html`, documentHTML({ ...values, route, fontFaces }));
+    files.set(`${route.slice(1)}index.html`, documentHTML({ ...values, route, fontFaces, motionScript }));
     pages.push(route);
   };
   for (const [coll, [slug, label]] of Object.entries(ARCHIVES)) {
@@ -167,7 +170,14 @@ export async function archiveAssets(siteRoot = path.join(projectRoot, 'preview_s
     return `@font-face{font-family:Manrope;src:${src};font-display:swap;unicode-range:${range}}`;
   }).join('\n');
   if (!fontFaces) throw new Error('Manrope faces not found in fonts.css');
-  return { thumbs, fontFaces };
+  // A content-named file cannot reuse stale bytes from a previous deployment.
+  // Compile from the authored source, also when generating a test site root.
+  const source = await readFile(path.join(projectRoot, 'preview_site/js/archive.js'), 'utf8');
+  const compiled = await minify(source, { ecma: 2020, compress: { passes: 2 }, mangle: true, format: { comments: false } });
+  if (!compiled.code) throw new Error('Archive motion produced no output');
+  const body = `${compiled.code}\n`;
+  const hash = createHash('sha256').update(body).digest('hex').slice(0, 12);
+  return { thumbs, fontFaces, motionScript: { path: `js/archive.${hash}.min.js`, body } };
 }
 
 async function writeIfChanged(file, body) {

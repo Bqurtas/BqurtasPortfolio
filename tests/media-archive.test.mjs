@@ -74,7 +74,9 @@ test('all archive pages are reachable by HTML links without script or button int
     const html = generated.files.get(`${route.slice(1)}index.html`);
     assert.ok(html, `linked page exists: ${route}`);
     assert.match(html, new RegExp(`rel="canonical" href="https://bqurtas\\.com${route}"`));
-    assert.doesNotMatch(html, /<script|data-src=|noindex/);
+    assert.doesNotMatch(html, /data-src=|noindex/);
+    const scripts = [...html.matchAll(/<script\b[^>]*>[\s\S]*?<\/script>/g)].map(([tag]) => tag);
+    assert.deepEqual(scripts, [`<script defer src="/${assets.motionScript.path}"></script>`], 'only the local progressive enhancement script is allowed');
     for (const match of html.matchAll(/<a\b[^>]*href="(\/archive\/[^"#]*)"/g)) queue.push(match[1]);
   }
   assert.equal(visited.size, generated.pages.length);
