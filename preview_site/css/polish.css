@@ -1998,3 +1998,87 @@ html.bq-reactive-motion body :is(#design#design, #bio#bio, #blog#blog, #contact#
   clip-path: none !important;
   transition: none !important;
 }
+
+/* On phones zoom already maps logical content to its available width. Applying
+   the fit factor to that width again made the room chapters narrow and let
+   intrinsic form widths escape the paper in Safari. */
+@media (max-width: 820px) {
+  /* A solid viewport-fixed strip occupies only the existing top gutter. iOS
+     can extend this bed colour into its status area instead of blurring the
+     rounded paper underneath. Retire the old full-window frame/pseudos. */
+  html body > .bq-frame.bq-frame.bq-frame {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 0 auto !important;
+    inline-size: 100% !important;
+    block-size: var(--bq-deck-gutter, 10px) !important;
+    min-block-size: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: var(--bq-paper-underlay, #050506) !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+    z-index: 2000000 !important;
+  }
+  html body > .bq-frame.bq-frame.bq-frame::before,
+  html body > .bq-frame.bq-frame.bq-frame::after { display: none !important; }
+  html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact).paper-stack > .section[data-paper-fit] > .paper-scroll > .sheet-mid {
+    inline-size: 100% !important;
+    max-inline-size: 100% !important;
+    min-inline-size: 0 !important;
+    margin-inline: 0 !important;
+    align-self: stretch !important;
+  }
+  html body #blog#blog#blog .subscribe,
+  html body #blog#blog#blog .subscribe-form,
+  html body #blog#blog#blog .subscribe-field,
+  html body #contact#contact#contact :is(.pitch-wrap, .pitch-form, .pitch-form .field) {
+    inline-size: 100% !important;
+    max-inline-size: 100% !important;
+    min-inline-size: 0 !important;
+    box-sizing: border-box !important;
+  }
+  html body #blog#blog#blog .subscribe-field input {
+    flex: 1 1 0 !important;
+    inline-size: 0 !important;
+    min-inline-size: 0 !important;
+    max-inline-size: 100% !important;
+  }
+  html body #blog#blog#blog .subscribe-field > i { flex: 0 0 auto !important; }
+  html body #blog#blog#blog .subscribe-form button,
+  html body #contact#contact#contact .pitch-form :is(input:not([type="checkbox"]), select, textarea) {
+    inline-size: 100% !important;
+    max-inline-size: 100% !important;
+    min-inline-size: 0 !important;
+    box-sizing: border-box !important;
+  }
+  html body #contact#contact#contact .pitch-form label {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+  html body #contact#contact#contact .contact-quick {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 0 !important;
+  }
+  html body #contact#contact#contact .qc-card > div { min-inline-size: 0 !important; flex: 1; }
+  html body #contact#contact#contact .qc-card > i { flex: 0 0 auto; }
+  html body #contact#contact#contact .qc-card :is(p, span) { white-space: normal !important; overflow-wrap: anywhere; }
+  html body #bio#bio#bio .tools-grid .tool { inline-size: 100% !important; min-inline-size: 0 !important; }
+  /* Oversized watermark glyphs must not determine the fit of phone chapters. */
+  html body #bio#bio#bio :is(.bio-connect-sheet, .bio-docs-sheet) .bio-social[data-wm]::before {
+    display: none !important;
+  }
+  html body #bio#bio#bio .bio-docs-sheet .bio-connect-links--docs {
+    block-size: auto !important;
+    min-block-size: 0 !important;
+    flex: 0 0 auto !important;
+  }
+}

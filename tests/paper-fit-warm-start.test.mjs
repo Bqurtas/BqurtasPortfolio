@@ -10,11 +10,12 @@ assert.ok(start > 0 && end > start);
 const source = main.slice(start, end);
 
 // A paper whose copy fits once the applied zoom is at or below `limit`.
-function paper(limit, widthLimit = Infinity, { section = true } = {}) {
+function paper(limit, widthLimit = Infinity, { section = true, room = null } = {}) {
   const state = { limit, widthLimit, applied: 1, layouts: 0 };
   const sheet = {
     hasAttribute: () => true,
     classList: { add() {}, toggle() {}, contains: name => section && name === 'section' },
+    closest: () => room ? { id: room } : null,
     style: { setProperty(_, value) { state.applied = Number(value); } },
   };
   const scroller = {
@@ -124,6 +125,51 @@ test('short viewport content that exceeds the minimum remains at the readable fl
   assert.ok(scroller.scrollHeight > scroller.clientHeight, 'the measurement still exposes the remainder to the reading track');
 });
 
+test('portrait phone room chapters keep their authored scale and expose long copy to native reading', () => {
+  const viewport = { innerWidth: 390, innerHeight: 844 };
+  const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: viewport });
+  for (const room of ['blog', 'bio', 'contact']) {
+    const { sheet, scroller, state } = paper(0.6, Infinity, { room });
+    fit(sheet, scroller);
+    assert.equal(state.applied, 1, `${room} keeps its authored phone type size`);
+    assert.ok(scroller.scrollHeight > scroller.clientHeight, `${room} exposes the remainder to the existing reading track`);
+    fit(sheet, scroller);
+    assert.equal(state.applied, 1, `${room} remains legible after a re-measure`);
+  }
+});
+
+test('short portrait room chapters follow the stable viewport ceiling without extra content shrinking', () => {
+  const viewport = { innerWidth: 390, innerHeight: 600, __bqViewportScale: 0.75 };
+  const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: viewport });
+  const { sheet, scroller, state } = paper(0.4, Infinity, { room: 'bio' });
+  fit(sheet, scroller);
+  assert.equal(state.applied, 0.75);
+  assert.ok(scroller.scrollHeight > scroller.clientHeight, 'the reading track retains the long chapter');
+  viewport.innerHeight = 680;
+  fit(sheet, scroller);
+  assert.equal(state.applied, 0.75, 'mobile browser chrome changes do not change the stable scale');
+  viewport.__bqViewportScale = 0.6;
+  fit(sheet, scroller);
+  assert.equal(state.applied, 0.6, 'an actual viewport ceiling change scales the complete chapter');
+});
+
+test('desktop, landscape, homepage and hero content retain measured fitting', () => {
+  for (const fixture of [
+    { viewport: { innerWidth: 1280, innerHeight: 900 }, room: 'blog', section: true },
+    { viewport: { innerWidth: 740, innerHeight: 430 }, room: 'contact', section: true },
+    { viewport: { innerWidth: 390, innerHeight: 844 }, room: 'design', section: true },
+    { viewport: { innerWidth: 390, innerHeight: 844 }, room: null, section: true },
+    { viewport: { innerWidth: 390, innerHeight: 844 }, room: 'bio', section: false },
+  ]) {
+    const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: fixture.viewport });
+    const { sheet, scroller, state } = paper(0.7, Infinity, fixture);
+    const ceiling = fixture.section ? Math.min(1, Math.max(0.5, fixture.viewport.innerHeight / 720)) : 1;
+    fit(sheet, scroller);
+    assert.equal(state.applied, Number(bisect(0.7, ceiling).toFixed(4)), JSON.stringify(fixture));
+    assert.ok(scroller.scrollHeight <= scroller.clientHeight, 'existing fitting still contains the copy');
+  }
+});
+
 const groupStart = main.indexOf('  const fitGroups = (entries) => {');
 const groupEnd = main.indexOf('  const paperLabel = ', groupStart);
 assert.ok(groupStart > 0 && groupEnd > groupStart);
@@ -190,6 +236,7 @@ test('hero and terminal footer resize with the active room without gaining inner
   const hero = frame(450), terminal = frame(390, {});
   const context = {
     WeakMap, Map, root, sheets: [hero.sheet], terminalSheet: terminal.sheet,
+    window: { innerWidth: 1280, innerHeight: 720 },
     ensures: [], ensurePaperMeter: () => null,
     allowsInnerScroll: () => false, paperLabel: () => 'Frame', updatePaperMeter() {},
   };

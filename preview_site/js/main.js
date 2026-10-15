@@ -2061,6 +2061,20 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
        ten. A different height changes the search interval, so it receives a
        fresh search and restores the original scale as the window grows. */
     const ceiling = paperFitCeiling(sheet);
+    /* Portrait room pages are reading surfaces. Keep the authored viewport
+       scale and let their existing native reading track carry long copy;
+       fitting every paragraph into one phone screen made it too small. */
+    const roomId = sheet.closest?.('.room')?.id;
+    const phoneReading = window.innerWidth > 0 && window.innerWidth <= 820
+      && window.innerHeight >= window.innerWidth
+      && sheet.classList.contains('section')
+      && ['blog', 'bio', 'contact'].includes(roomId);
+    if (phoneReading) {
+      apply(ceiling);
+      lastPaperFit.set(sheet, { fit: ceiling, ceiling });
+      sheet.classList.toggle('is-paper-fitted', ceiling < 1);
+      return;
+    }
     const fitStep = (ceiling - PAPER_FIT_MIN) / (2 ** PAPER_FIT_STEPS);
     const previousAnswer = lastPaperFit.get(sheet);
     const previous = previousAnswer?.fit;
