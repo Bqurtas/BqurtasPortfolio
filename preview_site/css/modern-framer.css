@@ -10392,18 +10392,15 @@ body,
     left: 50% !important;
     right: auto !important;
     width: min(360px, calc(100vw - 24px)) !important;
-    /* Sized to what they hold, up to the same ceiling: an empty Latest list or
-       a fresh chat no longer opens as a tall, mostly blank sheet. Longer
-       content still stops at the ceiling and scrolls inside its list. */
-    height: auto !important;
+    height: min(420px, 54vh) !important;
     max-height: min(420px, 54vh) !important;
+    /* 12px above the dock's real top edge (its bottom + its scaled bar).
+       The shared rule above adds --bq-dock-inset and --dock-h, and both carry
+       the home-indicator inset, so on an iPhone the sheets floated 82px over
+       the dock (38px on other phones). */
+    bottom: calc(var(--bq-dock-bottom, 16px) + var(--bq-dock-bar-h, 52px) * var(--bq-viewport-scale, 1) + 12px) !important;
     transform: translateX(-50%) translateY(18px) scale(.98) !important;
     border-radius: 20px 20px 18px 18px !important;
-  }
-
-  #chat .chat-body,
-  #latestPanel .latest-panel-list {
-    min-height: 0 !important;
   }
 
   #chat.is-open,
