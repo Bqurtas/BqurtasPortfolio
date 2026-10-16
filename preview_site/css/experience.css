@@ -5546,3 +5546,75 @@ html:root[data-theme][data-theme][dir="rtl"] body.menu-closing .bq-page-stage {
     transform: none !important;
   }
 }
+
+/* ============================================================================
+   PHONES — the curtain slides in from the side and slides back out.
+   The menu used to pop: the moment it opened the page was set to opacity 0 (so
+   the first frame was already black and the links wiped in over nothing), and
+   on close the black stayed until the 840ms close timer cleared the classes,
+   then the page reappeared in one frame. With Reduce Motion on, the curtain
+   only faded, so it read as appearing and disappearing outright.
+   Now the page and dock stay exactly where they are and the dark curtain
+   travels over them from the trailing edge, then back to it. A side slide is
+   the gesture the owner asked for, so it plays with Reduce Motion as well.
+   ========================================================================== */
+@media (max-width: 820px) {
+  html body #mobileMenu#mobileMenu#mobileMenu.mobile-menu,
+  html[dir="rtl"] body #mobileMenu#mobileMenu#mobileMenu.mobile-menu {
+    --menu-slide: cubic-bezier(.32, .72, 0, 1);
+    clip-path: none !important;
+    opacity: 1 !important;
+    visibility: hidden !important;
+    transform: translate3d(100%, 0, 0) !important;
+    transition:
+      transform .5s cubic-bezier(.4, 0, .2, 1),
+      visibility 0s linear .5s !important;
+  }
+
+  html[dir="rtl"] body #mobileMenu#mobileMenu#mobileMenu.mobile-menu {
+    transform: translate3d(-100%, 0, 0) !important;
+  }
+
+  html body #mobileMenu#mobileMenu#mobileMenu.mobile-menu.is-open,
+  html[dir="rtl"] body #mobileMenu#mobileMenu#mobileMenu.mobile-menu.is-open {
+    visibility: visible !important;
+    transform: translate3d(0, 0, 0) !important;
+    transition:
+      transform .62s var(--menu-slide),
+      visibility 0s linear 0s !important;
+  }
+
+  /* The sheet moves with the curtain as one panel, no second drift inside. */
+  html body #mobileMenu#mobileMenu#mobileMenu .mobile-sheet,
+  html body #mobileMenu#mobileMenu#mobileMenu.is-open .mobile-sheet,
+  html body #mobileMenu#mobileMenu#mobileMenu.is-closing .mobile-sheet {
+    transform: none !important;
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
+  /* What the curtain slides over stays exactly as it was: the older page-push
+     layers (some written as :root[data-theme] …, hence the specificity here)
+     moved it 356px aside, rounded it, gave it a light fill and lifted it above
+     the dock at z-index 1210. These are its closed-state values. */
+  html body.menu-open .bq-page-stage,
+  html body.menu-revealed .bq-page-stage,
+  html body.menu-closing .bq-page-stage,
+  html:root[data-theme][data-theme][data-theme] body.menu-open .bq-page-stage,
+  html:root[data-theme][data-theme][data-theme] body.menu-revealed .bq-page-stage,
+  html:root[data-theme][data-theme][data-theme] body.menu-closing .bq-page-stage {
+    opacity: 1 !important;
+    transform: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    z-index: 1 !important;
+    transition: none !important;
+  }
+
+  html body.menu-open .mobilebar,
+  html body.menu-closing .mobilebar {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}
