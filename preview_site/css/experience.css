@@ -5622,10 +5622,16 @@ html:root[data-theme][data-theme][dir="rtl"] body.menu-closing .bq-page-stage {
     transition: none !important;
   }
 
-  html body.menu-open .mobilebar,
-  html body.menu-closing .mobilebar {
+  /* The dock stays visible beneath the curtain. In Kurdish/Arabic an older
+     [dir="rtl"] .mobilebar rule lifts it to z-index 1600, above the curtain's
+     1190, so it is held at its LTR 860 while the menu is open or closing. */
+  html body.menu-open .mobilebar.mobilebar,
+  html body.menu-closing .mobilebar.mobilebar,
+  html[dir="rtl"] body.menu-open .mobilebar.mobilebar,
+  html[dir="rtl"] body.menu-closing .mobilebar.mobilebar {
     opacity: 1 !important;
     visibility: visible !important;
+    z-index: 860 !important;
   }
 }
 
