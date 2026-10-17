@@ -5628,3 +5628,24 @@ html:root[data-theme][data-theme][dir="rtl"] body.menu-closing .bq-page-stage {
     visibility: visible !important;
   }
 }
+
+/* ============================================================================
+   COOKIE CARD — waits in the middle of the screen.
+   It sat in a bottom corner on desktop and tablet and across the bottom above
+   the dock on phones, where it also covered the lower edge of the chat and
+   Latest sheets. Same card, same width (max-content up to 400px) and the same
+   .4s fade with a 14px rise; only its place changes.
+   ========================================================================== */
+html body #cookieCard#cookieCard.cookie-card,
+html[dir="rtl"] body #cookieCard#cookieCard.cookie-card {
+  top: 50% !important;
+  bottom: auto !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translate(-50%, calc(-50% + 14px)) !important;
+}
+
+html body #cookieCard#cookieCard.cookie-card.is-shown,
+html[dir="rtl"] body #cookieCard#cookieCard.cookie-card.is-shown {
+  transform: translate(-50%, -50%) !important;
+}
