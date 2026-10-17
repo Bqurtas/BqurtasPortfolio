@@ -10394,11 +10394,11 @@ body,
     width: min(360px, calc(100vw - 24px)) !important;
     height: min(420px, 54vh) !important;
     max-height: min(420px, 54vh) !important;
-    /* 12px above the dock's real top edge (its bottom + its scaled bar).
+    /* 12px above the dock's real top edge (--bq-dock-top, experience.css).
        The shared rule above adds --bq-dock-inset and --dock-h, and both carry
        the home-indicator inset, so on an iPhone the sheets floated 82px over
        the dock (38px on other phones). */
-    bottom: calc(var(--bq-dock-bottom, 16px) + var(--bq-dock-bar-h, 52px) * var(--bq-viewport-scale, 1) + 12px) !important;
+    bottom: calc(var(--bq-dock-top, 68px) + 12px) !important;
     transform: translateX(-50%) translateY(18px) scale(.98) !important;
     border-radius: 20px 20px 18px 18px !important;
   }
