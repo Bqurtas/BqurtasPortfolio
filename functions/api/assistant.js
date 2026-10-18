@@ -18,15 +18,6 @@ Barakat is a Kurdish graphic, motion, print and advertising designer in Hewlêr 
 Help him run the studio: drafting and polishing client replies, writing quotes and project briefs, planning timelines, brainstorming design and campaign ideas, naming, copywriting, captions, and translating between Kurdish (Sorani & Kurmancî), Arabic, English and French.
 Always reply in the SAME language the user wrote in. Be concise, warm and practical. When money or scope is involved, give clear options, not vague answers. You are advising the studio owner, not a public visitor.`;
 
-async function authorized(request, env) {
-  if (!sessionConfigured(env) || !env.EDIT_TOKEN) return false;
-  const [session, token] = await Promise.all([
-    hasSession(request, env),
-    hasEditToken(request, env)
-  ]);
-  return session && token;
-}
-
 function normalizedMessages(input) {
   if (!Array.isArray(input) || input.length === 0 || input.length > 20) return null;
   const messages = [];
@@ -79,7 +70,8 @@ async function viaWorkersAI(env, messages) {
 export async function onRequestPost({ request, env }) {
   if (!sessionConfigured(env) || !env.EDIT_TOKEN || !env.DB) return json({ ok: false, error: 'not-configured' }, 503);
   if (!isSameOrigin(request)) return json({ ok: false, error: 'forbidden-origin' }, 403);
-  if (!(await authorized(request, env))) return json({ ok: false, error: 'unauthorized' }, 401);
+  if (!(await hasSession(request, env))) return json({ ok: false, error: 'session-required' }, 401);
+  if (!(await hasEditToken(request, env))) return json({ ok: false, error: 'unauthorized' }, 401);
 
   const key = await rateKey(request, env, 'assistant-use');
   const slot = await takeRateLimit(env, key, { limit: 20, windowMs: 15 * 60 * 1000, durable: true });

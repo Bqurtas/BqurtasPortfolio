@@ -15,7 +15,8 @@ import {
   readJson,
   secretEqual,
   sessionConfigured,
-  takeRateLimit
+  takeRateLimit,
+  upstreamCredentialConfigured
 } from './_session.js';
 
 const PIN_LIMIT = { limit: 8, windowMs: 15 * 60 * 1000, durable: true };
@@ -66,17 +67,21 @@ async function totpAt(secret, time) {
   return String(number).padStart(6, '0');
 }
 
-async function totpValid(secret, supplied) {
+async function totpStep(secret, supplied) {
   const now = Date.now();
-  let valid = false;
+  let matched = null;
   for (const shift of [-30_000, 0, 30_000]) {
-    if (await secretEqual(supplied, await totpAt(secret, now + shift))) valid = true;
+    if (await secretEqual(supplied, await totpAt(secret, now + shift))) matched = Math.floor((now + shift) / 30_000);
   }
-  return valid;
+  return matched;
 }
 
 async function ensureChallenges(DB) {
   await DB.prepare('CREATE TABLE IF NOT EXISTS twofa (id TEXT PRIMARY KEY, code TEXT NOT NULL, exp INTEGER NOT NULL, tries INTEGER NOT NULL DEFAULT 0)').run();
+}
+
+function changed(result) {
+  return Number((result && result.meta && result.meta.changes) ?? (result && result.changes) ?? 0) > 0;
 }
 
 function secureSixDigitCode() {
@@ -162,10 +167,19 @@ async function sendSms(env, code) {
 }
 
 export async function onRequestGet({ request, env }) {
+  const requirements = {
+    pin: !!env.DASH_PIN,
+    session: sessionConfigured(env),
+    database: !!env.DB,
+    secondFactor: secondFactorConfigured(env),
+    editor: !!env.EDIT_TOKEN,
+    upstream: upstreamCredentialConfigured(env)
+  };
   return json({
     ok: true,
-    configured: !!(env.DASH_PIN && env.DB && sessionConfigured(env) && secondFactorConfigured(env)),
-    authenticated: await hasSession(request, env)
+    configured: requirements.pin && requirements.database && requirements.session && requirements.secondFactor,
+    authenticated: await hasSession(request, env),
+    requirements
   });
 }
 
@@ -243,8 +257,21 @@ export async function onRequestPost({ request, env }) {
     let valid = false;
     if (body.id === 'totp') {
       if (!hasTotp) return json({ ok: false, error: 'expired' }, 410);
-      try { valid = await totpValid(env.TOTP_SECRET, String(body.code)); } catch (error) {
+      let step;
+      try { step = await totpStep(env.TOTP_SECRET, String(body.code)); } catch (error) {
         return json({ ok: false, error: 'not-configured' }, 503);
+      }
+      if (step !== null) {
+        try {
+          await ensureChallenges(env.DB);
+          await env.DB.prepare('DELETE FROM twofa WHERE exp < ?').bind(Date.now()).run();
+          /* RFC 6238 codes are one-time credentials. A unique timestep claim
+             prevents replay, including concurrent requests on different edges. */
+          valid = changed(await env.DB.prepare('INSERT OR IGNORE INTO twofa (id,code,exp,tries) VALUES (?,?,?,0)')
+            .bind(`totp:${step}`, 'used', (step + 2) * 30_000).run());
+        } catch (error) {
+          return json({ ok: false, error: 'twofa-unavailable' }, 503);
+        }
       }
     } else {
       const id = String(body.id || '');
@@ -252,25 +279,33 @@ export async function onRequestPost({ request, env }) {
       let row;
       try {
         await ensureChallenges(env.DB);
-        row = await env.DB.prepare('SELECT id,code,exp,tries FROM twofa WHERE id=?').bind(id).first();
+        /* Claim an attempt atomically before examining the code. Reading then
+           incrementing allowed parallel requests to bypass the five-try cap. */
+        row = await env.DB.prepare('UPDATE twofa SET tries=tries+1 WHERE id=? AND exp>=? AND tries<5 RETURNING id,code,exp,tries')
+          .bind(id, Date.now()).first();
       } catch (error) {
         return json({ ok: false, error: 'twofa-unavailable' }, 503);
       }
-      if (!row || row.exp < Date.now()) {
-        if (row) try { await env.DB.prepare('DELETE FROM twofa WHERE id=?').bind(id).run(); } catch (error) { /* expired */ }
+      if (!row) {
+        try {
+          const exhausted = await env.DB.prepare('SELECT exp,tries FROM twofa WHERE id=?').bind(id).first();
+          if (exhausted && exhausted.exp >= Date.now() && exhausted.tries >= 5) return json({ ok: false, error: 'too-many' }, 429);
+        } catch (error) {
+          return json({ ok: false, error: 'twofa-unavailable' }, 503);
+        }
         return json({ ok: false, error: 'expired' }, 410);
-      }
-      if (row.tries >= 5) {
-        try { await env.DB.prepare('DELETE FROM twofa WHERE id=?').bind(id).run(); } catch (error) { /* expired */ }
-        return json({ ok: false, error: 'too-many' }, 429);
       }
       const suppliedDigest = await keyedDigest(env.SESSION_SECRET, `twofa-code|${body.code}`);
       valid = await secretEqual(suppliedDigest, String(row.code));
-      try {
-        if (!valid) await env.DB.prepare('UPDATE twofa SET tries=tries+1 WHERE id=?').bind(id).run();
-        else await env.DB.prepare('DELETE FROM twofa WHERE id=?').bind(id).run();
-      } catch (error) {
-        return json({ ok: false, error: 'twofa-unavailable' }, 503);
+      if (valid) {
+        try {
+          /* Only the request that consumes the row may mint a session. A
+             second successful DELETE used to be accepted even with 0 changes. */
+          valid = changed(await env.DB.prepare('DELETE FROM twofa WHERE id=? AND code=? AND exp>=?')
+            .bind(id, row.code, Date.now()).run());
+        } catch (error) {
+          return json({ ok: false, error: 'twofa-unavailable' }, 503);
+        }
       }
     }
 

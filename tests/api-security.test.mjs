@@ -38,7 +38,12 @@ test('2FA status is server-backed and logout always expires the host cookie', as
     request: new Request(`${ORIGIN}/api/2fa`, { headers: { Cookie: cookie } }),
     env: { SESSION_SECRET, DASH_PIN: '123456', TOTP_SECRET: 'JBSWY3DPEHPK3PXP', DB: {} }
   });
-  assert.deepEqual(await status.json(), { ok: true, configured: true, authenticated: true });
+  assert.deepEqual(await status.json(), {
+    ok: true,
+    configured: true,
+    authenticated: true,
+    requirements: { pin: true, session: true, database: true, secondFactor: true, editor: false, upstream: false }
+  });
 
   const logout = await twoFactorPost({
     request: new Request(`${ORIGIN}/api/2fa`, {
@@ -97,12 +102,46 @@ test('content mutations require both the signed session and edit header', async 
     env
   });
   assert.equal(tokenOnly.status, 401);
+  assert.equal((await tokenOnly.json()).error, 'session-required');
 
   const sessionOnly = await contentPost({
     request: new Request(`${ORIGIN}/api/content`, { ...base, headers: { ...base.headers, Cookie: cookie } }),
     env
   });
   assert.equal(sessionOnly.status, 401);
+  assert.equal((await sessionOnly.json()).error, 'unauthorized');
+});
+
+test('2FA setup diagnostics disclose only requirement booleans, never credential values', async () => {
+  const response = await twoFactorStatus({
+    request: new Request(`${ORIGIN}/api/2fa`),
+    env: { SESSION_SECRET, EDIT_TOKEN: 'private-editor-credential', SUPABASE_EDIT_TOKEN: 'private-upstream-credential' }
+  });
+  const body = await response.json();
+  assert.equal(body.configured, false);
+  assert.equal(body.authenticated, false);
+  assert.deepEqual(body.requirements, { pin: false, session: true, database: false, secondFactor: false, editor: true, upstream: true });
+  assert.doesNotMatch(JSON.stringify(body), /private-editor-credential|private-upstream-credential|a-strong-independent/);
+});
+
+test('missing sessions reject private requests before querying the editor credential store', async () => {
+  let databaseCalls = 0;
+  const env = {
+    SESSION_SECRET,
+    EDIT_TOKEN: 'edit-secret',
+    DB: { prepare() { databaseCalls += 1; throw new Error('must not be called'); } }
+  };
+  const response = await contentPost({
+    request: new Request(`${ORIGIN}/api/content`, {
+      method: 'POST',
+      headers: { Origin: ORIGIN, 'Content-Type': 'application/json', 'x-edit-token': 'edit-secret' },
+      body: JSON.stringify({ title: 'Unauthorized request' })
+    }),
+    env
+  });
+  assert.equal(response.status, 401);
+  assert.equal((await response.json()).error, 'session-required');
+  assert.equal(databaseCalls, 0);
 });
 
 test('analytics token in a URL is never accepted', async () => {

@@ -20,15 +20,6 @@ async function ensure(DB) {
   ).run();
 }
 
-async function authorized(request, env) {
-  if (!sessionConfigured(env) || !env.EDIT_TOKEN) return false;
-  const [session, token] = await Promise.all([
-    hasSession(request, env),
-    hasEditToken(request, env)
-  ]);
-  return session && token;
-}
-
 function shape(row) {
   let body = [];
   try { body = JSON.parse(row.body || '[]'); } catch (error) { body = row.body ? [String(row.body)] : []; }
@@ -102,7 +93,8 @@ async function mutationGate(request, env) {
   if (!env.DB) return json({ ok: false, error: 'no-db' }, 503);
   if (!sessionConfigured(env) || !env.EDIT_TOKEN) return json({ ok: false, error: 'not-configured' }, 503);
   if (!isSameOrigin(request)) return json({ ok: false, error: 'forbidden-origin' }, 403);
-  if (!(await authorized(request, env))) return json({ ok: false, error: 'unauthorized' }, 401);
+  if (!(await hasSession(request, env))) return json({ ok: false, error: 'session-required' }, 401);
+  if (!(await hasEditToken(request, env))) return json({ ok: false, error: 'unauthorized' }, 401);
   const key = await rateKey(request, env, 'content-write');
   const slot = await takeRateLimit(env, key, { limit: 120, windowMs: 15 * 60 * 1000, durable: true });
   if (slot.unavailable) return json({ ok: false, error: 'rate-limit-unavailable' }, 503);

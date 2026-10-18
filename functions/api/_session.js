@@ -55,6 +55,11 @@ export function sessionConfigured(env) {
   return signingSecret(env).length > 0;
 }
 
+export function upstreamCredentialConfigured(env) {
+  const upstream = String((env && env.SUPABASE_EDIT_TOKEN) || '');
+  return upstream.length > 0 && upstream !== String((env && env.EDIT_TOKEN) || '');
+}
+
 export async function issueSession(env) {
   const secret = signingSecret(env);
   if (!secret) return null;
@@ -293,7 +298,7 @@ export async function takeRateLimit(env, key, { limit, windowMs, durable = true 
   if (env && env.RATE_LIMITER && typeof env.RATE_LIMITER.limit === 'function') {
     try {
       const result = await env.RATE_LIMITER.limit({ key });
-      return { ok: result && result.success !== false, retryAfter: 60, durable: true };
+      return { ok: !!(result && result.success === true), retryAfter: 60, durable: true };
     } catch (error) {
       if (durable && !(env && env.DB)) return { ok: false, unavailable: true, retryAfter: 0 };
     }

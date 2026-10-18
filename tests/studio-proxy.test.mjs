@@ -47,15 +47,12 @@ test('built dashboard sends every privileged Supabase mutation through Pages', a
     readFile(new URL('../preview_site/js/enhance.v420.min.js', import.meta.url), 'utf8')
   ]);
   for (const source of files) {
-    /* No service may be wired straight to an Edge Function: the only direct
-       call left is the templated fallback inside the shared helper. */
+    /* No privileged service may be wired straight to an Edge Function. */
     assert.doesNotMatch(source, /functions\/v1\/(?:work-upload|set-token|blog-admin|latest-admin|projects-admin)/);
 
-    /* The proxy is the path every call takes first... */
+    /* The proxy is the only path; no configuration or network failure may
+       downgrade publication to the browser credential alone. */
     assert.match(source, /\/api\/studio\//);
-
-    /* ...and the direct call is reachable only after the proxy has said it is
-       not configured, so a configured deployment never leaves the origin. */
     assert.match(source, /studio-proxy-not-configured/);
 
     for (const service of ['work-upload', 'set-token', 'blog-admin', 'latest-admin', 'projects-admin']) {
@@ -71,6 +68,7 @@ test('Studio proxy requires both the signed session and browser edit token', asy
     params: { service: 'blog-admin' }
   });
   assert.equal(noSession.status, 401);
+  assert.equal((await noSession.json()).error, 'session-required');
 
   const noToken = await studioPost({
     request: request('blog-admin', 'wrong', { action: 'list' }, { Cookie: await cookie() }),
@@ -106,6 +104,7 @@ test('Studio proxy substitutes the server-only Supabase credential', async (t) =
   assert.equal(forwarded.url, 'https://dcnkhzrishphpismmxuu.supabase.co/functions/v1/blog-admin');
   assert.equal(forwarded.init.headers['x-edit-token'], 'server-only-upstream-secret');
   assert.notEqual(forwarded.init.headers['x-edit-token'], 'browser-edit-secret');
+  assert.equal(forwarded.init.redirect, 'error', 'redirects must never forward the private upstream credential elsewhere');
   assert.match(response.headers.get('cloudflare-cdn-cache-control'), /no-store/);
 });
 
@@ -126,41 +125,48 @@ test('Studio proxy only permits known services, actions and safe work folders', 
 
 });
 
-test('Studio proxy still runs, and still gates, without a separate upstream secret', async (t) => {
-  let forwarded;
-  t.mock.method(globalThis, 'fetch', async (url, init) => {
-    forwarded = { url, init };
-    return new Response(JSON.stringify({ ok: true, posts: [] }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
+test('Studio proxy fails closed if its upstream credential is missing or browser-accessible', async (t) => {
+  let fetches = 0;
+  t.mock.method(globalThis, 'fetch', async () => { fetches += 1; throw new Error('must not forward'); });
+  for (const upstream of ['', BASE_ENV.EDIT_TOKEN]) {
+    const response = await studioPost({
+      request: request('blog-admin', 'browser-edit-secret', { action: 'list' }, { Cookie: await cookie() }),
+      env: { ...BASE_ENV, SUPABASE_EDIT_TOKEN: upstream },
+      params: { service: 'blog-admin' }
     });
-  });
-  const { SUPABASE_EDIT_TOKEN, ...noUpstream } = BASE_ENV;
+    assert.equal(response.status, 503);
+    assert.equal((await response.json()).error, 'studio-proxy-not-configured');
+  }
+  assert.equal(fetches, 0);
+});
 
-  /* Falls back to EDIT_TOKEN rather than failing closed, so the dashboard keeps
-     working on a deployment that has not set the second secret yet. */
-  const ok = await studioPost({
+test('Studio proxy rejects inherited object names as unknown services', async () => {
+  for (const service of ['__proto__', 'constructor', 'toString']) {
+    const response = await studioPost({ request: request(service, '', {}), env: BASE_ENV, params: { service } });
+    assert.equal(response.status, 404);
+  }
+});
+
+test('Studio proxy stops reading oversized chunked upstream responses early', async (t) => {
+  let canceled = false;
+  let readCount = 0;
+  t.mock.method(globalThis, 'fetch', async () => new Response(new ReadableStream({
+    pull(controller) {
+      readCount += 1;
+      controller.enqueue(new Uint8Array(1024 * 1024));
+      if (readCount >= 30) controller.close();
+    },
+    cancel() { canceled = true; }
+  })));
+  const response = await studioPost({
     request: request('blog-admin', 'browser-edit-secret', { action: 'list' }, { Cookie: await cookie() }),
-    env: noUpstream,
+    env: BASE_ENV,
     params: { service: 'blog-admin' }
   });
-  assert.equal(ok.status, 200);
-  assert.equal(forwarded.init.headers['x-edit-token'], 'browser-edit-secret');
-
-  /* The session and the browser token are still both mandatory. */
-  const noSession = await studioPost({
-    request: request('blog-admin', 'browser-edit-secret', { action: 'list' }),
-    env: noUpstream,
-    params: { service: 'blog-admin' }
-  });
-  assert.equal(noSession.status, 401);
-
-  const wrongToken = await studioPost({
-    request: request('blog-admin', 'guessed', { action: 'list' }, { Cookie: await cookie() }),
-    env: noUpstream,
-    params: { service: 'blog-admin' }
-  });
-  assert.equal(wrongToken.status, 401);
+  assert.equal(response.status, 502);
+  assert.equal((await response.json()).error, 'studio-upstream-too-large');
+  assert.equal(canceled, true);
+  assert.ok(readCount < 10);
 });
 
 test('editor password rotation stays local, stores only a digest and retires the bootstrap token', async (t) => {

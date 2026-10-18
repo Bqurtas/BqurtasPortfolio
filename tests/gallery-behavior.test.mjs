@@ -82,6 +82,22 @@ test('video catalogue keeps its exact dimensions and only its own first-party fr
   assert.equal(items[2].poster, '', 'another film’s frame must not stand in for this film');
 });
 
+test('video playback uses first-party streaming while image thumbnails and raw fallbacks keep their existing URLs', async () => {
+  const gallery = loadGallery(async () => response({
+    images: [{ path: 'Book/BookCover7.webp', width: 696, height: 1039 }],
+    videos: [{ path: 'Videos/Videos26.mp4', width: 720, height: 720, poster: '/assets/thumbs/Videos/Videos26.jpg' }]
+  }));
+  assert.equal(gallery.url('video', 26), '/media/Videos/Videos26.mp4', 'the fallback catalogue also avoids the video CDN');
+  await gallery.loadManifest();
+  const [film] = gallery.items('video');
+  const [image] = gallery.items('book');
+  assert.equal(film.url, '/media/Videos/Videos26.mp4', 'manifest filenames determine the streamed file');
+  assert.equal(film.rawUrl, gallery.RAW_BASE + '/Videos/Videos26.mp4');
+  assert.equal(film.poster, '/assets/thumbs/Videos/Videos26.jpg');
+  assert.equal(image.url, gallery.CDN_BASE + '/Book/BookCover7.webp');
+  assert.equal(gallery.thumb(image.url, 320), 'assets/thumbs/Book/BookCover7.webp');
+});
+
 test('an initial manifest outage can be retried without discarding the fallback catalogue', async () => {
   let calls = 0;
   const gallery = loadGallery(async () => { if (++calls === 1) throw new Error('offline'); return response(); });
@@ -226,6 +242,26 @@ test('closing a lightbox restores focus, scroll state and each background inert 
   assert.equal(trigger.inert, false); assert.equal(alreadyInert.inert, true);
   assert.equal(element('lbOverlay').inert, true);
   assert.equal(element('lbOverlay').getAttribute('aria-hidden'), 'true');
+});
+
+test('a first-party film opened from its gallery card retains the bounded raw fallback', () => {
+  const { document, element, media, entries } = lightboxFixture();
+  const card = document.createElement('article');
+  card.className = 'card--photo';
+  card.dataset = {
+    full: '/media/Videos/Videos26.mp4',
+    raw: 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Videos/Videos26.mp4',
+    type: 'video', title: 'Video 26'
+  };
+  document.body.appendChild(card);
+  entries.push({ el: card });
+  document.dispatchEvent({ type: 'click', target: card });
+  assert.equal(media().src, card.dataset.full);
+  media().dispatch('error');
+  assert.equal(media().src, card.dataset.raw, 'a local file preview or unavailable edge can still use the existing raw mirror');
+  assert.equal(element('lbRetry').hidden, true);
+  media().dispatch('error');
+  assert.equal(element('lbRetry').hidden, false, 'failure of both sources exposes retry instead of cycling requests');
 });
 
 test('failed full images expose a retry action and RTL keyboard navigation stays consistent', () => {

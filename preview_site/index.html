@@ -2025,7 +2025,7 @@
         <h3>Enter access code</h3>
         <p class="mono">This console is private.</p>
         <form id="dashLoginForm" class="dash-login" method="POST">
-          <input type="password" id="dashKey" aria-label="Dashboard access code" placeholder="Access code" inputmode="numeric" autocomplete="one-time-code" />
+          <input type="password" id="dashKey" aria-label="Dashboard access code" placeholder="Access code" inputmode="text" autocomplete="current-password" />
           <button type="submit">Unlock <i class="fa-solid fa-arrow-right"></i></button>
         </form>
         <p class="dash-hint mono" id="dashHint"></p>
@@ -2175,15 +2175,15 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=3bd7c232b3fd"></script>
-  <script defer src="js/gallery.v420.min.js?v=5ed141a93167"></script>
+  <script defer src="js/main.v420.min.js?v=2064103416d8"></script>
+  <script defer src="js/gallery.v420.min.js?v=04a1bcf2fd6f"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
        still receive them immediately. This removes their database/GitHub work
        from the critical path without removing any feature. -->
   <script>
     (function () {
-      var loaded = false, loading = false, ready = [];
+      var loaded = false, loading = false, ready = [], studioQueued = false;
       function route() {
         var p = location.pathname.split('/').filter(Boolean);
         if (['ku','kmr','ar','fr','tr','sv'].indexOf(p[0]) > -1) p.shift();
@@ -2195,7 +2195,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=cf95a0ee199e';
+        s.src = 'js/enhance.v420.min.js?v=dbd18e6dbfca';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -2203,6 +2203,7 @@
         };
         s.onerror = function () {
           loading = false;
+          studioQueued = false;
           ready.length = 0;
           document.documentElement.classList.add('bq-enhance-error');
           s.remove();
@@ -2213,6 +2214,35 @@
       var direct = route();
       if (direct !== 'home' && direct !== 'design') loadEnhance();
       if (location.hash === '#studio') loadEnhance();
+      /* These owner entry points must also work before the optional dashboard
+         bundle exists. Authentication still happens only on the server. */
+      function openStudio() {
+        if (studioQueued) return;
+        studioQueued = true;
+        loadEnhance(function () {
+          studioQueued = false;
+          if (typeof window.__bqOpenStudio === 'function') window.__bqOpenStudio();
+        });
+      }
+      window.addEventListener('hashchange', function () {
+        if (!loaded && location.hash === '#studio') loadEnhance();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (loaded || !(e.ctrlKey || e.metaKey) || String(e.key || '').toLowerCase() !== 'b') return;
+        e.preventDefault(); e.stopImmediatePropagation();
+        openStudio();
+      }, true);
+      var logoClicks = 0, logoTimer;
+      document.addEventListener('click', function (e) {
+        if (loaded || !e.target || !e.target.closest || !e.target.closest('.rail-logo')) return;
+        logoClicks += 1;
+        clearTimeout(logoTimer);
+        logoTimer = setTimeout(function () { logoClicks = 0; }, 600);
+        if (logoClicks < 5) return;
+        logoClicks = 0;
+        e.preventDefault(); e.stopImmediatePropagation();
+        openStudio();
+      }, true);
       /* Warm-load enhance on hover/focus for rooms & panels — never block the
          first click on blog/bio/contact (main.js SPA router handles those). */
       var warmSelector = [
@@ -2320,7 +2350,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=f57f7a8f9f99', { updateViaCache: 'none' })
+            .register('/sw.js?v=11b5ae284e46', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

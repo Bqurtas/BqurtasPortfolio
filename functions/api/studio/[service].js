@@ -14,9 +14,11 @@ import {
   noContent,
   rateKey,
   readJson,
+  readRequestBytes,
   rotateEditToken,
   sessionConfigured,
-  takeRateLimit
+  takeRateLimit,
+  upstreamCredentialConfigured
 } from '../_session.js';
 
 const SUPABASE_URL = 'https://dcnkhzrishphpismmxuu.supabase.co';
@@ -145,40 +147,21 @@ function validPayload(service, body) {
   return false;
 }
 
-async function authorized(request, env) {
-  const [session, token] = await Promise.all([
-    hasSession(request, env),
-    hasEditToken(request, env)
-  ]);
-  return session && token;
-}
-
-/* The credential Pages presents to the Edge Functions. A separate server-only
-   SUPABASE_EDIT_TOKEN is the stronger setup: the browser then never holds a
-   secret that can mutate Studio data on its own. Where that is not set we fall
-   back to EDIT_TOKEN rather than refuse to run — the Edge Functions already
-   accept it, so calling them through here is no weaker than calling them
-   directly, and the proxy still adds the signed session and the same-origin
-   check on top. Set SUPABASE_EDIT_TOKEN to a different value to close the
-   remaining gap. */
-function upstreamEditToken(env) {
-  return String(env.SUPABASE_EDIT_TOKEN || '') || String(env.EDIT_TOKEN || '');
-}
-
 function configured(env) {
   return sessionConfigured(env)
     && !!env.DB
     && String(env.EDIT_TOKEN || '').length > 0
-    && upstreamEditToken(env).length > 0;
+    && upstreamCredentialConfigured(env);
 }
 
 export async function onRequestPost({ request, env, params }) {
   const service = String((params && params.service) || '');
-  const rule = RULES[service];
+  const rule = Object.hasOwn(RULES, service) ? RULES[service] : null;
   if (!rule) return json({ ok: false, error: 'unknown-studio-service' }, 404);
   if (!configured(env)) return json({ ok: false, error: 'studio-proxy-not-configured' }, 503);
   if (!isSameOrigin(request)) return json({ ok: false, error: 'forbidden-origin' }, 403);
-  if (!(await authorized(request, env))) return json({ ok: false, error: 'unauthorized' }, 401);
+  if (!(await hasSession(request, env))) return json({ ok: false, error: 'session-required' }, 401);
+  if (!(await hasEditToken(request, env))) return json({ ok: false, error: 'unauthorized' }, 401);
 
   const key = await rateKey(request, env, `studio-${service}`);
   const slot = await takeRateLimit(env, key, {
@@ -209,15 +192,20 @@ export async function onRequestPost({ request, env, params }) {
         Accept: 'application/json',
         apikey: publishableKey,
         Authorization: `Bearer ${publishableKey}`,
-        'x-edit-token': upstreamEditToken(env)
+        'x-edit-token': String(env.SUPABASE_EDIT_TOKEN)
       },
       body: JSON.stringify(body),
+      redirect: 'error',
       signal: AbortSignal.timeout(60_000)
     });
     if (upstream.status === 204) return noContent();
     if (upstream.status >= 500) return json({ ok: false, error: 'studio-upstream-failed' }, 502);
-    const raw = await upstream.text();
-    if (raw.length > 5 * 1024 * 1024) return json({ ok: false, error: 'studio-upstream-too-large' }, 502);
+    let raw;
+    try {
+      raw = new TextDecoder('utf-8', { fatal: true }).decode(await readRequestBytes(upstream, 5 * 1024 * 1024));
+    } catch (error) {
+      return json({ ok: false, error: error.status === 413 ? 'studio-upstream-too-large' : 'studio-upstream-invalid' }, 502);
+    }
     let payload;
     try { payload = JSON.parse(raw); } catch (error) {
       return json({ ok: false, error: 'studio-upstream-invalid' }, 502);

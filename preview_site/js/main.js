@@ -1729,6 +1729,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const cards = matchingCards().map(entry => entry.el).filter(element => element?.isConnected);
       const items = cards.map(element => ({
         full: element.dataset.full, title: element.dataset.title,
+        raw: element.dataset.raw,
         type: element.dataset.type || 'image', sourceEl: element,
       }));
       openPool(items, Math.max(0, cards.indexOf(card)));

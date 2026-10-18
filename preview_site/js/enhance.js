@@ -1012,9 +1012,39 @@
     Object.assign(DASH_I18N.kmr, { notSetup:'Têketin hêj li ser serverê nehatiye sazkirin — li Cloudflare Pages DASH_PIN, SESSION_SECRET, TOTP_SECRET û D1 "DB" zêde bike, paşê dîsa deploy bike.' });
     Object.assign(DASH_I18N.ar,  { notSetup:'تسجيل الدخول غير مُعدّ على الخادم بعد — أضف DASH_PIN وSESSION_SECRET وTOTP_SECRET وربط D1 باسم "DB" في Cloudflare Pages ثم أعد النشر.' });
     Object.assign(DASH_I18N.fr,  { notSetup:'La connexion n’est pas encore configurée sur le serveur — ajoutez DASH_PIN, SESSION_SECRET, TOTP_SECRET et la liaison D1 « DB » dans Cloudflare Pages, puis redéployez.' });
+    Object.assign(DASH_I18N.en, {
+      checking:'Checking secure access…', networkError:'The login service could not be reached. Check your connection and try again.',
+      liveOnly:'Open Studio on the live HTTPS website. A file preview cannot sign in or publish.', openLive:'Open secure Studio',
+      rateLimited:'Too many attempts. Wait before trying again.', deliveryFailed:'The verification code could not be delivered. Try the other configured inbox or contact the site owner.',
+      setupMissing:'Cloudflare setup is incomplete. Configure these items, then redeploy:', factorRequirement:'a second factor (TOTP_SECRET or a configured email/SMS provider)',
+      sessionExpired:'Your secure session has expired. Sign in again.', studioNotSetup:'Publishing is not configured on Cloudflare yet. Check EDIT_TOKEN, SUPABASE_EDIT_TOKEN and the DB binding.',
+      studioUnavailable:'The publishing service is temporarily unavailable. Your changes have not been published. Try again.', editorRequired:'Connect your editor password in the Content tab first.'
+    });
+    Object.assign(DASH_I18N.ku, {
+      checking:'دەستگەیشتنی پارێزراو دەپشکنرێت…', networkError:'پەیوەندی بە خزمەتگوزاری چوونەژوورەوە نەکرا. ئینتەرنێتەکەت بپشکنە و دووبارە هەوڵ بدەوە.',
+      liveOnly:'ستۆدیۆ لە وێبسایتی زیندووی HTTPS بکەرەوە. پێشبینینی فایل ناتوانێت بچێتە ژوورەوە یان بڵاو بکاتەوە.', openLive:'ستۆدیۆی پارێزراو بکەرەوە',
+      rateLimited:'ژمارەی هەوڵەکان زۆر بووە. کەمێک چاوەڕێ بکە پاشان هەوڵ بدەوە.', deliveryFailed:'کۆدی پشتڕاستکردنەوە نەنێردرا. سندووقە ڕێکخراوەکەی تر تاقی بکەوە یان پەیوەندی بە خاوەنی سایت بکە.',
+      setupMissing:'ڕێکخستنی Cloudflare تەواو نییە. ئەمانە ڕێک بخە، پاشان دووبارە بڵاوی بکەوە:', factorRequirement:'فاکتۆری دووەم (TOTP_SECRET یان خزمەتگوزاری ڕێکخراوی ئیمەیل/SMS)',
+      sessionExpired:'ماوەی چوونەژوورەوەی پارێزراوت بەسەرچووە. دووبارە بچۆ ژوورەوە.', studioNotSetup:'بڵاوکردنەوە هێشتا لە Cloudflare ڕێکنەخراوە. EDIT_TOKEN و SUPABASE_EDIT_TOKEN و بەستنی DB بپشکنە.',
+      studioUnavailable:'خزمەتگوزاری بڵاوکردنەوە کاتیاً بەردەست نییە. گۆڕانکارییەکانت بڵاونەکراونەتەوە. دووبارە هەوڵ بدەوە.', editorRequired:'سەرەتا پاسۆردی ئەدیتەر لە تابی ناوەڕۆک ببەستەوە.'
+    });
     const SERVER_NOT_SET = ['not-configured', 'session-not-configured', 'no-db', 'twofa-unavailable', 'rate-limit-unavailable'];
     const curLang = () => { const l = document.documentElement.getAttribute('lang') || document.documentElement.dataset.lang || 'en'; return DASH_I18N[l] ? l : 'en'; };
     const DT = (k) => (DASH_I18N[curLang()][k] ?? DASH_I18N.en[k] ?? k);
+    const loginSetupMessage = (requirements) => {
+      if (!requirements || typeof requirements !== 'object') return DT('notSetup');
+      const labels = { pin:'DASH_PIN', session:'SESSION_SECRET (32+ characters)', database:'D1 / DB', secondFactor:DT('factorRequirement') };
+      const missing = Object.keys(labels).filter(key => requirements[key] === false).map(key => labels[key]);
+      return missing.length ? DT('setupMissing') + ' ' + missing.join(' · ') : DT('notSetup');
+    };
+    const loginError = (data, challenge = false) => {
+      const code = data && data.error;
+      if (SERVER_NOT_SET.includes(code)) return loginSetupMessage(data.requirements);
+      if (code === 'rate-limited' || code === 'too-many') return DT('rateLimited');
+      if (code === 'email-failed' || code === 'sms-failed') return DT('deliveryFailed');
+      if (code === 'network-error' || code === 'bad-response') return DT('networkError');
+      return DT(challenge ? 'twoWrong' : 'wrong');
+    };
     const LANG_LABELS = { en: 'English', ku: 'کوردیی سۆرانی', kmr: 'Kurmancî', ar: 'العربية', fr: 'Français', tr: 'Türkçe', sv: 'Svenska' };
     const curSiteLang = () => document.documentElement.getAttribute('lang') || document.documentElement.dataset.lang || 'en';
     let twoFAId = null, twoFAPin = '', twoFAClearTimer = 0, twoFAVia = '';
@@ -1051,7 +1081,13 @@
         const inChallenge = Boolean(twoFAId);
         const h = g.querySelector('h3'); if (h) h.textContent = DT(inChallenge ? 'twoTitle' : 'gateTitle');
         const p = g.querySelector('p.mono'); if (p) p.textContent = inChallenge ? twoFANote() : DT('gatePrivate');
-        const k = $('#dashKey'); if (k) k.placeholder = DT(inChallenge ? 'twoPh' : 'gatePh');
+        const k = $('#dashKey'); if (k) {
+          k.placeholder = DT(inChallenge ? 'twoPh' : 'gatePh');
+          k.type = inChallenge ? 'text' : 'password';
+          k.inputMode = inChallenge ? 'numeric' : 'text';
+          k.autocomplete = inChallenge ? 'one-time-code' : 'current-password';
+          if (inChallenge) k.setAttribute('maxlength', '6'); else k.removeAttribute('maxlength');
+        }
         const b = g.querySelector('button[type="submit"]'); if (b) b.innerHTML = DT('unlock') + ' <i class="fa-solid fa-arrow-right"></i>';
         ensure2FAChoice();
       }
@@ -1084,54 +1120,77 @@
       showGate();
       localizeChrome();
     };
-    let sessionCheck = null;
-    const hasServerSession = () => {
-      if (!unlocked) return Promise.resolve(false);
-      if (sessionCheck) return sessionCheck;
-      sessionCheck = fetch('/api/2fa', {
-        method: 'GET',
-        credentials: 'same-origin',
-        headers: { Accept: 'application/json' }
-      }).then((response) => response.json())
-        .then((data) => Boolean(data && data.ok === true && data.authenticated === true))
-        .catch(() => false)
-        .then((valid) => {
-          if (!valid) invalidateDashboardSession();
-          return valid;
-        })
-        .finally(() => { sessionCheck = null; });
-      return sessionCheck;
+    let gateEpoch = 0, gateBusy = false, gateRequest = null;
+    const setGateBusy = (busy) => {
+      gateBusy = busy;
+      const button = $('#dashLoginForm button[type="submit"]');
+      if (button) button.disabled = busy;
+      $('#dashLoginForm')?.setAttribute('aria-busy', String(busy));
+    };
+    const requestLogin = async (payload) => {
+      const controller = new AbortController();
+      gateRequest = controller;
+      const timer = setTimeout(() => controller.abort(), 12_000);
+      try {
+        const response = await fetch('/api/2fa', {
+          method: payload ? 'POST' : 'GET',
+          credentials: 'same-origin', cache: 'no-store', signal: controller.signal,
+          headers: payload ? { 'Content-Type':'application/json', Accept:'application/json' } : { Accept:'application/json' },
+          ...(payload ? { body:JSON.stringify(payload) } : {})
+        });
+        const data = await response.json();
+        return data && typeof data === 'object' && !Array.isArray(data) ? data : { error:'bad-response' };
+      } catch (error) { return { error:'network-error' }; }
+      finally { clearTimeout(timer); if (gateRequest === controller) gateRequest = null; }
     };
     const openDash = async () => {
+      gateRequest?.abort();
+      const epoch = ++gateEpoch;
+      clearTwoFA();
       dash.classList.add('is-open');
       dash.setAttribute('aria-hidden', 'false');
+      hint.setAttribute('role', 'status');
       localizeChrome();
-      if (unlocked) {
-        /* A tab flag is only a display hint. Keep privileged content hidden
-           until the HttpOnly signed cookie has been confirmed by the server. */
-        showGate();
-        const valid = await hasServerSession();
-        if (valid && unlocked && dash.classList.contains('is-open')) showConsole();
-        else if (dash.classList.contains('is-open')) setTimeout(() => $('#dashKey')?.focus(), 50);
+      /* Confirm the HttpOnly cookie on every open, including a new tab. A
+         sessionStorage flag neither grants access nor prevents session reuse. */
+      showGate();
+      if (location.protocol === 'file:') {
+        setGateBusy(false);
+        hint.textContent = DT('liveOnly') + ' ';
+        const live = document.createElement('a');
+        live.href = 'https://bqurtas.com/#studio';
+        live.textContent = DT('openLive');
+        hint.appendChild(live);
         return;
       }
-      showGate();
-      setTimeout(() => $('#dashKey')?.focus(), 200);
-      /* Say up front when no code can work on this deployment. */
-      fetch('/api/2fa', { method: 'GET', credentials: 'same-origin', headers: { Accept: 'application/json' } })
-        .then((response) => response.json())
-        .then((data) => { if (data && data.ok === true && data.configured === false && !twoFAId) hint.textContent = DT('notSetup'); })
-        .catch(() => {});
+      setGateBusy(true);
+      hint.textContent = DT('checking');
+      const data = await requestLogin();
+      if (epoch !== gateEpoch || !dash.classList.contains('is-open')) return;
+      setGateBusy(false);
+      if (data.ok === true && data.authenticated === true) { unlocked = true; showConsole(); return; }
+      invalidateDashboardSession();
+      hint.textContent = data.configured === false ? loginSetupMessage(data.requirements) : data.error ? loginError(data) : '';
+      $('#dashKey')?.focus();
     };
     const closeDash = () => {
+      ++gateEpoch;
+      gateRequest?.abort();
+      gateRequest = null;
+      setGateBusy(false);
       clearTwoFA();
+      const key = $('#dashKey'); if (key) key.value = '';
       dash.classList.remove('is-open');
       dash.setAttribute('aria-hidden', 'true');
     };
 
     /* triggers: URL hash #studio, or Ctrl/Cmd+Shift+B, or 5 quick clicks on rail logo */
-    if (location.hash === '#studio') setTimeout(openDash, 0);   // defer: showConsole is defined later in this IIFE
+    if (location.hash === '#studio') setTimeout(() => {
+      if (!dash.classList.contains('is-open')) openDash();
+    }, 0); // defer until showConsole exists; a cold shortcut may already open it
     window.addEventListener('hashchange', () => { if (location.hash === '#studio') openDash(); });
+    window.addEventListener('bq:open-studio', openDash);
+    window.__bqOpenStudio = openDash;
     document.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') { e.preventDefault(); openDash(); }   // ⌘ / Ctrl + B
       if (e.key === 'Escape') closeDash();
@@ -1161,13 +1220,19 @@
       const p = g.querySelector('p.mono');
       if (p) p.textContent = twoFANote();
       ensure2FAChoice();
-      const k = $('#dashKey'); if (k) { k.value = ''; k.placeholder = DT('twoPh'); setTimeout(() => k.focus(), 50); }
+      localizeChrome();
+      const k = $('#dashKey'); if (k) { k.value = ''; k.placeholder = DT('twoPh'); k.focus(); }
       hint.textContent = '';
     };
-    $('#dashLoginForm')?.addEventListener('submit', (e) => {
+    $('#dashLoginForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const val = $('#dashKey').value.trim();
-      // step 2 — verifying the SMS code
+      if (location.protocol === 'file:') { openDash(); return; }
+      if (gateBusy) return;
+      const raw = $('#dashKey').value.trim();
+      // Authenticator/email codes may be entered with Kurdish or Arabic digits.
+      const val = twoFAId ? raw.replace(/[٠-٩۰-۹]/g, digit => String(digit.charCodeAt(0) - (digit <= '٩' ? 0x660 : 0x6f0))) : raw;
+      const epoch = gateEpoch;
+      // Step 2 — verify the selected second factor without overlapping requests.
       if (twoFAId) {
         if (!twoFAPin) {
           clearTwoFA();
@@ -1176,42 +1241,43 @@
           localizeChrome();
           return;
         }
-        fetch('/api/2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ pin: twoFAPin, action: 'verify', id: twoFAId, code: val }) })
-          .then(r => r.json()).then(d => {
-            if (d.ok) { doUnlock(); return; }
-            hint.textContent = SERVER_NOT_SET.includes(d.error) ? DT('notSetup') : DT('twoWrong');
-            $('#dashKey').value = '';
-            if (['expired', 'too-many', 'bad-pin', 'not-configured'].includes(d.error)) {
-              clearTwoFA();
-              localizeChrome();
-            }
-          })
-          .catch(() => { hint.textContent = DT('twoWrong'); });
+        if (!/^\d{6}$/.test(val)) { hint.textContent = DT('twoWrong'); return; }
+        setGateBusy(true);
+        const d = await requestLogin({ pin:twoFAPin, action:'verify', id:twoFAId, code:val });
+        if (epoch !== gateEpoch || !dash.classList.contains('is-open')) return;
+        setGateBusy(false);
+        if (d.ok === true) { doUnlock(); return; }
+        hint.textContent = loginError(d, true);
+        $('#dashKey').value = '';
+        if (['expired', 'too-many', 'bad-pin', 'not-configured'].includes(d.error)) {
+          clearTwoFA();
+          localizeChrome();
+        }
         return;
       }
       // step 1 — the access code
       if (!val) { hint.textContent = DT('wrong'); return; }
+      setGateBusy(true);
       hint.textContent = DT('twoSending');
       $('#dashKey').value = '';
-      fetch('/api/2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: val, action: 'send', recipient: selected2FARecipient() }) })
-        .then(r => r.json()).then(d => {
-          if (d.ok && d.id) {
-            clearTwoFA();
-            twoFAPin = val; // memory-only, cleared on success, expiry, logout, or close
-            twoFAId = d.id;
-            twoFAClearTimer = setTimeout(() => {
-              clearTwoFA();
-              localizeChrome();
-              hint.textContent = DT('twoWrong');
-              const key = $('#dashKey'); if (key) key.value = '';
-            }, 5 * 60 * 1000);
-            enter2FA(d.via);
-            return;
-          }
+      const d = await requestLogin({ pin:val, action:'send', recipient:selected2FARecipient() });
+      if (epoch !== gateEpoch || !dash.classList.contains('is-open')) return;
+      setGateBusy(false);
+      if (d.ok === true && d.id) {
+        clearTwoFA();
+        twoFAPin = val; // memory-only, cleared on success, expiry, logout, or close
+        twoFAId = d.id;
+        twoFAClearTimer = setTimeout(() => {
           clearTwoFA();
-          hint.textContent = DT(d.error === 'bad-pin' ? 'wrong' : SERVER_NOT_SET.includes(d.error) ? 'notSetup' : 'twoWrong');
-        })
-        .catch(() => { clearTwoFA(); hint.textContent = DT('twoWrong'); });
+          localizeChrome();
+          hint.textContent = DT('twoWrong');
+          const key = $('#dashKey'); if (key) key.value = '';
+        }, 5 * 60 * 1000);
+        enter2FA(d.via);
+        return;
+      }
+      clearTwoFA();
+      hint.textContent = loginError(d);
     });
 
     const getLeads = () => { try { return JSON.parse(localStorage.getItem('bq_pitches') || '[]'); } catch (e) { return []; } };
@@ -1537,42 +1603,29 @@
     };
     const editToken = () => { try { return sessionStorage.getItem('bq_edit_token') || ''; } catch (e) { return ''; } };
 
-    /* Every privileged Studio call goes through the same-origin proxy first, so
-       the credential the Edge Functions check stays on the server. A deployment
-       that has not been given the Pages secrets answers 503
-       studio-proxy-not-configured — there we fall back to calling the Edge
-       Function directly with the token the editor already holds, which is how
-       the dashboard worked before the proxy existed. Without this the whole
-       dashboard is dead on such a deployment. The flag latches so one probe is
-       enough per session. */
-    let studioDirect = false;
+    /* Privileged Studio calls always stay on this origin. A missing proxy or
+       network failure must never downgrade the signed two-factor session to a
+       direct request carrying an editor credential to a different origin. */
     const studioCall = async (service, payload) => {
       const token = editToken();
-      if (!studioDirect) {
-        try {
-          const res = await fetch('/api/studio/' + service, {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json', 'x-edit-token': token },
-            body: JSON.stringify(payload)
-          });
-          const body = await res.json().catch(() => ({ error: 'bad_response' }));
-          if (!(res.status === 503 && body && body.error === 'studio-proxy-not-configured')) return body;
-          studioDirect = true;
-        } catch (e) { studioDirect = true; }
-      }
-      const SB = window.BQ_SUPA || {};
-      if (!SB.url || !SB.key) return { error: 'bad_response' };
-      return fetch(SB.url + '/functions/v1/' + service, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          apikey: SB.key,
-          Authorization: 'Bearer ' + SB.key,
-          'x-edit-token': token
-        },
-        body: JSON.stringify(payload)
-      }).then(r => r.json().catch(() => ({ error: 'bad_response' })));
+      if (!token) return { error:'missing_token', detail:DT('editorRequired') };
+      try {
+        const res = await fetch('/api/studio/' + service, {
+          method:'POST', credentials:'same-origin', cache:'no-store',
+          headers:{ 'Content-Type':'application/json', Accept:'application/json', 'x-edit-token':token },
+          body:JSON.stringify(payload), signal:AbortSignal.timeout(65_000)
+        });
+        const body = await res.json().catch(() => ({ error:'bad_response' }));
+        if (body.error === 'session-required') {
+          invalidateDashboardSession();
+          hint.textContent = DT('sessionExpired');
+          return { ...body, detail:DT('sessionExpired') };
+        }
+        if (body.error === 'studio-proxy-not-configured') return { ...body, detail:DT('studioNotSetup') };
+        if (res.status === 429) return { ...body, detail:DT('rateLimited') };
+        if (res.status >= 500 || body.error === 'bad_response') return { ...body, detail:DT('studioUnavailable') };
+        return body;
+      } catch (error) { return { error:'studio-unavailable', detail:DT('studioUnavailable') }; }
     };
 
     const cmsApi = (payload) => studioCall('blog-admin', payload);

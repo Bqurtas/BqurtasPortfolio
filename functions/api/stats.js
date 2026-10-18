@@ -13,15 +13,6 @@ import {
 
 const DAY = 86_400_000;
 
-async function authorized(request, env) {
-  if (!sessionConfigured(env) || !env.STATS_TOKEN) return false;
-  const [session, token] = await Promise.all([
-    hasSession(request, env),
-    secretEqual(request.headers.get('x-stats-token') || '', String(env.STATS_TOKEN))
-  ]);
-  return session && token;
-}
-
 function dateParts(timestamp, timeZone) {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone,
@@ -134,7 +125,8 @@ async function fromD1(env) {
 export async function onRequestGet({ request, env }) {
   if (!sessionConfigured(env) || !env.STATS_TOKEN) return json({ ok: false, error: 'not-configured' }, 503);
   if (!isSameOrigin(request)) return json({ ok: false, error: 'forbidden-origin' }, 403);
-  if (!(await authorized(request, env))) return json({ ok: false, error: 'unauthorized' }, 401);
+  if (!(await hasSession(request, env))) return json({ ok: false, error: 'session-required' }, 401);
+  if (!(await secretEqual(request.headers.get('x-stats-token') || '', String(env.STATS_TOKEN)))) return json({ ok: false, error: 'unauthorized' }, 401);
 
   const key = await rateKey(request, env, 'stats-read');
   const slot = await takeRateLimit(env, key, { limit: 60, windowMs: 60_000, durable: true });

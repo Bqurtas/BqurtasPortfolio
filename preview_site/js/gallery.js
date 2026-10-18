@@ -1,6 +1,6 @@
 /* =========================================================
    Barakat Qurtas — Dynamic Gallery
-   Pulls images/videos from GitHub via jsDelivr CDN
+   Local image thumbnails, CDN originals and first-party film streaming
    ========================================================= */
 
 window.BQ_GALLERY = {
@@ -35,15 +35,15 @@ window.BQ_GALLERY = {
     video:       { folder: 'Videos',        prefix: 'Videos',      ext: 'mp4',  count: 30,  cat: 'video',       tag: 'Video',         icon: 'fa-video',          title: 'Video' },
   },
 
-  /* Direct CDN url for a collection + 1-based index. If a live folder
-     manifest was loaded it maps the index to the real filename; otherwise
-     it falls back to the static prefix+number scheme. */
+  /* Images retain their CDN and local-thumbnail paths. Films use the same
+     first-party streaming endpoint as their watch pages: it supports byte
+     ranges and avoids jsDelivr's slow/denied responses for larger MP4s. */
   url(coll, i) {
     const c = this.COLLECTIONS[coll];
     if (!c) return '';
-    if (c.files && c.files[i - 1] != null)
-      return `${this.CDN_BASE}/${c.folder}/${encodeURIComponent(c.files[i - 1])}`;
-    return `${this.CDN_BASE}/${c.folder}/${c.prefix}${i}.${c.ext}`;
+    const file = c.files && c.files[i - 1] != null ? c.files[i - 1] : `${c.prefix}${i}.${c.ext}`;
+    const base = /\.(mp4|webm|mov)$/i.test(file) ? '/media' : this.CDN_BASE;
+    return `${base}/${c.folder}/${encodeURIComponent(file)}`;
   },
 
   /* raw.githubusercontent fallback for the same item — used when jsDelivr
@@ -407,6 +407,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     article.dataset.coll  = item.coll;
     article.dataset.idx   = item.index;
     article.dataset.full  = item.url;
+    article.dataset.raw   = item.rawUrl;
     article.dataset.title = dispTitle;
     article.dataset.type  = item.type;
 
