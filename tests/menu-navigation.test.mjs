@@ -13,6 +13,8 @@ function events() {
   const listeners = new Map();
   return {
     addEventListener(type, callback) { listeners.set(type, [...(listeners.get(type) || []), callback]); },
+    removeEventListener(type, callback) { listeners.set(type, (listeners.get(type) || []).filter(item => item !== callback)); },
+    callbacks(type) { return [...(listeners.get(type) || [])]; },
     fire(type, values = {}) {
       const event = { type, target: this, currentTarget: this, button: 0, ...values,
         preventDefault() { this.defaultPrevented = true; }, stopPropagation() {} };
@@ -35,7 +37,7 @@ function element(id) {
     querySelector: () => null, querySelectorAll: () => [], focus() {},
   };
 }
-function fixture({ clampMenuScroll = true } = {}) {
+function fixture({ clampMenuScroll = true, menuTransition = {}, stageDuration = '1s' } = {}) {
   let now = 0, nextTimer = 0;
   const timers = new Map(), closed = [], historyChanges = [];
   const schedule = (callback, delay = 0) => { const id = ++nextTimer; timers.set(id, { at: now + delay, callback }); return id; };
@@ -70,6 +72,12 @@ function fixture({ clampMenuScroll = true } = {}) {
     dispatchEvent(event) { if (event.type === 'bq:menu-closed') closed.push(now); this.fire(event.type, event); },
   };
   const context = {
+    getComputedStyle(element) {
+      return element === ids.mobileMenu
+        ? { transitionProperty: 'clip-path, opacity, visibility', transitionDuration: '1.15s, .6s, 0s',
+          transitionDelay: '0s, 0s, 1.15s', ...menuTransition }
+        : { transitionProperty: 'transform', transitionDuration: stageDuration, transitionDelay: '0s' };
+    },
     window, document, location, rooms: ['design', 'bio', 'blog', 'contact'].map(id => ids[id]), routeLinks: [bioLink],
     routerReady: true, currentLang: 'ku', currentFilter: 'all', isCompact: () => true,
     setRoomChrome() {}, triggerReveals() {}, setDocTitle() {},
@@ -103,7 +111,7 @@ test('ordinary menu dismissal restores the reading position once and keeps close
   page.window.__bqPanels.menu();
   assert.equal(page.body.classList.contains('menu-closing'), true);
   assert.equal(page.window.scrollY, 0);
-  page.advance(440);
+  page.advance(830);
   assert.equal(page.window.scrollY, 5239);
   assert.equal(page.closed.length, 1);
   assert.equal(page.body.classList.contains('menu-open'), false);
@@ -115,7 +123,7 @@ test('the desktop preview keeps the visible document slice through closing and r
   assert.equal(page.window.scrollY, 5239, 'opening must leave the native reading position unchanged');
   assert.equal(page.body.style['--bq-menu-scroll-y'], '5239px');
   page.ids.mobileMenuClose.fire('click');
-  page.advance(840);
+  page.advance(1230);
   assert.equal(page.window.scrollY, 5239);
   assert.equal(page.body.style['--bq-menu-scroll-y'], '5239px', 'the scale return must retain the same viewport-centered pivot after menu classes clear');
   page.window.scrollTo({ top: 1800 });
@@ -133,7 +141,7 @@ test('a room selected beneath the curtain starts at its hero instead of restorin
   assert.equal(page.window.scrollY, 0);
   assert.equal(page.body.style['--bq-menu-scroll-y'], '0px', 'the new room must scale around its hero instead of the old gallery offset');
   assert.equal(page.body.classList.contains('menu-closing'), true, 'the room swap must not end the menu animation early');
-  page.advance(160);
+  page.advance(550);
   assert.equal(page.window.scrollY, 0);
   assert.equal(page.closed.length, 1);
   assert.equal(page.ids.mobileMenu.classList.contains('is-closing'), false);
@@ -152,7 +160,7 @@ test('reopening during dismissal cancels the old close timer and keeps the origi
   assert.equal(page.window.scrollY, 0);
   assert.equal(page.body.style['--bq-menu-scroll-y'], '5239px', 'reopening must retain the saved slice even if a browser lost its native offset');
   page.ids.mobileMenuClose.fire('click');
-  page.advance(840);
+  page.advance(1230);
   assert.equal(page.window.scrollY, 5239);
   assert.equal(page.closed.length, 1);
 });
@@ -176,9 +184,98 @@ test('scrollspy ignores the menu lock and queued pre-menu callbacks, then resume
   assert.deepEqual(page.historyChanges, []);
   page.ids.mobileMenuClose.fire('click');
   page.window.fire('scroll');
-  page.advance(840);
+  page.advance(1230);
   assert.equal(page.location.pathname, '/ku/design');
   page.window.scrollTo({ top: 9000 });
   page.advance(180);
   assert.equal(page.location.pathname, '/ku');
+});
+
+
+test('the desktop close guard waits for its longest transition and ignores child and shorter transition events', () => {
+  const page = fixture();
+  page.open();
+  page.ids.mobileMenuClose.fire('click');
+  page.advance(600);
+  page.ids.mobileMenu.fire('transitionend', { propertyName: 'opacity' });
+  page.ids.mobileMenu.fire('transitionend', { target: page.bioLink, propertyName: 'clip-path' });
+  page.advance(400);
+  page.ids.bqPageStage.fire('transitionend', { propertyName: 'transform' });
+  assert.equal(page.closed.length, 0, 'the curtain is still wiping after child and page transitions finish');
+  page.advance(150);
+  page.ids.mobileMenu.fire('transitionend', { propertyName: 'clip-path' });
+  assert.equal(page.body.classList.contains('menu-closing'), false);
+  assert.equal(page.window.scrollY, 5239);
+  assert.equal(page.closed.length, 1);
+  assert.equal(page.ids.mobileMenu.callbacks('transitionend').length, 0, 'completion removes its listener');
+  page.advance(1000);
+  assert.equal(page.closed.length, 1, 'the fallback cannot dispatch a second close');
+});
+
+test('the phone unlocks when its side slide ends, without a fixed desktop-length wait', () => {
+  const page = fixture({ stageDuration: '0s', menuTransition: {
+    transitionProperty: 'transform, opacity, visibility', transitionDuration: '600ms, .5s, 0s',
+    transitionDelay: '0s, 0s, .6s',
+  } });
+  page.open();
+  page.ids.mobileMenuClose.fire('click');
+  page.advance(500);
+  page.ids.mobileMenu.fire('transitionend', { propertyName: 'opacity' });
+  assert.equal(page.closed.length, 0);
+  page.advance(100);
+  page.ids.mobileMenu.fire('transitionend', { propertyName: 'transform' });
+  assert.equal(page.closed.length, 1);
+  assert.equal(page.body.classList.contains('menu-closing'), false);
+  assert.equal(page.window.scrollY, 5239);
+});
+
+test('a longer page return keeps geometry guards until the page itself finishes', () => {
+  const page = fixture({ menuTransition: { transitionDuration: '.95s, .5s, 0s' } });
+  page.open();
+  page.ids.mobileMenuClose.fire('click');
+  page.advance(950);
+  page.ids.mobileMenu.fire('transitionend', { propertyName: 'clip-path' });
+  assert.equal(page.closed.length, 0);
+  page.advance(50);
+  page.ids.bqPageStage.fire('transitionend', { propertyName: 'transform' });
+  assert.equal(page.closed.length, 1);
+});
+
+test('reopening removes the pending transition listener and invalidates an already queued old completion', () => {
+  const page = fixture();
+  page.open();
+  page.ids.mobileMenuClose.fire('click');
+  const oldCompletion = page.ids.mobileMenu.callbacks('transitionend')[0];
+  page.advance(300);
+  page.ids.menuToggle.fire('click');
+  assert.equal(page.ids.mobileMenu.callbacks('transitionend').length, 0);
+  page.advance(16);
+  page.ids.mobileMenuClose.fire('click');
+  oldCompletion({ target: page.ids.mobileMenu, propertyName: 'clip-path' });
+  assert.equal(page.closed.length, 0, 'an old event cannot release a later close cycle');
+  assert.equal(page.body.classList.contains('menu-closing'), true);
+  page.advance(1150);
+  page.ids.mobileMenu.fire('transitionend', { propertyName: 'clip-path' });
+  assert.equal(page.closed.length, 1);
+});
+
+test('missing transition events use the actual duration and repeated delay list as a bounded fallback', () => {
+  const page = fixture({ stageDuration: '0s', menuTransition: {
+    transitionDuration: '300ms, .15s, 0s', transitionDelay: '.1s',
+  } });
+  page.open();
+  page.ids.mobileMenuClose.fire('click');
+  page.advance(479);
+  assert.equal(page.closed.length, 0);
+  page.advance(1);
+  assert.equal(page.closed.length, 1);
+});
+
+test('a menu with no motion still releases its guards when no transitionend can fire', () => {
+  const page = fixture({ stageDuration: '0s', menuTransition: { transitionDuration: '0s' } });
+  page.open();
+  page.ids.mobileMenuClose.fire('click');
+  page.advance(80);
+  assert.equal(page.closed.length, 1);
+  assert.equal(page.body.classList.contains('menu-closing'), false);
 });

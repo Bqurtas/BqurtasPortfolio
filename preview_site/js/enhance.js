@@ -419,14 +419,20 @@
     const ICONS = { 'Brand Identity': 'fa-pen-nib', 'Editorial': 'fa-newspaper', 'Posters': 'fa-image', 'Book Design': 'fa-book', 'Video': 'fa-video' };
     const DISC_KEY = { 'Brand Identity':'disc.brand','Editorial':'disc.editorial','Posters':'disc.posters','Book Design':'disc.book','Video':'disc.video' };
     const discLabel = (d) => (window.BQ_DICT && window.BQ_DICT[DISC_KEY[d]]) || d;
-    const buildMarquee = () => {
+    let marqueeWidth = -1;
+    const buildMarquee = (force = false) => {
       if (!track || !wrap) return;
+      const width = wrap.clientWidth;
+      // Phone browser bars resize the height while this strip stays identical.
+      // Replacing its children would restart the animation and force layout.
+      if (!force && width === marqueeWidth) return;
+      marqueeWidth = width;
       const unit = DISC_ORDER.map(d =>
         `<span class="hero-disc" data-disc="${d}"><i class="fa-solid ${ICONS[d]}"></i> ${discLabel(d)}</span><span class="hero-sep">✦</span>`
       ).join('');
       track.innerHTML = unit;                              // measure one set
       const setW = track.scrollWidth || 900;
-      const reps = Math.max(2, Math.ceil((wrap.clientWidth * 1.25) / setW));
+      const reps = Math.max(2, Math.ceil((width * 1.25) / setW));
       const half = unit.repeat(reps);
       track.innerHTML = half + half;                       // two identical halves
       /* constant speed (~55px/s) no matter how many copies */
@@ -434,8 +440,15 @@
       track.style.animationDuration = Math.max(18, halfW / 55).toFixed(1) + 's';
     };
     buildMarquee();
-    window.__bqLangCb.push(() => buildMarquee());
-    let rb; window.addEventListener('resize', () => { clearTimeout(rb); rb = setTimeout(buildMarquee, 250); });
+    window.__bqLangCb.push(() => buildMarquee(true));
+    let rb;
+    window.addEventListener('resize', () => {
+      if (!wrap || wrap.clientWidth === marqueeWidth) return;
+      clearTimeout(rb);
+      rb = setTimeout(() => buildMarquee(), 250);
+    }, { passive: true });
+    // Font metrics can change without a width change when web fonts finish.
+    document.fonts?.addEventListener('loadingdone', () => buildMarquee(true));
 
     /* delegated discipline hover (survives marquee rebuild) */
     let curDisc = null;
@@ -788,13 +801,19 @@
     let greeted = false;
     const backdrop = $('#chatBackdrop');
     /* a quiet minute with no interaction → the chat closes itself */
-    let idleT = null;
+    let idleT = null, focusT = null, lastTrigger = null;
+    let resetDrag = () => {};
+    panel.toggleAttribute('inert', !panel.classList.contains('is-open'));
+    triggers.forEach(t => t.setAttribute('aria-expanded', String(panel.classList.contains('is-open'))));
     const armIdle = () => { clearTimeout(idleT); idleT = setTimeout(() => close(), 60000); };
-    const open = () => {
+    const open = (trigger) => {
+      clearTimeout(focusT);
+      lastTrigger = trigger || document.activeElement;
       if (window.__bqExclusive) window.__bqExclusive('chat');   // opening the chat closes Latest/menu/popovers
+      panel.removeAttribute('inert');
       panel.classList.add('is-open');
       backdrop && backdrop.classList.add('is-open');
-      triggers.forEach(t => t.classList.add('is-active'));
+      triggers.forEach(t => { t.classList.add('is-active'); t.setAttribute('aria-expanded', 'true'); });
       panel.setAttribute('aria-hidden', 'false');
       armIdle();
       if (!greeted) {
@@ -803,22 +822,38 @@
         if (!hadHistory) setTimeout(() => add('bot', getGreet()), 250);
         buildQuick();
       }
-      setTimeout(() => input.focus(), 300);
+      focusT = setTimeout(() => {
+        focusT = null;
+        if (panel.classList.contains('is-open')) input?.focus({ preventScroll: true });
+      }, 300);
     };
     const close = () => {
       clearTimeout(idleT);
+      clearTimeout(focusT);
+      focusT = null;
+      resetDrag();
+      if (panel.contains(document.activeElement) && lastTrigger && document.contains(lastTrigger)) {
+        lastTrigger.focus({ preventScroll: true });
+      }
       panel.classList.remove('is-open');
+      panel.setAttribute('inert', '');
       backdrop && backdrop.classList.remove('is-open');
-      triggers.forEach(t => t.classList.remove('is-active'));
+      triggers.forEach(t => { t.classList.remove('is-active'); t.setAttribute('aria-expanded', 'false'); });
       panel.setAttribute('aria-hidden', 'true');
+      lastTrigger = null;
     };
     ['pointerdown', 'keydown', 'touchstart'].forEach((ev) =>
       panel.addEventListener(ev, () => { if (panel.classList.contains('is-open')) armIdle(); }, { passive: true }));
     window.__bqPanels = window.__bqPanels || {};
     window.__bqPanels.chat = close;
-    triggers.forEach(t => t.addEventListener('click', () => panel.classList.contains('is-open') ? close() : open()));
+    triggers.forEach(t => t.addEventListener('click', () => panel.classList.contains('is-open') ? close() : open(t)));
     min && min.addEventListener('click', close);
     backdrop && backdrop.addEventListener('click', close);
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || !panel.classList.contains('is-open')) return;
+      e.preventDefault();
+      close();
+    });
 
     /* mobile: drag the header downward to dismiss the sheet — firm (the sheet
        tracks the finger and the page can't scroll under it) */
@@ -826,15 +861,19 @@
     if (cHead) {
       const isMobile = () => window.matchMedia('(max-width: 1024px)').matches;
       let sy = null, dy = 0, drag = false;
-      const down = (y) => { if (!isMobile()) return; sy = y; dy = 0; drag = true; panel.style.transition = 'none'; };
-      const move = (y, ev) => { if (!drag) return; dy = y - sy; if (dy < 0) dy = 0; if (dy > 3 && ev && ev.cancelable) ev.preventDefault(); panel.style.transform = `translateY(${dy}px)`; };
-      const up = () => { if (!drag) return; drag = false; sy = null; panel.style.transition = ''; if (dy > 55) close(); panel.style.transform = ''; };
+      const down = (y) => { if (!isMobile() || !panel.classList.contains('is-open')) return; sy = y; dy = 0; drag = true; panel.setAttribute('data-panel-dragging', ''); };
+      const move = (y, ev) => { if (!drag) return; dy = y - sy; if (dy < 0) dy = 0; if (dy > 3 && ev && ev.cancelable) ev.preventDefault(); panel.style.setProperty('--bq-panel-drag-y', `${dy}px`); };
+      const cancel = () => { drag = false; sy = null; dy = 0; panel.removeAttribute('data-panel-dragging'); panel.style.removeProperty('--bq-panel-drag-y'); };
+      resetDrag = cancel;
+      const up = () => { if (!drag) return; const dismiss = dy > 55; cancel(); if (dismiss) close(); };
       cHead.addEventListener('touchstart', (e) => down(e.touches[0].clientY), { passive: true });
       cHead.addEventListener('touchmove', (e) => move(e.touches[0].clientY, e), { passive: false });
       cHead.addEventListener('touchend', up);
+      cHead.addEventListener('touchcancel', cancel);
       cHead.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'touch') down(e.clientY); });
       window.addEventListener('pointermove', (e) => { if (drag && e.pointerType !== 'touch') move(e.clientY, e); });
       window.addEventListener('pointerup', () => { if (drag) up(); });
+      window.addEventListener('pointercancel', cancel);
     }
     /* rebuild quick chips in the new language (once) */
     window.__bqLangCb.push(() => { if (greeted) buildQuick(); });
@@ -2713,15 +2752,40 @@
   }).filter((row) => row.cat);
 
   /* a quiet minute with no interaction → Latest closes itself */
-  let idleT = null;
+  let idleT = null, lastTrigger = null;
+  let resetDrag = () => {};
+  const triggers = [bell, bellM].filter(Boolean);
+  panel.toggleAttribute('inert', !panel.classList.contains('is-open'));
+  triggers.forEach(t => t.setAttribute('aria-expanded', String(panel.classList.contains('is-open'))));
   const armIdle = () => { clearTimeout(idleT); idleT = setTimeout(() => close(), 60000); };
-  const open = () => { if (window.__bqExclusive) window.__bqExclusive('latest'); panel.classList.add('is-open'); panel.setAttribute('aria-hidden', 'false'); backdrop && backdrop.classList.add('is-open'); armIdle(); };
-  const close = () => { clearTimeout(idleT); panel.classList.remove('is-open'); panel.setAttribute('aria-hidden', 'true'); backdrop && backdrop.classList.remove('is-open'); };
+  const open = (trigger) => {
+    if (window.__bqExclusive) window.__bqExclusive('latest');
+    lastTrigger = trigger || document.activeElement;
+    panel.removeAttribute('inert');
+    panel.classList.add('is-open');
+    panel.setAttribute('aria-hidden', 'false');
+    triggers.forEach(t => t.setAttribute('aria-expanded', 'true'));
+    backdrop && backdrop.classList.add('is-open');
+    armIdle();
+  };
+  const close = () => {
+    clearTimeout(idleT);
+    resetDrag();
+    if (panel.contains(document.activeElement) && lastTrigger && document.contains(lastTrigger)) {
+      lastTrigger.focus({ preventScroll: true });
+    }
+    panel.classList.remove('is-open');
+    panel.setAttribute('inert', '');
+    panel.setAttribute('aria-hidden', 'true');
+    triggers.forEach(t => t.setAttribute('aria-expanded', 'false'));
+    backdrop && backdrop.classList.remove('is-open');
+    lastTrigger = null;
+  };
   ['pointerdown', 'touchstart', 'wheel'].forEach((ev) =>
     panel.addEventListener(ev, () => { if (panel.classList.contains('is-open')) armIdle(); }, { passive: true }));
   window.__bqPanels = window.__bqPanels || {};
   window.__bqPanels.latest = close;
-  const toggle = () => (panel.classList.contains('is-open') ? close() : open());
+  const toggle = (event) => (panel.classList.contains('is-open') ? close() : open(event?.currentTarget));
   const setBadge = () => { const on = (items.length + workItems.length + pinItems.length) > 0; if (badge) badge.hidden = !on; if (badgeM) badgeM.hidden = !on; };
 
   const render = () => {
@@ -2831,21 +2895,25 @@
   bellM && bellM.addEventListener('click', toggle);
   $('#latestClose') && $('#latestClose').addEventListener('click', close);
   backdrop && backdrop.addEventListener('click', close);
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && panel.classList.contains('is-open')) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && panel.classList.contains('is-open')) { e.preventDefault(); close(); } });
   /* mobile: drag the header down to dismiss — same firm gesture as the chat sheet */
   const lHead = panel.querySelector('.latest-panel-head');
   if (lHead) {
     const isMobile = () => window.matchMedia('(max-width: 1024px)').matches;
     let sy = null, dy = 0, drag = false;
-    const down = (y) => { if (!isMobile()) return; sy = y; dy = 0; drag = true; panel.style.transition = 'none'; };
-    const move = (y, ev) => { if (!drag) return; dy = y - sy; if (dy < 0) dy = 0; if (dy > 3 && ev && ev.cancelable) ev.preventDefault(); panel.style.transform = `translateY(${dy}px)`; };
-    const up = () => { if (!drag) return; drag = false; sy = null; panel.style.transition = ''; if (dy > 55) close(); panel.style.transform = ''; };
+    const down = (y) => { if (!isMobile() || !panel.classList.contains('is-open')) return; sy = y; dy = 0; drag = true; panel.setAttribute('data-panel-dragging', ''); };
+    const move = (y, ev) => { if (!drag) return; dy = y - sy; if (dy < 0) dy = 0; if (dy > 3 && ev && ev.cancelable) ev.preventDefault(); panel.style.setProperty('--bq-panel-drag-y', `${dy}px`); };
+    const cancel = () => { drag = false; sy = null; dy = 0; panel.removeAttribute('data-panel-dragging'); panel.style.removeProperty('--bq-panel-drag-y'); };
+    resetDrag = cancel;
+    const up = () => { if (!drag) return; const dismiss = dy > 55; cancel(); if (dismiss) close(); };
     lHead.addEventListener('touchstart', (e) => down(e.touches[0].clientY), { passive: true });
     lHead.addEventListener('touchmove', (e) => move(e.touches[0].clientY, e), { passive: false });
     lHead.addEventListener('touchend', up);
+    lHead.addEventListener('touchcancel', cancel);
     lHead.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'touch') down(e.clientY); });
     window.addEventListener('pointermove', (e) => { if (drag && e.pointerType !== 'touch') move(e.clientY, e); });
     window.addEventListener('pointerup', () => { if (drag) up(); });
+    window.addEventListener('pointercancel', cancel);
   }
   if (window.__bqLangCb) window.__bqLangCb.push(render);
   /* These feed the Latest BELL (hidden until tapped) and hit GitHub/Supabase APIs

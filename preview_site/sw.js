@@ -12,7 +12,7 @@
       instead of being pinned for the life of the installed worker.
    ========================================================= */
 
-const SW_VERSION = 'f1881ea8ef04'; // generated from this worker and the app shell
+const SW_VERSION = 'f57f7a8f9f99'; // generated from this worker and the app shell
 const CACHE_NAME = `bqurtas-cache-${SW_VERSION}`;
 const DOC_FALLBACK = '/index.html';
 
@@ -35,14 +35,14 @@ async function cachedEntry(request) {
    remain network-first, so this copy is only an offline fallback. */
 const PRECACHE_ASSETS = [
   '/index.html',
-  '/css/modern-framer.min.css?v=9ab586c33130',
+  '/css/modern-framer.min.css?v=3a29b0daa285',
   '/css/style.v417.min.css?v=567f31564044',
   '/css/fonts.css?v=ab564d35bc14',
   '/css/experience.min.css?v=d638c4c9abd3',
-  '/js/main.v420.min.js?v=abe682c2792f',
+  '/js/main.v420.min.js?v=3bd7c232b3fd',
   '/js/gallery.v420.min.js?v=5ed141a93167',
   '/js/i18n.v420.min.js?v=d2f12601ce49',
-  '/js/motion.68f1db2fbe9d.min.js?v=68f1db2fbe9d',
+  '/js/motion.8c122f12208b.min.js?v=8c122f12208b',
   '/js/lux.min.js?v=b10aaa8c59c6',
   '/site.webmanifest?v=19c5c4b9ee48',
   '/favicon.ico',

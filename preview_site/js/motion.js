@@ -381,14 +381,14 @@
     }
 
     /* Infinite marquees only run while on-screen; pause in background tabs. */
-    var softwareTracks = Array.from(document.querySelectorAll('.software-track, .hero-marquee-track'));
-    if (softwareTracks.length && 'IntersectionObserver' in window) {
+    var marqueeTracks = Array.from(document.querySelectorAll('.software-track, .hero-marquee-track, .logo-marquee-track'));
+    if (marqueeTracks.length && 'IntersectionObserver' in window) {
       var trackObserver = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           entry.target.classList.toggle('is-offscreen', !entry.isIntersecting);
         });
       }, { rootMargin: '12% 0px' });
-      softwareTracks.forEach(function (track) { trackObserver.observe(track); });
+      marqueeTracks.forEach(function (track) { trackObserver.observe(track); });
     }
     var syncPaused = function () {
       document.documentElement.classList.toggle('bq-paused', document.hidden);

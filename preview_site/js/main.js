@@ -517,7 +517,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let menuScrollY = 0;
   let menuCloseTimer = 0;
+  let menuCloseCleanup = null;
+  let menuCloseCycle = 0;
   let menuRestoreScroll = true;
+  const clearMenuCloseWait = () => {
+    window.clearTimeout(menuCloseTimer);
+    menuCloseTimer = 0;
+    menuCloseCleanup?.();
+    menuCloseCleanup = null;
+    menuCloseCycle += 1;
+  };
+  const menuCloseTransition = () => {
+    let longest = { element: null, property: '', milliseconds: 0 };
+    [mobileMenu, document.getElementById('bqPageStage')].filter(Boolean).forEach((element) => {
+      const style = getComputedStyle(element);
+      const properties = style.transitionProperty.split(',').map((value) => value.trim());
+      const time = (value) => (parseFloat(value) || 0) * (value.trim().endsWith('ms') ? 1 : 1000);
+      const durations = style.transitionDuration.split(',').map(time);
+      const delays = style.transitionDelay.split(',').map(time);
+      properties.forEach((property, index) => {
+        if (!['transform', 'clip-path', '-webkit-clip-path', 'opacity', 'all'].includes(property)) return;
+        const duration = durations[index % durations.length];
+        if (duration <= 0) return;
+        const milliseconds = Math.max(0, duration + delays[index % delays.length]);
+        if (milliseconds > longest.milliseconds) longest = { element, property, milliseconds };
+      });
+    });
+    return longest;
+  };
   const setMenu = (open, trigger, { restoreScroll = true } = {}) => {
     if (!mobileMenu) return;
     if (open && window.__bqExclusive) window.__bqExclusive('menu');   // opening the menu closes chat/Latest/popovers
@@ -541,8 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     if (open) {
-      window.clearTimeout(menuCloseTimer);
-      menuCloseTimer = 0;
+      clearMenuCloseWait();
       lastMenuTrigger = trigger || document.activeElement;
       const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
       /* Keep the native document position and scale its visible slice. The
@@ -568,8 +594,10 @@ document.addEventListener('DOMContentLoaded', () => {
       mobileMenu.classList.add('is-closing');
       // Read the destination at completion: a route selected while this menu
       // is closing must replace the old page's saved reading position.
-      menuCloseTimer = window.setTimeout(() => {
-        menuCloseTimer = 0;
+      const closeCycle = ++menuCloseCycle;
+      const finishClose = () => {
+        if (closeCycle !== menuCloseCycle || !mobileMenu.classList.contains('is-closing')) return;
+        clearMenuCloseWait();
         const restore = menuRestoreScroll ? menuScrollY : 0;
         mobileMenu.classList.remove('is-closing');
         document.body.classList.remove('menu-open', 'menu-closing');
@@ -579,7 +607,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         menuScrollY = 0;
         document.dispatchEvent(new CustomEvent('bq:menu-closed'));
-      }, 840);   /* matches the .8s Voxo slide-home */
+      };
+      /* The phone slide and desktop wipe have different durations. Clearing
+         their guards at a fixed 840ms measured the desktop page mid-transition
+         and left the phone waiting after its curtain was already gone. */
+      const transition = menuCloseTransition();
+      if (transition.element && transition.property !== 'all') {
+        const ended = (event) => {
+          if (event.target === transition.element && event.propertyName === transition.property) finishClose();
+        };
+        transition.element.addEventListener('transitionend', ended);
+        menuCloseCleanup = () => transition.element.removeEventListener('transitionend', ended);
+      }
+      // Interrupted/no-op transitions and suspended tabs may omit transitionend.
+      menuCloseTimer = window.setTimeout(finishClose, transition.milliseconds + 80);
       if (lastMenuTrigger && document.contains(lastMenuTrigger)) {
         try { lastMenuTrigger.focus({ preventScroll: true }); } catch (e) { lastMenuTrigger.focus(); }
       }
@@ -1362,11 +1403,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const suffix = el.dataset.suffix || '';
     const duration = 1400;
     const startTime = performance.now();
+    /* Replacing textContent every frame emits child-list mutations, which the
+       paper observer interprets as new content and fits the entire deck again.
+       Reuse the text node; ResizeObserver still catches real size changes. */
+    let text = el.firstChild;
+    if (!text || text.nodeType !== 3 || text.nextSibling) {
+      text = document.createTextNode('');
+      el.replaceChildren(text);
+    }
     const step = (now) => {
       const t = Math.min((now - startTime) / duration, 1);
       const eased = 1 - Math.pow(1 - t, 3);
       const v = Math.floor(eased * target);
-      el.textContent = (v >= 1000 ? v.toLocaleString() : v) + suffix;
+      const value = (v >= 1000 ? v.toLocaleString() : v) + suffix;
+      if (text.data !== value) text.data = value;
       if (t < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);

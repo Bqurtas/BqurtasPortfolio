@@ -16206,8 +16206,10 @@ html, body, .bq-frame, .bq-page-stage, #design, .room, .main {
 
 .software-track.is-offscreen,
 .hero-marquee-track.is-offscreen,
+.logo-marquee-track.is-offscreen,
 html.bq-paused .software-track,
 html.bq-paused .hero-marquee-track,
+html.bq-paused .logo-marquee-track,
 html.bq-paused .hero-portrait,
 html.bq-paused .hero-spark svg {
   animation-play-state: paused !important;
@@ -16542,14 +16544,19 @@ html.bq-compact [dir="rtl"] .main,
     max-width: calc(100vw - 24px) !important;
     left: 50% !important;
     right: auto !important;
-    transform: translateX(-50%) translateY(12px) !important;
+    transform: translateX(-50%) translateY(calc(12px + var(--bq-panel-drag-y, 0px))) !important;
   }
 
   #chat.is-open,
   #latestPanel.is-open,
   :root[data-theme] #chat.is-open,
   :root[data-theme] #latestPanel.is-open {
-    transform: translateX(-50%) translateY(0) !important;
+    transform: translateX(-50%) translateY(var(--bq-panel-drag-y, 0px)) !important;
+  }
+
+  html body #chat#chat[data-panel-dragging],
+  html body #latestPanel#latestPanel[data-panel-dragging] {
+    transition: none !important;
   }
 }
 
