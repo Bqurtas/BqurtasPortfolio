@@ -1344,9 +1344,12 @@ document.addEventListener('DOMContentLoaded', () => {
       panel.addEventListener('mouseenter', () => {
         window.clearTimeout(serviceHover);
         if (panel.classList.contains('is-active')) return;
+        const openWhenArmed = panel.parentElement?.querySelector('.service-panel.is-active');
         panel.classList.add('is-arming');
         serviceHover = window.setTimeout(() => {
           panel.classList.remove('is-arming');
+          // A row opened meanwhile by keyboard or click keeps its place.
+          if (panel.parentElement?.querySelector('.service-panel.is-active') !== openWhenArmed) return;
           const trigger = panel.querySelector('.service-trigger');
           if (trigger && !panel.classList.contains('is-active')) trigger.click();
         }, 110);

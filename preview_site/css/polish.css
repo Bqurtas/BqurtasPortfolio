@@ -1004,9 +1004,10 @@ html body #design#design#design #services#services .service-accordion {
 }
 
 /* Fitting reads the rows at rest: the paper's measuring pass already stops
-   transitions, but these row rules out-rank it. */
-html body #design#design#design #services#services.is-paper-measuring .service-accordion,
-html body #design#design#design #services#services.is-paper-measuring .service-accordion * {
+   transitions, but the row rules above out-rank it (up to 5 ids + 5 classes),
+   so this one carries a sixth id. */
+html body #design#design#design #services#services#services.is-paper-measuring .service-accordion,
+html body #design#design#design #services#services#services.is-paper-measuring .service-accordion * {
   transition: none !important;
 }
 
