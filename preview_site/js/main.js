@@ -1335,10 +1335,25 @@ document.addEventListener('DOMContentLoaded', () => {
      on a touch screen hover fires on tap and would open a panel the reader is
      only scrolling past. The click handler stays for keyboard and touch. */
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    /* A row opens once the pointer rests on it, not as it passes over rows on
+       its way to another, so a sweep down the list opens only the last row.
+       Meanwhile the row is .is-arming, which keeps the ink sweep meant for
+       rows that stay closed off it (modern-framer.css). */
+    let serviceHover = 0;
     document.querySelectorAll('.service-showcase .service-panel').forEach((panel) => {
       panel.addEventListener('mouseenter', () => {
-        const trigger = panel.querySelector('.service-trigger');
-        if (trigger && !panel.classList.contains('is-active')) trigger.click();
+        window.clearTimeout(serviceHover);
+        if (panel.classList.contains('is-active')) return;
+        panel.classList.add('is-arming');
+        serviceHover = window.setTimeout(() => {
+          panel.classList.remove('is-arming');
+          const trigger = panel.querySelector('.service-trigger');
+          if (trigger && !panel.classList.contains('is-active')) trigger.click();
+        }, 110);
+      });
+      panel.addEventListener('mouseleave', () => {
+        window.clearTimeout(serviceHover);
+        panel.classList.remove('is-arming');
       });
     });
   }
@@ -2100,12 +2115,18 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   const reserveTallestPanel = (scroller) => {
     const accordion = scroller.querySelector('.service-accordion');
     if (!accordion) return;
-    accordion.style.removeProperty('--bq-open-panel-h');
     let tallest = 0;
     accordion.querySelectorAll('.service-detail-inner').forEach((inner) => {
       tallest = Math.max(tallest, inner.scrollHeight);
     });
     if (tallest > 0) accordion.style.setProperty('--bq-open-panel-h', `${Math.ceil(tallest)}px`);
+    /* The list keeps its one-row-open height while rows trade places (see
+       polish.css), so the centred layout and the column beside it never move.
+       Read at rest: the measuring class stops the rows' transitions. */
+    accordion.style.removeProperty('--bq-accordion-h');
+    // The used height, unrounded: offsetHeight could add half a pixel and
+    // tip the paper fit one step smaller.
+    accordion.style.setProperty('--bq-accordion-h', getComputedStyle(accordion).height);
   };
 
   const fitPaper = (sheet, scroller) => {

@@ -17060,7 +17060,8 @@ html body #design .practice-note .stat.bq-rise {
    A flat colour swap is the usual answer here. Instead the row fills with the
    site's ink from the reading edge and the type inverts to paper as it passes,
    the way a press lays a bar down — a print gesture on a printer's portfolio.
-   The open row keeps its own state and is left alone. */
+   The open row keeps its own state and is left alone, and so does a row the
+   pointer has just reached (.is-arming, main.js): it opens a moment later. */
 #design .service-showcase .service-panel .service-trigger {
   /* No overflow clip here: a later rule deliberately restores `visible` to stop
      the trigger cutting its own toggle, and the sweep is bounded by inset:0. */
@@ -17082,13 +17083,13 @@ html body #design .practice-note .stat.bq-rise {
   transform-origin: right center;
 }
 
-#design .service-showcase .service-panel:not(.is-active) .service-trigger:hover::before,
-#design .service-showcase .service-panel:not(.is-active) .service-trigger:focus-visible::before {
+#design .service-showcase .service-panel:not(.is-active):not(.is-arming) .service-trigger:hover::before,
+#design .service-showcase .service-panel:not(.is-active):not(.is-arming) .service-trigger:focus-visible::before {
   transform: scaleX(1);
 }
 
-#design .service-showcase .service-panel:not(.is-active) .service-trigger:hover :is(.service-name, .service-sub, .service-index, .service-toggle),
-#design .service-showcase .service-panel:not(.is-active) .service-trigger:focus-visible :is(.service-name, .service-sub, .service-index, .service-toggle) {
+#design .service-showcase .service-panel:not(.is-active):not(.is-arming) .service-trigger:hover :is(.service-name, .service-sub, .service-index, .service-toggle),
+#design .service-showcase .service-panel:not(.is-active):not(.is-arming) .service-trigger:focus-visible :is(.service-name, .service-sub, .service-index, .service-toggle) {
   color: var(--bg) !important;
   transition: color .3s ease .06s;
 }
@@ -17098,7 +17099,7 @@ html body #design .practice-note .stat.bq-rise {
   transition: transform .52s cubic-bezier(.22, 1, .36, 1), color .3s ease;
 }
 
-#design .service-showcase .service-panel:not(.is-active) .service-trigger:hover .service-index {
+#design .service-showcase .service-panel:not(.is-active):not(.is-arming) .service-trigger:hover .service-index {
   transform: translateY(-0.14em);
 }
 

@@ -946,17 +946,24 @@ html body #design#design#design #services#services .service-accordion .service-p
 
 /* The press sweep (modern-framer.css) inverts a row under the pointer — the
    icon tile follows the rest of the row into paper colour. */
-html body #design#design#design #services#services .service-panel:not(.is-active) .service-trigger:is(:hover, :focus-visible) .service-icon {
+html body #design#design#design #services#services .service-panel:not(.is-active):not(.is-arming) .service-trigger:is(:hover, :focus-visible) .service-icon {
   border-color: transparent !important;
   background: color-mix(in srgb, var(--bg) 14%, transparent) !important;
   color: var(--bg) !important;
 }
 
-/* ---- the open row ---- */
+/* ---- the open row ----
+   A row opens and closes by animating its own height between 0 and the
+   reserved height (--bq-open-panel-h, the tallest description, set by
+   main.js), on one curve and one duration in both directions. The old
+   0fr -> 1fr row was pinned open at once by the inner's min-block-size while
+   the previous row was still closing, so for ~400ms two rows stood open, the
+   centred layout grew ~200px and the column beside it jumped up and back.
+   Now one row grows exactly as the other shrinks, and the list itself keeps
+   its settled height (--bq-accordion-h) even through a fast sweep. */
 html body #design#design#design #services#services .service-accordion .service-panel .service-detail {
-  display: grid !important;
-  grid-template-rows: 0fr !important;
-  block-size: auto !important;
+  display: block !important;
+  block-size: 0 !important;
   min-block-size: 0 !important;
   max-block-size: none !important;
   margin: 0 !important;
@@ -965,19 +972,42 @@ html body #design#design#design #services#services .service-accordion .service-p
   opacity: 0 !important;
   visibility: hidden !important;
   transition:
-    grid-template-rows .55s var(--bq-polish-ease),
-    opacity .3s ease,
-    visibility 0s linear .55s !important;
+    block-size .52s var(--bq-polish-ease),
+    opacity .24s ease,
+    visibility 0s linear .52s !important;
 }
 
 html body #design#design#design #services#services .service-accordion .service-panel.is-active .service-detail {
-  grid-template-rows: 1fr !important;
+  block-size: var(--bq-open-panel-h, auto) !important;
   opacity: 1 !important;
   visibility: visible !important;
   transition:
-    grid-template-rows .55s var(--bq-polish-ease),
-    opacity .45s ease .08s,
+    block-size .52s var(--bq-polish-ease),
+    opacity .42s ease .1s,
     visibility 0s !important;
+}
+
+/* The copy settles into place as it fades in, and lifts away as it closes. */
+html body #design#design#design #services#services .service-accordion .service-panel .service-detail > .service-detail-inner {
+  transform: translate3d(0, 8px, 0) !important;
+  transition: transform .52s var(--bq-polish-ease) !important;
+}
+
+html body #design#design#design #services#services .service-accordion .service-panel.is-active .service-detail > .service-detail-inner {
+  transform: none !important;
+}
+
+/* The list holds the height it has with one row open while rows trade
+   places, so the centred layout never resizes mid-transition. */
+html body #design#design#design #services#services .service-accordion {
+  block-size: var(--bq-accordion-h, auto) !important;
+}
+
+/* Fitting reads the rows at rest: the paper's measuring pass already stops
+   transitions, but these row rules out-rank it. */
+html body #design#design#design #services#services.is-paper-measuring .service-accordion,
+html body #design#design#design #services#services.is-paper-measuring .service-accordion * {
+  transition: none !important;
 }
 
 html body #design#design#design #services#services .service-accordion .service-panel .service-detail-inner {
@@ -998,10 +1028,6 @@ html body #design#design#design #services#services .service-accordion .service-p
   content: "" !important;
   display: block !important;
   block-size: clamp(12px, 2vh, 20px) !important;
-}
-
-html body #design#design#design #services#services .service-accordion .service-panel.is-active .service-detail-inner {
-  min-block-size: var(--bq-open-panel-h, 0px) !important;
 }
 
 html body #design#design#design #services#services .service-accordion .service-detail-inner p {
