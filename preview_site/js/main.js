@@ -1188,30 +1188,13 @@ document.addEventListener('DOMContentLoaded', () => {
       currentShown = 0;
     }
     const matching = matchingCards();
-    /* Level the columns before a second batch lands. Masonry sends each card
-       to the shortest column, so without this the new work fills the gaps
-       beside and ABOVE the last row the reader had already seen — measured:
-       the previous batch ended at 6023px and the new cards started at 4585px.
-       A spacer brings every column down to the tallest, so a batch always
-       begins below everything already on the page and the reader scrolls
-       forward to meet it, every time. */
+    /* A second batch continues the masonry: each card goes straight under the
+       last card of the shortest column, so no column is left with a hole above
+       the new work. Loaded fallback media can correct a card's ratio after
+       placement, so start from the rendered heights — read every column once,
+       before any append, rather than forcing layout between cards. */
     if (!reset && currentShown > 0 && mCols.length) {
-      // Loaded fallback media can correct a card's ratio after placement.
-      // Read every column before writing spacers so the next batch uses the
-      // rendered floor without forcing layout between individual cards.
       mHeights = mCols.map(col => col.offsetHeight);
-      const floor = Math.max(...mHeights);
-      mCols.forEach((col, i) => {
-        const need = floor - mHeights[i];
-        if (need > 2) {
-          const spacer = document.createElement('div');
-          spacer.className = 'grid-level-spacer';
-          spacer.setAttribute('aria-hidden', 'true');
-          spacer.style.height = `${need}px`;
-          col.appendChild(spacer);
-          mHeights[i] = floor;
-        }
-      });
     }
     const batch = matching.slice(currentShown, currentShown + PAGE_SIZE);
     placeCards(batch, currentShown);

@@ -50,21 +50,21 @@ function fixture() {
   return { context, columns, entries, events, render: context.window.__bqRenderGallery };
 }
 
-test('load more levels against rendered columns after a late media ratio correction', () => {
+test('load more continues each column from its rendered height', () => {
   const { render, columns, entries, events, context } = fixture();
   render(false);
 
   assert.deepEqual(events.slice(0, 2), ['read:left', 'read:right'],
-    'all existing column heights must be captured before any spacer or card writes');
+    'all existing column heights must be captured before any card writes');
   assert.equal(events.filter(event => event.startsWith('read:')).length, 2,
     'a batch must not read a height for each card');
-  assert.equal(columns[0].children.some(child => child.className === 'grid-level-spacer'), false,
-    'the corrected tallest column needs no spacer, even if its old estimate was shorter');
-  assert.equal(columns[1].children[0].style.height, '900px',
-    'the spacer must close the actual 1700px to 800px gap');
-  assert.equal(columns[0].children[0], entries[2].el);
+  assert.ok(columns.every(column => !column.children.some(child => child.className === 'grid-level-spacer')),
+    'no spacer may push the new work below the tallest column');
+  // Estimates said left (900) was shorter; rendered heights say right (800) is.
+  assert.equal(columns[1].children[0], entries[2].el,
+    'the first new card goes directly under the shortest rendered column');
   assert.equal(columns[1].children[1], entries[3].el);
-  assert.deepEqual(Array.from(context.state().heights), [2004, 2004]);
+  assert.equal(columns[0].children.length, 0);
   assert.equal(context.state().shown, 4);
 });
 
@@ -78,9 +78,9 @@ test('each appended batch refreshes column heights after subsequent media change
 
   assert.deepEqual(events.slice(0, 2), ['read:left', 'read:right']);
   assert.equal(events.filter(event => event.startsWith('read:')).length, 2);
-  assert.equal(columns[0].children.at(-2).style.height, '1500px');
-  assert.equal(columns[0].children.at(-1), entries[4].el);
-  assert.equal(columns[1].children.at(-1), entries[5].el);
+  assert.equal(columns[0].children.some(child => child.className === 'grid-level-spacer'), false);
+  assert.equal(columns[0].children.at(-2), entries[4].el);
+  assert.equal(columns[0].children.at(-1), entries[5].el);
 });
 
 test('a reset rebuilds columns without reading discarded or freshly inserted card heights', () => {
