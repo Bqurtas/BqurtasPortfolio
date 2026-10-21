@@ -3,7 +3,13 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 
-const source = await readFile(new URL('../preview_site/js/archive.js', import.meta.url), 'utf8');
+import { PAGE_GUARD_JS } from '../functions/_page-guard.js';
+
+/* archive.js opens with the shared page guard (tests/page-guard.test.mjs);
+   these fixtures exercise only the motion that follows it. */
+const file = await readFile(new URL('../preview_site/js/archive.js', import.meta.url), 'utf8');
+assert.ok(file.includes(PAGE_GUARD_JS));
+const source = file.replace(PAGE_GUARD_JS, '');
 
 function eventTarget() {
   const handlers = new Map();

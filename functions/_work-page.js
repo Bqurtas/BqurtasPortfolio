@@ -10,7 +10,8 @@
    is the page Google Images and video search can credit to Barakat Qurtas.
 
    No application JavaScript, no external requests: one inline nonce'd style
-   block, the locally hosted Noto Kufi Arabic face, and the media itself.
+   block, one inline nonce'd script (the page guard, functions/_page-guard.js),
+   the locally hosted Noto Kufi Arabic face, and the media itself.
    ========================================================= */
 
 import {
@@ -18,6 +19,7 @@ import {
   isoDuration, loadCatalog, mediaPath, mediaType, mediaUrl, pad2, workPath, workUrl
 } from './_gallery-catalog.js';
 import { KUFI_FACES } from './_font-faces.js';
+import { PAGE_GUARD_JS } from './_page-guard.js';
 
 const LANG_PREFIXES = ['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];
 const SIBLINGS = 12;
@@ -144,6 +146,7 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;border-radius:
 .plate-frame{background:var(--plate);border-radius:20px;padding:clamp(10px,2.2vw,28px);box-shadow:0 1px 2px rgba(0,0,0,.05),0 30px 70px -36px rgba(0,0,0,.42)}
 .plate img,.plate video{display:block;width:100%;height:auto;max-height:min(78vh,1180px);object-fit:contain;border-radius:6px;background:var(--plate)}
 .plate video{background:#000}
+.plate img,.plate video{-webkit-touch-callout:none;-webkit-user-drag:none;-webkit-user-select:none;user-select:none}
 .plate figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;margin-top:14px;padding:0 4px;color:var(--muted)}
 .meta{min-width:0;position:sticky;top:24px}
 .eyebrow{margin:0 0 14px;color:var(--muted)}
@@ -214,7 +217,7 @@ export function renderWorkPage({ item, list, nonce }) {
     : `${item.width} × ${item.height} px · ${(item.path.split('.').pop() || '').toUpperCase()}`;
 
   const mediaHtml = isVideo
-    ? `<video controls playsinline preload="metadata"${item.poster ? ` poster="${esc(item.poster)}"` : ''} width="${item.width}" height="${item.height}" aria-label="${esc(copy.alt)}">
+    ? `<video controls controlslist="nodownload" playsinline preload="metadata"${item.poster ? ` poster="${esc(item.poster)}"` : ''} width="${item.width}" height="${item.height}" aria-label="${esc(copy.alt)}">
           <source src="${esc(mediaSrc)}" type="video/mp4">
           <a href="${esc(mediaSrc)}">${esc(copy.title)} (MP4)</a>
         </video>`
@@ -274,6 +277,7 @@ export function renderWorkPage({ item, list, nonce }) {
 ${og}
 ${twitter}
 <style nonce="${esc(nonce)}">${STYLE}</style>
+<script nonce="${esc(nonce)}">${PAGE_GUARD_JS}</script>
 <script type="application/ld+json">${jsonLd(structuredData(item, copy, canon, list))}</script>
 </head>
 <body>
@@ -352,7 +356,7 @@ export async function serveWorkPage(request, url, env, route, helpers) {
   const csp = [
     "default-src 'none'", "base-uri 'none'", "object-src 'none'", "frame-ancestors 'self'",
     "form-action 'self'", "img-src 'self' data:", "media-src 'self'", "font-src 'self'",
-    "style-src 'nonce-" + nonce + "'", "script-src 'none'", 'upgrade-insecure-requests'
+    "style-src 'nonce-" + nonce + "'", "script-src 'nonce-" + nonce + "'", 'upgrade-insecure-requests'
   ].join('; ');
   const headers = new Headers({
     ...helpers.securityHeaders(),

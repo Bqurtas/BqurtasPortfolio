@@ -9,6 +9,7 @@ import {
   COLLECTIONS, EXTRA_MEDIA, ORDER, TABS, catalogFromManifest, isoDuration, mediaPath, workPath
 } from '../functions/_gallery-catalog.js';
 import { parseWorkPath } from '../functions/_work-page.js';
+import { PAGE_GUARD_JS } from '../functions/_page-guard.js';
 import { buildImageSitemap } from '../scripts/generate-image-sitemap.mjs';
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
@@ -120,10 +121,10 @@ test('an image work page is a complete, crawlable, same-origin document', async 
   assert.equal(response.headers.get('cloudflare-cdn-cache-control'), 'no-store');
   assert.equal(response.headers.get('x-robots-tag'), null);
   const csp = response.headers.get('content-security-policy');
-  assert.match(csp, /script-src 'none'/);
   assert.match(csp, /img-src 'self' data:/);
   const html = await response.text();
   const nonce = csp.match(/style-src 'nonce-([a-f0-9]+)'/)[1];
+  assert.match(csp, new RegExp(`script-src 'nonce-${nonce}'(?:;|$)`), 'scripts: this response\'s nonce only');
   assert.match(html, new RegExp(`<style nonce="${nonce}">`));
   assert.match(html, /<html lang="en"/);
   assert.match(html, /<title>Book Cover 07 — Barakat Qurtas, Graphic Designer in Erbil<\/title>/);
@@ -137,7 +138,10 @@ test('an image work page is a complete, crawlable, same-origin document', async 
   assert.match(html, /href="\/contact"/);
   assert.match(html, /href="\/design\/book\/6"/);
   assert.match(html, /href="\/design\/book\/8"/);
-  assert.doesNotMatch(html, /<script(?! type="application\/ld\+json")/, 'no executable script');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)]
+    .filter(([, attrs]) => !/type="application\/ld\+json"/.test(attrs));
+  assert.deepEqual(scripts.map(([, attrs, body]) => [attrs, body]), [[` nonce="${nonce}"`, PAGE_GUARD_JS]],
+    'the only executable script is the inline page guard');
   assert.doesNotMatch(html, /(?:src|href)="https:\/\/(?!bqurtas\.com)/, 'no external requests');
 
   const graph = jsonLd(html)['@graph'];
@@ -156,7 +160,7 @@ test('a video work page leads with the film and publishes VideoObject data', asy
   const response = await route('/design/video/26');
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /<video controls playsinline preload="metadata" poster="\/assets\/thumbs\/Videos\/Videos26\.jpg"/);
+  assert.match(html, /<video controls controlslist="nodownload" playsinline preload="metadata" poster="\/assets\/thumbs\/Videos\/Videos26\.jpg"/);
   assert.match(html, /<source src="\/media\/Videos\/Videos26\.mp4" type="video\/mp4">/);
   const video = jsonLd(html)['@graph'].find((node) => node['@type'] === 'VideoObject');
   assert.equal(video.contentUrl, 'https://bqurtas.com/media/Videos/Videos26.mp4');

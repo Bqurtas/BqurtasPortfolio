@@ -1,7 +1,9 @@
-/* Archive and work pages carry no script by design (their CSP has no
-   script-src). Cloudflare still injected its Web Analytics beacon and its bot
-   JavaScript-detection snippet into every HTML response, and the CSP blocked
-   both: two console errors on each of these pages, for nothing.
+/* Archive and work pages carry no third-party script by design (their CSP
+   allows only their own page guard: a nonce on work pages, the local archive
+   bundle on archive pages). Cloudflare still injected its Web Analytics
+   beacon and its bot JavaScript-detection snippet into every HTML response,
+   and the CSP blocked both: two console errors on each of these pages, for
+   nothing.
 
    `Cache-Control: no-transform` tells Cloudflare not to rewrite the body, so
    neither snippet is injected. It also switches off Cloudflare's compression,

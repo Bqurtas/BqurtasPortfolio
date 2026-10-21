@@ -1,3 +1,41 @@
+/* Page guard — right-click, dragging artwork out, and the DevTools /
+   view-source / save-page shortcuts stay closed on the archive. Source and
+   rationale: functions/_page-guard.js (keep this copy verbatim). */
+(() => {
+  if (window.__bqPageGuard) return;
+  window.__bqPageGuard = true;
+  const FIELD = 'input, textarea, select, [contenteditable]:not([contenteditable="false"])';
+  const MEDIA = 'img, video, picture';
+  const DEVTOOLS = ['KeyI', 'KeyJ', 'KeyC', 'KeyK', 'KeyE'];
+  const nav = window.navigator || {};
+  const mac = /Mac|iPhone|iPad|iPod/.test(nav.platform || nav.userAgent || '');
+  const touch = window.matchMedia ? window.matchMedia('(pointer: coarse)') : { matches: false };
+  const within = (event, selector) => event.target && event.target.closest ? event.target.closest(selector) : null;
+  document.addEventListener('contextmenu', (event) => {
+    const field = within(event, FIELD);
+    if (field && (event.pointerType === 'touch' || touch.matches || field.closest('#dash'))) return;
+    event.preventDefault();
+  }, true);
+  // A card drags as its link, and that drag carries the image inside it.
+  document.addEventListener('dragstart', (event) => {
+    const target = event.target;
+    if (within(event, MEDIA) || (target && target.querySelector && target.querySelector(MEDIA))) event.preventDefault();
+  }, true);
+  window.addEventListener('keydown', (event) => {
+    const code = event.code || '';
+    // Cmd on a Mac, Ctrl elsewhere. Alt stays out of the Ctrl rules: AltGr
+    // arrives as Ctrl+Alt and types letters on many layouts.
+    const command = mac ? event.metaKey : event.ctrlKey;
+    if (code === 'F12' || event.key === 'F12'
+      || (command && event.shiftKey && !event.altKey && DEVTOOLS.includes(code))
+      || (mac && event.metaKey && event.altKey && (DEVTOOLS.includes(code) || code === 'KeyU'))
+      || (command && !event.shiftKey && !event.altKey && (code === 'KeyU' || code === 'KeyS'))) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }, true);
+})();
+
 /* Progressive entrance motion for the standalone archive. Native scrolling,
    links and artwork never depend on this file loading or running. */
 (() => {
