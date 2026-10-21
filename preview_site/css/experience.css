@@ -5635,13 +5635,26 @@ html:root[data-theme][data-theme][dir="rtl"] body.menu-closing .bq-page-stage {
   }
 }
 
-/* Desktop: the menu bar stays on screen, unchanged, while the menu is open.
-   Owner's call (2026-10-21) — on a computer the bar is part of the page and
-   should not vanish with it; phones and tablets keep it under the curtain.
-   1300 clears the receding page card (1210) and the curtain (1190). Its ☰
-   closes the menu again, and chat, Latest, language and share each close the
-   menu as they open (window.__bqExclusive). The scroll shrink is held, so the
-   bar does not grow when the menu opens over a scrolled page. */
+/* Desktop: the menu bar recedes WITH the page while the menu is open.
+   Owner's call (2026-10-21) — on a computer the bar belongs to the page: it
+   must neither vanish nor sit on the curtain. Phones and tablets keep it under
+   the curtain.
+
+   The page (.bq-page-stage, above) moves by translateX(∓25.6%) scale(.8) about
+   the centre of the screen (50%, scroll + 50vh), on modern-framer.css's
+   .8s cubic-bezier(.15, .2, .1, 1) both ways (.26s ease back with Reduce
+   Motion). The bar is fixed,
+   outside the stage, so it is given the same move: its own bottom-centre
+   origin sits --bq-dock-inset above the screen's bottom, and mapping that
+   point through the page's scale lands it 25.6vw aside and
+   (1 - .8) × (inset - 50vh) higher, at .8 of its size. The stage's 25.6% is
+   of its own width, which is the full viewport here (scrolling is locked).
+   It returns on .menu-closing, like the page.
+
+   1300 keeps it above the receding card (1210) and the curtain (1190). Its ☰
+   closes the menu, and chat, Latest, language and share each close the menu
+   as they open (window.__bqExclusive). A bar shrunk by scrolling (.9) keeps
+   that size through the move. */
 @media (min-width: 1025px) {
   html body.menu-open .rail.rail,
   html body.menu-closing .rail.rail,
@@ -5651,14 +5664,41 @@ html:root[data-theme][data-theme][dir="rtl"] body.menu-closing .bq-page-stage {
     visibility: visible !important;
     pointer-events: auto !important;
     z-index: 1300 !important;
+    transform-origin: 50% 100% !important;
+    transition:
+      transform .8s cubic-bezier(.15, .2, .1, 1),
+      opacity .2s ease,
+      background-color .25s ease !important;
   }
 
-  html body.nav-compact.menu-open .rail.rail,
+  html body.menu-open:not(.menu-closing) .rail.rail {
+    --bq-rail-push-x: -25.6vw;
+  }
+  html[dir="rtl"] body.menu-open:not(.menu-closing) .rail.rail {
+    --bq-rail-push-x: 25.6vw;
+  }
+  html body.menu-open:not(.menu-closing) .rail.rail,
+  html[dir="rtl"] body.menu-open:not(.menu-closing) .rail.rail {
+    transform:
+      translate(var(--bq-rail-push-x), calc(.2 * (var(--bq-dock-inset, 38px) - 50vh)))
+      translateX(-50%) scale(calc(var(--bq-viewport-scale, 1) * .8)) !important;
+  }
+  html body.nav-compact.menu-open:not(.menu-closing) .rail.rail,
+  html[dir="rtl"] body.nav-compact.menu-open:not(.menu-closing) .rail.rail {
+    transform:
+      translate(var(--bq-rail-push-x), calc(.2 * (var(--bq-dock-inset, 38px) - 50vh)))
+      translateX(-50%) scale(calc(var(--bq-viewport-scale, 1) * .9 * .8)) !important;
+  }
+
   html body.nav-compact.menu-closing .rail.rail,
-  html[dir="rtl"] body.nav-compact.menu-open .rail.rail,
   html[dir="rtl"] body.nav-compact.menu-closing .rail.rail {
     transform: translateX(-50%) scale(calc(var(--bq-viewport-scale, 1) * .9)) !important;
-    transform-origin: 50% 100% !important;
+  }
+}
+@media (min-width: 1025px) and (prefers-reduced-motion: reduce) {
+  html body.menu-closing .rail.rail,
+  html[dir="rtl"] body.menu-closing .rail.rail {
+    transition: transform .26s ease, opacity .2s ease !important;
   }
 }
 
