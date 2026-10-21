@@ -1029,7 +1029,13 @@
       studioUnavailable:'خزمەتگوزاری بڵاوکردنەوە کاتیاً بەردەست نییە. گۆڕانکارییەکانت بڵاونەکراونەتەوە. دووبارە هەوڵ بدەوە.', editorRequired:'سەرەتا پاسۆردی ئەدیتەر لە تابی ناوەڕۆک ببەستەوە.'
     });
     const SERVER_NOT_SET = ['not-configured', 'session-not-configured', 'no-db', 'twofa-unavailable', 'rate-limit-unavailable'];
-    const curLang = () => { const l = document.documentElement.getAttribute('lang') || document.documentElement.dataset.lang || 'en'; return DASH_I18N[l] ? l : 'en'; };
+    // <html lang> holds the BCP-47 code (Sorani = ckb, Kurmanji = ku), so it
+    // read Sorani as English and Kurmanji as Sorani; data-lang is the site's key.
+    const curSiteLang = () => {
+      const root = document.documentElement;
+      return root.dataset.lang || ({ ckb: 'ku', ku: 'kmr' })[root.getAttribute('lang')] || root.getAttribute('lang') || 'en';
+    };
+    const curLang = () => { const l = curSiteLang(); return DASH_I18N[l] ? l : 'en'; };
     const DT = (k) => (DASH_I18N[curLang()][k] ?? DASH_I18N.en[k] ?? k);
     const loginSetupMessage = (requirements) => {
       if (!requirements || typeof requirements !== 'object') return DT('notSetup');
@@ -1046,7 +1052,6 @@
       return DT(challenge ? 'twoWrong' : 'wrong');
     };
     const LANG_LABELS = { en: 'English', ku: 'کوردیی سۆرانی', kmr: 'Kurmancî', ar: 'العربية', fr: 'Français', tr: 'Türkçe', sv: 'Svenska' };
-    const curSiteLang = () => document.documentElement.getAttribute('lang') || document.documentElement.dataset.lang || 'en';
     let twoFAId = null, twoFAPin = '', twoFAClearTimer = 0, twoFAVia = '';
     const twoFANote = () => TWOFA_VIA_NOTES[curLang()]?.[twoFAVia] || DT('twoNote');
     const selected2FARecipient = () => $('#dash2faChoice input[name="dashCodeTarget"]:checked')?.value || 'primary';
