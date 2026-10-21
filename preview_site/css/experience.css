@@ -5635,6 +5635,33 @@ html:root[data-theme][data-theme][dir="rtl"] body.menu-closing .bq-page-stage {
   }
 }
 
+/* Desktop: the menu bar stays on screen, unchanged, while the menu is open.
+   Owner's call (2026-10-21) — on a computer the bar is part of the page and
+   should not vanish with it; phones and tablets keep it under the curtain.
+   1300 clears the receding page card (1210) and the curtain (1190). Its ☰
+   closes the menu again, and chat, Latest, language and share each close the
+   menu as they open (window.__bqExclusive). The scroll shrink is held, so the
+   bar does not grow when the menu opens over a scrolled page. */
+@media (min-width: 1025px) {
+  html body.menu-open .rail.rail,
+  html body.menu-closing .rail.rail,
+  html[dir="rtl"] body.menu-open .rail.rail,
+  html[dir="rtl"] body.menu-closing .rail.rail {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    z-index: 1300 !important;
+  }
+
+  html body.nav-compact.menu-open .rail.rail,
+  html body.nav-compact.menu-closing .rail.rail,
+  html[dir="rtl"] body.nav-compact.menu-open .rail.rail,
+  html[dir="rtl"] body.nav-compact.menu-closing .rail.rail {
+    transform: translateX(-50%) scale(calc(var(--bq-viewport-scale, 1) * .9)) !important;
+    transform-origin: 50% 100% !important;
+  }
+}
+
 /* ============================================================================
    DOCK TOP — where the menu bar's top edge is, measured from the bottom of the
    screen, for whatever sits just above it (the phone chat/Latest sheets and
