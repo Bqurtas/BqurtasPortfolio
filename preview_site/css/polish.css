@@ -2132,3 +2132,298 @@ html body #design#design#design.paper-stack > .section.practice-note .bio-teaser
     will-change: auto !important;
   }
 }
+
+/* ============================================================================
+   ROOMS — Biography, Contact and the Journal speak the home sheets' language.
+   ========================================================================== */
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) {
+  --rm-mute: color-mix(in srgb, var(--ink) 58%, transparent);
+  --rm-faint: color-mix(in srgb, var(--ink) 42%, transparent);
+  --rm-line: color-mix(in srgb, var(--ink) 11%, transparent);
+  --rm-wash: color-mix(in srgb, var(--ink) 4.5%, transparent);
+  --rm-serif: 'Fraunces', 'Noto Kufi Arabic', serif;
+  --rm-night: #161615;
+}
+
+/* 1 — titles in Fraunces; Arabic-script letters fall back to Noto Kufi */
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .bio-block-title span, .bio-phil-label, .bio-social-title, .tl-card h4, .bio-card h4, .lang-item h4, .index-row-title, .index-card-title, .blog-card-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) {
+  font-family: var(--rm-serif) !important;
+  font-weight: 500 !important;
+  font-optical-sizing: auto;
+}
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) {
+  letter-spacing: -.028em !important;
+}
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .bio-phil-label, .bio-social-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) em {
+  font-family: var(--rm-serif) !important;
+  font-style: italic !important;
+  font-weight: 400 !important;
+  color: inherit !important;
+  letter-spacing: -.01em !important;
+}
+/* Arabic script is never slanted: the emphasised word steps back in tone. */
+html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .bio-phil-label, .bio-social-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) em {
+  font-style: normal !important;
+  font-weight: inherit !important;
+  color: var(--rm-mute) !important;
+}
+html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) {
+  letter-spacing: 0 !important;
+}
+
+/* 2 — the cover: one line of type, set large and calm */
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .room-hero .room-hero-title {
+  font-size: clamp(54px, min(7.4vw, 11vh), 112px) !important;
+  line-height: .98 !important;
+  letter-spacing: -.022em !important;
+  word-spacing: .06em !important;
+}
+html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .room-hero .room-hero-title {
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+}
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .room-hero .room-hero-sub {
+  max-inline-size: 34ch !important;
+  margin-block-start: clamp(16px, 2.6vh, 26px) !important;
+  font-size: clamp(15px, 1.15vw, 17px) !important;
+  line-height: 1.6 !important;
+  color: var(--rm-mute) !important;
+}
+
+/* 3 — eyebrows become the home's quiet pills */
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.section-num, .bio-phil-eyebrow, .pitch-head > .mono, .subscribe-eyebrow) {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  inline-size: fit-content !important;
+  padding: 7px 14px 7px 12px !important;
+  border-radius: 999px !important;
+  background: var(--rm-wash) !important;
+  color: var(--rm-mute) !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: .2em !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+}
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.section-num, .bio-phil-eyebrow, .pitch-head > .mono, .subscribe-eyebrow) i {
+  font-size: 10px !important;
+  opacity: .8 !important;
+}
+html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.section-num, .bio-phil-eyebrow, .pitch-head > .mono, .subscribe-eyebrow) {
+  letter-spacing: 0 !important;
+  font-size: 12px !important;
+  padding: 6px 12px 6px 14px !important;
+}
+
+/* 4 — chapter titles carry their icon as the home's black chip */
+html body #bio#bio#bio#bio > .paper-sheet .bio-block-title > i {
+  display: inline-grid !important;
+  place-items: center !important;
+  inline-size: 1.12em !important;
+  block-size: 1.12em !important;
+  border-radius: .3em !important;
+  background: var(--ink) !important;
+  color: var(--bg) !important;
+  font-size: .9em !important;
+  opacity: 1 !important;
+  flex: none !important;
+}
+html body #bio#bio#bio#bio > .paper-sheet .bio-block-title > i::before {
+  font-size: .4em !important;
+}
+html body #bio#bio#bio#bio > .paper-sheet .bio-block-title {
+  gap: .5em !important;
+}
+
+/* 5 — no watermarks behind the chapters */
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) [data-wm]::before,
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) [data-wm]::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* 6 — on a computer, a chapter reads like the home's "What I do": its title
+   and line on the reading edge, the content beside them. */
+@media (min-width: 1025px) {
+  html body #bio#bio#bio#bio > :is(.bio-kit-sheet, .bio-record-sheet, .bio-education-sheet, .bio-world-sheet) .bio-block {
+    display: flow-root !important;
+  }
+  html body #bio#bio#bio#bio > :is(.bio-kit-sheet, .bio-record-sheet, .bio-education-sheet, .bio-world-sheet) .bio-block > :is(.bio-block-title, .bio-block-lede) {
+    float: left !important;
+    clear: left !important;
+    inline-size: 30% !important;
+  }
+  html[dir="rtl"] body #bio#bio#bio#bio > :is(.bio-kit-sheet, .bio-record-sheet, .bio-education-sheet, .bio-world-sheet) .bio-block > :is(.bio-block-title, .bio-block-lede) {
+    float: right !important;
+    clear: right !important;
+  }
+  html body #bio#bio#bio#bio > :is(.bio-kit-sheet, .bio-record-sheet, .bio-education-sheet, .bio-world-sheet) .bio-block > :is(.bio-block-title, .bio-block-lede) ~ :not(.bio-block-title, .bio-block-lede) {
+    margin-inline-start: 36% !important;
+  }
+  html body #bio#bio#bio#bio > :is(.bio-kit-sheet, .bio-record-sheet, .bio-education-sheet, .bio-world-sheet) .bio-block > .bio-block-title {
+    flex-wrap: wrap !important;
+  }
+}
+
+/* 7 — tools as small paper tiles */
+html body #bio#bio#bio#bio .tools-grid {
+  gap: 14px 10px !important;
+}
+html body #bio#bio#bio#bio .tool {
+  inline-size: 74px !important;
+  gap: 8px !important;
+}
+html body #bio#bio#bio#bio .tool-ic {
+  inline-size: 54px !important;
+  block-size: 54px !important;
+  border-radius: 15px !important;
+  background: color-mix(in srgb, var(--bg) 70%, #fff) !important;
+  border: 1px solid var(--rm-line) !important;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 5%, transparent) !important;
+}
+html body #bio#bio#bio#bio .tool-ic img {
+  inline-size: 26px !important;
+  block-size: 26px !important;
+}
+html body #bio#bio#bio#bio .tool-name {
+  color: var(--rm-mute) !important;
+  letter-spacing: .02em !important;
+}
+html body #bio#bio#bio#bio .tools-cat {
+  display: block !important;
+  margin-block: 18px 10px !important;
+  color: var(--rm-faint) !important;
+  letter-spacing: .2em !important;
+  text-transform: uppercase !important;
+}
+html body #bio#bio#bio#bio .tools-group:first-of-type .tools-cat {
+  margin-block-start: 0 !important;
+}
+html body #bio#bio#bio#bio .tools-typing {
+  margin-block-start: 20px !important;
+  padding-block-start: 16px !important;
+  border-block-start: 1px solid var(--rm-line) !important;
+  color: var(--rm-mute) !important;
+}
+
+/* 8 — timeline: hairlines, quiet dates */
+html body #bio#bio#bio#bio .timeline .tl-item + .tl-item {
+  padding-block-start: clamp(14px, 2.2vh, 22px) !important;
+  border-block-start: 1px solid var(--rm-line) !important;
+}
+html body #bio#bio#bio#bio .tl-card {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+html body #bio#bio#bio#bio .tl-date {
+  color: var(--rm-faint) !important;
+  letter-spacing: .08em !important;
+}
+html body #bio#bio#bio#bio :is(.tl-org, .tl-loc, .tl-skills) {
+  color: var(--rm-mute) !important;
+}
+html body #bio#bio#bio#bio :is(.tl-org, .tl-loc, .tl-skills) i {
+  opacity: .55 !important;
+}
+
+/* 9 — languages: a ruled list, not boxes */
+html body #bio#bio#bio#bio .langs-grid {
+  gap: 0 clamp(24px, 3vw, 40px) !important;
+}
+html body #bio#bio#bio#bio .lang-item {
+  background: transparent !important;
+  border: 0 !important;
+  border-block-start: 1px solid var(--rm-line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 14px 0 16px !important;
+}
+html body #bio#bio#bio#bio .lang-item > i {
+  display: none !important;
+}
+html body #bio#bio#bio#bio .lang-item p {
+  color: var(--rm-mute) !important;
+}
+html body #bio#bio#bio#bio .lang-bar {
+  block-size: 2px !important;
+  margin-block-start: 10px !important;
+  border-radius: 2px !important;
+  background: var(--rm-line) !important;
+}
+html body #bio#bio#bio#bio .lang-bar > span {
+  background: var(--ink) !important;
+  border-radius: 2px !important;
+}
+
+/* 10 — the featured cards are night paper, not navy */
+html body :is(#bio#bio#bio#bio, #blog#blog#blog#blog) .index-card {
+  background: var(--rm-night) !important;
+  background-image: none !important;
+  border: 0 !important;
+}
+html body :is(#bio#bio#bio#bio, #blog#blog#blog#blog) .index-row {
+  border-color: var(--rm-line) !important;
+}
+
+/* 11 — links and documents: black marks, ink pills */
+html body #bio#bio#bio#bio .bio-social-mark {
+  background: var(--ink) !important;
+  color: var(--bg) !important;
+  border-radius: 12px !important;
+}
+html body #bio#bio#bio#bio .bio-social-mark i {
+  color: var(--bg) !important;
+}
+html body #bio#bio#bio#bio .bio-social-title em {
+  color: inherit !important;
+}
+html body #bio#bio#bio#bio .bio-social-go {
+  border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent) !important;
+  color: var(--ink) !important;
+  background: transparent !important;
+}
+html body #bio#bio#bio#bio .bio-social-go:hover {
+  background: var(--ink) !important;
+  color: var(--bg) !important;
+}
+html body #bio#bio#bio#bio .bio-social-handle {
+  color: var(--rm-faint) !important;
+}
+
+/* 12 — contact: four ruled cards with the home's black chip */
+html body #contact#contact#contact#contact .qc-card {
+  background: transparent !important;
+  border: 0 !important;
+  border-block-start: 1px solid var(--rm-line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding-inline: 0 !important;
+}
+html body #contact#contact#contact#contact .qc-card > i {
+  display: inline-grid !important;
+  place-items: center !important;
+  inline-size: 36px !important;
+  block-size: 36px !important;
+  border-radius: 11px !important;
+  background: var(--ink) !important;
+  color: var(--bg) !important;
+  font-size: 13px !important;
+}
+
+/* 13 — the story's quote, set in the serif */
+html body #bio#bio#bio#bio .bio-phil-quote {
+  font-family: var(--rm-serif) !important;
+  font-style: italic !important;
+  font-weight: 400 !important;
+  color: var(--ink) !important;
+}
+html[dir="rtl"] body #bio#bio#bio#bio .bio-phil-quote {
+  font-style: normal !important;
+}
+html body #bio#bio#bio#bio .dropcap {
+  font-family: var(--rm-serif) !important;
+  font-weight: 500 !important;
+}
