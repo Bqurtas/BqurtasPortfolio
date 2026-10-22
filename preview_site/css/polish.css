@@ -2161,11 +2161,16 @@ html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blo
   color: inherit !important;
   letter-spacing: -.01em !important;
 }
-/* Arabic script is never slanted: the emphasised word steps back in tone. */
+/* Arabic script is never slanted: the emphasised word steps back in weight,
+   not tone — several translations wrap the whole title in <em>, and a grey
+   whole title read as washed out. */
+html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .bio-phil-label, .bio-social-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) {
+  font-weight: 600 !important;
+}
 html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .bio-phil-label, .bio-social-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) em {
   font-style: normal !important;
-  font-weight: inherit !important;
-  color: var(--rm-mute) !important;
+  font-weight: 400 !important;
+  color: inherit !important;
 }
 html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) {
   letter-spacing: 0 !important;
@@ -2434,15 +2439,35 @@ html body #bio#bio#bio#bio .dropcap {
    the cards turn dark, so the bed around them turns to the light paper — the
    same frame, reversed. The bed is one variable (html/body and the fixed top
    strip .bq-frame read --bq-paper-underlay; the frame's own bed reads
-   --bq-frame-bed); the full-width footer and the menu curtain stay dark.
+   --bq-frame-bed). The full-width footer inverts with it — black in light
+   mode, light paper with dark type in dark mode. The menu curtain stays dark.
    ========================================================================== */
 :root[data-theme="dark"] {
   --bq-paper-underlay: #f4f3ef;
   --bq-frame-bed: #f4f3ef;
+  --bq-paper-footer: #f4f3ef;
 }
 html:root[data-theme="dark"],
-html:root[data-theme="dark"] body {
+html:root[data-theme="dark"] body,
+html:root[data-theme="dark"] body .bq-page-stage {
   background: #f4f3ef !important;
+}
+/* The menu curtain stays black, so the fixed top strip above it does too. */
+html:root[data-theme="dark"] body:is(.menu-open, .menu-closing) > .bq-frame.bq-frame.bq-frame {
+  background: #0a0a0a !important;
+}
+html:root[data-theme="dark"] body .footer.footer-v249,
+html:root[data-theme="dark"] body .footer.footer-v249 :is(.paper-scroll, .footer-stage, .footer-stage-copy, .footer-cta-title, .footer-email) {
+  color: #141414 !important;
+}
+html:root[data-theme="dark"] body .footer.footer-v249 {
+  background: #f4f3ef !important;
+}
+html:root[data-theme="dark"] body .footer.footer-v249 :is(.footer-kicker, .footer-kicker span:not(.footer-live-dot), .footer-cta-title em, .footer-bottom, .footer-bottom span) {
+  color: rgba(20, 20, 20, .55) !important;
+}
+html:root[data-theme="dark"] body .footer.footer-v249 .footer-bottom {
+  border-color: rgba(20, 20, 20, .12) !important;
 }
 
 /* The menu bar sits flat on the paper: no drop shadow under it (owner). */
