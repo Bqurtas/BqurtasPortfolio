@@ -2452,6 +2452,14 @@ html:root[data-theme="dark"] body,
 html:root[data-theme="dark"] body .bq-page-stage {
   background: #f4f3ef !important;
 }
+/* Flat on the light bed: the cards' and footer's shadows (invisible on the
+   black bed) would draw grey halos here, and the footer is the bed itself. */
+html:root[data-theme="dark"] body #bqPageStage#bqPageStage#bqPageStage#bqPageStage .paper-sheet > .paper-scroll,
+html:root[data-theme="dark"] body #bqPageStage#bqPageStage#bqPageStage#bqPageStage .footer.footer-v249,
+html:root[data-theme="dark"] body #bqPageStage#bqPageStage#bqPageStage#bqPageStage .footer.footer-v249 > .paper-scroll {
+  box-shadow: none !important;
+}
+
 /* The menu curtain stays black, so the fixed top strip above it does too. */
 html:root[data-theme="dark"] body:is(.menu-open, .menu-closing) > .bq-frame.bq-frame.bq-frame {
   background: #0a0a0a !important;
