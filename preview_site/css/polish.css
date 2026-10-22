@@ -2439,8 +2439,13 @@ html body #bio#bio#bio#bio .dropcap {
    the cards turn dark, so the bed around them turns to the light paper — the
    same frame, reversed. The bed is one variable (html/body and the fixed top
    strip .bq-frame read --bq-paper-underlay; the frame's own bed reads
-   --bq-frame-bed). The full-width footer inverts with it — black in light
-   mode, light paper with dark type in dark mode. The menu curtain stays dark.
+   --bq-frame-bed). The full-width footer and the menu curtain invert with
+   it — black in light mode, light paper with dark type in dark mode.
+
+   The footer and the page stage paint nothing of their own: they show the
+   body, so they change with it. Painting them read as a separate slab
+   whenever the theme switched — body fades over .38s while a painted footer
+   and stage switched at once. The fixed top strip takes the same fade.
    ========================================================================== */
 :root[data-theme="dark"] {
   --bq-paper-underlay: #f4f3ef;
@@ -2448,9 +2453,20 @@ html body #bio#bio#bio#bio .dropcap {
   --bq-paper-footer: #f4f3ef;
 }
 html:root[data-theme="dark"],
-html:root[data-theme="dark"] body,
-html:root[data-theme="dark"] body .bq-page-stage {
+html:root[data-theme="dark"] body {
   background: #f4f3ef !important;
+}
+html:root[data-theme] body #bqPageStage#bqPageStage#bqPageStage#bqPageStage,
+html:root[data-theme] body #bqPageStage#bqPageStage#bqPageStage#bqPageStage .footer.footer-v249 {
+  background: transparent !important;
+}
+html:root[data-theme] body #bqPageStage#bqPageStage#bqPageStage#bqPageStage .footer.footer-v249,
+html:root[data-theme] body #bqPageStage#bqPageStage#bqPageStage#bqPageStage .footer.footer-v249 > .paper-scroll {
+  box-shadow: none !important;
+}
+html:root[data-theme],
+html body > .bq-frame {
+  transition: background-color .38s cubic-bezier(.22, 1, .36, 1);
 }
 /* Flat on the light bed: the cards' and footer's shadows (invisible on the
    black bed) would draw grey halos here, and the footer is the bed itself. */
@@ -2460,9 +2476,24 @@ html:root[data-theme="dark"] body #bqPageStage#bqPageStage#bqPageStage#bqPageSta
   box-shadow: none !important;
 }
 
-/* The menu curtain stays black, so the fixed top strip above it does too. */
-html:root[data-theme="dark"] body:is(.menu-open, .menu-closing) > .bq-frame.bq-frame.bq-frame {
-  background: #0a0a0a !important;
+/* Dark mode: the menu curtain is the light paper and its type is dark; the
+   page receding onto it stays flat (its drop shadow only shows on light). */
+html:root[data-theme="dark"] body:is(.menu-open, .menu-revealed, .menu-closing) #bqPageStage#bqPageStage#bqPageStage#bqPageStage {
+  box-shadow: none !important;
+}
+html:root[data-theme="dark"] body #mobileMenu#mobileMenu#mobileMenu.mobile-menu,
+html:root[data-theme="dark"] body #mobileMenu#mobileMenu#mobileMenu.mobile-menu :is(.mobile-sheet, .mm-left) {
+  background: #f4f3ef !important;
+  color: #141414 !important;
+}
+html:root[data-theme="dark"] body #mobileMenu#mobileMenu#mobileMenu.mobile-menu :is(.mobile-menu-close, .mobile-menu-close i, .mm-link, .mm-link-copy, .mm-link-text, .mm-foot a, .mm-socs a, .mm-menu-brand) {
+  color: #141414 !important;
+}
+html:root[data-theme="dark"] body #mobileMenu#mobileMenu#mobileMenu.mobile-menu .mm-link-text {
+  background-image: linear-gradient(#141414, #141414) !important;
+}
+html:root[data-theme="dark"] body #mobileMenu#mobileMenu#mobileMenu.mobile-menu .mm-n {
+  color: rgba(20, 20, 20, .48) !important;
 }
 html:root[data-theme="dark"] body .footer.footer-v249,
 html:root[data-theme="dark"] body .footer.footer-v249 :is(.paper-scroll, .footer-stage, .footer-stage-copy, .footer-cta-title, .footer-email) {
