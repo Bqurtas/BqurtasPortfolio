@@ -2427,3 +2427,28 @@ html body #bio#bio#bio#bio .dropcap {
   font-family: var(--rm-serif) !important;
   font-weight: 500 !important;
 }
+
+/* ============================================================================
+   DARK MODE — the frame inverts with the cards.
+   Light mode is light paper on a black bed. Owner (2026-10-22): in dark mode
+   the cards turn dark, so the bed around them turns to the light paper — the
+   same frame, reversed. The bed is one variable (html/body and the fixed top
+   strip .bq-frame read --bq-paper-underlay; the frame's own bed reads
+   --bq-frame-bed); the full-width footer and the menu curtain stay dark.
+   ========================================================================== */
+:root[data-theme="dark"] {
+  --bq-paper-underlay: #f4f3ef;
+  --bq-frame-bed: #f4f3ef;
+}
+html:root[data-theme="dark"],
+html:root[data-theme="dark"] body {
+  background: #f4f3ef !important;
+}
+
+/* The menu bar sits flat on the paper: no drop shadow under it (owner). */
+html body .rail.rail,
+html[dir="rtl"] body .rail.rail,
+html body .mobilebar.mobilebar,
+html[dir="rtl"] body .mobilebar.mobilebar {
+  box-shadow: none !important;
+}
