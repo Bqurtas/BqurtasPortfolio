@@ -340,6 +340,12 @@ html body #design .bio-teaser-link:focus-visible {
   gap: 16px !important;
 }
 
+/* The arrow follows the link's own colour, so it never disappears in a theme
+   (it was painted dark on the dark-mode pill). */
+html body :is(#design#design#design, #bio#bio#bio) .bio-teaser-link i {
+  color: currentColor !important;
+}
+
 /* ============================================================================
    ROOM HEROES — a slightly quieter measure for the three inner rooms.
    ========================================================================== */
