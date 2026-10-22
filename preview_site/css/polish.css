@@ -2269,6 +2269,9 @@ html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blo
   html body #bio#bio#bio#bio > :is(.bio-kit-sheet, .bio-record-sheet, .bio-education-sheet, .bio-world-sheet) .bio-block > .bio-block-title {
     flex-wrap: wrap !important;
   }
+  html body #bio#bio#bio#bio > :is(.bio-kit-sheet, .bio-record-sheet, .bio-education-sheet, .bio-world-sheet) .bio-block > .bio-block-lede {
+    margin-block-start: 6px !important;
+  }
 }
 
 /* 7 — tools as small paper tiles */
@@ -2515,4 +2518,42 @@ html[dir="rtl"] body .rail.rail,
 html body .mobilebar.mobilebar,
 html[dir="rtl"] body .mobilebar.mobilebar {
   box-shadow: none !important;
+}
+
+/* ============================================================================
+   FLAT — no shadows anywhere, in either theme (owner, 2026-10-22: "shadows
+   are classic; keep it flat").
+   One rule in a cascade layer: an !important declaration inside a layer
+   outranks every unlayered !important rule whatever its specificity, so this
+   reaches the drop shadows spread through style.css, modern-framer.css and
+   this file at once. What is set back below is not a shadow — flat rings
+   with no blur or offset: the cut-out ring round the bar's small dots, the
+   portrait's outline, the photo cards' inner hairline and the keyboard focus
+   ring of a sheet. (revert-layer resolves to none here, so they are stated.)
+   ========================================================================== */
+@layer bq-flat {
+  html body *,
+  html body *::before,
+  html body *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  html body :is(.rail-latest-badge, .rail-chat-dot, .design-cta-dot) {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--bg, #e8e9eb) 90%, transparent) !important;
+  }
+  html body .card-art::after {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16) !important;
+  }
+  html body .paper-sheet > .paper-scroll:focus-visible {
+    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--bq-signal, #101010) 72%, transparent) !important;
+  }
+  /* The portrait keeps its two outline rings, without the shadow under them. */
+  html body #design > .hero .hero-portrait {
+    box-shadow:
+      0 0 0 6px color-mix(in srgb, var(--bg) 82%, transparent),
+      0 0 0 7px color-mix(in srgb, var(--bq-accent, #141414) 30%, transparent) !important;
+  }
+  html body .card-art {
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 8%, transparent) !important;
+  }
 }
