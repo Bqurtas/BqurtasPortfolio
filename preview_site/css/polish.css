@@ -2446,9 +2446,9 @@ html body #bio#bio#bio#bio .dropcap {
    it — black in light mode, light paper with dark type in dark mode.
 
    The footer and the page stage paint nothing of their own: they show the
-   body, so they change with it. Painting them read as a separate slab
-   whenever the theme switched — body fades over .38s while a painted footer
-   and stage switched at once. The fixed top strip takes the same fade.
+   body, so they change with it. And the body switches in the same frame as
+   the cards: it used to fade over .38s while the cards switched at once, so
+   the footer (and the top strip) read as a separate slab mid-switch.
    ========================================================================== */
 :root[data-theme="dark"] {
   --bq-paper-underlay: #f4f3ef;
@@ -2468,8 +2468,9 @@ html:root[data-theme] body #bqPageStage#bqPageStage#bqPageStage#bqPageStage .foo
   box-shadow: none !important;
 }
 html:root[data-theme],
+html:root[data-theme] body,
 html body > .bq-frame {
-  transition: background-color .38s cubic-bezier(.22, 1, .36, 1);
+  transition: none !important;
 }
 /* Flat on the light bed: the cards' and footer's shadows (invisible on the
    black bed) would draw grey halos here, and the footer is the bed itself. */
