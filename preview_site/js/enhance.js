@@ -1015,6 +1015,7 @@
     Object.assign(DASH_I18N.en, {
       checking:'Checking secure access…', networkError:'The login service could not be reached. Check your connection and try again.',
       liveOnly:'Open Studio on the live HTTPS website. A file preview cannot sign in or publish.', openLive:'Open secure Studio',
+      staticPreview:'This local preview does not have a working Studio API. Open Studio on the live HTTPS website to sign in and publish.',
       rateLimited:'Too many attempts. Wait before trying again.', deliveryFailed:'The verification code could not be delivered. Try the other configured inbox or contact the site owner.',
       setupMissing:'Cloudflare setup is incomplete. Configure these items, then redeploy:', factorRequirement:'a second factor (TOTP_SECRET or a configured email/SMS provider)',
       setupTitle:'Finish secure setup', setupNote:'Configure the missing server settings, redeploy, then check again. No access code can work until sign-in is configured.',
@@ -1027,6 +1028,7 @@
     Object.assign(DASH_I18N.ku, {
       checking:'دەستگەیشتنی پارێزراو دەپشکنرێت…', networkError:'پەیوەندی بە خزمەتگوزاری چوونەژوورەوە نەکرا. ئینتەرنێتەکەت بپشکنە و دووبارە هەوڵ بدەوە.',
       liveOnly:'ستۆدیۆ لە وێبسایتی زیندووی HTTPS بکەرەوە. پێشبینینی فایل ناتوانێت بچێتە ژوورەوە یان بڵاو بکاتەوە.', openLive:'ستۆدیۆی پارێزراو بکەرەوە',
+      staticPreview:'ئەم پێشبینینە ناوخۆییە API ـی کارای ستۆدیۆی نییە. بۆ چوونەژوورەوە و بڵاوکردنەوە، ستۆدیۆ لە وێبسایتی زیندووی HTTPS بکەرەوە.',
       rateLimited:'ژمارەی هەوڵەکان زۆر بووە. کەمێک چاوەڕێ بکە پاشان هەوڵ بدەوە.', deliveryFailed:'کۆدی پشتڕاستکردنەوە نەنێردرا. سندووقە ڕێکخراوەکەی تر تاقی بکەوە یان پەیوەندی بە خاوەنی سایت بکە.',
       setupMissing:'ڕێکخستنی Cloudflare تەواو نییە. ئەمانە ڕێک بخە، پاشان دووبارە بڵاوی بکەوە:', factorRequirement:'فاکتۆری دووەم (TOTP_SECRET یان خزمەتگوزاری ڕێکخراوی ئیمەیل/SMS)',
       setupTitle:'ڕێکخستنی پارێزراو تەواو بکە', setupNote:'ڕێکخستنە کەمەکانی سێرڤەر تەواو بکە، دووبارە بڵاوی بکەوە و پاشان بپشکنەوە. تا چوونەژوورەوە ڕێکنەخرێت، هیچ کۆدێک کار ناکات.',
@@ -1182,6 +1184,20 @@
       showGate();
       localizeChrome();
     };
+    const isLoopbackPreview = () => ['localhost', '127.0.0.1', '[::1]', '::1'].includes(location.hostname);
+    const showLiveStudioGate = () => {
+      loginConfigured = false;
+      invalidateDashboardSession();
+      setGateBusy(false);
+      $('#dashLoginForm').hidden = true;
+      const choices = $('#dash2faChoice'); if (choices) choices.hidden = true;
+      const setup = $('#dashSetup'); if (setup) setup.hidden = true;
+      hint.textContent = DT(location.protocol === 'file:' ? 'liveOnly' : 'staticPreview') + ' ';
+      const live = document.createElement('a');
+      live.href = 'https://bqurtas.com/#studio';
+      live.textContent = DT('openLive');
+      hint.appendChild(live);
+    };
     let gateEpoch = 0, gateBusy = false, gateRequest = null;
     const setGateBusy = (busy) => {
       gateBusy = busy;
@@ -1202,8 +1218,9 @@
           ...(payload ? { body:JSON.stringify(payload) } : {})
         });
         const data = await response.json();
+        if (!payload && isLoopbackPreview() && (response.status === 404 || response.status === 405 || !data || typeof data.configured !== 'boolean')) return { error:'static-preview' };
         return data && typeof data === 'object' && !Array.isArray(data) ? data : { error:'bad-response' };
-      } catch (error) { return { error:'network-error' }; }
+      } catch (error) { return { error:!payload && isLoopbackPreview() ? 'static-preview' : 'network-error' }; }
       finally { clearTimeout(timer); if (gateRequest === controller) gateRequest = null; }
     };
     const openDash = async () => {
@@ -1224,12 +1241,7 @@
          sessionStorage flag neither grants access nor prevents session reuse. */
       showGate();
       if (location.protocol === 'file:') {
-        setGateBusy(false);
-        hint.textContent = DT('liveOnly') + ' ';
-        const live = document.createElement('a');
-        live.href = 'https://bqurtas.com/#studio';
-        live.textContent = DT('openLive');
-        hint.appendChild(live);
+        showLiveStudioGate();
         return;
       }
       setGateBusy(true);
@@ -1237,6 +1249,7 @@
       const data = await requestLogin();
       if (epoch !== gateEpoch || !dash.classList.contains('is-open')) return;
       setGateBusy(false);
+      if (data.error === 'static-preview') { showLiveStudioGate(); return; }
       if (data.ok === true && data.authenticated === true) { unlocked = true; showConsole(); return; }
       invalidateDashboardSession();
       loginConfigured = typeof data.configured === 'boolean' ? data.configured : null;
@@ -1750,7 +1763,12 @@
           headers:{ 'Content-Type':'application/json', Accept:'application/json', 'x-edit-token':token },
           body:JSON.stringify(payload), signal:AbortSignal.timeout(65_000)
         });
-        const body = await res.json().catch(() => ({ error:'bad_response' }));
+        const parsed = await res.json().catch(() => null);
+        const body = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : { error:'bad_response' };
+        if (body.error === 'bad_response' && isLoopbackPreview()) {
+          showLiveStudioGate();
+          return { error:'static-preview', detail:DT('staticPreview') + ' https://bqurtas.com/#studio' };
+        }
         if (body.error === 'session-required') {
           invalidateDashboardSession();
           hint.textContent = DT('sessionExpired');

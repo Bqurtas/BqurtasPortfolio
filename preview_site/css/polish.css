@@ -2280,30 +2280,33 @@ html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blo
   }
 }
 
-/* 7 — tools as small paper tiles */
+/* 7 — plain software icons and slightly larger, readable names */
 html body #bio#bio#bio#bio .tools-grid {
   gap: 14px 10px !important;
 }
 html body #bio#bio#bio#bio .tool {
-  inline-size: 74px !important;
-  gap: 8px !important;
+  inline-size: 100% !important;
+  gap: 10px !important;
 }
 html body #bio#bio#bio#bio .tool-ic {
-  inline-size: 54px !important;
-  block-size: 54px !important;
-  border-radius: 15px !important;
-  background: color-mix(in srgb, var(--bg) 70%, #fff) !important;
-  border: 1px solid var(--rm-line) !important;
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 5%, transparent) !important;
+  flex: 0 0 30px !important;
+  inline-size: 30px !important;
+  block-size: 32px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
 }
 html body #bio#bio#bio#bio .tool-ic img {
-  inline-size: 26px !important;
-  block-size: 26px !important;
+  inline-size: 28px !important;
+  block-size: 28px !important;
 }
 html body #bio#bio#bio#bio .tool-name {
-  color: var(--rm-mute) !important;
+  font-size: 13px !important;
+  color: var(--ink) !important;
   letter-spacing: .02em !important;
 }
+html body #bio#bio#bio#bio .tool-ic--txt { font-size: 12px !important; }
 html body #bio#bio#bio#bio .tools-cat {
   display: block !important;
   margin-block: 18px 10px !important;

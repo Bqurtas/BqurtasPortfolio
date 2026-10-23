@@ -28,7 +28,7 @@ function element() {
     focus() {}, querySelector() { return null; }, querySelectorAll() { return []; }
   };
 }
-function fixture({ flag = false, lang = 'en', protocol = 'https:', setupUI = false, fetcher } = {}) {
+function fixture({ flag = false, lang = 'en', protocol = 'https:', hostname = 'bqurtas.com', setupUI = false, fetcher } = {}) {
   const nodes = Object.fromEntries(['dash', 'dashGate', 'dashMain', 'dashView', 'dashHint', 'dashKey', 'dashLoginForm', 'dash2faChoice', 'dashGateClose'].map(id => [`#${id}`, element()]));
   if (setupUI) {
     for (const id of ['dashSetup', 'dashSetupTitle', 'dashSetupNote', 'dashSetupLogin', 'dashSetupLoginLabel', 'dashSetupLoginMissing', 'dashSetupPublishing', 'dashSetupPublishingLabel', 'dashSetupPublishingMissing', 'dashSetupGuide', 'dashSetupRetry']) {
@@ -47,7 +47,7 @@ function fixture({ flag = false, lang = 'en', protocol = 'https:', setupUI = fal
   const document = { ...events(), documentElement:{ dataset:{}, getAttribute:() => lang }, querySelector:selector => nodes[selector] || null, querySelectorAll:() => [], createElement:() => element() };
   const window = { ...events() };
   vm.runInNewContext(source, {
-    $, $$:() => [], document, window, location:{ hash:'', href:'https://bqurtas.com/', protocol },
+    $, $$:() => [], document, window, location:{ hash:'', href:`${protocol}//${hostname}/`, hostname, protocol },
     localStorage:storage, sessionStorage:storage, URL, AbortController, AbortSignal,
     setTimeout(callback) { timers.set(++timerId, callback); return timerId; }, clearTimeout:id => timers.delete(id),
     fetch:async (url, options) => { calls.push({ url, options }); return fetcher ? fetcher(url, options) : { json:async () => ({ ok:true, configured:true, authenticated:false }) }; }
@@ -95,6 +95,72 @@ test('a local file preview links to HTTPS Studio instead of issuing unusable log
   assert.match(f.nodes['#dashHint'].textContent, /file preview cannot sign in/);
   assert.equal(f.nodes['#dashHint'].link.href, 'https://bqurtas.com/#studio');
   assert.equal(f.nodes['#dashMain'].hidden, true);
+  assert.equal(f.nodes['#dashLoginForm'].hidden, true);
+});
+
+test('a static loopback preview replaces unusable sign-in with a live Studio link', async () => {
+  const failures = [
+    () => ({ status:404, json:async () => ({ error:'not-found' }) }),
+    () => ({ status:404, json:async () => { throw new SyntaxError('Not Found'); } }),
+    () => ({ status:200, json:async () => { throw new SyntaxError('HTML page'); } }),
+    () => response({}),
+    () => { throw new Error('unavailable'); }
+  ];
+  for (const hostname of ['localhost', '127.0.0.1', '[::1]']) {
+    for (const fetcher of failures) {
+      const f = fixture({ protocol:'http:', hostname, flag:true, fetcher });
+      await f.open();
+      assert.equal(f.calls.length, 1, 'check the local API before deciding it is static');
+      assert.equal(f.nodes['#dashLoginForm'].hidden, true);
+      assert.equal(f.nodes['#dashMain'].hidden, true);
+      assert.equal(f.nodes['#dash2faChoice'].hidden, true);
+      assert.equal(f.store.has('bq_dash_ok'), false);
+      assert.match(f.nodes['#dashHint'].textContent, /local preview.*Studio API/);
+      assert.equal(f.nodes['#dashHint'].link.href, 'https://bqurtas.com/#studio');
+      await f.submitLogin('cannot-be-used-here');
+      assert.equal(f.calls.length, 1, 'the unavailable form must not send a PIN');
+    }
+  }
+});
+
+test('a functioning Wrangler loopback API keeps local sign-in and configured sessions available', async () => {
+  const f = fixture({ protocol:'http:', hostname:'127.0.0.1', fetcher:(url, options) => response(options.method === 'GET'
+    ? { ok:true, configured:true, authenticated:false }
+    : { ok:true, id:'local-totp', via:'totp' }) });
+  await f.open();
+  assert.equal(f.nodes['#dashLoginForm'].hidden, false);
+  assert.equal(f.nodes['#dashHint'].link, undefined);
+  await f.submitLogin('local-access-password');
+  assert.equal(f.calls.length, 2);
+  assert.equal(JSON.parse(f.calls[1].options.body).action, 'send');
+  const authenticated = fixture({ protocol:'http:', hostname:'localhost', fetcher:() => response({ ok:true, configured:true, authenticated:true }) });
+  await authenticated.open();
+  assert.equal(authenticated.nodes['#dashMain'].hidden, false);
+  const missingConfiguration = fixture({ protocol:'http:', hostname:'localhost', setupUI:true, fetcher:() => response({ ok:true, configured:false, authenticated:false, requirements:{ pin:false } }) });
+  await missingConfiguration.open();
+  assert.equal(missingConfiguration.nodes['#dashSetup'].hidden, false);
+  assert.match(missingConfiguration.nodes['#dashSetupLoginMissing'].textContent, /DASH_PIN/);
+  assert.equal(missingConfiguration.nodes['#dashHint'].link, undefined);
+});
+
+test('a non-JSON local publishing response restores the gate with the direct live Studio link', async () => {
+  const helperStart = authored.indexOf('const studioCall = async (service, payload) => {');
+  const helperEnd = authored.indexOf('\n    const cmsApi =', helperStart);
+  const helper = authored.slice(helperStart, helperEnd).replace('const studioCall =', 'globalThis.studioCall =');
+  let restored = 0;
+  const calls = [];
+  const context = {
+    editToken:() => 'private-editor-key', DT:key => key, AbortSignal,
+    isLoopbackPreview:() => true, showLiveStudioGate:() => { restored += 1; },
+    fetch:async (url, options) => { calls.push({ url, options }); return { status:405, json:async () => { throw new SyntaxError('Method Not Allowed'); } }; }
+  };
+  vm.runInNewContext(helper, context);
+  const result = await context.studioCall('work-upload', { action:'list', folder:'Book' });
+  assert.equal(result.error, 'static-preview');
+  assert.match(result.detail, /https:\/\/bqurtas\.com\/#studio/);
+  assert.equal(restored, 1);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].url, '/api/studio/work-upload');
 });
 
 test('closing during the status check prevents a late response reopening privileged content', async () => {
