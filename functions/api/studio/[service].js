@@ -188,6 +188,16 @@ export async function onRequestPost({ request, env, params }) {
       : json({ ok: false, error: 'token-update-failed' }, 503);
   }
 
+  // Emit only fixed failure codes and the already allowlisted service. This
+  // remains useful when an outer gateway replaces the JSON error response.
+  // Never log credentials, request content, upstream bodies or exceptions.
+  const upstreamFailure = (code, upstreamStatus) => {
+    const status = Number.isInteger(upstreamStatus) && upstreamStatus >= 100 && upstreamStatus <= 599
+      ? { upstreamStatus } : {};
+    console.warn({ event: 'studio-proxy-failure', service, code, ...status });
+    return json({ ok: false, error: code, ...status }, 502);
+  };
+
   const publishableKey = String(env.SUPABASE_PUBLISHABLE_KEY || PUBLIC_SUPABASE_KEY);
   try {
     const upstream = await fetch(`${SUPABASE_URL}/functions/v1/${service}`, {
@@ -207,7 +217,7 @@ export async function onRequestPost({ request, env, params }) {
     // The browser credential has already passed Pages. An upstream auth
     // rejection is a server configuration failure, not a request to reconnect
     // with (or expose) the Supabase-only credential in the browser.
-    if (upstream.status === 401 || upstream.status === 403) return json({ ok: false, error: 'studio-upstream-auth', upstreamStatus: upstream.status }, 502);
+    if (upstream.status === 401 || upstream.status === 403) return upstreamFailure('studio-upstream-auth', upstream.status);
     let raw;
     try {
       raw = new TextDecoder('utf-8', { fatal: true }).decode(await readRequestBytes(upstream, 5 * 1024 * 1024));
@@ -215,16 +225,16 @@ export async function onRequestPost({ request, env, params }) {
       const code = upstreamTimedOut(error)
         ? 'studio-upstream-timeout'
         : error.status === 413 ? 'studio-upstream-too-large' : 'studio-upstream-invalid';
-      return json({ ok: false, error: code, upstreamStatus: upstream.status }, 502);
+      return upstreamFailure(code, upstream.status);
     }
     let payload;
     try { payload = JSON.parse(raw); } catch (error) {
-      return json({ ok: false, error: 'studio-upstream-invalid', upstreamStatus: upstream.status }, 502);
+      return upstreamFailure('studio-upstream-invalid', upstream.status);
     }
-    if (payload && payload.error === 'no_github_token') return json({ ok: false, error: 'studio-github-not-configured', upstreamStatus: upstream.status }, 502);
-    if (upstream.status >= 500) return json({ ok: false, error: 'studio-upstream-failed', upstreamStatus: upstream.status }, 502);
+    if (payload && payload.error === 'no_github_token') return upstreamFailure('studio-github-not-configured', upstream.status);
+    if (upstream.status >= 500) return upstreamFailure('studio-upstream-failed', upstream.status);
     return json(payload, upstream.status);
   } catch (error) {
-    return json({ ok: false, error: upstreamTimedOut(error) ? 'studio-upstream-timeout' : 'studio-upstream-unavailable' }, 502);
+    return upstreamFailure(upstreamTimedOut(error) ? 'studio-upstream-timeout' : 'studio-upstream-unavailable');
   }
 }

@@ -202,6 +202,38 @@ test('Studio proxy preserves timeout diagnostics while reading an upstream respo
   assert.deepEqual(await response.json(), { ok:false, error:'studio-upstream-timeout', upstreamStatus:200 });
 });
 
+test('upstream failure logs identify each failure branch without credentials, request content or raw errors', async (t) => {
+  const warnings = [];
+  t.mock.method(console, 'warn', (...args) => warnings.push(args));
+  const cases = [
+    ['studio-upstream-auth', 401, () => new Response('private upstream body', { status:401 })],
+    ['studio-github-not-configured', 500, () => new Response(JSON.stringify({ error:'no_github_token', detail:'private upstream body' }), { status:500 })],
+    ['studio-upstream-failed', 503, () => new Response(JSON.stringify({ error:'private upstream body' }), { status:503 })],
+    ['studio-upstream-invalid', 502, () => new Response('private upstream body', { status:502 })],
+    ['studio-upstream-too-large', 200, () => new Response('private upstream body', { headers:{ 'Content-Length':String(6 * 1024 * 1024) } })],
+    ['studio-upstream-timeout', undefined, () => { throw new DOMException('private exception content', 'TimeoutError'); }],
+    ['studio-upstream-unavailable', undefined, () => { throw new TypeError('private exception content'); }],
+    ['studio-upstream-timeout', 200, () => new Response(new ReadableStream({
+      start(controller) { controller.error(new DOMException('private response error', 'AbortError')); }
+    }))]
+  ];
+  for (const [code, upstreamStatus, upstream] of cases) {
+    warnings.length = 0;
+    t.mock.method(globalThis, 'fetch', async () => upstream());
+    const response = await studioPost({
+      request:request('work-upload', 'browser-edit-secret', { action:'list', folder:'Book', private:'private request content' }, { Cookie:await cookie() }),
+      env:BASE_ENV,
+      params:{ service:'work-upload' }
+    });
+    assert.equal(response.status, 502);
+    assert.equal((await response.json()).error, code);
+    const expected = { event:'studio-proxy-failure', service:'work-upload', code };
+    if (upstreamStatus !== undefined) expected.upstreamStatus = upstreamStatus;
+    assert.deepEqual(warnings, [[expected]], 'each upstream failure emits one minimal structured event');
+    assert.doesNotMatch(JSON.stringify(warnings), /private|browser-edit-secret|server-only-upstream-secret|another-independent-session-secret/);
+  }
+});
+
 test('Studio proxy fails closed if its upstream credential is missing or browser-accessible', async (t) => {
   let fetches = 0;
   t.mock.method(globalThis, 'fetch', async () => { fetches += 1; throw new Error('must not forward'); });
