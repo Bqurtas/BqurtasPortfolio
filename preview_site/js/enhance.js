@@ -1037,6 +1037,32 @@
     };
     const curLang = () => { const l = curSiteLang(); return DASH_I18N[l] ? l : 'en'; };
     const DT = (k) => (DASH_I18N[curLang()][k] ?? DASH_I18N.en[k] ?? k);
+    /* Each console page opens with its name and one line on what it is for. */
+    const DASH_PAGE_DESC = {
+      en: {
+        overview:'Your studio at a glance.', visitors:'Who visits the site and what they look at.',
+        works:'Add finished designs to the gallery, or take them down.', content:'Write, edit and publish Journal posts.',
+        cases:'Case studies for Selected Work.', latest:'Pin a work to the homepage bell for seven days.',
+        leads:'Project pitches sent from the contact form.', profile:'Your name, role and photo in this console.',
+        settings:'Preferences, two-step sign-in and the editor password.', ai:'Drafts, replies, captions and translations.',
+        admins:'People who help you run the studio.'
+      },
+      ku: {
+        overview:'تێڕوانینێکی گشتی بۆ ستۆدیۆکەت.', visitors:'کێ سەردانی سایتەکە دەکات و چی دەبینێت.',
+        works:'دیزاینی تەواوکراو بۆ گالەری زیاد بکە، یان لایبە.', content:'بابەتەکانی جۆرناڵ بنووسە، دەستکاری بکە و بڵاوی بکەوە.',
+        cases:'لێکۆڵینەوەی پرۆژەکان بۆ بەشی کارە هەڵبژێردراوەکان.', latest:'کارێک بۆ ماوەی حەوت ڕۆژ لە زەنگی پەڕەی سەرەکی دابنێ.',
+        leads:'داواکاری پرۆژەکان کە لە فۆرمی پەیوەندییەوە هاتوون.', profile:'ناو، ڕۆڵ و وێنەکەت لەم داشبۆردەدا.',
+        settings:'ڕێکخستنەکان، چوونەژوورەوەی دوو هەنگاوی و وشەی نهێنیی دەستکاریکەر.', ai:'ڕەشنووس، وەڵام، کەپشن و وەرگێڕان.',
+        admins:'ئەو کەسانەی یارمەتیت دەدەن لە بەڕێوەبردنی ستۆدیۆ.'
+      }
+    };
+    let dashPageKey = 'overview';
+    const paintPageHead = () => {
+      const title = $('#dashPageTitle'), desc = $('#dashPageDesc');
+      const key = dashPageKey;
+      if (title) title.textContent = key === 'ai' ? DT('tAi') : key === 'admins' ? DT('tAddAdmin') : DT(key);
+      if (desc) desc.textContent = (DASH_PAGE_DESC[curLang()] || {})[key] || DASH_PAGE_DESC.en[key] || '';
+    };
     const loginSetupMessage = (requirements) => {
       if (!requirements || typeof requirements !== 'object') return DT('notSetup');
       const labels = { pin:'DASH_PIN', session:'SESSION_SECRET (32+ characters)', database:'D1 / DB', secondFactor:DT('factorRequirement') };
@@ -1104,6 +1130,7 @@
       // keep the mobile bar's current-section label localized
       const mc = $('#dashMbarCur'); const act = $('.dash-tab.is-active');
       if (mc && act) mc.textContent = DT(act.dataset.dash);
+      paintPageHead();
     };
 
     const clearTwoFA = () => {
@@ -2234,12 +2261,16 @@
       localizeChrome();
       // Always land on Overview when the console opens — reset the sidebar highlight too
       $$('.dash-tab').forEach(x => x.classList.toggle('is-active', x.dataset.dash === 'overview'));
-      setCur(DT('overview')); closeMenu();
+      setCur(DT('overview'), 'overview'); closeMenu();
       renderOverview();
     };
     /* ---- Mobile menu: tap the bar to expand the nav, tap a section to collapse ---- */
     const dashTabs = $('#dashTabs'), menuToggle = $('#dashMenuToggle'), mbarCur = $('#dashMbarCur');
-    const setCur = (label) => { if (mbarCur && label) mbarCur.textContent = label; };
+    const setCur = (label, key) => {
+      if (mbarCur && label) mbarCur.textContent = label;
+      if (key) dashPageKey = key;
+      paintPageHead();
+    };
     const closeMenu = () => { dashTabs?.classList.remove('is-menu-open'); menuToggle?.setAttribute('aria-expanded', 'false'); };
     menuToggle?.addEventListener('click', () => {
       const open = dashTabs.classList.toggle('is-menu-open');
@@ -2250,7 +2281,7 @@
       if (dashTabs?.classList.contains('is-menu-open') && !dashTabs.contains(e.target)) closeMenu();
     });
     /* open a non-tab view (AI, admins) from a sidebar tool — clear the nav highlight */
-    const openTool = (fn, label) => { $$('.dash-tab').forEach(x => x.classList.remove('is-active')); if (label) setCur(label); closeMenu(); (fn || renderOverview)(); };
+    const openTool = (fn, label, key) => { $$('.dash-tab').forEach(x => x.classList.remove('is-active')); if (label) setCur(label, key); closeMenu(); (fn || renderOverview)(); };
 
     // dark / light toggle
     $('#dashTheme')?.addEventListener('click', () => {
@@ -2263,8 +2294,8 @@
       }
     });
     // AI + Add-admin sidebar tools
-    $('#dashAi')?.addEventListener('click', () => openTool(renderAssistant, DT('tAi')));
-    $('#dashAddAdmin')?.addEventListener('click', () => openTool(renderAdmins, DT('tAddAdmin')));
+    $('#dashAi')?.addEventListener('click', () => openTool(renderAssistant, DT('tAi'), 'ai'));
+    $('#dashAddAdmin')?.addEventListener('click', () => openTool(renderAdmins, DT('tAddAdmin'), 'admins'));
     // Log out — lock the console again
     $('#dashLogout')?.addEventListener('click', async () => {
       if (!confirm(DT('logoutAsk'))) return;
@@ -2303,7 +2334,7 @@
     $$('.dash-tab').forEach(t => t.addEventListener('click', () => {
       $$('.dash-tab').forEach(x => x.classList.remove('is-active'));
       t.classList.add('is-active');
-      setCur(DT(t.dataset.dash));
+      setCur(DT(t.dataset.dash), t.dataset.dash);
       closeMenu();
       (VIEWS[t.dataset.dash] || renderOverview)();
     }));

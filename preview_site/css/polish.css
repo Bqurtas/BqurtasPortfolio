@@ -2564,3 +2564,424 @@ html[dir="rtl"] body .mobilebar.mobilebar {
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 8%, transparent) !important;
   }
 }
+
+/* ============================================================================
+   STUDIO DASHBOARD — calm and clear (owner, 2026-10-22: "make it more
+   beautiful and clearer; it feels jumbled").
+   One surface system in both themes: a paper canvas, cards with a hairline
+   edge (flat, no shadow), one primary button (ink) and one secondary
+   (outline) instead of gold/black/outline mixed, readable sentence-case
+   helper text instead of tiny capitals, and a title + one-line purpose at
+   the top of every page (#dashPageHead, set by setCur in enhance.js). The
+   sidebar is compact so all nine sections fit without an inner scroll.
+   ========================================================================== */
+html body #dash#dash {
+  --dz-canvas: #f4f3ef;
+  --dz-side: #fbfaf7;
+  --dz-card: #ffffff;
+  --dz-ink: #141414;
+  --dz-mute: rgba(20, 20, 20, .58);
+  --dz-faint: rgba(20, 20, 20, .4);
+  --dz-line: rgba(20, 20, 20, .09);
+  --dz-field: #f6f5f1;
+  --dz-hover: rgba(20, 20, 20, .05);
+  --dz-invert: #fbfaf7;
+}
+html:root[data-theme="dark"] body #dash#dash {
+  --dz-canvas: #121212;
+  --dz-side: #171716;
+  --dz-card: #1c1c1b;
+  --dz-ink: #ecebe8;
+  --dz-mute: rgba(236, 235, 232, .6);
+  --dz-faint: rgba(236, 235, 232, .4);
+  --dz-line: rgba(236, 235, 232, .1);
+  --dz-field: #232322;
+  --dz-hover: rgba(236, 235, 232, .06);
+  --dz-invert: #141414;
+}
+
+/* Surfaces */
+html body #dash#dash.is-full > .dash-panel,
+html body #dash#dash.is-full .dash-panel {
+  background: var(--dz-canvas) !important;
+  color: var(--dz-ink) !important;
+}
+html body #dash#dash .dash-tabs {
+  background: var(--dz-side) !important;
+  border-inline-end: 1px solid var(--dz-line) !important;
+}
+
+@media (min-width: 821px) {
+  /* Title above the page, beside the sidebar */
+  html body #dash#dash .dash-main {
+    display: grid !important;
+    grid-template-columns: 248px minmax(0, 1fr) !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+  }
+  html body #dash#dash .dash-main > .dash-tabs {
+    grid-column: 1 !important;
+    grid-row: 1 / span 2 !important;
+    min-height: 0 !important;
+  }
+  html body #dash#dash .dash-page-head {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    display: block !important;
+    padding: 34px 44px 6px !important;
+  }
+  html body #dash#dash .dash-main > .dash-view {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    min-height: 0 !important;
+    padding: 18px 44px 40px !important;
+  }
+
+  /* Sidebar: identity on one line, every section in view */
+  html body #dash#dash .dash-side-id {
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 22px 20px 18px !important;
+    border-block-end: 1px solid var(--dz-line) !important;
+  }
+  html body #dash#dash .dash-side-av {
+    flex: none !important;
+    inline-size: 40px !important;
+    block-size: 40px !important;
+  }
+  html body #dash#dash .dash-side-meta {
+    min-width: 0 !important;
+  }
+  html body #dash#dash .dash-side-meta strong {
+    display: block !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: var(--dz-ink) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  html body #dash#dash .dash-side-meta .mono {
+    display: block !important;
+    margin-block-start: 2px !important;
+    font-size: 11px !important;
+    letter-spacing: .04em !important;
+    text-transform: none !important;
+    color: var(--dz-mute) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  html body #dash#dash .dash-side-nav {
+    gap: 2px !important;
+    padding: 14px 12px !important;
+    overflow: visible !important;
+    flex: 0 0 auto !important;
+  }
+  html body #dash#dash .dash-side-tools {
+    gap: 0 !important;
+    margin-block-start: auto !important;
+    padding: 10px 12px 16px !important;
+    border-block-start: 1px solid var(--dz-line) !important;
+  }
+}
+
+/* Navigation items */
+html body #dash#dash .dash-tab,
+html body #dash#dash .dash-tool {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-height: 40px !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  color: var(--dz-mute) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+html body #dash#dash .dash-tool {
+  min-height: 36px !important;
+  font-size: 13px !important;
+}
+html body #dash#dash .dash-tab i,
+html body #dash#dash .dash-tool i {
+  inline-size: 18px !important;
+  font-size: 14px !important;
+  text-align: center !important;
+  color: var(--dz-faint) !important;
+}
+html body #dash#dash .dash-tab:hover,
+html body #dash#dash .dash-tool:hover {
+  background: var(--dz-hover) !important;
+  color: var(--dz-ink) !important;
+}
+html body #dash#dash .dash-tab:hover i,
+html body #dash#dash .dash-tool:hover i {
+  color: var(--dz-ink) !important;
+}
+html body #dash#dash .dash-tab.is-active {
+  background: var(--dz-ink) !important;
+  color: var(--dz-invert) !important;
+}
+html body #dash#dash .dash-tab.is-active i {
+  color: var(--dz-invert) !important;
+}
+
+/* Page title */
+html body #dash#dash .dash-page-head {
+  display: none;
+}
+html body #dash#dash .dash-page-title {
+  margin: 0 !important;
+  font-family: 'Fraunces', 'Noto Kufi Arabic', serif !important;
+  font-size: 30px !important;
+  font-weight: 500 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -.02em !important;
+  color: var(--dz-ink) !important;
+}
+html body #dash#dash .dash-page-desc {
+  margin: 6px 0 0 !important;
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+  color: var(--dz-mute) !important;
+}
+html[dir="rtl"] body #dash#dash .dash-page-title {
+  letter-spacing: 0 !important;
+  font-weight: 600 !important;
+}
+
+/* Readable helper text and labels (were 9–10px capitals) */
+html body #dash#dash .dash-view :is(.dash-note, .dash-empty, .dash-gate-inline > p, .cms-status, .dash-field > span) {
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--dz-mute) !important;
+}
+html body #dash#dash .dash-view .dash-field > span {
+  display: block !important;
+  margin-block-end: 6px !important;
+  font-weight: 600 !important;
+  color: var(--dz-ink) !important;
+}
+html body #dash#dash .dash-view .cms-status {
+  font-weight: 600 !important;
+  color: var(--dz-ink) !important;
+}
+
+/* One card style */
+html body #dash#dash .dash-view :is(.dash-card, .dash-latest-form, .dash-manage, .dash-box, .dash-set > .dash-row, .dash-gate-inline, .dash-bars, .dash-leads > *, .cms-card, .cms-row) {
+  background: var(--dz-card) !important;
+  background-image: none !important;
+  border: 1px solid var(--dz-line) !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+  color: var(--dz-ink) !important;
+}
+html body #dash#dash .dash-view :is(.dash-latest-form, .dash-manage, .dash-box, .dash-bars, .dash-gate-inline) {
+  padding: 22px 24px !important;
+  margin-block-end: 16px !important;
+}
+html body #dash#dash .dash-view .dash-latest-form {
+  max-inline-size: 640px !important;
+}
+html body #dash#dash .dash-view .dash-set {
+  display: grid !important;
+  gap: 10px !important;
+  max-inline-size: 640px !important;
+  margin-block-end: 16px !important;
+}
+html body #dash#dash .dash-view .dash-set > .dash-row {
+  padding: 14px 18px !important;
+}
+html body #dash#dash .dash-view .dash-box-h {
+  font-weight: 600 !important;
+  color: var(--dz-ink) !important;
+  margin-block-end: 12px !important;
+}
+html body #dash#dash .dash-view .dash-gate-inline {
+  max-inline-size: 520px !important;
+  margin-inline: 0 !important;
+  text-align: start !important;
+}
+html body #dash#dash .dash-view .dash-gate-inline h3 {
+  margin: 10px 0 4px !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  color: var(--dz-ink) !important;
+}
+html body #dash#dash .dash-view .dash-gate-icon {
+  color: var(--dz-faint) !important;
+}
+
+/* Overview figures */
+html body #dash#dash .dash-view .dash-cards {
+  gap: 14px !important;
+}
+html body #dash#dash .dash-view .dash-card {
+  padding: 20px 22px !important;
+}
+html body #dash#dash .dash-view .dash-card-n {
+  font-family: 'Fraunces', serif !important;
+  font-size: 44px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  letter-spacing: -.03em !important;
+  color: var(--dz-ink) !important;
+}
+html body #dash#dash .dash-view .dash-card .mono {
+  margin-block-start: 8px !important;
+  font-size: 13px !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--dz-mute) !important;
+}
+
+/* Works per collection */
+html body #dash#dash .dash-view .dash-bar-row {
+  gap: 16px !important;
+  padding-block: 6px !important;
+}
+html body #dash#dash .dash-view .dash-bar-label {
+  color: var(--dz-ink) !important;
+  font-size: 13px !important;
+}
+html body #dash#dash .dash-view .dash-bar {
+  block-size: 6px !important;
+  border-radius: 6px !important;
+  background: var(--dz-hover) !important;
+}
+html body #dash#dash .dash-view .dash-bar-fill {
+  border-radius: 6px !important;
+  background: var(--dz-ink) !important;
+}
+html body #dash#dash .dash-view .dash-bar-n {
+  color: var(--dz-mute) !important;
+  font-size: 12px !important;
+}
+
+/* Fields */
+html body #dash#dash .dash-view :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="color"]), select, textarea) {
+  min-height: 44px !important;
+  padding: 10px 14px !important;
+  border: 1px solid var(--dz-line) !important;
+  border-radius: 12px !important;
+  background: var(--dz-field) !important;
+  color: var(--dz-ink) !important;
+  font-size: 14px !important;
+  box-shadow: none !important;
+}
+html body #dash#dash .dash-view :is(input, select, textarea):focus {
+  outline: 2px solid var(--dz-ink) !important;
+  outline-offset: 1px !important;
+}
+html body #dash#dash .dash-view input[type="file"] {
+  inline-size: 100% !important;
+  padding: 8px !important;
+  border: 1px dashed var(--dz-line) !important;
+  border-radius: 12px !important;
+  background: var(--dz-field) !important;
+  color: var(--dz-mute) !important;
+  font-size: 13px !important;
+}
+html body #dash#dash .dash-view input[type="file"]::file-selector-button {
+  margin-inline-end: 12px !important;
+  padding: 8px 14px !important;
+  border: 1px solid var(--dz-line) !important;
+  border-radius: 9px !important;
+  background: var(--dz-card) !important;
+  color: var(--dz-ink) !important;
+  font: inherit !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+}
+
+/* Buttons: ink primary, outline secondary — no gold */
+html body #dash#dash .dash-view :is(.dash-btn, .dash-login button, .cms-btn, button.cms-save, .dash-gate-inline button) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  min-height: 42px !important;
+  padding: 0 18px !important;
+  border: 1px solid var(--dz-line) !important;
+  border-radius: 12px !important;
+  background: var(--dz-card) !important;
+  color: var(--dz-ink) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  box-shadow: none !important;
+}
+html body #dash#dash .dash-view :is(.dash-btn:hover, .dash-login button:hover, .cms-btn:hover, .dash-gate-inline button:hover) {
+  border-color: var(--dz-ink) !important;
+}
+html body #dash#dash .dash-view :is(.dash-btn--go, .dash-login button[type="submit"], .dash-login button:last-child, #laAdd, #wkUp, #setReset ~ .dash-btn--go, .cms-save, .dash-btn--primary) {
+  border-color: var(--dz-ink) !important;
+  background: var(--dz-ink) !important;
+  color: var(--dz-invert) !important;
+}
+html body #dash#dash .dash-view .dash-btn--danger {
+  color: #b3261e !important;
+}
+html:root[data-theme="dark"] body #dash#dash .dash-view .dash-btn--danger {
+  color: #f2b8b5 !important;
+}
+html body #dash#dash .dash-view :is(.cms-gate, .dash-prof-card) {
+  background: var(--dz-card) !important;
+  background-image: none !important;
+  border: 1px solid var(--dz-line) !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+  color: var(--dz-ink) !important;
+  padding: 22px 24px !important;
+  margin: 0 0 16px !important;
+}
+html body #dash#dash .dash-view .cms-gate {
+  max-inline-size: 520px !important;
+  text-align: start !important;
+}
+html body #dash#dash .dash-view .cms-gate h3 {
+  margin: 0 0 4px !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  color: var(--dz-ink) !important;
+}
+html body #dash#dash .dash-view :is(.cms-gate .cms-tokform, .dash-gate-inline .dash-login) {
+  display: flex !important;
+  gap: 10px !important;
+  justify-content: flex-start !important;
+  margin-block-start: 14px !important;
+}
+html body #dash#dash .dash-view :is(.cms-gate .cms-tokform input, .dash-gate-inline .dash-login input) {
+  flex: 1 1 auto !important;
+  min-inline-size: 0 !important;
+}
+html body #dash#dash .dash-view .cms-head .cms-status {
+  opacity: 1 !important;
+  font-size: 14px !important;
+}
+html body #dash#dash .dash-view .dash-latest-form > .dash-note:first-child,
+html body #dash#dash .dash-view > .dash-note:first-child {
+  margin-block-end: 14px !important;
+}
+html body #dash#dash .dash-view .dash-prof-card strong {
+  font-size: 16px !important;
+  color: var(--dz-ink) !important;
+}
+html body #dash#dash .dash-view .dash-prof-card .mono {
+  font-size: 12px !important;
+  letter-spacing: .02em !important;
+  text-transform: none !important;
+  color: var(--dz-mute) !important;
+}
+@media (min-width: 1100px) {
+  html body #dash#dash .dash-view .dash-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
