@@ -1026,6 +1026,7 @@
       studioUnavailable:'Publication could not be confirmed. Check Show images before trying again.',
       studioDatabaseUnavailable:'The secure publishing database could not be reached. Check the Cloudflare D1 binding and database health.',
       studioServerFailed:'The publishing server returned an error. Check its logs using the error reference below.',
+      studioEdgeFailed:'Cloudflare returned an error for the publishing request. Check its logs using the reference below, and check Show images before retrying.',
       studioResponseInvalid:'The publishing server returned an unreadable response. Check Show images before trying again.',
       studioResponseLarge:'The publishing server returned a response that exceeds its size limit. Check the server logs.',
       studioTimeout:'The publishing server timed out. Check Show images before trying again to avoid a duplicate upload.',
@@ -1046,6 +1047,7 @@
       studioUnavailable:'بڵاوکردنەوە پشتڕاست نەکرایەوە. پێش هەوڵدانەوە، بەشی پیشاندانی وێنەکان بپشکنە.',
       studioDatabaseUnavailable:'پەیوەندی بە داتابەیسی پارێزراوی بڵاوکردنەوە نەکرا. بەستنی D1 و دۆخی داتابەیسەکە لە Cloudflare بپشکنە.',
       studioServerFailed:'سێرڤەری بڵاوکردنەوە هەڵەی گەڕاندەوە. بە ناسێنەری هەڵەکەی خوارەوە لۆگەکانی بپشکنە.',
+      studioEdgeFailed:'Cloudflare بۆ داواکاری بڵاوکردنەوە هەڵەی گەڕاندەوە. بە ناسێنەری خوارەوە لۆگەکانی بپشکنە، و پێش هەوڵدانەوە بەشی پیشاندانی وێنەکان بپشکنە.',
       studioResponseInvalid:'وەڵامی سێرڤەری بڵاوکردنەوە نەخوێندرایەوە. پێش هەوڵدانەوە بەشی پیشاندانی وێنەکان بپشکنە.',
       studioResponseLarge:'قەبارەی وەڵامی سێرڤەر لە سنوورەکەی زیاترە. لۆگەکانی سێرڤەر بپشکنە.',
       studioTimeout:'کاتی چاوەڕوانی وەڵامی سێرڤەر تەواو بوو. بۆ ئەوەی وێنەکە دووبارە بار نەکرێت، پێش هەوڵدانەوە بەشی پیشاندانی وێنەکان بپشکنە.',
@@ -1417,11 +1419,11 @@
       fr:  { note:'Téléversez un design fini — il est redimensionné, converti en WebP et poussé dans son dossier sur GitHub. Il apparaît dans la galerie sous peu.', cat:'Catégorie / dossier', file:'Choisir une image (toute taille/format)', upload:'Publier dans la galerie', reading:'Préparation…', ready:'Prêt — cliquez sur Publier', pick:'Choisissez d’abord une image.', uploading:'Publication sur GitHub…', done:'Publié ✓ — il apparaît dans la galerie sous peu.', updating:'mise à jour des compteurs de la galerie…', updated:'galerie et compteurs des onglets mis à jour.', propagating:'rafraîchissez une fois si le nouveau fichier se propage encore.', noToken:'Le jeton GitHub n’est pas encore défini — ajoutez-le une fois.', connect:'Connectez d’abord l’éditeur (onglet Contenu).', fail:'Échec de la publication (site en ligne uniquement).' }
     };
     const WK_ACCESS_I18N = {
-      en:{ gate:'Connect gallery publishing', note:'Sign in with your editor password to upload and manage works.', wrong:'The editor password is incorrect. Try again.', noToken:'GitHub publishing is not connected. Configure the work-upload service with repository write access.' },
-      ku:{ gate:'بەستنی بڵاوکردنەوەی گەلەری', note:'بە پاسۆردی ئەدیتەر بچۆ ژوورەوە بۆ بارکردن و بەڕێوەبردنی کارەکان.', wrong:'پاسۆردی ئەدیتەر هەڵەیە. دووبارە هەوڵ بدەوە.', noToken:'بڵاوکردنەوەی GitHub بەستراو نییە. خزمەتگوزاری work-upload بە دەسەڵاتی نووسینی ڕیپۆ ڕێکبخە.' },
-      ar:{ gate:'ربط النشر في المعرض', note:'سجّل الدخول بكلمة مرور المحرر لرفع الأعمال وإدارتها.', wrong:'كلمة مرور المحرر غير صحيحة. حاول مجدداً.', noToken:'النشر عبر GitHub غير متصل. اضبط خدمة work-upload بصلاحية الكتابة في المستودع.' },
-      kmr:{ gate:'Weşandina galerîyê girêde', note:'Bi şîfreya edîtorê têkeve da ku karan bar bikî û birêve bibî.', wrong:'Şîfreya edîtorê çewt e. Dîsa biceribîne.', noToken:'Weşandina GitHub ne girêdayî ye. Xizmeta work-upload bi destûra nivîsandina repoyê saz bike.' },
-      fr:{ gate:'Connecter la publication du portfolio', note:'Connectez-vous avec votre mot de passe éditeur pour publier et gérer vos travaux.', wrong:'Le mot de passe éditeur est incorrect. Réessayez.', noToken:'La publication GitHub n’est pas connectée. Configurez le service work-upload avec un accès en écriture au dépôt.' }
+      en:{ gate:'Connect gallery publishing', gateNote:'Sign in with your editor password to upload and manage works.', wrong:'The editor password is incorrect. Try again.', noToken:'GitHub publishing is not connected. Configure the work-upload service with repository write access.' },
+      ku:{ gate:'بەستنی بڵاوکردنەوەی گەلەری', gateNote:'بە پاسۆردی ئەدیتەر بچۆ ژوورەوە بۆ بارکردن و بەڕێوەبردنی کارەکان.', wrong:'پاسۆردی ئەدیتەر هەڵەیە. دووبارە هەوڵ بدەوە.', noToken:'بڵاوکردنەوەی GitHub بەستراو نییە. خزمەتگوزاری work-upload بە دەسەڵاتی نووسینی ڕیپۆ ڕێکبخە.' },
+      ar:{ gate:'ربط النشر في المعرض', gateNote:'سجّل الدخول بكلمة مرور المحرر لرفع الأعمال وإدارتها.', wrong:'كلمة مرور المحرر غير صحيحة. حاول مجدداً.', noToken:'النشر عبر GitHub غير متصل. اضبط خدمة work-upload بصلاحية الكتابة في المستودع.' },
+      kmr:{ gate:'Weşandina galerîyê girêde', gateNote:'Bi şîfreya edîtorê têkeve da ku karan bar bikî û birêve bibî.', wrong:'Şîfreya edîtorê çewt e. Dîsa biceribîne.', noToken:'Weşandina GitHub ne girêdayî ye. Xizmeta work-upload bi destûra nivîsandina repoyê saz bike.' },
+      fr:{ gate:'Connecter la publication du portfolio', gateNote:'Connectez-vous avec votre mot de passe éditeur pour publier et gérer vos travaux.', wrong:'Le mot de passe éditeur est incorrect. Réessayez.', noToken:'La publication GitHub n’est pas connectée. Configurez le service work-upload avec un accès en écriture au dépôt.' }
     };
     const renderWorks = (connectionError = '') => {
       const colls = collections();
@@ -1431,7 +1433,7 @@
         const t = CT_I18N[curLang()] || CT_I18N.en;
         view.innerHTML = `<div class="dash-gate-inline">
           <i class="fa-solid fa-cloud-arrow-up dash-gate-icon"></i>
-          <h3>${esc(W.gate)}</h3><p class="mono">${esc(W.note)}</p>
+          <h3>${esc(W.gate)}</h3><p class="mono">${esc(W.gateNote)}</p>
           <form id="wkTokenForm" class="dash-login"><input type="password" id="wkToken" placeholder="${esc(t.tokPh)}" autocomplete="off" required><button type="submit">${esc(t.conn)} <i class="fa-solid fa-arrow-right"></i></button></form>
           <p class="dash-note mono" id="wkTokenMsg" role="status">${esc(connectionError)}</p></div>`;
         let connecting = false;
@@ -1769,6 +1771,13 @@
        network failure must never downgrade the signed two-factor session to a
        direct request carrying an editor credential to a different origin. */
     const studioFailure = (body, status = 0) => {
+      const http = Number.isInteger(status) && status >= 400 && status <= 599 ? `; HTTP ${status}` : '';
+      // Cloudflare problem responses have no `error` key. Keep only bounded
+      // reference fields; their explanatory text is never trusted UI copy.
+      if (body.cloudflare_error === true && Number.isInteger(body.error_code) && body.error_code >= 400 && body.error_code <= 1999) {
+        const ray = typeof body.ray_id === 'string' && /^[a-f0-9]{16}$/i.test(body.ray_id) ? `; Ray ID ${body.ray_id.toLowerCase()}` : '';
+        return { ok:false, error:'studio-edge-failed', detail:`${DT('studioEdgeFailed')} [studio-edge-failed${http}; Cloudflare ${body.error_code}${ray}]` };
+      }
       const messages = {
         'rate-limit-unavailable':'studioDatabaseUnavailable',
         'studio-upstream-failed':'studioServerFailed',
@@ -1781,7 +1790,6 @@
         'bad_response':'studioResponseInvalid'
       };
       const code = Object.hasOwn(messages, body.error) ? body.error : 'studio-service-failed';
-      const http = Number.isInteger(status) && status >= 400 && status <= 599 ? `; HTTP ${status}` : '';
       const upstream = Number.isInteger(body.upstreamStatus) && body.upstreamStatus >= 400 && body.upstreamStatus <= 599 ? `; upstream ${body.upstreamStatus}` : '';
       return { ...body, detail:`${DT(messages[code] || 'studioUnavailable')} [${code}${http}${upstream}]` };
     };

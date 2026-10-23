@@ -858,9 +858,10 @@ html body #design#design#design #services#services .service-accordion .service-p
   block-size: clamp(36px, 3.2vw, 42px) !important;
   margin: 0 !important;
   padding: 0 !important;
-  border: 1px solid var(--line) !important;
-  border-radius: 12px !important;
-  background: color-mix(in srgb, var(--ink) 4%, transparent) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
   color: var(--ink) !important;
   opacity: 1 !important;
   transform: none !important;
@@ -875,9 +876,8 @@ html body #design#design#design #services#services .service-accordion .service-p
 }
 
 html body #design#design#design #services#services .service-accordion .service-panel.is-active .service-icon {
-  border-color: var(--ink) !important;
-  background: var(--ink) !important;
-  color: var(--bq-paper-sheet, var(--bg)) !important;
+  background: transparent !important;
+  color: var(--ink) !important;
 }
 
 html body #design#design#design #services#services .service-accordion .service-panel .service-name {
@@ -950,11 +950,9 @@ html body #design#design#design #services#services .service-accordion .service-p
   transform: rotate(45deg) !important;
 }
 
-/* The press sweep (modern-framer.css) inverts a row under the pointer — the
-   icon tile follows the rest of the row into paper colour. */
+/* The press sweep inverts the row; its plain glyph follows the text. */
 html body #design#design#design #services#services .service-panel:not(.is-active):not(.is-arming) .service-trigger:is(:hover, :focus-visible) .service-icon {
-  border-color: transparent !important;
-  background: color-mix(in srgb, var(--bg) 14%, transparent) !important;
+  background: transparent !important;
   color: var(--bg) !important;
 }
 
@@ -1082,8 +1080,10 @@ html body #design#design#design #services#services .service-accordion .service-d
   inline-size: 24px !important;
   block-size: 24px !important;
   margin: 0 !important;
-  border-radius: 50% !important;
-  background: color-mix(in srgb, var(--ink) 7%, transparent) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
   color: var(--ink) !important;
   font-size: 10.5px !important;
   line-height: 1 !important;
@@ -2148,7 +2148,6 @@ html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blo
   --rm-line: color-mix(in srgb, var(--ink) 11%, transparent);
   --rm-wash: color-mix(in srgb, var(--ink) 4.5%, transparent);
   --rm-serif: 'Fraunces', 'Noto Kufi Arabic', serif;
-  --rm-night: #161615;
 }
 
 /* 1 — titles in Fraunces; Arabic-script letters fall back to Noto Kufi */
@@ -2227,21 +2226,23 @@ html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #bl
   padding: 6px 12px 6px 14px !important;
 }
 
-/* 4 — chapter titles carry their icon as the home's black chip */
+/* 4 — chapter glyphs sit directly on the paper, without decorative tiles. */
 html body #bio#bio#bio#bio > .paper-sheet .bio-block-title > i {
   display: inline-grid !important;
   place-items: center !important;
   inline-size: 1.12em !important;
   block-size: 1.12em !important;
-  border-radius: .3em !important;
-  background: var(--ink) !important;
-  color: var(--bg) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--ink) !important;
   font-size: .9em !important;
   opacity: 1 !important;
   flex: none !important;
 }
 html body #bio#bio#bio#bio > .paper-sheet .bio-block-title > i::before {
-  font-size: .4em !important;
+  font-size: .7em !important;
 }
 html body #bio#bio#bio#bio > .paper-sheet .bio-block-title {
   gap: .5em !important;
@@ -2375,42 +2376,40 @@ html body #bio#bio#bio#bio .lang-bar > span {
   border-radius: 2px !important;
 }
 
-/* 10 — biography features use night paper; Journal owns its paper-card palette. */
-html body #bio#bio#bio#bio .index-card {
-  background: var(--rm-night) !important;
-  background-image: none !important;
-  border: 0 !important;
-}
+/* 10 — card palettes are defined with their room layouts below. */
 html body :is(#bio#bio#bio#bio, #blog#blog#blog#blog) .index-row {
   border-color: var(--rm-line) !important;
 }
 
-/* 11 — links and documents: black marks, ink pills */
+/* 11 — links and documents use plain, theme-aware glyphs. */
 html body #bio#bio#bio#bio .bio-social-mark {
-  background: var(--ink) !important;
-  color: var(--bg) !important;
-  border-radius: 12px !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--ink) !important;
+  border-radius: 0 !important;
 }
 html body #bio#bio#bio#bio .bio-social-mark i {
-  color: var(--bg) !important;
+  color: inherit !important;
 }
 html body #bio#bio#bio#bio .bio-social-title em {
   color: inherit !important;
 }
 html body #bio#bio#bio#bio .bio-social-go {
-  border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent) !important;
+  border: 0 !important;
+  box-shadow: none !important;
   color: var(--ink) !important;
   background: transparent !important;
 }
 html body #bio#bio#bio#bio .bio-social-go:hover {
-  background: var(--ink) !important;
-  color: var(--bg) !important;
+  background: transparent !important;
+  color: var(--ink) !important;
 }
 html body #bio#bio#bio#bio .bio-social-handle {
   color: var(--rm-faint) !important;
 }
 
-/* 12 — contact: four ruled cards with the home's black chip */
+/* 12 — contact: four ruled entries with unboxed icons. */
 html body #contact#contact#contact#contact .qc-card {
   background: transparent !important;
   border: 0 !important;
@@ -2424,9 +2423,11 @@ html body #contact#contact#contact#contact .qc-card > i {
   place-items: center !important;
   inline-size: 36px !important;
   block-size: 36px !important;
-  border-radius: 11px !important;
-  background: var(--ink) !important;
-  color: var(--bg) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--ink) !important;
   font-size: 13px !important;
 }
 
@@ -2714,6 +2715,10 @@ html body #dash#dash .dash-tool i {
   inline-size: 18px !important;
   font-size: 14px !important;
   text-align: center !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
   color: var(--dz-faint) !important;
 }
 html body #dash#dash .dash-tab:hover,
@@ -3530,3 +3535,18 @@ html:has(#dash.is-open) :is(.cursor-dot, .cursor-ring) { visibility: hidden !imp
 
 /* Dashboard layout must always respect authenticated/conditional visibility. */
 html body #dash#dash [hidden] { display: none !important; }
+
+/* Decorative glyphs need no second tile inside their existing button/card.
+   Keep control hit areas, selected tabs, media controls and status badges. */
+html body :is(.cookie-card-ic, .studio-proof-item > i),
+html body #mobileMenu#mobileMenu#mobileMenu .mobile-menu-close > i,
+html body #dash#dash :is(.dash-gate-icon, .dash-btn > i, .cms-btn > i, .dash-login button > i) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+html body #mobileMenu#mobileMenu#mobileMenu .mobile-menu-close > i,
+html body #dash#dash :is(.dash-btn > i, .cms-btn > i, .dash-login button > i) {
+  color: inherit !important;
+}

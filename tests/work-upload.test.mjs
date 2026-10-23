@@ -29,7 +29,7 @@ function worksFixture({ token = 'browser-editor', resize = async () => 'webp-ima
   const context = {
     $:selector => nodes[selector], view, collections:() => collection, curLang:() => 'en',
     window:{ BQ_GALLERY:{ COLLECTIONS:collection } },
-    WK_I18N:{ en:{ note:'Upload', upload:'Publish', cat:'Folder', file:'Image', reading:'Preparing', ready:'Ready', pick:'Pick an image', uploading:'Publishing', done:'Published', fail:'Failed' } },
+    WK_I18N:{ en:{ note:'Upload a finished design.', upload:'Publish', cat:'Folder', file:'Image', reading:'Preparing', ready:'Ready', pick:'Pick an image', uploading:'Publishing', done:'Published', fail:'Failed' } },
     CT_I18N:{ en:{ tokPh:'Editor password', conn:'Connect' } },
     editToken:() => store.get('bq_edit_token') || '',
     sessionStorage:{ setItem:(key, value) => store.set(key, value), removeItem:key => store.delete(key) },
@@ -51,6 +51,8 @@ test('Works connects its editor directly and verifies publishing access before s
   let finish;
   const f = worksFixture({ token:'', api:() => new Promise(resolve => { finish = resolve; }) });
   assert.match(f.view.innerHTML, /Connect gallery publishing/);
+  assert.match(f.view.innerHTML, /Sign in with your editor password/);
+  assert.doesNotMatch(f.view.innerHTML, /Upload a finished design\./);
   assert.doesNotMatch(f.view.innerHTML, /id="wkFile"/);
   const first = f.connect('browser-editor');
   assert.equal(f.nodes['#wkToken'].value, '');
@@ -62,6 +64,8 @@ test('Works connects its editor directly and verifies publishing access before s
   await first;
   assert.match(f.view.innerHTML, /id="wkFile"/);
   assert.match(f.view.innerHTML, /id="wkUp"[^>]*disabled/);
+  assert.match(f.view.innerHTML, /Upload a finished design\./);
+  assert.doesNotMatch(f.view.innerHTML, /Sign in with your editor password/);
 });
 
 test('Works rejects a wrong editor password without presenting upload controls', async () => {
@@ -188,6 +192,41 @@ test('Studio hides unknown server messages and rejects untrusted upstream status
     }));
     const result = await call();
     assert.equal(result.detail, 'studioUnavailable [studio-service-failed; HTTP 503]');
+  }
+});
+
+test('Studio recognizes Cloudflare problem responses and displays only safe diagnostic references', async () => {
+  const call = studioFixture(async () => ({
+    status:502,
+    json:async () => ({
+      cloudflare_error:true, error_code:502, ray_id:'A4F1D87FE836D384',
+      title:'private server title', detail:'private server detail', email:'private@example.com'
+    })
+  }));
+  const result = await call();
+  assert.equal(result.ok, false);
+  assert.equal(result.error, 'studio-edge-failed');
+  assert.equal(result.detail, 'studioEdgeFailed [studio-edge-failed; HTTP 502; Cloudflare 502; Ray ID a4f1d87fe836d384]');
+  assert.deepEqual(Object.keys(result).sort(), ['detail', 'error', 'ok']);
+  assert.doesNotMatch(JSON.stringify(result), /private/);
+
+  const invalidRay = await studioFixture(async () => ({
+    status:502,
+    json:async () => ({ cloudflare_error:true, error_code:1101, ray_id:'private@example.com' })
+  }))();
+  assert.equal(invalidRay.detail, 'studioEdgeFailed [studio-edge-failed; HTTP 502; Cloudflare 1101]');
+});
+
+test('Studio requires a genuine Cloudflare marker and bounded integer code before classifying an edge failure', async () => {
+  const invalid = [
+    { cloudflare_error:'true', error_code:502 },
+    { cloudflare_error:false, error_code:502 },
+    { error_code:502 },
+    ...['502', 399, 2000, 502.5].map(error_code => ({ cloudflare_error:true, error_code }))
+  ];
+  for (const body of invalid) {
+    const result = await studioFixture(async () => ({ status:502, json:async () => body }))();
+    assert.equal(result.detail, 'studioUnavailable [studio-service-failed; HTTP 502]');
   }
 });
 
