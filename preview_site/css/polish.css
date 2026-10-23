@@ -955,6 +955,12 @@ html body #design#design#design #services#services .service-panel:not(.is-active
   background: transparent !important;
   color: var(--bg) !important;
 }
+html body #design#design#design #services#services .service-panel:not(.is-active):not(.is-arming) .service-trigger:is(:hover, :focus-visible) :is(.service-name, .service-sub, .service-toggle) {
+  color: var(--bg) !important;
+}
+html body #design#design#design #services#services .service-panel:not(.is-active):not(.is-arming) .service-trigger:is(:hover, :focus-visible) .service-toggle {
+  border-color: color-mix(in srgb, var(--bg) 45%, transparent) !important;
+}
 
 /* ---- the open row ----
    A row opens and closes by animating its own height between 0 and the
@@ -1837,6 +1843,15 @@ html body .footer.footer.paper-sheet[data-paper-fit] > .paper-scroll > .footer-s
   height: auto !important;
   min-height: 0 !important;
   max-height: none !important;
+}
+
+/* English display copy wraps between words; reserve emergency breaks for
+   unusually narrow windows instead of auto-hyphenating the headline. */
+html:lang(en) body #footerCtaTitle {
+  -webkit-hyphens: none;
+  hyphens: none;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
 }
 
 @media (max-height: 640px) {

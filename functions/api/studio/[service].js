@@ -210,9 +210,12 @@ export async function onRequestPost({ request, env, params }) {
         'x-edit-token': String(env.SUPABASE_EDIT_TOKEN)
       },
       body: JSON.stringify(body),
-      redirect: 'error',
+      // workerd supports only follow/manual. Explicitly reject redirects below
+      // so the private upstream credential can never reach another location.
+      redirect: 'manual',
       signal: AbortSignal.timeout(60_000)
     });
+    if (upstream.status >= 300 && upstream.status < 400) return upstreamFailure('studio-upstream-invalid', upstream.status);
     if (upstream.status === 204) return noContent();
     // The browser credential has already passed Pages. An upstream auth
     // rejection is a server configuration failure, not a request to reconnect

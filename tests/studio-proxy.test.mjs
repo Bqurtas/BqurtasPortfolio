@@ -105,8 +105,33 @@ test('Studio proxy substitutes the server-only Supabase credential', async (t) =
   assert.equal(forwarded.url, 'https://dcnkhzrishphpismmxuu.supabase.co/functions/v1/blog-admin');
   assert.equal(forwarded.init.headers['x-edit-token'], 'server-only-upstream-secret');
   assert.notEqual(forwarded.init.headers['x-edit-token'], 'browser-edit-secret');
-  assert.equal(forwarded.init.redirect, 'error', 'redirects must never forward the private upstream credential elsewhere');
+  assert.equal(forwarded.init.redirect, 'manual', 'workerd must accept the redirect mode without following the private upstream credential elsewhere');
   assert.match(response.headers.get('cloudflare-cdn-cache-control'), /no-store/);
+});
+
+test('Studio proxy rejects upstream redirects without following them or exposing a redirect to the browser', async (t) => {
+  t.mock.method(console, 'warn', () => {});
+  for (const status of [301, 302, 303, 304, 307, 308]) {
+    const calls = [];
+    t.mock.method(globalThis, 'fetch', async (url, init) => {
+      calls.push({ url, init });
+      assert.equal(init.redirect, 'manual');
+      return new Response(status === 304 ? null : JSON.stringify({ ok:true }), {
+        status,
+        headers:{ Location:'https://untrusted.example/private' }
+      });
+    });
+    const response = await studioPost({
+      request:request('work-upload', 'browser-edit-secret', { action:'list', folder:'Book' }, { Cookie:await cookie() }),
+      env:BASE_ENV,
+      params:{ service:'work-upload' }
+    });
+    assert.equal(response.status, 502);
+    assert.deepEqual(await response.json(), { ok:false, error:'studio-upstream-invalid', upstreamStatus:status });
+    assert.equal(response.headers.get('Location'), null);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].url, 'https://dcnkhzrishphpismmxuu.supabase.co/functions/v1/work-upload');
+  }
 });
 
 test('Studio proxy only permits known services, actions and safe work folders', async () => {
