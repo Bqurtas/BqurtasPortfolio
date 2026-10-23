@@ -2985,3 +2985,543 @@ html body #dash#dash .dash-view .dash-prof-card .mono {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   }
 }
+
+/* ============================================================================
+   INNER ROOMS — editorial mastheads, a journal index, and a studio letter.
+   Keep the existing paper stack and measured viewport fitting intact.
+   ========================================================================== */
+html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-inner {
+  position: relative !important;
+  inline-size: 100% !important;
+  max-inline-size: 1100px !important;
+  padding-block: 30px !important;
+  gap: 0 !important;
+  text-align: start !important;
+  isolation: isolate;
+}
+html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-num {
+  inline-size: 100%;
+  margin-block-end: 28px !important;
+  padding-block-end: 18px;
+  border-block-end: 1px solid var(--line);
+  opacity: 1 !important;
+  color: var(--ink-soft) !important;
+  font-size: 11px !important;
+}
+html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-title {
+  max-inline-size: 12ch !important;
+  font-family: 'Fraunces', 'Noto Kufi Arabic', serif !important;
+  font-size: clamp(62px, min(10vw, 16svh), 138px) !important;
+  font-weight: 400 !important;
+  line-height: 1.04 !important;
+  letter-spacing: -.055em !important;
+  text-wrap: balance;
+}
+html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-title em { font-weight: 400 !important; }
+html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-sub {
+  max-inline-size: 38ch !important;
+  margin: 26px 0 0 !important;
+  font-size: clamp(16px, 1.7vw, 21px) !important;
+  line-height: 1.65 !important;
+  color: var(--ink-soft) !important;
+  opacity: 1 !important;
+  text-wrap: pretty;
+}
+html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-ghost { display: none !important; }
+html[dir='rtl'] body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-title {
+  font-family: 'Noto Kufi Arabic', serif !important;
+  font-size: clamp(44px, min(8vw, 12svh), 100px) !important;
+  line-height: 1.45 !important;
+  letter-spacing: 0 !important;
+}
+
+/* Journal: readable contents beside one image-led feature. */
+html body #blog#blog#blog .blog-index-sheet .section-head {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, .62fr) !important;
+  gap: 14px 40px !important;
+  align-items: end !important;
+  margin-block-end: 28px !important;
+  padding: 0 0 24px !important;
+  border-block-end: 1px solid var(--line) !important;
+}
+html body #blog#blog#blog .blog-index-sheet .section-head > .section-num { grid-column: 1 / -1 !important; margin: 0 !important; }
+html body #blog#blog#blog .blog-index-sheet .section-title {
+  grid-column: 1 !important;
+  font-family: 'Fraunces', 'Noto Kufi Arabic', serif !important;
+  font-size: clamp(38px, 4.8vw, 62px) !important;
+  font-weight: 400 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -.04em !important;
+  margin: 0 !important;
+  max-inline-size: none !important;
+}
+html body #blog#blog#blog .blog-index-sheet .section-head > .section-lede {
+  grid-column: 2 !important;
+  margin: 0 0 3px !important;
+  max-inline-size: 28ch !important;
+  font-size: 15px !important;
+  line-height: 1.65 !important;
+  text-align: start !important;
+  color: var(--ink-soft) !important;
+}
+html body #blog#blog#blog .blog-filters { gap: 8px !important; margin-block: 0 20px !important; flex-wrap: wrap !important; }
+html body #blog#blog#blog .blog-filter { min-block-size: 36px; padding: 8px 15px !important; font-size: 10px !important; }
+html body #blog#blog#blog .index-layout--blog {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr) !important;
+  align-items: start !important;
+  gap: clamp(26px, 4vw, 60px) !important;
+  margin: 0 !important;
+}
+html body #blog#blog#blog #blogList { min-inline-size: 0; border-block-start: 1px solid var(--line); }
+html body #blog#blog#blog .index-ghost { display: none !important; }
+html body #blog#blog#blog .blog-index-sheet .index-row {
+  display: grid !important;
+  grid-template-columns: 42px minmax(0, 1fr) 24px !important;
+  gap: 7px 14px !important;
+  align-items: start !important;
+  padding: 24px 0 !important;
+  border: 0 !important;
+  border-block-end: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+html body #blog#blog#blog .index-row::before { display: none !important; }
+html body #blog#blog#blog .index-row::after {
+  content: '↗';
+  position: static !important;
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  font-size: 24px;
+  color: var(--ink-soft);
+  opacity: .65;
+  transform: none !important;
+}
+html body #blog#blog#blog .index-row-num { grid-column: 1; grid-row: 1 / span 2; font-size: 10px !important; line-height: 1.8; color: var(--ink-soft) !important; white-space: normal !important; }
+html body #blog#blog#blog .blog-index-sheet .index-row .index-row-title {
+  grid-column: 2;
+  font-size: clamp(20px, 2.15vw, 28px) !important;
+  line-height: 1.35 !important;
+  font-weight: 500 !important;
+  color: var(--ink) !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  text-wrap: pretty;
+}
+html body #blog#blog#blog .index-row-tag { grid-column: 2; font-size: 9px !important; color: var(--ink-soft) !important; opacity: 1 !important; transform: none !important; }
+html body #blog#blog#blog .index-row:hover .index-row-title { text-decoration: underline; text-underline-offset: .2em; text-decoration-thickness: 1px; }
+html body #blog#blog#blog .index-preview { display: block !important; position: static !important; min-inline-size: 0; }
+html body #blog#blog#blog .index-card--blog {
+  min-block-size: 0 !important;
+  block-size: auto !important;
+  padding: 0 !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  background: var(--bg) !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+html body #blog#blog#blog .blog-card-cover { block-size: auto !important; min-block-size: 0 !important; aspect-ratio: 16 / 8 !important; margin: 0 !important; }
+html body #blog#blog#blog .blog-card-cover img { inline-size: 100% !important; block-size: 100% !important; object-fit: cover !important; opacity: 1 !important; border-radius: 0 !important; }
+html body #blog#blog#blog .blog-card-cover::after { display: none !important; }
+html body #blog#blog#blog .blog-card-body { padding: 24px !important; background: transparent !important; gap: 14px !important; }
+html body #blog#blog#blog .blog-card-tag { background: var(--ink) !important; color: var(--bg) !important; font-size: 9px !important; }
+html body #blog#blog#blog .blog-card-title { font-size: 22px !important; line-height: 1.35 !important; font-weight: 600 !important; color: var(--ink) !important; }
+html body #blog#blog#blog .blog-card-excerpt { display: block !important; font-size: 14px !important; line-height: 1.65 !important; color: var(--ink-soft) !important; -webkit-line-clamp: unset !important; }
+html body #blog#blog#blog .blog-card-foot { padding-block-start: 16px !important; margin-block-start: 18px !important; border-block-start: 1px solid var(--line) !important; }
+html body #blog#blog#blog .blog-card-author strong { font-size: 11px !important; color: var(--ink) !important; }
+html body #blog#blog#blog :is(.blog-card-author small, .blog-card-read, .blog-card-cta) { font-size: 9px !important; color: var(--ink-soft) !important; opacity: 1 !important; }
+html body #blog#blog#blog .blog-card-cta { margin-block-start: 18px !important; }
+html body #blog#blog#blog .blog-pager { margin-block-start: 24px !important; padding-block-start: 20px !important; border-block-start: 1px solid var(--line); gap: 12px !important; }
+html body #blog#blog#blog #blogIndex:not([data-blog-state='ready']) :is(.blog-card-cover, .blog-card-foot, .blog-card-cta) { display: none !important; }
+html body #blog#blog#blog .blog-feed-status { padding: 28px 0; color: var(--ink-soft); font-size: 15px; line-height: 1.7; }
+
+/* The newsletter has its own paper, so its form never shrinks the contents. */
+html body #blog#blog#blog .blog-subscribe-sheet .subscribe {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, .8fr) !important;
+  gap: clamp(36px, 7vw, 100px) !important;
+  align-items: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+html body #blog#blog#blog .subscribe::before { display: none !important; }
+html body #blog#blog#blog .subscribe-eyebrow { margin-block-end: 28px !important; font-size: 10px !important; color: var(--ink-soft) !important; line-height: 1.8; }
+html body #blog#blog#blog .subscribe-title { font-family: 'Fraunces', 'Noto Kufi Arabic', serif !important; font-size: clamp(40px, 5vw, 70px) !important; font-weight: 400 !important; line-height: 1.12 !important; letter-spacing: -.035em; margin-block-end: 24px !important; max-inline-size: 13ch; }
+html body #blog#blog#blog .subscribe-text p { max-inline-size: 38ch !important; font-size: 16px !important; line-height: 1.75 !important; color: var(--ink-soft) !important; }
+html body #blog#blog#blog .subscribe-form { gap: 12px !important; margin: 0 !important; padding: 24px 0 0 !important; border-block-start: 1px solid var(--line); }
+html body #blog#blog#blog .subscribe-field { min-block-size: 60px; padding: 12px 18px !important; border: 1px solid var(--line) !important; border-radius: 12px !important; background: transparent !important; }
+html body #blog#blog#blog .subscribe-field input { font-size: 17px !important; color: var(--ink) !important; background: transparent !important; }
+html body #blog#blog#blog .subscribe-form button { min-block-size: 52px; font-size: 11px !important; letter-spacing: .14em; }
+
+/* Contact: four clear entries, then an open letter with a generous margin. */
+html body #contact#contact#contact .contact-reach-sheet .sheet-mid { display: grid !important; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr) !important; gap: clamp(32px, 6vw, 88px); align-items: start !important; }
+html body #contact#contact#contact .contact-reach-sheet .section-head { display: block !important; margin: 0 !important; padding: 0 !important; }
+html body #contact#contact#contact .contact-reach-sheet .section-num { display: block !important; margin-block-end: 24px !important; }
+html body #contact#contact#contact .contact-eyebrow { font-size: 10px !important; line-height: 1.8 !important; color: var(--ink-soft) !important; white-space: normal !important; }
+html body #contact#contact#contact .contact-reach-sheet .section-title { font-family: 'Fraunces', 'Noto Kufi Arabic', serif !important; font-size: clamp(38px, 4.5vw, 64px) !important; font-weight: 400 !important; line-height: 1.15 !important; margin-block-start: 20px !important; max-inline-size: 12ch !important; letter-spacing: -.035em; }
+html body #contact#contact#contact .contact-quick { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; gap: 0 !important; margin: 0 !important; }
+html body #contact#contact#contact .contact-quick .qc-card,
+html body #contact#contact#contact .contact-quick .qc-card:hover {
+  display: grid !important;
+  grid-template-columns: 26px minmax(0, 1fr) 22px !important;
+  gap: 18px !important;
+  align-items: center !important;
+  padding: 25px 0 !important;
+  border: 0 !important;
+  border-block-start: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+html body #contact#contact#contact .qc-card::after { content: '↗'; position: static !important; font-size: 23px; color: var(--ink-soft); }
+html body #contact#contact#contact .contact-quick .qc-card > i { inline-size: 26px !important; block-size: auto !important; border: 0 !important; background: transparent !important; font-size: 20px !important; color: var(--ink) !important; }
+html body #contact#contact#contact .contact-quick .qc-card .mono { display: block; font-size: 10px !important; line-height: 1.7 !important; color: var(--ink-soft) !important; opacity: 1 !important; }
+html body #contact#contact#contact .contact-quick .qc-card p { margin-block-start: 7px !important; font-size: clamp(18px, 2vw, 25px) !important; font-weight: 500; line-height: 1.4 !important; color: var(--ink) !important; }
+html body #contact#contact#contact .contact-quick .qc-card:hover p { text-decoration: underline; text-underline-offset: .2em; text-decoration-thickness: 1px; }
+html body #contact#contact#contact .pitch-wrap { display: grid !important; grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr) !important; gap: clamp(32px, 5vw, 72px) !important; align-items: start !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; }
+html body #contact#contact#contact .contact-pitch-sheet .pitch-head.pitch-head--compact { display: flex !important; flex-direction: column !important; align-items: flex-start !important; gap: 22px !important; margin: 0 !important; padding: 0 !important; }
+html body #contact#contact#contact .contact-pitch-sheet .pitch-head.pitch-head--compact > .mono:first-child { font-size: 10px !important; white-space: normal !important; line-height: 1.7 !important; }
+html body #contact#contact#contact .contact-pitch-sheet .pitch-head.pitch-head--compact h3 { font-family: 'Fraunces', 'Noto Kufi Arabic', serif !important; font-size: clamp(32px, 3.5vw, 48px) !important; font-weight: 400 !important; line-height: 1.2 !important; letter-spacing: -.035em !important; white-space: normal !important; overflow: visible !important; text-overflow: clip !important; max-inline-size: 15ch !important; padding: 0 !important; margin: 0 !important; }
+html body #contact#contact#contact .contact-pitch-sheet .pitch-head.pitch-head--compact .section-lede { display: block !important; font-size: 15px !important; line-height: 1.75 !important; color: var(--ink-soft) !important; margin: 0 !important; max-inline-size: 34ch !important; }
+html body #contact#contact#contact .pitch-head .pitch-mail { display: flex !important; position: static !important; font-size: 11px !important; margin: 0 !important; padding-block: 18px 0 !important; border-block-start: 1px solid var(--line) !important; }
+html body #contact#contact#contact#contact .pitch-form { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 18px 20px !important; }
+html body #contact#contact#contact .pitch-form .field > label:not(.checkbox) { font-size: 12px !important; font-weight: 500 !important; line-height: 1.6 !important; letter-spacing: .015em !important; text-transform: none !important; color: var(--ink-soft) !important; }
+html body #contact#contact#contact .pitch-form .field > label:not(.checkbox) i { display: none !important; }
+html body #contact#contact#contact#contact.paper-stack > .paper-sheet[data-paper-fit] .pitch-form :is(input:not([type='checkbox']), select) { block-size: max(48px, calc(40px / var(--bq-paper-fit, 1))) !important; min-block-size: max(48px, calc(40px / var(--bq-paper-fit, 1))) !important; padding-inline: 14px !important; border: 1px solid var(--line) !important; border-radius: 9px !important; background: transparent !important; }
+html body #contact#contact#contact .pitch-form textarea { block-size: 120px !important; min-block-size: 120px !important; padding: 14px !important; border: 1px solid var(--line) !important; border-radius: 9px !important; background: transparent !important; }
+html body #contact#contact#contact .pitch-form .pitch-submit { min-block-size: 50px !important; font-size: 11px !important; letter-spacing: .1em; }
+
+@media (max-width: 1024px) {
+  html body #blog#blog#blog .index-layout--blog { grid-template-columns: minmax(0, 1fr) !important; }
+  html body #blog#blog#blog .index-preview { display: none !important; }
+  html body #blog#blog#blog .index-inline { margin: 0 !important; padding: 22px !important; border: 1px solid var(--line) !important; border-radius: 14px !important; background: transparent !important; }
+  html body #blog#blog#blog .index-inline-title { font-size: 24px !important; line-height: 1.4 !important; }
+  html body #blog#blog#blog .index-inline-sub { font-size: 15px !important; line-height: 1.7 !important; color: var(--ink-soft) !important; }
+}
+@media (max-width: 820px) {
+  html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-inner { padding: 20px 0 !important; }
+  html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-title { font-size: clamp(54px, 14vw, 96px) !important; }
+  html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-ghost { display: none !important; }
+  html body #blog#blog#blog .blog-index-sheet .section-head { grid-template-columns: minmax(0, 1fr) !important; gap: 14px !important; }
+  html body #blog#blog#blog .blog-index-sheet .section-head > .section-lede { grid-column: 1 !important; }
+  html body #blog#blog#blog .blog-index-sheet .index-row { grid-template-columns: 36px minmax(0, 1fr) 20px !important; gap: 6px 10px !important; padding-block: 22px !important; }
+  html body #blog#blog#blog .blog-index-sheet .index-row .index-row-title { font-size: 21px !important; line-height: 1.45 !important; }
+  html body #blog#blog#blog .blog-pager { flex-wrap: wrap !important; justify-content: flex-start !important; }
+  html body #blog#blog#blog .blog-pager-go { margin-inline-start: auto !important; }
+  html body #blog#blog#blog .blog-subscribe-sheet .subscribe { grid-template-columns: minmax(0, 1fr) !important; gap: 36px !important; }
+  html body #blog#blog#blog .subscribe-title { font-size: clamp(38px, 10.5vw, 58px) !important; }
+  html body #contact#contact#contact .contact-reach-sheet .sheet-mid,
+  html body #contact#contact#contact .pitch-wrap { grid-template-columns: minmax(0, 1fr) !important; gap: 36px !important; }
+  html body #contact#contact#contact .contact-reach-sheet .section-title { max-inline-size: 15ch !important; font-size: clamp(38px, 10.5vw, 58px) !important; }
+  html body #contact#contact#contact .contact-quick .qc-card { padding-block: 23px !important; }
+  html body #contact#contact#contact .contact-quick .qc-card p { font-size: 20px !important; }
+  html body #contact#contact#contact .contact-pitch-sheet .pitch-head.pitch-head--compact h3 { max-inline-size: 19ch !important; font-size: clamp(32px, 9vw, 44px) !important; }
+}
+@media (max-width: 600px) {
+  html body #contact#contact#contact#contact .pitch-form { grid-template-columns: minmax(0, 1fr) !important; gap: 22px !important; }
+  html body #contact#contact#contact#contact .pitch-form .row-2 > .field { grid-column: 1 / -1 !important; }
+  html body #contact#contact#contact .pitch-form .field > label:not(.checkbox) { font-size: 13px !important; }
+  html body #contact#contact#contact .pitch-form textarea { block-size: 160px !important; min-block-size: 160px !important; }
+}
+@media (max-height: 540px) {
+  html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-title { font-size: clamp(38px, 14svh, 68px) !important; }
+  html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-ghost { display: none !important; }
+}
+
+/* Feed state is authoritative even when an earlier layout sets display. */
+html body #blog#blog#blog :is(.blog-filters, .blog-pager, .blog-feed-status, .blog-card-foot, .blog-card-cta, .blog-card-cover img)[hidden] { display: none !important; }
+
+/* The desktop toolbar remains above the menu. Phones/tablets retain their
+   original curtain over the dock. Keep each bar's anchor and viewport scale. */
+@media (min-width: 1025px) {
+  html body:is(.menu-open, .menu-revealed, .menu-closing) > .rail.rail {
+    position: fixed !important;
+    z-index: 2000 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+}
+
+/* The page is a visual preview until the menu finishes closing. Its actual
+   content is inert, but its stage remains a click target to dismiss the menu. */
+html body:is(.menu-open, .menu-revealed, .menu-closing) > .bq-page-stage > [inert] {
+  pointer-events: none !important;
+}
+
+/* Biography — a portrait, a margin note and an open professional record.
+   Content-only refinement: the shared paper-stack owns frame/scroll geometry. */
+html body #bio#bio#bio {
+  --bio-rule: color-mix(in srgb, var(--ink) 15%, transparent);
+  --bio-muted: color-mix(in srgb, var(--ink) 68%, transparent);
+}
+html body #bio#bio#bio :is(.bio-block, .bio-social)[data-wm]::before { display: none !important; }
+html body #bio#bio#bio :is(.bio-block, .bio-chapter-heading, .bio-hero-layout, .bio-phil-margin, .bio-phil-copy, .bio-social-text) { min-inline-size: 0 !important; }
+html body #bio#bio#bio :is(.section-title, .bio-block-title, .bio-social-title, .index-row-title, .index-card-title, .tl-head h4) {
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+  white-space: normal !important;
+  text-overflow: clip !important;
+}
+
+/* Open chapters replace nested boxes and decorative watermarks. */
+html body #bio#bio#bio .bio-chapter-heading { margin-block-end: 28px; }
+html body #bio#bio#bio .bio-block-title {
+  display: flex !important;
+  align-items: baseline !important;
+  flex-wrap: nowrap !important;
+  gap: 14px !important;
+  margin: 0 0 24px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  font-size: clamp(22px, 2.5vw, 32px) !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  letter-spacing: -.035em !important;
+}
+html body #bio#bio#bio .bio-block-title > i { display: none !important; }
+html body #bio#bio#bio .bio-chapter-index { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 28px; block-size: 28px; border: 1px solid var(--bio-rule); border-radius: 50%; font-size: 10px !important; font-weight: 400; line-height: 1 !important; letter-spacing: 0 !important; color: var(--bio-muted) !important; transform: translateY(-3px); }
+html body #bio#bio#bio .bio-block-lede { margin: -12px 0 0 !important; font-size: 14px !important; line-height: 1.8 !important; color: var(--bio-muted) !important; }
+html body #bio#bio#bio .bio-story-sheet .section-head { display: grid !important; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 12px clamp(24px, 4vw, 60px); align-items: start !important; margin: 0 0 36px !important; }
+html body #bio#bio#bio .bio-story-sheet .section-num { grid-column: 1; gap: 12px !important; margin: 0 !important; font-size: 10px !important; line-height: 1.7 !important; }
+html body #bio#bio#bio .bio-story-sheet .section-title { grid-column: 1; max-inline-size: 16ch !important; margin: 0 !important; font-size: clamp(28px, 3vw, 40px) !important; line-height: 1.25 !important; }
+html body #bio#bio#bio .bio-story-sheet .section-lede { grid-column: 2; grid-row: 1 / span 2; max-inline-size: 55ch !important; margin: 0 !important; font-size: 14px !important; line-height: 1.9 !important; color: var(--bio-muted) !important; }
+html body #bio#bio#bio .bio-story-sheet .dropcap { float: none !important; margin: 0 !important; padding: 0 !important; font: inherit !important; line-height: inherit !important; }
+html body #bio#bio#bio .bio-philosophy { display: grid !important; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) !important; gap: clamp(24px, 4vw, 60px) !important; align-items: start !important; padding-block-start: 30px !important; border-block-start: 1px solid var(--bio-rule) !important; }
+html body #bio#bio#bio .bio-phil-eyebrow { display: block !important; margin: 0 0 16px !important; font-size: 10px !important; line-height: 1.8 !important; color: var(--bio-muted) !important; }
+html body #bio#bio#bio .bio-phil-eyebrow > i { display: none !important; }
+html body #bio#bio#bio .bio-phil-label { margin: 0 0 18px !important; font-size: 20px !important; font-weight: 500 !important; line-height: 1.5 !important; }
+html body #bio#bio#bio .bio-phil-quote { max-inline-size: 25ch !important; margin: 0 !important; padding: 0 !important; border: 0 !important; font-family: Fraunces, Georgia, serif !important; font-size: clamp(22px, 2.4vw, 30px) !important; font-weight: 400 !important; font-style: italic !important; line-height: 1.5 !important; color: var(--ink) !important; }
+html body #bio#bio#bio .bio-phil-text { display: block !important; max-inline-size: 62ch !important; columns: 1 !important; }
+html body #bio#bio#bio .bio-phil-text p { margin: 0 0 17px !important; font-size: 14px !important; line-height: 1.95 !important; color: var(--bio-muted) !important; text-align: start !important; }
+html body #bio#bio#bio .bio-phil-text p:last-child { margin-block-end: 0 !important; }
+html body #bio#bio#bio .bio-phil-sign { display: block !important; margin: 24px 0 0 !important; font-size: 36px !important; }
+
+/* The working kit is a small directory rather than a wall of capsules. */
+html body #bio#bio#bio .bio-tools { display: block !important; }
+html body #bio#bio#bio .bio-tools-directory { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 38px; }
+html body #bio#bio#bio .tools-group { min-inline-size: 0; margin: 0 !important; padding-block-start: 14px; border-block-start: 1px solid var(--bio-rule); }
+html body #bio#bio#bio .tools-cat { display: block !important; margin: 0 0 14px !important; font-size: 10px !important; line-height: 1.7 !important; color: var(--bio-muted) !important; }
+html body #bio#bio#bio .tools-grid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 12px 18px !important; }
+html body #bio#bio#bio .tools-grid .tool { display: flex !important; flex-direction: row !important; justify-content: flex-start !important; align-items: center !important; gap: 9px !important; inline-size: 100% !important; min-inline-size: 0 !important; padding: 0 !important; margin: 0 !important; background: transparent !important; border: 0 !important; box-shadow: none !important; }
+html body #bio#bio#bio .tool-ic { display: flex !important; align-items: center !important; justify-content: center !important; flex: 0 0 26px !important; inline-size: 26px !important; block-size: 28px !important; padding: 0 !important; border: 0 !important; transform: none !important; }
+html body #bio#bio#bio .tool-ic img { inline-size: 24px !important; block-size: 24px !important; object-fit: contain; filter: grayscale(1); }
+html body #bio#bio#bio .tool-ic--txt { font-size: 11px !important; font-weight: 600; color: var(--ink) !important; }
+html body #bio#bio#bio .tool-name { min-inline-size: 0; font-size: 12px !important; line-height: 1.6 !important; color: var(--ink) !important; text-align: start !important; white-space: normal !important; }
+html body #bio#bio#bio .tools-typing { margin: 26px 0 0 !important; padding-block-start: 18px !important; border-block-start: 1px solid var(--bio-rule) !important; font-size: 11px !important; line-height: 1.9 !important; color: var(--bio-muted) !important; }
+
+/* Dates lead the professional record; all descriptions remain in full. */
+html body #bio#bio#bio :is(.bio-record-sheet, .bio-education-sheet) .bio-block { display: grid !important; grid-template-columns: minmax(160px, .45fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 60px); align-items: start; }
+html body #bio#bio#bio .timeline { margin: 0 !important; padding: 0 !important; border: 0 !important; list-style: none; }
+html body #bio#bio#bio .tl-item { margin: 0 0 24px !important; padding: 0 0 24px !important; border-block-end: 1px solid var(--bio-rule) !important; }
+html body #bio#bio#bio .tl-item:last-child { margin-block-end: 0 !important; }
+html body #bio#bio#bio .tl-dot { display: none !important; }
+html body #bio#bio#bio .tl-card { margin: 0 !important; padding: 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important; }
+html body #bio#bio#bio .tl-head { display: flex !important; flex-direction: column !important; align-items: flex-start !important; gap: 9px !important; }
+html body #bio#bio#bio .tl-head h4 { max-inline-size: 34ch; margin: 0 !important; font-size: clamp(18px, 1.8vw, 23px) !important; font-weight: 500 !important; line-height: 1.5 !important; }
+html body #bio#bio#bio .tl-date { order: -1; font-size: 10px !important; line-height: 1.8 !important; white-space: normal !important; color: var(--bio-muted) !important; }
+html body #bio#bio#bio :is(.tl-org, .tl-loc, .tl-desc) { display: block !important; max-inline-size: 65ch; margin: 10px 0 0 !important; font-size: 12px !important; line-height: 1.9 !important; color: var(--bio-muted) !important; }
+html body #bio#bio#bio .tl-org { color: var(--ink) !important; font-weight: 500 !important; }
+html body #bio#bio#bio :is(.tl-org, .tl-loc) > i { display: none !important; }
+html body #bio#bio#bio .tl-skills { display: flex !important; flex-wrap: wrap; align-items: center; gap: 6px; margin: 12px 0 0 !important; padding: 0 !important; font-size: 10px !important; line-height: 1.8 !important; color: var(--bio-muted) !important; }
+html body #bio#bio#bio .tl-skills > i { display: none !important; }
+html body #bio#bio#bio .tl-skills span { background: transparent !important; border: 0 !important; padding: 0 !important; color: inherit !important; font-size: inherit !important; }
+html body #bio#bio#bio .bio-education-sheet .bio-card { margin: 0 !important; padding: 24px 0 0 !important; border: 0 !important; border-block-start: 2px solid var(--ink) !important; background: transparent !important; border-radius: 0 !important; box-shadow: none !important; }
+html body #bio#bio#bio .bio-education-sheet .bio-card h4 { margin: 0 0 12px !important; font-size: clamp(23px, 2.4vw, 32px) !important; font-weight: 500 !important; line-height: 1.5 !important; }
+html body #bio#bio#bio .bio-education-sheet .bio-card p { margin: 8px 0 0 !important; font-size: 13px !important; line-height: 1.9 !important; color: var(--bio-muted) !important; }
+html body #bio#bio#bio .bio-education-sheet .bio-card .bio-sub { color: var(--ink) !important; font-size: 16px !important; }
+
+/* The honours preview stays monochrome and readable instead of oversized. */
+html body #bio#bio#bio .index-layout--honors { display: grid !important; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr) !important; gap: 32px !important; align-items: start !important; }
+html body #bio#bio#bio .index-layout--honors .index-ghost { display: none !important; }
+html body #bio#bio#bio .index-layout--honors .index-row { display: grid !important; grid-template-columns: 50px minmax(0, 1fr) 35px !important; align-items: baseline !important; gap: 12px !important; min-block-size: 56px !important; padding: 18px 0 !important; border: 0 !important; border-block-end: 1px solid var(--bio-rule) !important; border-radius: 0 !important; background: transparent !important; }
+html body #bio#bio#bio .index-layout--honors .index-row.is-active { border-block-end-color: var(--ink) !important; }
+html body #bio#bio#bio .index-row-title { font-size: 13px !important; font-weight: 500 !important; line-height: 1.8 !important; }
+html body #bio#bio#bio :is(.index-row-num, .index-row-tag) { font-size: 10px !important; line-height: 1.8 !important; color: var(--bio-muted) !important; }
+html body #bio#bio#bio .index-layout--honors .index-preview { display: block !important; position: static !important; min-inline-size: 0 !important; block-size: auto !important; min-block-size: 0 !important; }
+html body #bio#bio#bio .index-card--honor { display: flex !important; flex-direction: column !important; inline-size: 100% !important; block-size: auto !important; min-block-size: 0 !important; padding: 24px !important; border: 1px solid var(--bio-rule) !important; border-radius: 12px !important; background: var(--ink) !important; color: var(--bg) !important; box-shadow: none !important; }
+html body #bio#bio#bio .index-card--honor :is(.index-card-top, .index-card-body, .index-card-foot) { position: static !important; inset: auto !important; padding: 0 !important; margin: 0 !important; border: 0 !important; }
+html body #bio#bio#bio .index-card--honor .index-card-body { margin-block: 24px !important; }
+html body #bio#bio#bio .index-card--honor .index-card-icon { position: static !important; font-size: 28px !important; opacity: .6 !important; color: inherit !important; margin: 0 0 18px !important; }
+html body #bio#bio#bio .index-card--honor .index-card-title { max-inline-size: none !important; margin: 0 0 14px !important; font-family: Fraunces, Georgia, serif !important; font-size: clamp(23px, 2.3vw, 32px) !important; font-weight: 400 !important; line-height: 1.3 !important; color: inherit !important; }
+html body #bio#bio#bio .index-card--honor .index-card-title .hl { color: inherit !important; }
+html body #bio#bio#bio .index-card--honor .index-card-sub { margin: 0 !important; font-size: 12px !important; line-height: 1.85 !important; color: inherit !important; opacity: .8 !important; }
+html body #bio#bio#bio .index-card--honor :is(.index-card-vol, .index-card-meta .mono) { color: inherit !important; font-size: 10px !important; line-height: 1.8 !important; opacity: .75; }
+html body #bio#bio#bio .index-card--honor .index-card-meta { display: block !important; }
+html body #bio#bio#bio .index-card--honor :is(.index-card-big, .index-card-rule) { display: none !important; }
+
+/* Language proficiency remains textual; ornamental percentage bars retire. */
+html body #bio#bio#bio .langs-grid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 0 36px !important; }
+html body #bio#bio#bio .lang-item { display: block !important; min-inline-size: 0 !important; padding: 18px 0 !important; margin: 0 !important; border: 0 !important; border-block-end: 1px solid var(--bio-rule) !important; border-radius: 0 !important; background: transparent !important; }
+html body #bio#bio#bio .lang-item > i,html body #bio#bio#bio .lang-bar { display: none !important; }
+html body #bio#bio#bio .lang-item h4 { margin: 0 0 6px !important; font-size: 17px !important; font-weight: 500 !important; line-height: 1.6 !important; }
+html body #bio#bio#bio .lang-item p { margin: 0 !important; font-size: 12px !important; line-height: 1.85 !important; color: var(--bio-muted) !important; }
+html body #bio#bio#bio .bio-proof-sheet .cert-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 20px !important; }
+html body #bio#bio#bio .bio-proof-sheet .cert-img-wrap { border: 1px solid var(--bio-rule) !important; border-radius: 6px !important; background: color-mix(in srgb, var(--ink) 3%, var(--bg)) !important; }
+html body #bio#bio#bio .bio-proof-sheet .cert-img-wrap img { object-fit: contain !important; }
+
+/* Quiet network rows and two distinct, complete document links. */
+html body #bio#bio#bio .bio-connect-links { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 0 30px !important; inline-size: 100% !important; block-size: auto !important; min-block-size: 0 !important; margin: 0 !important; }
+html body #bio#bio#bio .bio-connect-links .bio-social { display: grid !important; grid-template-columns: 32px minmax(0, 1fr) 24px !important; grid-template-areas: 'mark text go' !important; align-items: start !important; gap: 16px !important; margin: 0 !important; padding: 22px 0 !important; border: 0 !important; border-block-start: 1px solid var(--bio-rule) !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; }
+html body #bio#bio#bio .bio-social-mark { display: flex !important; align-items: center; justify-content: flex-start; grid-area: mark !important; inline-size: 32px !important; block-size: 32px !important; font-size: 20px !important; background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+html body #bio#bio#bio .bio-social-text { grid-area: text !important; line-height: 1.7 !important; }
+html body #bio#bio#bio .bio-social-eyebrow { margin: 0 0 8px !important; font-size: 10px !important; line-height: 1.8 !important; color: var(--bio-muted) !important; }
+html body #bio#bio#bio .bio-social-title { max-inline-size: none !important; margin: 0 0 9px !important; font-size: clamp(19px, 2vw, 25px) !important; font-weight: 500 !important; line-height: 1.4 !important; color: var(--ink) !important; }
+html body #bio#bio#bio .bio-social-desc { display: block !important; max-inline-size: 44ch !important; margin: 0 0 10px !important; font-size: 12px !important; line-height: 1.85 !important; color: var(--bio-muted) !important; }
+html body #bio#bio#bio .bio-social-handle { font-size: 10px !important; line-height: 1.8 !important; overflow-wrap: anywhere; color: var(--bio-muted) !important; }
+html body #bio#bio#bio .bio-social-go { display: flex !important; align-items: center !important; justify-content: center !important; grid-area: go !important; inline-size: 24px !important; min-inline-size: 0 !important; padding: 4px 0 !important; border: 0 !important; font-size: 11px !important; background: transparent !important; color: var(--ink) !important; }
+html body #bio#bio#bio .bio-social-go > span { display: none !important; }
+html body #bio#bio#bio .bio-docs-sheet .bio-connect-links--docs { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 30px !important; justify-content: stretch !important; align-items: stretch !important; }
+html body #bio#bio#bio .bio-docs-sheet .bio-doc-card { grid-template-columns: minmax(0, 1fr) 24px !important; grid-template-areas: 'mark go' 'text text' !important; padding: 24px 0 !important; border-block-start: 2px solid var(--ink) !important; gap: 22px 12px !important; }
+html body #bio#bio#bio .bio-docs-sheet .bio-social-mark { font-size: 30px !important; }
+html body #bio#bio#bio .bio-docs-sheet .bio-social-title { font-size: clamp(26px, 3vw, 40px) !important; }
+
+@media (max-width: 900px) {
+  html body #bio#bio#bio :is(.bio-record-sheet, .bio-education-sheet) .bio-block { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  html body #bio#bio#bio .index-layout--honors { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; gap: 22px !important; }
+}
+@media (max-width: 680px) {
+  html body #bio#bio#bio .bio-story-sheet .section-head { grid-template-columns: minmax(0, 1fr); gap: 12px; margin-block-end: 24px !important; }
+  html body #bio#bio#bio .bio-story-sheet .section-lede { grid-column: 1; grid-row: auto; }
+  html body #bio#bio#bio .bio-philosophy { grid-template-columns: minmax(0, 1fr) !important; gap: 26px !important; padding-block-start: 24px !important; }
+  html body #bio#bio#bio .bio-phil-quote { max-inline-size: 28ch !important; font-size: 23px !important; }
+  html body #bio#bio#bio .bio-phil-text p { font-size: 14px !important; line-height: 1.95 !important; }
+  html body #bio#bio#bio .bio-tools-directory { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  html body #bio#bio#bio .bio-block-title { font-size: 23px !important; gap: 11px !important; }
+  html body #bio#bio#bio .index-layout--honors { grid-template-columns: minmax(0, 1fr) !important; }
+  html body #bio#bio#bio .index-layout--honors .index-row { grid-template-columns: 42px minmax(0, 1fr) 32px !important; gap: 8px !important; padding-block: 16px !important; }
+  html body #bio#bio#bio .index-row-title { font-size: 12px !important; }
+  html body #bio#bio#bio .index-card--honor { padding: 22px !important; }
+  html body #bio#bio#bio .langs-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  html body #bio#bio#bio .bio-proof-sheet .cert-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 12px !important; }
+  html body #bio#bio#bio .bio-connect-links,html body #bio#bio#bio .bio-docs-sheet .bio-connect-links--docs { grid-template-columns: minmax(0, 1fr) !important; gap: 0 !important; }
+  html body #bio#bio#bio .bio-connect-links .bio-social { grid-template-columns: 28px minmax(0, 1fr) 20px !important; gap: 12px !important; }
+  html body #bio#bio#bio .bio-docs-sheet .bio-doc-card { grid-template-columns: minmax(0, 1fr) 20px !important; }
+  html body #bio#bio#bio .bio-social-eyebrow,html body #bio#bio#bio .bio-social-handle { font-size: 10px !important; }
+}
+@media (max-width: 380px) {
+  html body #bio#bio#bio .tools-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  html body #bio#bio#bio .bio-proof-sheet .cert-grid { grid-template-columns: minmax(0, 1fr) !important; }
+}
+:root[dir="rtl"] body #bio#bio#bio .bio-phil-quote,
+:root[dir="rtl"] body #bio#bio#bio .index-card--honor .index-card-title {
+  font-family: "Noto Kufi Arabic", sans-serif !important;
+  font-style: normal !important;
+  line-height: 1.8 !important;
+  letter-spacing: 0 !important;
+}
+:root[dir="rtl"] body #bio#bio#bio :is(.bio-philosophy, .bio-story-sheet .section-head) { text-align: start !important; }
+
+html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-num::after { display: none !important; }
+/* Small supporting copy retains a readable physical size after paper fitting. */
+html body #blog#blog#blog .blog-card-excerpt { font-size: max(15px, calc(13px / var(--bq-paper-fit, 1))) !important; }
+html body #blog#blog#blog :is(.blog-card-author strong, .blog-card-author small, .blog-card-read, .blog-card-cta) { font-size: max(11px, calc(10px / var(--bq-paper-fit, 1))) !important; }
+html body #contact#contact#contact .contact-reach-sheet .section-head,
+html body #contact#contact#contact .contact-reach-sheet .contact-quick { grid-column: auto !important; grid-row: auto !important; }
+html body #contact#contact#contact .qc-card::after { display: block !important; }
+html body #contact#contact#contact .pitch-form .field > label:not(.checkbox) { font-size: max(12px, calc(12px / var(--bq-paper-fit, 1))) !important; }
+
+/* Studio setup stays inside its own scrollable gate, including short phones
+   and large text. The public website and authenticated console are unchanged. */
+html body #dash:not(.is-full) .dash-panel {
+  max-block-size: calc(100dvh - 32px);
+}
+html body #dash .dash-gate {
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+html body #dash #dashSetup {
+  inline-size: 100%;
+  min-inline-size: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  text-align: start;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+html body #dash #dashSetup > strong { display: block; font-size: 15px; line-height: 1.4; }
+html body #dash #dashSetup > p { margin-block: 8px 14px; color: var(--ink-soft, #555); }
+html body #dash #dashSetup dl { display: grid; gap: 10px; margin: 0; }
+html body #dash #dashSetup dt { font-weight: 700; }
+html body #dash #dashSetup dd {
+  margin: 2px 0 0;
+  direction: ltr;
+  unicode-bidi: plaintext;
+  color: var(--ink-soft, #555);
+  font-size: 11px;
+}
+html body #dash #dashSetup .dash-setup-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-block-start: 16px; }
+html body #dash #dashSetup .dash-setup-actions :is(a, button) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-block-size: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+}
+html body #dash #dashSetupRetry:disabled { cursor: wait; opacity: .6; }
+
+/* Raise the dock by a modest 12px. Every dependent sheet uses the same top
+   edge, including RTL phones, so the safe area is counted only once. */
+html:root { --bq-dock-inset: calc(var(--bq-deck-gutter, 14px) + 34px); }
+@media (max-width: 1024px) {
+  html:root { --bq-dock-inset: calc(var(--bq-deck-gutter, 10px) + 32px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (max-width: 820px) {
+  html:root { --bq-dock-bottom: max(28px, calc(env(safe-area-inset-bottom, 0px) + 18px)); }
+  html:not([dir="rtl"]) body,
+  html[dir="rtl"] body { --bq-dock-lift: var(--bq-dock-bottom); }
+  html body .mobilebar.mobilebar,
+  html[dir="rtl"] body .mobilebar.mobilebar { bottom: var(--bq-dock-bottom) !important; }
+}
+html body #chat#chat,
+html body #latestPanel#latestPanel {
+  bottom: calc(var(--bq-dock-top, 92px) + 12px) !important;
+}
+/* Reserve the bar's real scaled height in fitted rooms and their footer.
+   The gallery keeps its existing native scroll and gains the same end gap. */
+html body #design#design#design#design.paper-stack > .paper-sheet:not(.work) > .paper-scroll,
+html body :is(#bio#bio#bio#bio, #blog#blog#blog#blog, #contact#contact#contact#contact).paper-stack > .paper-sheet > .paper-scroll,
+html body .footer.footer.footer.footer-v249.paper-sheet > .paper-scroll.paper-scroll {
+  padding-block-end: max(76px, calc(var(--bq-dock-top, 92px) + 20px - var(--bq-deck-gutter, 10px))) !important;
+}
+html body #design#design#design .section.work #loadMoreWrap#loadMoreWrap.load-more-wrap {
+  padding-block-end: max(100px, calc(var(--bq-dock-top, 92px) + 24px)) !important;
+}
+
+/* Studio is a working surface above the decorative cursor. Restore native
+   pointer feedback here instead of drawing a second cursor under the modal. */
+html.bq-cursor-on body #dash,
+html.bq-cursor-on body #dash * { cursor: auto !important; }
+html.bq-cursor-on body #dash :is(a, button, [role="button"], summary, label[for], select) { cursor: pointer !important; }
+html.bq-cursor-on body #dash :is(input, textarea, [contenteditable="true"]) { cursor: text !important; }
+html.bq-cursor-on body #dash :is(button, input, select):disabled { cursor: not-allowed !important; }
+html:has(#dash.is-open) :is(.cursor-dot, .cursor-ring) { visibility: hidden !important; }
+
+/* Dashboard layout must always respect authenticated/conditional visibility. */
+html body #dash#dash [hidden] { display: none !important; }

@@ -6,7 +6,7 @@
    mutate Studio data without that separate upstream credential. */
 
 import {
-  hasEditToken,
+  editorAuthorization,
   hasSession,
   inputErrorResponse,
   isSameOrigin,
@@ -161,7 +161,8 @@ export async function onRequestPost({ request, env, params }) {
   if (!configured(env)) return json({ ok: false, error: 'studio-proxy-not-configured' }, 503);
   if (!isSameOrigin(request)) return json({ ok: false, error: 'forbidden-origin' }, 403);
   if (!(await hasSession(request, env))) return json({ ok: false, error: 'session-required' }, 401);
-  if (!(await hasEditToken(request, env))) return json({ ok: false, error: 'unauthorized' }, 401);
+  const editorGate = await editorAuthorization(request, env);
+  if (editorGate) return editorGate;
 
   const key = await rateKey(request, env, `studio-${service}`);
   const slot = await takeRateLimit(env, key, {
@@ -199,7 +200,10 @@ export async function onRequestPost({ request, env, params }) {
       signal: AbortSignal.timeout(60_000)
     });
     if (upstream.status === 204) return noContent();
-    if (upstream.status >= 500) return json({ ok: false, error: 'studio-upstream-failed' }, 502);
+    // The browser credential has already passed Pages. An upstream auth
+    // rejection is a server configuration failure, not a request to reconnect
+    // with (or expose) the Supabase-only credential in the browser.
+    if (upstream.status === 401 || upstream.status === 403) return json({ ok: false, error: 'studio-upstream-auth' }, 502);
     let raw;
     try {
       raw = new TextDecoder('utf-8', { fatal: true }).decode(await readRequestBytes(upstream, 5 * 1024 * 1024));
@@ -210,6 +214,8 @@ export async function onRequestPost({ request, env, params }) {
     try { payload = JSON.parse(raw); } catch (error) {
       return json({ ok: false, error: 'studio-upstream-invalid' }, 502);
     }
+    if (payload && payload.error === 'no_github_token') return json({ ok: false, error: 'studio-github-not-configured' }, 502);
+    if (upstream.status >= 500) return json({ ok: false, error: 'studio-upstream-failed' }, 502);
     return json(payload, upstream.status);
   } catch (error) {
     return json({ ok: false, error: 'studio-upstream-unavailable' }, 502);

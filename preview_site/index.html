@@ -705,7 +705,7 @@
   <link rel="stylesheet" href="css/fonts.css?v=ab564d35bc14">
   <link rel="stylesheet" href="css/experience.min.css?v=f25ca5458f26">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.css?v=ded0990f2eeb">
+  <link rel="stylesheet" href="css/polish.css?v=a91bf89dfa52">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=d102bb86e515" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=d102bb86e515"></noscript>
 
@@ -1379,25 +1379,25 @@
             <h2 class="section-title" data-i18n="blog.title">Short <em>notes</em>.</h2>
             <p class="section-lede" data-i18n="blog.lede">Ideas from the desk, kept simple.</p>
           </header>
-          <div class="index-layout index-layout--blog" id="blogIndex">
+          <div class="index-layout index-layout--blog" id="blogIndex" data-blog-state="loading" aria-busy="true">
             <div class="index-list" id="blogList">
               <span class="index-ghost" id="blogGhost" aria-hidden="true">01</span>
             </div>
-            <div class="index-preview" aria-hidden="true">
+            <div class="index-preview">
               <article class="index-card index-card--blog" id="blogCard">
                 <div class="blog-card-cover">
                   <img id="bcImg" alt="" />
-                  <span class="mono blog-card-tag" id="bcTag">Editorial</span>
+                  <span class="mono blog-card-tag" id="bcTag"></span>
                 </div>
                 <div class="blog-card-body">
-                  <h3 class="blog-card-title" id="bcTitle">On the architecture of meaning</h3>
-                  <p class="blog-card-excerpt" id="bcSub">Typography is not decoration — it is the floorplan of the page.</p>
+                  <h3 class="blog-card-title" id="bcTitle"></h3>
+                  <p class="blog-card-excerpt" id="bcSub"></p>
                   <div class="blog-card-foot">
                     <span class="blog-card-author">
                       <img src="assets/avatar.webp" alt="" width="124" height="124" />
-                      <span><strong data-i18n="name.full">Barakat Qurtas</strong><small class="mono" id="bcMeta">MAY 2026</small></span>
+                      <span><strong data-i18n="name.full">Barakat Qurtas</strong><small class="mono" id="bcMeta"></small></span>
                     </span>
-                    <span class="mono blog-card-read" id="bcRead">6 MIN</span>
+                    <span class="mono blog-card-read" id="bcRead"></span>
                   </div>
                   <span class="blog-card-cta mono"><i class="fa-solid fa-arrow-right"></i> <span data-i18n="blog.cta">Click to read the full note</span></span>
                 </div>
@@ -1414,7 +1414,11 @@
               <button type="submit" aria-label="Go to page" data-i18n-aria="a11y.goPage" data-i18n="blog.go">Go</button>
             </form>
           </nav>
+        </div>
+      </div>
 
+      <div class="section blog-subscribe-sheet">
+        <div class="sheet-mid">
           <div class="subscribe" id="subscribe">
             <div class="subscribe-text">
               <span class="mono subscribe-eyebrow"><i class="fa-solid fa-envelope-open-text"></i> <span data-i18n="sub.eye">The Journal · Newsletter</span></span>
@@ -1457,20 +1461,24 @@
       <div class="section bio-story-sheet">
         <div class="sheet-mid">
         <header class="section-head">
-          <span class="section-num mono"><i class="fa-solid fa-user-pen"></i> &nbsp; <span data-i18n="bio.label">Biography Room</span></span>
+          <span class="section-num mono"><span class="bio-chapter-index mono" aria-hidden="true">01</span><span data-i18n="bio.label">Biography Room</span></span>
           <h2 class="section-title" data-i18n="bio.title">A short, <em>honest</em> biography.</h2>
           <p class="section-lede" data-i18n="bio.lede"><span class="dropcap">B</span>arakat Qurtas Babakr — independent graphic designer, working between state protocol, editorial design, and quiet personal projects. Based in Erbil, Kurdistan Region of Iraq.</p>
         </header>
         <div class="bio-block bio-philosophy" data-wm="&#xf14e;">
+          <div class="bio-phil-margin">
           <span class="mono bio-phil-eyebrow"><i class="fa-solid fa-compass"></i> <span data-i18n="bp.eye">Discover the story behind the designer</span></span>
           <h3 class="bio-phil-label" data-i18n="bp.label">Work <em>Philosophy</em></h3>
           <blockquote class="bio-phil-quote" data-i18n="bp.quote">"Wherever I work — now or later — what matters is that the work earns trust and leaves people glad they asked."</blockquote>
+          <span class="bio-phil-sign" data-i18n="name.full">Barakat Qurtas</span>
+          </div>
+          <div class="bio-phil-copy">
           <div class="bio-phil-text">
             <p data-i18n="bp.p1">I'm Barakat Qurtas, born in Soran and currently based in Erbil — a city that transformed the way I see the world. I grew up between the stillness of the mountains and the rhythm of city life — two contrasts that continue to define my design language. Erbil now offers glowing nights and endless inspiration.</p>
             <p data-i18n="bp.p2">My passion for design began early. At the age of 12, I started experimenting, and by 17 I was fully immersed in graphic design as a profession. Since then I've continued to develop my skills through practice and real-world experience — letting my work speak for itself.</p>
             <p data-i18n="bp.p3">I work with Adobe Creative Suite and hold several masterclass certificates. I've collaborated with the Presidency of the Kurdistan Region and the KRG Protocol. My aim is to expand my creative impact and establish a leading advertising and publishing company.</p>
           </div>
-          <span class="bio-phil-sign" data-i18n="name.full">Barakat Qurtas</span>
+          </div>
         </div>
         </div>
       </div>
@@ -1478,9 +1486,11 @@
       <div class="section bio-kit-sheet">
         <div class="sheet-mid">
         <div class="bio-block bio-tools" data-wm="&#xf0ad;">
-          <h3 class="bio-block-title"><i class="fa-solid fa-toolbox"></i> <span data-i18n="bt.title">Tools &amp; Software</span></h3>
+          <header class="bio-chapter-heading">
+          <h3 class="bio-block-title"><span class="bio-chapter-index mono" aria-hidden="true">02</span><i class="fa-solid fa-toolbox" aria-hidden="true"></i> <span data-i18n="bt.title">Tools &amp; Software</span></h3>
           <p class="bio-block-lede" data-i18n="bt.lede">The kit I design, edit and move with every day.</p>
-
+          </header>
+          <div class="bio-tools-directory">
           <div class="tools-group">
             <span class="mono tools-cat">Adobe</span>
             <div class="tools-grid">
@@ -1524,6 +1534,7 @@
             </div>
           </div>
 
+          </div>
           <p class="tools-typing"><i class="fa-solid fa-keyboard"></i> <span data-i18n="bt.typing">Fast, accurate typist — quick keyboarding in Kurdish, Arabic &amp; English.</span></p>
         </div>
         </div>
@@ -1532,7 +1543,7 @@
       <div class="section bio-record-sheet">
         <div class="sheet-mid">
         <div class="bio-block" data-wm="&#xf0b1;">
-          <h3 class="bio-block-title"><i class="fa-solid fa-briefcase"></i> <span data-i18n="bio.experience">Experience</span></h3>
+          <h3 class="bio-block-title"><span class="bio-chapter-index mono" aria-hidden="true">03</span><i class="fa-solid fa-briefcase"></i> <span data-i18n="bio.experience">Experience</span></h3>
           <ol class="timeline">
             <li class="tl-item">
               <span class="tl-dot"></span>
@@ -1571,7 +1582,7 @@
       <div class="section bio-education-sheet">
         <div class="sheet-mid">
         <div class="bio-block" data-wm="&#xf19d;">
-          <h3 class="bio-block-title"><i class="fa-solid fa-graduation-cap"></i> <span data-i18n="bio.education">Education</span></h3>
+          <h3 class="bio-block-title"><span class="bio-chapter-index mono" aria-hidden="true">04</span><i class="fa-solid fa-graduation-cap"></i> <span data-i18n="bio.education">Education</span></h3>
           <div class="bio-card">
             <h4 data-i18n="ed.title">Salahaddin University — Erbil</h4>
             <p class="bio-sub" data-i18n="ed.sub">Diploma of Law · 2020 — 2022</p>
@@ -1586,7 +1597,7 @@
       <div class="section bio-honors-sheet">
         <div class="sheet-mid">
         <div class="bio-block" data-wm="&#xf091;">
-          <h3 class="bio-block-title"><i class="fa-solid fa-trophy"></i> <span data-i18n="bio.honors">Honors &amp; Awards</span></h3>
+          <h3 class="bio-block-title"><span class="bio-chapter-index mono" aria-hidden="true">05</span><i class="fa-solid fa-trophy"></i> <span data-i18n="bio.honors">Honors &amp; Awards</span></h3>
 
           <div class="index-layout index-layout--honors" id="honorsIndex">
             <div class="index-list">
@@ -1643,7 +1654,7 @@
               </a>
             </div>
 
-            <div class="index-preview" aria-hidden="true">
+            <div class="index-preview" aria-live="polite" aria-atomic="true">
               <article class="index-card index-card--honor" id="honorCard">
                 <div class="index-card-top">
                   <span class="mono index-card-vol" id="hcVol">AWARD №01 · 2025</span>
@@ -1670,7 +1681,7 @@
       <div class="section bio-world-sheet">
         <div class="sheet-mid">
         <div class="bio-block" data-wm="&#xf1ab;">
-          <h3 class="bio-block-title"><i class="fa-solid fa-language"></i> <span data-i18n="bio.languages">Languages</span></h3>
+          <h3 class="bio-block-title"><span class="bio-chapter-index mono" aria-hidden="true">06</span><i class="fa-solid fa-language"></i> <span data-i18n="bio.languages">Languages</span></h3>
           <div class="langs-grid">
             <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4 data-i18n="lng.ar">Arabic</h4><p data-i18n="lp.full">Full professional proficiency</p><div class="lang-bar"><span data-css="width:95%"></span></div></div></div>
             <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4 data-i18n="lng.en">English</h4><p data-i18n="lp.enNote">Elementary proficiency · Duolingo Score 10 (May 2026)</p><div class="lang-bar"><span data-css="width:45%"></span></div></div></div>
@@ -1688,7 +1699,7 @@
       <div class="section bio-proof-sheet room-sheet--scroll">
         <div class="sheet-mid">
         <div class="bio-block" data-wm="&#xf559;">
-          <h3 class="bio-block-title"><i class="fa-solid fa-award"></i> <span data-i18n="bio.certificates">Certificates &amp; Honours</span></h3>
+          <h3 class="bio-block-title"><span class="bio-chapter-index mono" aria-hidden="true">07</span><i class="fa-solid fa-award"></i> <span data-i18n="bio.certificates">Certificates &amp; Honours</span></h3>
           <div class="cert-grid" id="certGrid">
             <div class="gallery-loading" id="certLoading">
               <i class="fa-solid fa-circle-notch fa-spin"></i>
@@ -1701,6 +1712,7 @@
 
       <div class="section bio-connect-sheet">
         <div class="sheet-mid">
+        <header class="bio-chapter-heading"><h3 class="bio-block-title"><span class="bio-chapter-index mono" aria-hidden="true">08</span><span data-i18n="f.connect">Connect</span></h3></header>
         <div class="bio-connect-links">
         <a class="bio-block bio-social bio-social--linkedin" data-wm="&#xf08c;" href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener">
           <span class="bio-social-mark"><i class="fa-brands fa-linkedin-in"></i></span>
@@ -2029,6 +2041,18 @@
           <button type="submit">Unlock <i class="fa-solid fa-arrow-right"></i></button>
         </form>
         <p class="dash-hint mono" id="dashHint"></p>
+        <aside class="dash-setup" id="dashSetup" hidden aria-labelledby="dashSetupTitle">
+          <strong id="dashSetupTitle">Finish secure setup</strong>
+          <p id="dashSetupNote">Configure the missing server settings, redeploy, then check again. No access code can work until sign-in is configured.</p>
+          <dl>
+            <div id="dashSetupLogin"><dt id="dashSetupLoginLabel">Sign in</dt><dd id="dashSetupLoginMissing"></dd></div>
+            <div id="dashSetupPublishing"><dt id="dashSetupPublishingLabel">Publishing</dt><dd id="dashSetupPublishingMissing"></dd></div>
+          </dl>
+          <div class="dash-setup-actions">
+            <a id="dashSetupGuide" href="https://github.com/Bqurtas/BqurtasPortfolio/blob/main/CLOUDFLARE_SETUP.md" target="_blank" rel="noopener noreferrer">Setup guide <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+            <button id="dashSetupRetry" type="button">Check again <i class="fa-solid fa-rotate" aria-hidden="true"></i></button>
+          </div>
+        </aside>
       </div>
 
       <!-- Console -->
@@ -2179,7 +2203,7 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=02b4949a577d"></script>
+  <script defer src="js/main.v420.min.js?v=09310ad43f61"></script>
   <script defer src="js/gallery.v420.min.js?v=04a1bcf2fd6f"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2199,7 +2223,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=b6b386d8e1dd';
+        s.src = 'js/enhance.v420.min.js?v=750547648933';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -2354,7 +2378,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=8dc607be08f7', { updateViaCache: 'none' })
+            .register('/sw.js?v=50a103afbe43', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

@@ -21,7 +21,7 @@
 | `UMAMI_WEBSITE_ID` | Plain text | ناسێنەری سایتی Umami (پێشوەختە لە کۆد دانراوە) | `f58c1ade-02c7-4c2e-95b3-2bcbf2e354fa` |
 | `ANTHROPIC_API_KEY` | Secret (ئارەزوومەندانە) | کلیلی Claude ئەگەر بتەوێت مۆدێلی پارەدار بەکاربهێنیت | `sk-ant-api03-...` |
 | `DASH_PIN` | Secret (Encrypted) | پینی چوونەژوورەوەی ستۆدیۆ داشبۆرد (بۆ 2FA)؛ ئەگەر پێشتر لە Git بووە دەبێت بگۆڕدرێت | `use_a_new_random_pin` |
-| `TOTP_SECRET` | Secret (ئارەزوومەندانە) | کلیلی دوو قۆناغی بۆ ئەپی Google Authenticator | `JBSWY3DPEHPK3PXP` |
+| `TOTP_SECRET` | Secret (ئارەزوومەندانە) | کلیلی دوو قۆناغی بۆ ئەپی Google Authenticator | `new_private_base32_key` |
 | `WEB3FORMS_KEY` | Secret (ئارەزوومەندانە) | access key ـی Web3Forms؛ خۆی دیاری دەکات کۆدەکە بۆ کام inbox بڕوات | `your_primary_form_key` |
 | `WEB3FORMS_BACKUP_KEY` | Secret (ئارەزوومەندانە) | access key ـێکی جیاواز بۆ inbox ـی backup | `your_backup_form_key` |
 | `TWOFA_SENDER_EMAIL` | Secret (ئارەزوومەندانە) | ناونیشانی نێرەر بۆ داواکاری Web3Forms؛ لە source code ـدا ناونیشانی تایبەت دانەنراوە | `security@your-domain.example` |

@@ -3,7 +3,7 @@
 
 import {
   hasSession,
-  hasEditToken,
+  editorAuthorization,
   inputErrorResponse,
   isSameOrigin,
   json,
@@ -71,7 +71,8 @@ export async function onRequestPost({ request, env }) {
   if (!sessionConfigured(env) || !env.EDIT_TOKEN || !env.DB) return json({ ok: false, error: 'not-configured' }, 503);
   if (!isSameOrigin(request)) return json({ ok: false, error: 'forbidden-origin' }, 403);
   if (!(await hasSession(request, env))) return json({ ok: false, error: 'session-required' }, 401);
-  if (!(await hasEditToken(request, env))) return json({ ok: false, error: 'unauthorized' }, 401);
+  const editorGate = await editorAuthorization(request, env);
+  if (editorGate) return editorGate;
 
   const key = await rateKey(request, env, 'assistant-use');
   const slot = await takeRateLimit(env, key, { limit: 20, windowMs: 15 * 60 * 1000, durable: true });

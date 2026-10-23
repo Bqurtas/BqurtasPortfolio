@@ -1017,7 +1017,11 @@
       liveOnly:'Open Studio on the live HTTPS website. A file preview cannot sign in or publish.', openLive:'Open secure Studio',
       rateLimited:'Too many attempts. Wait before trying again.', deliveryFailed:'The verification code could not be delivered. Try the other configured inbox or contact the site owner.',
       setupMissing:'Cloudflare setup is incomplete. Configure these items, then redeploy:', factorRequirement:'a second factor (TOTP_SECRET or a configured email/SMS provider)',
+      setupTitle:'Finish secure setup', setupNote:'Configure the missing server settings, redeploy, then check again. No access code can work until sign-in is configured.',
+      setupPublishNote:'Sign-in is ready. Configure publishing before uploading work.', setupLogin:'Sign in', setupPublishing:'Publishing', setupGuide:'Setup guide', setupRetry:'Check again',
       sessionExpired:'Your secure session has expired. Sign in again.', studioNotSetup:'Publishing is not configured on Cloudflare yet. Check EDIT_TOKEN, SUPABASE_EDIT_TOKEN and the DB binding.',
+      studioUpstreamAuth:'Supabase rejected the publishing server. Check that Cloudflare SUPABASE_EDIT_TOKEN matches the Supabase service secret and that the Edge Function allows the server request.',
+      studioGithubMissing:'GitHub publishing is not connected. Configure the work-upload service with repository write access.',
       studioUnavailable:'The publishing service is temporarily unavailable. Your changes have not been published. Try again.', editorRequired:'Connect your editor password in the Content tab first.'
     });
     Object.assign(DASH_I18N.ku, {
@@ -1025,7 +1029,11 @@
       liveOnly:'ستۆدیۆ لە وێبسایتی زیندووی HTTPS بکەرەوە. پێشبینینی فایل ناتوانێت بچێتە ژوورەوە یان بڵاو بکاتەوە.', openLive:'ستۆدیۆی پارێزراو بکەرەوە',
       rateLimited:'ژمارەی هەوڵەکان زۆر بووە. کەمێک چاوەڕێ بکە پاشان هەوڵ بدەوە.', deliveryFailed:'کۆدی پشتڕاستکردنەوە نەنێردرا. سندووقە ڕێکخراوەکەی تر تاقی بکەوە یان پەیوەندی بە خاوەنی سایت بکە.',
       setupMissing:'ڕێکخستنی Cloudflare تەواو نییە. ئەمانە ڕێک بخە، پاشان دووبارە بڵاوی بکەوە:', factorRequirement:'فاکتۆری دووەم (TOTP_SECRET یان خزمەتگوزاری ڕێکخراوی ئیمەیل/SMS)',
+      setupTitle:'ڕێکخستنی پارێزراو تەواو بکە', setupNote:'ڕێکخستنە کەمەکانی سێرڤەر تەواو بکە، دووبارە بڵاوی بکەوە و پاشان بپشکنەوە. تا چوونەژوورەوە ڕێکنەخرێت، هیچ کۆدێک کار ناکات.',
+      setupPublishNote:'چوونەژوورەوە ئامادەیە. پێش ئەپلۆدکردنی کار، بڵاوکردنەوە ڕێک بخە.', setupLogin:'چوونەژوورەوە', setupPublishing:'بڵاوکردنەوە', setupGuide:'ڕێبەری ڕێکخستن', setupRetry:'دووبارە بپشکنەوە',
       sessionExpired:'ماوەی چوونەژوورەوەی پارێزراوت بەسەرچووە. دووبارە بچۆ ژوورەوە.', studioNotSetup:'بڵاوکردنەوە هێشتا لە Cloudflare ڕێکنەخراوە. EDIT_TOKEN و SUPABASE_EDIT_TOKEN و بەستنی DB بپشکنە.',
+      studioUpstreamAuth:'Supabase داواکاری سێرڤەری بڵاوکردنەوەی ڕەتکردەوە. SUPABASE_EDIT_TOKEN ـی Cloudflare لەگەڵ نهێنی خزمەتگوزاری Supabase و مۆڵەتی داواکاری سێرڤەر لە Edge Function بپشکنە.',
+      studioGithubMissing:'بڵاوکردنەوەی GitHub بەستراو نییە. خزمەتگوزاری work-upload بە دەسەڵاتی نووسینی ڕیپۆ ڕێکبخە.',
       studioUnavailable:'خزمەتگوزاری بڵاوکردنەوە کاتیاً بەردەست نییە. گۆڕانکارییەکانت بڵاونەکراونەتەوە. دووبارە هەوڵ بدەوە.', editorRequired:'سەرەتا پاسۆردی ئەدیتەر لە تابی ناوەڕۆک ببەستەوە.'
     });
     const SERVER_NOT_SET = ['not-configured', 'session-not-configured', 'no-db', 'twofa-unavailable', 'rate-limit-unavailable'];
@@ -1065,7 +1073,7 @@
     };
     const loginSetupMessage = (requirements) => {
       if (!requirements || typeof requirements !== 'object') return DT('notSetup');
-      const labels = { pin:'DASH_PIN', session:'SESSION_SECRET (32+ characters)', database:'D1 / DB', secondFactor:DT('factorRequirement') };
+      const labels = { pin:'DASH_PIN', session:'SESSION_SECRET (32+ bytes)', database:'D1 / DB', secondFactor:DT('factorRequirement') };
       const missing = Object.keys(labels).filter(key => requirements[key] === false).map(key => labels[key]);
       return missing.length ? DT('setupMissing') + ' ' + missing.join(' · ') : DT('notSetup');
     };
@@ -1078,6 +1086,7 @@
       return DT(challenge ? 'twoWrong' : 'wrong');
     };
     const LANG_LABELS = { en: 'English', ku: 'کوردیی سۆرانی', kmr: 'Kurmancî', ar: 'العربية', fr: 'Français', tr: 'Türkçe', sv: 'Svenska' };
+    let loginConfigured = null;
     let twoFAId = null, twoFAPin = '', twoFAClearTimer = 0, twoFAVia = '';
     const twoFANote = () => TWOFA_VIA_NOTES[curLang()]?.[twoFAVia] || DT('twoNote');
     const selected2FARecipient = () => $('#dash2faChoice input[name="dashCodeTarget"]:checked')?.value || 'primary';
@@ -1092,7 +1101,7 @@
         box.id = 'dash2faChoice';
         form.insertAdjacentElement('afterend', box);
       }
-      box.hidden = !!twoFAId;
+      box.hidden = !!twoFAId || loginConfigured === false;
       box.innerHTML = `
         <span class="mono">${DT('twoChoose')}</span>
         <div class="dash-code-options" role="radiogroup" aria-label="${DT('twoChoose')}">
@@ -1140,6 +1149,27 @@
       clearTimeout(twoFAClearTimer);
       twoFAClearTimer = 0;
     };
+    const showLoginSetup = (data) => {
+      const box = $('#dashSetup');
+      if (!box) return;
+      const requirements = data.requirements || {};
+      const loginLabels = { pin:'DASH_PIN', session:'SESSION_SECRET (32+ bytes)', database:'D1 / DB', secondFactor:DT('factorRequirement') };
+      const publishLabels = { editor:'EDIT_TOKEN', upstream:'SUPABASE_EDIT_TOKEN (≠ EDIT_TOKEN)' };
+      const missing = (labels) => Object.keys(labels).filter(key => requirements[key] === false).map(key => labels[key]);
+      const signIn = missing(loginLabels), publishing = missing(publishLabels);
+      box.hidden = data.configured !== false && !publishing.length;
+      $('#dashLoginForm').hidden = data.configured === false;
+      $('#dashSetupTitle').textContent = DT('setupTitle');
+      $('#dashSetupNote').textContent = DT(data.configured === false ? 'setupNote' : 'setupPublishNote');
+      $('#dashSetupLogin').hidden = !signIn.length;
+      $('#dashSetupLoginLabel').textContent = DT('setupLogin');
+      $('#dashSetupLoginMissing').textContent = signIn.join(' · ');
+      $('#dashSetupPublishing').hidden = !publishing.length;
+      $('#dashSetupPublishingLabel').textContent = DT('setupPublishing');
+      $('#dashSetupPublishingMissing').textContent = publishing.join(' · ');
+      $('#dashSetupGuide').firstChild.textContent = DT('setupGuide') + ' ';
+      $('#dashSetupRetry').firstChild.textContent = DT('setupRetry') + ' ';
+    };
     const showGate = () => {
       dash.classList.remove('is-full');
       gate.hidden = false;
@@ -1157,6 +1187,7 @@
       gateBusy = busy;
       const button = $('#dashLoginForm button[type="submit"]');
       if (button) button.disabled = busy;
+      const retry = $('#dashSetupRetry'); if (retry) retry.disabled = busy;
       $('#dashLoginForm')?.setAttribute('aria-busy', String(busy));
     };
     const requestLogin = async (payload) => {
@@ -1176,9 +1207,15 @@
       finally { clearTimeout(timer); if (gateRequest === controller) gateRequest = null; }
     };
     const openDash = async () => {
+      // A still-open menu owns Tab navigation. Close public panels before
+      // showing Studio so their keyboard handlers cannot trap this gate.
+      window.__bqExclusive?.('studio');
       gateRequest?.abort();
       const epoch = ++gateEpoch;
       clearTwoFA();
+      loginConfigured = null;
+      const setup = $('#dashSetup'); if (setup) setup.hidden = true;
+      $('#dashLoginForm').hidden = false;
       dash.classList.add('is-open');
       dash.setAttribute('aria-hidden', 'false');
       hint.setAttribute('role', 'status');
@@ -1202,8 +1239,14 @@
       setGateBusy(false);
       if (data.ok === true && data.authenticated === true) { unlocked = true; showConsole(); return; }
       invalidateDashboardSession();
+      loginConfigured = typeof data.configured === 'boolean' ? data.configured : null;
+      showLoginSetup(data);
+      ensure2FAChoice();
       hint.textContent = data.configured === false ? loginSetupMessage(data.requirements) : data.error ? loginError(data) : '';
-      $('#dashKey')?.focus();
+      if (data.configured === false && setup) {
+        hint.textContent = '';
+        $('#dashSetupRetry')?.focus();
+      } else $('#dashKey')?.focus();
     };
     const closeDash = () => {
       ++gateEpoch;
@@ -1223,6 +1266,11 @@
     window.addEventListener('hashchange', () => { if (location.hash === '#studio') openDash(); });
     window.addEventListener('bq:open-studio', openDash);
     window.__bqOpenStudio = openDash;
+    $('#dashSetupRetry')?.addEventListener('click', () => {
+      if (gateBusy) return;
+      const key = $('#dashKey'); if (key) key.value = '';
+      openDash();
+    });
     document.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') { e.preventDefault(); openDash(); }   // ⌘ / Ctrl + B
       if (e.key === 'Escape') closeDash();
@@ -1259,7 +1307,7 @@
     $('#dashLoginForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (location.protocol === 'file:') { openDash(); return; }
-      if (gateBusy) return;
+      if (gateBusy || loginConfigured === false) return;
       const raw = $('#dashKey').value.trim();
       // Authenticator/email codes may be entered with Kurdish or Arabic digits.
       const val = twoFAId ? raw.replace(/[٠-٩۰-۹]/g, digit => String(digit.charCodeAt(0) - (digit <= '٩' ? 0x660 : 0x6f0))) : raw;
@@ -1341,10 +1389,47 @@
       ar:  { note:'ارفع تصميماً منتهياً — يُعاد تحجيمه تلقائياً ويُحوّل إلى WebP ثم يُرفع إلى مجلده على GitHub. يظهر في المعرض قريباً.', cat:'التصنيف / المجلد', file:'اختر صورة (أي حجم أو صيغة)', upload:'نشر في المعرض', reading:'جارٍ التحضير…', ready:'جاهز — اضغط نشر', pick:'اختر صورة أولاً.', uploading:'جارٍ النشر إلى GitHub…', done:'تم النشر ✓ — سيظهر في المعرض قريباً.', updating:'جارٍ تحديث أعداد المعرض…', updated:'تم تحديث المعرض وأعداد التبويبات.', propagating:'حدّث الصفحة مرة إذا كان الملف الجديد ما زال قيد الانتشار.', noToken:'لم يُضبط رمز GitHub بعد — أضفه مرة لتفعيل النشر.', connect:'اربط المحرر أولاً (تبويب المحتوى).', fail:'تعذّر النشر (الموقع المباشر فقط).' },
       fr:  { note:'Téléversez un design fini — il est redimensionné, converti en WebP et poussé dans son dossier sur GitHub. Il apparaît dans la galerie sous peu.', cat:'Catégorie / dossier', file:'Choisir une image (toute taille/format)', upload:'Publier dans la galerie', reading:'Préparation…', ready:'Prêt — cliquez sur Publier', pick:'Choisissez d’abord une image.', uploading:'Publication sur GitHub…', done:'Publié ✓ — il apparaît dans la galerie sous peu.', updating:'mise à jour des compteurs de la galerie…', updated:'galerie et compteurs des onglets mis à jour.', propagating:'rafraîchissez une fois si le nouveau fichier se propage encore.', noToken:'Le jeton GitHub n’est pas encore défini — ajoutez-le une fois.', connect:'Connectez d’abord l’éditeur (onglet Contenu).', fail:'Échec de la publication (site en ligne uniquement).' }
     };
-    const renderWorks = () => {
+    const WK_ACCESS_I18N = {
+      en:{ gate:'Connect gallery publishing', note:'Sign in with your editor password to upload and manage works.', wrong:'The editor password is incorrect. Try again.', noToken:'GitHub publishing is not connected. Configure the work-upload service with repository write access.' },
+      ku:{ gate:'بەستنی بڵاوکردنەوەی گەلەری', note:'بە پاسۆردی ئەدیتەر بچۆ ژوورەوە بۆ بارکردن و بەڕێوەبردنی کارەکان.', wrong:'پاسۆردی ئەدیتەر هەڵەیە. دووبارە هەوڵ بدەوە.', noToken:'بڵاوکردنەوەی GitHub بەستراو نییە. خزمەتگوزاری work-upload بە دەسەڵاتی نووسینی ڕیپۆ ڕێکبخە.' },
+      ar:{ gate:'ربط النشر في المعرض', note:'سجّل الدخول بكلمة مرور المحرر لرفع الأعمال وإدارتها.', wrong:'كلمة مرور المحرر غير صحيحة. حاول مجدداً.', noToken:'النشر عبر GitHub غير متصل. اضبط خدمة work-upload بصلاحية الكتابة في المستودع.' },
+      kmr:{ gate:'Weşandina galerîyê girêde', note:'Bi şîfreya edîtorê têkeve da ku karan bar bikî û birêve bibî.', wrong:'Şîfreya edîtorê çewt e. Dîsa biceribîne.', noToken:'Weşandina GitHub ne girêdayî ye. Xizmeta work-upload bi destûra nivîsandina repoyê saz bike.' },
+      fr:{ gate:'Connecter la publication du portfolio', note:'Connectez-vous avec votre mot de passe éditeur pour publier et gérer vos travaux.', wrong:'Le mot de passe éditeur est incorrect. Réessayez.', noToken:'La publication GitHub n’est pas connectée. Configurez le service work-upload avec un accès en écriture au dépôt.' }
+    };
+    const renderWorks = (connectionError = '') => {
       const colls = collections();
-      const W = WK_I18N[curLang()] || WK_I18N.en;
+      const W = { ...(WK_I18N[curLang()] || WK_I18N.en), ...(WK_ACCESS_I18N[curLang()] || WK_ACCESS_I18N.en) };
       const C = (window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS) || {};
+      if (!editToken()) {
+        const t = CT_I18N[curLang()] || CT_I18N.en;
+        view.innerHTML = `<div class="dash-gate-inline">
+          <i class="fa-solid fa-cloud-arrow-up dash-gate-icon"></i>
+          <h3>${esc(W.gate)}</h3><p class="mono">${esc(W.note)}</p>
+          <form id="wkTokenForm" class="dash-login"><input type="password" id="wkToken" placeholder="${esc(t.tokPh)}" autocomplete="off" required><button type="submit">${esc(t.conn)} <i class="fa-solid fa-arrow-right"></i></button></form>
+          <p class="dash-note mono" id="wkTokenMsg" role="status">${esc(connectionError)}</p></div>`;
+        let connecting = false;
+        const form = $('#wkTokenForm');
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          if (connecting) return;
+          const tokenIn = $('#wkToken'), button = $('#wkTokenForm button[type="submit"]'), message = $('#wkTokenMsg');
+          const token = tokenIn.value.trim(); if (!token) return;
+          connecting = true; button.disabled = true; tokenIn.value = '';
+          message.textContent = W.reading;
+          try { sessionStorage.setItem('bq_edit_token', token); } catch (e) {}
+          const folder = Object.values(C).find(collection => collection.ext !== 'mp4' && collection.folder)?.folder || 'GeneralDesign';
+          const result = await wkApi({ action:'list', folder });
+          connecting = false; button.disabled = false;
+          if ($('#wkTokenForm') !== form) return;
+          if (result && result.ok) { renderWorks(); return; }
+          if (result && result.error === 'unauthorized') {
+            try { sessionStorage.removeItem('bq_edit_token'); } catch (e) {}
+            message.textContent = W.wrong;
+          } else if (result && result.error === 'no_github_token') message.textContent = W.noToken;
+          else message.textContent = (result && (result.detail || result.error)) || W.fail;
+        });
+        return;
+      }
       const seen = {};
       const opts = Object.keys(C).filter(k => C[k].ext !== 'mp4' && C[k].folder).filter(k => { if (seen[C[k].folder]) return false; seen[C[k].folder] = 1; return true; })
         .map(k => `<option value="${esc(C[k].folder)}">${esc(C[k].title || C[k].tag || k)}</option>`).join('');
@@ -1355,7 +1440,7 @@
           <label class="dash-field"><span class="mono">${esc(W.cat)}</span><select id="wkFolder">${opts}</select></label>
           <label class="dash-field"><span class="mono">${esc(W.file)}</span><input id="wkFile" type="file" accept="image/*" class="cms-file"><span class="dash-note mono" id="wkMsg"></span></label>
           <div class="dash-latest-prev" id="wkPrev" hidden><img src="" alt=""></div>
-          <button class="dash-btn dash-btn--go" id="wkUp"><i class="fa-solid fa-cloud-arrow-up"></i> ${esc(W.upload)}</button>
+          <button class="dash-btn dash-btn--go" id="wkUp" type="button" disabled><i class="fa-solid fa-cloud-arrow-up"></i> ${esc(W.upload)}</button>
         </div>
         <div class="dash-manage">
           <div class="cms-head"><span class="mono cms-status">${W.manageTitle || 'Manage works — view & delete'}</span></div>
@@ -1371,19 +1456,31 @@
            <span class="dash-bar"><span class="dash-bar-fill" data-css="width:${(c.count / max * 100).toFixed(1)}%"></span></span>
            <span class="dash-bar-n mono">${c.count}</span>
          </div>`).join('') + `</div>`;
-      let pend = null;
-      const fileIn = $('#wkFile'), prev = $('#wkPrev'), msg = $('#wkMsg');
+      let pend = null, preparation = 0, publishing = false;
+      const fileIn = $('#wkFile'), prev = $('#wkPrev'), msg = $('#wkMsg'), publish = $('#wkUp'), folderIn = $('#wkFolder');
       fileIn.addEventListener('change', async (ev) => {
-        const file = ev.target.files && ev.target.files[0]; if (!file) return;
+        const current = ++preparation;
+        const file = ev.target.files && ev.target.files[0];
+        pend = null; prev.hidden = true; publish.disabled = true;
+        if (!file) { msg.textContent = ''; return; }
         msg.textContent = W.reading;
-        try { const b64 = await cmsResize(file, 1400, 0.78); pend = b64; prev.hidden = false; prev.querySelector('img').src = 'data:image/webp;base64,' + b64; msg.textContent = W.ready; }
-        catch (e) { msg.textContent = '✗ ' + e; }
+        try {
+          const b64 = await cmsResize(file, 1400, 0.78);
+          if (current !== preparation) return;
+          if (b64.length > 6000000) { msg.textContent = '✗ ' + (W.tooBig || 'Image is too large — please pick a smaller source image.'); return; }
+          pend = b64; prev.hidden = false; prev.querySelector('img').src = 'data:image/webp;base64,' + b64;
+          msg.textContent = W.ready; publish.disabled = publishing;
+        } catch (e) {
+          if (current === preparation) msg.textContent = '✗ ' + (W.imageError || 'Could not prepare this image. Choose a JPG, PNG or WebP image.');
+        }
       });
-      $('#wkUp').addEventListener('click', () => {
+      publish.addEventListener('click', async () => {
+        if (publishing) return;
         if (!pend) { msg.textContent = W.pick; return; }
-        if (pend.length > 6000000) { msg.textContent = '✗ ' + (W.tooBig || 'Image is too large — please pick a smaller source image.'); return; }
+        publishing = true; publish.disabled = true; fileIn.disabled = true; folderIn.disabled = true;
         msg.textContent = W.uploading;
-        wkApi({ folder: $('#wkFolder').value, dataB64: pend, ext: 'webp' }).then(d => {
+        try {
+          const d = await wkApi({ folder: folderIn.value, dataB64: pend, ext: 'webp' });
           if (d && d.ok) {
             try { sessionStorage.removeItem('bq_gallery_tree_v1'); } catch (e) {}
             msg.textContent = (W.done || 'Published ✓') + ' — ' + (W.updating || 'updating gallery counts…');
@@ -1394,9 +1491,15 @@
               .catch(() => { msg.textContent = (W.done || 'Published ✓') + ' — ' + (W.propagating || 'refresh once if the new file is still propagating.'); });
           }
           else if (d && d.error === 'no_github_token') { msg.textContent = W.noToken; }
-          else if (d && (d.error === 'missing_token' || d.error === 'unauthorized')) { msg.textContent = W.connect; }
+          else if (d && (d.error === 'missing_token' || d.error === 'unauthorized')) {
+            try { sessionStorage.removeItem('bq_edit_token'); } catch (e) {}
+            renderWorks(W.wrong);
+          }
           else { msg.textContent = '✗ ' + ((d && (d.detail || d.error)) || 'failed'); }
-        }).catch(() => { msg.textContent = W.fail; });
+        } catch (e) { msg.textContent = W.fail; }
+        finally {
+          publishing = false; fileIn.disabled = false; folderIn.disabled = false; publish.disabled = !pend;
+        }
       });
       /* ---- Manage works: list every image in a folder + delete one ---- */
       const wkGrid = $('#wkGrid'), wkMgFolder = $('#wkMgFolder');
@@ -1654,6 +1757,8 @@
           return { ...body, detail:DT('sessionExpired') };
         }
         if (body.error === 'studio-proxy-not-configured') return { ...body, detail:DT('studioNotSetup') };
+        if (body.error === 'studio-upstream-auth') return { ...body, detail:DT('studioUpstreamAuth') };
+        if (body.error === 'studio-github-not-configured') return { ...body, detail:DT('studioGithubMissing') };
         if (res.status === 429) return { ...body, detail:DT('rateLimited') };
         if (res.status >= 500 || body.error === 'bad_response') return { ...body, detail:DT('studioUnavailable') };
         return body;
@@ -1720,16 +1825,24 @@
     };
     const cmsResize = (file, maxW, q) => new Promise((resolve, reject) => {
       const im = new Image();
+      const source = URL.createObjectURL(file);
       im.onload = () => {
-        const scale = Math.min(1, maxW / (im.width || maxW));
-        const w = Math.max(1, Math.round(im.width * scale)), h = Math.max(1, Math.round(im.height * scale));
-        const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
-        cv.getContext('2d').drawImage(im, 0, 0, w, h);
-        URL.revokeObjectURL(im.src);
-        try { resolve(cv.toDataURL('image/webp', q).split(',')[1]); } catch (e) { reject(e); }
+        try {
+          if (!im.width || !im.height) throw new Error('image_error');
+          const scale = Math.min(1, maxW / Math.max(im.width, im.height));
+          const w = Math.max(1, Math.round(im.width * scale)), h = Math.max(1, Math.round(im.height * scale));
+          const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+          const context = cv.getContext('2d');
+          if (!context) throw new Error('image_processing_failed');
+          context.drawImage(im, 0, 0, w, h);
+          const encoded = cv.toDataURL('image/webp', q);
+          if (!encoded.startsWith('data:image/webp;base64,') || !encoded.split(',')[1]) throw new Error('webp_not_supported');
+          resolve(encoded.split(',')[1]);
+        } catch (e) { reject(e); }
+        finally { URL.revokeObjectURL(source); }
       };
-      im.onerror = () => reject('image_error');
-      im.src = URL.createObjectURL(file);
+      im.onerror = () => { URL.revokeObjectURL(source); reject(new Error('image_error')); };
+      im.src = source;
     });
     const cmsGate = () => {
       const t = CT_I18N[curLang()] || CT_I18N.en;
@@ -2386,6 +2499,15 @@
       sub: $('#bcSub'), meta: $('#bcMeta'), read: $('#bcRead'),
     };
     let curPost = null;
+    let previewTimer = 0;
+    let feedState = 'loading';
+    let feedRequest = 0;
+    const feedStatus = document.createElement('p');
+    feedStatus.className = 'blog-feed-status';
+    feedStatus.setAttribute('role', 'status');
+    feedStatus.setAttribute('aria-live', 'polite');
+    feedStatus.setAttribute('aria-atomic', 'true');
+    list.appendChild(feedStatus);
     /* translate a post into the active language (falls back to English) */
     const blogLang = () => (document.documentElement.dataset.lang || 'en');
     const L = (p) => {
@@ -2407,20 +2529,60 @@
                date: t.date || p.date, body: t.body || p.body };
     };
     const dT = (k, fb) => (window.BQ_DICT && window.BQ_DICT[k]) || fb;
+    const feedCopy = {
+      en: { loading: ['Loading the journal…', 'The latest notes are on their way.'], empty: ['No notes published yet.', 'New notes will appear here when they are published.'], error: ['The journal could not be loaded.', 'Please try again later.'] },
+      ku: { loading: ['ژوورناڵەکە بار دەکرێت…', 'نوێترین تێبینییەکان لە ڕێگادان.'], empty: ['هێشتا هیچ تێبینییەک بڵاو نەکراوەتەوە.', 'تێبینییە نوێکان دوای بڵاوکردنەوە لێرە دەردەکەون.'], error: ['نەتوانرا ژوورناڵەکە بار بکرێت.', 'تکایە دواتر دووبارە هەوڵ بدەوە.'] },
+      kmr: { loading: ['Rojname tê barkirin…', 'Nîşeyên herî nû di rê de ne.'], empty: ['Hêj nîşe nehatine weşandin.', 'Nîşeyên nû piştî weşandinê li vir xuya dibin.'], error: ['Rojname nehat barkirin.', 'Ji kerema xwe paşê dîsa biceribîne.'] },
+      ar: { loading: ['جارٍ تحميل المجلة…', 'أحدث الملاحظات في طريقها إليك.'], empty: ['لم تُنشر ملاحظات بعد.', 'ستظهر الملاحظات الجديدة هنا عند نشرها.'], error: ['تعذّر تحميل المجلة.', 'يرجى المحاولة لاحقاً.'] },
+      fr: { loading: ['Chargement du journal…', 'Les dernières notes arrivent.'], empty: ['Aucune note publiée pour le moment.', 'Les nouvelles notes apparaîtront ici après leur publication.'], error: ['Le journal n’a pas pu être chargé.', 'Veuillez réessayer plus tard.'] },
+      tr: { loading: ['Günlük yükleniyor…', 'En yeni notlar yolda.'], empty: ['Henüz yayımlanmış not yok.', 'Yeni notlar yayımlandığında burada görünecek.'], error: ['Günlük yüklenemedi.', 'Lütfen daha sonra tekrar deneyin.'] },
+      sv: { loading: ['Journalen laddas…', 'De senaste anteckningarna är på väg.'], empty: ['Inga anteckningar har publicerats ännu.', 'Nya anteckningar visas här när de publiceras.'], error: ['Journalen kunde inte laddas.', 'Försök igen senare.'] }
+    };
+    const renderFeedState = (state) => {
+      const ready = state === 'ready';
+      layout.dataset.blogState = state;
+      layout.setAttribute('aria-busy', String(feedState === 'loading'));
+      feedStatus.hidden = ready;
+      if (els.ghost) els.ghost.hidden = !ready;
+      if (ready) return;
+      clearTimeout(previewTimer);
+      curPost = null;
+      const [title, detail] = (feedCopy[blogLang()] || feedCopy.en)[state];
+      feedStatus.textContent = `${title} ${detail}`;
+      if (els.card) {
+        els.card.classList.remove('swapping');
+        els.card.style.background = '';
+        els.card.style.cursor = 'default';
+        els.card.removeAttribute('role');
+        els.card.removeAttribute('tabindex');
+        els.card.removeAttribute('aria-labelledby');
+      }
+      setCover(els.img, '');
+      if (els.title) els.title.textContent = title;
+      if (els.sub) els.sub.textContent = detail;
+      [els.tag, els.meta, els.read].forEach(el => { if (el) el.textContent = ''; });
+      els.card?.querySelectorAll('.blog-card-foot, .blog-card-cta').forEach(el => { el.hidden = true; });
+    };
     const preview = (p) => {
-      if (!p) return;
-      curPost = p;
+      if (!p || !els.card) return;
+      clearTimeout(previewTimer);
       const q = L(p);
       els.card.classList.add('swapping');
       if (els.ghost) els.ghost.textContent = p.num;
       els.card.style.background = safeAccent(p.accent);
-      setTimeout(() => {
+      previewTimer = setTimeout(() => {
+        curPost = p;
         if (els.img)  setCover(els.img, q.img);
         if (els.tag)  els.tag.textContent = q.tag;
         if (els.title) els.title.innerHTML = hl(q.title);
         if (els.sub)  els.sub.textContent = q.sub;
         if (els.meta) els.meta.textContent = `${q.tag.toUpperCase()} · ${q.date.toUpperCase()}`;
         if (els.read) els.read.textContent = dT('blog.min', '{n} MIN').replace('{n}', p.read);
+        els.card.style.cursor = 'pointer';
+        els.card.setAttribute('role', 'button');
+        els.card.setAttribute('tabindex', '0');
+        els.card.setAttribute('aria-labelledby', 'bcTitle');
+        els.card.querySelectorAll('.blog-card-foot, .blog-card-cta').forEach(el => { el.hidden = false; });
         els.card.classList.remove('swapping');
       }, 160);
     };
@@ -2428,9 +2590,6 @@
     /* the rich preview card is itself a shortcut into the post it's showing —
        its "Click to read the full note" now actually opens that post. */
     if (els.card) {
-      els.card.style.cursor = 'pointer';
-      els.card.setAttribute('role', 'button');
-      els.card.setAttribute('tabindex', '0');
       els.card.addEventListener('click', () => { if (curPost) openReader(curPost); });
       els.card.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && curPost) { e.preventDefault(); openReader(curPost); } });
     }
@@ -2444,6 +2603,7 @@
       if (!anchor || !anchor.parentNode) return;
       let bar = anchor.parentNode.querySelector('.blog-filters');
       if (!bar) { bar = document.createElement('div'); bar.className = 'blog-filters'; anchor.parentNode.insertBefore(bar, anchor); }
+      bar.hidden = POSTS.length === 0;
       const cats = []; const seen = {};
       POSTS.forEach(p => { const c = (L(p).tag || '').trim(); const k = catNorm(c); if (c && !seen[k]) { seen[k] = 1; cats.push(c); } });
       const allLabel = (window.BQ_DICT && window.BQ_DICT['blog.all']) || 'All';
@@ -2455,12 +2615,13 @@
     };
     const renderPage = () => {
       renderFilters();
-      list.querySelectorAll('.index-row').forEach(r => r.remove());
+      list.querySelectorAll('.index-row, .index-inline').forEach(r => r.remove());
       const FP = viewPosts();
       pageCount = Math.max(1, Math.ceil(FP.length / PAGE_SIZE));
       if (page > pageCount) page = 1;
       const start = (page - 1) * PAGE_SIZE;
       const slice = FP.slice(start, start + PAGE_SIZE);
+      renderFeedState(slice.length ? 'ready' : feedState === 'ready' ? 'empty' : feedState);
       slice.forEach((p, i) => {
         const q = L(p);
         const a = document.createElement('a');
@@ -2474,6 +2635,7 @@
            <span class="index-row-title">${esc(q.title)}</span>
            <span class="mono index-row-tag">${esc(q.tag)}</span>`;
         a.addEventListener('mouseenter', () => { setActive(a); preview(p); });
+        a.addEventListener('focus', () => { setActive(a); preview(p); });
         a.addEventListener('click', (e) => {
           if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
           e.preventDefault();
@@ -2500,6 +2662,8 @@
         list.appendChild(a);
       });
       if (slice[0]) preview(slice[0]);
+      const pager = $('#blogPager');
+      if (pager) pager.hidden = FP.length === 0;
       renderPager();
     };
     const setActive = (row) => { list.querySelectorAll('.index-row').forEach(r => r.classList.remove('is-active')); row.classList.add('is-active'); };
@@ -2722,10 +2886,19 @@
     const BUILTIN_POSTS = POSTS.slice();
     const loadCmsPosts = () => {
       const SB = window.BQ_SUPA || {};
-      if (!SB.url || !SB.key) return;
-      fetch(SB.url + '/rest/v1/posts?select=*&published=eq.true&order=pos.asc,created_at.desc', { headers: { apikey: SB.key }, cache: 'no-store' })
-        .then((r) => r.json()).then((rows) => {
-          const cms = (Array.isArray(rows) ? rows : []).map((p) => ({
+      const request = ++feedRequest;
+      if (!SB.url || !SB.key) { feedState = 'error'; renderPage(); return; }
+      feedState = 'loading';
+      layout.setAttribute('aria-busy', 'true');
+      if (!POSTS.length) renderFeedState('loading');
+      return fetch(SB.url + '/rest/v1/posts?select=*&published=eq.true&order=pos.asc,created_at.desc', { headers: { apikey: SB.key }, cache: 'no-store' })
+        .then((r) => {
+          if (!r.ok) throw new Error('journal-http-error');
+          return r.json();
+        }).then((rows) => {
+          if (request !== feedRequest) return;
+          if (!Array.isArray(rows)) throw new Error('journal-invalid-feed');
+          const cms = rows.map((p) => ({
             num: String(p.num || p.id || ''),
             id: p.id,
             slug: String(p.id),
@@ -2740,13 +2913,18 @@
             _i18n: p.i18n || null
           }));
           POSTS = cms;   // DB is the ONLY source — when it's empty the blog is empty (no demo posts), until the owner writes their own
+          feedState = 'ready';
           try { window.__bqBlogCount = POSTS.length; } catch (e) {}   // live blog count for the dashboard overview
           pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
           if (page > pageCount) page = 1;
           renderPage();
           renderLatest();
           if (pendingSlug) { const s = pendingSlug; pendingSlug = null; const p = findPostBySlug(s); if (p) openReader(p, true); }
-        }).catch(() => {});
+        }).catch(() => {
+          if (request !== feedRequest) return;
+          feedState = 'error';
+          renderPage();
+        });
     };
     try { window.__bqBlogCount = POSTS.length; } catch (e) {}   // initial count (built-ins) before the CMS fetch resolves
     loadCmsPosts();

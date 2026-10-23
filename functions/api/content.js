@@ -4,7 +4,7 @@
 
 import {
   hasSession,
-  hasEditToken,
+  editorAuthorization,
   inputErrorResponse,
   isSameOrigin,
   json,
@@ -94,7 +94,8 @@ async function mutationGate(request, env) {
   if (!sessionConfigured(env) || !env.EDIT_TOKEN) return json({ ok: false, error: 'not-configured' }, 503);
   if (!isSameOrigin(request)) return json({ ok: false, error: 'forbidden-origin' }, 403);
   if (!(await hasSession(request, env))) return json({ ok: false, error: 'session-required' }, 401);
-  if (!(await hasEditToken(request, env))) return json({ ok: false, error: 'unauthorized' }, 401);
+  const editorGate = await editorAuthorization(request, env);
+  if (editorGate) return editorGate;
   const key = await rateKey(request, env, 'content-write');
   const slot = await takeRateLimit(env, key, { limit: 120, windowMs: 15 * 60 * 1000, durable: true });
   if (slot.unavailable) return json({ ok: false, error: 'rate-limit-unavailable' }, 503);

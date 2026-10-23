@@ -163,6 +163,7 @@ test('assistant rejects cross-origin, partial auth and oversized prompts before 
     DB: {
       prepare() {
         return {
+          bind() { return this; },
           async run() { return { meta: { changes: 1 } }; },
           async first() { return null; }
         };

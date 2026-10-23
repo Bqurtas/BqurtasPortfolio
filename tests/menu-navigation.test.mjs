@@ -12,7 +12,13 @@ function section(from, to) {
 function events() {
   const listeners = new Map();
   return {
-    addEventListener(type, callback) { listeners.set(type, [...(listeners.get(type) || []), callback]); },
+    addEventListener(type, callback, options) {
+      if (options?.once) {
+        const original = callback;
+        callback = (...args) => { this.removeEventListener(type, callback); original(...args); };
+      }
+      listeners.set(type, [...(listeners.get(type) || []), callback]);
+    },
     removeEventListener(type, callback) { listeners.set(type, (listeners.get(type) || []).filter(item => item !== callback)); },
     callbacks(type) { return [...(listeners.get(type) || [])]; },
     fire(type, values = {}) {
@@ -25,7 +31,7 @@ function events() {
 function element(id) {
   const classes = new Set();
   return {
-    ...events(), id, dataset: {}, attrs: {},
+    ...events(), id, dataset: {}, attrs: {}, children: [], inert: false,
     classList: {
       contains: value => classes.has(value),
       add: (...values) => values.forEach(value => classes.add(value)),
@@ -34,10 +40,16 @@ function element(id) {
     },
     style: { setProperty(name, value) { this[name] = value; }, removeProperty(name) { delete this[name]; } },
     setAttribute(name, value) { this.attrs[name] = value; }, removeAttribute(name) { delete this.attrs[name]; },
-    querySelector: () => null, querySelectorAll: () => [], focus() {},
+    getAttribute(name) { return this.attrs[name] ?? null; },
+    contains(item) { return item === this || this.children.some(child => child.contains(item)); },
+    closest(selector) {
+      if (selector === '[inert]' && this.inert) return this;
+      return this.parent?.closest(selector) || null;
+    },
+    getClientRects: () => [{}], querySelector: () => null, querySelectorAll: () => [], focus() {},
   };
 }
-function fixture({ clampMenuScroll = true, menuTransition = {}, stageDuration = '1s' } = {}) {
+function fixture({ clampMenuScroll = true, menuTransition = {}, stageDuration = '1s', innerWidth = 390 } = {}) {
   let now = 0, nextTimer = 0;
   const timers = new Map(), closed = [], historyChanges = [];
   const schedule = (callback, delay = 0) => { const id = ++nextTimer; timers.set(id, { at: now + delay, callback }); return id; };
@@ -51,14 +63,25 @@ function fixture({ clampMenuScroll = true, menuTransition = {}, stageDuration = 
     }
     now = end;
   };
-  const ids = Object.fromEntries(['menuToggle', 'railMenu', 'mobileMenu', 'mobileMenuClose', 'bqPageStage', 'design', 'bio', 'blog', 'contact'].map(id => [id, element(id)]));
+  const ids = Object.fromEntries(['menuToggle', 'railMenu', 'mobileMenu', 'mobileMenuClose', 'bqPageStage', 'design', 'bio', 'blog', 'contact', 'main', 'footer', 'rail', 'mobilebar', 'dockChat', 'dockTheme', 'mobileChat', 'mobileTheme', 'bioHeading'].map(id => [id, element(id)]));
   const bioLink = element('bio-link'); bioLink.dataset.route = 'bio';
-  ids.mobileMenu.querySelectorAll = () => [bioLink];
+  ids.mobileMenu.children = [ids.mobileMenuClose, bioLink];
+  ids.mobileMenu.children.forEach(child => { child.parent = ids.mobileMenu; });
+  ids.mobileMenu.querySelectorAll = selector => selector === '.mm-link, .mm-touch, .mm-logo' ? [bioLink] : [ids.mobileMenuClose, bioLink];
+  ids.mobilebar.children = [ids.menuToggle, ids.mobileChat, ids.mobileTheme];
+  ids.mobilebar.children.forEach(child => { child.parent = ids.mobilebar; });
+  ids.mobilebar.querySelectorAll = () => ids.mobilebar.children;
+  ids.rail.children = [ids.railMenu, ids.dockChat, ids.dockTheme];
+  ids.rail.children.forEach(child => { child.parent = ids.rail; });
+  ids.rail.querySelectorAll = () => ids.rail.children;
+  ids.bqPageStage.children = [ids.main, ids.footer];
+  ids.bqPageStage.children.forEach(child => { child.parent = ids.bqPageStage; });
+  ids.bio.querySelector = selector => selector === '.room-hero-title, h1, h2' ? ids.bioHeading : null;
   const body = element('body'); body.dataset.room = 'design';
   const root = element('html'); root.scrollTop = 0;
   const location = { pathname: '/ku/design' };
   const window = {
-    ...events(), scrollY: 5239, innerHeight: 760, setTimeout: schedule, clearTimeout: cancel,
+    ...events(), scrollY: 5239, innerHeight: 760, innerWidth, setTimeout: schedule, clearTimeout: cancel,
     matchMedia: () => ({ matches: false }), __bqPlayRoomCurtain: () => true,
     scrollTo({ top }) { this.scrollY = top; this.fire('scroll'); },
   };
@@ -68,9 +91,12 @@ function fixture({ clampMenuScroll = true, menuTransition = {}, stageDuration = 
     ...events(), body, documentElement: root, activeElement: ids.menuToggle,
     getElementById: id => ids[id], contains: () => true,
     querySelector: selector => ({ '.lux-transition': {}, '.section.work': work, '.service-showcase': afterWork })[selector] || null,
-    querySelectorAll: () => [],
+    querySelectorAll: selector => selector === '.rail' ? [ids.rail] : [],
     dispatchEvent(event) { if (event.type === 'bq:menu-closed') closed.push(now); this.fire(event.type, event); },
   };
+  ids.rail.children.forEach(child => { child.getClientRects = () => window.innerWidth >= 1025 ? [{}] : []; });
+  ids.mobilebar.children.forEach(child => { child.getClientRects = () => window.innerWidth < 1025 ? [{}] : []; });
+  [...Object.values(ids), bioLink].forEach(item => { item.focus = () => { document.activeElement = item; }; });
   const context = {
     getComputedStyle(element) {
       return element === ids.mobileMenu
@@ -278,4 +304,106 @@ test('a menu with no motion still releases its guards when no transitionend can 
   page.advance(80);
   assert.equal(page.closed.length, 1);
   assert.equal(page.body.classList.contains('menu-closing'), false);
+});
+
+test('desktop menu leaves its rail available while only the visible page content is inert', () => {
+  const page = fixture({ innerWidth:1280 });
+  page.ids.footer.inert = true;
+  page.open();
+  assert.equal(page.ids.mobileMenu.attrs['aria-modal'], 'false', 'the dialog cannot hide its sibling toolbar from assistive technology');
+  assert.equal(page.ids.bqPageStage.attrs['aria-hidden'], 'true');
+  assert.equal(page.ids.main.inert, true);
+  assert.equal(page.ids.footer.inert, true);
+  assert.equal(page.ids.bqPageStage.inert, false, 'the preview surface still dismisses the menu');
+  assert.equal(page.ids.mobilebar.inert, false);
+  assert.equal(page.ids.rail.inert, false);
+  page.ids.mobileMenuClose.fire('click');
+  assert.equal(page.ids.main.inert, true, 'page content stays unavailable during its return transition');
+  page.advance(1230);
+  assert.equal(page.ids.main.inert, false);
+  assert.equal(page.ids.footer.inert, true, 'pre-existing inert state must not be erased');
+  assert.equal(page.ids.bqPageStage.getAttribute('aria-hidden'), null);
+});
+
+test('desktop Tab includes its rail controls, skips the hidden mobile bar and wraps around the interaction area', () => {
+  const page = fixture({ innerWidth:1280 });
+  page.open();
+  page.ids.dockTheme.focus();
+  page.document.fire('keydown', { key:'Tab' });
+  assert.equal(page.document.activeElement, page.ids.mobileMenuClose);
+  page.document.fire('keydown', { key:'Tab', shiftKey:true });
+  assert.equal(page.document.activeElement, page.ids.dockTheme);
+  page.ids.dockChat.focus();
+  page.document.fire('keydown', { key:'Tab' });
+  assert.equal(page.document.activeElement, page.ids.dockTheme, 'the complete cycle stays inside the menu and its toolbar');
+  page.bioLink.focus();
+  page.document.fire('keydown', { key:'Tab' });
+  assert.equal(page.document.activeElement, page.ids.railMenu, 'the final menu link continues into the visible desktop rail');
+});
+
+test('phone and tablet menus exclude the covered dock from keyboard navigation', () => {
+  for (const innerWidth of [390, 1024]) {
+    const page = fixture({ innerWidth });
+    page.open();
+    assert.equal(page.ids.mobileMenu.attrs['aria-modal'], 'true');
+    page.bioLink.focus();
+    page.document.fire('keydown', { key:'Tab' });
+    assert.equal(page.document.activeElement, page.ids.mobileMenuClose);
+    page.document.fire('keydown', { key:'Tab', shiftKey:true });
+    assert.equal(page.document.activeElement, page.bioLink);
+  }
+});
+
+test('resizing an open desktop menu to a phone releases focus from its hidden rail', () => {
+  const page = fixture({ innerWidth:1280 });
+  page.open();
+  page.ids.dockTheme.focus();
+  page.window.innerWidth = 390;
+  page.window.fire('resize');
+  assert.equal(page.ids.mobileMenu.attrs['aria-modal'], 'true');
+  assert.equal(page.document.activeElement, page.ids.mobileMenuClose);
+  page.window.innerWidth = 1280;
+  page.window.fire('resize');
+  assert.equal(page.ids.mobileMenu.attrs['aria-modal'], 'false');
+});
+
+test('closing for another dock panel preserves that dock control’s focus', () => {
+  const page = fixture({ innerWidth:1280 });
+  page.open();
+  page.ids.dockChat.focus();
+  page.window.__bqPanels.menu();
+  assert.equal(page.document.activeElement, page.ids.dockChat);
+  page.advance(1230);
+  assert.equal(page.document.activeElement, page.ids.dockChat);
+});
+
+test('ordinary menu close restores the trigger and reopening retains the original background accessibility state', () => {
+  const page = fixture();
+  page.ids.bqPageStage.setAttribute('aria-hidden', 'false');
+  page.open();
+  assert.equal(page.document.activeElement, page.ids.mobileMenuClose);
+  page.ids.mobileMenuClose.fire('click');
+  assert.equal(page.document.activeElement, page.ids.menuToggle);
+  page.advance(300);
+  page.ids.menuToggle.fire('click');
+  page.advance(16);
+  assert.equal(page.ids.main.inert, true);
+  page.ids.mobileMenuClose.fire('click');
+  page.advance(1230);
+  assert.equal(page.ids.main.inert, false);
+  assert.equal(page.ids.bqPageStage.getAttribute('aria-hidden'), 'false');
+});
+
+test('a new room receives focus only after its menu return has actually finished', () => {
+  const page = fixture();
+  page.open();
+  page.bioLink.focus();
+  page.bioLink.fire('click');
+  page.advance(1000);
+  assert.equal(page.body.dataset.room, 'bio');
+  assert.equal(page.ids.main.inert, true);
+  assert.notEqual(page.document.activeElement, page.ids.bioHeading);
+  page.advance(230);
+  assert.equal(page.ids.main.inert, false);
+  assert.equal(page.document.activeElement, page.ids.bioHeading);
 });

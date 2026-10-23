@@ -139,6 +139,26 @@ export async function hasEditToken(request, env) {
   return secretEqual(supplied, bootstrap);
 }
 
+/* Call only after verifying the signed session. Reserve an attempt before
+   reading the editor credential so concurrent guesses share one durable
+   budget across every private API. Successful credentials clear this budget;
+   publication and assistant usage retain their separate limits. D1 is used
+   directly because a Rate Limiting binding cannot clear successful attempts. */
+export async function editorAuthorization(request, env) {
+  if (!request.headers.get('x-edit-token')) return json({ ok: false, error: 'unauthorized' }, 401);
+  const key = await rateKey(request, env, 'editor-auth');
+  const slot = await takeRateLimit({ DB: env && env.DB }, key, {
+    limit: 8,
+    windowMs: 15 * 60 * 1000,
+    durable: true
+  });
+  if (slot.unavailable) return json({ ok: false, error: 'rate-limit-unavailable' }, 503);
+  if (!slot.ok) return json({ ok: false, error: 'rate-limited', retryAfter: slot.retryAfter }, 429, { 'Retry-After': String(slot.retryAfter) });
+  if (!(await hasEditToken(request, env))) return json({ ok: false, error: 'unauthorized' }, 401);
+  await clearRateLimit(env, key);
+  return null;
+}
+
 export async function rotateEditToken(env, replacement) {
   if (!env || !env.DB || !sessionConfigured(env)) return false;
   const token = String(replacement || '');

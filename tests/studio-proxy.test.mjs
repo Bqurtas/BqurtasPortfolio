@@ -10,6 +10,7 @@ const SESSION_SECRET = 'another-independent-session-secret-over-32-bytes';
 const BOOTSTRAP_DB = {
   prepare() {
     return {
+      bind() { return this; },
       async run() { return { meta: { changes: 1 } }; },
       async first() { return null; }
     };
@@ -123,6 +124,30 @@ test('Studio proxy only permits known services, actions and safe work folders', 
   });
   assert.equal(unsafe.status, 400);
 
+});
+
+test('upstream authentication failures name server configuration without rejecting the browser editor password', async (t) => {
+  for (const status of [401, 403]) {
+    t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify({ error:'unauthorized', detail:'must not echo upstream details' }), { status }));
+    const response = await studioPost({
+      request:request('work-upload', 'browser-edit-secret', { action:'list', folder:'Book' }, { Cookie:await cookie() }),
+      env:BASE_ENV,
+      params:{ service:'work-upload' }
+    });
+    assert.equal(response.status, 502);
+    assert.deepEqual(await response.json(), { ok:false, error:'studio-upstream-auth' });
+  }
+});
+
+test('missing GitHub credentials remain actionable even when the work service returns a server error', async (t) => {
+  t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify({ error:'no_github_token' }), { status:500 }));
+  const response = await studioPost({
+    request:request('work-upload', 'browser-edit-secret', { action:'list', folder:'Book' }, { Cookie:await cookie() }),
+    env:BASE_ENV,
+    params:{ service:'work-upload' }
+  });
+  assert.equal(response.status, 502);
+  assert.deepEqual(await response.json(), { ok:false, error:'studio-github-not-configured' });
 });
 
 test('Studio proxy fails closed if its upstream credential is missing or browser-accessible', async (t) => {

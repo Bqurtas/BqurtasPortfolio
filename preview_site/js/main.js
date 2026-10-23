@@ -378,12 +378,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (push) {
       const destination = document.getElementById(id)?.querySelector('.room-hero-title, h1, h2');
       if (destination) {
-        const focusDelay = menuWasOpen ? 880 : 0;
-        window.setTimeout(() => {
+        const focusDestination = () => {
           destination.setAttribute('tabindex', '-1');
           try { destination.focus({ preventScroll: true }); } catch (e) { destination.focus(); }
           destination.addEventListener('blur', () => destination.removeAttribute('tabindex'), { once: true });
-        }, focusDelay);
+        };
+        // The page stays inert until the real return transition finishes.
+        // A fixed delay can target its heading while the curtain still moves.
+        if (menuWasOpen) document.addEventListener('bq:menu-closed', focusDestination, { once: true });
+        else window.setTimeout(focusDestination, 0);
       }
     }
   };
@@ -539,11 +542,42 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileMenu = document.getElementById('mobileMenu');
   const menuCloseBtn = document.getElementById('mobileMenuClose');
   const menuTriggers = [menuBtn, railMenuBtn].filter(Boolean);
+  const menuDocks = Array.from(document.querySelectorAll('.rail'));
+  const menuHasDock = () => window.innerWidth >= 1025;
+  const menuStage = document.getElementById('bqPageStage');
+  const menuPageState = new Map();
+  let menuStageHidden = null;
   let lastMenuTrigger = null;
   let menuFrame = 0;
 
+  const setMenuPageUnavailable = (unavailable) => {
+    if (!menuStage) return;
+    if (unavailable) {
+      if (menuStageHidden !== null) return;
+      menuStageHidden = { value:menuStage.getAttribute('aria-hidden') };
+      menuStage.setAttribute('aria-hidden', 'true');
+      // Leave the preview surface interactive so clicking it still dismisses
+      // the curtain. Only its actual page content becomes unavailable.
+      Array.from(menuStage.children).forEach((element) => {
+        menuPageState.set(element, element.inert);
+        element.inert = true;
+      });
+    } else if (menuStageHidden !== null) {
+      menuPageState.forEach((inert, element) => { element.inert = inert; });
+      menuPageState.clear();
+      if (menuStageHidden.value === null) menuStage.removeAttribute('aria-hidden');
+      else menuStage.setAttribute('aria-hidden', menuStageHidden.value);
+      menuStageHidden = null;
+    }
+  };
   function syncMenuA11y(open) {
     mobileMenu?.setAttribute('aria-hidden', String(!open));
+    if (mobileMenu) {
+      mobileMenu.inert = !open;
+      // Only the desktop rail stays above the curtain. Its sibling controls
+      // remain accessible there; phones/tablets keep a modal, menu-only sheet.
+      mobileMenu.setAttribute('aria-modal', String(!menuHasDock()));
+    }
     const key = open ? 'a11y.menuClose' : 'a11y.menuOpen';
     const fallback = open ? 'Close menu' : 'Open menu';
     const label = (window.BQ_DICT && window.BQ_DICT[key]) || fallback;
@@ -602,6 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.remove('menu-open', 'menu-revealed', 'menu-closing');
       document.body.style.overflow = '';
       document.body.style.removeProperty('--bq-menu-scroll-shift');
+      setMenuPageUnavailable(false);
       syncMenuA11y(false);
       return;
     }
@@ -620,6 +655,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.remove('menu-closing');
       mobileMenu.classList.add('is-open');
       document.body.classList.add('menu-open');
+      setMenuPageUnavailable(true);
       menuFrame = requestAnimationFrame(() => {
         mobileMenu.classList.add('is-ready');
         document.body.classList.add('menu-revealed');
@@ -640,6 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileMenu.classList.remove('is-closing');
         document.body.classList.remove('menu-open', 'menu-closing');
         document.body.style.removeProperty('--bq-menu-scroll-shift');
+        setMenuPageUnavailable(false);
         if (Math.abs(window.scrollY - restore) > 2) {
           window.scrollTo({ top: restore, left: 0, behavior: 'auto' });
         }
@@ -659,7 +696,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       // Interrupted/no-op transitions and suspended tabs may omit transitionend.
       menuCloseTimer = window.setTimeout(finishClose, transition.milliseconds + 80);
-      if (lastMenuTrigger && document.contains(lastMenuTrigger)) {
+      const focused = document.activeElement;
+      const focusIsInMenu = mobileMenu.contains(focused) || focused === document.body;
+      // Opening another dock panel owns its own focus. Do not drag keyboard
+      // users from a language/chat button back to the menu button as it closes.
+      if (focusIsInMenu && lastMenuTrigger && document.contains(lastMenuTrigger)) {
         try { lastMenuTrigger.focus({ preventScroll: true }); } catch (e) { lastMenuTrigger.focus(); }
       }
       lastMenuTrigger = null;
@@ -681,18 +722,18 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     if (e.key !== 'Tab') return;
-    const focusable = Array.from(mobileMenu.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'))
-      .filter((el) => !el.hidden && el.getClientRects().length);
+    const scopes = menuHasDock() ? [mobileMenu, ...menuDocks] : [mobileMenu];
+    const focusable = scopes.flatMap((scope) => Array.from(scope.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')))
+      .filter((el) => !el.hidden && !el.inert && !el.closest('[inert]') && el.getClientRects().length);
     if (!focusable.length) return;
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    if (e.shiftKey && document.activeElement === first) {
-      e.preventDefault();
-      last.focus();
-    } else if (!e.shiftKey && document.activeElement === last) {
-      e.preventDefault();
-      first.focus();
-    }
+    // These two surfaces are siblings in the DOM. Own the full cycle rather
+    // than just its ends, or native traversal can enter an unrelated cookie
+    // or utility control between the menu and the toolbar.
+    const current = focusable.indexOf(document.activeElement);
+    const next = current < 0 ? (e.shiftKey ? focusable.length - 1 : 0)
+      : (current + (e.shiftKey ? -1 : 1) + focusable.length) % focusable.length;
+    e.preventDefault();
+    try { focusable[next].focus({ preventScroll:true }); } catch (error) { focusable[next].focus(); }
   });
   mobileMenu?.querySelectorAll('.mm-link, .mm-touch, .mm-logo').forEach((a) => a.addEventListener('click', (event) => {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -707,6 +748,14 @@ document.addEventListener('DOMContentLoaded', () => {
     e.stopPropagation();
     setMenu(false);
   }, true);
+  syncMenuA11y(false);
+  window.addEventListener('resize', () => {
+    if (!mobileMenu?.classList.contains('is-open')) return;
+    syncMenuA11y(true);
+    if (!menuHasDock() && menuDocks.some(dock => dock.contains(document.activeElement))) {
+      try { menuCloseBtn?.focus({ preventScroll:true }); } catch (error) { menuCloseBtn?.focus(); }
+    }
+  }, { passive:true });
 
   window.__bqGoDocumentTop = (behavior = 'smooth') => {
     window.__bqPaperBypassUntil = performance.now() + (behavior === 'smooth' ? 1200 : 180);
@@ -2889,8 +2938,10 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       if (sheet.classList.contains('section')) {
         sheet.dataset.paperScroll = 'inner';
         sheet.dataset.paperFit = '';
-        // The Biography reads as one document: its chapters share one scale.
-        if (id === 'bio') sheet.dataset.paperFitGroup = 'bio';
+        // The certificate collection has its own reading scale. Its many
+        // thumbnail rows must not shrink the rest of the biography's type.
+        if (id === 'bio' && !sheet.classList.contains('bio-proof-sheet')) sheet.dataset.paperFitGroup = 'bio';
+        else delete sheet.dataset.paperFitGroup;
       } else {
         delete sheet.dataset.paperScroll;
         sheet.dataset.paperFit = '';
