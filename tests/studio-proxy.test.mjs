@@ -135,7 +135,7 @@ test('upstream authentication failures name server configuration without rejecti
       params:{ service:'work-upload' }
     });
     assert.equal(response.status, 502);
-    assert.deepEqual(await response.json(), { ok:false, error:'studio-upstream-auth' });
+    assert.deepEqual(await response.json(), { ok:false, error:'studio-upstream-auth', upstreamStatus:status });
   }
 });
 
@@ -147,7 +147,59 @@ test('missing GitHub credentials remain actionable even when the work service re
     params:{ service:'work-upload' }
   });
   assert.equal(response.status, 502);
-  assert.deepEqual(await response.json(), { ok:false, error:'studio-github-not-configured' });
+  assert.deepEqual(await response.json(), { ok:false, error:'studio-github-not-configured', upstreamStatus:500 });
+});
+
+test('Studio proxy distinguishes upstream timeouts from network failures without exposing exception details', async (t) => {
+  for (const [name, code] of [
+    ['TimeoutError', 'studio-upstream-timeout'],
+    ['AbortError', 'studio-upstream-timeout'],
+    ['TypeError', 'studio-upstream-unavailable']
+  ]) {
+    t.mock.method(globalThis, 'fetch', async () => {
+      const error = new Error('private upstream token or network details');
+      error.name = name;
+      throw error;
+    });
+    const response = await studioPost({
+      request: request('blog-admin', 'browser-edit-secret', { action:'list' }, { Cookie:await cookie() }),
+      env: BASE_ENV,
+      params: { service:'blog-admin' }
+    });
+    assert.equal(response.status, 502);
+    assert.deepEqual(await response.json(), { ok:false, error:code });
+  }
+});
+
+test('Studio proxy reports safe upstream status for failed or invalid responses without echoing their bodies', async (t) => {
+  for (const [status, body, code] of [
+    [503, JSON.stringify({ error:'private upstream error details' }), 'studio-upstream-failed'],
+    [502, '<html>private upstream error details</html>', 'studio-upstream-invalid']
+  ]) {
+    t.mock.method(globalThis, 'fetch', async () => new Response(body, { status }));
+    const response = await studioPost({
+      request: request('blog-admin', 'browser-edit-secret', { action:'list' }, { Cookie:await cookie() }),
+      env: BASE_ENV,
+      params: { service:'blog-admin' }
+    });
+    assert.equal(response.status, 502);
+    assert.deepEqual(await response.json(), { ok:false, error:code, upstreamStatus:status });
+  }
+});
+
+test('Studio proxy preserves timeout diagnostics while reading an upstream response body', async (t) => {
+  t.mock.method(globalThis, 'fetch', async () => new Response(new ReadableStream({
+    start(controller) {
+      controller.error(new DOMException('private upstream details', 'AbortError'));
+    }
+  }), { status:200 }));
+  const response = await studioPost({
+    request: request('blog-admin', 'browser-edit-secret', { action:'list' }, { Cookie:await cookie() }),
+    env: BASE_ENV,
+    params: { service:'blog-admin' }
+  });
+  assert.equal(response.status, 502);
+  assert.deepEqual(await response.json(), { ok:false, error:'studio-upstream-timeout', upstreamStatus:200 });
 });
 
 test('Studio proxy fails closed if its upstream credential is missing or browser-accessible', async (t) => {
@@ -189,7 +241,7 @@ test('Studio proxy stops reading oversized chunked upstream responses early', as
     params: { service: 'blog-admin' }
   });
   assert.equal(response.status, 502);
-  assert.equal((await response.json()).error, 'studio-upstream-too-large');
+  assert.deepEqual(await response.json(), { ok:false, error:'studio-upstream-too-large', upstreamStatus:200 });
   assert.equal(canceled, true);
   assert.ok(readCount < 10);
 });

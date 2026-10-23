@@ -108,19 +108,86 @@ test('publishing is single flight and a service failure preserves the prepared i
   assert.equal(f.nodes['#wkPrev'].hidden, true);
 });
 
-test('Studio diagnostics distinguish browser editor credentials from upstream server credentials', async () => {
-  const start = authored.indexOf('const studioCall =');
+function studioFixture(fetch) {
+  const start = authored.indexOf('const studioFailure =');
   const end = authored.indexOf('\n    const cmsApi =', start);
   const source = authored.slice(start, end).replace('const studioCall =', 'globalThis.studioCall =');
+  const context = {
+    editToken:() => 'browser-editor', DT:key => key, AbortSignal,
+    isLoopbackPreview:() => false, fetch
+  };
+  vm.runInNewContext(source, context);
+  return () => context.studioCall('work-upload', { action:'list', folder:'Book' });
+}
+
+test('Studio diagnostics distinguish browser editor credentials from upstream server credentials', async () => {
   for (const [error, expected] of [['studio-upstream-auth', 'studioUpstreamAuth'], ['studio-github-not-configured', 'studioGithubMissing']]) {
-    const context = {
-      editToken:() => 'browser-editor', DT:key => key, AbortSignal,
-      fetch:async () => ({ status:502, json:async () => ({ error }) })
-    };
-    vm.runInNewContext(source, context);
-    const result = await context.studioCall('work-upload', { action:'list', folder:'Book' });
+    const call = studioFixture(async () => ({ status:502, json:async () => ({ error }) }));
+    const result = await call();
     assert.equal(result.error, error);
     assert.equal(result.detail, expected);
+  }
+});
+
+test('Studio reports actionable database and publishing server failures with safe HTTP references', async () => {
+  const failures = [
+    { status:503, error:'rate-limit-unavailable', expected:'studioDatabaseUnavailable [rate-limit-unavailable; HTTP 503]' },
+    { status:502, error:'studio-upstream-failed', upstreamStatus:500, expected:'studioServerFailed [studio-upstream-failed; HTTP 502; upstream 500]' },
+    { status:502, error:'studio-upstream-invalid', upstreamStatus:502, expected:'studioResponseInvalid [studio-upstream-invalid; HTTP 502; upstream 502]' },
+    { status:502, error:'studio-upstream-too-large', expected:'studioResponseLarge [studio-upstream-too-large; HTTP 502]' },
+    { status:504, error:'studio-upstream-timeout', expected:'studioTimeout [studio-upstream-timeout; HTTP 504]' },
+    { status:502, error:'studio-upstream-unavailable', expected:'studioNetworkFailed [studio-upstream-unavailable; HTTP 502]' }
+  ];
+  for (const { status, error, upstreamStatus, expected } of failures) {
+    const call = studioFixture(async () => ({ status, json:async () => ({ error, upstreamStatus }) }));
+    const result = await call();
+    assert.equal(result.error, error);
+    assert.equal(result.detail, expected);
+  }
+});
+
+test('Studio handles unreadable or structurally invalid responses without presenting them as successful publication', async () => {
+  for (const json of [async () => { throw new SyntaxError('private HTML response'); }, async () => null, async () => ['unexpected']]) {
+    const result = await studioFixture(async () => ({ status:200, json }))();
+    assert.equal(result.error, 'bad_response');
+    assert.equal(result.detail, 'studioResponseInvalid [bad_response]');
+  }
+});
+
+test('Studio distinguishes a client timeout from a lost connection without displaying raw exceptions', async () => {
+  for (const [name, error, expected] of [
+    ['TimeoutError', 'studio-client-timeout', 'studioTimeout'],
+    ['AbortError', 'studio-client-timeout', 'studioTimeout'],
+    ['TypeError', 'studio-unavailable', 'studioNetworkFailed']
+  ]) {
+    const call = studioFixture(async () => { throw Object.assign(new Error('private network diagnostics'), { name }); });
+    const result = await call();
+    assert.equal(result.error, error);
+    assert.equal(result.detail, `${expected} [${error}]`);
+    assert.doesNotMatch(result.detail, /private network diagnostics/);
+  }
+});
+
+test('a timeout while reading the publishing response remains a timeout rather than a malformed JSON failure', async () => {
+  for (const name of ['AbortError', 'TimeoutError']) {
+    const call = studioFixture(async () => ({
+      status:200,
+      json:async () => { throw Object.assign(new Error('private interrupted response'), { name }); }
+    }));
+    const result = await call();
+    assert.equal(result.error, 'studio-client-timeout');
+    assert.equal(result.detail, 'studioTimeout [studio-client-timeout]');
+  }
+});
+
+test('Studio hides unknown server messages and rejects untrusted upstream status values in its displayed diagnostic', async () => {
+  for (const upstreamStatus of ['500; private-token', 200, 600, 500.5]) {
+    const call = studioFixture(async () => ({
+      status:503,
+      json:async () => ({ error:'private-server-error', detail:'private upstream body', upstreamStatus })
+    }));
+    const result = await call();
+    assert.equal(result.detail, 'studioUnavailable [studio-service-failed; HTTP 503]');
   }
 });
 

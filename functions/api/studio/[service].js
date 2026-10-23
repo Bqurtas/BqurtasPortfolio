@@ -154,6 +154,10 @@ function configured(env) {
     && upstreamCredentialConfigured(env);
 }
 
+function upstreamTimedOut(error) {
+  return error?.name === 'TimeoutError' || error?.name === 'AbortError';
+}
+
 export async function onRequestPost({ request, env, params }) {
   const service = String((params && params.service) || '');
   const rule = Object.hasOwn(RULES, service) ? RULES[service] : null;
@@ -203,21 +207,24 @@ export async function onRequestPost({ request, env, params }) {
     // The browser credential has already passed Pages. An upstream auth
     // rejection is a server configuration failure, not a request to reconnect
     // with (or expose) the Supabase-only credential in the browser.
-    if (upstream.status === 401 || upstream.status === 403) return json({ ok: false, error: 'studio-upstream-auth' }, 502);
+    if (upstream.status === 401 || upstream.status === 403) return json({ ok: false, error: 'studio-upstream-auth', upstreamStatus: upstream.status }, 502);
     let raw;
     try {
       raw = new TextDecoder('utf-8', { fatal: true }).decode(await readRequestBytes(upstream, 5 * 1024 * 1024));
     } catch (error) {
-      return json({ ok: false, error: error.status === 413 ? 'studio-upstream-too-large' : 'studio-upstream-invalid' }, 502);
+      const code = upstreamTimedOut(error)
+        ? 'studio-upstream-timeout'
+        : error.status === 413 ? 'studio-upstream-too-large' : 'studio-upstream-invalid';
+      return json({ ok: false, error: code, upstreamStatus: upstream.status }, 502);
     }
     let payload;
     try { payload = JSON.parse(raw); } catch (error) {
-      return json({ ok: false, error: 'studio-upstream-invalid' }, 502);
+      return json({ ok: false, error: 'studio-upstream-invalid', upstreamStatus: upstream.status }, 502);
     }
-    if (payload && payload.error === 'no_github_token') return json({ ok: false, error: 'studio-github-not-configured' }, 502);
-    if (upstream.status >= 500) return json({ ok: false, error: 'studio-upstream-failed' }, 502);
+    if (payload && payload.error === 'no_github_token') return json({ ok: false, error: 'studio-github-not-configured', upstreamStatus: upstream.status }, 502);
+    if (upstream.status >= 500) return json({ ok: false, error: 'studio-upstream-failed', upstreamStatus: upstream.status }, 502);
     return json(payload, upstream.status);
   } catch (error) {
-    return json({ ok: false, error: 'studio-upstream-unavailable' }, 502);
+    return json({ ok: false, error: upstreamTimedOut(error) ? 'studio-upstream-timeout' : 'studio-upstream-unavailable' }, 502);
   }
 }

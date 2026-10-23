@@ -2375,8 +2375,8 @@ html body #bio#bio#bio#bio .lang-bar > span {
   border-radius: 2px !important;
 }
 
-/* 10 — the featured cards are night paper, not navy */
-html body :is(#bio#bio#bio#bio, #blog#blog#blog#blog) .index-card {
+/* 10 — biography features use night paper; Journal owns its paper-card palette. */
+html body #bio#bio#bio#bio .index-card {
   background: var(--rm-night) !important;
   background-image: none !important;
   border: 0 !important;
@@ -3137,11 +3137,13 @@ html body #blog#blog#blog .blog-card-cover::after { display: none !important; }
 html body #blog#blog#blog .blog-card-body { padding: 24px !important; background: transparent !important; gap: 14px !important; }
 html body #blog#blog#blog .blog-card-tag { background: var(--ink) !important; color: var(--bg) !important; font-size: 9px !important; }
 html body #blog#blog#blog .blog-card-title { font-size: 22px !important; line-height: 1.35 !important; font-weight: 600 !important; color: var(--ink) !important; }
+html body #blog#blog#blog .blog-card-title .hl { color: inherit !important; }
 html body #blog#blog#blog .blog-card-excerpt { display: block !important; font-size: 14px !important; line-height: 1.65 !important; color: var(--ink-soft) !important; -webkit-line-clamp: unset !important; }
 html body #blog#blog#blog .blog-card-foot { padding-block-start: 16px !important; margin-block-start: 18px !important; border-block-start: 1px solid var(--line) !important; }
 html body #blog#blog#blog .blog-card-author strong { font-size: 11px !important; color: var(--ink) !important; }
 html body #blog#blog#blog :is(.blog-card-author small, .blog-card-read, .blog-card-cta) { font-size: 9px !important; color: var(--ink-soft) !important; opacity: 1 !important; }
 html body #blog#blog#blog .blog-card-cta { margin-block-start: 18px !important; }
+html body #blog#blog#blog .blog-card-cta i { color: inherit !important; }
 html body #blog#blog#blog .blog-pager { margin-block-start: 24px !important; padding-block-start: 20px !important; border-block-start: 1px solid var(--line); gap: 12px !important; }
 html body #blog#blog#blog #blogIndex:not([data-blog-state='ready']) :is(.blog-card-cover, .blog-card-foot, .blog-card-cta) { display: none !important; }
 html body #blog#blog#blog .blog-feed-status { padding: 28px 0; color: var(--ink-soft); font-size: 15px; line-height: 1.7; }

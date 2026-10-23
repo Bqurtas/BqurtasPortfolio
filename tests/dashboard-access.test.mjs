@@ -144,7 +144,7 @@ test('a functioning Wrangler loopback API keeps local sign-in and configured ses
 });
 
 test('a non-JSON local publishing response restores the gate with the direct live Studio link', async () => {
-  const helperStart = authored.indexOf('const studioCall = async (service, payload) => {');
+  const helperStart = authored.indexOf('const studioFailure =');
   const helperEnd = authored.indexOf('\n    const cmsApi =', helperStart);
   const helper = authored.slice(helperStart, helperEnd).replace('const studioCall =', 'globalThis.studioCall =');
   let restored = 0;
@@ -233,7 +233,7 @@ test('network and delivery failures are distinguished from wrong access credenti
 });
 
 test('privileged publishing never falls back to a cross-origin service on proxy errors', async () => {
-  const helperStart = authored.indexOf('const studioCall = async (service, payload) => {');
+  const helperStart = authored.indexOf('const studioFailure =');
   const helperEnd = authored.indexOf('\n    const cmsApi =', helperStart);
   const helper = authored.slice(helperStart, helperEnd).replace('const studioCall =', 'globalThis.studioCall =');
   for (const status of [503, 401, 502, 429]) {
@@ -255,7 +255,7 @@ test('privileged publishing never falls back to a cross-origin service on proxy 
 });
 
 test('a publishing network failure never sends the editor password to Supabase', async () => {
-  const helperStart = authored.indexOf('const studioCall = async (service, payload) => {');
+  const helperStart = authored.indexOf('const studioFailure =');
   const helperEnd = authored.indexOf('\n    const cmsApi =', helperStart);
   const helper = authored.slice(helperStart, helperEnd).replace('const studioCall =', 'globalThis.studioCall =');
   const calls = [];

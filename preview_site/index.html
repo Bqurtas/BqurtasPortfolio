@@ -705,7 +705,7 @@
   <link rel="stylesheet" href="css/fonts.css?v=ab564d35bc14">
   <link rel="stylesheet" href="css/experience.min.css?v=f25ca5458f26">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.css?v=f92f2a7a77a1">
+  <link rel="stylesheet" href="css/polish.css?v=b2d747068aa9">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=d102bb86e515" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=d102bb86e515"></noscript>
 
@@ -2223,7 +2223,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=91c67b87d97e';
+        s.src = 'js/enhance.v420.min.js?v=0ac12a6e412f';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -2378,7 +2378,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=689e372f6cb0', { updateViaCache: 'none' })
+            .register('/sw.js?v=51586e8cd9bd', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

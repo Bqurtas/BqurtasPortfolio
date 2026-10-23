@@ -1023,7 +1023,14 @@
       sessionExpired:'Your secure session has expired. Sign in again.', studioNotSetup:'Publishing is not configured on Cloudflare yet. Check EDIT_TOKEN, SUPABASE_EDIT_TOKEN and the DB binding.',
       studioUpstreamAuth:'Supabase rejected the publishing server. Check that Cloudflare SUPABASE_EDIT_TOKEN matches the Supabase service secret and that the Edge Function allows the server request.',
       studioGithubMissing:'GitHub publishing is not connected. Configure the work-upload service with repository write access.',
-      studioUnavailable:'The publishing service is temporarily unavailable. Your changes have not been published. Try again.', editorRequired:'Connect your editor password in the Content tab first.'
+      studioUnavailable:'Publication could not be confirmed. Check Show images before trying again.',
+      studioDatabaseUnavailable:'The secure publishing database could not be reached. Check the Cloudflare D1 binding and database health.',
+      studioServerFailed:'The publishing server returned an error. Check its logs using the error reference below.',
+      studioResponseInvalid:'The publishing server returned an unreadable response. Check Show images before trying again.',
+      studioResponseLarge:'The publishing server returned a response that exceeds its size limit. Check the server logs.',
+      studioTimeout:'The publishing server timed out. Check Show images before trying again to avoid a duplicate upload.',
+      studioNetworkFailed:'The connection to the publishing service failed. Check Show images before trying again.',
+      editorRequired:'Connect your editor password in the Content tab first.'
     });
     Object.assign(DASH_I18N.ku, {
       checking:'دەستگەیشتنی پارێزراو دەپشکنرێت…', networkError:'پەیوەندی بە خزمەتگوزاری چوونەژوورەوە نەکرا. ئینتەرنێتەکەت بپشکنە و دووبارە هەوڵ بدەوە.',
@@ -1036,7 +1043,14 @@
       sessionExpired:'ماوەی چوونەژوورەوەی پارێزراوت بەسەرچووە. دووبارە بچۆ ژوورەوە.', studioNotSetup:'بڵاوکردنەوە هێشتا لە Cloudflare ڕێکنەخراوە. EDIT_TOKEN و SUPABASE_EDIT_TOKEN و بەستنی DB بپشکنە.',
       studioUpstreamAuth:'Supabase داواکاری سێرڤەری بڵاوکردنەوەی ڕەتکردەوە. SUPABASE_EDIT_TOKEN ـی Cloudflare لەگەڵ نهێنی خزمەتگوزاری Supabase و مۆڵەتی داواکاری سێرڤەر لە Edge Function بپشکنە.',
       studioGithubMissing:'بڵاوکردنەوەی GitHub بەستراو نییە. خزمەتگوزاری work-upload بە دەسەڵاتی نووسینی ڕیپۆ ڕێکبخە.',
-      studioUnavailable:'خزمەتگوزاری بڵاوکردنەوە کاتیاً بەردەست نییە. گۆڕانکارییەکانت بڵاونەکراونەتەوە. دووبارە هەوڵ بدەوە.', editorRequired:'سەرەتا پاسۆردی ئەدیتەر لە تابی ناوەڕۆک ببەستەوە.'
+      studioUnavailable:'بڵاوکردنەوە پشتڕاست نەکرایەوە. پێش هەوڵدانەوە، بەشی پیشاندانی وێنەکان بپشکنە.',
+      studioDatabaseUnavailable:'پەیوەندی بە داتابەیسی پارێزراوی بڵاوکردنەوە نەکرا. بەستنی D1 و دۆخی داتابەیسەکە لە Cloudflare بپشکنە.',
+      studioServerFailed:'سێرڤەری بڵاوکردنەوە هەڵەی گەڕاندەوە. بە ناسێنەری هەڵەکەی خوارەوە لۆگەکانی بپشکنە.',
+      studioResponseInvalid:'وەڵامی سێرڤەری بڵاوکردنەوە نەخوێندرایەوە. پێش هەوڵدانەوە بەشی پیشاندانی وێنەکان بپشکنە.',
+      studioResponseLarge:'قەبارەی وەڵامی سێرڤەر لە سنوورەکەی زیاترە. لۆگەکانی سێرڤەر بپشکنە.',
+      studioTimeout:'کاتی چاوەڕوانی وەڵامی سێرڤەر تەواو بوو. بۆ ئەوەی وێنەکە دووبارە بار نەکرێت، پێش هەوڵدانەوە بەشی پیشاندانی وێنەکان بپشکنە.',
+      studioNetworkFailed:'پەیوەندی بە خزمەتگوزاری بڵاوکردنەوە پچڕا. پێش هەوڵدانەوە بەشی پیشاندانی وێنەکان بپشکنە.',
+      editorRequired:'سەرەتا پاسۆردی ئەدیتەر لە تابی ناوەڕۆک ببەستەوە.'
     });
     const SERVER_NOT_SET = ['not-configured', 'session-not-configured', 'no-db', 'twofa-unavailable', 'rate-limit-unavailable'];
     // <html lang> holds the BCP-47 code (Sorani = ckb, Kurmanji = ku), so it
@@ -1754,6 +1768,23 @@
     /* Privileged Studio calls always stay on this origin. A missing proxy or
        network failure must never downgrade the signed two-factor session to a
        direct request carrying an editor credential to a different origin. */
+    const studioFailure = (body, status = 0) => {
+      const messages = {
+        'rate-limit-unavailable':'studioDatabaseUnavailable',
+        'studio-upstream-failed':'studioServerFailed',
+        'studio-upstream-invalid':'studioResponseInvalid',
+        'studio-upstream-too-large':'studioResponseLarge',
+        'studio-upstream-timeout':'studioTimeout',
+        'studio-upstream-unavailable':'studioNetworkFailed',
+        'studio-client-timeout':'studioTimeout',
+        'studio-unavailable':'studioNetworkFailed',
+        'bad_response':'studioResponseInvalid'
+      };
+      const code = Object.hasOwn(messages, body.error) ? body.error : 'studio-service-failed';
+      const http = Number.isInteger(status) && status >= 400 && status <= 599 ? `; HTTP ${status}` : '';
+      const upstream = Number.isInteger(body.upstreamStatus) && body.upstreamStatus >= 400 && body.upstreamStatus <= 599 ? `; upstream ${body.upstreamStatus}` : '';
+      return { ...body, detail:`${DT(messages[code] || 'studioUnavailable')} [${code}${http}${upstream}]` };
+    };
     const studioCall = async (service, payload) => {
       const token = editToken();
       if (!token) return { error:'missing_token', detail:DT('editorRequired') };
@@ -1763,7 +1794,10 @@
           headers:{ 'Content-Type':'application/json', Accept:'application/json', 'x-edit-token':token },
           body:JSON.stringify(payload), signal:AbortSignal.timeout(65_000)
         });
-        const parsed = await res.json().catch(() => null);
+        const parsed = await res.json().catch((error) => {
+          if (error && ['AbortError', 'TimeoutError'].includes(error.name)) throw error;
+          return null;
+        });
         const body = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : { error:'bad_response' };
         if (body.error === 'bad_response' && isLoopbackPreview()) {
           showLiveStudioGate();
@@ -1778,9 +1812,11 @@
         if (body.error === 'studio-upstream-auth') return { ...body, detail:DT('studioUpstreamAuth') };
         if (body.error === 'studio-github-not-configured') return { ...body, detail:DT('studioGithubMissing') };
         if (res.status === 429) return { ...body, detail:DT('rateLimited') };
-        if (res.status >= 500 || body.error === 'bad_response') return { ...body, detail:DT('studioUnavailable') };
+        if (res.status >= 500 || body.error === 'bad_response') return studioFailure(body, res.status);
         return body;
-      } catch (error) { return { error:'studio-unavailable', detail:DT('studioUnavailable') }; }
+      } catch (error) {
+        return studioFailure({ error:error && ['AbortError', 'TimeoutError'].includes(error.name) ? 'studio-client-timeout' : 'studio-unavailable' });
+      }
     };
 
     const cmsApi = (payload) => studioCall('blog-admin', payload);
