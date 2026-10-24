@@ -10,6 +10,7 @@ import {
   sessionConfigured,
   takeRateLimit
 } from './_session.js';
+import { ensureAnalyticsStore } from './_analytics.js';
 
 const DAY = 86_400_000;
 
@@ -37,60 +38,9 @@ function startOfZonedDay(timestamp, timeZone) {
   return guess;
 }
 
-async function umami(env, path, params) {
-  const id = env.UMAMI_WEBSITE_ID || 'f58c1ade-02c7-4c2e-95b3-2bcbf2e354fa';
-  const base = String(env.UMAMI_API_URL || 'https://api.umami.is/v1').replace(/\/+$/, '');
-  const query = new URLSearchParams(params).toString();
-  const response = await fetch(`${base}/websites/${encodeURIComponent(id)}/${path}?${query}`, {
-    headers: { 'x-umami-api-key': env.UMAMI_API_KEY, Accept: 'application/json' },
-    signal: AbortSignal.timeout(8_000)
-  });
-  if (!response.ok) throw new Error('upstream');
-  return response.json();
-}
-
-async function fromUmami(env) {
-  const now = Date.now();
-  const timezone = env.UMAMI_TZ || 'Asia/Baghdad';
-  const dayStart = startOfZonedDay(now, timezone);
-  const wide = now - 400 * DAY;
-  const start14 = now - 14 * DAY;
-  const start30 = now - 30 * DAY;
-  const [overall, today, pageviews, pathMetrics, countryMetrics, referrerMetrics, deviceMetrics] = await Promise.all([
-    umami(env, 'stats', { startAt: wide, endAt: now }),
-    umami(env, 'stats', { startAt: dayStart, endAt: now }),
-    umami(env, 'pageviews', { startAt: start14, endAt: now, unit: 'day', timezone }),
-    umami(env, 'metrics', { startAt: start30, endAt: now, type: 'url', limit: 10 }),
-    umami(env, 'metrics', { startAt: start30, endAt: now, type: 'country', limit: 10 }),
-    umami(env, 'metrics', { startAt: start30, endAt: now, type: 'referrer', limit: 8 }),
-    umami(env, 'metrics', { startAt: start30, endAt: now, type: 'device', limit: 6 })
-  ]);
-  const value = (object, key) => {
-    if (object && object[key] && typeof object[key].value === 'number') return object[key].value;
-    return object && typeof object[key] === 'number' ? object[key] : 0;
-  };
-  const metrics = (items, key) => (Array.isArray(items) ? items : [])
-    .filter((item) => item && typeof item.y === 'number')
-    .map((item) => ({ [key]: String(item.x || '').slice(0, 160), c: item.y }));
-  return {
-    ok: true,
-    views: value(overall, 'pageviews'),
-    visitors: value(overall, 'visitors'),
-    viewsToday: value(today, 'pageviews'),
-    visitorsToday: value(today, 'visitors'),
-    series: ((pageviews && pageviews.pageviews) || [])
-      .filter((point) => point && typeof point.y === 'number')
-      .map((point) => ({ d: String(point.x).slice(0, 10), c: point.y })),
-    paths: metrics(pathMetrics, 'path'),
-    countries: metrics(countryMetrics, 'country'),
-    referrers: metrics(referrerMetrics, 'ref'),
-    devices: metrics(deviceMetrics, 'device'),
-    recent: []
-  };
-}
-
 async function fromD1(env) {
   const DB = env.DB;
+  await ensureAnalyticsStore(DB);
   const now = Date.now();
   const today = startOfZonedDay(now, 'Asia/Baghdad');
   const since14 = now - 14 * DAY;
@@ -98,8 +48,8 @@ async function fromD1(env) {
   const [views, viewsToday, visitors, visitorsToday, series, paths, countries, referrers, devices, recent] = await Promise.all([
     query('SELECT COUNT(*) c FROM hits').first(),
     query('SELECT COUNT(*) c FROM hits WHERE ts>=?', today).first(),
-    query('SELECT COUNT(DISTINCT vid) c FROM hits').first(),
-    query('SELECT COUNT(DISTINCT vid) c FROM hits WHERE ts>=?', today).first(),
+    query("SELECT COUNT(DISTINCT vid) c FROM hits WHERE vid<>''").first(),
+    query("SELECT COUNT(DISTINCT vid) c FROM hits WHERE ts>=? AND vid<>''", today).first(),
     query("SELECT date(ts/1000,'unixepoch','+3 hours') d, COUNT(*) c FROM hits WHERE ts>=? GROUP BY d ORDER BY d", since14).all(),
     query('SELECT path, COUNT(*) c FROM hits GROUP BY path ORDER BY c DESC LIMIT 10').all(),
     query("SELECT country, COUNT(*) c FROM hits WHERE country<>'' GROUP BY country ORDER BY c DESC LIMIT 10").all(),
@@ -133,10 +83,7 @@ export async function onRequestGet({ request, env }) {
   if (slot.unavailable) return json({ ok: false, error: 'rate-limit-unavailable' }, 503);
   if (!slot.ok) return json({ ok: false, error: 'rate-limited', retryAfter: slot.retryAfter }, 429, { 'Retry-After': String(slot.retryAfter) });
 
-  if (env.UMAMI_API_KEY) {
-    try { return json(await fromUmami(env)); } catch (error) { /* use D1 below */ }
-  }
-  if (!env.DB) return json({ ok: false, error: env.UMAMI_API_KEY ? 'analytics-upstream-unavailable' : 'no-db' }, 503);
+  if (!env.DB) return json({ ok: false, error: 'no-db' }, 503);
   try { return json(await fromD1(env)); } catch (error) {
     return json({ ok: false, error: 'analytics-unavailable' }, 503);
   }

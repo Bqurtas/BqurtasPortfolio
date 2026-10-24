@@ -5,7 +5,8 @@ import { readFile } from 'node:fs/promises';
 
 const authored = await readFile(new URL('../preview_site/js/enhance.js', import.meta.url), 'utf8');
 const worksStart = authored.indexOf('const WK_ACCESS_I18N =');
-const worksEnd = authored.indexOf('\n    let leadsPage', worksStart);
+const worksEnd = authored.indexOf('\n    const renderLeads', worksStart);
+assert.ok(worksStart > 0 && worksEnd > worksStart);
 const publicationStart = authored.indexOf('const PUBLICATION_I18N =');
 const publicationEnd = authored.indexOf('    /* Uploads create', publicationStart);
 assert.ok(publicationStart > 0 && publicationEnd > publicationStart);

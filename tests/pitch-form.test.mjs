@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
+import { webcrypto } from 'node:crypto';
 
 const main = await readFile(new URL('../preview_site/js/main.js', import.meta.url), 'utf8');
 const start = main.indexOf('  /* ---------- Pitch form ---------- */');
@@ -9,7 +10,7 @@ const end = main.indexOf('  /* Keep the original name-card hover', start);
 assert.ok(start >= 0 && end > start, 'the real pitch form handler is available');
 const source = main.slice(start, end);
 
-function fixture({ language = 'en', fetchImpl = async () => ({ ok: true, json: async () => ({ success: true }) }) } = {}) {
+function fixture({ language = 'en', fetchImpl = async () => ({ ok: true, json: async () => ({ ok: true, status: 'stored' }) }) } = {}) {
   let focused = null;
   let resets = 0;
   const calls = [];
@@ -39,6 +40,7 @@ function fixture({ language = 'en', fetchImpl = async () => ({ ok: true, json: a
   const context = {
     currentLang: language,
     AbortController,
+    crypto: webcrypto,
     document: {
       getElementById(id) { return { pitchForm: form, pitchStatus: status }[id] || null; },
       createElement() { return { setAttribute() {} }; },
@@ -86,13 +88,13 @@ test('duplicate submissions share one in-flight request and successful unchanged
   assert.equal(page.form.attributes['aria-busy'], 'true');
   assert.match(page.status.text, /Sending/);
   assert.equal(JSON.parse(page.calls[0].options.body).message, page.fields.pMessage.value);
-  complete({ ok: true, json: async () => ({ success: true }) });
+  complete({ ok: true, json: async () => ({ ok: true, status: 'stored' }) });
   await first;
   assert.equal(page.resets, 1);
   assert.equal(page.submit.disabled, false);
   assert.equal(page.form.attributes['aria-busy'], undefined);
   assert.equal(page.timers.size, 0);
-  assert.match(page.status.text, /has been sent/);
+  assert.match(page.status.text, /saved in my studio inbox/);
 });
 
 test('a successful send preserves all fields if any draft field changed while waiting', async () => {
@@ -101,7 +103,7 @@ test('a successful send preserves all fields if any draft field changed while wa
   const sending = page.send();
   page.fields.pCompany.value = 'An updated company';
   page.fields.pNDA.checked = true;
-  complete({ ok: true, json: async () => ({ success: true }) });
+  complete({ ok: true, json: async () => ({ ok: true, status: 'stored' }) });
   await sending;
   assert.equal(page.resets, 0);
   assert.equal(page.fields.pCompany.value, 'An updated company');
@@ -111,8 +113,8 @@ test('a successful send preserves all fields if any draft field changed while wa
 
 test('HTTP errors, API refusals, malformed JSON and network failures retain the draft and unlock retry', async () => {
   for (const fetchImpl of [
-    async () => ({ ok: false, json: async () => ({ success: true }) }),
-    async () => ({ ok: true, json: async () => ({ success: false }) }),
+    async () => ({ ok: false, json: async () => ({ ok: true, status: 'stored' }) }),
+    async () => ({ ok: true, json: async () => ({ ok: false }) }),
     async () => ({ ok: true, json: async () => { throw new SyntaxError('invalid JSON'); } }),
     async () => { throw new TypeError('network unavailable'); }
   ]) {
@@ -140,7 +142,7 @@ test('a stalled request is aborted after 15 seconds and late completion cannot c
   assert.equal(page.submit.disabled, false);
   assert.match(page.status.text, /too long to confirm/);
   assert.equal(page.resets, 0);
-  complete({ ok: true, json: async () => ({ success: true }) });
+  complete({ ok: true, json: async () => ({ ok: true, status: 'stored' }) });
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(page.resets, 0);
   assert.match(page.status.text, /too long to confirm/);
@@ -173,4 +175,28 @@ test('validation and delivery statuses use each of the seven active languages', 
     if (language !== 'en') assert.doesNotMatch(page.status.text, /Thank you|your pitch/);
   }
   assert.equal(messages.size, 7);
+});
+
+
+test('contact sends only to this origin and timeout retries reuse the same draft identifier', async () => {
+  const page = fixture({ fetchImpl: async () => { throw new TypeError('connection lost'); } });
+  await page.send();
+  await page.send();
+  const first = JSON.parse(page.calls[0].options.body);
+  const retry = JSON.parse(page.calls[1].options.body);
+  assert.equal(page.calls[0].url, '/api/contact');
+  assert.equal(page.calls[0].options.credentials, 'same-origin');
+  assert.equal(first.request_id, retry.request_id);
+  assert.equal(first.access_key, undefined);
+  assert.equal(first.lang, 'en');
+  page.fields.pMessage.value += ' Updated brief.';
+  await page.send();
+  assert.notEqual(JSON.parse(page.calls[2].options.body).request_id, first.request_id);
+});
+
+test('contact requires confirmed durable storage before clearing the draft', async () => {
+  const page = fixture({ fetchImpl: async () => ({ ok:true, json:async () => ({ ok:true }) }) });
+  await page.send();
+  assert.equal(page.resets, 0);
+  assert.match(page.status.text, /could not be sent/);
 });

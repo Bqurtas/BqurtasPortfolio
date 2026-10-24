@@ -58,7 +58,7 @@ test('2FA status is server-backed and logout always expires the host cookie', as
   assert.match(logout.headers.get('cache-control'), /no-store/);
 });
 
-test('2FA honours the selected configured email before its TOTP fallback', async (t) => {
+test('2FA uses the authenticator even when retired delivery keys remain configured', async (t) => {
   let submitted;
   t.mock.method(globalThis, 'fetch', async (url, init) => {
     submitted = { url, body: JSON.parse(init.body) };
@@ -85,10 +85,8 @@ test('2FA honours the selected configured email before its TOTP fallback', async
     }
   });
   const result = await response.json();
-  assert.equal(result.via, 'email');
-  assert.equal(result.recipient, 'primary');
-  assert.equal(submitted.url, 'https://api.web3forms.com/submit');
-  assert.equal(submitted.body.access_key, 'primary-key');
+  assert.deepEqual(result, { ok: true, id: 'totp', via: 'totp' });
+  assert.equal(submitted, undefined, 'login codes must never leave Cloudflare');
 });
 
 test('content mutations require both the signed session and edit header', async () => {
@@ -200,7 +198,7 @@ test('assistant rejects cross-origin, partial auth and oversized prompts before 
   assert.equal(oversized.status, 413);
 });
 
-test('hit collection fails closed without its private analytics salt', async () => {
+test('hit collection fails closed without any strong private analytics key', async () => {
   const response = await hitPost({
     request: new Request(`${ORIGIN}/api/hit`, {
       method: 'POST',

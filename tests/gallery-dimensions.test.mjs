@@ -73,7 +73,7 @@ function fixture(item, media) {
   return { sync: () => window.BQ_GALLERY.syncCardDimensions(card, media, item), events, attributes, styles };
 }
 
-const original = 'https://cdn.jsdelivr.net/gh/Bqurtas/BqurtasPortfolio@main/Other/Other37.webp';
+const original = '/media/Other/Other37.webp';
 
 test('a rounded thumbnail never replaces the exact original aspect ratio or triggers gallery remeasurement', () => {
   const item = { width: 3396, height: 600, url: original };

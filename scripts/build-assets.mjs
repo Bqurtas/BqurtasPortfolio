@@ -7,6 +7,7 @@ import { minify as minifyCss } from 'csso';
 import { generateGalleryManifest } from './generate-gallery-manifest.mjs';
 import { generateMediaArchive } from './generate-media-archive.mjs';
 import { generateImageSitemap } from './generate-image-sitemap.mjs';
+import { ANALYTICS_CLIENT_JS } from '../functions/_analytics-client.js';
 
 const projectRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const siteRoot = path.join(projectRoot, 'preview_site');
@@ -110,7 +111,9 @@ export function stripStaticBlogPosts(sitemap) {
 
 async function compileJavaScript() {
   for (const [input, output] of jsBundles) {
-    const source = await readFile(path.join(siteRoot, input), 'utf8');
+    let source = await readFile(path.join(siteRoot, input), 'utf8');
+    // The owner inbox ships only with the intent-loaded Studio bundle.
+    if (input === 'js/enhance.js') source = await readFile(path.join(siteRoot, 'js/studio-inbox.js'), 'utf8') + '\n' + source;
     // The CDN may retain a stable manifest URL across deployments. Tie the
     // shipped gallery loader to the exact catalogue used to build this release.
     const versionedSource = input === 'js/gallery.js'
@@ -143,6 +146,7 @@ async function compileStylesheets() {
 }
 
 export async function buildAssets() {
+  await writeIfChanged(path.join(siteRoot, 'js/analytics.js'), ANALYTICS_CLIENT_JS);
   const manifest = await generateGalleryManifest();
   await generateMediaArchive({ manifest });
   await compileJavaScript();

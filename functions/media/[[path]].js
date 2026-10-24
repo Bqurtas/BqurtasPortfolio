@@ -2,12 +2,9 @@
    Barakat Qurtas — same-origin media
    GET/HEAD https://bqurtas.com/media/<Folder>/<file>
 
-   Search engines index an image under the host that serves it. The gallery
-   originals live in the GitHub repository (jsDelivr / raw.githubusercontent),
-   hosts the owner cannot verify in Search Console, so not one of the ~700
-   works was indexed as his. This endpoint serves the same bytes from
-   bqurtas.com: the work pages, Open Graph tags and the image/video sitemap
-   all point here.
+   Originals live in the owner's GitHub repository. This endpoint serves
+   their bytes through Cloudflare under bqurtas.com: the gallery, work pages,
+   Open Graph tags and image/video sitemap all use these stable URLs.
 
    It is not a proxy. Only files listed in assets/gallery-manifest.json, plus
    the few repository images named in EXTRA_MEDIA, are served; any other
@@ -17,7 +14,6 @@
 
 import { SITE, loadCatalog, mediaType } from '../_gallery-catalog.js';
 
-const CDN_BASE = 'https://cdn.jsdelivr.net/gh/Bqurtas/BqurtasPortfolio@main/';
 const RAW_BASE = 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/';
 const FORWARDED = ['Range', 'If-Range', 'If-None-Match', 'If-Modified-Since'];
 const PASSED_BACK = ['Content-Range', 'ETag', 'Last-Modified'];
@@ -69,9 +65,9 @@ function discard(response) {
   } catch (e) {}
 }
 
-async function fetchUpstream(base, key, request) {
+async function fetchUpstream(key, request) {
   const slash = key.indexOf('/');
-  const target = base + key.slice(0, slash) + '/' + encodeURIComponent(key.slice(slash + 1));
+  const target = RAW_BASE + key.slice(0, slash) + '/' + encodeURIComponent(key.slice(slash + 1));
   const headers = new Headers();
   for (const name of FORWARDED) {
     const value = request.headers.get(name);
@@ -85,7 +81,7 @@ async function fetchUpstream(base, key, request) {
     return await fetch(target, {
       method: request.method === 'HEAD' ? 'HEAD' : 'GET',
       headers,
-      redirect: 'follow',
+      redirect: 'manual',
       signal: controller.signal,
       // A day at the edge, matching the browser cache below. Upstream errors
       // are never kept.
@@ -117,28 +113,16 @@ export async function onRequest(context) {
   catch (e) { return failure(503, request.method, { 'Retry-After': '60' }); }
   if (!catalog.byPath.has(key) && !catalog.extra.has(key)) return failure(404, request.method);
 
-  /* Several films stall at jsDelivr until the upstream timeout expires.
-     Read videos from raw GitHub first; keep jsDelivr as their fallback and
-     retain the existing CDN-first path for images. */
-  const video = mediaType(key).startsWith('video/');
-  const primary = video ? RAW_BASE : CDN_BASE;
-  const secondary = video ? CDN_BASE : RAW_BASE;
-  let upstream = await fetchUpstream(primary, key, request);
-  let missing = !!upstream && upstream.status === 404;
+  /* The repository is the only upstream. Cloudflare caches successful media;
+     failures never redirect a visitor or send their request to another host. */
+  const upstream = await fetchUpstream(key, request);
   if (!upstream || !FINAL.has(upstream.status)) {
+    const missing = upstream?.status === 404;
     discard(upstream);
-    const fallback = await fetchUpstream(secondary, key, request);
-    if (fallback && FINAL.has(fallback.status)) upstream = fallback;
-    else {
-      // Only a file both mirrors deny is gone; anything else is an outage.
-      missing = missing && !!fallback && fallback.status === 404;
-      discard(fallback);
-      upstream = null;
-    }
+    return missing ? failure(404, request.method) : failure(502, request.method, { 'Retry-After': '60' });
   }
-  if (!upstream) return missing ? failure(404, request.method) : failure(502, request.method, { 'Retry-After': '60' });
   /* An unsatisfiable range is an answer about this request only: no media
-     type on the CDN's error body and nothing for a cache to keep. */
+     type on the origin's error body and nothing for a cache to keep. */
   if (upstream.status === 416) {
     const range = upstream.headers.get('Content-Range');
     discard(upstream);

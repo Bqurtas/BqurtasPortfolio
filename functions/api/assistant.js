@@ -12,6 +12,7 @@ import {
   sessionConfigured,
   takeRateLimit
 } from './_session.js';
+import { workersAIConfigured, runWorkersText } from './_workers-ai.js';
 
 const SYSTEM = `You are Barakat Qurtas's private studio assistant inside his portfolio dashboard.
 Barakat is a Kurdish graphic, motion, print and advertising designer in Hewlêr (Erbil), Kurdistan; his studio is called Pencemor ("fingerprint").
@@ -34,39 +35,6 @@ function normalizedMessages(input) {
   return messages;
 }
 
-async function viaAnthropic(env, messages) {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: env.ANTHROPIC_MODEL || 'claude-3-5-haiku-latest',
-      max_tokens: 800,
-      system: SYSTEM,
-      messages
-    }),
-    signal: AbortSignal.timeout(30_000)
-  });
-  if (!response.ok) throw new Error('upstream');
-  const data = await response.json();
-  const text = data && data.content && data.content[0] && data.content[0].text;
-  if (typeof text !== 'string') throw new Error('upstream-shape');
-  return text.slice(0, 20_000);
-}
-
-async function viaWorkersAI(env, messages) {
-  const result = await env.AI.run(env.WORKERS_AI_MODEL || '@cf/meta/llama-3.1-8b-instruct', {
-    messages: [{ role: 'system', content: SYSTEM }, ...messages],
-    max_tokens: 800
-  });
-  const text = result && (result.response || (result.result && result.result.response));
-  if (typeof text !== 'string') throw new Error('upstream-shape');
-  return text.slice(0, 20_000);
-}
-
 export async function onRequestPost({ request, env }) {
   if (!sessionConfigured(env) || !env.EDIT_TOKEN || !env.DB) return json({ ok: false, error: 'not-configured' }, 503);
   if (!isSameOrigin(request)) return json({ ok: false, error: 'forbidden-origin' }, 403);
@@ -85,11 +53,12 @@ export async function onRequestPost({ request, env }) {
   if (!messages) return json({ ok: false, error: 'invalid-messages' }, 400);
 
   try {
-    if (env.ANTHROPIC_API_KEY) return json({ ok: true, text: await viaAnthropic(env, messages) });
-    if (env.AI) return json({ ok: true, text: await viaWorkersAI(env, messages) });
+    if (workersAIConfigured(env)) return json({ ok: true, text: await runWorkersText(env, {
+      messages: [{ role: 'system', content: SYSTEM }, ...messages], max_tokens: 800
+    }) });
     return json({
       ok: true,
-      text: 'سڵاو! من یاریدەدەری ستۆدیۆی بەرەکاتم. بۆ چالاککردنی تەواوی ژیری دەستکرد لە سێرڤەر، تکایە Workers AI یان ANTHROPIC_API_KEY لە پڕۆژەی Cloudflare زیاد بکە.'
+      text: 'سڵاو! من یاریدەدەری ستۆدیۆی بەرەکاتم. بۆ چالاککردنی تەواوی ژیری دەستکرد لە سێرڤەر، تکایە پەیوەندیی Workers AI بە ناوی AI لە پڕۆژەی Cloudflare زیاد بکە.'
     });
   } catch (error) {
     return json({ ok: false, error: 'ai-upstream-failed' }, 502);

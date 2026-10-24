@@ -1,5 +1,5 @@
-# Send www to the canonical apex host (bqurtas.com)
-https://www.bqurtas.com/*  https://bqurtas.com/:splat  301!
+# The edge Function redirects www to the canonical apex host. Pages redirect
+# rules accept relative source paths, so host redirects belong in the Function.
 
 # Some scanners and clients still look for the legacy root path.
 /security.txt  /.well-known/security.txt  301

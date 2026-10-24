@@ -1,11 +1,11 @@
 /* =========================================================
    Barakat Qurtas — Dynamic Gallery
-   Local image thumbnails, CDN originals and first-party film streaming
+   Local image thumbnails and first-party image/film streaming
    ========================================================= */
 
 window.BQ_GALLERY = {
 
-  CDN_BASE: 'https://cdn.jsdelivr.net/gh/Bqurtas/BqurtasPortfolio@main',
+  MEDIA_BASE: '/media',
   RAW_BASE: 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main',
   REPO:     'Bqurtas/BqurtasPortfolio',
   BRANCH:   'main',
@@ -35,21 +35,18 @@ window.BQ_GALLERY = {
     video:       { folder: 'Videos',        prefix: 'Videos',      ext: 'mp4',  count: 30,  cat: 'video',       tag: 'Video',         icon: 'fa-video',          title: 'Video' },
   },
 
-  /* Images retain their CDN and local-thumbnail paths. Films use the same
-     first-party streaming endpoint as their watch pages: it supports byte
-     ranges and avoids jsDelivr's slow/denied responses for larger MP4s. */
+  /* Original images and films use the same first-party endpoint as their
+     work pages. Cloudflare serves the allowlisted GitHub files and byte ranges. */
   url(coll, i) {
     const c = this.COLLECTIONS[coll];
     if (!c) return '';
     const file = c.indexFiles ? c.indexFiles[i]
       : c.files && c.files[i - 1] != null ? c.files[i - 1] : `${c.prefix}${i}.${c.ext}`;
     if (!file) return '';
-    const base = /\.(mp4|webm|mov)$/i.test(file) ? '/media' : this.CDN_BASE;
-    return `${base}/${c.folder}/${encodeURIComponent(file)}`;
+    return `${this.MEDIA_BASE}/${c.folder}/${encodeURIComponent(file)}`;
   },
 
-  /* raw.githubusercontent fallback for the same item — used when jsDelivr
-     hasn't cached a brand-new file yet, so freshly dropped work still shows. */
+  /* One direct GitHub fallback for the same file during an edge outage. */
   rawUrl(coll, i) {
     const c = this.COLLECTIONS[coll];
     if (!c) return '';
@@ -60,13 +57,14 @@ window.BQ_GALLERY = {
   },
 
   /* Gallery cards use local thumbnails; the lightbox keeps the original. */
-  thumb(url, w) {
+  thumb(url) {
     /* A missing local thumbnail falls back to its canonical original through
        the element's single, bounded error handler. */
-    const base = url.indexOf(this.RAW_BASE) === 0 ? this.RAW_BASE
-               : (url.indexOf(this.CDN_BASE) === 0 ? this.CDN_BASE : null);
-    if (base) return 'assets/thumbs/' + url.slice(base.length + 1);
-    return 'https://images.weserv.nl/?url=' + encodeURIComponent(url.replace(/^https?:\/\//, '')) + '&w=' + (Number(w) || 320) + '&output=webp&q=66';
+    const source = String(url || '');
+    const base = [this.MEDIA_BASE, 'https://bqurtas.com' + this.MEDIA_BASE, this.RAW_BASE]
+      .find(prefix => source.startsWith(prefix + '/'));
+    if (base) return '/assets/thumbs/' + source.slice(base.length + 1);
+    return source;
   },
 
   dimsFromRatio(ratio, width) {
@@ -663,7 +661,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     ).join('');
     const images = Array.from(marqueeTrack.querySelectorAll('img'));
     images.forEach(img => gallery.bindMediaFallback(img, [
-      `${gallery.CDN_BASE}/WorkWith/${img.dataset.clientFile}`,
+      `${gallery.MEDIA_BASE}/WorkWith/${img.dataset.clientFile}`,
       `${gallery.RAW_BASE}/WorkWith/${img.dataset.clientFile}`
     ]));
     const loadStrip = () => images.forEach(img => { img.loading = 'eager'; });

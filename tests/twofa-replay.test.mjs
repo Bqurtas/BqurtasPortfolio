@@ -77,25 +77,25 @@ async function totp(time) {
   return String(number % 1_000_000).padStart(6, '0');
 }
 
-test('simultaneous email-code verification issues exactly one admin session', async (t) => {
+test('retired delivery-code challenges never issue a session, even with a valid stored code', async (t) => {
   const env = environment(await emailStore());
   t.after(() => env.DB.close());
   const responses = await Promise.all(Array.from({ length: 4 }, () => verify(env, CHALLENGE, '123456')));
-  assert.equal(responses.filter((response) => response.status === 200).length, 1);
-  assert.equal(responses.filter((response) => response.headers.has('set-cookie')).length, 1);
-  assert.notEqual((await verify(env, CHALLENGE, '123456')).status, 200);
+  assert.ok(responses.every(response => response.status === 410));
+  assert.ok(responses.every(response => !response.headers.has('set-cookie')));
 });
 
-test('parallel incorrect codes cannot exceed the five-attempt challenge budget', async (t) => {
-  const env = environment(await emailStore());
+test('parallel incorrect authenticator codes share the durable eight-attempt budget', async (t) => {
+  const now = Date.UTC(2026, 9, 18, 10, 0, 0);
+  t.mock.method(Date, 'now', () => now);
+  const env = environment(challengeStore());
+  delete env.RATE_LIMITER;
   t.after(() => env.DB.close());
-  const responses = await Promise.all(Array.from({ length: 8 }, () => verify(env, CHALLENGE, '000000')));
-  assert.equal(responses.filter((response) => response.status === 401).length, 5);
-  assert.equal(responses.filter((response) => response.status === 429).length, 3);
-  assert.ok(responses.every((response) => !response.headers.has('set-cookie')));
-  const final = await verify(env, CHALLENGE, '123456');
-  assert.equal(final.status, 429);
-  assert.equal((await final.json()).error, 'too-many');
+  const responses = await Promise.all(Array.from({ length: 12 }, () => verify(env, 'totp', '000000')));
+  assert.equal(responses.filter(response => response.status === 401).length, 8);
+  assert.equal(responses.filter(response => response.status === 429).length, 4);
+  assert.ok(responses.every(response => !response.headers.has('set-cookie')));
+  assert.equal((await verify(env, 'totp', await totp(now))).status, 429);
 });
 
 test('TOTP verification consumes a timestep once and accepts the next fresh code', async (t) => {

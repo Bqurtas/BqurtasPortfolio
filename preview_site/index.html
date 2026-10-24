@@ -7,15 +7,8 @@
   <meta name="theme-color" content="#fbfbfa" />
   <meta name="color-scheme" content="light dark" />
 
-  <!-- Umami analytics (auto-tracks SPA navigation) — SELF-HOSTED so it's a
-       same-origin script (no SRI needed → full Subresource-Integrity pass).
-       The tracker still posts events to Umami cloud (gateway.umami.is/api/send,
-       its built-in default), so the dashboard keeps receiving data. -->
-  <script defer src="js/umami.js?v=c8af63dd9b16" data-website-id="f58c1ade-02c7-4c2e-95b3-2bcbf2e354fa"></script>
-
-  <!-- Google Analytics REMOVED 2026-06-18 — it was redundant with Umami (and
-       showed no data in Semrush). gtag.js can't carry SRI, so dropping it gives
-       the site a clean, fully-SRI external surface. Umami covers analytics. -->
+  <!-- Cookieless analytics stay on this origin and in Cloudflare D1. -->
+  <script defer src="js/analytics.js?v=e6bceaf80441"></script>
 
   <!-- Meta (Facebook) Pixel removed 2026-06-14 — it was configured (in Facebook
        Events Manager) to forward visitor data to an unrecognised third-party
@@ -705,7 +698,7 @@
   <link rel="stylesheet" href="css/fonts.css?v=ab564d35bc14">
   <link rel="stylesheet" href="css/experience.min.css?v=b4fa17515262">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.css?v=e54db3a3b6ae">
+  <link rel="stylesheet" href="css/polish.css?v=eb116d6bb99d">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=d102bb86e515" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=d102bb86e515"></noscript>
 
@@ -1853,6 +1846,7 @@
             <!--email_off--><a class="pitch-mail mono" href="mailto:hello@bqurtas.com"><i class="fa-solid fa-envelope"></i> hello@bqurtas.com</a><!--/email_off-->
           </header>
           <form class="pitch-form" id="pitchForm" novalidate>
+            <input type="text" id="pWebsite" name="website" hidden tabindex="-1" autocomplete="off" aria-hidden="true" />
             <div class="row-2">
               <div class="field">
                 <label for="pName"><i class="fa-solid fa-user"></i> <span data-i18n="cf.name">Full name</span></label>
@@ -2198,8 +2192,8 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=4ac1334986b1"></script>
-  <script defer src="js/gallery.v420.min.js?v=cd949b262082"></script>
+  <script defer src="js/main.v420.min.js?v=599dff87e6a6"></script>
+  <script defer src="js/gallery.v420.min.js?v=67cec0a27c0f"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
        still receive them immediately. This removes their database/GitHub work
@@ -2218,7 +2212,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=f8e61477ea6f';
+        s.src = 'js/enhance.v420.min.js?v=3cbf146cea1d';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -2373,7 +2367,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=b4e631f6f9b4', { updateViaCache: 'none' })
+            .register('/sw.js?v=d04291eef105', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

@@ -10,7 +10,7 @@
    is the page Google Images and video search can credit to Barakat Qurtas.
 
    No application JavaScript, no external requests: one inline nonce'd style
-   block, one inline nonce'd script (the page guard, functions/_page-guard.js),
+   block, nonce'd page-guard, back-to-top and first-party analytics scripts,
    the locally hosted Noto Kufi Arabic face, and the media itself.
    ========================================================= */
 
@@ -20,6 +20,8 @@ import {
 } from './_gallery-catalog.js';
 import { KUFI_FACES } from './_font-faces.js';
 import { PAGE_GUARD_JS } from './_page-guard.js';
+import { BACK_TO_TOP_HTML, BACK_TO_TOP_JS, BACK_TO_TOP_STYLE } from './_back-to-top.js';
+import { ANALYTICS_CLIENT_JS } from './_analytics-client.js';
 
 const LANG_PREFIXES = ['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];
 const SIBLINGS = 12;
@@ -183,6 +185,7 @@ h1{margin:0;font-size:clamp(34px,5.2vw,68px);line-height:1.02;font-weight:600;le
 @media (max-width:900px){.work{grid-template-columns:minmax(0,1fr)}.meta{position:static}.plate img,.plate video{max-height:none}}
 @media (max-width:480px){.sheet{border-radius:22px}.plate-frame{border-radius:16px}.btn{flex:1 1 100%}.pager{grid-template-columns:1fr}.pager .next{grid-column:auto}.facts{grid-template-columns:minmax(0,1fr);gap:2px 0}.facts dd{margin-bottom:10px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+${BACK_TO_TOP_STYLE}
 `;
 
 export function renderWorkPage({ item, list, nonce }) {
@@ -280,7 +283,7 @@ ${twitter}
 <script nonce="${esc(nonce)}">${PAGE_GUARD_JS}</script>
 <script type="application/ld+json">${jsonLd(structuredData(item, copy, canon, list))}</script>
 </head>
-<body>
+<body id="page-top">
 <a class="skip mono" href="#work">Skip to the work</a>
 <div class="bed">
   <header class="top">
@@ -330,6 +333,9 @@ ${twitter}
     <nav aria-label="Footer"><a href="/">Home</a><a href="/design">All work</a><a href="/contact">Start a project</a></nav>
   </footer>
 </div>
+${BACK_TO_TOP_HTML}
+<script nonce="${esc(nonce)}">${BACK_TO_TOP_JS}</script>
+<script nonce="${esc(nonce)}">${ANALYTICS_CLIENT_JS}</script>
 </body>
 </html>
 `;
@@ -355,7 +361,7 @@ export async function serveWorkPage(request, url, env, route, helpers) {
   const nonce = crypto.randomUUID().replace(/-/g, '');
   const csp = [
     "default-src 'none'", "base-uri 'none'", "object-src 'none'", "frame-ancestors 'self'",
-    "form-action 'self'", "img-src 'self' data:", "media-src 'self'", "font-src 'self'",
+    "form-action 'self'", "img-src 'self' data:", "media-src 'self'", "font-src 'self'", "connect-src 'self'",
     "style-src 'nonce-" + nonce + "'", "script-src 'nonce-" + nonce + "'", 'upgrade-insecure-requests'
   ].join('; ');
   const headers = new Headers({

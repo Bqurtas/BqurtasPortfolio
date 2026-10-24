@@ -8,7 +8,7 @@
   'use strict';
   const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-  const CDN = (window.BQ_GALLERY && window.BQ_GALLERY.CDN_BASE) || '';
+  const CDN = (window.BQ_GALLERY && window.BQ_GALLERY.MEDIA_BASE) || '';
   const scrollTarget = (target, options = {}) => {
     if (!target) return;
     if (window.__bqScrollPaperTarget?.(target, options)) return;
@@ -54,9 +54,11 @@
         ring.style.strokeDashoffset = offset;
         lastRingOffset = offset;
       }
-      const shown = st > 200;
+      const shown = lastShown ? st > 40 : st > 160;
       if (toTop && shown !== lastShown) {
         toTop.classList.toggle('is-shown', shown);
+        toTop.setAttribute?.('aria-hidden', String(!shown));
+        toTop.tabIndex = shown ? 0 : -1;
         lastShown = shown;
       }
     };
@@ -216,42 +218,14 @@
     });
     watchScrollBriefly(700);
 
-    /* rAF glide — bulletproof on iOS, where native smooth scrollTo is sometimes
-       ignored right after touch momentum. Eases to the target, then hard-sets it. */
-    const glideTo = (target, ms) => {
-      const from = window.scrollY || (document.scrollingElement || document.documentElement).scrollTop || 0;
-      const d = target - from, t0 = performance.now();
-      const step = (now) => {
-        const t = Math.min((now - t0) / (ms || 480), 1);
-        const e = 1 - Math.pow(1 - t, 3);
-        window.scrollTo(0, Math.round(from + d * e));
-        if (t < 1) requestAnimationFrame(step);
-        else { window.scrollTo(0, target); onScroll(); }
-      };
-      requestAnimationFrame(step);
-    };
-
+    // The fallback uses the same document owner as the core. Native scrolling
+    // can be interrupted by a new touch; repeated clicks cannot leave several
+    // animation loops and delayed hard resets fighting the visitor's scroll.
     if (toTop && !window.__bqTopClickBound) toTop.addEventListener('click', () => {
-      /* to the ABSOLUTE top in every room. We turn OFF both the CSS scroll-snap
-         (so proximity can't stop us short) and CSS scroll-behavior:smooth (so our
-         own rAF glide isn't fought), poll until we truly reach 0, then restore. */
-      const h = document.documentElement;
-      h.style.scrollSnapType = 'none';
-      h.style.scrollBehavior = 'auto';
-      glideTo(0, 480);
-      let tries = 0;
-      const iv = setInterval(() => {
-        if (window.scrollY <= 1 || ++tries > 40) {
-          clearInterval(iv);
-          window.scrollTo(0, 0);
-          onScroll();
-          /* the mobile URL bar usually re-appears on the way up, shrinking the
-             viewport — recompute --app-vh so the hero fills EXACTLY to the dock
-             again (otherwise a small blank gap shows below it). */
-          window.dispatchEvent(new Event('resize'));
-          requestAnimationFrame(() => { h.style.scrollSnapType = ''; h.style.scrollBehavior = ''; window.dispatchEvent(new Event('resize')); });
-        }
-      }, 50);
+      const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+      if (window.__bqGoDocumentTop) window.__bqGoDocumentTop(behavior);
+      else window.scrollTo({ top:0, behavior });
+      onScroll();
     });
     if (toTop) window.__bqTopClickBound = true;
 
@@ -865,25 +839,6 @@
   /* =======================================================
      7 · SECRET STUDIO DASHBOARD
      ======================================================= */
-  /* ---- First-party analytics beacon → /api/hit (cookieless) ---- */
-  (function analytics() {
-    let first = true;
-    function hit() {
-      try {
-        const data = JSON.stringify({ p: location.pathname, r: first ? document.referrer : '', l: document.documentElement.lang || 'en' });
-        first = false;
-        if (navigator.sendBeacon) navigator.sendBeacon('/api/hit', data);
-        else fetch('/api/hit', { method: 'POST', body: data, keepalive: true }).catch(() => {});
-      } catch (e) {}
-    }
-    hit();
-    try {
-      const _push = history.pushState;
-      history.pushState = function () { const r = _push.apply(this, arguments); setTimeout(hit, 80); return r; };
-      window.addEventListener('popstate', () => setTimeout(hit, 80));
-    } catch (e) {}
-  })();
-
   (function dashboard() {
     const dash = $('#dash');
     if (!dash) return;
@@ -903,7 +858,7 @@
     const DASH_I18N = {
       en: { overview:'Overview', visitors:'Visitors', works:'Works', latest:'Latest', leads:'Leads', profile:'Profile', settings:'Settings', content:'Content', cases:'Projects', assistant:'Assistant',
         gateTitle:'Enter access code', gatePrivate:'This console is private.', gatePh:'Access code', unlock:'Unlock', wrong:'✗ Wrong access code.', twoTitle:'Enter the verification code', twoNote:'A 6-digit code was emailed to the selected inbox. Check spam too.', twoChoose:'Send code to', twoPrimary:'Primary inbox', twoBackup:'Backup inbox', twoPh:'6-digit code', twoWrong:'✗ Wrong or expired code.', twoSending:'Sending code…', twoSetupBtn:'Set up 2FA (authenticator)', twoSetup1:'1) In Cloudflare set TOTP_SECRET to this (then Retry deployment):', twoSetup2:'2) Add the same key to Google Authenticator (manual entry: "Pencemor Studio"). Tap the key to copy.', twoSetupLink:'open in app',
-        oTotal:'Total works', oColl:'Collections', oLeads:'Leads stored', oLangs:'Languages', oBlogs:'Blog posts', oAdmins:'Admins', oWelcome:'Welcome back — your studio console is private to you; data lives in this browser.',
+        oTotal:'Total works', oColl:'Collections', oLeads:'Leads stored', oLangs:'Languages', oBlogs:'Blog posts', oAdmins:'Admins', oWelcome:'Welcome back — your posts, project details and enquiries are stored privately in Cloudflare.',
         lEmpty:'No leads yet. Pitches from the Contact form appear here.', lClear:'Clear all leads', lConfirm:'Delete all stored leads?',
         pName:'Name', pTitle:'Title / role', pAvatar:'Avatar URL', pSave:'Save profile', pSaved:'✓ Saved', pNote:'Adding more admins needs a backend login system — that arrives with the content manager. For now this profile is yours, kept privately in this browser.',
         sSplash:'Show intro splash on load', sTheme:'Theme', sLight:'Light', sDark:'Dark', sReset:'Reset saved preferences', sResetConfirm:'Reset saved preferences?', sDone:'Done.', sNote:'Open anytime with ⌘ / Ctrl + B, or 5× click the studio logo.',
@@ -912,7 +867,7 @@
         admYou:'Owner', admName:'Name', admEmail:'Email', admRole:'Role', admAdd:'Add admin', admEmpty:'No additional admins yet.', admRemove:'Remove', admNote:'Shared login across devices needs the backend login system; for now these admins are saved privately in this browser.', logoutAsk:'Log out of the console?' },
       ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', latest:'نوێترین', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن', content:'ناوەڕۆک', cases:'پڕۆژەکان', assistant:'یاریدەدەر',
         gateTitle:'کۆدی چوونەژوورەوە بنووسە', gatePrivate:'ئەم کۆنسۆڵە تایبەتە.', gatePh:'کۆدی چوونەژوورەوە', unlock:'کردنەوە', wrong:'✗ کۆدەکە هەڵەیە.', twoTitle:'کۆدی پشتڕاستکردنەوە بنووسە', twoNote:'کۆدێکی ٦ ژمارەیی بۆ سندووقی هەڵبژێردراو نێردرا. سپامیش بپشکنە.', twoChoose:'کۆد بنێرە بۆ', twoPrimary:'سندووقی سەرەکی', twoBackup:'سندووقی یەدەک', twoPh:'کۆدی ٦ ژمارەیی', twoWrong:'✗ کۆد هەڵەیە یان بەسەرچووە.', twoSending:'ناردنی کۆد…', twoSetupBtn:'ڕێکخستنی 2FA (ئەپی ئۆتێنتیکەیتەر)', twoSetup1:'١) لە Cloudflare، TOTP_SECRET بکە بەمە (پاشان Retry deployment):', twoSetup2:'٢) هەمان کلیل بخە ناو Google Authenticator (داخڵکردنی دەستی: «Pencemor Studio»). کلیک لە کلیلەکە بکە بۆ کۆپی.', twoSetupLink:'لە ئەپ بیکەرەوە',
-        oTotal:'کۆی کارەکان', oColl:'کۆکراوەکان', oLeads:'داواکاری هەڵگیراو', oLangs:'زمانەکان', oBlogs:'بابەتی بلۆگ', oAdmins:'بەڕێوەبەران', oWelcome:'بەخێربێیتەوە — کۆنسۆڵی ستۆدیۆ تەنها بۆ تۆیە؛ زانیارییەکان لەم وێبگەڕەدا دەمێننەوە.',
+        oTotal:'کۆی کارەکان', oColl:'کۆکراوەکان', oLeads:'داواکاری هەڵگیراو', oLangs:'زمانەکان', oBlogs:'بابەتی بلۆگ', oAdmins:'بەڕێوەبەران', oWelcome:'بەخێربێیتەوە — بابەتەکان، وردەکاریی پڕۆژەکان و داواکارییەکانت بە تایبەتی لە Cloudflare هەڵدەگیرێن.',
         lEmpty:'هێشتا داواکاری نییە. پرۆژەکانی فۆڕمی پەیوەندی لێرە دەردەکەون.', lClear:'سڕینەوەی هەموو داواکارییەکان', lConfirm:'هەموو داواکارییە هەڵگیراوەکان بسڕێتەوە؟',
         pName:'ناو', pTitle:'پلە / ڕۆڵ', pAvatar:'بەستەری وێنە', pSave:'پاشەکەوتکردنی پرۆفایل', pSaved:'✓ پاشەکەوتکرا', pNote:'زیادکردنی ئەدمینی زیاتر پێویستی بە سیستەمی چوونەژوورەوەی سێرڤەر هەیە — لەگەڵ بەڕێوەبەری ناوەڕۆکدا دێت. ئێستا ئەم پرۆفایلە هی تۆیە، بە تایبەتی لەم وێبگەڕەدا پارێزراوە.',
         sSplash:'پیشاندانی سپلاشی دەستپێک', sTheme:'ڕووکار', sLight:'ڕووناک', sDark:'تاریک', sReset:'ڕێکخستنە پاشەکەوتکراوەکان بسڕەوە', sResetConfirm:'ڕێکخستنە پاشەکەوتکراوەکان بسڕێتەوە؟', sDone:'تەواوبوو.', sNote:'هەر کاتێک بە ⌘ / Ctrl + B بیکەرەوە، یان ٥ جار کلیک لە لۆگۆکە بکە.',
@@ -921,7 +876,7 @@
         admYou:'خاوەن', admName:'ناو', admEmail:'ئیمەیل', admRole:'ڕۆڵ', admAdd:'زیادکردنی ئەدمین', admEmpty:'هێشتا ئەدمینی زیاتر نییە.', admRemove:'لابردن', admNote:'چوونەژوورەوەی هاوبەش لەنێوان ئامێرەکان پێویستی بە سیستەمی سێرڤەرە؛ ئێستا ئەم ئەدمینانە بە تایبەتی لەم وێبگەڕەدا هەڵگیراون.', logoutAsk:'لە کۆنسۆڵ بچیتە دەرەوە؟' },
       ar: { overview:'نظرة عامة', visitors:'الزوار', works:'الأعمال', leads:'الطلبات', profile:'الملف', settings:'الإعدادات', content:'المحتوى', cases:'المشاريع', assistant:'المساعد',
         gateTitle:'أدخل رمز الدخول', gatePrivate:'هذه اللوحة خاصة.', gatePh:'رمز الدخول', unlock:'فتح', wrong:'✗ رمز خاطئ.', twoTitle:'أدخل رمز التحقق', twoNote:'تم إرسال رمز من ٦ أرقام إلى الصندوق المختار. افحص البريد المزعج أيضاً.', twoChoose:'أرسل الرمز إلى', twoPrimary:'الصندوق الأساسي', twoBackup:'الصندوق الاحتياطي', twoPh:'رمز من ٦ أرقام', twoWrong:'✗ رمز خاطئ أو منتهٍ.', twoSending:'جار إرسال الرمز…', twoSetupBtn:'إعداد 2FA (تطبيق المصادقة)', twoSetup1:'١) في Cloudflare اضبط TOTP_SECRET على هذا (ثم Retry deployment):', twoSetup2:'٢) أضف نفس المفتاح إلى Google Authenticator (إدخال يدوي: «Pencemor Studio»). انقر المفتاح للنسخ.', twoSetupLink:'افتح في التطبيق',
-        oTotal:'إجمالي الأعمال', oColl:'المجموعات', oLeads:'الطلبات المحفوظة', oLangs:'اللغات', oWelcome:'أهلاً بعودتك — لوحة الاستوديو خاصة بك؛ البيانات تبقى في هذا المتصفح.',
+        oTotal:'إجمالي الأعمال', oColl:'المجموعات', oLeads:'الطلبات المحفوظة', oLangs:'اللغات', oWelcome:'أهلاً بعودتك — تُحفظ مقالاتك وتفاصيل مشاريعك والطلبات بصورة خاصة في Cloudflare.',
         lEmpty:'لا طلبات بعد. تظهر هنا مشاريع نموذج التواصل.', lClear:'مسح كل الطلبات', lConfirm:'حذف كل الطلبات المحفوظة؟',
         pName:'الاسم', pTitle:'اللقب / الدور', pAvatar:'رابط الصورة', pSave:'حفظ الملف', pSaved:'✓ تم الحفظ', pNote:'إضافة مزيد من المشرفين تتطلب نظام تسجيل دخول خلفي — يأتي مع مدير المحتوى. حالياً هذا الملف خاص بك، محفوظ في هذا المتصفح.',
         sSplash:'إظهار شاشة البداية', sTheme:'المظهر', sLight:'فاتح', sDark:'داكن', sReset:'إعادة تعيين التفضيلات', sResetConfirm:'إعادة تعيين التفضيلات المحفوظة؟', sDone:'تم.', sNote:'افتحها في أي وقت بـ ⌘ / Ctrl + B، أو انقر الشعار خمس مرات.',
@@ -930,7 +885,7 @@
         admYou:'المالك', admName:'الاسم', admEmail:'البريد', admRole:'الدور', admAdd:'إضافة مشرف', admEmpty:'لا مشرفين إضافيين بعد.', admRemove:'إزالة', admNote:'تسجيل الدخول المشترك بين الأجهزة يحتاج نظام الخادم؛ حالياً هؤلاء المشرفون محفوظون في هذا المتصفح فقط.', logoutAsk:'تسجيل الخروج من اللوحة؟' },
       kmr: { overview:'Giştî', visitors:'Mêvan', works:'Kar', leads:'Daxwaz', profile:'Profîl', settings:'Mîheng', content:'Naverok', cases:'Proje', assistant:'Alîkar',
         gateTitle:'Koda gihiştinê binivîse', gatePrivate:'Ev konsol taybet e.', gatePh:'Koda gihiştinê', unlock:'Veke', wrong:'✗ Koda çewt.', twoTitle:'Koda piştrastkirinê binivîse', twoNote:'Koda 6-hejmarî ji qutiya hilbijartî re hate şandin. Spam jî kontrol bike.', twoChoose:'Kodê bişîne bo', twoPrimary:'Qutiya sereke', twoBackup:'Qutiya piştgir', twoPh:'Koda 6-hejmarî', twoWrong:'✗ Koda çewt an qediyayî.', twoSending:'Kod tê şandin…', twoSetupBtn:'Sazkirina 2FA (sepana erêkirinê)', twoSetup1:'1) Li Cloudflare TOTP_SECRET wiha saz bike (paşê Retry deployment):', twoSetup2:'2) Heman mifte têxe Google Authenticator (têketina destî: "Pencemor Studio"). Li mifte bitikîne ji bo kopî.', twoSetupLink:'di sepanê de veke',
-        oTotal:'Tevahiya karan', oColl:'Berhevok', oLeads:'Daxwazên tomarkirî', oLangs:'Ziman', oWelcome:'Bi xêr hatî — konsola studyoyê taybet e ji te re; dane di vê gerokê de dimînin.',
+        oTotal:'Tevahiya karan', oColl:'Berhevok', oLeads:'Daxwazên tomarkirî', oLangs:'Ziman', oWelcome:'Bi xêr hatî — nivîs, hûrgiliyên projeyan û daxwazên te bi taybetî li Cloudflare tên tomarkirin.',
         lEmpty:'Hêj daxwaz tune. Pêşniyarên forma têkiliyê li vir xuya dibin.', lClear:'Hemû daxwazan paqij bike', lConfirm:'Hemû daxwazên tomarkirî werin jêbirin?',
         pName:'Nav', pTitle:'Sernav / rol', pAvatar:'Girêdana wêneyê', pSave:'Profîlê tomar bike', pSaved:'✓ Tomar bû', pNote:'Zêdekirina admînên din pêdivî bi sîstema têketinê ya backend heye — ew bi rêveberê naverokê re tê. Niha ev profîl ya te ye, bi taybetî di vê gerokê de tê parastin.',
         sSplash:'Dîmena destpêkê nîşan bide', sTheme:'Tema', sLight:'Ronî', sDark:'Tarî', sReset:'Vebijarkên tomarkirî jê bibe', sResetConfirm:'Vebijarkên tomarkirî werin jêbirin?', sDone:'Qediya.', sNote:'Her dem bi ⌘ / Ctrl + B veke, an 5 caran li logoyê bitikîne.',
@@ -939,7 +894,7 @@
         admYou:'Xwedî', admName:'Nav', admEmail:'E-name', admRole:'Rol', admAdd:'Admîn zêde bike', admEmpty:'Hêj admînên din tune.', admRemove:'Rake', admNote:'Têketina hevpar a di navbera amûran de pêdivî bi sîstema backend heye; niha ev admîn bi taybetî di vê gerokê de tên parastin.', logoutAsk:'Ji konsolê derkevî?' },
       fr: { overview:'Aperçu', visitors:'Visiteurs', works:'Travaux', leads:'Demandes', profile:'Profil', settings:'Réglages', content:'Contenu', cases:'Projets', assistant:'Assistant',
         gateTitle:"Entrez le code d'accès", gatePrivate:'Cette console est privée.', gatePh:"Code d'accès", unlock:'Déverrouiller', wrong:'✗ Code incorrect.', twoTitle:'Saisissez le code de vérification', twoNote:'Un code à 6 chiffres a été envoyé à la boîte choisie. Vérifiez aussi les spams.', twoChoose:'Envoyer le code à', twoPrimary:'Boîte principale', twoBackup:'Boîte de secours', twoPh:'Code à 6 chiffres', twoWrong:'✗ Code incorrect ou expiré.', twoSending:'Envoi du code…', twoSetupBtn:'Configurer la 2FA (authentification)', twoSetup1:'1) Dans Cloudflare, définissez TOTP_SECRET sur ceci (puis Retry deployment) :', twoSetup2:'2) Ajoutez la même clé à Google Authenticator (saisie manuelle : « Pencemor Studio »). Cliquez la clé pour copier.', twoSetupLink:'ouvrir dans l’app',
-        oTotal:'Total des travaux', oColl:'Collections', oLeads:'Demandes enregistrées', oLangs:'Langues', oWelcome:'Bon retour — votre console studio est privée ; les données restent dans ce navigateur.',
+        oTotal:'Total des travaux', oColl:'Collections', oLeads:'Demandes enregistrées', oLangs:'Langues', oWelcome:'Bon retour — vos articles, détails de projets et demandes sont enregistrés de façon privée dans Cloudflare.',
         lEmpty:'Aucune demande pour l’instant. Les projets du formulaire de contact apparaissent ici.', lClear:'Effacer toutes les demandes', lConfirm:'Supprimer toutes les demandes enregistrées ?',
         pName:'Nom', pTitle:'Titre / rôle', pAvatar:"URL de l'avatar", pSave:'Enregistrer le profil', pSaved:'✓ Enregistré', pNote:'Ajouter d’autres admins nécessite un système de connexion backend — il arrive avec le gestionnaire de contenu. Pour l’instant ce profil est le vôtre, gardé dans ce navigateur.',
         sSplash:"Afficher l'intro au chargement", sTheme:'Thème', sLight:'Clair', sDark:'Sombre', sReset:'Réinitialiser les préférences', sResetConfirm:'Réinitialiser les préférences enregistrées ?', sDone:'Terminé.', sNote:'Ouvrez à tout moment avec ⌘ / Ctrl + B, ou cliquez 5× sur le logo.',
@@ -1082,33 +1037,17 @@
     };
     const LANG_LABELS = { en: 'English', ku: 'کوردیی سۆرانی', kmr: 'Kurmancî', ar: 'العربية', fr: 'Français', tr: 'Türkçe', sv: 'Svenska' };
     let loginConfigured = null;
-    let twoFAId = null, twoFAPin = '', twoFAClearTimer = 0, twoFAVia = '';
-    const twoFANote = () => TWOFA_VIA_NOTES[curLang()]?.[twoFAVia] || DT('twoNote');
-    const selected2FARecipient = () => $('#dash2faChoice input[name="dashCodeTarget"]:checked')?.value || 'primary';
+    let twoFAId = null, twoFAPin = '', twoFAClearTimer = 0;
+    const twoFANote = () => TWOFA_VIA_NOTES[curLang()]?.totp || TWOFA_VIA_NOTES.en.totp;
+    const checkingAccess = () => ({
+      en:'Checking access…', ku:'پشکنینی چوونەژوورەوە…', ar:'جارٍ التحقق من الدخول…',
+      kmr:'Gihiştin tê kontrolkirin…', fr:'Vérification de l’accès…'
+    }[curLang()] || 'Checking access…');
     const ensure2FAChoice = () => {
-      const form = $('#dashLoginForm');
-      if (!form) return;
-      const current = selected2FARecipient();
-      let box = $('#dash2faChoice');
-      if (!box) {
-        box = document.createElement('div');
-        box.className = 'dash-code-choice';
-        box.id = 'dash2faChoice';
-        form.insertAdjacentElement('afterend', box);
-      }
-      box.hidden = !!twoFAId || loginConfigured === false;
-      box.innerHTML = `
-        <span class="mono">${DT('twoChoose')}</span>
-        <div class="dash-code-options" role="radiogroup" aria-label="${DT('twoChoose')}">
-          <label class="dash-code-option">
-            <input type="radio" name="dashCodeTarget" value="primary" ${current === 'backup' ? '' : 'checked'}>
-            <span><i class="fa-solid fa-inbox"></i> ${DT('twoPrimary')}</span>
-          </label>
-          <label class="dash-code-option">
-            <input type="radio" name="dashCodeTarget" value="backup" ${current === 'backup' ? 'checked' : ''}>
-            <span><i class="fa-solid fa-shield-halved"></i> ${DT('twoBackup')}</span>
-          </label>
-        </div>`;
+      // Older cached shells may still contain the retired inbox choices.
+      // Authentication now uses the owner's authenticator app exclusively.
+      const box = $('#dash2faChoice');
+      if (box) { box.hidden = true; box.innerHTML = ''; }
     };
     const localizeChrome = () => {
       $$('.dash-tab').forEach(t => { const ic = t.querySelector('i'); t.innerHTML = (ic ? ic.outerHTML + ' ' : '') + DT(t.dataset.dash); });
@@ -1140,7 +1079,6 @@
     const clearTwoFA = () => {
       twoFAId = null;
       twoFAPin = '';
-      twoFAVia = '';
       clearTimeout(twoFAClearTimer);
       twoFAClearTimer = 0;
     };
@@ -1299,8 +1237,7 @@
       clearTwoFA();
       showConsole();
     };
-    const enter2FA = (via) => {
-      twoFAVia = ['email', 'totp', 'sms'].includes(via) ? via : '';
+    const enter2FA = () => {
       const g = $('#dashGate'); if (!g) return;
       const h = g.querySelector('h3'); if (h) h.textContent = DT('twoTitle');
       const p = g.querySelector('p.mono');
@@ -1315,7 +1252,7 @@
       if (location.protocol === 'file:') { openDash(); return; }
       if (gateBusy || loginConfigured === false) return;
       const raw = $('#dashKey').value.trim();
-      // Authenticator/email codes may be entered with Kurdish or Arabic digits.
+      // Authenticator codes may be entered with Kurdish or Arabic digits.
       const val = twoFAId ? raw.replace(/[٠-٩۰-۹]/g, digit => String(digit.charCodeAt(0) - (digit <= '٩' ? 0x660 : 0x6f0))) : raw;
       const epoch = gateEpoch;
       // Step 2 — verify the selected second factor without overlapping requests.
@@ -1344,9 +1281,9 @@
       // step 1 — the access code
       if (!val) { hint.textContent = DT('wrong'); return; }
       setGateBusy(true);
-      hint.textContent = DT('twoSending');
+      hint.textContent = checkingAccess();
       $('#dashKey').value = '';
-      const d = await requestLogin({ pin:val, action:'send', recipient:selected2FARecipient() });
+      const d = await requestLogin({ pin:val, action:'send' });
       if (epoch !== gateEpoch || !dash.classList.contains('is-open')) return;
       setGateBusy(false);
       if (d.ok === true && d.id) {
@@ -1359,20 +1296,19 @@
           hint.textContent = DT('twoWrong');
           const key = $('#dashKey'); if (key) key.value = '';
         }, 5 * 60 * 1000);
-        enter2FA(d.via);
+        enter2FA();
         return;
       }
       clearTwoFA();
       hint.textContent = loginError(d);
     });
 
-    const getLeads = () => { try { return JSON.parse(localStorage.getItem('bq_pitches') || '[]'); } catch (e) { return []; } };
+    let inboxTotal = null;
     const collections = () => (window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS) || {};
 
     const renderOverview = () => {
       const colls = collections();
       const total = Object.values(colls).reduce((a, c) => a + (c.count || 0), 0);
-      const leads = getLeads();
       const cats = Object.keys(colls).length;
       const admins = getAdmins().length + 1;          // +1 = you, the owner
       const blogs = window.__bqBlogCount || 0;
@@ -1380,7 +1316,7 @@
         <div class="dash-cards">
           <div class="dash-card"><span class="dash-card-n">${total}</span><span class="mono">${DT('oTotal')}</span></div>
           <div class="dash-card"><span class="dash-card-n">${blogs}</span><span class="mono">${DT('oBlogs')}</span></div>
-          <div class="dash-card"><span class="dash-card-n">${leads.length}</span><span class="mono">${DT('oLeads')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${inboxTotal === null ? '—' : inboxTotal}</span><span class="mono">${DT('oLeads')}</span></div>
           <div class="dash-card"><span class="dash-card-n">${cats}</span><span class="mono">${DT('oColl')}</span></div>
           <div class="dash-card"><span class="dash-card-n">${admins}</span><span class="mono">${DT('oAdmins')}</span></div>
           <div class="dash-card"><span class="dash-card-n">7</span><span class="mono">${DT('oLangs')}</span></div>
@@ -1506,7 +1442,7 @@
       });
       /* ---- Manage works: list every image in a folder + delete one ---- */
       const wkGrid = $('#wkGrid'), wkMgFolder = $('#wkMgFolder');
-      const mgThumb = (p) => 'https://images.weserv.nl/?url=cdn.jsdelivr.net/gh/Bqurtas/BqurtasPortfolio@main/' + p + '&w=260&h=195&fit=cover&output=webp&q=72';
+      const mgThumb = (p) => '/assets/thumbs/' + p.split('/').map(encodeURIComponent).join('/');
       const mgRaw = (p) => 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/' + p;
       const loadMg = () => {
         const folder = wkMgFolder.value;
@@ -1530,27 +1466,11 @@
       };
       $('#wkMgLoad').addEventListener('click', loadMg);
     };
-    let leadsPage = 1;
-    const renderLeads = () => {
-      const all = getLeads().slice().reverse();
-      if (!all.length) { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-inbox"></i><br>${DT('lEmpty')}</p>`; return; }
-      const pages = Math.max(1, Math.ceil(all.length / DASH_PER));
-      if (leadsPage > pages) leadsPage = pages;
-      const start = (leadsPage - 1) * DASH_PER;
-      const pager = dashPager(all.length, leadsPage, (n) => { leadsPage = n; renderLeads(); });
-      view.innerHTML = `<div class="dash-leads">` + all.slice(start, start + DASH_PER).map(l =>
-        `<div class="dash-lead">
-           <div class="dash-lead-top"><strong>${esc(l.name)}</strong><span class="mono">${esc(l.type || '')}</span></div>
-           <span class="mono dash-lead-mail">${esc(l.email)}</span>
-           <p>${esc(l.message || '')}</p>
-           <span class="mono dash-lead-meta">${esc(l.budget || '—')} · ${esc(l.timeline || '—')} · ${esc(new Date(l.at).toLocaleDateString())}</span>
-         </div>`).join('') + `</div>${pager.html}
-         <button class="dash-btn dash-btn--danger" id="dashClearLeads"><i class="fa-solid fa-trash"></i> ${DT('lClear')}</button>`;
-      $('#dashClearLeads')?.addEventListener('click', () => {
-        if (confirm(DT('lConfirm'))) { localStorage.removeItem('bq_pitches'); leadsPage = 1; renderLeads(); }
-      });
-      pager.wire(view);
-    };
+    const renderLeads = () => window.BQStudioInbox.render({
+      root:view, lang:curLang(), getToken:editToken,
+      onSessionRequired:invalidateDashboardSession,
+      onCount:count => { inboxTotal = count; }
+    });
     const SET_I18N = {
       en:  { twoH:'Two-factor (2FA)', edH:'Editor password', edNote:'The publish key for your works and blog. Connect the editor first (Content tab), then change it here. A strong one is safest.', edNew:'New editor password', edBtn:'Change', edGen:'Strong', min4:'✗ Use at least 4 characters', edConnect:'✗ Connect the editor first (Content tab)', edDone:'✓ Changed & reconnected.', edWrong:'✗ Current editor password is wrong', edFail:'✗ Failed (works on the live site only)' },
       ku:  { twoH:'دوو-فاکتۆری (2FA)', edH:'پاسۆردی ئەدیتەر', edNote:'کلیلی بڵاوکردنی ئیش و بلۆگ. سەرەتا ئەدیتەر ببەستەوە (تابی ناوەڕۆک)، پاشان لێرە بیگۆڕە. بەهێز سەلامەتترە.', edNew:'پاسۆردی ئەدیتەری نوێ', edBtn:'گۆڕین', edGen:'بەهێز', min4:'✗ لانیکەم ٤ پیت', edConnect:'✗ سەرەتا ئەدیتەر ببەستەوە (تابی ناوەڕۆک)', edDone:'✓ گۆڕدرا و دووبارە بەستراوەوە.', edWrong:'✗ پاسۆردی ئەدیتەری ئێستا هەڵەیە', edFail:'✗ نەکرا (تەنیا سایتی زیندوو)' },
@@ -1732,11 +1652,11 @@
 
     /* ---- Blog manager — Cloudflare D1 content, GitHub media ---- */
         const CT_I18N = {
-      en: { gate:'Publish to your blog', note:'Enter your edit token to write, edit and publish posts.', tokPh:'Edit token', conn:'Connect', newBtn:'Write new post', editBtn:'Edit', delBtn:'Delete', delAsk:'Delete this post permanently?', fTitle:'Title', fSub:'Subtitle', fTag:'Label', fCover:'Cover image link', fCoverPh:'https://…  paste any image link', fAccent:'Accent', fMin:'Read (min)', fBody:'Body', fBodyPh:'Write your post here…  Leave one empty line between paragraphs.', fPub:'Published — visible on the site', save:'Publish', update:'Update', saving:'Publishing…', updating:'Updating…', translating:'Translating to all languages…', savedMsg:"Saved — it's on your blog now.", cancel:'Cancel', back:'All posts', loading:'Loading your posts…', empty:'No posts yet — write your first one.', err:'Could not reach the blog service (works on the live site).', needTitle:'Please add a title.', posts:'posts', draft:'draft', studio:'Advanced (raw database)' },
-      ku: { gate:'بڵاوکردنەوە بۆ بلۆگەکەت', note:'تۆکنی دەستکاریت بنووسە بۆ نووسین، دەستکاری و بڵاوکردنەوەی بابەت.', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', newBtn:'نووسینی بابەتی نوێ', editBtn:'دەستکاری', delBtn:'سڕینەوە', delAsk:'ئەم بابەتە بە تەواوی بسڕێتەوە؟', fTitle:'سەردێڕ', fSub:'ژێر-سەردێڕ', fTag:'لەیبڵ', fCover:'بەستەری وێنەی سەرەکی', fCoverPh:'https://…  هەر بەستەرێکی وێنە', fAccent:'ڕەنگ', fMin:'خوێندنەوە (خ)', fBody:'دەق', fBodyPh:'لێرە بابەتەکەت بنووسە…  دێڕێکی بەتاڵ لە نێوان پەرەگرافەکان بهێڵە.', fPub:'بڵاوکراوە — لەسەر سایت دیارە', save:'بڵاوکردنەوە', update:'نوێکردنەوە', saving:'بڵاودەکرێتەوە…', updating:'نوێدەکرێتەوە…', translating:'وەردەگێڕدرێت بۆ هەموو زمانەکان…', savedMsg:'پاشەکەوتکرا — ئێستا لەسەر بلۆگەکەتە.', cancel:'هەڵوەشاندنەوە', back:'هەموو بابەتەکان', loading:'بارکردنی بابەتەکانت…', empty:'هێشتا بابەت نییە — یەکەمیان بنووسە.', err:'نەگەیشتە خزمەتگوزاری بلۆگ (لەسەر سایتە زیندووەکە کاردەکات).', needTitle:'تکایە سەردێڕێک زیاد بکە.', posts:'بابەت', draft:'ڕەشنووس', studio:'پێشکەوتوو (داتابەیس)' },
-      ar: { gate:'انشر في مدونتك', note:'أدخل رمز التحرير للكتابة والتعديل والنشر.', tokPh:'رمز التحرير', conn:'اتصال', newBtn:'كتابة مقال جديد', editBtn:'تعديل', delBtn:'حذف', delAsk:'حذف هذا المقال نهائياً؟', fTitle:'العنوان', fSub:'العنوان الفرعي', fTag:'التصنيف', fCover:'رابط صورة الغلاف', fCoverPh:'https://…  ألصق أي رابط صورة', fAccent:'اللون', fMin:'القراءة (د)', fBody:'النص', fBodyPh:'اكتب مقالك هنا…  اترك سطراً فارغاً بين الفقرات.', fPub:'منشور — ظاهر على الموقع', save:'نشر', update:'تحديث', saving:'جارٍ النشر…', updating:'جارٍ التحديث…', translating:'جارٍ الترجمة إلى كل اللغات…', savedMsg:'تم الحفظ — إنه الآن على مدونتك.', cancel:'إلغاء', back:'كل المقالات', loading:'جارٍ تحميل مقالاتك…', empty:'لا مقالات بعد — اكتب أول واحد.', err:'تعذّر الوصول إلى خدمة المدونة (تعمل على الموقع المباشر).', needTitle:'الرجاء إضافة عنوان.', posts:'مقالات', draft:'مسودة', studio:'متقدم (قاعدة البيانات)' },
-      kmr: { gate:'Li blogê biweşîne', note:'Ji bo nivîsîn, guhertin û weşandinê tokena xwe binivîse.', tokPh:'Tokena guhertinê', conn:'Girêde', newBtn:'Nivîsa nû binivîse', editBtn:'Biguhere', delBtn:'Jê bibe', delAsk:'Ev nivîs bi temamî were jêbirin?', fTitle:'Sernav', fSub:'Bin-sernav', fTag:'Etîket', fCover:'Girêdana wêneyê', fCoverPh:'https://…  her girêdana wêneyê', fAccent:'Reng', fMin:'Xwendin (deq)', fBody:'Nivîs', fBodyPh:'Nivîsa xwe li vir binivîse…  Rêzeke vala di navbera paragrafan de bihêle.', fPub:'Weşandî — li ser malperê xuya ye', save:'Biweşîne', update:'Nûve bike', saving:'Tê weşandin…', updating:'Tê nûvekirin…', translating:'Ji bo hemû zimanan tê wergerandin…', savedMsg:'Hat tomarkirin — niha li ser blogê ye.', cancel:'Betal', back:'Hemû nivîs', loading:'Nivîsên te tên barkirin…', empty:'Hêj nivîs tune — ya yekem binivîse.', err:'Negihîşt xizmeta blogê (li ser malpera zindî dixebite).', needTitle:'Ji kerema xwe sernavekê zêde bike.', posts:'nivîs', draft:'reşnivîs', studio:'Pêşketî (database)' },
-      fr: { gate:'Publier sur votre blog', note:"Saisissez votre jeton d'édition pour écrire, modifier et publier.", tokPh:"Jeton d'édition", conn:'Connecter', newBtn:'Écrire un article', editBtn:'Modifier', delBtn:'Supprimer', delAsk:'Supprimer définitivement cet article ?', fTitle:'Titre', fSub:'Sous-titre', fTag:'Étiquette', fCover:"Lien de l'image", fCoverPh:"https://…  collez un lien d'image", fAccent:'Couleur', fMin:'Lecture (min)', fBody:'Texte', fBodyPh:'Écrivez votre article ici…  Laissez une ligne vide entre les paragraphes.', fPub:'Publié — visible sur le site', save:'Publier', update:'Mettre à jour', saving:'Publication…', updating:'Mise à jour…', translating:'Traduction dans toutes les langues…', savedMsg:"Enregistré — c'est sur votre blog.", cancel:'Annuler', back:'Tous les articles', loading:'Chargement de vos articles…', empty:'Aucun article — écrivez le premier.', err:'Service du blog inaccessible (fonctionne sur le site en ligne).', needTitle:'Veuillez ajouter un titre.', posts:'articles', draft:'brouillon', studio:'Avancé (base de données)' }
+      en: { gate:'Publish to your blog', note:'Enter your edit token to write, edit and publish posts.', tokPh:'Edit token', conn:'Connect', newBtn:'Write new post', editBtn:'Edit', delBtn:'Delete', delAsk:'Delete this post permanently?', fTitle:'Title', fSub:'Subtitle', fTag:'Label', fCover:'Cover image link', fCoverPh:'/uploads/… or /assets/…', fAccent:'Accent', fMin:'Read (min)', fBody:'Body', fBodyPh:'Write your post here…  Leave one empty line between paragraphs.', fPub:'Published — visible on the site', save:'Publish', update:'Update', saving:'Publishing…', updating:'Updating…', translating:'Translating to all languages…', savedMsg:"Saved — it's on your blog now.", cancel:'Cancel', back:'All posts', loading:'Loading your posts…', empty:'No posts yet — write your first one.', err:'Could not reach the blog service (works on the live site).', needTitle:'Please add a title.', posts:'posts', draft:'draft', studio:'Advanced (raw database)' },
+      ku: { gate:'بڵاوکردنەوە بۆ بلۆگەکەت', note:'تۆکنی دەستکاریت بنووسە بۆ نووسین، دەستکاری و بڵاوکردنەوەی بابەت.', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', newBtn:'نووسینی بابەتی نوێ', editBtn:'دەستکاری', delBtn:'سڕینەوە', delAsk:'ئەم بابەتە بە تەواوی بسڕێتەوە؟', fTitle:'سەردێڕ', fSub:'ژێر-سەردێڕ', fTag:'لەیبڵ', fCover:'بەستەری وێنەی سەرەکی', fCoverPh:'/uploads/… یان /assets/…', fAccent:'ڕەنگ', fMin:'خوێندنەوە (خ)', fBody:'دەق', fBodyPh:'لێرە بابەتەکەت بنووسە…  دێڕێکی بەتاڵ لە نێوان پەرەگرافەکان بهێڵە.', fPub:'بڵاوکراوە — لەسەر سایت دیارە', save:'بڵاوکردنەوە', update:'نوێکردنەوە', saving:'بڵاودەکرێتەوە…', updating:'نوێدەکرێتەوە…', translating:'وەردەگێڕدرێت بۆ هەموو زمانەکان…', savedMsg:'پاشەکەوتکرا — ئێستا لەسەر بلۆگەکەتە.', cancel:'هەڵوەشاندنەوە', back:'هەموو بابەتەکان', loading:'بارکردنی بابەتەکانت…', empty:'هێشتا بابەت نییە — یەکەمیان بنووسە.', err:'نەگەیشتە خزمەتگوزاری بلۆگ (لەسەر سایتە زیندووەکە کاردەکات).', needTitle:'تکایە سەردێڕێک زیاد بکە.', posts:'بابەت', draft:'ڕەشنووس', studio:'پێشکەوتوو (داتابەیس)' },
+      ar: { gate:'انشر في مدونتك', note:'أدخل رمز التحرير للكتابة والتعديل والنشر.', tokPh:'رمز التحرير', conn:'اتصال', newBtn:'كتابة مقال جديد', editBtn:'تعديل', delBtn:'حذف', delAsk:'حذف هذا المقال نهائياً؟', fTitle:'العنوان', fSub:'العنوان الفرعي', fTag:'التصنيف', fCover:'رابط صورة الغلاف', fCoverPh:'/uploads/… أو /assets/…', fAccent:'اللون', fMin:'القراءة (د)', fBody:'النص', fBodyPh:'اكتب مقالك هنا…  اترك سطراً فارغاً بين الفقرات.', fPub:'منشور — ظاهر على الموقع', save:'نشر', update:'تحديث', saving:'جارٍ النشر…', updating:'جارٍ التحديث…', translating:'جارٍ الترجمة إلى كل اللغات…', savedMsg:'تم الحفظ — إنه الآن على مدونتك.', cancel:'إلغاء', back:'كل المقالات', loading:'جارٍ تحميل مقالاتك…', empty:'لا مقالات بعد — اكتب أول واحد.', err:'تعذّر الوصول إلى خدمة المدونة (تعمل على الموقع المباشر).', needTitle:'الرجاء إضافة عنوان.', posts:'مقالات', draft:'مسودة', studio:'متقدم (قاعدة البيانات)' },
+      kmr: { gate:'Li blogê biweşîne', note:'Ji bo nivîsîn, guhertin û weşandinê tokena xwe binivîse.', tokPh:'Tokena guhertinê', conn:'Girêde', newBtn:'Nivîsa nû binivîse', editBtn:'Biguhere', delBtn:'Jê bibe', delAsk:'Ev nivîs bi temamî were jêbirin?', fTitle:'Sernav', fSub:'Bin-sernav', fTag:'Etîket', fCover:'Girêdana wêneyê', fCoverPh:'/uploads/… an /assets/…', fAccent:'Reng', fMin:'Xwendin (deq)', fBody:'Nivîs', fBodyPh:'Nivîsa xwe li vir binivîse…  Rêzeke vala di navbera paragrafan de bihêle.', fPub:'Weşandî — li ser malperê xuya ye', save:'Biweşîne', update:'Nûve bike', saving:'Tê weşandin…', updating:'Tê nûvekirin…', translating:'Ji bo hemû zimanan tê wergerandin…', savedMsg:'Hat tomarkirin — niha li ser blogê ye.', cancel:'Betal', back:'Hemû nivîs', loading:'Nivîsên te tên barkirin…', empty:'Hêj nivîs tune — ya yekem binivîse.', err:'Negihîşt xizmeta blogê (li ser malpera zindî dixebite).', needTitle:'Ji kerema xwe sernavekê zêde bike.', posts:'nivîs', draft:'reşnivîs', studio:'Pêşketî (database)' },
+      fr: { gate:'Publier sur votre blog', note:"Saisissez votre jeton d'édition pour écrire, modifier et publier.", tokPh:"Jeton d'édition", conn:'Connecter', newBtn:'Écrire un article', editBtn:'Modifier', delBtn:'Supprimer', delAsk:'Supprimer définitivement cet article ?', fTitle:'Titre', fSub:'Sous-titre', fTag:'Étiquette', fCover:"Lien de l'image", fCoverPh:"/uploads/… ou /assets/…", fAccent:'Couleur', fMin:'Lecture (min)', fBody:'Texte', fBodyPh:'Écrivez votre article ici…  Laissez une ligne vide entre les paragraphes.', fPub:'Publié — visible sur le site', save:'Publier', update:'Mettre à jour', saving:'Publication…', updating:'Mise à jour…', translating:'Traduction dans toutes les langues…', savedMsg:"Enregistré — c'est sur votre blog.", cancel:'Annuler', back:'Tous les articles', loading:'Chargement de vos articles…', empty:'Aucun article — écrivez le premier.', err:'Service du blog inaccessible (fonctionne sur le site en ligne).', needTitle:'Veuillez ajouter un titre.', posts:'articles', draft:'brouillon', studio:'Avancé (base de données)' }
     };
     const editToken = () => { try { return sessionStorage.getItem('bq_edit_token') || ''; } catch (e) { return ''; } };
 
@@ -1875,41 +1795,55 @@
 
     const cmsApi = (payload) => studioCall('blog-admin', payload);
 
-    /* ---- Auto-translate in the BROWSER ----
-       Translate before publishing so Cloudflare stores the complete i18n object.
-       A failed translation retains the author's original text. */
-    const TR_LANGS = { en: 'en', ku: 'ckb', kmr: 'ku', ar: 'ar', fr: 'fr', tr: 'tr', sv: 'sv' };
-    const trOne = async (text, tl) => {
-      const u = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=' + tl + '&dt=t&q=' + encodeURIComponent(text);
-      try { const r = await fetch(u); if (!r.ok) return ''; const j = await r.json(); return (j[0] || []).map((s) => (s && s[0]) || '').join(''); }
-      catch (e) { return ''; }
+    /* Optional translations stay in Cloudflare Workers AI. Failure preserves
+       the author's text and never sends it to another translation provider. */
+    const TR_LANGS = { en:'en', ku:'ku', kmr:'kmr', ar:'ar', fr:'fr', tr:'tr', sv:'sv' };
+    let translationUnavailable = false;
+    const trOne = async (text, target) => {
+      if (translationUnavailable) return '';
+      try {
+        const r = await fetch('/api/translate', {
+          method:'POST', credentials:'same-origin', cache:'no-store',
+          headers:{ 'Content-Type':'application/json', 'x-edit-token':editToken() },
+          body:JSON.stringify({ text, target }), signal:AbortSignal.timeout(35_000)
+        });
+        if (!r.ok) { translationUnavailable = true; return ''; }
+        const result = await r.json();
+        return result.ok && typeof result.text === 'string' ? result.text : '';
+      } catch (e) { translationUnavailable = true; return ''; }
     };
-    // Chunk by ENCODED url length — Kurdish/Arabic letters become 6 url-chars each,
-    // so a char-count chunk would blow past Google's GET limit and fail silently.
     const trChunks = (s) => {
-      const MAX = 1200, enc = (x) => encodeURIComponent(x).length, out = [];
-      let buf = '';
-      for (const tok of String(s).split(/(\n+)/)) {
-        if (enc(tok) > MAX) { if (buf) { out.push(buf); buf = ''; } for (const w of tok.split(/( )/)) { if (buf && enc(buf + w) > MAX) { out.push(buf); buf = ''; } buf += w; } continue; }
-        if (buf && enc(buf + tok) > MAX) { out.push(buf); buf = ''; }
-        buf += tok;
-      }
-      if (buf) out.push(buf);
+      const chars = Array.from(String(s)), out = [];
+      for (let start = 0; start < chars.length; start += 2000) out.push(chars.slice(start, start + 2000).join(''));
       return out;
     };
     const trText = async (text, tl) => {
       const s = String(text || ''); if (!s.trim()) return '';
       let out = '';
-      for (const c of trChunks(s)) { if (!c.trim()) { out += c; continue; } const r = await trOne(c, tl); out += (r && r.trim()) ? r : c; }
+      for (const c of trChunks(s)) {
+        if (!c.trim()) { out += c; continue; }
+        const r = await trOne(c, tl);
+        // A failed chunk must not publish a field containing mixed languages.
+        if (!r || !r.trim()) { translationUnavailable = true; return s; }
+        out += r;
+      }
       return out;
     };
     // Translate a post into every language; languages run one-by-one (gentle on
     // the endpoint) while a post's three fields translate together.
-    const buildI18n = async (post, onProgress) => {
+    const buildI18n = async (post, onProgress, previous = {}) => {
+      translationUnavailable = false;
       const langs = Object.keys(TR_LANGS), i18n = {};
       for (let k = 0; k < langs.length; k++) {
         const lang = langs[k], tl = TR_LANGS[lang];
-        const [title, subtitle, body] = await Promise.all([trText(post.title, tl), trText(post.subtitle, tl), trText(post.body, tl)]);
+        const translateField = key => {
+          const existing = previous.i18n?.[lang]?.[key];
+          // Cover, category or publication-only edits must not erase an
+          // existing translation or spend another model request on it.
+          if (String(post[key] || '') === String(previous[key] || '') && typeof existing === 'string' && existing.trim()) return existing;
+          return trText(post[key], tl);
+        };
+        const [title, subtitle, body] = await Promise.all(['title', 'subtitle', 'body'].map(translateField));
         i18n[lang] = {
           title: (title && title.trim()) ? title : (post.title || ''),
           subtitle: (subtitle && subtitle.trim()) ? subtitle : (post.subtitle || ''),
@@ -1999,7 +1933,7 @@
       }));
       pager.wire(view);
     };
-    const cmsList = () => {
+    const cmsList = (notice = '') => {
       const t = CT_I18N[curLang()] || CT_I18N.en;
       view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i><br>${t.loading}</p>`;
       cmsApi({ action: 'list' }).then(d => {
@@ -2008,6 +1942,11 @@
         CMS_POSTS = Array.isArray(d.posts) ? d.posts : [];
         cmsPage = 1;
         drawCms();
+        if (typeof notice === 'string' && notice) {
+          const status = document.createElement('p');
+          status.className = 'dash-note'; status.setAttribute('role', 'status');
+          status.textContent = notice; view.prepend(status);
+        }
       }).catch(() => { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${t.err}</p>`; });
     };
     const cmsDel = (id) => {
@@ -2086,10 +2025,10 @@
           cover: $('#cf_cover').value.trim(), body: $('#cf_body').value, published: $('#cf_pub').checked
         } };
         const btn = $('#ctSave'); btn.disabled = true;
-        // Translate every field into all 7 languages here in the browser, then
-        // hand the finished i18n to the function (its server IP is Google-blocked).
+        // Cloudflare translates before saving; unavailable translations retain
+        // the author's words and the editor is told which fallback occurred.
         try {
-          const i18n = await buildI18n(payload.post, (done, total) => { msg.textContent = (t.translating || 'Translating…') + ' ' + done + '/' + total; });
+          const i18n = await buildI18n(payload.post, (done, total) => { msg.textContent = (t.translating || 'Translating…') + ' ' + done + '/' + total; }, p);
           payload.i18n = i18n;
         } catch (x) {}
         payload.translate = false;
@@ -2100,7 +2039,9 @@
           if (!d || !d.ok) { msg.textContent = '✗ ' + ((d && d.error) || ''); return; }
           msg.textContent = t.savedMsg;
           try { if (window.__bqReloadBlog) window.__bqReloadBlog(); } catch (x) {}
-          setTimeout(cmsList, 800);
+          const translationNote = translationUnavailable
+            ? (curLang() === 'ku' ? 'بابەتەکە پاشەکەوت کرا. وەرگێڕان بەردەست نەبوو؛ دەقی ڕەسەن پارێزرا.' : 'Post saved. Translation was unavailable; the original text was preserved.') : '';
+          setTimeout(() => cmsList(translationNote), 800);
         }).catch(() => { btn.disabled = false; msg.textContent = t.err; });
       });
     };
@@ -2930,8 +2871,29 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && reader.classList.contains('is-open')) closeReader(); });
     rd.prev?.addEventListener('click', () => { if (curPrev) { if (rd.scroll) rd.scroll.scrollTop = 0; openReader(curPrev); } });
     rd.next?.addEventListener('click', () => { if (curNext) { if (rd.scroll) rd.scroll.scrollTop = 0; openReader(curNext); } });
-    rd.top?.addEventListener('click', () => { if (rd.scroll) rd.scroll.scrollTo({ top: 0, behavior: 'smooth' }); });
-    rd.scroll?.addEventListener('scroll', () => { if (rd.top) rd.top.classList.toggle('is-shown', rd.scroll.scrollTop > 420); }, { passive: true });
+    (function readerGoUp() {
+      if (!rd.top || !rd.scroll) return;
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let frame = 0;
+      const update = () => {
+        frame = 0;
+        const position = Math.max(0, rd.scroll.scrollTop || 0);
+        const shown = rd.top.classList.contains('is-shown') ? position > 40 : position > 160;
+        rd.top.classList.toggle('is-shown', shown);
+        rd.top.setAttribute('aria-hidden', String(!shown));
+        rd.top.tabIndex = shown ? 0 : -1;
+      };
+      const queue = () => { if (!frame) frame = requestAnimationFrame(update); };
+      rd.top.addEventListener('click', () => {
+        rd.scroll.scrollTo({ top:0, behavior:reduced.matches ? 'auto' : 'smooth' });
+        queue();
+      });
+      rd.scroll.addEventListener('scroll', queue, { passive:true });
+      rd.scroll.addEventListener('touchmove', queue, { passive:true });
+      window.addEventListener('pageshow', queue);
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) queue(); });
+      update();
+    })();
     rd.like?.addEventListener('click', () => {
       const p = curPostObj; if (!p) return;
       if (p.id != null) {
@@ -3149,7 +3111,7 @@
   const lang = () => document.documentElement.dataset.lang || 'en';
   let items = [], workItems = [], pinItems = [];
   const GH = 'https://api.github.com/repos/Bqurtas/BqurtasPortfolio';
-  const CDN = (window.BQ_GALLERY && window.BQ_GALLERY.CDN_BASE) || '';
+  const CDN = (window.BQ_GALLERY && window.BQ_GALLERY.MEDIA_BASE) || '';
   const normalizeWorkItems = (rows) => (Array.isArray(rows) ? rows : []).slice(0, 100).map((row) => {
     const count = Number(row && row.count);
     return {

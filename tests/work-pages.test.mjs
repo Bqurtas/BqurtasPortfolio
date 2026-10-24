@@ -10,6 +10,8 @@ import {
 } from '../functions/_gallery-catalog.js';
 import { parseWorkPath } from '../functions/_work-page.js';
 import { PAGE_GUARD_JS } from '../functions/_page-guard.js';
+import { BACK_TO_TOP_HTML, BACK_TO_TOP_JS } from '../functions/_back-to-top.js';
+import { ANALYTICS_CLIENT_JS } from '../functions/_analytics-client.js';
 import { buildImageSitemap } from '../scripts/generate-image-sitemap.mjs';
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
@@ -140,8 +142,11 @@ test('an image work page is a complete, crawlable, same-origin document', async 
   assert.match(html, /href="\/design\/book\/8"/);
   const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)]
     .filter(([, attrs]) => !/type="application\/ld\+json"/.test(attrs));
-  assert.deepEqual(scripts.map(([, attrs, body]) => [attrs, body]), [[` nonce="${nonce}"`, PAGE_GUARD_JS]],
-    'the only executable script is the inline page guard');
+  assert.deepEqual(scripts.map(([, attrs, body]) => [attrs, body]), [[` nonce="${nonce}"`, PAGE_GUARD_JS], [` nonce="${nonce}"`, BACK_TO_TOP_JS], [` nonce="${nonce}"`, ANALYTICS_CLIENT_JS]],
+    'only local page guard, back-to-top and privacy-aware analytics execute, protected by this response nonce');
+  assert.match(csp, /connect-src 'self'(?:;|$)/);
+  assert.ok(html.includes(BACK_TO_TOP_HTML));
+  assert.match(html, /<body id="page-top">/);
   assert.doesNotMatch(html, /(?:src|href)="https:\/\/(?!bqurtas\.com)/, 'no external requests');
 
   const graph = jsonLd(html)['@graph'];
@@ -211,7 +216,7 @@ test('media paths are a strict allowlist, never an open proxy', async (t) => {
   assert.equal(post.headers.get('allow'), 'GET, HEAD');
 });
 
-test('media is served from jsDelivr with first-party headers and the query ignored', async (t) => {
+test('media is served from GitHub through Cloudflare with first-party headers and the query ignored', async (t) => {
   const calls = [];
   t.mock.method(globalThis, 'fetch', async (url, init) => {
     calls.push({ url: String(url), init });
@@ -224,7 +229,7 @@ test('media is served from jsDelivr with first-party headers and the query ignor
   assert.equal(response.status, 200);
   assert.equal(await response.text(), 'webp-bytes');
   assert.equal(calls.length, 1);
-  assert.equal(calls[0].url, 'https://cdn.jsdelivr.net/gh/Bqurtas/BqurtasPortfolio@main/Book/BookCover7.webp');
+  assert.equal(calls[0].url, 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Book/BookCover7.webp');
   assert.equal(calls[0].init.cf.cacheEverything, true);
   assert.equal(response.headers.get('content-type'), 'image/webp');
   assert.equal(response.headers.get('cache-control'), 'public, max-age=86400, stale-while-revalidate=604800');
@@ -239,14 +244,13 @@ test('media is served from jsDelivr with first-party headers and the query ignor
 
   const extra = await media('/media/WebsitePortfolio/websiteLogo%26tab.webp');
   assert.equal(extra.status, 200);
-  assert.equal(calls.at(-1).url, 'https://cdn.jsdelivr.net/gh/Bqurtas/BqurtasPortfolio@main/WebsitePortfolio/websiteLogo%26tab.webp');
+  assert.equal(calls.at(-1).url, 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/WebsitePortfolio/websiteLogo%26tab.webp');
 });
 
-test('videos use raw GitHub directly for byte ranges and HEAD without waiting for jsDelivr', async (t) => {
+test('videos use raw GitHub directly for byte ranges and HEAD', async (t) => {
   const calls = [];
   t.mock.method(globalThis, 'fetch', async (url, init) => {
     calls.push({ url: String(url), range: init.headers.get('Range'), method: init.method });
-    if (String(url).startsWith('https://cdn.jsdelivr.net/')) return new Response('unexpected CDN request', { status: 500 });
     return new Response(init.method === 'HEAD' ? null : 'abc', {
       status: init.method === 'HEAD' ? 200 : 206,
       headers: init.method === 'HEAD'
@@ -274,32 +278,65 @@ test('videos use raw GitHub directly for byte ranges and HEAD without waiting fo
   assert.equal(calls.at(-1).method, 'HEAD');
 });
 
-test('video requests retain their byte range and condition when raw GitHub needs a CDN fallback', async (t) => {
-  for (const failure of ['server', 'network']) {
+test('media errors and redirects never try an unrelated hosting provider', async (t) => {
+  for (const failure of [503, 302, 'network']) {
     const calls = [];
     t.mock.method(globalThis, 'fetch', async (url, init) => {
-      calls.push({ url: String(url), range: init.headers.get('Range'), condition: init.headers.get('If-Range') });
-      if (String(url).startsWith('https://raw.githubusercontent.com/')) {
-        if (failure === 'network') throw new Error('raw origin unavailable');
-        return new Response('raw origin unavailable', { status: 503 });
-      }
-      return new Response('abc', { status: 206, headers: {
-        'Content-Range': 'bytes 0-2/24269001', 'Content-Length': '3', ETag: '"film"'
-      } });
+      calls.push({ url: String(url), range: init.headers.get('Range'), condition: init.headers.get('If-Range'), redirect: init.redirect });
+      if (failure === 'network') throw new Error('origin unavailable');
+      return new Response('origin unavailable', { status: failure, headers: { Location: 'https://outside.example/media.mp4' } });
     });
     const response = await media('/media/Videos/Videos26.mp4', { headers: { Range: 'bytes=0-2', 'If-Range': '"film"' } });
-    assert.equal(response.status, 206, failure);
-    assert.equal(await response.text(), 'abc');
-    assert.equal(response.headers.get('content-type'), 'video/mp4');
-    assert.equal(response.headers.get('content-range'), 'bytes 0-2/24269001');
-    assert.equal(response.headers.get('content-length'), '3');
-    assert.equal(response.headers.get('etag'), '"film"');
-    assert.equal(response.headers.get('x-robots-tag'), null);
+    assert.equal(response.status, 502, String(failure));
+    assert.equal(response.headers.get('location'), null);
+    assert.match(response.headers.get('cache-control'), /no-store/);
+    assert.equal(response.headers.get('retry-after'), '60');
     assert.deepEqual(calls, [
-      { url: 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Videos/Videos26.mp4', range: 'bytes=0-2', condition: '"film"' },
-      { url: 'https://cdn.jsdelivr.net/gh/Bqurtas/BqurtasPortfolio@main/Videos/Videos26.mp4', range: 'bytes=0-2', condition: '"film"' }
-    ], failure);
+      { url: 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Videos/Videos26.mp4', range: 'bytes=0-2', condition: '"film"', redirect: 'manual' }
+    ], String(failure));
   }
+});
+
+test('conditional media and unsatisfiable byte ranges retain their upstream semantics', async (t) => {
+  const calls = [];
+  t.mock.method(globalThis, 'fetch', async (_url, init) => {
+    calls.push(init);
+    if (init.headers.has('Range')) return new Response('range error', {
+      status: 416, headers: { 'Content-Range': 'bytes */24269001', 'Content-Type': 'text/html' }
+    });
+    return new Response(null, { status: 304, headers: { ETag: '"film"', 'Last-Modified': 'Fri, 23 Oct 2026 07:00:00 GMT' } });
+  });
+  const unchanged = await media('/media/Videos/Videos26.mp4', {
+    headers: { 'If-None-Match': '"film"', 'If-Modified-Since': 'Fri, 23 Oct 2026 07:00:00 GMT' }
+  });
+  assert.equal(unchanged.status, 304);
+  assert.equal(await unchanged.text(), '');
+  assert.equal(unchanged.headers.get('etag'), '"film"');
+  assert.equal(calls[0].headers.get('If-None-Match'), '"film"');
+  assert.equal(calls[0].headers.get('If-Modified-Since'), 'Fri, 23 Oct 2026 07:00:00 GMT');
+  const invalidRange = await media('/media/Videos/Videos26.mp4', { method: 'HEAD', headers: { Range: 'bytes=99999999-' } });
+  assert.equal(invalidRange.status, 416);
+  assert.equal(await invalidRange.text(), '');
+  assert.equal(invalidRange.headers.get('content-range'), 'bytes */24269001');
+  assert.match(invalidRange.headers.get('cache-control'), /no-store/);
+  assert.equal(invalidRange.headers.get('content-type'), 'text/plain; charset=utf-8');
+});
+
+test('an upstream header timeout returns an uncached gateway error', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  let fetchStarted;
+  const started = new Promise(resolve => { fetchStarted = resolve; });
+  t.mock.method(globalThis, 'fetch', async (_url, init) => new Promise((_resolve, reject) => {
+    init.signal.addEventListener('abort', () => reject(new Error('timeout')), { once: true });
+    fetchStarted();
+  }));
+  const pending = media('/media/Book/BookCover7.webp');
+  await started;
+  t.mock.timers.tick(15_000);
+  const response = await pending;
+  assert.equal(response.status, 502);
+  assert.equal(response.headers.get('retry-after'), '60');
+  assert.match(response.headers.get('cache-control'), /no-store/);
 });
 
 test('upstream failures are uncached, noindex errors', async (t) => {

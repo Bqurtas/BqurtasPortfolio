@@ -130,6 +130,36 @@ test('unsupported actions and malformed identifiers cannot create or delete cont
   assert.equal((await (await get(journal, env)).json()).length, 1);
 });
 
+test('CMS media accepts only the site and its GitHub repository while preserving migrated asset URLs', async t => {
+  const env = database(t);
+  const accepted = [
+    '/assets/migrated/original.webp', 'assets/migrated/original.webp',
+    'https://bqurtas.com/uploads/123.webp', '/media/Book/BookCover1.webp',
+    'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/Book/BookCover1.webp'
+  ];
+  for (const cover of accepted) await save(env, { title: 'Owned image', cover, published: true });
+  assert.deepEqual((await (await get(journal, env)).json()).map(post => post.cover).sort(), accepted.sort());
+  for (const url of [
+    'https://external.example/cover.webp', 'https://bqurtas.com.evil.example/cover.webp',
+    'https://raw.githubusercontent.com/Another/Repository/main/cover.webp',
+    'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio-other/main/cover.webp',
+    'https://user:password@bqurtas.com/cover.webp', '//external.example/cover.webp'
+  ]) {
+    for (const [service, body] of [
+      ['blog-admin', { action: 'upsert', post: { title: 'Rejected image', cover: url } }],
+      ['projects-admin', { action: 'upsert', project: { title: 'Rejected gallery', gallery: [{ url }] } }],
+      ['latest-admin', { action: 'add', item: { title: 'Rejected notice', image: url, link: 'book' } }]
+    ]) {
+      const response = await handleCmsAdmin(service, body, env);
+      assert.equal(response.status, 400);
+      const result = await response.json();
+      assert.equal(result.error, 'invalid-media-url');
+      assert.match(result.detail, /Upload the image/);
+    }
+  }
+  assert.equal((await (await get(journal, env)).json()).length, accepted.length);
+});
+
 test('public filtering accepts bounded integral limits and ISO timestamps without SQL interpolation', async t => {
   const env = database(t);
   await save(env, { title: 'One', published: true, pos: 2 });

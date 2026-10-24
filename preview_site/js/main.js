@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setRoomChrome(document.body.dataset.room || 'design');
     document.dispatchEvent(new CustomEvent('bq:language', { detail: { lang: resolvedLang } }));
     if (window.__bqRelocalizeGallery) window.__bqRelocalizeGallery();
-    if (routerReady) { syncURL(false); try { if (window.umami) umami.track(); } catch (e) {} }   // Umami: count each language URL (replaceState isn't auto-tracked)
+    if (routerReady) syncURL(false);
     if (window.__bqRerenderChrome) window.__bqRerenderChrome();
     if (window.__bqRenderActiveHonor) window.__bqRenderActiveHonor();
     return resolvedLang;
@@ -758,6 +758,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { passive:true });
 
   window.__bqGoDocumentTop = (behavior = 'smooth') => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) behavior = 'auto';
     window.__bqPaperBypassUntil = performance.now() + (behavior === 'smooth' ? 1200 : 180);
     document.querySelectorAll('.room:not(.is-hidden) .paper-scroll, .footer.footer-v249.paper-sheet > .paper-scroll')
       .forEach((scroller) => { scroller.scrollTop = 0; });
@@ -1267,16 +1268,46 @@ document.addEventListener('DOMContentLoaded', () => {
     entries.forEach((entry, index) => placeCard(entry, startRank + index, colWidth));
   };
 
+  let categoryOrderSource = null, categoryOrderFilter = null, categoryOrder = [];
+  const categoryFirst = new Map();
   const matchingCards = () => {
-    const list = (window.BQ_ALL_CARDS || []).filter(e => currentFilter === 'all' || e.cat === currentFilter);
-    if (currentFilter !== 'all') return list;
-    const stills = [], videos = [];
-    list.forEach(e => (e.type === 'video' ? videos : stills).push(e));
-    return stills.concat(videos);
+    const source = window.BQ_ALL_CARDS || [];
+    if (source !== categoryOrderSource) {
+      categoryOrderSource = source;
+      categoryOrderFilter = null;
+      categoryFirst.clear();
+    }
+    // A visit owns one order. Load-more, resizing and translated labels keep
+    // that exact sequence; only entering a different tab creates a new one.
+    if (categoryOrderFilter === currentFilter) return categoryOrder;
+    let list = source.filter(e => currentFilter === 'all' || e.cat === currentFilter);
+    const previousFirst = categoryFirst.get(currentFilter);
+    if (categoryFirst.has(currentFilter)) {
+      for (let i = list.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [list[i], list[j]] = [list[j], list[i]];
+      }
+    }
+    if (currentFilter === 'all') {
+      const stills = [], videos = [];
+      list.forEach(e => (e.type === 'video' ? videos : stills).push(e));
+      list = stills.concat(videos);
+    }
+    // Chance must not make a return look unchanged. Prefer another still in
+    // All Work so its opening batch stays light; a tiny mixed set still varies.
+    if (list.length > 1 && list[0] === previousFirst) {
+      let swap = list.findIndex((entry, i) => i > 0 && entry.type === list[0].type);
+      if (swap < 1) swap = 1;
+      [list[0], list[swap]] = [list[swap], list[0]];
+    }
+    categoryOrder = list;
+    categoryOrderFilter = currentFilter;
+    categoryFirst.set(currentFilter, list[0]);
+    return categoryOrder;
   };
 
-  /* Mix disciplines once with a deterministic seed. The opening pins stay
-     visually varied without making image weight and audit results random. */
+  /* Keep the first visit reproducible and varied. Re-entered tabs shuffle
+     their own lightweight record list without changing this source catalogue. */
   const shuffleAllCards = () => {
     const a = window.BQ_ALL_CARDS;
     if (!Array.isArray(a) || a.__bqShuffled) return;
@@ -1290,6 +1321,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const t = a[i]; a[i] = a[j]; a[j] = t;
     }
     Object.defineProperty(a, '__bqShuffled', { value: true });
+    categoryOrderSource = null;
   };
   /* render the gallery. reset=true rebuilds columns (tab switch / resize). */
   window.__bqRenderGallery = (reset) => {
@@ -1483,7 +1515,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* The deck re-shuffles on every page load and tab switch — that stays.
+  /* Returning to a tab gives its works a fresh order, stable for that visit.
      The gallery shows one batch (PAGE_SIZE = 40) at a time; the reader
      taps "Load more" to reveal the next batch. No auto-infinite-scroll — the works
      never all load at once, and nothing swaps under the reader as they scroll. */
@@ -1763,8 +1795,8 @@ document.addEventListener('DOMContentLoaded', () => {
         media.onload = ready;
       }
       const gallery = window.BQ_GALLERY;
-      const raw = item.raw || (gallery && item.full.startsWith(gallery.CDN_BASE + '/')
-        ? gallery.RAW_BASE + item.full.slice(gallery.CDN_BASE.length) : '');
+      const raw = item.raw || (gallery && item.full.startsWith(gallery.MEDIA_BASE + '/')
+        ? gallery.RAW_BASE + item.full.slice(gallery.MEDIA_BASE.length) : '');
       if (gallery?.bindMediaFallback) {
         releaseFallback = gallery.bindMediaFallback(media, [raw], failed);
       } else media.onerror = failed;
@@ -1933,13 +1965,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const status = document.getElementById('pitchStatus');
   if (form) {
     const pitchCopy = {
-      en: { missing: 'Please add your name, email and a short message.', email: 'Please enter a valid email address.', sending: 'Sending your pitch…', success: 'Thank you — your pitch has been sent. I reply within 48 hours.', failure: 'Your pitch could not be sent. Your text is saved here; please try again or email hello@bqurtas.com.', timeout: 'Sending took too long to confirm. Your text is saved here; contact hello@bqurtas.com if you need help.' },
-      ku: { missing: 'تکایە ناو، ئیمەیڵ و پەیامێکی کورت بنووسە.', email: 'تکایە ناونیشانێکی دروستی ئیمەیڵ بنووسە.', sending: 'پەیامەکەت دەنێردرێت…', success: 'سوپاس — پەیامەکەت نێردرا. لە ماوەی ٤٨ کاتژمێردا وەڵام دەدەمەوە.', failure: 'پەیامەکەت نەنێردرا. دەقەکەت لێرە ماوەتەوە؛ تکایە دووبارە هەوڵ بدەوە یان ئیمەیڵ بنێرە بۆ hello@bqurtas.com.', timeout: 'پشتڕاستکردنەوەی ناردن زۆری خایاند. دەقەکەت لێرە ماوەتەوە؛ بۆ یارمەتی ئیمەیڵ بنێرە بۆ hello@bqurtas.com.' },
-      kmr: { missing: 'Ji kerema xwe nav, e-name û peyameke kurt binivîse.', email: 'Ji kerema xwe navnîşaneke e-nameyê ya derbasdar binivîse.', sending: 'Peyama te tê şandin…', success: 'Spas — peyama te hat şandin. Ez di nav 48 saetan de bersiv didim.', failure: 'Peyama te nehat şandin. Nivîsa te li vir maye; dîsa biceribîne an e-nameyê bişîne hello@bqurtas.com.', timeout: 'Piştrastkirina şandinê pir dirêj kir. Nivîsa te li vir maye; ji bo alîkariyê binivîse hello@bqurtas.com.' },
-      ar: { missing: 'يرجى إدخال اسمك وبريدك الإلكتروني ورسالة قصيرة.', email: 'يرجى إدخال عنوان بريد إلكتروني صالح.', sending: 'جارٍ إرسال رسالتك…', success: 'شكراً — تم إرسال رسالتك. سأرد خلال ٤٨ ساعة.', failure: 'تعذر إرسال رسالتك. ما زال نصك هنا؛ حاول مجدداً أو راسل hello@bqurtas.com.', timeout: 'استغرق تأكيد الإرسال وقتاً طويلاً. ما زال نصك هنا؛ للمساعدة راسل hello@bqurtas.com.' },
-      fr: { missing: 'Indiquez votre nom, votre adresse e-mail et un court message.', email: 'Indiquez une adresse e-mail valide.', sending: 'Envoi de votre message…', success: 'Merci — votre message a été envoyé. Je réponds sous 48 heures.', failure: 'Votre message n’a pas pu être envoyé. Votre texte est conservé ici ; réessayez ou écrivez à hello@bqurtas.com.', timeout: 'L’envoi n’a pas pu être confirmé à temps. Votre texte est conservé ici ; contactez hello@bqurtas.com si besoin.' },
-      tr: { missing: 'Lütfen adınızı, e-posta adresinizi ve kısa bir mesaj yazın.', email: 'Lütfen geçerli bir e-posta adresi girin.', sending: 'Mesajınız gönderiliyor…', success: 'Teşekkürler — mesajınız gönderildi. 48 saat içinde yanıt vereceğim.', failure: 'Mesajınız gönderilemedi. Metniniz burada duruyor; tekrar deneyin veya hello@bqurtas.com adresine yazın.', timeout: 'Gönderimin onaylanması çok uzun sürdü. Metniniz burada duruyor; yardım için hello@bqurtas.com adresine yazın.' },
-      sv: { missing: 'Ange ditt namn, din e-postadress och ett kort meddelande.', email: 'Ange en giltig e-postadress.', sending: 'Skickar ditt meddelande…', success: 'Tack — ditt meddelande har skickats. Jag svarar inom 48 timmar.', failure: 'Ditt meddelande kunde inte skickas. Din text finns kvar här; försök igen eller skriv till hello@bqurtas.com.', timeout: 'Det tog för lång tid att bekräfta sändningen. Din text finns kvar här; kontakta hello@bqurtas.com om du behöver hjälp.' }
+      en: { missing: 'Please add your name, email and a short message.', email: 'Please enter a valid email address.', sending: 'Sending your pitch…', success: 'Thank you — your pitch is saved in my studio inbox. I aim to reply within 48 hours.', failure: 'Your pitch could not be sent. Your text is saved here; please try again or email hello@bqurtas.com.', timeout: 'Sending took too long to confirm. Your text is saved here; contact hello@bqurtas.com if you need help.' },
+      ku: { missing: 'تکایە ناو، ئیمەیڵ و پەیامێکی کورت بنووسە.', email: 'تکایە ناونیشانێکی دروستی ئیمەیڵ بنووسە.', sending: 'پەیامەکەت دەنێردرێت…', success: 'سوپاس — پەیامەکەت لە سندووقی ستۆدیۆکەم پاشەکەوت کرا. هەوڵ دەدەم لە ٤٨ کاتژمێردا وەڵام بدەمەوە.', failure: 'پەیامەکەت نەنێردرا. دەقەکەت لێرە ماوەتەوە؛ تکایە دووبارە هەوڵ بدەوە یان ئیمەیڵ بنێرە بۆ hello@bqurtas.com.', timeout: 'پشتڕاستکردنەوەی ناردن زۆری خایاند. دەقەکەت لێرە ماوەتەوە؛ بۆ یارمەتی ئیمەیڵ بنێرە بۆ hello@bqurtas.com.' },
+      kmr: { missing: 'Ji kerema xwe nav, e-name û peyameke kurt binivîse.', email: 'Ji kerema xwe navnîşaneke e-nameyê ya derbasdar binivîse.', sending: 'Peyama te tê şandin…', success: 'Spas — peyama te di qutiya stûdyoya min de hat tomarkirin. Ez hewl didim di nav 48 saetan de bersiv bidim.', failure: 'Peyama te nehat şandin. Nivîsa te li vir maye; dîsa biceribîne an e-nameyê bişîne hello@bqurtas.com.', timeout: 'Piştrastkirina şandinê pir dirêj kir. Nivîsa te li vir maye; ji bo alîkariyê binivîse hello@bqurtas.com.' },
+      ar: { missing: 'يرجى إدخال اسمك وبريدك الإلكتروني ورسالة قصيرة.', email: 'يرجى إدخال عنوان بريد إلكتروني صالح.', sending: 'جارٍ إرسال رسالتك…', success: 'شكراً — حُفظت رسالتك في صندوق الاستوديو. أسعى للرد خلال ٤٨ ساعة.', failure: 'تعذر إرسال رسالتك. ما زال نصك هنا؛ حاول مجدداً أو راسل hello@bqurtas.com.', timeout: 'استغرق تأكيد الإرسال وقتاً طويلاً. ما زال نصك هنا؛ للمساعدة راسل hello@bqurtas.com.' },
+      fr: { missing: 'Indiquez votre nom, votre adresse e-mail et un court message.', email: 'Indiquez une adresse e-mail valide.', sending: 'Envoi de votre message…', success: 'Merci — votre message est enregistré dans la boîte du studio. Je vise une réponse sous 48 heures.', failure: 'Votre message n’a pas pu être envoyé. Votre texte est conservé ici ; réessayez ou écrivez à hello@bqurtas.com.', timeout: 'L’envoi n’a pas pu être confirmé à temps. Votre texte est conservé ici ; contactez hello@bqurtas.com si besoin.' },
+      tr: { missing: 'Lütfen adınızı, e-posta adresinizi ve kısa bir mesaj yazın.', email: 'Lütfen geçerli bir e-posta adresi girin.', sending: 'Mesajınız gönderiliyor…', success: 'Teşekkürler — mesajınız stüdyo gelen kutuma kaydedildi. 48 saat içinde yanıt vermeyi hedefliyorum.', failure: 'Mesajınız gönderilemedi. Metniniz burada duruyor; tekrar deneyin veya hello@bqurtas.com adresine yazın.', timeout: 'Gönderimin onaylanması çok uzun sürdü. Metniniz burada duruyor; yardım için hello@bqurtas.com adresine yazın.' },
+      sv: { missing: 'Ange ditt namn, din e-postadress och ett kort meddelande.', email: 'Ange en giltig e-postadress.', sending: 'Skickar ditt meddelande…', success: 'Tack — ditt meddelande har sparats i studions inkorg. Jag siktar på att svara inom 48 timmar.', failure: 'Ditt meddelande kunde inte skickas. Din text finns kvar här; försök igen eller skriv till hello@bqurtas.com.', timeout: 'Det tog för lång tid att bekräfta sändningen. Din text finns kvar här; kontakta hello@bqurtas.com om du behöver hjälp.' }
     };
     const showPitchStatus = (kind) => {
       if (!status) return;
@@ -1951,6 +1983,7 @@ document.addEventListener('DOMContentLoaded', () => {
       status.replaceChildren(icon, document.createTextNode(` ${copy[kind]}`));
     };
     let pitchSending = false;
+    let pitchRequest = null;
     form.addEventListener('input', (event) => {
       if (event.target && event.target.removeAttribute) event.target.removeAttribute('aria-invalid');
     });
@@ -1977,8 +2010,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (first) first.focus();
         return;
       }
-      // This is the public Web3Forms form identifier, not a private server token.
-      const WEB3FORMS_KEY = 'cd575d52-8847-4286-af53-efa296c04686'; // delivers each pitch to hello@bqurtas.com
       const fields = {
         company:      val('#pCompany'),
         phone:        val('#pPhone'),
@@ -1987,8 +2018,15 @@ document.addEventListener('DOMContentLoaded', () => {
         timeline:     val('#pTimeline'),
         heard_about:  val('#pHear'),
         references:   val('#pRefs'),
-        nda:          chk('#pNDA') ? 'Yes' : 'No'
+        nda:          chk('#pNDA'),
+        website:      val('#pWebsite'),
+        lang:         currentLang
       };
+      const payload = JSON.stringify({ name, email, message, ...fields });
+      // Reuse an opaque ID only for the identical draft after an uncertain
+      // network response; the server makes these retries idempotent.
+      if (!pitchRequest || pitchRequest.payload !== payload) pitchRequest = { payload, id: crypto.randomUUID() };
+      const requestId = pitchRequest.id;
       const submit = form.querySelector('[type="submit"]');
       const wasDisabled = !!(submit && submit.disabled);
       // Keep every draft field if the visitor edits anything while delivery is pending.
@@ -2009,17 +2047,18 @@ document.addEventListener('DOMContentLoaded', () => {
             reject(new Error('pitch-timeout'));
           }, 15_000);
         });
-        const delivery = fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
+        const delivery = fetch('/api/contact', {
+          method: 'POST', credentials: 'same-origin', cache: 'no-store',
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: `New pitch — ${type} — ${name}`, name, email, message, ...fields }),
+          body: JSON.stringify({ request_id: requestId, name, email, message, ...fields }),
           signal: controller.signal
         }).then(async response => {
           if (!response.ok) throw new Error('pitch-http-error');
           const result = await response.json();
-          if (!result || result.success !== true) throw new Error('pitch-rejected');
+          if (!result || result.ok !== true || result.status !== 'stored') throw new Error('pitch-rejected');
         });
         await Promise.race([delivery, deadline]);
+        if (pitchRequest && pitchRequest.id === requestId) pitchRequest = null;
         showPitchStatus('success');
         if (snapshot.every(({ el, value, checked }) => el.value === value && el.checked === checked)) form.reset();
       } catch (error) {
@@ -3612,6 +3651,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     if (shown !== shownNow) {
       shownNow = shown;
       control.classList.toggle('is-shown', shown);
+      control.setAttribute?.('aria-hidden', String(!shown));
+      control.tabIndex = shown ? 0 : -1;
     }
     const offset = String(circumference * (1 - progress));
     if (ring && offset !== lastRingOffset) ring.style.strokeDashoffset = lastRingOffset = offset;

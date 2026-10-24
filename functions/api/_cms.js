@@ -50,9 +50,16 @@ function text(value, maximum, required = false) {
   if (typeof value !== 'string' || value.length > maximum || (required && !value.trim())) throw new Error('invalid-content');
   return value.trim();
 }
-function safeUrl(value) {
+function safeMediaUrl(value) {
   const url = text(value, 2048);
-  if (url && (!/^(?:https:\/\/|\/(?!\/)|assets\/)/i.test(url) || /[\\\u0000-\u001f\u007f]/.test(url))) throw new Error('invalid-content');
+  if (!url) return '';
+  if (!/^(?:https:\/\/|\/(?!\/)|assets\/)/i.test(url) || /[\\\u0000-\u001f\u007f]/.test(url)) throw new Error('invalid-media-url');
+  let parsed;
+  try { parsed = new URL(url, 'https://bqurtas.com/'); } catch { throw new Error('invalid-media-url'); }
+  const firstParty = parsed.origin === 'https://bqurtas.com';
+  const repository = parsed.origin === 'https://raw.githubusercontent.com'
+    && /^\/Bqurtas\/BqurtasPortfolio\/[^/]+\/.+/.test(parsed.pathname);
+  if (parsed.username || parsed.password || (!firstParty && !repository)) throw new Error('invalid-media-url');
   return url;
 }
 function translations(value) {
@@ -73,8 +80,8 @@ function normalize(input, service, i18n) {
   const data = { title: text(input.title, 300, true) };
   for (const key of ['subtitle','tag','num','date','client','year','role','summary','slug']) if (input[key] != null) data[key] = text(String(input[key]), key === 'summary' ? 6000 : 2000);
   if (input.body != null) data.body = text(input.body, 100000);
-  if (input.cover != null) data.cover = safeUrl(input.cover);
-  if (input.image != null) data.image = safeUrl(input.image);
+  if (input.cover != null) data.cover = safeMediaUrl(input.cover);
+  if (input.image != null) data.image = safeMediaUrl(input.image);
   if (input.accent != null) {
     if (!/^#[0-9a-f]{6}(?:[0-9a-f]{2})?$/i.test(input.accent)) throw new Error('invalid-content');
     data.accent = input.accent;
@@ -92,7 +99,7 @@ function normalize(input, service, i18n) {
   }
   if (input.gallery != null) {
     if (!Array.isArray(input.gallery) || input.gallery.length > 100) throw new Error('invalid-content');
-    data.gallery = input.gallery.map(image => ({ url: safeUrl(image?.url) }));
+    data.gallery = input.gallery.map(image => ({ url: safeMediaUrl(image?.url) }));
   }
   data.i18n = translations(i18n ?? input.i18n);
   return data;
@@ -129,7 +136,13 @@ export async function handleCmsAdmin(service, body, env) {
     input = { ...shape(row), ...input, pos: input.pos ?? row.pos };
   }
   let payload;
-  try { payload = normalize(input, service, body.i18n); } catch { return json({ ok: false, error: 'invalid-content' }, 400); }
+  try { payload = normalize(input, service, body.i18n); } catch (error) {
+    if (error.message === 'invalid-media-url') return json({
+      ok: false, error: 'invalid-media-url',
+      detail: 'Upload the image here, or use an image URL from bqurtas.com or the BqurtasPortfolio GitHub repository.'
+    }, 400);
+    return json({ ok: false, error: 'invalid-content' }, 400);
+  }
   const flag = service === 'latest-admin' ? 'active' : 'published';
   const pos = Number.isFinite(Number(input.pos)) ? Number(input.pos) : 0;
   const date = new Date().toISOString();

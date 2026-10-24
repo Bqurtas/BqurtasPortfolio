@@ -37,7 +37,7 @@ function video(index = 1) {
   const listeners = new Map();
   return {
     isConnected: true, src: '', paused: true, plays: 0, pauses: 0,
-    dataset: { src: `https://cdn.jsdelivr.net/gh/Bqurtas/BqurtasPortfolio@main/Videos/Videos${index}.mp4` },
+    dataset: { src: `/media/Videos/Videos${index}.mp4` },
     addEventListener(name, callback) { listeners.set(name, callback); },
     emit(name) { listeners.get(name)?.(); },
     play() { this.paused = false; this.plays++; return Promise.resolve(); },

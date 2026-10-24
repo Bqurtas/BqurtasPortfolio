@@ -82,7 +82,7 @@ test('video catalogue keeps its exact dimensions and only its own first-party fr
   assert.equal(items[2].poster, '', 'another film’s frame must not stand in for this film');
 });
 
-test('video playback uses first-party streaming while image thumbnails and raw fallbacks keep their existing URLs', async () => {
+test('images and films use first-party media with local thumbnails and one GitHub fallback', async () => {
   const gallery = loadGallery(async () => response({
     images: [{ path: 'Book/BookCover7.webp', width: 696, height: 1039 }],
     videos: [{ path: 'Videos/Videos26.mp4', width: 720, height: 720, poster: '/assets/thumbs/Videos/Videos26.jpg' }]
@@ -94,8 +94,13 @@ test('video playback uses first-party streaming while image thumbnails and raw f
   assert.equal(film.url, '/media/Videos/Videos26.mp4', 'manifest filenames determine the streamed file');
   assert.equal(film.rawUrl, gallery.RAW_BASE + '/Videos/Videos26.mp4');
   assert.equal(film.poster, '/assets/thumbs/Videos/Videos26.jpg');
-  assert.equal(image.url, gallery.CDN_BASE + '/Book/BookCover7.webp');
-  assert.equal(gallery.thumb(image.url, 320), 'assets/thumbs/Book/BookCover7.webp');
+  assert.equal(image.url, '/media/Book/BookCover7.webp');
+  assert.equal(gallery.thumb(image.url, 320), '/assets/thumbs/Book/BookCover7.webp');
+  assert.equal(gallery.thumb(image.rawUrl), '/assets/thumbs/Book/BookCover7.webp');
+  assert.equal(gallery.thumb('https://bqurtas.com' + image.url), '/assets/thumbs/Book/BookCover7.webp');
+  assert.equal(gallery.thumb('/assets/migrated/post.webp'), '/assets/migrated/post.webp');
+  assert.equal(gallery.thumb('/media-other/Book/BookCover7.webp'), '/media-other/Book/BookCover7.webp');
+  assert.equal(gallery.thumb(''), '');
 });
 
 test('an initial manifest outage can be retried without discarding the fallback catalogue', async () => {

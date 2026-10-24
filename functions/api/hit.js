@@ -8,13 +8,26 @@ import {
   keyedDigest,
   noContent,
   readRequestBytes,
+  sessionConfigured,
   takeRateLimit
 } from './_session.js';
+import { ensureAnalyticsStore } from './_analytics.js';
+import { COLLECTIONS, TABS } from '../_gallery-catalog.js';
+import { MEDIA_ARCHIVE_ROUTES } from '../_media-archive-routes.js';
 
 const RETENTION_MS = 400 * 86_400_000;
-const ROUTE_OK = /^\/(?:(?:ku|kmr|ar|fr|tr|sv)(?:\/|$))?(?:|design(?:\/[a-z0-9-]{1,48})?|blog(?:\/[1-9]\d{0,17})?|bio|contact)\/?$/i;
 const encoder = new TextEncoder();
-let lastPrune = 0;
+const pruneTimes = new WeakMap();
+
+function knownRoute(path) {
+  const route = path.replace(/^\/(?:ku|kmr|ar|fr|tr|sv)(?=\/|$)/, '').replace(/\/$/, '') || '/';
+  if (['/', '/design', '/blog', '/bio', '/contact'].includes(route)) return true;
+  if (MEDIA_ARCHIVE_ROUTES.has(route + '/')) return true;
+  if (/^\/blog\/[1-9]\d{0,17}$/.test(route)) return true;
+  const match = /^\/design\/([a-z]+)(?:\/([1-9]\d{0,17}))?$/.exec(route);
+  return !!match && (match[2] ? Object.hasOwn(COLLECTIONS, match[1])
+    : Object.hasOwn(COLLECTIONS, match[1]) || TABS.includes(match[1]));
+}
 
 function hostname(value) {
   try {
@@ -43,19 +56,26 @@ async function readBeacon(request) {
 
 export async function onRequestPost({ request, env }) {
   const done = () => noContent();
-  const analyticsSalt = String(env.ANALYTICS_SALT || '');
-  if (!env.DB || encoder.encode(analyticsSalt).byteLength < 32 || !isSameOrigin(request)) return done();
+  if (!env.DB || !isSameOrigin(request)) return done();
 
   try {
     const userAgent = String(request.headers.get('User-Agent') || '').slice(0, 512);
     const ip = clientAddress(request);
     if (!ip || !userAgent || isBot(userAgent)) return done();
 
+    let analyticsSalt = String(env.ANALYTICS_SALT || '');
+    if (encoder.encode(analyticsSalt).byteLength < 32) {
+      if (!sessionConfigured(env)) return done();
+      // Derive a separate purpose-bound key; never use the session signing
+      // value directly as a visitor identifier or write it to the database.
+      analyticsSalt = await keyedDigest(env.SESSION_SECRET, 'bqurtas:analytics-key:v1');
+    }
+
     const body = await readBeacon(request);
     if (!body) return done();
-    const path = (String(body.p || '/').split('?')[0] || '/').slice(0, 160);
+    const path = (String(body.p || '/').split(/[?#]/)[0] || '/');
     const language = String(body.l || '').toLowerCase();
-    if (!ROUTE_OK.test(path) || (language && !/^(?:en|ku|kmr|ar|fr|tr|sv)$/.test(language))) return done();
+    if (path.length > 160 || !knownRoute(path) || (language && !/^(?:en|ku|kmr|ar|fr|tr|sv)$/.test(language))) return done();
 
     const visitor = (await keyedDigest(analyticsSalt, `visitor|${ip}|${userAgent}`)).slice(0, 32);
     const slot = await takeRateLimit(env, `hit:${visitor}`, { limit: 30, windowMs: 60_000, durable: true });
@@ -67,9 +87,10 @@ export async function onRequestPost({ request, env }) {
       : (/iPad|Tablet/i.test(userAgent) ? 'tablet' : 'desktop');
     const now = Date.now();
 
-    if (now - lastPrune > 6 * 60 * 60 * 1000) {
+    await ensureAnalyticsStore(env.DB);
+    if (now - (pruneTimes.get(env.DB) || 0) > 6 * 60 * 60 * 1000) {
       await env.DB.prepare('DELETE FROM hits WHERE ts < ?').bind(now - RETENTION_MS).run();
-      lastPrune = now;
+      pruneTimes.set(env.DB, now);
     }
 
     await env.DB.prepare(

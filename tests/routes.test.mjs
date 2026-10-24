@@ -139,11 +139,12 @@ test('two-factor authentication fails closed without server secrets', async () =
   assert.deepEqual(await response.json(), { ok: false, error: 'not-configured' });
 });
 
-test('route CSP permits only the external origins used by translation and gallery fallback', async () => {
+test('route CSP limits external runtime access to GitHub', async () => {
   const source = await readFile(new URL('../functions/[[route]].js', import.meta.url), 'utf8');
-  assert.match(source, /connect-src[^\n]*https:\/\/translate\.googleapis\.com/);
-  assert.match(source, /img-src[^\n]*https:\/\/cdn\.statically\.io/);
-  assert.match(source, /media-src[^\n]*https:\/\/cdn\.statically\.io/);
+  assert.match(source, /connect-src 'self' https:\/\/api\.github\.com https:\/\/raw\.githubusercontent\.com/);
+  assert.match(source, /img-src 'self' data: blob: https:\/\/raw\.githubusercontent\.com/);
+  assert.match(source, /media-src 'self' blob: https:\/\/raw\.githubusercontent\.com/);
+  assert.doesNotMatch(source, /translate\.googleapis|statically\.io|jsdelivr|weserv|web3forms|umami/);
   assert.doesNotMatch(source, /bq_fresh=1/);
 });
 

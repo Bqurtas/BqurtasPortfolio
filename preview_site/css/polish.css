@@ -3613,3 +3613,7 @@ html body:has(#cookieCard.is-shown):not(.menu-open):not(.menu-closing) #toTop.is
   pointer-events: auto !important;
   bottom: min(calc(var(--bq-dock-top, 92px) + var(--bq-cookie-height, 210px) + 36px), calc(100svh - 74px)) !important;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+}

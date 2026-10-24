@@ -587,9 +587,9 @@ export async function onRequest(context) {
     "script-src 'nonce-" + nonce + "' 'strict-dynamic' 'self'",
     "style-src 'nonce-" + nonce + "' 'self'",
     "font-src 'self' data:",
-    "img-src 'self' data: blob: https://cdn.jsdelivr.net https://cdn.statically.io https://raw.githubusercontent.com https://images.weserv.nl",
-    "media-src 'self' blob: https://cdn.jsdelivr.net https://cdn.statically.io https://raw.githubusercontent.com",
-    "connect-src 'self' https://cloud.umami.is https://api.umami.is https://gateway.umami.is https://api.github.com https://api.web3forms.com https://translate.googleapis.com https://cdn.jsdelivr.net https://data.jsdelivr.com https://images.weserv.nl https://raw.githubusercontent.com",
+    "img-src 'self' data: blob: https://raw.githubusercontent.com",
+    "media-src 'self' blob: https://raw.githubusercontent.com",
+    "connect-src 'self' https://api.github.com https://raw.githubusercontent.com",
     "frame-src 'self'",
     "worker-src 'self' blob:"
   ].join('; ');

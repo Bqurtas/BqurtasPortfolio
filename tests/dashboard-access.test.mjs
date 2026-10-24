@@ -175,20 +175,39 @@ test('closing during the status check prevents a late response reopening privile
   assert.equal(f.calls[0].options.signal.aborted, true);
 });
 
-test('double submission does not send duplicate verification emails', async () => {
+test('double submission makes one authenticator preparation request without obsolete delivery choices', async () => {
   let finish;
   const f = fixture({ fetcher:(url, options) => options.method === 'GET'
     ? response({ ok:true, configured:true, authenticated:false })
     : new Promise(resolve => { finish = resolve; }) });
   await f.open();
+  assert.equal(f.nodes['#dash2faChoice'].hidden, true);
+  assert.equal(f.nodes['#dash2faChoice'].innerHTML, '');
   const first = f.submitLogin('access-password');
   const second = f.submitLogin('access-password');
   assert.equal(f.calls.length, 2, 'one GET status and exactly one POST');
   assert.equal(f.submit.disabled, true);
-  finish(response({ ok:true, id:'challenge', via:'email' }));
+  assert.match(f.nodes['#dashHint'].textContent, /Checking access/);
+  assert.equal('recipient' in JSON.parse(f.calls[1].options.body), false);
+  finish(response({ ok:true, id:'totp', via:'totp' }));
   await Promise.all([first, second]);
   assert.equal(f.submit.disabled, false);
   assert.equal(f.nodes['#dashKey'].autocomplete, 'one-time-code');
+  assert.match(f.note.textContent, /authenticator app/);
+  assert.doesNotMatch(f.note.textContent, /email|inbox|phone/);
+  assert.equal(f.nodes['#dash2faChoice'].hidden, true);
+});
+
+test('authenticator guidance remains localized without inbox controls', async () => {
+  for (const [lang, expected] of [['ckb', /ئۆتێنتیکەیتەر/], ['ar', /تطبيق المصادقة/], ['ku', /sepana erêkirinê/], ['fr', /application d’authentification/]]) {
+    const f = fixture({ lang, fetcher:(url, options) => response(options.method === 'GET'
+      ? { ok:true, configured:true, authenticated:false } : { ok:true, id:'totp', via:'totp' }) });
+    await f.open();
+    await f.submitLogin('owner-password');
+    assert.match(f.note.textContent, expected);
+    assert.equal(f.nodes['#dash2faChoice'].hidden, true);
+    assert.equal(f.nodes['#dash2faChoice'].innerHTML, '');
+  }
 });
 
 test('Kurdish and Arabic verification digits are normalized while PINs stay exact', async () => {

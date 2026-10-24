@@ -3,13 +3,13 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const REPO = 'Bqurtas/BqurtasPortfolio';
-const CDN = `https://cdn.jsdelivr.net/gh/${REPO}@main`;
 const RAW = `https://raw.githubusercontent.com/${REPO}/main`;
 const API = `https://api.github.com/repos/${REPO}`;
 
-test('the live gallery keeps the canonical GitHub path', async () => {
+test('the live gallery uses first-party media with only the canonical GitHub fallback', async () => {
   const gallery = await readFile(new URL('../preview_site/js/gallery.js', import.meta.url), 'utf8');
-  assert.match(gallery, new RegExp(`CDN_BASE:\\s*'${CDN.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`));
+  assert.match(gallery, /MEDIA_BASE:\s*'\/media'/);
+  assert.doesNotMatch(gallery, /jsdelivr|weserv/);
   assert.match(gallery, new RegExp(`RAW_BASE:\\s*'${RAW.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`));
   assert.match(gallery, new RegExp(`REPO:\\s*'${REPO}'`));
   assert.match(gallery, /BRANCH:\s*'main'/);
@@ -24,8 +24,8 @@ test('the media endpoint, sitemap and README keep the same GitHub route', async 
   assert.doesNotMatch(sitemap, /githubusercontent\.com|cdn\.jsdelivr\.net/);
   assert.match(sitemap, /<image:loc>https:\/\/bqurtas\.com\/media\//);
   const media = await readFile(new URL('../functions/media/[[path]].js', import.meta.url), 'utf8');
-  assert.ok(media.includes(`'${CDN}/'`), 'media endpoint must read from the canonical jsDelivr route');
-  assert.ok(media.includes(`'${RAW}/'`), 'media endpoint must fall back to the canonical raw route');
+  assert.doesNotMatch(media, /jsdelivr|weserv/);
+  assert.ok(media.includes(`'${RAW}/'`), 'media endpoint must read only from the canonical GitHub route');
 
   const readme = await readFile(new URL('../README.md', import.meta.url), 'utf8');
   assert.match(readme, /github\.com\/Bqurtas\/BqurtasPortfolio/);
