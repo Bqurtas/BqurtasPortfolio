@@ -10,7 +10,8 @@ import {
   fingerprintQuotedAssets,
   fingerprintVersionedLocalAssets,
   serviceWorkerVersion,
-  stripStaticBlogPosts
+  stripStaticBlogPosts,
+  stripUnverifiedStaticDates
 } from '../scripts/build-assets.mjs';
 import {
   DEFAULT_HOST,
@@ -57,6 +58,10 @@ test('fingerprinting and static-sitemap cleanup are deterministic', async () => 
     assert.doesNotMatch(stripped, /\/blog\/000/);
     assert.match(stripped, /\/design/);
     assert.equal(stripStaticBlogPosts(stripped), stripped);
+    const withoutDates = stripUnverifiedStaticDates('<urlset>\n  <url><loc>https://bqurtas.com/</loc>\n    <lastmod>2026-08-31</lastmod>\n  </url>\n</urlset>');
+    assert.doesNotMatch(withoutDates, /lastmod/);
+    assert.match(withoutDates, /https:\/\/bqurtas\.com\//);
+    assert.equal(stripUnverifiedStaticDates(withoutDates), withoutDates);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

@@ -18,13 +18,22 @@ gallery manifest. Generated HTML is committed with the other build outputs.
 The generator is deterministic, writes only changed files, and removes only
 its own obsolete HTML pages when a collection shrinks.
 
-The current manifest produces 38 archive pages covering 685 images and 30
-videos. Discovery files:
+As of 24 October 2026, the manifest produces 38 archive pages covering 686 image
+records and 30 videos. Of those image records, 633 have their own canonical work
+page; 53 byte-identical aliases redirect to their canonical work and are not
+submitted as separate works. Counts change when the owner publishes or removes
+media. Discovery files:
 
 - `/sitemap-gallery.xml`: the canonical archive URLs (written by the archive
   generator).
-- `/sitemap-images.xml`: every work page with its image or video, written by
+- `/sitemap-images.xml`: every canonical work page with its image or video, written by
   `scripts/generate-image-sitemap.mjs`. The archive generator does not touch it.
+
+Studio gallery uploads update the manifest and original/thumbnail files in one
+GitHub commit. The Cloudflare Pages production build regenerates the archive and
+image sitemap from that manifest. Journal posts are stored in D1 and enter
+`/sitemap.xml` at request time when published; no Pages rebuild is required for
+text-only Journal changes.
 
 `robots.txt` advertises both alongside the page sitemap. The Cloudflare
 function passes only the generated archive routes
@@ -33,7 +42,13 @@ paths are real 404s rather than the SPA shell, and slashless or `index.html`
 aliases redirect to the canonical trailing-slash URL. The old
 `/sitemap-media.xml` alias still serves the image sitemap.
 
-Archive pages carry a strict CSP (`img-src 'self'`, no scripts) from `_headers`.
+Archive pages carry a strict CSP (`img-src 'self'`, `script-src 'self'`) from
+`_headers`. One local script adds motion, back-to-top behaviour and first-party
+analytics. Crawlable links and images remain available without JavaScript.
+
+These files provide discovery paths, not a guarantee of Google indexing. A
+successful sitemap submission, a requested crawl and an indexed work are
+different states; Search Console must be used to check the latter.
 
 Google documentation informing this implementation:
 

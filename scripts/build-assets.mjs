@@ -109,6 +109,13 @@ export function stripStaticBlogPosts(sitemap) {
   );
 }
 
+export function stripUnverifiedStaticDates(sitemap) {
+  /* Room pages have no trusted per-page modification history. An old fixed
+     date (or today's build clock) misstates their content freshness. Keep
+     lastmod only in dynamic/generated sitemaps with a real content date. */
+  return sitemap.replace(/^[ \t]*<lastmod>[^<]*<\/lastmod>[ \t]*\r?\n/gm, '');
+}
+
 async function compileJavaScript() {
   for (const [input, output] of jsBundles) {
     let source = await readFile(path.join(siteRoot, input), 'utf8');
@@ -199,9 +206,9 @@ export async function buildAssets() {
 
   const sitemapPath = path.join(siteRoot, 'sitemap.xml');
   const sitemap = await readFile(sitemapPath, 'utf8');
-  const staticPagesOnly = stripStaticBlogPosts(sitemap);
+  const staticPagesOnly = stripUnverifiedStaticDates(stripStaticBlogPosts(sitemap));
   if (await writeIfChanged(sitemapPath, staticPagesOnly)) {
-    console.log('sitemap.xml -> removed database-owned blog URLs');
+    console.log('sitemap.xml -> static pages without unverified modification dates');
   }
 
   return { serviceWorkerVersion: stamp };

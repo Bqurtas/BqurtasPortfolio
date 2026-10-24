@@ -383,6 +383,9 @@ test('every distinct gallery image and film appears exactly once, under its own 
   assert.doesNotMatch(xml, /githubusercontent|jsdelivr/);
 
   const urls = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((m) => m[1]);
+  const homepage = urls.find(block => /<loc>https:\/\/bqurtas\.com<\/loc>/.test(block));
+  assert.ok(homepage);
+  assert.doesNotMatch(homepage, /<lastmod>/, 'the homepage has no verified modification date');
   const locs = [];
   const mediaByPage = new Map();
   for (const block of urls) {

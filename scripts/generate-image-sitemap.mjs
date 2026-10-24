@@ -8,7 +8,7 @@
    Function uses: one <url> per work page with its image, or for a film a
    <video:video> block.
 
-   Output is deterministic (manifest order, fixed static lastmod, film dates
+   Output is deterministic (manifest order, verified film dates
    from the manifest), so CI rebuilding it never produces a diff. */
 
 import { readFile, writeFile } from 'node:fs/promises';
@@ -20,10 +20,6 @@ import {
 
 const projectRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const siteRoot = path.join(projectRoot, 'preview_site');
-
-/* The last time the static rooms' artwork changed. A fixed value: deriving
-   it from the build clock would rewrite the file on every build. */
-export const STATIC_LASTMOD = '2026-08-21';
 
 /* The homepage lists only the photographs its shell really renders, at the
    exact URL it renders them (the portrait carries a ?v= fingerprint). Google
@@ -67,7 +63,6 @@ export function buildImageSitemap(manifest, html = '') {
     blocks.push([
       '  <url>',
       `    <loc>${xmlEscape(SITE)}</loc>`,
-      `    <lastmod>${STATIC_LASTMOD}</lastmod>`,
       ...home.map(imageBlock),
       '  </url>'
     ].join('\n'));

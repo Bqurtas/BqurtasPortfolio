@@ -41,6 +41,23 @@ export async function getPublishedPost(DB, id) {
   const row = await DB.prepare('SELECT * FROM cms_posts WHERE id=? AND published=1').bind(Number(id)).first();
   return row ? shape(row) : null;
 }
+function contentTimestamp(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2}))?$/.test(value)) return '';
+  const day = value.slice(0, 10);
+  const midnight = Date.parse(day + 'T00:00:00Z');
+  const time = Date.parse(value);
+  if (!Number.isFinite(midnight) || new Date(midnight).toISOString().slice(0, 10) !== day
+      || !Number.isFinite(time) || time > Date.now()) return '';
+  return new Date(time).toISOString();
+}
+/* Both search surfaces use the same real content dates. Missing, invalid or
+   future legacy values are omitted, never replaced with a made-up date. */
+export function cmsContentDates(post) {
+  const published = contentTimestamp(post?.created_at);
+  const updated = contentTimestamp(post?.updated_at);
+  const modified = updated && (!published || updated >= published) ? updated : published;
+  return { ...(published ? { datePublished: published } : {}), ...(modified ? { dateModified: modified } : {}) };
+}
 export function validCmsId(value) {
   return (typeof value === 'number' || (typeof value === 'string' && /^[0-9]+$/.test(value)))
     && Number.isSafeInteger(Number(value)) && Number(value) > 0;
@@ -130,10 +147,12 @@ export async function handleCmsAdmin(service, body, env) {
   let input = body.post || body.project || body.item;
   if (!input || typeof input !== 'object' || Array.isArray(input)
       || (input.id != null && !validCmsId(input.id))) return json({ ok: false, error: 'invalid-content' }, 400);
+  let previous;
   if (input.id != null) {
     const row = await env.DB.prepare(`SELECT * FROM ${table} WHERE id=?`).bind(Number(input.id)).first();
     if (!row) return json({ ok: false, error: 'content-not-found' }, 404);
-    input = { ...shape(row), ...input, pos: input.pos ?? row.pos };
+    previous = shape(row);
+    input = { ...previous, ...input, pos: input.pos ?? row.pos };
   }
   let payload;
   try { payload = normalize(input, service, body.i18n); } catch (error) {
@@ -146,6 +165,13 @@ export async function handleCmsAdmin(service, body, env) {
   const flag = service === 'latest-admin' ? 'active' : 'published';
   const pos = Number.isFinite(Number(input.pos)) ? Number(input.pos) : 0;
   const date = new Date().toISOString();
+  /* Record publication/content changes at the server. A list, reorder, or
+     no-op save must not advertise a fresh article to search engines. Client
+     supplied timestamps never pass normalize(). */
+  let previousPayload;
+  try { if (previous) previousPayload = normalize(previous, service); } catch {}
+  if (!previous || JSON.stringify(payload) !== JSON.stringify(previousPayload)) payload.updated_at = date;
+  else if (contentTimestamp(previous.updated_at)) payload.updated_at = previous.updated_at;
   if (input.id != null) {
     await env.DB.prepare(`UPDATE ${table} SET payload=?,${flag}=?,pos=? WHERE id=?`).bind(JSON.stringify(payload), payload[flag] ? 1 : 0, pos, Number(input.id)).run();
     return json({ ok: true, id: Number(input.id) });

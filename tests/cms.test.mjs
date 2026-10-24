@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
-import { ensureCms, getPublishedPost, handleCmsAdmin, validCmsId } from '../functions/api/_cms.js';
+import { ensureCms, getPublishedPost, handleCmsAdmin, validCmsId, cmsContentDates } from '../functions/api/_cms.js';
+import { onRequest as siteRoute } from '../functions/[[route]].js';
 import { onRequestGet as journal } from '../functions/api/journal.js';
 import { onRequestGet as projects } from '../functions/api/projects.js';
 import { onRequestGet as latest } from '../functions/api/latest.js';
@@ -89,6 +90,63 @@ test('imported article IDs remain reserved after deletion and partial edits keep
   await handleCmsAdmin('blog-admin', { action: 'delete', id: 27 }, env);
   assert.equal(await getPublishedPost(env.DB, 27), null);
   assert.equal(await save(env, { title: 'Next note', published: true }), 28);
+});
+
+test('server content dates advance for actual edits while reads, ordering and unchanged saves preserve them', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-22T10:00:00Z') });
+  const env = database(t);
+  const id = await save(env, { title: 'A note', body: 'Original', published: true,
+    created_at: '1990-01-01', updated_at: '2099-01-01' });
+  const original = await getPublishedPost(env.DB, id);
+  assert.equal(original.created_at, '2026-10-22T10:00:00.000Z');
+  assert.equal(original.updated_at, original.created_at);
+  t.mock.timers.tick(60000);
+  await save(env, { id, pos: 8, updated_at: '2099-01-01', created_at: '1990-01-01' });
+  await handleCmsAdmin('blog-admin', { action: 'reorder', ids: [id] }, env);
+  await handleCmsAdmin('blog-admin', { action: 'list' }, env);
+  await get(journal, env);
+  assert.equal((await getPublishedPost(env.DB, id)).updated_at, original.updated_at);
+  t.mock.timers.tick(60000);
+  await save(env, { id, body: 'A meaningfully updated note', updated_at: '1990-01-01' });
+  const changed = await getPublishedPost(env.DB, id);
+  assert.equal(changed.created_at, original.created_at);
+  assert.equal(changed.updated_at, '2026-10-22T10:02:00.000Z');
+});
+
+test('sitemap and article metadata agree on verified publication and modification dates', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-22T10:00:00Z') });
+  const env = database(t);
+  const id = await save(env, { title: 'Changed article', published: true });
+  t.mock.timers.tick(86400000);
+  await save(env, { id, body: 'New content' });
+  env.ASSETS = { fetch: async () => new Response('<urlset></urlset>') };
+  const sitemap = await siteRoute({ env, request: new Request(ORIGIN + '/sitemap.xml'), next: () => new Response('missing') });
+  const xml = await sitemap.text();
+  assert.equal((xml.match(/<lastmod>2026-10-23T10:00:00\.000Z<\/lastmod>/g) || []).length, 7);
+  assert.doesNotMatch(xml, /<lastmod>2026-10-22/);
+
+  let appended = '';
+  const originalRewriter = globalThis.HTMLRewriter;
+  globalThis.HTMLRewriter = class {
+    on(selector, handler) {
+      if (selector === 'head') handler.element({ append(value) { appended += value; } });
+      return this;
+    }
+    transform(response) { return response; }
+  };
+  t.after(() => { if (originalRewriter === undefined) delete globalThis.HTMLRewriter; else globalThis.HTMLRewriter = originalRewriter; });
+  assert.equal((await siteRoute({ env, request: new Request(ORIGIN + '/blog/' + id), next: () => new Response('missing') })).status, 200);
+  const article = JSON.parse(appended.match(/<script[^>]*>(.*?)<\/script>/s)[1]);
+  assert.equal(article.datePublished, '2026-10-22T10:00:00.000Z');
+  assert.equal(article.dateModified, '2026-10-23T10:00:00.000Z');
+
+  const fallback = cmsContentDates({ created_at: '2026-01-27', updated_at: '2025-01-01' });
+  assert.equal(fallback.dateModified, '2026-01-27T00:00:00.000Z');
+  for (const bad of ['not a date', '2026-02-31', '2099-01-01', '']) {
+    assert.deepEqual(cmsContentDates({ created_at: bad, updated_at: bad }), {}, bad);
+  }
+  assert.deepEqual(cmsContentDates({ created_at: '2026-01-27', updated_at: 'invalid' }),
+    { datePublished: '2026-01-27T00:00:00.000Z', dateModified: '2026-01-27T00:00:00.000Z' });
 });
 
 test('named palettes, allowed translations and literal SQL-looking text round-trip safely', async t => {

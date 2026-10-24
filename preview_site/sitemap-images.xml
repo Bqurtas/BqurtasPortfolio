@@ -4,7 +4,6 @@
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
     <loc>https://bqurtas.com</loc>
-    <lastmod>2026-08-21</lastmod>
     <image:image>
       <image:loc>https://bqurtas.com/assets/avatar.webp</image:loc>
     </image:image>

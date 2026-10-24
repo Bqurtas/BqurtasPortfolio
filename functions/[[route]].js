@@ -15,7 +15,7 @@
 import { MEDIA_ARCHIVE_ROUTES } from './_media-archive-routes.js';
 import { parseWorkPath, serveWorkPage } from './_work-page.js';
 import { untransformedDocument } from './_untransformed.js';
-import { listPublishedPosts, getPublishedPost } from './api/_cms.js';
+import { listPublishedPosts, getPublishedPost, cmsContentDates } from './api/_cms.js';
 
 const SITE = 'https://bqurtas.com';
 const LANGS = ['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];                 // en = no prefix
@@ -233,17 +233,13 @@ function blogPostSitemapBlocks(posts) {
     const id = String(p && p.id != null ? p.id : '').trim();
     if (!/^[1-9]\d{0,17}$/.test(id) || seen.has(id)) return '';
     seen.add(id);
-    /* This table has no updated_at column. Asking for one made PostgREST
-     reject the whole query, the error was swallowed, and every blog post fell
-     out of the sitemap. */
-    const rawDate = String(p.created_at || '').slice(0, 10);
-    const lastmod = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : '2026-07-01';
+    const lastmod = cmsContentDates(p).dateModified;
     return langs.map((lang) => {
       const loc = localizedUrl(lang, { key: 'blogpost', slug: id });
       return [
         '  <url>',
         '    <loc>' + xmlEsc(loc) + '</loc>',
-        '    <lastmod>' + xmlEsc(lastmod) + '</lastmod>',
+        ...(lastmod ? ['    <lastmod>' + xmlEsc(lastmod) + '</lastmod>'] : []),
         '    <changefreq>monthly</changefreq>',
         '    <priority>0.7</priority>',
         altLinks(id),
@@ -555,6 +551,7 @@ export async function onRequest(context) {
         headline: headline,
         description: meta.d,
         image: img,
+        ...cmsContentDates(post),
         inLanguage: BCP47[r.lang] || 'en',
         url: r.canon,
         mainEntityOfPage: { '@type': 'WebPage', '@id': r.canon },
