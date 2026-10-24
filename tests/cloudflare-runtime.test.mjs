@@ -61,7 +61,7 @@ test('private AI and translation use only the Cloudflare binding even with retir
   assert.equal(calls[0].input.messages[1].content, 'A careful practice.');
   assert.equal((await assistant({ env, request: request('/api/assistant', { messages: [{ role: 'user', content: 'A short reply' }] }) })).status, 200);
   assert.equal(calls.length, 2);
-  assert.ok(calls.every(call => call.model.startsWith('@cf/')));
+  assert.ok(calls.every(call => call.model === '@cf/meta/llama-3.1-8b-instruct-fp8'));
 });
 
 test('translation requires both owner credentials, validates bounded text, and fails closed without AI', async (t) => {

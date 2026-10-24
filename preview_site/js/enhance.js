@@ -1311,17 +1311,25 @@
       const total = Object.values(colls).reduce((a, c) => a + (c.count || 0), 0);
       const cats = Object.keys(colls).length;
       const admins = getAdmins().length + 1;          // +1 = you, the owner
-      const blogs = window.__bqBlogCount || 0;
       view.innerHTML = `
         <div class="dash-cards">
           <div class="dash-card"><span class="dash-card-n">${total}</span><span class="mono">${DT('oTotal')}</span></div>
-          <div class="dash-card"><span class="dash-card-n">${blogs}</span><span class="mono">${DT('oBlogs')}</span></div>
+          <div class="dash-card"><span class="dash-card-n" id="dashOverviewBlogs" aria-live="polite">—</span><span class="mono">${DT('oBlogs')}</span></div>
           <div class="dash-card"><span class="dash-card-n">${inboxTotal === null ? '—' : inboxTotal}</span><span class="mono">${DT('oLeads')}</span></div>
           <div class="dash-card"><span class="dash-card-n">${cats}</span><span class="mono">${DT('oColl')}</span></div>
           <div class="dash-card"><span class="dash-card-n">${admins}</span><span class="mono">${DT('oAdmins')}</span></div>
           <div class="dash-card"><span class="dash-card-n">7</span><span class="mono">${DT('oLangs')}</span></div>
         </div>
         <p class="dash-note mono">${DT('oWelcome')}</p>`;
+      // The public Journal cache can be uninitialized or omit drafts. Read the
+      // same Cloudflare list as Content; unknown is never presented as zero.
+      const blogCount = $('#dashOverviewBlogs');
+      if (editToken()) {
+        cmsApi({ action:'list' }).then(result => {
+          if ($('#dashOverviewBlogs') !== blogCount || !result?.ok || !Array.isArray(result.posts)) return;
+          blogCount.textContent = String(result.posts.length);
+        }).catch(() => {});
+      }
     };
     const wkApi = (payload) => studioCall('work-upload', payload);
     const WK_I18N = {
@@ -2052,14 +2060,67 @@
 
     /* ---- AI assistant (private; proxied via /api/assistant) ---- */
     const AT_I18N = {
-      en: { gate:'Connect the assistant', note:'Enter your EDIT_TOKEN (same as the content editor).', tokPh:'Edit token', conn:'Connect', ph:'Ask about clients, pricing, briefs, ideas…', send:'Send', intro:'Hello Barakat — I can help with client replies, quotes, briefs, ideas, captions and translation. Ask in any language.', clear:'Clear', thinking:'Thinking…', errKey:'Enable Workers AI in Cloudflare (free) to turn this on.', err:'Assistant works on the live site only.' },
-      ku: { gate:'بەستنەوەی یاریدەدەر', note:'EDIT_TOKENـەکەت بنووسە (هەمان تۆکنی ناوەڕۆک).', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', ph:'دەربارەی کڕیار، نرخ، پلان، بیرۆکە بپرسە…', send:'ناردن', intro:'سڵاو بەرەکات — دەتوانم یارمەتیت بدەم لە وەڵامی کڕیار، نرخ، پلانی پڕۆژە، بیرۆکە، کاپشن و وەرگێڕان. بە هەر زمانێک بپرسە.', clear:'پاککردنەوە', thinking:'بیردەکاتەوە…', errKey:'Workers AI لە Cloudflare چالاک بکە (بەخۆڕایی) بۆ کارکردنی.', err:'یاریدەدەر تەنها لەسەر سایتە زیندووەکە کاردەکات.' },
-      ar: { gate:'ربط المساعد', note:'أدخل EDIT_TOKEN (نفس رمز محرر المحتوى).', tokPh:'رمز التحرير', conn:'اتصال', ph:'اسأل عن العملاء، التسعير، الخطط، الأفكار…', send:'إرسال', intro:'مرحباً بركات — أساعدك في ردود العملاء، عروض الأسعار، الخطط، الأفكار، التعليقات والترجمة. اسأل بأي لغة.', clear:'مسح', thinking:'يفكر…', errKey:'فعّل Workers AI في Cloudflare (مجاناً) لتشغيله.', err:'المساعد يعمل على الموقع المباشر فقط.' },
-      kmr: { gate:'Alîkar girêde', note:'EDIT_TOKEN ya xwe binivîse (heman tokena edîtorê).', tokPh:'Tokena guhertinê', conn:'Girêde', ph:'Li ser kirîar, biha, plan, fikiran bipirse…', send:'Bişîne', intro:'Slav Barakat — ez dikarim di bersivên kirîaran, bihayan, planan, fikiran, sernivîs û wergerê de alîkar bim. Bi her zimanî bipirse.', clear:'Paqij bike', thinking:'Difikire…', errKey:'Workers AI li Cloudflare çalak bike (belaş) ji bo vê.', err:'Alîkar tenê li ser malpera zindî dixebite.' },
-      fr: { gate:"Connecter l'assistant", note:'Saisissez votre EDIT_TOKEN (le même que l’éditeur).', tokPh:"Jeton d'édition", conn:'Connecter', ph:'Clients, tarifs, briefs, idées…', send:'Envoyer', intro:'Bonjour Barakat — je peux aider pour les réponses clients, devis, briefs, idées, légendes et traduction. Demandez dans n’importe quelle langue.', clear:'Effacer', thinking:'Réflexion…', errKey:'Activez Workers AI dans Cloudflare (gratuit) pour l’activer.', err:"L'assistant fonctionne sur le site en ligne uniquement." }
+      en: { gate:'Connect the assistant', note:'Enter your EDIT_TOKEN (same as the content editor).', tokPh:'Edit token', conn:'Connect', ph:'Ask about clients, pricing, briefs, ideas…', send:'Send', intro:'Hello Barakat — I can help with client replies, quotes, briefs, ideas, captions and translation. Ask in any language.', clear:'Clear', thinking:'Thinking…', errKey:'The assistant is not configured in Cloudflare yet.', err:'The assistant is temporarily unavailable. Your conversation is saved.' },
+      ku: { gate:'بەستنەوەی یاریدەدەر', note:'EDIT_TOKENـەکەت بنووسە (هەمان تۆکنی ناوەڕۆک).', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', ph:'دەربارەی کڕیار، نرخ، پلان، بیرۆکە بپرسە…', send:'ناردن', intro:'سڵاو بەرەکات — دەتوانم یارمەتیت بدەم لە وەڵامی کڕیار، نرخ، پلانی پڕۆژە، بیرۆکە، کاپشن و وەرگێڕان. بە هەر زمانێک بپرسە.', clear:'پاککردنەوە', thinking:'بیردەکاتەوە…', errKey:'یاریدەدەر هێشتا لە Cloudflare ڕێکنەخراوە.', err:'یاریدەدەر کاتییەن بەردەست نییە. گفتوگۆکەت پارێزراوە.' },
+      ar: { gate:'ربط المساعد', note:'أدخل EDIT_TOKEN (نفس رمز محرر المحتوى).', tokPh:'رمز التحرير', conn:'اتصال', ph:'اسأل عن العملاء، التسعير، الخطط، الأفكار…', send:'إرسال', intro:'مرحباً بركات — أساعدك في ردود العملاء، عروض الأسعار، الخطط، الأفكار، التعليقات والترجمة. اسأل بأي لغة.', clear:'مسح', thinking:'يفكر…', errKey:'المساعد غير مهيأ في Cloudflare بعد.', err:'المساعد غير متاح مؤقتاً. محادثتك محفوظة.' },
+      kmr: { gate:'Alîkar girêde', note:'EDIT_TOKEN ya xwe binivîse (heman tokena edîtorê).', tokPh:'Tokena guhertinê', conn:'Girêde', ph:'Li ser kirîar, biha, plan, fikiran bipirse…', send:'Bişîne', intro:'Slav Barakat — ez dikarim di bersivên kirîaran, bihayan, planan, fikiran, sernivîs û wergerê de alîkar bim. Bi her zimanî bipirse.', clear:'Paqij bike', thinking:'Difikire…', errKey:'Alîkar hêj li Cloudflare nehatiye mîhengkirin.', err:'Alîkar demkî ne berdest e. Axaftina te hatiye parastin.' },
+      fr: { gate:"Connecter l'assistant", note:'Saisissez votre EDIT_TOKEN (le même que l’éditeur).', tokPh:"Jeton d'édition", conn:'Connecter', ph:'Clients, tarifs, briefs, idées…', send:'Envoyer', intro:'Bonjour Barakat — je peux aider pour les réponses clients, devis, briefs, idées, légendes et traduction. Demandez dans n’importe quelle langue.', clear:'Effacer', thinking:'Réflexion…', errKey:'L’assistant n’est pas encore configuré dans Cloudflare.', err:'L’assistant est temporairement indisponible. Votre conversation est conservée.' }
     };
+    const AT_ERRORS = {
+      en:{ network:'The connection to the assistant failed. Your conversation is saved.', timeout:'The assistant took too long to respond. Your conversation is saved; please try again.', invalid:'The assistant returned an unreadable response. Please try again.', upstream:'Cloudflare AI could not answer this request. Please try again shortly.', limit:'Please keep each message within 4,000 characters.', rate:'Too many requests. Wait a few minutes before trying again.', editor:'Reconnect with your editor password to use the assistant.' },
+      ku:{ network:'پەیوەندی بە یاریدەدەر پچڕا. گفتوگۆکەت پارێزراوە.', timeout:'کاتی چاوەڕوانی وەڵام تەواو بوو. گفتوگۆکەت پارێزراوە؛ دووبارە هەوڵ بدەوە.', invalid:'وەڵامی یاریدەدەر نەخوێندرایەوە. دووبارە هەوڵ بدەوە.', upstream:'Cloudflare AI نەیتوانی وەڵامی ئەم داواکارییە بداتەوە. کەمێک دواتر هەوڵ بدەوە.', limit:'تکایە هەر پەیامێک لە ٤٬٠٠٠ پیت زیاتر نەبێت.', rate:'داواکارییەکان زۆرن. چەند خولەکێک چاوەڕێ بکە و دووبارە هەوڵ بدەوە.', editor:'بۆ بەکارهێنانی یاریدەدەر، بە پاسۆردی ئەدیتەر دووبارە پەیوەست ببە.' },
+      ar:{ network:'انقطع الاتصال بالمساعد. محادثتك محفوظة.', timeout:'استغرق المساعد وقتاً طويلاً. محادثتك محفوظة؛ حاول مجدداً.', invalid:'تعذّرت قراءة رد المساعد. حاول مجدداً.', upstream:'تعذّر على Cloudflare AI الإجابة. حاول بعد قليل.', limit:'اجعل كل رسالة ضمن 4,000 حرف.', rate:'طلبات كثيرة. انتظر بضع دقائق ثم حاول مجدداً.', editor:'أعد الاتصال بكلمة مرور المحرر لاستخدام المساعد.' },
+      kmr:{ network:'Girêdana alîkar qut bû. Axaftina te parastî ye.', timeout:'Bersiva alîkar pir dirêj kir. Axaftin parastî ye; dîsa biceribîne.', invalid:'Bersiva alîkar nehat xwendin. Dîsa biceribîne.', upstream:'Cloudflare AI nikarî bersiv bide. Piştî demeke kurt dîsa biceribîne.', limit:'Her peyam di nav 4,000 tîpan de bihêle.', rate:'Daxwaz pir in. Çend deqeyan bisekine û dîsa biceribîne.', editor:'Bi şîfreya edîtorê dîsa girêde.' },
+      fr:{ network:'La connexion à l’assistant a échoué. Votre conversation est conservée.', timeout:'L’assistant a mis trop de temps à répondre. Votre conversation est conservée ; réessayez.', invalid:'La réponse de l’assistant est illisible. Réessayez.', upstream:'Cloudflare AI n’a pas pu répondre. Réessayez dans un instant.', limit:'Limitez chaque message à 4 000 caractères.', rate:'Trop de requêtes. Patientez quelques minutes avant de réessayer.', editor:'Reconnectez-vous avec votre mot de passe d’édition.' }
+    };
+    // The display keeps 40 messages; the API receives only the newest context
+    // within its message, character and UTF-8 body limits. Never discard the
+    // saved conversation merely because an upstream request failed.
+    const assistantContext = history => {
+      const messages = [];
+      let total = 0;
+      for (let i = history.length - 1; i >= 0 && messages.length < 20; i--) {
+        const message = history[i];
+        if (!message || !['user', 'assistant'].includes(message.role) || typeof message.content !== 'string') continue;
+        const content = message.content.trim().slice(0, 4000);
+        if (!content) continue;
+        if (total + content.length > 20000) break;
+        const next = [{ role:message.role, content }, ...messages];
+        if (new TextEncoder().encode(JSON.stringify({ messages:next })).length > 24 * 1024) break;
+        messages.unshift({ role:message.role, content });
+        total += content.length;
+      }
+      return messages;
+    };
+    const assistantCall = async (token, messages) => {
+      try {
+        const response = await fetch('/api/assistant', {
+          method:'POST', credentials:'same-origin', cache:'no-store',
+          headers:{ 'Content-Type':'application/json', Accept:'application/json', 'x-edit-token':token },
+          body:JSON.stringify({ messages }), signal:AbortSignal.timeout(35000)
+        });
+        const parsed = await response.json().catch(error => {
+          if (error && ['AbortError', 'TimeoutError'].includes(error.name)) throw error;
+          return null;
+        });
+        const data = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+        if (data.error === 'session-required' || (response.status === 401 && data.error !== 'unauthorized')) return { error:'session' };
+        if (data.error === 'unauthorized') return { error:'editor' };
+        if (response.status === 429) return { error:'rate' };
+        if (['not-configured', 'no-key', 'no-ai'].includes(data.error)) return { error:'configuration' };
+        if (data.error === 'invalid-messages' || response.status === 413) return { error:'limit' };
+        if (data.error === 'ai-upstream-failed') return { error:'upstream' };
+        if (response.ok && data.ok === true && typeof data.text === 'string' && data.text.trim() && data.text.length <= 24000) return { ok:true, text:data.text.trim() };
+        // Never echo upstream error strings, HTML, or exception messages.
+        return { error:response.status >= 500 ? 'unavailable' : 'invalid' };
+      } catch (error) {
+        return { error:error && ['AbortError', 'TimeoutError'].includes(error.name) ? 'timeout' : 'network' };
+      }
+    };
+    let assistantState;
     const renderAssistant = () => {
       const t = AT_I18N[curLang()] || AT_I18N.en;
+      const errors = AT_ERRORS[curLang()] || AT_ERRORS.en;
       const token = editToken();
       if (!token) {
         view.innerHTML = `<div class="dash-gate-inline">
@@ -2069,34 +2130,59 @@
         $('#asTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#asTok').value.trim(); if (!v) return; try { sessionStorage.setItem('bq_edit_token', v); } catch (x) {} renderAssistant(); });
         return;
       }
-      let hist = []; try { hist = JSON.parse(localStorage.getItem('bq_assist') || '[]'); } catch (e) {}
-      const save = () => { try { localStorage.setItem('bq_assist', JSON.stringify(hist.slice(-40))); } catch (e) {} };
+      if (!assistantState) {
+        let saved = []; try { saved = JSON.parse(localStorage.getItem('bq_assist') || '[]'); } catch (e) {}
+        const history = Array.isArray(saved) ? saved.filter(m => m && ['user', 'assistant'].includes(m.role) && typeof m.content === 'string' && m.content.trim()).slice(-40).map(m => ({ role:m.role, content:m.content.slice(0, 24000) })) : [];
+        assistantState = { history, pending:false, error:'', draft:'' };
+      }
+      const state = assistantState;
+      const save = () => { state.history = state.history.slice(-40); try { localStorage.setItem('bq_assist', JSON.stringify(state.history)); } catch (e) {} };
       view.innerHTML = `
         <div class="asst">
           <div class="asst-bar"><button class="dash-btn" id="asstClear"><i class="fa-solid fa-eraser"></i> ${t.clear}</button></div>
-          <div class="asst-msgs" id="asstMsgs"></div>
-          <form class="asst-form" id="asstForm"><input id="asstInput" type="text" placeholder="${t.ph}" autocomplete="off"><button type="submit" aria-label="${t.send}"><i class="fa-solid fa-paper-plane"></i></button></form>
+          <div class="asst-msgs" id="asstMsgs" aria-live="polite"></div>
+          <form class="asst-form" id="asstForm"><input id="asstInput" type="text" maxlength="4000" placeholder="${t.ph}" aria-label="${t.ph}" autocomplete="off"><button id="asstSend" type="submit" aria-label="${t.send}"><i class="fa-solid fa-paper-plane"></i></button></form>
         </div>`;
-      const msgs = $('#asstMsgs');
+      const msgs = $('#asstMsgs'), input = $('#asstInput'), form = $('#asstForm'), send = $('#asstSend'), clear = $('#asstClear');
+      input.value = state.draft;
       const paint = () => {
+        if (!msgs.isConnected) return;
+        const errorText = state.error === 'configuration' ? t.errKey : (errors[state.error] || t.err);
         msgs.innerHTML = `<div class="asst-msg asst-bot">${esc(t.intro)}</div>` +
-          hist.map(m => `<div class="asst-msg asst-${m.role === 'user' ? 'me' : 'bot'}">${esc(m.content).replace(/\n/g, '<br>')}</div>`).join('');
+          state.history.map(m => `<div class="asst-msg asst-${m.role === 'user' ? 'me' : 'bot'}">${esc(m.content).replace(/\n/g, '<br>')}</div>`).join('') +
+          (state.pending ? `<div class="asst-msg asst-bot asst-typing">${esc(t.thinking)}</div>` : '') +
+          (state.error ? `<div class="asst-msg asst-bot" role="status">${esc(errorText)}</div>` : '');
+        input.readOnly = state.pending; send.disabled = state.pending; clear.disabled = state.pending;
+        form.setAttribute('aria-busy', String(state.pending));
         msgs.scrollTop = msgs.scrollHeight;
       };
+      state.paint = paint;
       paint();
-      $('#asstClear').addEventListener('click', () => { hist = []; save(); paint(); });
-      $('#asstForm').addEventListener('submit', (e) => {
+      input.addEventListener('input', () => { state.draft = input.value; });
+      clear.addEventListener('click', () => {
+        if (state.pending) return;
+        state.history = []; state.error = ''; save(); paint();
+      });
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const v = $('#asstInput').value.trim(); if (!v) return;
-        hist.push({ role: 'user', content: v }); save(); $('#asstInput').value = ''; paint();
-        const typing = document.createElement('div'); typing.className = 'asst-msg asst-bot asst-typing'; typing.textContent = t.thinking;
-        msgs.appendChild(typing); msgs.scrollTop = msgs.scrollHeight;
-        fetch('/api/assistant', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-edit-token': token }, body: JSON.stringify({ messages: hist.map(m => ({ role: m.role, content: m.content })) }) })
-          .then(r => r.json()).then(d => {
-            if (d.ok) { hist.push({ role: 'assistant', content: d.text }); save(); paint(); }
-            else if (d.error === 'unauthorized') { try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {} renderAssistant(); }
-            else { typing.classList.remove('asst-typing'); typing.textContent = (d.error === 'no-key' || d.error === 'no-ai') ? t.errKey : ('✗ ' + (d.error || '')); }
-          }).catch(() => { typing.classList.remove('asst-typing'); typing.textContent = t.err; });
+        if (state.pending) return;
+        const value = input.value.trim(); if (!value) return;
+        state.draft = input.value;
+        const messages = assistantContext([...state.history, { role:'user', content:value }]);
+        if (value.length > 4000 || !messages.length || messages[messages.length - 1].content !== value) { state.error = 'limit'; paint(); return; }
+        state.history.push({ role:'user', content:value }); save();
+        state.draft = ''; input.value = ''; state.error = ''; state.pending = true; paint();
+        const result = await assistantCall(token, messages);
+        state.pending = false;
+        if (result.ok) { state.history.push({ role:'assistant', content:result.text }); save(); }
+        else if (result.error === 'session') {
+          invalidateDashboardSession(); hint.textContent = DT('sessionExpired');
+        } else if (result.error === 'editor') {
+          try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {}
+          state.error = 'editor';
+          if ($('#asstMsgs')?.isConnected) renderAssistant();
+        } else state.error = result.error;
+        state.paint?.();
       });
     };
 
