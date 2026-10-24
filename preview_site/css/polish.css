@@ -1962,11 +1962,9 @@ html body :is(#bio, #blog, #contact).paper-stack > .section[data-paper-fit] {
   --bq-paper-content-max: 1100px;
 }
 
-/* The entire dock scales with the viewport, including its icons and text.
-   Its bottom anchor and centering stay fixed. Scroll may still set
-   nav-compact, but that class must not scale the bar: a second scale changes
-   --bq-dock-top, the paper padding follows, and the bar jumps by itself.
-   Menu-open keeps the separate transform that travels with the page. */
+/* Viewport scaling and scroll compaction share one bottom-centred transform.
+   The reserved --bq-dock-top stays full size, independent of this animation.
+   Menu-open keeps its separate transform that travels with the page. */
 html body .rail.rail,
 html[dir="rtl"] body .rail.rail,
 html body .mobilebar.mobilebar,
@@ -1975,8 +1973,9 @@ html body.nav-compact:not(.menu-open) .rail.rail,
 html[dir="rtl"] body.nav-compact:not(.menu-open) .rail.rail,
 html body.nav-compact:not(.menu-open) .mobilebar.mobilebar,
 html[dir="rtl"] body.nav-compact:not(.menu-open) .mobilebar.mobilebar {
-  transform: translateX(-50%) scale(var(--bq-viewport-scale, 1)) !important;
+  transform: translateX(-50%) scale(calc(var(--bq-viewport-scale, 1) * var(--bq-dock-shrink, 1))) !important;
   transform-origin: 50% 100% !important;
+  transition: transform .32s cubic-bezier(.22, 1, .36, 1), opacity .2s ease, visibility .2s ease !important;
 }
 
 /* Pointer and native-scroll depth belongs to leaf artwork, never the fitted
@@ -3560,25 +3559,21 @@ html body #dash#dash :is(.dash-btn > i, .cms-btn > i, .dash-login button > i) {
   color: inherit !important;
 }
 
-/* Stable navigation: one size and one reserved clearance while scrolling.
-   No scroll-state scaling can move the bar or the paper beside it. */
-@media (min-width: 1025px) {
-  html body,
-  html body.nav-compact:not(.menu-open) { --bq-dock-shrink: 1; }
-}
+/* Keep phone compositing stable throughout a swipe. Only transform animates;
+   no scroll-state blur switch or changing paper clearance is involved. */
 @media (max-width: 1024px), (hover: none), (pointer: coarse) {
-  html body,
-  html body.nav-compact:not(.menu-open) { --bq-dock-shrink: 1; }
   html body .mobilebar.mobilebar,
   html[dir="rtl"] body .mobilebar.mobilebar,
   html body.nav-compact:not(.menu-open) .mobilebar.mobilebar,
   html[dir="rtl"] body.nav-compact:not(.menu-open) .mobilebar.mobilebar {
-    transform: translateX(-50%) scale(var(--bq-viewport-scale, 1)) !important;
-    transition: opacity .2s ease, visibility .2s ease !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
     background: color-mix(in srgb, var(--bg) 96%, transparent) !important;
   }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body .rail.rail,
+  html body .mobilebar.mobilebar { transition-duration: .01ms !important; }
 }
 
 /* Client marks stay readable even if an entrance observer misses a sticky

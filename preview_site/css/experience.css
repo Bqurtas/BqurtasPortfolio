@@ -5703,22 +5703,21 @@ html:root[data-theme][data-theme][dir="rtl"] body.menu-closing .bq-page-stage {
 }
 
 /* ============================================================================
-   DOCK TOP — where the menu bar's top edge is, measured from the bottom of the
-   screen, for whatever sits just above it (the phone chat/Latest sheets and
-   the cookie card): the bar's bottom offset + its height x its current scale.
+   DOCK TOP — reserve the menu bar's expanded footprint, measured from the
+   bottom of the screen. Paper padding, popups and the cookie card must not
+   move when the painted bar shrinks during scrolling.
    - Phones place the LTR dock with --bq-dock-bottom; in Kurdish/Arabic the
      [dir="rtl"] .mobilebar rule in modern-framer.css keeps --bq-dock-inset
      (the RTL selector meant to share --bq-dock-bottom targets body[dir], but
      dir lives on <html>), as do tablets and the desktop rail.
    - 281-360px phones draw a 46px bar while --bq-dock-bar-h stays 52px.
-   - After a scroll down, nav-compact shrinks the bar (polish.css): x.86 for
-     the dock, x.9 for the desktop rail, around its bottom edge.
+   - Scroll compaction affects only the bar's transform, around its bottom edge.
    ========================================================================== */
 html body {
   --bq-dock-lift: var(--bq-dock-inset, 30px);
   --bq-dock-shown-h: var(--bq-dock-bar-h, 50px);
   --bq-dock-shrink: 1;
-  --bq-dock-top: calc(var(--bq-dock-lift) + var(--bq-dock-shown-h) * var(--bq-viewport-scale, 1) * var(--bq-dock-shrink));
+  --bq-dock-top: calc(var(--bq-dock-lift) + var(--bq-dock-shown-h) * var(--bq-viewport-scale, 1));
 }
 
 @media (min-width: 1025px) {
@@ -5726,7 +5725,7 @@ html body {
 }
 
 @media (max-width: 1024px) {
-  html body.nav-compact:not(.menu-open) { --bq-dock-shrink: .86; }
+  html body.nav-compact:not(.menu-open) { --bq-dock-shrink: .92; }
 }
 
 @media (max-width: 820px) {

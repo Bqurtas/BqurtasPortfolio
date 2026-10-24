@@ -1489,12 +1489,9 @@
           const d = await wkApi({ folder: folderIn.value, dataB64: pend, ext: 'webp' });
           if (d && d.ok) {
             try { sessionStorage.removeItem('bq_gallery_tree_v1'); } catch (e) {}
-            msg.textContent = (W.done || 'Published ✓') + ' — ' + (W.updating || 'updating gallery counts…');
+            // A GitHub commit is queued for Pages, not proof that its manifest is live.
+            msg.textContent = publicationText('queued');
             pend = null; fileIn.value = ''; prev.hidden = true;
-            const refreshed = window.__bqRefreshGalleryFromManifest ? window.__bqRefreshGalleryFromManifest() : Promise.resolve();
-            Promise.resolve(refreshed)
-              .then(() => { msg.textContent = (W.done || 'Published ✓') + ' — ' + (W.updated || 'gallery and tab counts updated.'); })
-              .catch(() => { msg.textContent = (W.done || 'Published ✓') + ' — ' + (W.propagating || 'refresh once if the new file is still propagating.'); });
           }
           else if (d && d.error === 'no_github_token') { msg.textContent = W.noToken; }
           else if (d && (d.error === 'missing_token' || d.error === 'unauthorized')) {
@@ -1811,6 +1808,71 @@
       }
     };
 
+    const PUBLICATION_I18N = {
+      en:{ queued:'Saved to GitHub ✓ — waiting for the website deployment. It is not live yet.', waiting:'The image is saved. Waiting for it to become available on the website…', ready:'Image is live ✓ — ready to publish.', retry:'Check again', failed:'Still waiting for deployment. Check again before publishing.', uploadFailed:'The image could not be uploaded.' },
+      ku:{ queued:'لە GitHub پاشەکەوت کرا ✓ — چاوەڕێی بڵاوکردنەوەی وێبسایتە. هێشتا لە پەخشی ڕاستەوخۆ نییە.', waiting:'وێنەکە پاشەکەوت کرا. چاوەڕێی بەردەستبوونی لەسەر وێبسایتەکەین…', ready:'وێنەکە لەسەر وێبسایتە ✓ — ئامادەی بڵاوکردنەوەیە.', retry:'دووبارە بپشکنە', failed:'هێشتا چاوەڕێی بڵاوکردنەوەیە. پێش بڵاوکردنەوە دووبارە بپشکنە.', uploadFailed:'نەتوانرا وێنەکە بار بکرێت.' },
+      ar:{ queued:'حُفظ على GitHub ✓ — بانتظار نشر الموقع. لم يظهر على الموقع بعد.', waiting:'حُفظت الصورة. ننتظر إتاحتها على الموقع…', ready:'الصورة متاحة ✓ — جاهزة للنشر.', retry:'تحقق مجدداً', failed:'لا يزال النشر جارياً. تحقق مجدداً قبل النشر.', uploadFailed:'تعذّر رفع الصورة.' },
+      kmr:{ queued:'Li GitHub hat tomarkirin ✓ — li benda weşandina malperê ye. Hêj ne zindî ye.', waiting:'Wêne hat tomarkirin. Li benda xuya bûna li malperê ne…', ready:'Wêne zindî ye ✓ — amade ye.', retry:'Dîsa kontrol bike', failed:'Hêj li benda weşandinê ye. Berî weşandinê dîsa kontrol bike.', uploadFailed:'Wêne nehat barkirin.' },
+      fr:{ queued:'Enregistré sur GitHub ✓ — en attente du déploiement du site. Pas encore en ligne.', waiting:'Image enregistrée. En attente de sa disponibilité sur le site…', ready:'Image en ligne ✓ — prête à publier.', retry:'Vérifier à nouveau', failed:'Déploiement toujours en attente. Vérifiez avant de publier.', uploadFailed:'Impossible de téléverser cette image.' }
+    };
+    const publicationText = key => (PUBLICATION_I18N[curLang()] || PUBLICATION_I18N.en)[key];
+    /* Uploads create a Git commit before Pages serves the file. Keep publishing
+       locked until the exact first-party WebP is available; never accept the
+       SPA's 200 HTML fallback as an image. Retry rechecks, it does not re-upload. */
+    const createStudioMediaGate = (container, saveButton) => {
+      let pending = 0;
+      const inputCounts = new Map();
+      const busy = () => pending > 0;
+      const upload = async ({ file, input, message, api, maxW = 1600, quality = 0.82, preview, ready }) => {
+        pending += 1; inputCounts.set(input, (inputCounts.get(input) || 0) + 1);
+        saveButton.disabled = true; input.disabled = true;
+        let finished = false;
+        const finish = () => {
+          if (finished) return;
+          finished = true; pending -= 1;
+          const remaining = Math.max(0, (inputCounts.get(input) || 1) - 1);
+          if (remaining) inputCounts.set(input, remaining); else inputCounts.delete(input);
+          if (container.isConnected) { input.disabled = remaining > 0; saveButton.disabled = busy(); }
+        };
+        try {
+          const dataB64 = await cmsResize(file, maxW, quality);
+          if (!container.isConnected) { finish(); return; }
+          // This generated, bounded WebP preview has no object-URL lifecycle or
+          // dependency on an unfinished deployment.
+          const result = await api({ action:'upload', filename:file.name, contentType:'image/webp', dataB64 });
+          if (!container.isConnected) { finish(); return; }
+          if (!result?.ok || !result.url) throw new Error(result?.detail || result?.error || publicationText('uploadFailed'));
+          const url = new URL(result.url, location.origin);
+          if (url.origin !== location.origin || !/^\/uploads\/[a-f0-9-]+\.webp$/.test(url.pathname) || url.search || url.hash) throw new Error(publicationText('uploadFailed'));
+          if (preview) preview('data:image/webp;base64,' + dataB64);
+          const check = async () => {
+            message.textContent = publicationText('waiting');
+            for (let attempt = 0; attempt < 12 && container.isConnected; attempt++) {
+              try {
+                const response = await fetch(url.href, { method:'HEAD', credentials:'same-origin', cache:'no-store', redirect:'error', signal:AbortSignal.timeout(8000) });
+                if (response.ok && /^image\/webp(?:;|$)/i.test(response.headers.get('content-type') || '')) {
+                  if (container.isConnected) { ready(url.href); message.textContent = publicationText('ready'); }
+                  finish(); return;
+                }
+              } catch (error) { /* A pending deployment is retried with a bounded budget. */ }
+              if (attempt < 11) await new Promise(resolve => setTimeout(resolve, 5000));
+            }
+            if (!container.isConnected) { finish(); return; }
+            message.textContent = publicationText('failed') + ' ';
+            const retry = document.createElement('button');
+            retry.type = 'button'; retry.className = 'dash-btn'; retry.textContent = publicationText('retry');
+            retry.addEventListener('click', () => { retry.disabled = true; check(); }, { once:true });
+            message.appendChild(retry);
+          };
+          check();
+        } catch (error) {
+          if (container.isConnected) message.textContent = '✗ ' + (error.message || publicationText('uploadFailed'));
+          finish();
+        }
+      };
+      return { busy, upload };
+    };
+
     const cmsApi = (payload) => studioCall('blog-admin', payload);
 
     /* ---- Auto-translate in the BROWSER ----
@@ -2002,19 +2064,18 @@
         wrap.addEventListener('click', (e) => { const b = e.target.closest('.cms-cat'); if (!b) return; hid.value = b.getAttribute('data-cat'); draw(); });
       })();
       const coverHidden = $('#cf_cover'), prev = $('#cf_prev'), upmsg = $('#cf_upmsg');
-      $('#cf_coverfile').addEventListener('change', async (ev) => {
+      const media = createStudioMediaGate($('#ctForm'), $('#ctSave'));
+      $('#cf_coverfile').addEventListener('change', (ev) => {
         const file = ev.target.files && ev.target.files[0]; if (!file) return;
         upmsg.textContent = t.uploading;
-        try {
-          const b64 = await cmsResize(file, 1600, 0.82);
-          const d = await cmsApi({ action: 'upload', filename: file.name, contentType: 'image/webp', dataB64: b64 });
-          if (d && d.ok && d.url) { coverHidden.value = d.url; prev.hidden = false; prev.querySelector('img').src = d.url; upmsg.textContent = t.uploaded; }
-          else if (d && d.error === 'unauthorized') { try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); }
-          else { upmsg.textContent = '✗ ' + ((d && d.error) || ''); }
-        } catch (err) { upmsg.textContent = '✗ ' + err; }
+        media.upload({ file, input:ev.target, message:upmsg, api:cmsApi,
+          preview:url => { prev.hidden = false; prev.querySelector('img').src = url; },
+          ready:url => { coverHidden.value = url; prev.querySelector('img').src = url; }
+        });
       });
       $('#ctForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (media.busy()) return;
         const title = $('#cf_title').value.trim();
         const msg = $('#ctMsg');
         if (!title) { msg.textContent = t.needTitle; return; }
@@ -2211,15 +2272,14 @@
         </div>
         <div class="dash-latest-list" id="laList"><p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i></p></div>`;
       const msg = $('#laMsg'), upmsg = $('#laUp'), prev = $('#laPrev');
-      $('#laImageFile').addEventListener('change', async (ev) => {
+      const media = createStudioMediaGate($('#laAdd').closest('.dash-latest-form'), $('#laAdd'));
+      $('#laImageFile').addEventListener('change', (ev) => {
         const file = ev.target.files && ev.target.files[0]; if (!file) return;
         upmsg.textContent = LAT('uploading');
-        try {
-          const b64 = await cmsResize(file, 1200, 0.82);
-          const d = await cmsApi({ action: 'upload', filename: file.name, contentType: 'image/webp', dataB64: b64 });
-          if (d && d.ok && d.url) { $('#laImage').value = d.url; prev.hidden = false; prev.querySelector('img').src = d.url; upmsg.textContent = LAT('uploaded'); }
-          else { upmsg.textContent = (d && (d.error === 'missing_token' || d.error === 'unauthorized')) ? LAT('connect') : '✗ ' + ((d && d.error) || ''); }
-        } catch (err) { upmsg.textContent = '✗ ' + err; }
+        media.upload({ file, input:ev.target, message:upmsg, api:cmsApi, maxW:1200,
+          preview:url => { prev.hidden = false; prev.querySelector('img').src = url; },
+          ready:url => { $('#laImage').value = url; prev.querySelector('img').src = url; }
+        });
       });
       let LIST = [], latPage = 1;
       const drawList = () => {
@@ -2260,6 +2320,7 @@
         }).catch(() => {});
       };
       $('#laAdd').addEventListener('click', () => {
+        if (media.busy()) return;
         const title = $('#laTitle').value.trim();
         if (!title) { msg.textContent = LAT('need'); return; }
         const link = $('#laLink').value, tag = TAB_EN[link] || 'Featured';
@@ -2371,8 +2432,30 @@
       $('#prjBack').addEventListener('click', prjList);
       const setCover = (url) => { $('#pf_cover').value = url || ''; $('#pf_cover_url').value = url || ''; const pr = $('#pf_prev'); pr.hidden = !url; if (url) pr.querySelector('img').src = url; };
       $('#pf_cover_url').addEventListener('change', (ev) => setCover(ev.target.value.trim()));
-      $('#pf_coverfile').addEventListener('change', async (ev) => { const f = ev.target.files && ev.target.files[0]; if (!f) return; const um = $('#pf_upmsg'); um.textContent = PT('uploading'); try { const b64 = await cmsResize(f, 1600, 0.82); const d = await prjApi({ action:'upload', filename:f.name, contentType:'image/webp', dataB64:b64 }); if (d && d.ok && d.url) { setCover(d.url); um.textContent = '✓'; } else um.textContent = '✗'; } catch (e) { um.textContent = '✗'; } });
-      $('#pf_galfile').addEventListener('change', async (ev) => { const files = [...(ev.target.files || [])]; const gm = $('#pf_galmsg'); for (const f of files) { gm.textContent = PT('uploading'); try { const b64 = await cmsResize(f, 1600, 0.82); const d = await prjApi({ action:'upload', filename:f.name, contentType:'image/webp', dataB64:b64 }); if (d && d.ok && d.url) gal.push({ url:d.url }); } catch (e) {} } gm.textContent = '✓'; ev.target.value = ''; drawGal(); });
+      const media = createStudioMediaGate($('#prjForm'), $('#pf_save'));
+      $('#pf_coverfile').addEventListener('change', (ev) => {
+        const file = ev.target.files && ev.target.files[0]; if (!file) return;
+        const message = $('#pf_upmsg'); message.textContent = PT('uploading');
+        media.upload({ file, input:ev.target, message, api:prjApi,
+          preview:url => { $('#pf_prev').hidden = false; $('#pf_prev img').src = url; }, ready:setCover
+        });
+      });
+      $('#pf_galfile').addEventListener('change', async (ev) => {
+        const input = ev.target, files = [...(input.files || [])];
+        const messages = $('#pf_galmsg'); messages.textContent = '';
+        for (const file of files) {
+          const message = document.createElement('span'); message.textContent = PT('uploading');
+          messages.appendChild(message);
+          // Keep temporary previews out of the payload; only confirmed URLs enter gal.
+          const previewImage = document.createElement('img'); previewImage.alt = '';
+          const previewCell = document.createElement('span'); previewCell.className = 'cms-gal'; previewCell.appendChild(previewImage);
+          await media.upload({ file, input, message, api:prjApi,
+            preview:url => { previewImage.src = url; messages.appendChild(previewCell); },
+            ready:url => { previewCell.remove(); gal.push({ url }); drawGal(); }
+          });
+        }
+        input.value = '';
+      });
       $('#pf_addgal').addEventListener('click', () => { const inp = $('#pf_galurl'); const url = inp.value.trim(); if (!url) return; gal.push({ url }); inp.value = ''; drawGal(); });
       const drawPick = async () => {
         const grid = $('#prjPickGrid'), coll = $('#prjPickColl').value;
@@ -2390,6 +2473,7 @@
       });
       $('#prjForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (media.busy()) return;
         const msg = $('#pf_msg'); const title = $('#pf_title').value.trim();
         if (!title) { msg.textContent = PT('needTitle'); return; }
         const proj = { id: p.id || undefined, title, client: $('#pf_client').value.trim(), year: $('#pf_year').value.trim(), role: $('#pf_role').value.trim(), tag: $('#pf_tag').value.trim() || 'Brand Identity', accent: $('#pf_accent').value, cover: $('#pf_cover').value.trim(), summary: $('#pf_summary').value, body: $('#pf_body').value, palette: parsePalette($('#pf_palette').value), gallery: gal, published: $('#pf_pub').checked };

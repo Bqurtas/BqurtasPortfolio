@@ -1,6 +1,6 @@
 # ڕێبەری ڕێکخستنی کلاودفلێر بۆ پۆرتفۆلیۆی بەرەکات قورتاس (Cloudflare Pages Setup Guide)
 
-ئەم ڕێبەرە ڕوونکردنەوەی تەواو دەدات لەسەر چۆنیەتی چالاککردن و بەستنەوەی سەرجەم تایبەتمەندییە سێرڤەرلێسەکانی (Cloudflare Pages Functions):
+ئەم ڕێبەرە ڕێکخستنی Cloudflare Pages Functions و داشبۆردی ستۆدیۆ ڕوون دەکاتەوە. ناوەڕۆک لە Cloudflare D1 هەڵدەگیرێت؛ وێنە و فایلە گشتییەکان لە ڕیپۆی GitHub پاشەکەوت دەکرێن و Cloudflare Pages بڵاویان دەکاتەوە. بۆ ئەم ڕێڕەوەی CMS ـە Supabase پێویست نییە. ئەم بەڵگەنامەیە ڕێنمایی ڕێکخستنە، نە پشتڕاستکردنەوەی ئەوەی هەموو Secret ـەکان پێشتر دانراون.
 
 ---
 
@@ -12,8 +12,7 @@
 | ناوی گۆڕاو (Variable) | جۆر (Type) | وەسف (Description) | نموونە |
 |---|---|---|---|
 | `EDIT_TOKEN` | Secret (Encrypted) | تۆکنی پارێزراوی ستۆدیۆ بۆ دەستکاریکردنی ناوەڕۆک و چاتبۆتی ناوخۆ | `your_strong_secret_token` |
-| `SUPABASE_EDIT_TOKEN` | Secret (Encrypted) | تۆکنی جیاواز و تەنها-سێرڤەر کە Supabase Edge Function ـەکان دەیانپشکنن؛ نابێت یەکسان بێت بە `EDIT_TOKEN` | `a_different_upstream_only_secret` |
-| `SUPABASE_PUBLISHABLE_KEY` | Secret (ئارەزوومەندانە) | publishable key ـی Supabase بۆ proxy؛ ئەگەر دانەنرێت کلیلی گشتیی پڕۆژە بەکاردێت | `sb_publishable_...` |
+| `GITHUB_TOKEN` | Secret (Encrypted)، لە Production | fine-grained token ـی GitHub بۆ تەنها `Bqurtas/BqurtasPortfolio`، بە مۆڵەتی `Contents: Read and write`؛ تەنها سێرڤەر بۆ پاشەکەوتکردنی وێنە و گۆڕانکاریی گەلەری بەکاری دەهێنێت | نرخە ڕاستەقینەکە تەنها لە خانەی Secret دابنێ |
 | `STATS_TOKEN` | Secret (Encrypted) | تۆکنی تایبەت بۆ خوێندنەوەی ئامارەکانی سەردانیکەران لە داشبۆرد | `your_stats_token` |
 | `SESSION_SECRET` | Secret (Encrypted) | کلیلی سەربەخۆ بۆ واژۆکردنی سێشنی 2FA؛ دەبێت جیاواز بێت لە PIN و هەموو تۆکنەکان و لانیکەم 32 بایت هەڕەمەکی بێت | `generate_a_new_random_32_byte_secret` |
 | `ANALYTICS_SALT` | Secret (Encrypted) | کلیلی HMAC بۆ دروستکردنی ناسێنەری نهێنی سەردانیکەر؛ هەرگیز `SALT` یان نرخێکی گشتی بەکارمەهێنە | `generate_another_random_secret` |
@@ -31,25 +30,30 @@
 
 ## ٢. بەستنەوەی بنکەی دراوەی D1 (D1 Database Binding)
 
-ئەگەر دەتەوێت ئاماری لۆکاڵی سەردانیکەران و خشتەی کارەکان لەناو کلاودفلێر پاشەکەوت بکرێن:
-1. لە داشبۆردی Cloudflare بچۆ بۆ `Storage & Databases` > `D1 SQL Database` > `Create Database` بە ناوی `bqurtas-db`.
-2. لەناو بەشی پڕۆژەکەت لە Pages، بچۆ بۆ `Settings` > `Functions` > `D1 database bindings`.
-3. گۆڕاوەکە بە ناوی **`DB`** ببەستەوە بە بنکەی دراوەی دروستکراو.
-4. خشتەکان دروست بکە بە جێبەجێکردنی فایلی [analytics-schema.sql](./analytics-schema.sql) و [content-schema.sql](./content-schema.sql).
+بنکەی دراوەی ئێستای پڕۆژە **`bq-analytics`** ـە؛ هەمانە بۆ ناوەڕۆک و ئاسایش بەکاربهێنە و بنکەیەکی بەتاڵی جێگرەوە دروست مەکە:
+
+1. لە پڕۆژەی `bqurtasportfolio` لە Cloudflare Pages، بەشی `Settings` > `Bindings` یان `Functions` > `D1 database bindings` بکەرەوە.
+2. پەیوەندییەکە دەبێت بە ناوی **`DB`** بە بنکەی **`bq-analytics`** بەسترابێتەوە. ئەگەر پێشتر هەیە هەر ئەوە بپارێزە.
+3. خشتەکانی CMS بە ناوی `cms_posts`، `cms_projects`، `cms_latest`، `cms_comments`، `cms_likes` و `cms_subscribers` لە یەکەم داواکاریی CMS دا بە `CREATE TABLE IF NOT EXISTS` دروست دەبن. ئەمە خشتە و داتای ئامار و چوونەژوورەوە ناسڕێتەوە.
+4. بۆ دامەزراندنێکی نوێ، [analytics-schema.sql](./analytics-schema.sql) و [content-schema.sql](./content-schema.sql) ڕێکخستنی خزمەتگوزارییە پێشووەکانن؛ خشتەکانی نوێی `cms_*` لە [functions/api/_cms.js](./functions/api/_cms.js) بەڕێوە دەبرێن. دروستبوونی خشتە بەتاڵەکان داتای سیستەمێکی کۆن ناگوازێتەوە؛ گواستنەوەی داتا هەنگاوێکی جیاوازە.
 
 `DB` بۆ rate limiting ـی سێشن، دەستکاریی ناوەڕۆک، ئامار و AI پێویستە. ئەگەر Cloudflare Rate Limiting binding بە ناوی `RATE_LIMITER` دابنێیت، API ـەکان ئەوی بە پێشەوە بەکاردەهێنن؛ بەڵام D1 هێشتا بۆ 2FA challenge و ناوەڕۆک پێویستە.
 
 > گرنگ: دوای دانانی secret ـە نوێکان، هەر `DASH_PIN`، `EDIT_TOKEN` یان `STATS_TOKEN` ـێک کە پێشتر لە Git history یان log ـدا دەرکەوتووە بگۆڕە. تەنها سڕینەوەی لە فایلی ئێستا secret ـی کۆن بێ‌کار ناکات.
 
-### جیاکردنەوەی تۆکنی داشبۆرد لە Supabase
+### بەستنەوەی GitHub بۆ بڵاوکردنەوە
 
-هەموو کارەکانی `work-upload`، `blog-admin`، `latest-admin` و `projects-admin` لە ڕێگەی `/api/studio/*` دەڕۆن. بۆ ئەوەی بانگکردنی ڕاستەوخۆی Supabase نتوانێت 2FA تێپەڕێنێت:
+هەموو کارەکانی `work-upload`، `blog-admin`، `latest-admin` و `projects-admin` لە ڕێگەی `/api/studio/*` دەڕۆن. Cloudflare پێش هەر دەستکارییەک سێشنی واژۆکراوی 2FA، پاسۆردی ئەدیتەر، سەرچاوەی داواکاری و سنووری هەوڵەکان دەپشکنێت.
 
-1. جارێک تۆکنی ناوخۆی Edge Function ـەکانی Supabase بگۆڕە بۆ نرخێکی نوێ و هەڕەمەکی.
-2. هەمان نرخ لە Cloudflare بە ناوی `SUPABASE_EDIT_TOKEN` دابنێ؛ ئەم نرخە هەرگیز بۆ براوزەر نانێردرێت.
-3. `EDIT_TOKEN` ـێکی جیاواز بۆ چوونەژوورەوەی ئەدیتەر دابنێ. Proxy داواکارییەک تەنها کاتێک دەنێرێت کە سێشنی 2FA و ئەم تۆکنە هەردووکیان دروست بن.
+1. بە هەژماری خاوەنی ڕیپۆ، `Bqurtas`، لە GitHub بچۆ بۆ `Settings` > `Developer settings` > `Personal access tokens` > `Fine-grained tokens`.
+2. تۆکنێک بە ناوێکی وەک `Bqurtas Studio Cloudflare` و بەرواری بەسەرچوونی دیار دروست بکە. `Resource owner` بکە بە `Bqurtas`؛ لە `Only select repositories` تەنها **`BqurtasPortfolio`** هەڵبژێرە.
+3. لە `Repository permissions` تەنها **`Contents: Read and write`** زیاد بکە؛ `Metadata: Read` مۆڵەتی بنەڕەتیی GitHub ـە. مۆڵەتی هەموو ڕیپۆکان، هەژمار یان گۆڕینی workflow پێویست نییە.
+4. نرخەکە لە Cloudflare Pages، پڕۆژەی `bqurtasportfolio`، ژینگەی **Production**، بە جۆری **Secret** و بە ناوی **`GITHUB_TOKEN`** پاشەکەوت بکە؛ پاشان production دووبارە بڵاو بکەوە تا Function ـەکان گۆڕاوەکە وەربگرن.
+5. `EDIT_TOKEN` پاسۆردی جیاوازی ئەدیتەرە. `GITHUB_TOKEN` مەخە ناو فۆڕمی ستۆدیۆ، کۆدی JavaScript، فایلەکانی ڕیپۆ یان چات؛ ئەم کلیلی GitHub ـە هەرگیز لە وەڵامی API بۆ براوزەری وێبسایت نانێردرێت.
 
-دوگمەی «گۆڕینی پاسۆردی ئەدیتەر» لە ئێستاوە تەنها تۆکنی براوزەر دەگۆڕێت و digest ـێکی HMAC لە خشتەی `studio_auth` ـی D1 هەڵدەگرێت؛ تۆکنی ناوخۆی Supabase ناگۆڕێت. ئەگەر `SESSION_SECRET` بگۆڕیت، جارێک `DELETE FROM studio_auth WHERE k='edit-token';` لە D1 جێبەجێ بکە تا `EDIT_TOKEN` ـی Cloudflare دووبارە ببێتە bootstrap.
+دوگمەی «گۆڕینی پاسۆردی ئەدیتەر» تەنها پاسۆردی ئەدیتەر دەگۆڕێت و digest ـێکی HMAC لە خشتەی `studio_auth` ـی D1 هەڵدەگرێت؛ `GITHUB_TOKEN` ناگۆڕێت. ئەگەر `SESSION_SECRET` بگۆڕیت، جارێک `DELETE FROM studio_auth WHERE k='edit-token';` لە D1 جێبەجێ بکە تا `EDIT_TOKEN` ـی Cloudflare دووبارە ببێتە bootstrap.
+
+Secret ـە کۆنەکانی `SUPABASE_EDIT_TOKEN` و `SUPABASE_PUBLISHABLE_KEY` لەم ڕێڕەوی نوێی CMS دا بەکار نایەن. ئەگەر پڕۆژەی کۆنی Supabase بۆ مێژوو یان پاشەکەوت ماوەتەوە، وابەستەی runtime ـی ئەم CMS ـە نییە.
 
 ---
 
@@ -95,19 +99,16 @@ HTML، `sw.js`، sitemap و API نابێت بە یاسای **Cache Everything** 
 
 ---
 
-## ٥. پشکنینی Supabase Studio
+## ٥. ڕێڕەوی بڵاوکردنەوە: D1، GitHub و Pages
 
-Edge Function ـەکانی `blog-admin`، `projects-admin`، `latest-admin` و
-`set-token` لە دۆمەینی Supabase جێبەجێ دەبن، نە لە Pages. لە هەر یەکێکیاندا:
+بابەتەکانی Journal، Projects و Latest ڕاستەوخۆ لە خشتەکانی `cms_*` ـی Cloudflare D1 پاشەکەوت دەبن. وێنەی گەلەری و وێنەی بابەتەکان لە GitHub پاشەکەوت دەبن:
 
-- `x-edit-token` لەگەڵ secret ـی سێرڤەر بەراورد بکە؛
-- CORS تەنها بۆ `https://bqurtas.com` ڕێگە پێبدە؛
-- تۆکنێکی پێشتر دەرکەوتوو بگۆڕە و log ـەکان پاک بکەوە؛
-- RLS ـی خشتەکان بۆ anonymous write داخراو بێت.
+- ئەپلۆدی **Works** وێنە، thumbnail و لیستی گەلەری لە یەک commit ـدا نوێ دەکاتەوە؛ گۆڕانکارییەکە لە لقەی **`main`** پاشەکەوت دەبێت.
+- ئەپلۆدی وێنە بۆ **Content / Projects** فایلێکی WebP لە `preview_site/uploads/` دروست دەکات. پاش بڵاوکردنەوە بە ڕێڕەوی `/uploads/…webp` لە هەمان دۆمەینی وێبسایت بەردەست دەبێت.
+- workflow ـی **Site quality** بە push بۆ `main` بە خۆکار build و تاقیکردنەوەکان جێبەجێ دەکات. پەیوەندیی Git ـی Cloudflare Pages دەبێت production branch ـی **`main`** و automatic deployments ـی چالاک هەبێت تا هەمان push وێبسایتەکەش نوێ بکاتەوە.
+- **Saved to GitHub / queued** واتە commit پاشەکەوت کراوە؛ بە مانای تەواوبوونی deployment یان بینراوبوونی وێنە لە سایت نییە. دۆخی production deployment لە Cloudflare و دەرئەنجامی Site quality لە GitHub بپشکنە.
 
-تۆکنەکە لە وێبگەڕدا ئێستا تەنها لە `sessionStorage` ـە و بە داخستنی تاب
-نامێنێت؛ بەڵام گۆڕینی secret ـی Supabase دەبێت لە داشبۆردی Supabase خۆی
-ئەنجام بدرێت.
+پاسۆردی ئەدیتەر لە براوزەر تەنها لە `sessionStorage` هەڵدەگیرێت و بە داخستنی تاب نامێنێت. کلیلی GitHub لە Cloudflare Secret دەمێنێتەوە.
 
 ---
 
@@ -118,7 +119,7 @@ Edge Function ـەکانی `blog-admin`، `projects-admin`، `latest-admin` و
 1. لە مۆبایل یان کۆمپیوتەر [ستۆدیۆی پارێزراو](https://bqurtas.com/#studio) بکەرەوە و بە دڵخواز bookmark ـی بکە. فایلە ناوخۆییەکەی `preview_site/index.html` ناتوانێت بە API ـی زیندوو بگات، بچێتە ژوورەوە یان بڵاو بکاتەوە.
 2. کۆدی تایبەتی `DASH_PIN` بنووسە. دەتوانێت پاسۆردێکی بەهێز بێت؛ تەنها ژمارە نییە. ئەم نرخە لە Cloudflare خۆت دیاری دەکەیت، نە لە GitHub و نە لە کۆدی سایت.
 3. کۆدی شەش ژمارەیی ئەپی authenticator یان سندووق/ژمارە ڕێکخراوەکەت بنووسە. ژمارەکانی کوردی و عەرەبیش قبووڵ دەکرێن. کۆدی authenticator تەنها یەک جار بەکاردێت؛ ئەگەر پێشتر بەکارهاتووە چاوەڕێی کۆدی نوێ بکە.
-4. لە بەشی **Content / ناوەڕۆک** پاسۆردی جیاوازی ئەدیتەر (`EDIT_TOKEN`) ببەستەوە. ئەم پاسۆردە بۆ بڵاوکردنەوە پێویستە و تەنها لە تابی ئێستا هەڵدەگیرێت. `SUPABASE_EDIT_TOKEN` مەخە ناو ئەم فۆڕمە؛ ئەوە تەنها بۆ سێرڤەرە.
+4. لە بەشی **Content / ناوەڕۆک** پاسۆردی جیاوازی ئەدیتەر (`EDIT_TOKEN`) ببەستەوە. ئەم پاسۆردە بۆ بڵاوکردنەوە پێویستە و تەنها لە تابی ئێستا هەڵدەگیرێت. `GITHUB_TOKEN` مەخە ناو ئەم فۆڕمە؛ ئەوە تەنها بۆ سێرڤەرە.
 
 لە کۆمپیوتەر `⌘ B` یان `Ctrl B` ستۆدیۆ دەکاتەوە؛ پێنج کلیکی خێرا لە لۆگۆی ستۆدیۆش کار دەکات. بەستەری `#studio` لە مۆبایل ئاسانترین ڕێگایە.
 
@@ -126,15 +127,26 @@ Edge Function ـەکانی `blog-admin`، `projects-admin`، `latest-admin` و
 
 1. **Works / کارەکان** هەڵبژێرە و کەتەگۆرییە گونجاوەکە دیاری بکە.
 2. وێنەیەک هەڵبژێرە و چاوەڕێی **Ready / ئامادەیە** بکە. ستۆدیۆ وێنەکە ڕیسایز دەکات و دەیکاتە WebP.
-3. **Publish to gallery / بڵاوکردنەوە بۆ گەلەری** دابگرە و چاوەڕێی وەڵامی سەرکەوتن بکە. ئەگەر هەڵەیەک هات، پەیامەکە بخوێنەوە؛ نیشاندانی پێشبینین بە تەنها بە مانای بڵاوکردنەوە نییە.
-4. **Show images** وێنەکانی فۆڵدەرەکە پیشان دەدات. سڕینەوە پێویستی بە پشتڕاستکردنەوە هەیە و لە ڕیپۆکەدا جێبەجێ دەکرێت.
+3. **Publish to gallery / بڵاوکردنەوە بۆ گەلەری** یەک جار دابگرە. پەیامی **لە GitHub پاشەکەوت کرا — چاوەڕێی بڵاوکردنەوەی وێبسایتە** واتە وێنەکە پاشەکەوت کراوە و Cloudflare هێشتا دەبێت deployment تەواو بکات. بۆ هەمان وێنە دووبارە Publish مەکە.
+4. دوای سەرکەوتنی deployment، پەڕەی گەلەری نوێ بکەرەوە و کەتەگۆرییەکە ببینە. نیشاندانی پێشبینین یان لیستی فایلەکانی GitHub بە تەنها پشتڕاستکردنەوەی پەخشی ڕاستەوخۆ نییە.
+5. **Show images** وێنەکانی فۆڵدەرەکە لە GitHub پیشان دەدات. سڕینەوە پێویستی بە پشتڕاستکردنەوە هەیە؛ لە ڕیپۆکەدا جێبەجێ دەکرێت و لەسەر سایتیش دوای deployment دەردەکەوێت. ئەگەر هەڵەیەک هات، دەقی هەڵەکە بخوێنەوە.
 
 ئەم ئەپلۆدەرە بۆ وێنەیە. ڤیدیۆ لە ڕێڕەوی ئێستای GitHub زیاد دەکرێت؛ فۆڕمی Works ئەپلۆدی ڤیدیۆ ناکات. **Content** بۆ بابەتی بلۆگ، **Projects** بۆ پڕۆژە و **Latest** بۆ نوێکارییەکانە.
+
+### بڵاوکردنەوەی بابەت یان پڕۆژەیەک کە وێنەی نوێی هەیە
+
+1. لە **Content** یان **Projects** ناونیشان و ناوەڕۆک بنووسە و وێنەی بەرگ یان گەلەری هەڵبژێرە.
+2. وێنەکە سەرەتا لە GitHub پاشەکەوت دەبێت. داشبۆرد دوگمەی پاشەکەوتکردن/بڵاوکردنەوە ڕادەگرێت تا وێنەکە لەسەر وێبسایت بەردەست بێت؛ لەو ماوەیەدا تابەکە بە کراوەیی بهێڵەوە.
+3. پشکنینەکە داواکاریی `HEAD` بۆ هەمان فایل دەنێرێت و وەڵامی سەرکەوتوو بە جۆری **`image/webp`** دەوێت. پەڕەی HTML کە تەنها status ـی `200` دەدات، بە وێنەی ئامادە هەژمار ناکرێت.
+4. ئەگەر **Check again / دووبارە بپشکنە** دەرکەوت، دوگمەکە دابگرە. ئەمە تەنها بەردەستبوونی هەمان وێنە دەپشکنێتەوە؛ فایلەکە دووبارە ئەپلۆد ناکات و commit ـێکی نوێ دروست ناکات.
+5. کە **Image is live — ready to publish / وێنەکە لەسەر وێبسایتە — ئامادەی بڵاوکردنەوەیە** دەرکەوت، بابەت یان پڕۆژەکە پاشەکەوت و بڵاو بکەرەوە. ناوەڕۆک لە D1 هەڵدەگیرێت؛ گۆڕانکاریی نووسین بە تەنها پێویستی بە build ـێکی نوێی Pages نییە.
 
 ### ئەگەر ستۆدیۆ نەکرایەوە
 
 - **Cloudflare setup is incomplete**: ناوی ئەو پێداویستییانەی کە کەمن پیشان دەدرێت. `DASH_PIN`، `SESSION_SECRET`، `DB` و لانیکەم فاکتۆرێکی دووەم پێویستن. دوای گۆڕینی ڕێکخستنەکان production دووبارە بڵاو بکەوە.
-- **Publishing is not configured**: جگە لە چوونەژوورەوە، `EDIT_TOKEN` و `SUPABASE_EDIT_TOKEN` ـی جیاواز پێویستن؛ تۆکنی ناوخۆی Supabase دەبێت لەگەڵ ئەوەی Cloudflare یەک بێت. پشتڕاستکردنەوەی secret ـەکان لە داشبۆردەکانیان دەکرێت، نە بە ناردنیان بۆ چات یان دانانیان لە ڕیپۆ.
+- **Publishing is not configured**: بۆ دەستکاریکردنی ناوەڕۆک `EDIT_TOKEN` و `DB`، و بۆ ئەپلۆد و بەڕێوەبردنی فایل `GITHUB_TOKEN` ـی Production بپشکنە؛ دوای گۆڕینی Secret دووبارە deploy بکە. کلیلی GitHub و پاسۆردی ئەدیتەر جیاوازن.
+- **GitHub rejected the publishing request**: بەسەرچوون یان هەڵوەشاندنەوەی تۆکن، هەڵبژاردنی ڕیپۆی `BqurtasPortfolio` و مۆڵەتی `Contents: Read and write` بپشکنە. تۆکنەکە تەنها لە Cloudflare Secret نوێ بکەرەوە؛ بۆ چات مەینێرە.
+- **Still waiting for deployment**: وێنەکە پاشەکەوت کراوە، بەڵام هێشتا لە Pages بەردەست نییە. دۆخی deployment و automatic production deployments ـی `main` بپشکنە؛ لە فۆڕمی بابەت/پڕۆژە **Check again** دابگرە، وێنەکە دووبارە هەڵمەبژێرە.
 - **Session expired**: دووبارە بچۆ ژوورەوە. سێشنی واژۆکراو دوو کاتژمێر بەردەوامە؛ پاسۆردی ئەدیتەر بە تەنها جێگای ناگرێتەوە.
 - **Too many attempts**: کەمێک چاوەڕێ بکە؛ پەیاپی کۆد مەنووسەوە. سنووری هەوڵەکان بۆ پاراستنی هەژمارەکەیە.
 - **Code could not be delivered**: ڕێکخستنی خزمەتگوزاری ئیمەیل/SMS و سپام بپشکنە؛ ئەگەر authenticator ڕێکخراوە، لە ڕێڕەوی فاکتۆری گونجاو بەکاری بهێنە.

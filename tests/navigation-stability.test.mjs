@@ -46,34 +46,74 @@ function fixture(mobile = true) {
     scroll(y) { window.scrollY = y; window.fire('scroll'); flush(); } };
 }
 
-test('phone dock remains full size throughout a swipe, reversal and bottom rubber band', () => {
+for (const mobile of [true, false]) {
+  test(`${mobile ? 'phone' : 'desktop'} dock follows sustained direction without reacting to tiny reversals or rubber band`, () => {
+    const page = fixture(mobile);
+    page.run('dockScrollState', '  ');
+    page.scroll(100);
+    assert.equal(page.body.classList.contains('nav-compact'), true, 'downward scroll makes the dock compact');
+    for (const y of [96, 100, 97, 101]) page.scroll(y);
+    assert.equal(page.body.classList.contains('nav-compact'), true, 'tiny reversals do not expand the dock');
+    page.scroll(60);
+    assert.equal(page.body.classList.contains('nav-compact'), false, 'deliberate upward scroll expands the dock');
+    page.scroll(2200);
+    for (const y of [2250, 2300, 2220, 2200]) page.scroll(y);
+    assert.equal(page.body.classList.contains('nav-compact'), true, 'bottom rubber band is not upward intent');
+    page.scroll(2160);
+    assert.equal(page.body.classList.contains('nav-compact'), false, 'upward scroll away from the bottom still works');
+    page.scroll(2200);
+    page.window.innerHeight = 720;
+    page.root.clientHeight = 720;
+    page.window.fire('resize');
+    page.flush();
+    assert.equal(page.body.classList.contains('nav-compact'), true, 'a viewport resize preserves the current dock state');
+    page.scroll(-60);
+    for (const y of [-20, -45, 0, 10, 0]) page.scroll(y);
+    assert.equal(page.body.classList.contains('nav-compact'), false, 'the top of the document keeps the dock expanded');
+  });
+}
+
+test('menu opening, closing and restored scroll do not reverse the dock state', () => {
   const page = fixture();
   page.run('dockScrollState', '  ');
-  for (const y of [0, 100, 700, 1200, 2200, 2250, 2195, 2210, 2150, 300, -60, 0]) {
-    page.scroll(y);
-    assert.equal(page.body.classList.contains('nav-compact'), false);
-    assert.equal(page.queue.size, 0);
-  }
-  page.window.innerHeight = 720;
-  page.window.fire('resize');
-  assert.equal(page.body.classList.contains('nav-compact'), false);
+  page.scroll(200);
+  assert.equal(page.body.classList.contains('nav-compact'), true);
+  page.body.classList.toggle('menu-open', true);
+  page.scroll(0);
+  page.scroll(55);
+  assert.equal(page.body.classList.contains('nav-compact'), true, 'menu scroll lock cannot expand a compact dock');
+  page.body.classList.remove('menu-open');
+  page.body.classList.toggle('menu-closing', true);
+  page.scroll(199);
+  page.scroll(40);
+  assert.equal(page.body.classList.contains('nav-compact'), true, 'closing transition cannot change the dock size');
+  page.scroll(200);
+  page.body.classList.remove('menu-closing');
+  page.document.fire('bq:menu-closed');
+  page.flush();
+  for (const y of [196, 199, 195]) page.scroll(y);
+  assert.equal(page.body.classList.contains('nav-compact'), true, 'restored document position starts a fresh direction measurement');
+  page.scroll(160);
+  assert.equal(page.body.classList.contains('nav-compact'), false, 'real upward scrolling works after the menu closes');
 });
 
-test('desktop intent ignores small reversals and overscroll; changing to mobile clears compaction', () => {
-  const page = fixture(false);
+test('loading more portfolio content updates the dock scroll bounds without changing its state', () => {
+  const page = fixture();
   page.run('dockScrollState', '  ');
-  page.scroll(100);
-  assert.equal(page.body.classList.contains('nav-compact'), true);
-  for (const y of [96, 100, 97, 101]) page.scroll(y);
-  assert.equal(page.body.classList.contains('nav-compact'), true);
-  page.scroll(60);
-  assert.equal(page.body.classList.contains('nav-compact'), false);
   page.scroll(2200);
-  for (const y of [2250, 2300, 2200]) page.scroll(y);
-  assert.equal(page.body.classList.contains('nav-compact'), true, 'rubber band is not upward intent');
-  page.media.matches = true;
-  page.media.fire('change');
-  assert.equal(page.body.classList.contains('nav-compact'), false);
+  assert.equal(page.body.classList.contains('nav-compact'), true);
+  page.root.scrollHeight = 6000;
+  const contentResize = page.observed.find(({ element }) => element === page.body || element === page.root);
+  assert.ok(contentResize, 'document growth must invalidate cached scroll bounds');
+  contentResize.callback();
+  page.flush();
+  assert.equal(page.body.classList.contains('nav-compact'), true, 'appending content does not expand the dock');
+  page.scroll(4800);
+  page.scroll(4760);
+  assert.equal(page.body.classList.contains('nav-compact'), false, 'upward intent works past the previous document end');
+  page.scroll(5200);
+  for (const y of [5270, 5250, 5200]) page.scroll(y);
+  assert.equal(page.body.classList.contains('nav-compact'), true, 'the new document end also ignores rubber band');
 });
 
 test('go-up stays available across threshold corrections and refreshes after menu/foreground restoration', () => {

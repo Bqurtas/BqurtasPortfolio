@@ -6,7 +6,11 @@ import { readFile } from 'node:fs/promises';
 const authored = await readFile(new URL('../preview_site/js/enhance.js', import.meta.url), 'utf8');
 const worksStart = authored.indexOf('const WK_ACCESS_I18N =');
 const worksEnd = authored.indexOf('\n    let leadsPage', worksStart);
-const worksSource = authored.slice(worksStart, worksEnd).replace('const renderWorks =', 'globalThis.renderWorks =');
+const publicationStart = authored.indexOf('const PUBLICATION_I18N =');
+const publicationEnd = authored.indexOf('    /* Uploads create', publicationStart);
+assert.ok(publicationStart > 0 && publicationEnd > publicationStart);
+const worksSource = authored.slice(publicationStart, publicationEnd)
+  + authored.slice(worksStart, worksEnd).replace('const renderWorks =', 'globalThis.renderWorks =');
 
 function node() {
   const handlers = new Map();
@@ -101,12 +105,14 @@ test('publishing is single flight and a service failure preserves the prepared i
   assert.equal(f.nodes['#wkUp'].disabled, true);
   assert.equal(f.nodes['#wkFile'].disabled, true);
   assert.equal(f.nodes['#wkFolder'].disabled, true);
-  finish({ error:'studio-upstream-auth', detail:'Match the server credentials in Cloudflare and Supabase.' }); await first;
+  finish({ error:'studio-github-auth', detail:'Check the server credentials in Cloudflare for GitHub publishing.' }); await first;
   assert.match(f.nodes['#wkMsg'].textContent, /server credentials/);
   assert.equal(f.nodes['#wkUp'].disabled, false);
   assert.equal(f.nodes['#wkFile'].disabled, false);
   const retry = f.publish();
-  finish({ ok:true }); await retry;
+  finish({ ok:true, publication:'queued' }); await retry;
+  assert.match(f.nodes['#wkMsg'].textContent, /waiting for the website deployment/);
+  assert.doesNotMatch(f.nodes['#wkMsg'].textContent, /gallery and tab counts updated/);
   assert.equal(f.calls.length, 2);
   assert.equal(f.nodes['#wkUp'].disabled, true);
   assert.equal(f.nodes['#wkPrev'].hidden, true);

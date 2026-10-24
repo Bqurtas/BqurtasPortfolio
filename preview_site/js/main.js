@@ -768,24 +768,18 @@ document.addEventListener('DOMContentLoaded', () => {
     window.__bqGoDocumentTop('smooth');
   });
 
-  /* Phone navigation is a fixed-size control. Scroll-direction compaction
-     changed --bq-dock-top, which also changes fitted-paper padding: the paper
-     could correct scrollY and immediately reverse the compaction decision.
-     Desktop retains its response, with a real intent threshold and clamped
-     overscroll so bouncing at either end cannot flicker the toolbar. */
+  /* Compaction changes only the dock's painted scale; CSS reserves its full
+     footprint so fitted paper cannot feed scroll corrections back into this
+     state. Accumulated intent and clamped bounds ignore small reversals and
+     the browser's rubber-band bounce at either end of a swipe. */
   (function dockScrollState() {
-    const mobile = window.matchMedia('(max-width: 1024px), (hover: none), (pointer: coarse)');
     let lastY = 0, travel = 0, frame = 0, maxY = 0;
     const position = () => Math.min(maxY, Math.max(0, window.scrollY || 0));
     const update = () => {
       frame = 0;
-      if (mobile.matches) {
-        document.body.classList.remove('nav-compact');
-        return;
-      }
       const y = position(), delta = y - lastY;
       lastY = y;
-      if (document.body.classList.contains('menu-open')) { travel = 0; return; }
+      if (document.body.classList.contains('menu-open') || document.body.classList.contains('menu-closing')) { travel = 0; return; }
       if (y < 28) {
         document.body.classList.remove('nav-compact');
         travel = 0;
@@ -805,14 +799,17 @@ document.addEventListener('DOMContentLoaded', () => {
       update();
     };
     window.addEventListener('scroll', () => {
-      if (mobile.matches || frame) return;
+      if (frame) return;
       frame = requestAnimationFrame(update);
     }, { passive: true });
     window.addEventListener('resize', refresh, { passive: true });
     window.addEventListener('pageshow', refresh);
     window.addEventListener('bq:gallery-built', refresh);
     document.addEventListener('bq:route', refresh);
-    mobile.addEventListener?.('change', refresh);
+    document.addEventListener('bq:menu-closed', refresh);
+    // Image/font-driven paper measurements can extend the document after the
+    // initial layout. Cache that new end outside the scroll handler.
+    if (typeof ResizeObserver === 'function') new ResizeObserver(refresh).observe(document.body);
     refresh();
   })();
 
