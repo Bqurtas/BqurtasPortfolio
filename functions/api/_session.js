@@ -55,11 +55,6 @@ export function sessionConfigured(env) {
   return signingSecret(env).length > 0;
 }
 
-export function upstreamCredentialConfigured(env) {
-  const upstream = String((env && env.SUPABASE_EDIT_TOKEN) || '');
-  return upstream.length > 0 && upstream !== String((env && env.EDIT_TOKEN) || '');
-}
-
 export async function issueSession(env) {
   const secret = signingSecret(env);
   if (!secret) return null;

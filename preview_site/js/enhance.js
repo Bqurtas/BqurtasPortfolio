@@ -493,32 +493,9 @@
     });
   })();
 
-  /* =======================================================
-     5 · LOGO SECTIONS — grow on hover
-     ======================================================= */
-  (function logoHovers() {
-    /* Worked-with marquee: enlarge the hovered logo, scale toward cursor */
-    const track = $('.logo-marquee-track');
-    if (track) {
-      track.addEventListener('mousemove', (e) => {
-        const chip = e.target.closest('.logo-chip--img');
-        if (!chip) return;
-        const r = chip.getBoundingClientRect();
-        const dx = (e.clientX - (r.left + r.width / 2)) / r.width;
-        const dy = (e.clientY - (r.top + r.height / 2)) / r.height;
-        chip.style.setProperty('--tilt', `${(-dy * 6).toFixed(2)}deg ${(dx * 6).toFixed(2)}deg`);
-      });
-    }
-    /* Designed-by-hand: clicking a logo jumps to the Logo tab */
-    const grid = $('.logos-grid');
-    if (grid) {
-      grid.addEventListener('click', (e) => {
-        if (!e.target.closest('.logo-mark')) return;
-        const t = document.querySelector('.tab[data-filter="logo"]');
-        if (t) { t.click(); scrollTarget(document.getElementById('grid'), { behavior: 'smooth' }); }
-      });
-    }
-  })();
+  /* Client marks retain stable geometry. Designed-by-hand buttons are owned
+     by gallery.js's lightbox; a second click handler used to switch the room
+     underneath that lightbox and unexpectedly reset the portfolio scroll. */
 
   /* =======================================================
      5b · FLYOUT INTENT — keep language/social menus open
@@ -1020,8 +997,8 @@
       setupMissing:'Cloudflare setup is incomplete. Configure these items, then redeploy:', factorRequirement:'a second factor (TOTP_SECRET or a configured email/SMS provider)',
       setupTitle:'Finish secure setup', setupNote:'Configure the missing server settings, redeploy, then check again. No access code can work until sign-in is configured.',
       setupPublishNote:'Sign-in is ready. Configure publishing before uploading work.', setupLogin:'Sign in', setupPublishing:'Publishing', setupGuide:'Setup guide', setupRetry:'Check again',
-      sessionExpired:'Your secure session has expired. Sign in again.', studioNotSetup:'Publishing is not configured on Cloudflare yet. Check EDIT_TOKEN, SUPABASE_EDIT_TOKEN and the DB binding.',
-      studioUpstreamAuth:'Supabase rejected the publishing server. Check that Cloudflare SUPABASE_EDIT_TOKEN matches the Supabase service secret and that the Edge Function allows the server request.',
+      sessionExpired:'Your secure session has expired. Sign in again.', studioNotSetup:'Publishing is not configured on Cloudflare yet. Check EDIT_TOKEN, GitHub publishing access and the DB binding.',
+      studioUpstreamAuth:'GitHub rejected the publishing request. Check the repository access configured in Cloudflare.',
       studioGithubMissing:'GitHub publishing is not connected. Configure the work-upload service with repository write access.',
       studioUnavailable:'Publication could not be confirmed. Check Show images before trying again.',
       studioDatabaseUnavailable:'The secure publishing database could not be reached. Check the Cloudflare D1 binding and database health.',
@@ -1041,8 +1018,8 @@
       setupMissing:'ڕێکخستنی Cloudflare تەواو نییە. ئەمانە ڕێک بخە، پاشان دووبارە بڵاوی بکەوە:', factorRequirement:'فاکتۆری دووەم (TOTP_SECRET یان خزمەتگوزاری ڕێکخراوی ئیمەیل/SMS)',
       setupTitle:'ڕێکخستنی پارێزراو تەواو بکە', setupNote:'ڕێکخستنە کەمەکانی سێرڤەر تەواو بکە، دووبارە بڵاوی بکەوە و پاشان بپشکنەوە. تا چوونەژوورەوە ڕێکنەخرێت، هیچ کۆدێک کار ناکات.',
       setupPublishNote:'چوونەژوورەوە ئامادەیە. پێش ئەپلۆدکردنی کار، بڵاوکردنەوە ڕێک بخە.', setupLogin:'چوونەژوورەوە', setupPublishing:'بڵاوکردنەوە', setupGuide:'ڕێبەری ڕێکخستن', setupRetry:'دووبارە بپشکنەوە',
-      sessionExpired:'ماوەی چوونەژوورەوەی پارێزراوت بەسەرچووە. دووبارە بچۆ ژوورەوە.', studioNotSetup:'بڵاوکردنەوە هێشتا لە Cloudflare ڕێکنەخراوە. EDIT_TOKEN و SUPABASE_EDIT_TOKEN و بەستنی DB بپشکنە.',
-      studioUpstreamAuth:'Supabase داواکاری سێرڤەری بڵاوکردنەوەی ڕەتکردەوە. SUPABASE_EDIT_TOKEN ـی Cloudflare لەگەڵ نهێنی خزمەتگوزاری Supabase و مۆڵەتی داواکاری سێرڤەر لە Edge Function بپشکنە.',
+      sessionExpired:'ماوەی چوونەژوورەوەی پارێزراوت بەسەرچووە. دووبارە بچۆ ژوورەوە.', studioNotSetup:'بڵاوکردنەوە هێشتا لە Cloudflare ڕێکنەخراوە. EDIT_TOKEN و دەستگەیشتنی GitHub و بەستنی DB بپشکنە.',
+      studioUpstreamAuth:'GitHub داواکاری بڵاوکردنەوەی ڕەتکردەوە. دەستگەیشتنی ڕیپۆ لە Cloudflare بپشکنە.',
       studioGithubMissing:'بڵاوکردنەوەی GitHub بەستراو نییە. خزمەتگوزاری work-upload بە دەسەڵاتی نووسینی ڕیپۆ ڕێکبخە.',
       studioUnavailable:'بڵاوکردنەوە پشتڕاست نەکرایەوە. پێش هەوڵدانەوە، بەشی پیشاندانی وێنەکان بپشکنە.',
       studioDatabaseUnavailable:'پەیوەندی بە داتابەیسی پارێزراوی بڵاوکردنەوە نەکرا. بەستنی D1 و دۆخی داتابەیسەکە لە Cloudflare بپشکنە.',
@@ -1172,7 +1149,7 @@
       if (!box) return;
       const requirements = data.requirements || {};
       const loginLabels = { pin:'DASH_PIN', session:'SESSION_SECRET (32+ bytes)', database:'D1 / DB', secondFactor:DT('factorRequirement') };
-      const publishLabels = { editor:'EDIT_TOKEN', upstream:'SUPABASE_EDIT_TOKEN (≠ EDIT_TOKEN)' };
+      const publishLabels = { editor:'EDIT_TOKEN', github:'GitHub publishing access' };
       const missing = (labels) => Object.keys(labels).filter(key => requirements[key] === false).map(key => labels[key]);
       const signIn = missing(loginLabels), publishing = missing(publishLabels);
       box.hidden = data.configured !== false && !publishing.length;
@@ -1756,8 +1733,7 @@
       $$('#admList [data-rm]').forEach(b => b.addEventListener('click', () => { const a = getAdmins(); a.splice(+b.dataset.rm, 1); setAdmins(a); renderAdmins(); }));
     };
 
-    /* ---- Blog manager — posts live in Supabase (free; edit in its studio) ---- */
-    const SB_STUDIO = 'https://supabase.com/dashboard/project/dcnkhzrishphpismmxuu/editor';
+    /* ---- Blog manager — Cloudflare D1 content, GitHub media ---- */
         const CT_I18N = {
       en: { gate:'Publish to your blog', note:'Enter your edit token to write, edit and publish posts.', tokPh:'Edit token', conn:'Connect', newBtn:'Write new post', editBtn:'Edit', delBtn:'Delete', delAsk:'Delete this post permanently?', fTitle:'Title', fSub:'Subtitle', fTag:'Label', fCover:'Cover image link', fCoverPh:'https://…  paste any image link', fAccent:'Accent', fMin:'Read (min)', fBody:'Body', fBodyPh:'Write your post here…  Leave one empty line between paragraphs.', fPub:'Published — visible on the site', save:'Publish', update:'Update', saving:'Publishing…', updating:'Updating…', translating:'Translating to all languages…', savedMsg:"Saved — it's on your blog now.", cancel:'Cancel', back:'All posts', loading:'Loading your posts…', empty:'No posts yet — write your first one.', err:'Could not reach the blog service (works on the live site).', needTitle:'Please add a title.', posts:'posts', draft:'draft', studio:'Advanced (raw database)' },
       ku: { gate:'بڵاوکردنەوە بۆ بلۆگەکەت', note:'تۆکنی دەستکاریت بنووسە بۆ نووسین، دەستکاری و بڵاوکردنەوەی بابەت.', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', newBtn:'نووسینی بابەتی نوێ', editBtn:'دەستکاری', delBtn:'سڕینەوە', delAsk:'ئەم بابەتە بە تەواوی بسڕێتەوە؟', fTitle:'سەردێڕ', fSub:'ژێر-سەردێڕ', fTag:'لەیبڵ', fCover:'بەستەری وێنەی سەرەکی', fCoverPh:'https://…  هەر بەستەرێکی وێنە', fAccent:'ڕەنگ', fMin:'خوێندنەوە (خ)', fBody:'دەق', fBodyPh:'لێرە بابەتەکەت بنووسە…  دێڕێکی بەتاڵ لە نێوان پەرەگرافەکان بهێڵە.', fPub:'بڵاوکراوە — لەسەر سایت دیارە', save:'بڵاوکردنەوە', update:'نوێکردنەوە', saving:'بڵاودەکرێتەوە…', updating:'نوێدەکرێتەوە…', translating:'وەردەگێڕدرێت بۆ هەموو زمانەکان…', savedMsg:'پاشەکەوتکرا — ئێستا لەسەر بلۆگەکەتە.', cancel:'هەڵوەشاندنەوە', back:'هەموو بابەتەکان', loading:'بارکردنی بابەتەکانت…', empty:'هێشتا بابەت نییە — یەکەمیان بنووسە.', err:'نەگەیشتە خزمەتگوزاری بلۆگ (لەسەر سایتە زیندووەکە کاردەکات).', needTitle:'تکایە سەردێڕێک زیاد بکە.', posts:'بابەت', draft:'ڕەشنووس', studio:'پێشکەوتوو (داتابەیس)' },
@@ -1780,6 +1756,14 @@
       }
       const messages = {
         'rate-limit-unavailable':'studioDatabaseUnavailable',
+        'studio-database-unavailable':'studioDatabaseUnavailable',
+        'studio-content-unavailable':'studioDatabaseUnavailable',
+        'studio-github-unavailable':'studioNetworkFailed',
+        'studio-github-timeout':'studioTimeout',
+        'studio-github-invalid':'studioResponseInvalid',
+        'studio-github-not-found':'studioGithubMissing',
+        'studio-github-conflict':'studioUnavailable',
+        'studio-github-folder-limit':'studioResponseLarge',
         'studio-upstream-failed':'studioServerFailed',
         'studio-upstream-invalid':'studioResponseInvalid',
         'studio-upstream-too-large':'studioResponseLarge',
@@ -1817,10 +1801,10 @@
           return { ...body, detail:DT('sessionExpired') };
         }
         if (body.error === 'studio-proxy-not-configured') return { ...body, detail:DT('studioNotSetup') };
-        if (body.error === 'studio-upstream-auth') return { ...body, detail:DT('studioUpstreamAuth') };
+        if (body.error === 'studio-upstream-auth' || body.error === 'studio-github-auth') return { ...body, detail:DT('studioUpstreamAuth') };
         if (body.error === 'studio-github-not-configured') return { ...body, detail:DT('studioGithubMissing') };
         if (res.status === 429) return { ...body, detail:DT('rateLimited') };
-        if (res.status >= 500 || body.error === 'bad_response') return studioFailure(body, res.status);
+        if (res.status >= 500 || body.error === 'bad_response' || body.error === 'studio-github-conflict' || body.error === 'studio-github-folder-limit') return studioFailure(body, res.status);
         return body;
       } catch (error) {
         return studioFailure({ error:error && ['AbortError', 'TimeoutError'].includes(error.name) ? 'studio-client-timeout' : 'studio-unavailable' });
@@ -1830,11 +1814,8 @@
     const cmsApi = (payload) => studioCall('blog-admin', payload);
 
     /* ---- Auto-translate in the BROWSER ----
-       Google's free translate endpoint blocks data-center IPs (so the Supabase
-       Edge Function could never translate — titles AND bodies came back empty).
-       The browser runs on a residential IP, which Google allows, and the endpoint
-       sends `access-control-allow-origin: *`, so we translate here and hand the
-       finished i18n object to the function purely to store. */
+       Translate before publishing so Cloudflare stores the complete i18n object.
+       A failed translation retains the author's original text. */
     const TR_LANGS = { en: 'en', ku: 'ckb', kmr: 'ku', ar: 'ar', fr: 'fr', tr: 'tr', sv: 'sv' };
     const trOne = async (text, tl) => {
       const u = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=' + tl + '&dt=t&q=' + encodeURIComponent(text);
@@ -2292,7 +2273,7 @@
       loadList();
     };
 
-    /* ---- Projects / Case studies manager (Supabase `projects` via projects-admin) ---- */
+    /* ---- Projects / Case studies manager (Cloudflare D1 via projects-admin) ---- */
     const PR_I18N = {
       en: { gate:'Manage case studies', note:'Enter your edit token to add and edit projects.', conn:'Connect', tokPh:'Edit token', newBtn:'New case study', edit:'Edit', del:'Delete', delAsk:'Delete this project permanently?', back:'All projects', loading:'Loading…', empty:'No case studies yet — add your first.', fTitle:'Project title', fClient:'Client', fYear:'Year', fRole:'Role / scope', fTag:'Category', fAccent:'Accent colour', fCover:'Cover image', fSummary:'The brief (one strong paragraph)', fBody:'The story (separate paragraphs with a blank line)', fPalette:'Palette — one per line, e.g.  Clay #BD4A2C', fGallery:'In-use images', fPub:'Published — visible on the site', save:'Publish', update:'Update', translating:'Translating to all languages…', saving:'Saving…', saved:'Saved ✓', err:'Could not reach the service (works on the live site).', needTitle:'Please add a title.', uploading:'Uploading…', add:'Add', remove:'Remove' },
       ku: { gate:'بەڕێوەبردنی تاوتوێی پڕۆژە', note:'تۆکنی دەستکاریت بنووسە بۆ زیادکردن و دەستکاری.', conn:'بەستنەوە', tokPh:'تۆکنی دەستکاری', newBtn:'تاوتوێی پڕۆژەی نوێ', edit:'دەستکاری', del:'سڕینەوە', delAsk:'ئەم پڕۆژەیە بە تەواوی بسڕێتەوە؟', back:'هەموو پڕۆژەکان', loading:'بارکردن…', empty:'هێشتا هیچ تاوتوێیەک نییە — یەکەمیان زیاد بکە.', fTitle:'ناونیشانی پڕۆژە', fClient:'کڕیار', fYear:'ساڵ', fRole:'ڕۆڵ / مەودا', fTag:'کەتەگۆری', fAccent:'ڕەنگی سەرەکی', fCover:'وێنەی سەرەکی', fSummary:'بریف (یەک پەرەگرافی بەهێز)', fBody:'چیرۆکەکە (پەرەگرافەکان بە دێڕی بەتاڵ جیابکەرەوە)', fPalette:'پاڵێت — هەر دێڕێک، نموونە  Clay #BD4A2C', fGallery:'وێنەکانی بەکارهێنان', fPub:'بڵاوکراوە — لەسەر سایت دیارە', save:'بڵاوکردنەوە', update:'نوێکردنەوە', translating:'وەردەگێڕدرێت بۆ هەموو زمانەکان…', saving:'پاشەکەوت دەکرێت…', saved:'پاشەکەوتکرا ✓', err:'نەگەیشتە خزمەتگوزاری (لەسەر سایتە زیندووەکە کاردەکات).', needTitle:'تکایە ناونیشانێک زیاد بکە.', uploading:'بارکردن…', add:'زیادکردن', remove:'لابردن' },
@@ -2771,9 +2752,15 @@
     const cmKey = (n) => `bq_blog_cmts_${n}`;
     const baseLikes = (n) => 11 + (parseInt(n, 10) * 7) % 30;
     const getComments = (n) => { try { return JSON.parse(localStorage.getItem(cmKey(n)) || '[]'); } catch (e) { return []; } };
-    /* real, shared likes + comments on published posts (Supabase); built-in demo notes stay on localStorage */
-    const SBE = () => window.BQ_SUPA || {};
-    const sbHeaders = () => ({ apikey: SBE().key, Authorization: 'Bearer ' + SBE().key, 'Content-Type': 'application/json' });
+    /* Shared engagement stays on this origin; browser-only demo notes are never published. */
+    const engagementRequest = async (payload) => {
+      const response = await fetch('/api/engagement', {
+        method:'POST', credentials:'same-origin', headers:{ 'Content-Type':'application/json' },
+        body:JSON.stringify(payload), signal:AbortSignal.timeout(15_000)
+      });
+      if (!response.ok) throw new Error('engagement-unavailable');
+      return response;
+    };
     const profile = () => { try { return JSON.parse(localStorage.getItem('bq_blog_profile') || '{}'); } catch (e) { return {}; } };
     const saveProfile = (pp) => { try { localStorage.setItem('bq_blog_profile', JSON.stringify(pp)); } catch (e) {} };
     const myToken = () => { const pp = profile(); if (!pp.token) { pp.token = 'bq' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36); saveProfile(pp); } return pp.token; };
@@ -2792,12 +2779,16 @@
         : `<p class="reader-comment-empty">${esc(empty)}</p>`;
     };
     const loadEngagement = (p) => {
-      if (p && p.id != null && SBE().url) {
+      if (p && p.id != null) {
         curLikes = 0; curLiked = false; renderLike(); renderCommentList([]);
-        fetch(SBE().url + '/rest/v1/post_likes?post_id=eq.' + p.id + '&select=token', { headers: sbHeaders(), cache: 'no-store' })
-          .then((r) => r.ok ? r.json() : []).then((rows) => { if (curPostObj !== p) return; const tok = myToken(); curLikes = rows.length; curLiked = rows.some((x) => x.token === tok); renderLike(); }).catch(() => {});
-        fetch(SBE().url + '/rest/v1/comments?post_id=eq.' + p.id + '&select=name,body,created_at&order=created_at.desc', { headers: sbHeaders(), cache: 'no-store' })
-          .then((r) => r.ok ? r.json() : []).then((rows) => { if (curPostObj !== p) return; renderCommentList(rows.map((c) => ({ name: c.name, text: c.body, at: c.created_at }))); }).catch(() => {});
+        fetch('/api/engagement?post_id=' + encodeURIComponent(p.id) + '&token=' + encodeURIComponent(myToken()), { credentials:'same-origin', cache:'no-store', signal:AbortSignal.timeout(15_000) })
+          .then((r) => { if (!r.ok) throw new Error('engagement-unavailable'); return r.json(); })
+          .then((data) => {
+            if (curPostObj !== p) return;
+            if (!data || !Number.isSafeInteger(data.likes) || data.likes < 0 || !Array.isArray(data.comments)) throw new Error('engagement-invalid');
+            curLikes = data.likes; curLiked = data.liked === true; renderLike();
+            renderCommentList(data.comments.map((c) => ({ name:c.name, text:c.body, at:c.created_at })));
+          }).catch(() => {});
       } else {
         const liked = localStorage.getItem(lkKey(p.num)) === '1';
         curLiked = liked; curLikes = baseLikes(p.num) + (liked ? 1 : 0); renderLike();
@@ -2859,15 +2850,13 @@
     rd.scroll?.addEventListener('scroll', () => { if (rd.top) rd.top.classList.toggle('is-shown', rd.scroll.scrollTop > 420); }, { passive: true });
     rd.like?.addEventListener('click', () => {
       const p = curPostObj; if (!p) return;
-      if (p.id != null && SBE().url) {
-        const tok = myToken();
-        if (!curLiked) {
-          curLiked = true; curLikes++; renderLike();
-          fetch(SBE().url + '/rest/v1/post_likes', { method: 'POST', headers: Object.assign(sbHeaders(), { Prefer: 'resolution=ignore-duplicates' }), body: JSON.stringify({ post_id: p.id, token: tok }) }).catch(() => {});
-        } else {
-          curLiked = false; curLikes = Math.max(0, curLikes - 1); renderLike();
-          fetch(SBE().url + '/rest/v1/post_likes?post_id=eq.' + p.id + '&token=eq.' + encodeURIComponent(tok), { method: 'DELETE', headers: sbHeaders() }).catch(() => {});
-        }
+      if (p.id != null) {
+        const wasLiked = curLiked, previousCount = curLikes;
+        rd.like.disabled = true;
+        curLiked = !wasLiked; curLikes = Math.max(0, previousCount + (wasLiked ? -1 : 1)); renderLike();
+        engagementRequest({ action:wasLiked ? 'unlike' : 'like', post_id:p.id, token:myToken() })
+          .catch(() => { if (curPostObj === p) { curLiked = wasLiked; curLikes = previousCount; renderLike(); } })
+          .finally(() => { rd.like.disabled = false; });
       } else {
         const liked = localStorage.getItem(lkKey(p.num)) === '1';
         if (liked) localStorage.removeItem(lkKey(p.num)); else localStorage.setItem(lkKey(p.num), '1');
@@ -2881,10 +2870,20 @@
       const text = (rd.cText.value || '').trim();
       if (!text) { rd.cText.focus(); return; }
       const pp = profile(); pp.name = name; saveProfile(pp);   // remember the visitor for next time (lightweight profile)
-      if (p.id != null && SBE().url) {
+      if (p.id != null) {
         const btn = rd.cForm.querySelector('button[type="submit"], button:not([type])'); if (btn) btn.disabled = true;
-        fetch(SBE().url + '/rest/v1/comments', { method: 'POST', headers: Object.assign(sbHeaders(), { Prefer: 'return=minimal' }), body: JSON.stringify({ post_id: p.id, name: name, body: text }) })
-          .then(() => { rd.cText.value = ''; loadEngagement(p); }).catch(() => {}).then(() => { if (btn) btn.disabled = false; });
+        let status = rd.cForm.querySelector('[data-comment-status]');
+        if (status) status.textContent = '';
+        engagementRequest({ action:'comment', post_id:p.id, name, body:text })
+          .then(() => { if (curPostObj === p) { rd.cText.value = ''; loadEngagement(p); } })
+          .catch(() => {
+            if (curPostObj !== p) return;
+            if (!status) {
+              status = document.createElement('p'); status.dataset.commentStatus = '';
+              status.setAttribute('role', 'status'); rd.cForm.appendChild(status);
+            }
+            status.textContent = dT('blog.commentFailed', 'Could not publish your comment. Your text is still here; please try again.');
+          }).finally(() => { if (btn) btn.disabled = false; });
       } else {
         const l = getComments(p.num); l.push({ name, text, at: Date.now() });
         try { localStorage.setItem(cmKey(p.num), JSON.stringify(l)); } catch (x) {}
@@ -2911,7 +2910,7 @@
     (function () { const m = location.pathname.match(/\/blog\/([^\/?#]+)/); if (m) { const slug = decodeURIComponent(m[1]); const p = findPostBySlug(slug); if (p) openReader(p, true); else pendingSlug = slug; } })();
 
     renderPage();
-        /* studio-managed posts from Supabase, merged ahead of the built-in notes.
+        /* Studio-managed posts from Cloudflare D1.
        Rebuilt from the built-ins on each call (idempotent), so publishing from
        the dashboard can refresh the live blog instantly via window.__bqReloadBlog.
        The publishable key is public/safe; row-level security keeps the table
@@ -2947,13 +2946,11 @@
 
     const BUILTIN_POSTS = POSTS.slice();
     const loadCmsPosts = () => {
-      const SB = window.BQ_SUPA || {};
       const request = ++feedRequest;
-      if (!SB.url || !SB.key) { feedState = 'error'; renderPage(); return; }
       feedState = 'loading';
       layout.setAttribute('aria-busy', 'true');
       if (!POSTS.length) renderFeedState('loading');
-      return fetch(SB.url + '/rest/v1/posts?select=*&published=eq.true&order=pos.asc,created_at.desc', { headers: { apikey: SB.key }, cache: 'no-store' })
+      return fetch('/api/journal', { credentials:'same-origin', cache:'no-store', signal:AbortSignal.timeout(15_000) })
         .then((r) => {
           if (!r.ok) throw new Error('journal-http-error');
           return r.json();
@@ -3024,16 +3021,15 @@
         status.textContent = D['sub.bad'] || '✗ Please enter a valid email.';
         return;
       }
-      const SB = window.BQ_SUPA || {};
       const okMsg = D['sub.ok'] || '✓ Subscribed. Welcome to the journal.';
       const dupMsg = D['sub.dup'] || '✓ You are already subscribed — thank you.';
       const errMsg = D['sub.fail'] || '✗ Could not subscribe — please try again.';
       status.style.color = 'var(--ink-muted)';
       status.textContent = '…';
-      if (!SB.url || !SB.key) { status.style.color = 'var(--ink)'; status.textContent = okMsg; email.value = ''; return; }
-      fetch(SB.url + '/rest/v1/subscribers', {
+      fetch('/api/subscribe', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', apikey: SB.key, Authorization: 'Bearer ' + SB.key, Prefer: 'return=minimal' },
+        credentials:'same-origin', signal:AbortSignal.timeout(15_000),
+        headers:{ 'Content-Type':'application/json' },
         body: JSON.stringify({ email: v, lang: (document.documentElement.dataset.lang || 'en') })
       }).then(r => {
         if (r.ok) { status.style.color = 'var(--ink)'; status.textContent = okMsg; email.value = ''; }
@@ -3053,7 +3049,6 @@
    ======================================================= */
 (function latest() {
   const $ = (s) => document.querySelector(s);
-  const SB = window.BQ_SUPA || {};
   const panel = $('#latestPanel'), backdrop = $('#latestBackdrop'), list = $('#latestList');
   if (!panel || !list) return;
   const bell = $('#railLatest'), bellM = $('#railLatestM');
@@ -3175,17 +3170,15 @@
   };
 
   const load = () => {
-    if (!SB.url) return;
     const since = sinceStamp();
-    fetch(SB.url + '/rest/v1/posts?select=id,title,tag,cover,i18n,created_at&published=eq.true&created_at=gte.' + since + '&order=created_at.desc&limit=8', { headers: { apikey: SB.key }, cache: 'no-store' })
+    fetch('/api/journal?since=' + encodeURIComponent(since) + '&limit=8', { credentials:'same-origin', cache:'no-store', signal:AbortSignal.timeout(15_000) })
       .then((r) => (r.ok ? r.json() : [])).then((rows) => { items = Array.isArray(rows) ? rows : []; setBadge(); render(); }).catch(() => {});
   };
 
   /* hand-pinned items the studio added from the dashboard — show for a week */
   const loadPins = () => {
-    if (!SB.url) return;
     const since = new Date(Date.now() - WEEK).toISOString();
-    fetch(SB.url + '/rest/v1/latest_items?select=id,title,tag,link,image,created_at&active=eq.true&created_at=gte.' + since + '&order=pos.asc,created_at.desc&limit=6', { headers: { apikey: SB.key }, cache: 'no-store' })
+    fetch('/api/latest?since=' + encodeURIComponent(since) + '&limit=6', { credentials:'same-origin', cache:'no-store', signal:AbortSignal.timeout(15_000) })
       .then((r) => (r.ok ? r.json() : [])).then((rows) => { pinItems = Array.isArray(rows) ? rows : []; setBadge(); render(); }).catch(() => {});
   };
 
@@ -3245,7 +3238,7 @@
     window.addEventListener('pointercancel', cancel);
   }
   if (window.__bqLangCb) window.__bqLangCb.push(render);
-  /* These feed the Latest BELL (hidden until tapped) and hit GitHub/Supabase APIs
+  /* These feed the Latest BELL (hidden until tapped) and hit GitHub/Cloudflare APIs
      (~175 KB). Defer them off the critical render path — they run once the browser
      is idle, so first paint isn't waiting on them. The badge just appears a beat later. */
   const startLatest = () => { load(); loadWorks(); loadPins(); };

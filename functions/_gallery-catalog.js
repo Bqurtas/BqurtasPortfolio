@@ -97,13 +97,14 @@ export const mediaUrl = (path) => SITE + mediaPath(path);
 
 /* Map manifest records to collections exactly as gallery.js loadManifest()
    does: images then videos, first occurrence wins, invalid geometry, nested
-   paths and unknown folders are skipped, and an item's 1-based index is its
-   position within its folder in manifest order. */
+   paths and unknown folders are skipped. Explicit indices preserve URLs when
+   a work is removed; older manifests retain their original folder positions. */
 export function catalogFromManifest(manifest) {
   if (!manifest || !Array.isArray(manifest.images) || !Array.isArray(manifest.videos)) {
     throw new Error('invalid gallery manifest');
   }
   const byColl = Object.fromEntries(Object.keys(COLLECTIONS).map((key) => [key, []]));
+  const indices = Object.fromEntries(Object.keys(COLLECTIONS).map((key) => [key, new Set()]));
   const byPath = new Map();
   for (const record of [...manifest.images, ...manifest.videos]) {
     if (!record || typeof record.path !== 'string' || byPath.has(record.path)
@@ -116,8 +117,11 @@ export function catalogFromManifest(manifest) {
     const coll = FOLDER_TO_KEY[folder];
     if (!coll || !FILE_RE.test(file)) continue;
     const list = byColl[coll];
+    const index = record.index === undefined ? list.length + 1 : record.index;
+    if (!Number.isSafeInteger(index) || index < 1 || indices[coll].has(index)) continue;
+    indices[coll].add(index);
     const item = {
-      coll, index: list.length + 1, path: record.path, folder, file,
+      coll, index, path: record.path, folder, file,
       width: record.width, height: record.height,
       hash: typeof record.hash === 'string' && /^[0-9a-f]{16}$/.test(record.hash) ? record.hash : '',
       canonical: null,

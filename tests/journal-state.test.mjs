@@ -79,7 +79,7 @@ function element(tagName = 'div') {
   return el;
 }
 
-function fixture({ configured = true, mobile = false, lang = 'en' } = {}) {
+function fixture({ mobile = false, lang = 'en' } = {}) {
   const ids = ['blogIndex', 'blogList', 'blogGhost', 'blogCard', 'bcImg', 'bcTag', 'bcTitle', 'bcSub', 'bcMeta', 'bcRead',
     'blogPager', 'blogPages', 'blogPrev', 'blogNext', 'blogGoForm', 'blogGoInput'];
   const nodes = Object.fromEntries(ids.map(id => [id, element()]));
@@ -95,12 +95,12 @@ function fixture({ configured = true, mobile = false, lang = 'en' } = {}) {
   nodes.bcTitle.textContent = 'On the architecture of meaning';
   nodes.bcRead.textContent = '6 MIN';
   const document = { createElement: element, documentElement: { dataset: { lang } } };
-  const window = { BQ_SUPA: configured ? { url: 'https://cms.example', key: 'public' } : {}, matchMedia: () => ({ matches: mobile }) };
+  const window = { matchMedia: () => ({ matches: mobile }) };
   const requests = [], timers = new Map(), opened = [];
   let timer = 0;
   vm.runInNewContext(source, {
     $: selector => nodes[selector.slice(1)] || null,
-    document, window, CDN: '', blogBase: () => '/blog', scrollTarget() {},
+    document, window, AbortSignal, CDN: '', blogBase: () => '/blog', scrollTarget() {},
     openReader: post => opened.push(post), renderLatest() {}, pendingSlug: null,
     setTimeout(callback) { timers.set(++timer, callback); return timer; },
     clearTimeout: id => timers.delete(id),
@@ -124,6 +124,9 @@ const post = (id, tag = 'Type') => ({ id, title: `Note ${id}`, subtitle: `Summar
 
 test('loading and confirmed empty feeds never expose a fictional or interactive post', async () => {
   const f = fixture();
+  assert.equal(f.requests[0].url, '/api/journal');
+  assert.equal(f.requests[0].options.credentials, 'same-origin');
+  assert.equal(f.requests[0].options.headers, undefined, 'published content needs no third-party key');
   assert.equal(f.nodes.blogIndex.dataset.blogState, 'loading');
   assert.equal(f.nodes.blogIndex.getAttribute('aria-busy'), 'true');
   assert.match(f.status().textContent, /Loading the journal/);
@@ -203,8 +206,9 @@ test('HTTP and malformed feed failures are errors, not confirmed empty journals'
     assert.match(f.nodes.bcTitle.textContent, /نەتوانرا/);
     assert.equal(f.nodes.blogCard.getAttribute('role'), null);
   }
-  const missing = fixture({ configured: false });
-  assert.equal(missing.requests.length, 0);
+  const missing = fixture();
+  missing.requests[0].reject(new Error('connection lost'));
+  await missing.window.journal.initialLoad;
   assert.equal(missing.nodes.blogIndex.dataset.blogState, 'error');
   assert.equal(missing.nodes.blogIndex.getAttribute('aria-busy'), 'false');
 });

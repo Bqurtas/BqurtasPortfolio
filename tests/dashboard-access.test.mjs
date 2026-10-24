@@ -254,7 +254,7 @@ test('privileged publishing never falls back to a cross-origin service on proxy 
   }
 });
 
-test('a publishing network failure never sends the editor password to Supabase', async () => {
+test('a publishing network failure never sends the editor password to an external origin', async () => {
   const helperStart = authored.indexOf('const studioFailure =');
   const helperEnd = authored.indexOf('\n    const cmsApi =', helperStart);
   const helper = authored.slice(helperStart, helperEnd).replace('const studioCall =', 'globalThis.studioCall =');
@@ -273,14 +273,14 @@ test('a publishing network failure never sends the editor password to Supabase',
 
 test('unconfigured Studio shows exact sign-in and publishing prerequisites without a usable PIN form', async () => {
   const f = fixture({ setupUI:true, fetcher:() => response({ ok:true, configured:false, authenticated:false,
-    requirements:{ pin:false, session:false, database:true, secondFactor:false, editor:false, upstream:false } }) });
+    requirements:{ pin:false, session:false, database:true, secondFactor:false, editor:false, github:false } }) });
   await f.open();
   assert.equal(f.nodes['#dashSetup'].hidden, false);
   assert.equal(f.nodes['#dashLoginForm'].hidden, true);
   assert.equal(f.nodes['#dash2faChoice'].hidden, true);
   assert.match(f.nodes['#dashSetupLoginMissing'].textContent, /DASH_PIN.*SESSION_SECRET.*second factor/);
   assert.doesNotMatch(f.nodes['#dashSetupLoginMissing'].textContent, /D1/);
-  assert.match(f.nodes['#dashSetupPublishingMissing'].textContent, /EDIT_TOKEN.*SUPABASE_EDIT_TOKEN/);
+  assert.match(f.nodes['#dashSetupPublishingMissing'].textContent, /EDIT_TOKEN.*GitHub publishing access/);
   await f.submitLogin('a-code-that-cannot-work-yet');
   assert.equal(f.calls.length, 1, 'typing or submitting cannot mutate authentication before server setup');
 });
@@ -288,8 +288,8 @@ test('unconfigured Studio shows exact sign-in and publishing prerequisites witho
 test('setup recheck sends only a fresh GET and restores sign-in when the server becomes ready', async () => {
   let checks = 0;
   const f = fixture({ setupUI:true, fetcher:() => response(++checks === 1
-    ? { ok:true, configured:false, authenticated:false, requirements:{ pin:false, editor:false, upstream:false } }
-    : { ok:true, configured:true, authenticated:false, requirements:{ pin:true, session:true, database:true, secondFactor:true, editor:true, upstream:true } }) });
+    ? { ok:true, configured:false, authenticated:false, requirements:{ pin:false, editor:false, github:false } }
+    : { ok:true, configured:true, authenticated:false, requirements:{ pin:true, session:true, database:true, secondFactor:true, editor:true, github:true } }) });
   await f.open();
   f.nodes['#dashKey'].value = 'discarded-local-input';
   await f.nodes['#dashSetupRetry'].fire('click');
@@ -307,7 +307,7 @@ test('setup recheck sends only a fresh GET and restores sign-in when the server 
 
 test('publishing setup remains visible without blocking an otherwise configured login', async () => {
   const f = fixture({ setupUI:true, fetcher:() => response({ ok:true, configured:true, authenticated:false,
-    requirements:{ pin:true, session:true, database:true, secondFactor:true, editor:false, upstream:false } }) });
+    requirements:{ pin:true, session:true, database:true, secondFactor:true, editor:false, github:false } }) });
   await f.open();
   assert.equal(f.nodes['#dashSetup'].hidden, false);
   assert.equal(f.nodes['#dashSetupLogin'].hidden, true);

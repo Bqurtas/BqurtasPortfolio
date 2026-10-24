@@ -20,16 +20,16 @@ function store() {
   return {
     state,
     close() { database.close(); },
+    async batch(statements) { return Promise.all(statements.map(statement => statement.run())); },
     prepare(sql) {
       if (state.failRates && sql.includes('api_rate')) throw new Error('rate-store-unavailable');
       if (sql.includes('SELECT digest FROM studio_auth')) state.credentialReads += 1;
-      const statement = database.prepare(sql);
       let bindings = [];
       return {
         bind(...values) { bindings = values; return this; },
-        async first() { return statement.get(...bindings) || null; },
-        async all() { return { results: statement.all(...bindings) }; },
-        async run() { return { meta: { changes: Number(statement.run(...bindings).changes) } }; }
+        async first() { return database.prepare(sql).get(...bindings) || null; },
+        async all() { return { results: database.prepare(sql).all(...bindings) }; },
+        async run() { return { meta: { changes: Number(database.prepare(sql).run(...bindings).changes) } }; }
       };
     }
   };
@@ -49,7 +49,7 @@ async function setup(t) {
     DB,
     SESSION_SECRET,
     EDIT_TOKEN,
-    SUPABASE_EDIT_TOKEN: 'server-only-upstream-editor-password'
+    GITHUB_TOKEN: 'server-only-github-repository-token'
   };
   const cookie = (await issueSession(env)).split(';', 1)[0];
   return { env, cookie, DB };
@@ -109,7 +109,7 @@ test('valid publishing and assistant calls clear failed attempts without spendin
   const { env, cookie } = await setup(t);
   let bindingCalls = 0;
   env.RATE_LIMITER = { limit: async () => { bindingCalls += 1; return { success: true }; } };
-  t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify({ ok: true, posts: [] }), { status: 200 }));
+  t.mock.method(globalThis, 'fetch', async () => Response.json([]));
 
   for (let attempt = 0; attempt < 7; attempt += 1) {
     assert.equal((await call(targets[attempt % targets.length], env, cookie, 'wrong')).status, 401);

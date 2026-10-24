@@ -21,7 +21,7 @@ function fixture({ observersSupported = true, hidden = false } = {}) {
   const observed = [], listeners = new Map();
   let observer;
   const tracks = ['software-track', 'hero-marquee-track', 'logo-marquee-track'].map(name => ({
-    name, classList: classes(name),
+    name, parentElement: { name: name + '-viewport' }, classList: classes(name),
     getBoundingClientRect() { throw new Error('marquee suspension must not measure during native scroll'); },
   }));
   const document = {
@@ -47,12 +47,12 @@ function fixture({ observersSupported = true, hidden = false } = {}) {
 
 test('all authored marquees, including the client logo strip, suspend outside the viewing area', () => {
   const page = fixture();
-  assert.deepEqual(page.observed, page.tracks, 'the logo strip must not animate unobserved throughout the portfolio');
+  assert.deepEqual(page.observed, page.tracks.map(track => track.parentElement), 'the logo strip must not animate unobserved throughout the portfolio');
   assert.equal(page.observer.options.rootMargin, '12% 0px', 'motion resumes shortly before the strip arrives');
-  page.observer.callback(page.tracks.map(target => ({ target, isIntersecting: false })));
+  page.observer.callback(page.tracks.map(track => ({ target: track.parentElement, isIntersecting: false })));
   assert.ok(page.tracks.every(track => track.classList.contains('is-offscreen')));
   const logo = page.tracks.find(track => track.name === 'logo-marquee-track');
-  page.observer.callback([{ target: logo, isIntersecting: true }]);
+  page.observer.callback([{ target: logo.parentElement, isIntersecting: true }]);
   assert.equal(logo.classList.contains('is-offscreen'), false, 'the existing animation resumes when the logo strip is visible');
   assert.equal(page.tracks[0].classList.contains('is-offscreen'), true);
 });
@@ -60,7 +60,7 @@ test('all authored marquees, including the client logo strip, suspend outside th
 test('background tabs pause and restore marquee motion without discarding offscreen state', () => {
   const page = fixture({ hidden: true });
   assert.equal(page.document.documentElement.classList.contains('bq-paused'), true);
-  page.observer.callback([{ target: page.tracks[2], isIntersecting: false }]);
+  page.observer.callback([{ target: page.tracks[2].parentElement, isIntersecting: false }]);
   page.visibility(false);
   assert.equal(page.document.documentElement.classList.contains('bq-paused'), false);
   assert.equal(page.tracks[2].classList.contains('is-offscreen'), true, 'returning to the tab does not resume a distant logo strip');

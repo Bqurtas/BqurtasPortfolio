@@ -768,25 +768,53 @@ document.addEventListener('DOMContentLoaded', () => {
     window.__bqGoDocumentTop('smooth');
   });
 
-  /* Instagram-style dock response: shrink slightly while moving down, restore
-     immediately on upward intent. One rAF + a deadband keeps the scroll path
-     compositor-only and avoids class thrashing on touch momentum. */
-  let dockLastY = Math.max(0, window.scrollY);
-  let dockTicking = false;
-  const updateDock = () => {
-    const y = Math.max(0, window.scrollY);
-    const delta = y - dockLastY;
-    if (y < 28 || delta < -3) document.body.classList.remove('nav-compact');
-    else if (y > 56 && delta > 3) document.body.classList.add('nav-compact');
-    if (Math.abs(delta) > 3) dockLastY = y;
-    dockTicking = false;
-  };
-  window.addEventListener('scroll', () => {
-    if (dockTicking) return;
-    dockTicking = true;
-    requestAnimationFrame(updateDock);
-  }, { passive: true });
-  window.addEventListener('pageshow', updateDock);
+  /* Phone navigation is a fixed-size control. Scroll-direction compaction
+     changed --bq-dock-top, which also changes fitted-paper padding: the paper
+     could correct scrollY and immediately reverse the compaction decision.
+     Desktop retains its response, with a real intent threshold and clamped
+     overscroll so bouncing at either end cannot flicker the toolbar. */
+  (function dockScrollState() {
+    const mobile = window.matchMedia('(max-width: 1024px), (hover: none), (pointer: coarse)');
+    let lastY = 0, travel = 0, frame = 0, maxY = 0;
+    const position = () => Math.min(maxY, Math.max(0, window.scrollY || 0));
+    const update = () => {
+      frame = 0;
+      if (mobile.matches) {
+        document.body.classList.remove('nav-compact');
+        return;
+      }
+      const y = position(), delta = y - lastY;
+      lastY = y;
+      if (document.body.classList.contains('menu-open')) { travel = 0; return; }
+      if (y < 28) {
+        document.body.classList.remove('nav-compact');
+        travel = 0;
+        return;
+      }
+      if (Math.abs(delta) < 1) return;
+      travel = Math.sign(delta) === Math.sign(travel) ? travel + delta : delta;
+      if (Math.abs(travel) >= 24) {
+        document.body.classList.toggle('nav-compact', travel > 0 && y > 56);
+        travel = 0;
+      }
+    };
+    const refresh = () => {
+      maxY = Math.max(0, document.documentElement.scrollHeight - document.documentElement.clientHeight);
+      lastY = position();
+      travel = 0;
+      update();
+    };
+    window.addEventListener('scroll', () => {
+      if (mobile.matches || frame) return;
+      frame = requestAnimationFrame(update);
+    }, { passive: true });
+    window.addEventListener('resize', refresh, { passive: true });
+    window.addEventListener('pageshow', refresh);
+    window.addEventListener('bq:gallery-built', refresh);
+    document.addEventListener('bq:route', refresh);
+    mobile.addEventListener?.('change', refresh);
+    refresh();
+  })();
 
   /* ---------- MOBILE BOTTOM-BAR POPUPS (language · socials) ----------
      Every floating panel (chat · Latest · menu · these popovers) is EXCLUSIVE:
@@ -1513,7 +1541,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- REVEAL on scroll ---------- */
   const markReveal = () => {
     /* .card visibility is handled entirely by activateTab pagination — excluded here */
-    document.querySelectorAll('.blog-card, .tl-item, .bio-card, .honor, .lang-item, .orgs li, .service, .qc-card, .stat, .logo-mark, .logo-chip, .studio-card, .studio-step, .studio-proof-item, .pj-cta-section')
+    document.querySelectorAll('.blog-card, .tl-item, .bio-card, .honor, .lang-item, .orgs li, .service, .qc-card, .stat, .studio-card, .studio-step, .studio-proof-item, .pj-cta-section')
       .forEach(el => el.classList.add('reveal'));
   };
   markReveal();
@@ -3582,7 +3610,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const progress = deck === null
       ? Math.min(Math.max(top / cachedMax, 0), 1)
       : deck;
-    const shown = top > 160;
+    // Keep the control through small scroll corrections near its threshold.
+    const shown = shownNow ? top > 40 : top > 160;
     if (shown !== shownNow) {
       shownNow = shown;
       control.classList.toggle('is-shown', shown);
@@ -3603,7 +3632,22 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   window.addEventListener('bq:css-ready', onResize);
   window.addEventListener('bq:gallery-built', onResize);
   document.addEventListener('bq:route', onResize);
-  window.addEventListener('pageshow', update);
+  document.addEventListener('bq:menu-closed', onResize);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) onResize(); });
+  window.addEventListener('pageshow', onResize);
+
+  // The consent card is centred above the dock. Move the go-up control above
+  // its measured height instead of hiding it for the lifetime of that card.
+  const cookie = document.getElementById('cookieCard');
+  if (cookie && typeof ResizeObserver === 'function') {
+    let lastHeight = -1;
+    new ResizeObserver(() => {
+      const height = Math.ceil(cookie.getBoundingClientRect().height);
+      if (height === lastHeight) return;
+      lastHeight = height;
+      document.documentElement.style.setProperty('--bq-cookie-height', height + 'px');
+    }).observe(cookie);
+  }
   window.__bqCoreGoUpUpdate = queueUpdate;
 
   if (!window.__bqTopClickBound) {

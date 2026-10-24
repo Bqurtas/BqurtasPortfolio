@@ -705,12 +705,10 @@
   <link rel="stylesheet" href="css/fonts.css?v=ab564d35bc14">
   <link rel="stylesheet" href="css/experience.min.css?v=f25ca5458f26">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.css?v=ba1a023d2ef8">
+  <link rel="stylesheet" href="css/polish.css?v=e7503adc6666">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=d102bb86e515" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/all.min.css?v=d102bb86e515"></noscript>
 
-  <!-- Supabase powers the journal and subscription form. -->
-  <link rel="preconnect" href="https://dcnkhzrishphpismmxuu.supabase.co" crossorigin>
 
 </head>
 <body>
@@ -1756,7 +1754,7 @@
       <div class="section bio-docs-sheet">
         <div class="sheet-mid">
         <div class="bio-connect-links bio-connect-links--docs">
-        <a class="bio-block bio-social bio-doc-card bio-doc-card--cv" data-wm="&#xf15c;" href="https://dcnkhzrishphpismmxuu.supabase.co/storage/v1/object/public/PDF/df9e89_a909ec87afa044c9aca814e2de2e553c_compressed.pdf" target="_blank" rel="noopener">
+        <a class="bio-block bio-social bio-doc-card bio-doc-card--cv" data-wm="&#xf15c;" href="/assets/documents/cv.pdf" target="_blank" rel="noopener">
           <span class="bio-social-mark"><i class="fa-solid fa-file-lines"></i></span>
           <div class="bio-social-text">
             <span class="mono bio-social-eyebrow" data-i18n="doc.cv.eye">PDF · Curriculum Vitae</span>
@@ -1767,7 +1765,7 @@
           <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
         </a>
 
-        <a class="bio-block bio-social bio-doc-card bio-doc-card--catalogue" data-wm="&#xf518;" href="https://dcnkhzrishphpismmxuu.supabase.co/storage/v1/object/public/PDF/df9e89_fc710677a00048569ff9b0f6f86efebd_compressed.pdf" target="_blank" rel="noopener">
+        <a class="bio-block bio-social bio-doc-card bio-doc-card--catalogue" data-wm="&#xf518;" href="/assets/documents/catalogue.pdf" target="_blank" rel="noopener">
           <span class="bio-social-mark"><i class="fa-solid fa-book-open"></i></span>
           <div class="bio-social-text">
             <span class="mono bio-social-eyebrow" data-i18n="doc.cat.eye">PDF · Catalogue</span>
@@ -2172,9 +2170,6 @@
     </article>
   </div>
 
-  <!-- Blog content backend (Supabase). The key is a PUBLIC publishable key —
-       safe in the client; row-level security lets visitors only read posts. -->
-  <script>window.BQ_SUPA = { url: 'https://dcnkhzrishphpismmxuu.supabase.co', key: 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3' };</script>
   <script defer src="js/i18n.v420.min.js?v=d2f12601ce49"></script>
   <!-- Non-English visitors need the extra dictionaries before first render;
        English (the default + PSI) never loads them, keeping the parse light.
@@ -2203,8 +2198,8 @@
       }
     }catch(e){}})();
   </script>
-  <script defer src="js/main.v420.min.js?v=09310ad43f61"></script>
-  <script defer src="js/gallery.v420.min.js?v=04a1bcf2fd6f"></script>
+  <script defer src="js/main.v420.min.js?v=65af515712e6"></script>
+  <script defer src="js/gallery.v420.min.js?v=cd949b262082"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
        still receive them immediately. This removes their database/GitHub work
@@ -2223,7 +2218,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=05678f13d1c6';
+        s.src = 'js/enhance.v420.min.js?v=1c9bc84e2c13';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -2292,8 +2287,8 @@
       }, true);
     }());
   </script>
-  <script defer src="js/lux.min.js?v=b10aaa8c59c6"></script>
-  <script defer src="js/motion.8c122f12208b.min.js?v=8c122f12208b"></script>
+  <script defer src="js/lux.min.js?v=1e8781ff602a"></script>
+  <script defer src="js/motion.a54e2b0bcfc8.min.js?v=a54e2b0bcfc8"></script>
   <!-- The chatbot knowledge base is loaded only when a visitor shows intent. -->
   <script>
     (function () {
@@ -2378,7 +2373,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=adfd8726294f', { updateViaCache: 'none' })
+            .register('/sw.js?v=a4c235609394', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

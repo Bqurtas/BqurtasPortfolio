@@ -54,7 +54,7 @@
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
 
-    var sel = ['.section-head', '.bio-teaser-grid', '.logos-head', '.latest-blog-head',
+    var sel = ['.section-head', '.bio-teaser-grid', '.latest-blog-head',
                '.room-features', '.room-hero-inner', '.bio-block', '.pencemor-hero-inner',
                '.feature-card', '.tab-header'].join(',');
     document.querySelectorAll(sel).forEach(function (el) {
@@ -129,7 +129,7 @@
   (function () {
     var mq = document.querySelector('.logo-marquee');
     var track = mq && mq.querySelector('.logo-marquee-track');
-    if (!mq || !track || !track.getAnimations) return;
+    if (!mq || !track || !track.getAnimations || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     var rate = function (v) {
       track.getAnimations().forEach(function (a) {
         if (a.updatePlaybackRate) a.updatePlaybackRate(v); else a.playbackRate = v;

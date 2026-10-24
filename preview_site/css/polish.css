@@ -1962,27 +1962,21 @@ html body :is(#bio, #blog, #contact).paper-stack > .section[data-paper-fit] {
   --bq-paper-content-max: 1100px;
 }
 
-/* The entire dock scales, including its icons and text. Its bottom anchor and
-   centering remain fixed, and the existing scroll compaction compounds with
-   the viewport factor rather than replacing it. */
+/* The entire dock scales with the viewport, including its icons and text.
+   Its bottom anchor and centering stay fixed. Scroll may still set
+   nav-compact, but that class must not scale the bar: a second scale changes
+   --bq-dock-top, the paper padding follows, and the bar jumps by itself.
+   Menu-open keeps the separate transform that travels with the page. */
 html body .rail.rail,
 html[dir="rtl"] body .rail.rail,
 html body .mobilebar.mobilebar,
-html[dir="rtl"] body .mobilebar.mobilebar {
+html[dir="rtl"] body .mobilebar.mobilebar,
+html body.nav-compact:not(.menu-open) .rail.rail,
+html[dir="rtl"] body.nav-compact:not(.menu-open) .rail.rail,
+html body.nav-compact:not(.menu-open) .mobilebar.mobilebar,
+html[dir="rtl"] body.nav-compact:not(.menu-open) .mobilebar.mobilebar {
   transform: translateX(-50%) scale(var(--bq-viewport-scale, 1)) !important;
   transform-origin: 50% 100% !important;
-}
-@media (min-width: 1025px) {
-  html body.nav-compact:not(.menu-open) .rail.rail,
-  html[dir="rtl"] body.nav-compact:not(.menu-open) .rail.rail {
-    transform: translateX(-50%) scale(calc(var(--bq-viewport-scale, 1) * .9)) !important;
-  }
-}
-@media (max-width: 1024px) {
-  html body.nav-compact:not(.menu-open) .mobilebar.mobilebar,
-  html[dir="rtl"] body.nav-compact:not(.menu-open) .mobilebar.mobilebar {
-    transform: translateX(-50%) scale(calc(var(--bq-viewport-scale, 1) * .86)) !important;
-  }
 }
 
 /* Pointer and native-scroll depth belongs to leaf artwork, never the fitted
@@ -3564,4 +3558,63 @@ html body #dash#dash :is(.dash-gate-icon, .dash-btn > i, .cms-btn > i, .dash-log
 html body #mobileMenu#mobileMenu#mobileMenu .mobile-menu-close > i,
 html body #dash#dash :is(.dash-btn > i, .cms-btn > i, .dash-login button > i) {
   color: inherit !important;
+}
+
+/* Stable navigation: one size and one reserved clearance while scrolling.
+   No scroll-state scaling can move the bar or the paper beside it. */
+@media (min-width: 1025px) {
+  html body,
+  html body.nav-compact:not(.menu-open) { --bq-dock-shrink: 1; }
+}
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  html body,
+  html body.nav-compact:not(.menu-open) { --bq-dock-shrink: 1; }
+  html body .mobilebar.mobilebar,
+  html[dir="rtl"] body .mobilebar.mobilebar,
+  html body.nav-compact:not(.menu-open) .mobilebar.mobilebar,
+  html[dir="rtl"] body.nav-compact:not(.menu-open) .mobilebar.mobilebar {
+    transform: translateX(-50%) scale(var(--bq-viewport-scale, 1)) !important;
+    transition: opacity .2s ease, visibility .2s ease !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: color-mix(in srgb, var(--bg) 96%, transparent) !important;
+  }
+}
+
+/* Client marks stay readable even if an entrance observer misses a sticky
+   handoff. Fixed cells and a trailing gap make both loop halves identical. */
+html body #design .logos-section :is(.logos-head, .logo-chip, .logo-mark) {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
+html body #design .logo-marquee-track {
+  --client-gap: clamp(24px, 4vw, 56px);
+  gap: var(--client-gap);
+  padding-inline-end: var(--client-gap);
+  box-sizing: content-box;
+}
+html body #design .logo-chip--img {
+  flex: 0 0 clamp(104px, 14vw, 160px);
+  width: clamp(104px, 14vw, 160px);
+  height: 104px;
+  padding: 0 !important;
+}
+html body #design .logo-chip--img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: none !important;
+}
+html body #design .logo-chip--img img[data-media-exhausted] { visibility: hidden; }
+@media (hover: none), (pointer: coarse) {
+  html body #design .logo-chip--img img { transition: none; }
+}
+
+/* Consent never disables navigation. Reserve its actual height, including
+   translated copy; dialogs still keep their existing focus/visibility rules. */
+html body:has(#cookieCard.is-shown):not(.menu-open):not(.menu-closing) #toTop.is-shown {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  bottom: min(calc(var(--bq-dock-top, 92px) + var(--bq-cookie-height, 210px) + 36px), calc(100svh - 74px)) !important;
 }

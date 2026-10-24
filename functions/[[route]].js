@@ -15,10 +15,9 @@
 import { MEDIA_ARCHIVE_ROUTES } from './_media-archive-routes.js';
 import { parseWorkPath, serveWorkPage } from './_work-page.js';
 import { untransformedDocument } from './_untransformed.js';
+import { listPublishedPosts, getPublishedPost } from './api/_cms.js';
 
 const SITE = 'https://bqurtas.com';
-const SUPA = 'https://dcnkhzrishphpismmxuu.supabase.co';             // blog posts live here
-const SUPA_KEY = 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3';   // publishable (read-only, safe in client)
 const LANGS = ['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];                 // en = no prefix
 const ROOMS = ['blog', 'bio', 'contact'];
 const TABS  = ['logo','official','book','posters','social','events','stationery','image','video','other','certificate'];
@@ -121,7 +120,7 @@ function resolve(pathname) {
     if (seg.length === 2 && TABS.includes(tab)) return { lang, key: tab, canon: SITE + prefix + '/design/' + tab };
     return null;
   }
-  /* Supabase IDs are positive integers. Keep them as strings so a large ID is
+  /* Published post IDs are positive integers. Keep them as strings so a large ID is
      never rounded by JavaScript, and put a finite ceiling on the route space
      so arbitrary digit strings cannot become crawlable application pages. */
   if (first === 'blog' && seg.length === 2 && /^[1-9]\d{0,17}$/.test(seg[1])) return { lang, key: 'blogpost', slug: seg[1], canon: SITE + prefix + '/blog/' + seg[1] };
@@ -153,7 +152,7 @@ function retiredRedirectPath(pathname) {
 }
 
 function isPassthroughPath(pathname, request) {
-  if (/^\/(?:api|assets|css|js|vendor|\.well-known|mail|autodiscover)(?:\/|$)/i.test(pathname)) return true;
+  if (/^\/(?:api|assets|uploads|css|js|vendor|\.well-known|mail|autodiscover)(?:\/|$)/i.test(pathname)) return true;
   if (['/index.html', '/404.html', '/favicon.ico', '/llms.txt', '/robots.txt', '/security.txt', '/site.webmanifest', '/sitemap-images.xml', '/sitemap-gallery.xml', '/sitemap-media.xml'].includes(pathname)) return true;
   const acceptsHtml = /(?:^|,)\s*text\/html(?:\s*;|\s*,|$)/i.test(request.headers.get('Accept') || '');
   return !acceptsHtml && /\.[a-z0-9]{2,10}$/i.test(pathname);
@@ -276,26 +275,11 @@ async function serveSitemap(request, url, env, next) {
     ''
   );
   try {
-    const res = await fetch(SUPA + '/rest/v1/posts?select=id,created_at&published=eq.true&order=created_at.desc', {
-      headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY },
-      signal: AbortSignal.timeout(8_000)
-    });
-    if (res.ok) {
-      const posts = await res.json();
-      const live = Array.isArray(posts) ? posts : [];
-      /* Rebuild the blog section rather than appending to it. The static file
-         still listed /blog/1 through /blog/1134 from an earlier state of the
-         table, while one post is actually published — so Google was being
-         handed a thousand URLs that 404, and the only real post could still be
-         missing. Every existing <url> block whose <loc> is a /blog/<id> comes
-         out, and the current published rows go back in. */
-      const blocks = blogPostSitemapBlocks(live);
-      if (blocks) {
-        body = body.replace(/\s*<\/urlset>\s*$/i, '\n' + blocks + '\n</urlset>\n');
-      }
-    } else {
-      console.warn('sitemap posts query', res.status, await res.text().catch(() => ''));
-    }
+    const live = await listPublishedPosts(env.DB);
+    if (!Array.isArray(live)) throw new Error('invalid-post-list');
+    // Rebuild from published D1 rows so drafts and retired IDs stay out of the sitemap.
+    const blocks = blogPostSitemapBlocks(live);
+    if (blocks) body = body.replace(/\s*<\/urlset>\s*$/i, '\n' + blocks + '\n</urlset>\n');
   } catch (e) { console.warn('sitemap posts query threw', String(e)); }
   /* Build the headers rather than inheriting the static asset's. The body
      leaving here is not the body that came out of ASSETS — blog posts get
@@ -537,20 +521,14 @@ export async function onRequest(context) {
   let meta, img, imgType = 'image/jpeg';
   let postJsonLd = '';   // per-post BlogPosting schema (filled for real blog posts)
   if (r.key === 'blogpost') {
-    // a single blog post — fetch it from Supabase so the share shows ITS cover + title
+    // Share metadata reads the same published D1 row as the journal.
     const id = r.slug;
     let post = null;
     let lookupFailed = false;
     try {
-      const res = await fetch(SUPA + '/rest/v1/posts?id=eq.' + encodeURIComponent(id) + '&published=eq.true&select=title,subtitle,cover,i18n&limit=1',
-        { headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY }, signal: AbortSignal.timeout(8_000) });
-      if (res.ok) {
-        const rows = await res.json();
-        if (!Array.isArray(rows) || rows.some((row) => !row || typeof row !== 'object' || Array.isArray(row))) {
-          lookupFailed = true;
-        } else post = rows[0] || null;
-      }
-      else { lookupFailed = true; console.warn('blogpost lookup', id, res.status); }
+      post = await getPublishedPost(env.DB, id);
+      if (post !== null && (!post || typeof post !== 'object' || Array.isArray(post))) lookupFailed = true;
+      if (lookupFailed) post = null;
     } catch (e) { lookupFailed = true; console.warn('blogpost lookup threw', id, String(e)); }
     /* A post id that does not exist, or is not published, is not a page.
        /blog/999999999999 was answering 200 with index,follow, which invites
@@ -565,7 +543,9 @@ export async function onRequest(context) {
       const headline = String(tr.title || post.title || 'Journal').trim();
       meta = { t: headline + ' — Barakat Qurtas',
                d: String(tr.subtitle || post.subtitle || blogD).trim() };
-      img  = (post.cover && /^https?:\/\//.test(post.cover)) ? post.cover : (SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=3');
+      img = post.cover && /^(?:https?:\/\/|\/(?!\/))/.test(post.cover)
+        ? new URL(post.cover, SITE).href
+        : SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=3';
       imgType = /\.png(\?|$)/i.test(img) ? 'image/png' : /\.webp(\?|$)/i.test(img) ? 'image/webp' : 'image/jpeg';
       // Machine-readable BlogPosting so AI engines + Google attribute every post
       // to Barakat — author named in the page's own language, linked to #person.
@@ -607,9 +587,9 @@ export async function onRequest(context) {
     "script-src 'nonce-" + nonce + "' 'strict-dynamic' 'self'",
     "style-src 'nonce-" + nonce + "' 'self'",
     "font-src 'self' data:",
-    "img-src 'self' data: blob: https://cdn.jsdelivr.net https://cdn.statically.io https://raw.githubusercontent.com https://images.weserv.nl https://*.supabase.co",
+    "img-src 'self' data: blob: https://cdn.jsdelivr.net https://cdn.statically.io https://raw.githubusercontent.com https://images.weserv.nl",
     "media-src 'self' blob: https://cdn.jsdelivr.net https://cdn.statically.io https://raw.githubusercontent.com",
-    "connect-src 'self' https://cloud.umami.is https://api.umami.is https://gateway.umami.is https://*.supabase.co https://api.github.com https://api.web3forms.com https://translate.googleapis.com https://cdn.jsdelivr.net https://data.jsdelivr.com https://images.weserv.nl https://raw.githubusercontent.com",
+    "connect-src 'self' https://cloud.umami.is https://api.umami.is https://gateway.umami.is https://api.github.com https://api.web3forms.com https://translate.googleapis.com https://cdn.jsdelivr.net https://data.jsdelivr.com https://images.weserv.nl https://raw.githubusercontent.com",
     "frame-src 'self'",
     "worker-src 'self' blob:"
   ].join('; ');

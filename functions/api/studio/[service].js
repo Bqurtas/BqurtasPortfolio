@@ -1,9 +1,5 @@
-/* Same-origin gateway for privileged Supabase Edge Functions.
-
-   The browser proves two factors to Pages: its signed HttpOnly session and the
-   browser-facing EDIT_TOKEN. Pages then substitutes SUPABASE_EDIT_TOKEN, which
-   is never exposed to browser code. Direct calls to the Edge Functions cannot
-   mutate Studio data without that separate upstream credential. */
+/* Same-origin Studio: signed session + independent editor credential, with
+   content in Cloudflare D1 and public media in the owner GitHub repository. */
 
 import {
   editorAuthorization,
@@ -11,18 +7,15 @@ import {
   inputErrorResponse,
   isSameOrigin,
   json,
-  noContent,
   rateKey,
   readJson,
-  readRequestBytes,
   rotateEditToken,
   sessionConfigured,
-  takeRateLimit,
-  upstreamCredentialConfigured
+  takeRateLimit
 } from '../_session.js';
 
-const SUPABASE_URL = 'https://dcnkhzrishphpismmxuu.supabase.co';
-const PUBLIC_SUPABASE_KEY = 'sb_publishable_FrR6Ur2yy-rOCgKk5D326w_j5rfBgV3';
+import { handleCmsAdmin } from '../_cms.js';
+import { handleGithubWork, handleGithubMediaUpload } from '../_github-works.js';
 const IMAGE_LIMIT = 8 * 1024 * 1024;
 const LATEST_LINKS = new Set(['', 'logo', 'book', 'image', 'posters', 'social', 'events', 'stationery', 'official', 'video', 'other']);
 const FOLDERS = new Set([
@@ -150,12 +143,7 @@ function validPayload(service, body) {
 function configured(env) {
   return sessionConfigured(env)
     && !!env.DB
-    && String(env.EDIT_TOKEN || '').length > 0
-    && upstreamCredentialConfigured(env);
-}
-
-function upstreamTimedOut(error) {
-  return error?.name === 'TimeoutError' || error?.name === 'AbortError';
+    && String(env.EDIT_TOKEN || '').length > 0;
 }
 
 export async function onRequestPost({ request, env, params }) {
@@ -188,56 +176,12 @@ export async function onRequestPost({ request, env, params }) {
       : json({ ok: false, error: 'token-update-failed' }, 503);
   }
 
-  // Emit only fixed failure codes and the already allowlisted service. This
-  // remains useful when an outer gateway replaces the JSON error response.
-  // Never log credentials, request content, upstream bodies or exceptions.
-  const upstreamFailure = (code, upstreamStatus) => {
-    const status = Number.isInteger(upstreamStatus) && upstreamStatus >= 100 && upstreamStatus <= 599
-      ? { upstreamStatus } : {};
-    console.warn({ event: 'studio-proxy-failure', service, code, ...status });
-    return json({ ok: false, error: code, ...status }, 502);
-  };
-
-  const publishableKey = String(env.SUPABASE_PUBLISHABLE_KEY || PUBLIC_SUPABASE_KEY);
   try {
-    const upstream = await fetch(`${SUPABASE_URL}/functions/v1/${service}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        apikey: publishableKey,
-        Authorization: `Bearer ${publishableKey}`,
-        'x-edit-token': String(env.SUPABASE_EDIT_TOKEN)
-      },
-      body: JSON.stringify(body),
-      // workerd supports only follow/manual. Explicitly reject redirects below
-      // so the private upstream credential can never reach another location.
-      redirect: 'manual',
-      signal: AbortSignal.timeout(60_000)
-    });
-    if (upstream.status >= 300 && upstream.status < 400) return upstreamFailure('studio-upstream-invalid', upstream.status);
-    if (upstream.status === 204) return noContent();
-    // The browser credential has already passed Pages. An upstream auth
-    // rejection is a server configuration failure, not a request to reconnect
-    // with (or expose) the Supabase-only credential in the browser.
-    if (upstream.status === 401 || upstream.status === 403) return upstreamFailure('studio-upstream-auth', upstream.status);
-    let raw;
-    try {
-      raw = new TextDecoder('utf-8', { fatal: true }).decode(await readRequestBytes(upstream, 5 * 1024 * 1024));
-    } catch (error) {
-      const code = upstreamTimedOut(error)
-        ? 'studio-upstream-timeout'
-        : error.status === 413 ? 'studio-upstream-too-large' : 'studio-upstream-invalid';
-      return upstreamFailure(code, upstream.status);
-    }
-    let payload;
-    try { payload = JSON.parse(raw); } catch (error) {
-      return upstreamFailure('studio-upstream-invalid', upstream.status);
-    }
-    if (payload && payload.error === 'no_github_token') return upstreamFailure('studio-github-not-configured', upstream.status);
-    if (upstream.status >= 500) return upstreamFailure('studio-upstream-failed', upstream.status);
-    return json(payload, upstream.status);
-  } catch (error) {
-    return upstreamFailure(upstreamTimedOut(error) ? 'studio-upstream-timeout' : 'studio-upstream-unavailable');
+    if (service === 'work-upload') return await handleGithubWork(body, env);
+    if (body.action === 'upload') return await handleGithubMediaUpload(body, env);
+    return await handleCmsAdmin(service, body, env);
+  } catch {
+    console.warn({ event: 'studio-content-failure', service });
+    return json({ ok: false, error: 'studio-content-unavailable' }, 503);
   }
 }

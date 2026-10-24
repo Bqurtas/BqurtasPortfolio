@@ -42,7 +42,7 @@ test('2FA status is server-backed and logout always expires the host cookie', as
     ok: true,
     configured: true,
     authenticated: true,
-    requirements: { pin: true, session: true, database: true, secondFactor: true, editor: false, upstream: false }
+    requirements: { pin: true, session: true, database: true, secondFactor: true, editor: false, github: false }
   });
 
   const logout = await twoFactorPost({
@@ -115,13 +115,13 @@ test('content mutations require both the signed session and edit header', async 
 test('2FA setup diagnostics disclose only requirement booleans, never credential values', async () => {
   const response = await twoFactorStatus({
     request: new Request(`${ORIGIN}/api/2fa`),
-    env: { SESSION_SECRET, EDIT_TOKEN: 'private-editor-credential', SUPABASE_EDIT_TOKEN: 'private-upstream-credential' }
+    env: { SESSION_SECRET, EDIT_TOKEN: 'private-editor-credential', GITHUB_TOKEN: 'private-github-credential' }
   });
   const body = await response.json();
   assert.equal(body.configured, false);
   assert.equal(body.authenticated, false);
-  assert.deepEqual(body.requirements, { pin: false, session: true, database: false, secondFactor: false, editor: true, upstream: true });
-  assert.doesNotMatch(JSON.stringify(body), /private-editor-credential|private-upstream-credential|a-strong-independent/);
+  assert.deepEqual(body.requirements, { pin: false, session: true, database: false, secondFactor: false, editor: true, github: true });
+  assert.doesNotMatch(JSON.stringify(body), /private-editor-credential|private-github-credential|a-strong-independent/);
 });
 
 test('missing sessions reject private requests before querying the editor credential store', async () => {

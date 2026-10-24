@@ -343,7 +343,7 @@ export async function serveWorkPage(request, url, env, route, helpers) {
   try { catalog = await loadCatalog(env, url.origin); }
   catch (e) { return helpers.unavailable(); }
   const list = catalog.byColl[route.coll] || [];
-  const item = list[route.index - 1];
+  const item = list.find(item => item.index === route.index);
   if (!item) return helpers.notFound();
   /* The same artwork filed under a second collection: send the visitor (and
      Google) to the one canonical page for that image. */

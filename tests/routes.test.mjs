@@ -40,35 +40,32 @@ test('blog IDs are finite positive decimal strings without number coercion', asy
   assert.equal((await runRoute('/blog/123456789012345678')).status, 204);
 });
 
-test('blog lookup distinguishes a confirmed missing post from an upstream outage', async () => {
-  const originalFetch = globalThis.fetch;
+test('blog lookup distinguishes a confirmed missing D1 post from a database outage', async () => {
   const assets = { fetch: async () => new Response('<!doctype html><title>404</title>') };
-  try {
-    globalThis.fetch = async () => new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json' } });
-    const missing = await onRequest({
-      request: new Request('https://bqurtas.com/blog/42', { headers: { Accept: 'text/html' } }),
-      env: { ASSETS: assets },
-      next: () => new Response(null, { status: 204 })
-    });
-    assert.equal(missing.status, 404);
+  const emptyDB = {
+    prepare() { return { bind() { return this; }, async run() { return { success:true }; }, async first() { return null; }, async all() { return { results:[] }; } }; },
+    batch(statements) { return Promise.all(statements.map(statement => statement.run())); }
+  };
+  const missing = await onRequest({
+    request: new Request('https://bqurtas.com/blog/42', { headers: { Accept: 'text/html' } }),
+    env: { ASSETS:assets, DB:emptyDB }, next:() => new Response(null, { status:204 })
+  });
+  assert.equal(missing.status, 404);
 
-    globalThis.fetch = async () => new Response('upstream unavailable', { status: 503 });
-    const unavailable = await onRequest({
-      request: new Request('https://bqurtas.com/blog/42', { headers: { Accept: 'text/html' } }),
-      env: { ASSETS: assets },
-      next: () => new Response(null, { status: 204 })
-    });
-    assert.equal(unavailable.status, 503);
-    assert.equal(unavailable.headers.get('retry-after'), '60');
-    assert.equal(unavailable.headers.get('x-robots-tag'), 'noindex, nofollow');
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
+  const unavailable = await onRequest({
+    request: new Request('https://bqurtas.com/blog/42', { headers: { Accept: 'text/html' } }),
+    env: { ASSETS:assets, DB:{ prepare() { throw new Error('database unavailable'); } } },
+    next:() => new Response(null, { status:204 })
+  });
+  assert.equal(unavailable.status, 503);
+  assert.equal(unavailable.headers.get('retry-after'), '60');
+  assert.equal(unavailable.headers.get('x-robots-tag'), 'noindex, nofollow');
 });
 
 test('known app routes and static files continue to Pages', async () => {
   assert.equal((await runRoute('/blog/12')).status, 204);
   assert.equal((await runRoute('/assets/avatar.webp', 'image/avif,image/webp,*/*')).status, 204);
+  assert.equal((await runRoute('/uploads/published-cover.webp', 'text/html')).status, 204, 'uploaded media can be opened directly as well as embedded');
   assert.equal((await runRoute('/sitemap-images.xml', 'application/xml')).status, 204);
 });
 
@@ -179,21 +176,17 @@ test('rewritten routes discard static validators and return bodyless HEAD respon
   }
 });
 
-test('malformed successful blog lookups are temporary failures, not confirmed missing posts', async (t) => {
-  for (const payload of [{ message: 'temporarily unavailable' }, [null], ['invalid-row']]) {
-    t.mock.method(globalThis, 'fetch', async () => Response.json(payload));
-    const response = await onRequest({
-      request: new Request('https://bqurtas.com/blog/42'),
-      env: { ASSETS: { fetch: async () => new Response('shell') } },
-      next: () => new Response(null, { status: 204 })
-    });
-    assert.equal(response.status, 503);
-    assert.equal(response.headers.get('retry-after'), '60');
-  }
+test('a missing D1 binding is a temporary blog failure, never a confirmed missing post', async () => {
+  const response = await onRequest({
+    request: new Request('https://bqurtas.com/blog/42'),
+    env: { ASSETS: { fetch: async () => new Response('shell') } },
+    next: () => new Response(null, { status:204 })
+  });
+  assert.equal(response.status, 503);
+  assert.equal(response.headers.get('retry-after'), '60');
 });
 
 test('sitemaps and ownership verification obey HEAD and reject missing source assets', async (t) => {
-  t.mock.method(globalThis, 'fetch', async () => Response.json([]));
   for (const path of ['/sitemap.xml', '/sitemap-images.xml', '/googlece435b444cb43243.html']) {
     const response = await onRequest({
       request: new Request(`https://bqurtas.com${path}`, { method: 'HEAD' }),

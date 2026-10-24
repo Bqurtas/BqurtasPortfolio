@@ -15,8 +15,7 @@ import {
   readJson,
   secretEqual,
   sessionConfigured,
-  takeRateLimit,
-  upstreamCredentialConfigured
+  takeRateLimit
 } from './_session.js';
 
 const PIN_LIMIT = { limit: 8, windowMs: 15 * 60 * 1000, durable: true };
@@ -173,7 +172,7 @@ export async function onRequestGet({ request, env }) {
     database: !!env.DB,
     secondFactor: secondFactorConfigured(env),
     editor: !!env.EDIT_TOKEN,
-    upstream: upstreamCredentialConfigured(env)
+    github: typeof env.GITHUB_TOKEN === 'string' && env.GITHUB_TOKEN.trim().length > 0
   };
   return json({
     ok: true,

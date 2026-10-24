@@ -1,12 +1,50 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { IMAGE_FILE_PREFIXES, withStableImageIndices } from '../functions/_gallery-update.js';
+export { IMAGE_FILE_PREFIXES } from '../functions/_gallery-update.js';
 
 const projectRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const defaultManifest = path.join(projectRoot, 'preview_site/assets/gallery-manifest.json');
+
+/* Only Studio's gallery destinations are discoverable. Keep the authored
+   order of existing works: the number in a filename is not its public URL
+   (TickerLogo2.webp, for example, has always been /design/tickerlogo/1). */
+export async function discoverGalleryImages(manifest, root = projectRoot) {
+  const stable = withStableImageIndices(manifest);
+  const available = new Set();
+  const discovered = [];
+  const imageIndexHighWater = { ...stable.imageIndexHighWater };
+  const imageFileHighWater = { ...stable.imageFileHighWater };
+  for (const [folder, prefix] of Object.entries(IMAGE_FILE_PREFIXES)) {
+    // A missing collection directory is a broken checkout, not permission to
+    // silently remove that entire collection from a production deployment.
+    const entries = await readdir(path.join(root, folder), { withFileTypes: true });
+    entries.filter(entry => entry.isFile() && /^[^/\\]+\.webp$/i.test(entry.name))
+      .forEach(entry => available.add(`${folder}/${entry.name}`));
+    const pattern = new RegExp(`^${prefix}[1-9][0-9]*\\.webp$`);
+    const files = entries.filter(entry => entry.isFile() && pattern.test(entry.name))
+      .map(entry => entry.name).sort((a, b) => Number(a.slice(prefix.length, -5)) - Number(b.slice(prefix.length, -5)));
+    files.forEach(file => discovered.push(`${folder}/${file}`));
+  }
+  const known = new Set(stable.images.map(record => record.path));
+  const images = stable.images.filter(record => available.has(record.path));
+  for (const name of discovered) {
+    if (known.has(name)) continue;
+    const folder = name.split('/')[0];
+    const fileNumber = Number(name.match(/([1-9][0-9]*)\.webp$/)[1]);
+    if (!Number.isSafeInteger(fileNumber)) throw new Error('Invalid gallery filename number');
+    const index = imageIndexHighWater[folder] + 1;
+    if (!Number.isSafeInteger(index)) throw new Error('Gallery image index exhausted');
+    imageIndexHighWater[folder] = index;
+    imageFileHighWater[folder] = Math.max(imageFileHighWater[folder], fileNumber);
+    images.push({ path: name, index });
+  }
+  return { ...stable, images, imageIndexHighWater, imageFileHighWater };
+}
 
 /* Read the encoded canvas dimensions without decoding or modifying the image.
    WebP stores them in VP8X, VP8L, or the VP8 keyframe header. */
@@ -122,7 +160,8 @@ export async function withVideoMetadata(manifest, root = projectRoot) {
 
 export async function generateGalleryManifest({ manifestFile = defaultManifest, root = projectRoot } = {}) {
   const before = await readFile(manifestFile, 'utf8');
-  const manifest = await withVideoMetadata(await withOriginalImageDimensions(JSON.parse(before), root), root);
+  const discovered = await discoverGalleryImages(JSON.parse(before), root);
+  const manifest = await withVideoMetadata(await withOriginalImageDimensions(discovered, root), root);
   const after = JSON.stringify(manifest) + '\n';
   if (after !== before) await writeFile(manifestFile, after);
   return manifest;

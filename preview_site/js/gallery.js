@@ -41,7 +41,9 @@ window.BQ_GALLERY = {
   url(coll, i) {
     const c = this.COLLECTIONS[coll];
     if (!c) return '';
-    const file = c.files && c.files[i - 1] != null ? c.files[i - 1] : `${c.prefix}${i}.${c.ext}`;
+    const file = c.indexFiles ? c.indexFiles[i]
+      : c.files && c.files[i - 1] != null ? c.files[i - 1] : `${c.prefix}${i}.${c.ext}`;
+    if (!file) return '';
     const base = /\.(mp4|webm|mov)$/i.test(file) ? '/media' : this.CDN_BASE;
     return `${base}/${c.folder}/${encodeURIComponent(file)}`;
   },
@@ -51,6 +53,7 @@ window.BQ_GALLERY = {
   rawUrl(coll, i) {
     const c = this.COLLECTIONS[coll];
     if (!c) return '';
+    if (c.indexFiles) return c.indexFiles[i] ? `${this.RAW_BASE}/${c.folder}/${encodeURIComponent(c.indexFiles[i])}` : '';
     if (c.files && c.files[i - 1] != null)
       return `${this.RAW_BASE}/${c.folder}/${encodeURIComponent(c.files[i - 1])}`;
     return `${this.RAW_BASE}/${c.folder}/${c.prefix}${i}.${c.ext}`;
@@ -83,15 +86,16 @@ window.BQ_GALLERY = {
     for (let i = 1; i <= n; i++) {
       const fname = c.files ? c.files[i - 1] : null;
       const metadata = c.dimensions?.[fname || `${c.prefix}${i}.${c.ext}`];
+      const index = metadata?.index || i;
       const type  = fname ? (/\.(mp4|webm|mov)$/i.test(fname) ? 'video' : 'image')
                           : (c.ext === 'mp4' ? 'video' : 'image');
-      out.push({ coll, cat, index: i, type,
-        url:    this.url(coll, i),
-        rawUrl: this.rawUrl(coll, i),
+      out.push({ coll, cat, index, type,
+        url:    this.url(coll, index),
+        rawUrl: this.rawUrl(coll, index),
         width: metadata?.width || 0,
         height: metadata?.height || 0,
         poster: metadata?.poster || '',
-        title:  `${c.title} ${String(i).padStart(2, '0')}`,
+        title:  `${c.title} ${String(index).padStart(2, '0')}`,
         titlePrefix: c.title,
         tag: c.tag, icon: c.icon,
       });
@@ -121,6 +125,7 @@ window.BQ_GALLERY = {
       }
       const records = [...manifest.images, ...manifest.videos];
       const byFolder = Object.create(null);
+      const indices = Object.create(null);
       const knownFolders = new Set(Object.values(this.COLLECTIONS).map(c => c.folder));
       const seen = new Set();
       records.forEach((record) => {
@@ -132,9 +137,14 @@ window.BQ_GALLERY = {
         const folder = record.path.slice(0, slash);
         const file = record.path.slice(slash + 1);
         if (!knownFolders.has(folder) || !/^[^\\/]+\.(webp|png|jpe?g|avif|gif|mp4|webm|mov)$/i.test(file)) return;
+        const list = byFolder[folder] || (byFolder[folder] = []);
+        const index = record.index === undefined ? list.length + 1 : record.index;
+        const used = indices[folder] || (indices[folder] = new Set());
+        if (!Number.isSafeInteger(index) || index < 1 || used.has(index)) return;
+        used.add(index);
         seen.add(record.path);
-        (byFolder[folder] || (byFolder[folder] = [])).push({
-          file,
+        list.push({
+          file, index,
           width: record.width,
           height: record.height,
           // Only the exact first-party frame generated for this film is used.
@@ -147,6 +157,7 @@ window.BQ_GALLERY = {
         const collection = this.COLLECTIONS[key];
         const list = byFolder[collection.folder] || [];
         collection.files = list.map((record) => record.file);
+        collection.indexFiles = Object.fromEntries(list.map((record) => [record.index, record.file]));
         collection.dimensions = Object.fromEntries(list.map((record) => [record.file, record]));
         collection.count = collection.files.length;
       }
@@ -640,23 +651,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   window.__bqLangCb = window.__bqLangCb || [];
   window.__bqLangCb.push(() => window.__bqRelocalizeGallery());
 
-  /* ── WorkWith: real images in marquee ── */
+  /* ── WorkWith: same-origin marks, loaded as one strip before it arrives ── */
   const marqueeTrack = document.querySelector('.logo-marquee-track');
   if (marqueeTrack) {
-    const CDN = window.BQ_GALLERY.CDN_BASE;
-    const wLogos = Array.from({length:16}, (_,i) =>
-      `${CDN}/WorkWith/WorkLogo${i+1}.webp`);
-    const all = [...wLogos, ...wLogos]; // duplicate for seamless loop
-    marqueeTrack.innerHTML = all.map(src =>
-      `<div class="logo-chip logo-chip--img">
-         <img src="${src}" alt="" loading="lazy" decoding="async" width="180" height="135" />
+    const gallery = window.BQ_GALLERY;
+    const wLogos = Array.from({ length: 16 }, (_, i) => `WorkLogo${i + 1}.webp`);
+    marqueeTrack.innerHTML = [...wLogos, ...wLogos].map(file =>
+      `<div class="logo-chip logo-chip--img" aria-hidden="true">
+         <img src="/assets/clients/${file}" data-client-file="${file}" alt="" loading="lazy" decoding="async" width="180" height="135" />
        </div>`
     ).join('');
-    /* The local thumbnail bundle does not contain WorkWith; use the canonical
-       CDN asset directly so the marquee never starts with a guaranteed 404. */
-    marqueeTrack.querySelectorAll('img').forEach(img =>
-      img.addEventListener('error', () => img.closest('.logo-chip')?.remove())
-    );
+    const images = Array.from(marqueeTrack.querySelectorAll('img'));
+    images.forEach(img => gallery.bindMediaFallback(img, [
+      `${gallery.CDN_BASE}/WorkWith/${img.dataset.clientFile}`,
+      `${gallery.RAW_BASE}/WorkWith/${img.dataset.clientFile}`
+    ]));
+    const loadStrip = () => images.forEach(img => { img.loading = 'eager'; });
+    if (typeof IntersectionObserver === 'function') {
+      const loader = new IntersectionObserver(entries => {
+        if (!entries.some(entry => entry.isIntersecting)) return;
+        loadStrip();
+        loader.disconnect();
+      }, { rootMargin: '600px 0px' });
+      loader.observe(marqueeTrack.parentElement);
+    } else loadStrip();
   }
 
   /* ── TickerLogo: B/W marks in Designed by hand grid ── */
@@ -665,13 +683,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const logos = (window.BQ_GALLERY.items('tickerlogo') || []).slice(0, 8);
     logosGrid.removeAttribute('aria-busy');
     logosGrid.removeAttribute('data-logos-empty');
-    logosGrid.innerHTML = logos.map((item, idx) => {
+    logosGrid.innerHTML = logos.map((item) => {
       const src = item.url;
       /* Same localized name the cards get, so the label, the alt text and the
          lightbox caption all read in the visitor's language — and so the
          relocalize pass below can find and update them on a language switch. */
-      const title = galTitle('tickerlogo', idx + 1, 'Ticker Logo');
-      return `<button type="button" class="logo-mark logo-mark--img logo-mark--ticker" data-full="${src}" data-coll="tickerlogo" data-idx="${idx + 1}" data-title="${title}" aria-label="${galViewLabel(title)}">
+      const title = galTitle('tickerlogo', item.index, 'Ticker Logo');
+      return `<button type="button" class="logo-mark logo-mark--img logo-mark--ticker" data-full="${src}" data-coll="tickerlogo" data-idx="${item.index}" data-title="${title}" aria-label="${galViewLabel(title)}">
          <img src="${window.BQ_GALLERY.thumb(src, 180)}" data-full="${src}" data-raw="${item.rawUrl}" alt="${title}" loading="lazy" decoding="async" width="180" height="135" />
        </button>`
     }).join('');
