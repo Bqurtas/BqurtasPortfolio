@@ -550,6 +550,21 @@ document.addEventListener('DOMContentLoaded', () => {
   let lastMenuTrigger = null;
   let menuFrame = 0;
 
+  // Keep the full-screen curtain exactly as tall as the VISIBLE viewport.
+  // iOS/Android grow and shrink the visible area as the address/tool bar hides
+  // on scroll; CSS 100dvh only updates at rest, so mirror visualViewport.height
+  // into --bq-menu-vh live (polish.css reads var(--bq-menu-vh, 100dvh)).
+  const syncMenuViewport = () => {
+    const height = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    if (height) document.documentElement.style.setProperty('--bq-menu-vh', height + 'px');
+  };
+  syncMenuViewport();
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncMenuViewport, { passive: true });
+    window.visualViewport.addEventListener('scroll', syncMenuViewport, { passive: true });
+  }
+  window.addEventListener('resize', syncMenuViewport, { passive: true });
+
   const setMenuPageUnavailable = (unavailable) => {
     if (!menuStage) return;
     if (unavailable) {
@@ -642,6 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (open) {
       clearMenuCloseWait();
+      syncMenuViewport();
       lastMenuTrigger = trigger || document.activeElement;
       const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
       /* Keep the native document position and scale its visible slice. The

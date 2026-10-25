@@ -3565,3 +3565,113 @@ html body #mobileMenu#mobileMenu#mobileMenu .mobile-menu-close > i,
 html body #dash#dash :is(.dash-btn > i, .cms-btn > i, .dash-login button > i) {
   color: inherit !important;
 }
+
+/* ============================================================================
+   MOBILE / TABLET MENU (<=1024px) — fit the dynamic viewport, and let the
+   curtain FOLLOW the page theme as frosted glass. Owner (2026-10-25): on a
+   real phone the full-screen menu did two wrong things. (1) It did not track
+   the browser's dynamic toolbar as it hid/showed on scroll, so the gallery and
+   the bottom dock peeked under it. (2) It read as the OPPOSITE of the page —
+   a black curtain over a light page, light paper over a dark page. Below
+   1024px the overlay now sizes to the live visible viewport, and the glass
+   takes on the current theme so the page shows faintly through it.
+
+   DESKTOP (min-width:1025px) is deliberately untouched: the inverted curtain
+   there stays exactly as before. polish.css loads last, so these
+   equal-or-higher-specificity rules win the ties. The slide-in transform,
+   transitions and layout authored in experience.css are NOT touched here —
+   only sizing and colour.
+   ========================================================================== */
+@media (max-width: 1024px) {
+  /* ---- FIX 1: size the overlay to the DYNAMIC (visible) viewport ---------
+     100vh is the static fallback; 100dvh tracks the toolbar at rest; the live
+     --bq-menu-vh (set from window.visualViewport.height in main.js) tracks it
+     mid-scroll, which pure CSS cannot do on iOS/Android. */
+  html body #mobileMenu#mobileMenu#mobileMenu.mobile-menu {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: auto !important;
+    height: 100vh !important;
+    height: var(--bq-menu-vh, 100dvh) !important;
+    min-height: 100vh !important;
+    min-height: var(--bq-menu-vh, 100dvh) !important;
+    max-height: 100vh !important;
+    max-height: var(--bq-menu-vh, 100dvh) !important;
+  }
+  html body #mobileMenu#mobileMenu#mobileMenu.mobile-menu .mobile-sheet,
+  html body #mobileMenu#mobileMenu#mobileMenu.mobile-menu .mm-left,
+  html body #mobileMenu#mobileMenu#mobileMenu.mobile-menu.is-ready .mm-left {
+    height: 100% !important;
+    min-height: 100% !important;
+  }
+
+  /* ---- FIX 2: the glass FOLLOWS the page theme -------------------------- */
+  /* Light (explicit + the default when no data-theme is set). Translucent
+     paper + blur so the page shows through; theme ink keeps the type legible.
+     The opaque var(--bg) above is the fallback for browsers without
+     color-mix()/backdrop-filter. */
+  html:root[data-theme="light"] body #mobileMenu#mobileMenu#mobileMenu.mobile-menu,
+  html body #mobileMenu#mobileMenu#mobileMenu.mobile-menu {
+    background: var(--bg) !important;
+    background: color-mix(in srgb, var(--bg) 80%, transparent) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
+    backdrop-filter: blur(22px) saturate(140%) !important;
+    color: var(--ink) !important;
+  }
+  /* Dark — equal specificity to the base polish.css dark rule (~line 2513) and
+     later in the file, so it wins; a darker translucent bed, light ink. */
+  html:root[data-theme="dark"] body #mobileMenu#mobileMenu#mobileMenu.mobile-menu {
+    background: var(--bg) !important;
+    background: color-mix(in srgb, var(--bg) 78%, transparent) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
+    backdrop-filter: blur(22px) saturate(140%) !important;
+    color: var(--ink) !important;
+  }
+
+  /* The sheet and the link stack carry no colour of their own, so the glass
+     shows through them, and they fill the overlay. */
+  html:root[data-theme] body #mobileMenu#mobileMenu#mobileMenu.mobile-menu :is(.mobile-sheet, .mm-left),
+  html body #mobileMenu#mobileMenu#mobileMenu.mobile-menu :is(.mobile-sheet, .mm-left) {
+    background: transparent !important;
+    color: var(--ink) !important;
+    height: 100% !important;
+    min-height: 100% !important;
+  }
+
+  /* Primary type: links, brand, close, footers and socials read in theme ink
+     on the matching glass. Mirrors the sub-elements of the base dark block. */
+  html:root[data-theme] body #mobileMenu#mobileMenu#mobileMenu.mobile-menu :is(.mobile-menu-close, .mobile-menu-close i, .mm-link, .mm-link-copy, .mm-link-text, .mm-menu-brand, .mm-menu-brand strong, .mm-menu-brand-copy strong, .mm-logo, .mm-touch, .mm-foot a, .mm-socs a, .mm-menu-social a),
+  html body #mobileMenu#mobileMenu#mobileMenu.mobile-menu :is(.mobile-menu-close, .mobile-menu-close i, .mm-link, .mm-link-copy, .mm-link-text, .mm-menu-brand, .mm-menu-brand strong, .mm-menu-brand-copy strong, .mm-logo, .mm-touch, .mm-foot a, .mm-socs a, .mm-menu-social a) {
+    color: var(--ink) !important;
+  }
+  /* Secondary type: the small numbers, notes, kicker and brand sub-line stay
+     muted against the glass. */
+  html:root[data-theme] body #mobileMenu#mobileMenu#mobileMenu.mobile-menu :is(.mm-n, .mm-link-copy small, .mm-menu-brand small, .mm-menu-brand-copy small, .mm-menu-index, .mm-menu-statement, .mm-menu-statement .mono, .mm-menu-foot .mono),
+  html body #mobileMenu#mobileMenu#mobileMenu.mobile-menu :is(.mm-n, .mm-link-copy small, .mm-menu-brand small, .mm-menu-brand-copy small, .mm-menu-index, .mm-menu-statement, .mm-menu-statement .mono, .mm-menu-foot .mono) {
+    color: var(--ink-muted) !important;
+  }
+  /* The link's animated underline is a background-image gradient (set to the
+     paper white in experience.css) — repaint it in the theme ink. */
+  html:root[data-theme] body #mobileMenu#mobileMenu#mobileMenu.mobile-menu .mm-link-text,
+  html body #mobileMenu#mobileMenu#mobileMenu.mobile-menu .mm-link-text {
+    background-image: linear-gradient(var(--ink), var(--ink)) !important;
+  }
+  /* Borders follow the theme hairline. */
+  html:root[data-theme] body #mobileMenu#mobileMenu#mobileMenu.mobile-menu :is(.mm-nav, .mm-link, .mm-foot, .mm-menu-foot, .mobile-menu-close),
+  html body #mobileMenu#mobileMenu#mobileMenu.mobile-menu :is(.mm-nav, .mm-link, .mm-foot, .mm-menu-foot, .mobile-menu-close) {
+    border-color: var(--line) !important;
+  }
+}
+
+/* Very narrow phones (~320px): the dynamic-viewport sizing must never clip the
+   stack. Let the link column scroll inside the overlay instead of overflowing
+   it, and hold the type on one line. */
+@media (max-width: 360px) {
+  html body #mobileMenu#mobileMenu#mobileMenu.mobile-menu .mm-left {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  html body #mobileMenu#mobileMenu#mobileMenu.mobile-menu .mm-link .mm-link-text {
+    font-size: clamp(26px, 8vw, 34px) !important;
+  }
+}
