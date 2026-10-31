@@ -1460,14 +1460,55 @@ html body #design#design#design > .section.practice-note .bio-teaser-grid .stats
 }
 
 html body #design#design#design > .section.practice-note .bio-teaser-grid .stats .stat .stat-num {
-  display: block !important;
+  display: inline-flex !important;
+  align-items: baseline !important;
+  direction: ltr;
+  unicode-bidi: isolate;
   margin: 0 !important;
   font-size: clamp(21px, min(5.6vw, 3.6vh), 40px) !important;
   line-height: 1.12 !important;
   letter-spacing: -.02em !important;
   font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "tnum" 1;
   color: var(--ink) !important;
   white-space: nowrap !important;
+}
+
+/* The sizer reserves the final figure (1,000). Digits grow toward the +
+   so the suffix and the row never shift while the number is counting. */
+html body #design#design#design > .section.practice-note .bio-teaser-grid .stats .stat .stat-digits {
+  display: inline-grid;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+html body #design#design#design > .section.practice-note .bio-teaser-grid .stats .stat .stat-sizer,
+html body #design#design#design > .section.practice-note .bio-teaser-grid .stats .stat .stat-live {
+  grid-area: 1 / 1;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+html body #design#design#design > .section.practice-note .bio-teaser-grid .stats .stat .stat-sizer {
+  visibility: hidden;
+}
+
+html body #design#design#design > .section.practice-note .bio-teaser-grid .stats .stat .stat-live {
+  text-align: end;
+}
+
+html body #design#design#design > .section.practice-note .bio-teaser-grid .stats .stat .stat-plus {
+  flex: none;
+}
+
+html body #design#design#design > .section.practice-note .bio-teaser-grid .stats .stat .stat-final {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 
 html body #design#design#design > .section.practice-note .bio-teaser-grid .stats .stat .stat-label {
@@ -5437,4 +5478,71 @@ html body :is(
 ) {
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
+}
+
+/* ============================================================================
+   Filter chips are circles on every screen. The control itself is the circle;
+   a label that does not fit stays outside it (under it, or hidden where a
+   smaller-screen rule already hides it). The menu-strip hamburger and the
+   talk circle are not part of this.
+   ========================================================================== */
+html body #design#design#design .section.work .tabs .tab,
+html body #design#design#design .work-head .tabs .tab,
+html body #design#design#design.paper-stack .paper-scroll.work-head-flow > .work-head .tab {
+  box-sizing: border-box !important;
+  width: clamp(40px, 4.8vw, 56px) !important;
+  height: clamp(40px, 4.8vw, 56px) !important;
+  min-width: clamp(40px, 4.8vw, 56px) !important;
+  min-height: clamp(40px, 4.8vw, 56px) !important;
+  max-width: clamp(40px, 4.8vw, 56px) !important;
+  max-height: clamp(40px, 4.8vw, 56px) !important;
+  aspect-ratio: 1 / 1 !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+html body #design#design#design .section.work .tabs .tab > i,
+html body #design#design#design .work-head .tabs .tab > i {
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
+/* The "A short note" chip and the tray under the four figures use the same
+   glass as the menu strip. The chapter sheet underneath stays paper. */
+html body #design#design#design > .section.practice-note .bio-teaser-text .section-num,
+html body #design#design#design > .section.practice-note .bio-teaser-grid .stats {
+  background-color: var(--bq-glass) !important;
+  background-image: var(--bq-glass-sheen) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.6) !important;
+  backdrop-filter: blur(22px) saturate(1.6) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--ink) !important;
+}
+html body #design#design#design > .section.practice-note .bio-teaser-text .section-num {
+  border-radius: 999px !important;
+}
+html body #design#design#design > .section.practice-note .bio-teaser-grid .stats {
+  border-radius: 22px !important;
+  padding: clamp(12px, 1.8vh, 18px) clamp(10px, 1.4vw, 16px) !important;
+}
+
+/* Book covers and logos are transparent artwork. The gray plate behind them
+   is the shape; the picture stays. */
+html body #design#design#design #grid .card:is([data-cat="book"], [data-cat="logo"]) :is(.card-art, .card-art--photo) {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+@layer bq-flat {
+  html body #design#design #grid .card:is([data-cat="book"], [data-cat="logo"]) .card-art,
+  html body #design#design #grid .card:is([data-cat="book"], [data-cat="logo"]) .card-art::after {
+    box-shadow: none !important;
+  }
 }

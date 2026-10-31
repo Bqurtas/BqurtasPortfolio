@@ -1613,27 +1613,67 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   /* ---------- COUNT UP (statistics) ---------- */
-  const animateCount = (el) => {
+  /* Digits only. The "+" lives in its own span so it cannot shift as the
+     figure climbs, and the hidden sizer keeps the column as wide as the
+     final value (1,000) from the first frame. */
+  const statDigits = (value) => (value >= 1000 ? value.toLocaleString('en-US') : String(value));
+  const statMotionReduced = () => typeof matchMedia === 'function'
+    && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const prepareStat = (el) => {
     const target = parseInt(el.dataset.count, 10) || 0;
     const suffix = el.dataset.suffix || '';
-    const duration = 1400;
-    const startTime = performance.now();
-    /* Replacing textContent every frame emits child-list mutations, which the
-       paper observer interprets as new content and fits the entire deck again.
-       Reuse the text node; ResizeObserver still catches real size changes. */
-    let text = el.firstChild;
-    if (!text || text.nodeType !== 3 || text.nextSibling) {
-      text = document.createTextNode('');
-      el.replaceChildren(text);
+    let live = el.querySelector('.stat-live');
+    if (!live) {
+      const digits = document.createElement('span');
+      digits.className = 'stat-digits';
+      const sizer = document.createElement('span');
+      sizer.className = 'stat-sizer';
+      sizer.setAttribute('aria-hidden', 'true');
+      sizer.textContent = statDigits(target);
+      live = document.createElement('span');
+      live.className = 'stat-live';
+      live.appendChild(document.createTextNode(statDigits(1)));
+      digits.setAttribute('aria-hidden', 'true');
+      digits.append(sizer, live);
+      const plus = document.createElement('span');
+      plus.className = 'stat-plus';
+      plus.setAttribute('aria-hidden', 'true');
+      plus.textContent = suffix;
+      const full = document.createElement('span');
+      full.className = 'stat-final';
+      full.textContent = statDigits(target) + suffix;
+      /* Once, before the paper observer exists. Per-frame child replacement
+         would refit the whole deck. The spoken name stays the final figure
+         while the visible digits climb. */
+      el.replaceChildren(digits, plus, full);
     }
+    const text = live.firstChild;
+    if (statMotionReduced()) {
+      if (text.data !== statDigits(target)) text.data = statDigits(target);
+      el.dataset.counted = '1';
+    } else if (!el.dataset.counted && text.data !== statDigits(1)) {
+      text.data = statDigits(1);
+    }
+    return text;
+  };
+  const animateCount = (el) => {
+    const target = parseInt(el.dataset.count, 10) || 0;
+    const text = prepareStat(el);
+    if (el.dataset.counted === '1' && statMotionReduced()) return;
+    /* Long enough to read as counting (1 → 25, 1 → 1,000), still under a
+       second. A steep ease-out finished on the final figure before the
+       rise fade made the number visible, so it looked frozen. */
+    const duration = 820;
+    const startTime = performance.now();
     const step = (now) => {
       const t = Math.min((now - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - t, 3);
-      const v = Math.floor(eased * target);
-      const value = (v >= 1000 ? v.toLocaleString() : v) + suffix;
+      const eased = 1 - Math.pow(1 - t, 1.35);
+      const v = t >= 1 ? target : Math.max(1, Math.round(eased * target));
+      const value = statDigits(v);
       if (text.data !== value) text.data = value;
       if (t < 1) requestAnimationFrame(step);
     };
+    if (text.data !== statDigits(1)) text.data = statDigits(1);
     requestAnimationFrame(step);
   };
 
@@ -1652,13 +1692,7 @@ document.addEventListener('DOMContentLoaded', () => {
       entries.forEach(e => {
         if (e.isIntersecting) {
           e.target.classList.add('is-in');
-          if (e.target.classList.contains('stat')) {
-            const numEl = e.target.querySelector('.stat-num');
-            if (numEl && !numEl.dataset.counted) {
-              numEl.dataset.counted = '1';
-              animateCount(numEl);
-            }
-          }
+          if (e.target.classList.contains('stat')) queueStatCount();
           io.unobserve(e.target);
         }
       });
@@ -1693,7 +1727,73 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(restorePortfolio, 80);
   }
   routerReady = true;   // from here on, language switches update the URL prefix
+
+  /* The paper stack sticks every sheet in the same viewport slot, and the
+     note's figures also fade in (.reveal / .bq-rise, opacity 0). A rect check
+     alone started the climb while the glyphs were still invisible, and the
+     number was already final when the fade arrived. Count only once the
+     figure is on the front sheet AND painted. */
+  document.querySelectorAll('.practice-note .stat-num').forEach((numEl) => prepareStat(numEl));
+  const statWait = new WeakMap();
+  const statOnStage = (stat) => {
+    const sheet = stat.closest('.section.practice-note');
+    if (!sheet || sheet.classList.contains('is-paper-measuring')) return false;
+    if (sheet.classList.contains('is-paper-gone')) return false;
+    const viewH = window.innerHeight || document.documentElement.clientHeight || 0;
+    if (!viewH) return false;
+    const sheetBox = sheet.getBoundingClientRect();
+    if (sheetBox.top > viewH * 0.72 || sheetBox.bottom < viewH * 0.22) return false;
+    const box = stat.getBoundingClientRect();
+    return box.width > 0 && box.top < viewH * 0.92 && box.bottom > viewH * 0.12;
+  };
+  const statPainted = (stat) => {
+    const cs = getComputedStyle(stat);
+    if (cs.visibility === 'hidden' || cs.display === 'none') return false;
+    return parseFloat(cs.opacity) >= 0.92;
+  };
+  const queueStatCount = () => {
+    let pending = false;
+    let waitingForPaint = false;
+    document.querySelectorAll('.practice-note .stat').forEach((stat) => {
+      const numEl = stat.querySelector('.stat-num');
+      if (!numEl || numEl.dataset.counted) return;
+      if (!statOnStage(stat)) {
+        statWait.delete(stat);
+        pending = true;
+        return;
+      }
+      const waited = statWait.get(stat) || performance.now();
+      if (!statWait.has(stat)) statWait.set(stat, waited);
+      /* If the fade never quite reaches opaque, still climb rather than
+         sitting on 1. A second on stage is enough to decide. */
+      if (!statPainted(stat) && performance.now() - waited < 1000) {
+        pending = true;
+        waitingForPaint = true;
+        return;
+      }
+      statWait.delete(stat);
+      numEl.dataset.counted = '1';
+      animateCount(numEl);
+    });
+    if (!pending) {
+      window.removeEventListener('scroll', requestStatCount);
+      window.removeEventListener('resize', requestStatCount);
+    } else if (waitingForPaint && !document.hidden) {
+      requestStatCount();
+    }
+  };
+  let statCountFrame = 0;
+  const requestStatCount = () => {
+    if (statCountFrame) return;
+    statCountFrame = requestAnimationFrame(() => {
+      statCountFrame = 0;
+      queueStatCount();
+    });
+  };
+  window.addEventListener('scroll', requestStatCount, { passive: true });
+  window.addEventListener('resize', requestStatCount, { passive: true });
   triggerReveals();
+  requestStatCount();
 
   /* ---------- Expose helpers for gallery.js ---------- */
   window.__bqRefreshReveal = () => { triggerReveals(); };
