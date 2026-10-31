@@ -125,29 +125,31 @@ test('short viewport content that exceeds the minimum remains at the readable fl
   assert.ok(scroller.scrollHeight > scroller.clientHeight, 'the measurement still exposes the remainder to the reading track');
 });
 
-test('portrait phone room chapters keep their authored scale and expose long copy to native reading', () => {
+test('portrait phone room chapters shrink to fit like the hero instead of opening an inner scroller', () => {
   const viewport = { innerWidth: 390, innerHeight: 844 };
   const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: viewport });
   for (const room of ['blog', 'bio', 'contact']) {
     const { sheet, scroller, state } = paper(0.6, Infinity, { room });
     fit(sheet, scroller);
-    assert.equal(state.applied, 1, `${room} keeps its authored phone type size`);
-    assert.ok(scroller.scrollHeight > scroller.clientHeight, `${room} exposes the remainder to the existing reading track`);
+    assert.equal(state.applied, Number(bisect(0.6).toFixed(4)), `${room} scales until the copy fits`);
+    assert.ok(scroller.scrollHeight <= scroller.clientHeight, `${room} has no inner reading remainder`);
+    state.layouts = 0;
     fit(sheet, scroller);
-    assert.equal(state.applied, 1, `${room} remains legible after a re-measure`);
+    assert.equal(state.applied, Number(bisect(0.6).toFixed(4)), `${room} keeps that fit after a re-measure`);
+    assert.equal(state.layouts, 2);
   }
 });
 
-test('short portrait room chapters follow the stable viewport ceiling without extra content shrinking', () => {
+test('portrait room chapters follow the viewport ceiling and shrink only until the copy fits', () => {
   const viewport = { innerWidth: 390, innerHeight: 600, __bqViewportScale: 0.75 };
   const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: viewport });
-  const { sheet, scroller, state } = paper(0.4, Infinity, { room: 'bio' });
+  const { sheet, scroller, state } = paper(0.9, Infinity, { room: 'bio' });
   fit(sheet, scroller);
-  assert.equal(state.applied, 0.75);
-  assert.ok(scroller.scrollHeight > scroller.clientHeight, 'the reading track retains the long chapter');
+  assert.equal(state.applied, Number(bisect(0.9, 0.75).toFixed(4)));
+  assert.ok(scroller.scrollHeight <= scroller.clientHeight);
   viewport.innerHeight = 680;
   fit(sheet, scroller);
-  assert.equal(state.applied, 0.75, 'mobile browser chrome changes do not change the stable scale');
+  assert.equal(state.applied, Number(bisect(0.9, 0.75).toFixed(4)), 'mobile browser chrome changes do not change the stable scale');
   viewport.__bqViewportScale = 0.6;
   fit(sheet, scroller);
   assert.equal(state.applied, 0.6, 'an actual viewport ceiling change scales the complete chapter');
@@ -187,7 +189,7 @@ test('services still fit excess width without squeezing away vertical reading co
   }
 });
 
-test('brief phone summaries fit their own paper while long room chapters retain reading scale', () => {
+test('phone room chapters and brief summaries fit their paper', () => {
   const viewport = { innerWidth: 320, innerHeight: 568, __bqViewportScale: 568 / 720 };
   const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: viewport });
   for (const [room, summary] of [
@@ -197,37 +199,33 @@ test('brief phone summaries fit their own paper while long room chapters retain 
     const long = paper(0.55, Infinity, { room });
     fit(brief.sheet, brief.scroller);
     fit(long.sheet, long.scroller);
-    const floor = room === 'bio' ? Math.max(0.5, viewport.__bqViewportScale * 0.84) : 0.5;
-    assert.equal(brief.state.applied, Number(bisect(0.72, viewport.__bqViewportScale, floor).toFixed(4)), summary);
+    const ceiling = viewport.__bqViewportScale;
+    assert.equal(brief.state.applied, Number(bisect(0.72, ceiling).toFixed(4)), summary);
     assert.ok(brief.scroller.scrollHeight <= brief.scroller.clientHeight, `${summary} has no unnecessary inner reading distance`);
-    assert.equal(long.state.applied, Number(viewport.__bqViewportScale.toFixed(4)), `${room} long copy keeps its readable type scale`);
-    assert.ok(long.scroller.scrollHeight > long.scroller.clientHeight);
+    assert.equal(long.state.applied, Number(bisect(0.55, ceiling).toFixed(4)), `${room} long copy scales until it fits`);
+    assert.ok(long.scroller.scrollHeight <= long.scroller.clientHeight);
   }
 });
 
-test('short biography directories fit modest overflow without shrinking long reading chapters', () => {
-  const viewport = { innerWidth: 390, innerHeight: 844, __bqViewportScale: 1 };
+test('biography chapters fit their own paper on a portrait phone', () => {
+  const viewport = { innerWidth: 428, innerHeight: 926, __bqViewportScale: 1 };
   const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: viewport });
   for (const summary of [
     'bio-kit-sheet', 'bio-record-sheet', 'bio-education-sheet', 'bio-honors-sheet',
     'bio-world-sheet', 'bio-connect-sheet', 'bio-docs-sheet',
+    'bio-story-sheet', 'bio-proof-sheet',
   ]) {
-    const brief = paper(0.91, Infinity, { room: 'bio', summary });
-    fit(brief.sheet, brief.scroller);
-    assert.equal(brief.state.applied, Number(bisect(0.91, 1, 0.84).toFixed(4)), summary);
-    assert.ok(brief.scroller.scrollHeight <= brief.scroller.clientHeight, `${summary} removes modest overflow`);
-    brief.state.layouts = 0;
-    fit(brief.sheet, brief.scroller);
-    assert.equal(brief.state.layouts, 2, `${summary} keeps the warm fit efficient`);
-    brief.state.limit = 0.7;
-    fit(brief.sheet, brief.scroller);
-    assert.equal(brief.state.applied, 0.84, `${summary} keeps a readable floor`);
-    assert.ok(brief.scroller.scrollHeight > brief.scroller.clientHeight, 'genuine overflow remains reachable');
-  }
-  for (const summary of ['bio-story-sheet', 'bio-proof-sheet']) {
-    const long = paper(0.6, Infinity, { room: 'bio', summary });
-    fit(long.sheet, long.scroller);
-    assert.equal(long.state.applied, 1, `${summary} retains its authored reading size`);
+    const chapter = paper(0.91, Infinity, { room: 'bio', summary });
+    fit(chapter.sheet, chapter.scroller);
+    assert.equal(chapter.state.applied, Number(bisect(0.91, 1, 0.5).toFixed(4)), summary);
+    assert.ok(chapter.scroller.scrollHeight <= chapter.scroller.clientHeight, `${summary} removes overflow`);
+    chapter.state.layouts = 0;
+    fit(chapter.sheet, chapter.scroller);
+    assert.equal(chapter.state.layouts, 2, `${summary} keeps the warm fit efficient`);
+    chapter.state.limit = 0.7;
+    fit(chapter.sheet, chapter.scroller);
+    assert.equal(chapter.state.applied, Number(bisect(0.7).toFixed(4)), `${summary} shrinks with the copy`);
+    assert.ok(chapter.scroller.scrollHeight <= chapter.scroller.clientHeight, `${summary} still has no inner scroller`);
   }
 });
 

@@ -2378,30 +2378,13 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
        ten. A different height changes the search interval, so it receives a
        fresh search and restores the original scale as the window grows. */
     const ceiling = paperFitCeiling(sheet);
-    /* Portrait room pages are reading surfaces. Keep their authored viewport
-       scale; only genuine overflow needs a native reading interval. */
+    /* Biography, journal and contact used to keep authored type on a portrait
+       phone and scroll the remainder inside the card. That inner track is not
+       needed: every chapter scales with its frame the way the hero does, down
+       to the legibility floor. Only a remainder below that floor still reads
+       on the page track. */
+    const floor = PAPER_FIT_MIN;
     const roomId = sheet.closest?.('.room')?.id;
-    /* Brief summaries should fit their card instead of gaining a small
-       reading interval from large display type or generous whitespace. */
-    const compactBiography = roomId === 'bio' && compactBioPaper(sheet);
-    const compactSummary = compactBiography
-      || ['contact-reach-sheet', 'blog-subscribe-sheet'].some(name => sheet.classList.contains(name));
-    /* Small biography directories should not buy a reading interval for a
-       little extra spacing. Fit each independently, but only modestly: long
-       translations or a genuinely short screen still retain their readable
-       overflow instead of squeezing the whole chapter to half its size. */
-    const floor = compactBiography ? Math.max(PAPER_FIT_MIN, ceiling * 0.84) : PAPER_FIT_MIN;
-    const phoneReading = window.innerWidth > 0 && window.innerWidth <= 820
-      && window.innerHeight >= window.innerWidth
-      && sheet.classList.contains('section')
-      && !compactSummary
-      && ['blog', 'bio', 'contact'].includes(roomId);
-    if (phoneReading) {
-      apply(ceiling);
-      lastPaperFit.set(sheet, { fit: ceiling, ceiling });
-      sheet.classList.toggle('is-paper-fitted', ceiling < 1);
-      return;
-    }
     /* The compact service accordion also needs its reading track on tablets,
        landscape phones and desktops. Fitting its HEIGHT removed the overflow
        before measurement, so those screens could never enter the track.
