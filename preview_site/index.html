@@ -9,7 +9,7 @@
   <link rel="preload" as="style" href="css/modern-framer.min.css?v=618db1d097f1" />
   <link rel="preload" as="style" href="css/fonts.css?v=6bd89c103953" />
   <link rel="preload" as="style" href="css/experience.min.css?v=591ff4b19b30" />
-  <link rel="preload" as="style" href="css/polish.min.css?v=6ea9715d7e64" />
+  <link rel="preload" as="style" href="css/polish.min.css?v=1fca1ad4fe99" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#fbfbfa" />
   <meta name="color-scheme" content="light dark" />
@@ -784,7 +784,7 @@
   <link rel="stylesheet" href="css/fonts.css?v=6bd89c103953">
   <link rel="stylesheet" href="css/experience.min.css?v=591ff4b19b30">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.min.css?v=6ea9715d7e64">
+  <link rel="stylesheet" href="css/polish.min.css?v=1fca1ad4fe99">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=6dee64a9a95d" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=6dee64a9a95d"></noscript>
 
@@ -921,9 +921,11 @@
     <!-- Floating CTA — sits in the MIDDLE of the dock on desktop
          (JS shows it only in the design room via .is-shown) -->
     <a href="/contact" class="design-cta" id="designCta" data-route="contact">
-      <span class="design-cta-dot" aria-hidden="true"></span>
       <span data-i18n="cta.float">Let's work together</span>
-      <i class="fa-solid fa-arrow-right"></i>
+      <svg class="talk-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+        <path d="M5.6 12H14.4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+        <path d="M11.5 7.2 18.3 12 11.5 16.8" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </a>
   </aside>
 
@@ -952,9 +954,11 @@
     <button type="button" class="mobilebar-btn" id="railLatestM" data-i18n-aria="tip.latest" aria-label="Latest"><i class="fa-solid fa-bell"></i><span class="rail-latest-badge" id="railLatestBadgeM" hidden></span></button>
     <button type="button" class="mobilebar-btn" id="railChatM" data-i18n-aria="chat.title" aria-label="Chat with assistant"><i class="fa-solid fa-comment-dots"></i><span class="rail-chat-dot" aria-hidden="true"></span></button>
     <a href="/contact" class="mobilebar-cta" data-route="contact" data-i18n-aria="cta.float" aria-label="Let's work together">
-      <span class="design-cta-dot" aria-hidden="true"></span>
       <span class="mobilebar-cta-txt" data-i18n="cta.float">Let's work together</span>
-      <i class="fa-solid fa-arrow-right"></i>
+      <svg class="talk-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+        <path d="M5.6 12H14.4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+        <path d="M11.5 7.2 18.3 12 11.5 16.8" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </a>
 
     <div class="mobilebar-pop-wrap">
@@ -2259,7 +2263,7 @@
     }catch(e){}})();
   </script>
   <script defer src="js/latest-feed.min.js?v=76465997249c"></script>
-  <script defer src="js/main.v420.min.js?v=e9c10b03bd32"></script>
+  <script defer src="js/main.v420.min.js?v=f93024aa469d"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2434,7 +2438,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=16f57860948f', { updateViaCache: 'none' })
+            .register('/sw.js?v=9cef31f1fd3b', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

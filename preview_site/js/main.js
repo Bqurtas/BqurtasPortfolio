@@ -3775,6 +3775,30 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   let frame = 0;
 
   let lastProgress, lastMix, lastArriving, lastEntered;
+  let lastUnder = false;
+
+  /* The footer is the inverse of the cards, and the dock stays painted over
+     it. Flip the glass only once the footer actually covers the bar — the
+     arriving flag turns on while the dock is still on a card. */
+  const dockCoverLine = () => {
+    if (typeof document.querySelectorAll !== 'function') return null;
+    if (typeof window.getComputedStyle !== 'function') return null;
+    const nodes = document.querySelectorAll('.mobilebar, .rail');
+    let line = null;
+    let bestBottom = -Infinity;
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
+      if (!node || typeof node.getBoundingClientRect !== 'function') continue;
+      const style = window.getComputedStyle(node);
+      if (style && (style.display === 'none' || style.visibility === 'hidden')) continue;
+      const box = node.getBoundingClientRect();
+      if (!box || !(box.height > 8) || !(box.width > 8) || !Number.isFinite(box.top)) continue;
+      if (box.bottom <= bestBottom) continue;
+      bestBottom = box.bottom;
+      line = box.top + box.height * .55;
+    }
+    return line;
+  };
 
   const render = () => {
     frame = 0;
@@ -3791,10 +3815,13 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const nextProgress = progress.toFixed(4);
     const nextMix = (progress * 100).toFixed(2) + '%';
     const arriving = raw > .001, entered = raw > .72;
+    const edge = dockCoverLine();
+    const underDock = edge == null ? false : (lastUnder ? top < edge + 28 : top <= edge);
     if (nextProgress !== lastProgress) root.style.setProperty('--bq-footer-progress', lastProgress = nextProgress);
     if (nextMix !== lastMix) root.style.setProperty('--bq-footer-mix', lastMix = nextMix);
     if (arriving !== lastArriving) body.classList.toggle('footer-arriving', lastArriving = arriving);
     if (entered !== lastEntered) body.classList.toggle('footer-entered', lastEntered = entered);
+    if (underDock !== lastUnder) body.classList.toggle('footer-under-dock', lastUnder = underDock);
   };
 
   const queue = () => {

@@ -4821,7 +4821,7 @@ html[dir="rtl"].bq-scrolling body .mobilebar.mobilebar {
   background-image: linear-gradient(180deg, rgb(255 255 255 / .42), rgb(255 255 255 / .08)) !important;
   -webkit-backdrop-filter: blur(22px) saturate(1.6) !important;
   backdrop-filter: blur(22px) saturate(1.6) !important;
-  border: 1px solid rgb(255 255 255 / .55) !important;
+  border: 0 !important;
 }
 html:root[data-theme="dark"] body .rail.rail,
 html:root[data-theme="dark"][dir="rtl"] body .rail.rail,
@@ -4831,14 +4831,250 @@ html:root[data-theme="dark"].bq-scrolling body .rail.rail,
 html:root[data-theme="dark"].bq-scrolling body .mobilebar.mobilebar {
   background-color: color-mix(in srgb, #141414 34%, transparent) !important;
   background-image: linear-gradient(180deg, rgb(255 255 255 / .2), rgb(255 255 255 / .04)) !important;
-  border-color: rgb(255 255 255 / .28) !important;
+  border: 0 !important;
 }
 
+/* The footer is the inverse of the cards: black in light mode, paper in dark
+   mode. Once the strip sits on it, swap the frost and the icon ink so the
+   pill still reads as glass instead of disappearing into the footer. */
+html:root body.footer-under-dock :is(.rail.rail, .mobilebar.mobilebar),
+html:root.bq-scrolling body.footer-under-dock :is(.rail.rail, .mobilebar.mobilebar),
+html:root[dir="rtl"] body.footer-under-dock :is(.rail.rail, .mobilebar.mobilebar),
+html:root[dir="rtl"].bq-scrolling body.footer-under-dock :is(.rail.rail, .mobilebar.mobilebar) {
+  background-color: color-mix(in srgb, #141414 42%, transparent) !important;
+  background-image: linear-gradient(180deg, rgb(255 255 255 / .24), rgb(255 255 255 / .05)) !important;
+  border: 0 !important;
+  color: #f6f6f2 !important;
+}
+html:root[data-theme="dark"] body.footer-under-dock :is(.rail.rail, .mobilebar.mobilebar),
+html:root[data-theme="dark"].bq-scrolling body.footer-under-dock :is(.rail.rail, .mobilebar.mobilebar),
+html:root[data-theme="dark"][dir="rtl"] body.footer-under-dock :is(.rail.rail, .mobilebar.mobilebar),
+html:root[data-theme="dark"][dir="rtl"].bq-scrolling body.footer-under-dock :is(.rail.rail, .mobilebar.mobilebar) {
+  background-color: color-mix(in srgb, #f4f3ef 52%, transparent) !important;
+  background-image: linear-gradient(180deg, rgb(255 255 255 / .62), rgb(255 255 255 / .14)) !important;
+  border: 0 !important;
+  color: #141414 !important;
+}
+html:root body.footer-under-dock .mobilebar.mobilebar :is(.mobilebar-btn, .mobilebar-btn i, .menu-icon, #langCurrentCodeM),
+html:root body.footer-under-dock .rail.rail :is(.rail-link, .rail-icon, .rail-chat, .rail-chat i, .lang-current, #langCurrentCode, .social-current, .social-current i, .theme-btn, .theme-btn i, .rail-action-label, .rail-logo-mark, .rail-logo-name, .rail-logo-role, .rail-room-name) {
+  color: #f6f6f2 !important;
+}
+html:root[data-theme="dark"] body.footer-under-dock .mobilebar.mobilebar :is(.mobilebar-btn, .mobilebar-btn i, .menu-icon, #langCurrentCodeM),
+html:root[data-theme="dark"] body.footer-under-dock .rail.rail :is(.rail-link, .rail-icon, .rail-chat, .rail-chat i, .lang-current, #langCurrentCode, .social-current, .social-current i, .theme-btn, .theme-btn i, .rail-action-label, .rail-logo-mark, .rail-logo-name, .rail-logo-role, .rail-room-name) {
+  color: #141414 !important;
+}
+html:root body.footer-under-dock .mobilebar.mobilebar .mobilebar-cta,
+html:root body.footer-under-dock .rail.rail .design-cta {
+  background: #f4f3ef !important;
+  background-image: none !important;
+  color: #141414 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+html:root body.footer-under-dock .mobilebar.mobilebar .mobilebar-cta :is(i, .talk-arrow, .mobilebar-cta-txt),
+html:root body.footer-under-dock .rail.rail .design-cta :is(i, .talk-arrow, span[data-i18n]),
+html:root body.footer-under-dock .rail.rail #designCta.design-cta > span[data-i18n] {
+  color: #141414 !important;
+}
+html:root body.footer-under-dock :is(.mobilebar.mobilebar .mobilebar-cta, .rail.rail .design-cta) .design-cta-dot {
+  box-shadow: 0 0 0 2px #f4f3ef !important;
+}
+html:root[data-theme="dark"] body.footer-under-dock .mobilebar.mobilebar .mobilebar-cta,
+html:root[data-theme="dark"] body.footer-under-dock .rail.rail .design-cta {
+  background: #141414 !important;
+  background-image: none !important;
+  color: #f4f3ef !important;
+}
+html:root[data-theme="dark"] body.footer-under-dock .mobilebar.mobilebar .mobilebar-cta :is(i, .talk-arrow, .mobilebar-cta-txt),
+html:root[data-theme="dark"] body.footer-under-dock .rail.rail .design-cta :is(i, .talk-arrow, span[data-i18n]),
+html:root[data-theme="dark"] body.footer-under-dock .rail.rail #designCta.design-cta > span[data-i18n] {
+  color: #f4f3ef !important;
+}
+html:root[data-theme="dark"] body.footer-under-dock :is(.mobilebar.mobilebar .mobilebar-cta, .rail.rail .design-cta) .design-cta-dot {
+  box-shadow: 0 0 0 2px #141414 !important;
+}
+
+/* The talk mark is the one filled circle in the strip. Its fill and the
+   hairline arrow are an explicit pair, so dark and light cannot leave the
+   mark on the wrong ground. */
+html body .mobilebar.mobilebar .mobilebar-cta,
+html body .rail.rail .design-cta {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: #141414 !important;
+  background-image: none !important;
+  color: #f4f3ef !important;
+}
+html body .mobilebar.mobilebar .mobilebar-cta :is(i, .talk-arrow, .mobilebar-cta-txt),
+html body .rail.rail .design-cta :is(i, .talk-arrow, span[data-i18n]),
+html body .rail.rail #designCta.design-cta > span[data-i18n] {
+  color: #f4f3ef !important;
+}
+html body :is(.mobilebar.mobilebar .mobilebar-cta, .rail.rail .design-cta) .design-cta-dot {
+  display: none !important;
+}
+html body :is(.mobilebar.mobilebar .mobilebar-cta, .rail.rail .design-cta) .talk-arrow {
+  display: block !important;
+  width: 16px !important;
+  height: 16px !important;
+  flex: 0 0 auto !important;
+  overflow: visible !important;
+}
+html[dir="rtl"] body :is(.mobilebar.mobilebar .mobilebar-cta, .rail.rail .design-cta) .talk-arrow {
+  transform: scaleX(-1) !important;
+}
+html:root[data-theme="dark"] body .mobilebar.mobilebar .mobilebar-cta,
+html:root[data-theme="dark"] body .rail.rail .design-cta {
+  background: #f4f3ef !important;
+  color: #141414 !important;
+}
+html:root[data-theme="dark"] body .mobilebar.mobilebar .mobilebar-cta :is(i, .talk-arrow, .mobilebar-cta-txt),
+html:root[data-theme="dark"] body .rail.rail .design-cta :is(i, .talk-arrow, span[data-i18n]),
+html:root[data-theme="dark"] body .rail.rail #designCta.design-cta > span[data-i18n] {
+  color: #141414 !important;
+}
+
+/* Hover has to change the ink itself. The old hover only repeated --gold,
+   which is the same colour as the icon in both themes, so the mouse
+   appeared to do nothing. */
+@media (hover: hover) and (pointer: fine) {
+  html body .mobilebar.mobilebar .mobilebar-btn:is(:hover, :focus-visible),
+  html body .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle, #railMenu):is(:hover, :focus-visible) {
+    background-color: var(--ink) !important;
+    color: var(--bg) !important;
+  }
+  html body .mobilebar.mobilebar .mobilebar-btn:is(:hover, :focus-visible) :is(i, .menu-icon, #langCurrentCodeM),
+  html body .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle, #railMenu):is(:hover, :focus-visible) :is(i, .rail-icon, #langCurrentCode, .rail-action-label) {
+    color: var(--bg) !important;
+    background-color: transparent !important;
+  }
+  html:root body.footer-under-dock .mobilebar.mobilebar .mobilebar-btn:is(:hover, :focus-visible),
+  html:root body.footer-under-dock .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle, #railMenu):is(:hover, :focus-visible) {
+    background-color: #f6f6f2 !important;
+    color: #141414 !important;
+  }
+  html:root body.footer-under-dock .mobilebar.mobilebar .mobilebar-btn:is(:hover, :focus-visible) :is(i, .menu-icon, #langCurrentCodeM),
+  html:root body.footer-under-dock .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle, #railMenu):is(:hover, :focus-visible) :is(i, .rail-icon, #langCurrentCode, .rail-action-label) {
+    background-color: transparent !important;
+    color: #141414 !important;
+  }
+  html:root[data-theme="dark"] body.footer-under-dock .mobilebar.mobilebar .mobilebar-btn:is(:hover, :focus-visible),
+  html:root[data-theme="dark"] body.footer-under-dock .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle, #railMenu):is(:hover, :focus-visible) {
+    background-color: #141414 !important;
+    color: #f6f6f2 !important;
+  }
+  html:root[data-theme="dark"] body.footer-under-dock .mobilebar.mobilebar .mobilebar-btn:is(:hover, :focus-visible) :is(i, .menu-icon, #langCurrentCodeM),
+  html:root[data-theme="dark"] body.footer-under-dock .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle, #railMenu):is(:hover, :focus-visible) :is(i, .rail-icon, #langCurrentCode, .rail-action-label) {
+    background-color: transparent !important;
+    color: #f6f6f2 !important;
+  }
+  html body .mobilebar.mobilebar .mobilebar-cta:is(:hover, :focus-visible),
+  html body .rail.rail .design-cta:is(:hover, :focus-visible) {
+    background: #f4f3ef !important;
+    color: #141414 !important;
+  }
+  html body .mobilebar.mobilebar .mobilebar-cta:is(:hover, :focus-visible) :is(i, .talk-arrow, .mobilebar-cta-txt),
+  html body .rail.rail .design-cta:is(:hover, :focus-visible) :is(i, .talk-arrow, span[data-i18n]),
+  html body .rail.rail #designCta.design-cta:is(:hover, :focus-visible) > span[data-i18n] {
+    color: #141414 !important;
+  }
+  html body :is(.mobilebar.mobilebar .mobilebar-cta, .rail.rail .design-cta):is(:hover, :focus-visible) .design-cta-dot {
+    box-shadow: 0 0 0 2px #f4f3ef !important;
+  }
+  html:root[data-theme="dark"] body .mobilebar.mobilebar .mobilebar-cta:is(:hover, :focus-visible),
+  html:root[data-theme="dark"] body .rail.rail .design-cta:is(:hover, :focus-visible) {
+    background: #141414 !important;
+    color: #f4f3ef !important;
+  }
+  html:root[data-theme="dark"] body .mobilebar.mobilebar .mobilebar-cta:is(:hover, :focus-visible) :is(i, .talk-arrow, .mobilebar-cta-txt),
+  html:root[data-theme="dark"] body .rail.rail .design-cta:is(:hover, :focus-visible) :is(i, .talk-arrow, span[data-i18n]),
+  html:root[data-theme="dark"] body .rail.rail #designCta.design-cta:is(:hover, :focus-visible) > span[data-i18n] {
+    color: #f4f3ef !important;
+  }
+  html:root[data-theme="dark"] body :is(.mobilebar.mobilebar .mobilebar-cta, .rail.rail .design-cta):is(:hover, :focus-visible) .design-cta-dot {
+    box-shadow: 0 0 0 2px #141414 !important;
+  }
+  html:root body.footer-under-dock .mobilebar.mobilebar .mobilebar-cta:is(:hover, :focus-visible),
+  html:root body.footer-under-dock .rail.rail .design-cta:is(:hover, :focus-visible) {
+    background: #141414 !important;
+    color: #f4f3ef !important;
+  }
+  html:root body.footer-under-dock .mobilebar.mobilebar .mobilebar-cta:is(:hover, :focus-visible) :is(i, .talk-arrow, .mobilebar-cta-txt),
+  html:root body.footer-under-dock .rail.rail .design-cta:is(:hover, :focus-visible) :is(i, .talk-arrow, span[data-i18n]),
+  html:root body.footer-under-dock .rail.rail #designCta.design-cta:is(:hover, :focus-visible) > span[data-i18n] {
+    color: #f4f3ef !important;
+  }
+  html:root body.footer-under-dock :is(.mobilebar.mobilebar .mobilebar-cta, .rail.rail .design-cta):is(:hover, :focus-visible) .design-cta-dot {
+    box-shadow: 0 0 0 2px #141414 !important;
+  }
+  html:root[data-theme="dark"] body.footer-under-dock .mobilebar.mobilebar .mobilebar-cta:is(:hover, :focus-visible),
+  html:root[data-theme="dark"] body.footer-under-dock .rail.rail .design-cta:is(:hover, :focus-visible) {
+    background: #f4f3ef !important;
+    color: #141414 !important;
+  }
+  html:root[data-theme="dark"] body.footer-under-dock .mobilebar.mobilebar .mobilebar-cta:is(:hover, :focus-visible) :is(i, .talk-arrow, .mobilebar-cta-txt),
+  html:root[data-theme="dark"] body.footer-under-dock .rail.rail .design-cta:is(:hover, :focus-visible) :is(i, .talk-arrow, span[data-i18n]),
+  html:root[data-theme="dark"] body.footer-under-dock .rail.rail #designCta.design-cta:is(:hover, :focus-visible) > span[data-i18n] {
+    color: #141414 !important;
+  }
+  html:root[data-theme="dark"] body.footer-under-dock :is(.mobilebar.mobilebar .mobilebar-cta, .rail.rail .design-cta):is(:hover, :focus-visible) .design-cta-dot {
+    box-shadow: 0 0 0 2px #f4f3ef !important;
+  }
+}
+
+
+/* iPad widths still inherited the pill: 14px of side padding, an 8px gap, and
+   the label beside the arrow, inside a box only ~42px wide. Phones at 600px
+   and under already hide that label. From there up to the desktop dock, the
+   talk control matches the other 40px marks and the arrow is the only item. */
+@media (min-width: 601px) and (max-width: 1024px) {
+  html.bq-compact body .mobilebar.mobilebar > .mobilebar-cta.mobilebar-cta {
+    display: inline-grid !important;
+    place-items: center !important;
+    box-sizing: border-box !important;
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    flex: 0 0 40px !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    margin: 0 !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 !important;
+    line-height: 0 !important;
+    overflow: visible !important;
+  }
+  html.bq-compact body .mobilebar.mobilebar > .mobilebar-cta.mobilebar-cta .mobilebar-cta-txt {
+    display: none !important;
+  }
+  html.bq-compact body .mobilebar.mobilebar > .mobilebar-cta.mobilebar-cta .talk-arrow {
+    display: block !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 !important;
+    flex: none !important;
+    justify-self: center !important;
+    align-self: center !important;
+  }
+}
 
 /* The tablet preview overlaps the inner edge of its menu column. Give RTL
    link numbers room on that edge instead of letting the page cover them. */
 @media (min-width: 821px) and (max-width: 1024px) {
   html[dir="rtl"] body #mobileMenu#mobileMenu#mobileMenu#mobileMenu.mobile-menu .mm-left {
     padding-inline-start: calc(3vw + 48px) !important;
+  }
+}
+
+/* Layered !important shadows outrank an unlayered hide, so the talk pip is
+   removed inside the same layer that used to ring it. */
+@layer bq-flat {
+  html body .mobilebar.mobilebar .mobilebar-cta .design-cta-dot,
+  html body .rail.rail .design-cta .design-cta-dot {
+    display: none !important;
+    box-shadow: none !important;
   }
 }
