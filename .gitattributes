@@ -1,0 +1,5 @@
+# Keep GitHub language stats on the authored site, not minified bundles.
+preview_site/js/*.min.js linguist-generated=true
+preview_site/css/*.min.css linguist-generated=true
+preview_site/vendor/** linguist-vendored=true
+preview_site/assets/gallery-manifest.json linguist-generated=true

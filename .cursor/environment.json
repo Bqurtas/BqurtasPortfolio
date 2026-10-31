@@ -1,0 +1,17 @@
+{
+  "name": "BqurtasPortfolio",
+  "install": "npm ci",
+  "terminals": [
+    {
+      "name": "Preview",
+      "command": "python3 -m http.server 4173 --directory preview_site --bind 0.0.0.0",
+      "description": "Local preview of preview_site on port 4173."
+    }
+  ],
+  "ports": [
+    {
+      "name": "Preview",
+      "port": 4173
+    }
+  ]
+}

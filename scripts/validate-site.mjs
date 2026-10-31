@@ -1,0 +1,93 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const root = resolve('preview_site');
+const html = readFileSync(resolve(root, 'index.html'), 'utf8');
+const i18nSource = readFileSync(resolve(root, 'js/i18n.js'), 'utf8');
+const failures = [];
+
+const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
+const duplicateIds = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
+if (duplicateIds.length) failures.push(`duplicate IDs: ${duplicateIds.join(', ')}`);
+
+const localRefs = new Set();
+for (const match of html.matchAll(/\b(?:src|href)="([^"]+)"/g)) {
+  let ref = match[1];
+  if (!ref || /^(?:https?:|mailto:|tel:|#|data:|blob:)/i.test(ref)) continue;
+  ref = ref.split(/[?#]/, 1)[0];
+  if (!ref || ref === '/' || ref.startsWith('/design') || ref.startsWith('/blog') || ref.startsWith('/bio') || ref.startsWith('/contact')) continue;
+  localRefs.add(ref.replace(/^\//, ''));
+}
+for (const ref of localRefs) {
+  if (!existsSync(resolve(root, ref))) failures.push(`missing local asset: ${ref}`);
+}
+
+const ariaKeys = [...new Set([...html.matchAll(/\bdata-i18n-aria="([^"]+)"/g)].map((match) => match[1]))];
+for (const key of ariaKeys) {
+  if (!i18nSource.includes(`'${key}'`) && !i18nSource.includes(`"${key}"`)) {
+    failures.push(`missing accessible-label translation key: ${key}`);
+  }
+}
+
+for (const file of ['site.webmanifest']) {
+  try { JSON.parse(readFileSync(resolve(root, file), 'utf8')); }
+  catch (error) { failures.push(`${file} is not valid JSON: ${error.message}`); }
+}
+
+for (const [index, match] of [...html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)].entries()) {
+  try { JSON.parse(match[1]); }
+  catch (error) { failures.push(`structured data block ${index + 1} is not valid JSON: ${error.message}`); }
+}
+
+for (const file of ['sitemap.xml', 'sitemap-images.xml', 'sitemap-gallery.xml']) {
+  const xml = readFileSync(resolve(root, file), 'utf8');
+  if (!/^<\?xml[\s\S]*<urlset\b[\s\S]*<\/urlset>\s*$/i.test(xml)) failures.push(`${file} is not a complete urlset`);
+}
+
+/* The image/video sitemap is generated (scripts/generate-image-sitemap.mjs).
+   Google credits images to a host it can verify, so every URL in it must be
+   on bqurtas.com, and a single raw '&' makes the whole file unreadable. */
+{
+  const xml = readFileSync(resolve(root, 'sitemap-images.xml'), 'utf8');
+  if (!xml.includes('xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"')
+      || !xml.includes('xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"')) {
+    failures.push('sitemap-images.xml must declare the image and video namespaces');
+  }
+  for (const match of xml.matchAll(/<(loc|image:loc|video:content_loc|video:thumbnail_loc)>([^<]*)</g)) {
+    if (!match[2].startsWith('https://bqurtas.com/') && match[2] !== 'https://bqurtas.com') {
+      failures.push(`sitemap-images.xml lists an off-site URL: ${match[2]}`);
+    }
+  }
+  if (/<image:(?:title|caption)>/.test(xml)) failures.push('sitemap-images.xml uses deprecated image:title/image:caption');
+  if (/&(?!(?:amp|lt|gt|quot|apos);)/.test(xml)) failures.push('sitemap-images.xml contains an unescaped ampersand');
+  for (const match of xml.matchAll(/<video:thumbnail_loc>https:\/\/bqurtas\.com\/([^<]+)</g)) {
+    if (!existsSync(resolve(root, match[1]))) failures.push(`missing video poster: ${match[1]}`);
+  }
+}
+
+for (const forbidden of [
+  '107502',
+  'bq_dash_pin',
+  'i18n-more.min.js?v=1',
+  'i18n-more.min.js?v=5',
+  'i18n-more.min.js?v=418',
+  'js/menu-stage.js',
+  'js/hero-pin.js'
+]) {
+  if (html.includes(forbidden)) failures.push(`index.html contains retired token: ${forbidden}`);
+}
+
+const roomHeroNumbers = [...html.matchAll(/<span\b[^>]*class="[^"]*\broom-hero-ghost\b[^"]*"[^>]*>\s*(\d+)\s*<\/span>/g)].map(match => match[1]);
+if (!['02', '03', '04'].every(number => roomHeroNumbers.includes(number))) {
+  failures.push('room heroes are not numbered 02–04 to match the four-room menu');
+}
+if (roomHeroNumbers.includes('05') || roomHeroNumbers.includes('06')) {
+  failures.push('retired room numbers 05/06 still present');
+}
+
+if (failures.length) {
+  console.error(failures.map((failure) => `- ${failure}`).join('\n'));
+  process.exit(1);
+}
+
+console.log(`Validated ${ids.length} unique IDs and ${localRefs.size} local references.`);

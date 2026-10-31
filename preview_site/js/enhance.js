@@ -1,0 +1,3758 @@
+/* =========================================================
+   Barakat Qurtas — enhance.js
+   Splash · scroll-progress · go-to-top · rail room cards ·
+   hero discipline cards · name portrait · logo hovers ·
+   chatbot · secret studio dashboard
+   ========================================================= */
+(function () {
+  'use strict';
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const CDN = (window.BQ_GALLERY && window.BQ_GALLERY.MEDIA_BASE) || '';
+  const scrollTarget = (target, options = {}) => {
+    if (!target) return;
+    if (window.__bqScrollPaperTarget?.(target, options)) return;
+    target.scrollIntoView(options);
+  };
+
+  /* Language-change dispatcher — modules push callbacks to re-render
+     their JS-generated content (marquee, blog, chatbot) on language switch. */
+  window.__bqLangCb = window.__bqLangCb || [];
+  window.__bqOnLang = function (lang, dict) {
+    window.__bqLangCb.forEach(function (fn) { try { fn(lang, dict); } catch (e) {} });
+  };
+
+  /* =======================================================
+     2 · SCROLL PROGRESS + GO TO TOP
+     ======================================================= */
+  (function scrollProgress() {
+    const railFill = $('#railProgress');
+    const toTop    = $('#toTop');
+    const ring     = $('#toTopProg');
+    const C = 2 * Math.PI * 20;            // circumference of r=20
+    const coreOwnsProgress = () => window.__bqDeckRing && typeof window.__bqCoreGoUpUpdate === 'function';
+    if (ring && !coreOwnsProgress()) { ring.style.strokeDasharray = C; ring.style.strokeDashoffset = C; }
+    let railVisible = false, maxScroll = 1, progressFrame = 0;
+    let lastRailHeight = '', lastRingOffset = null, lastShown = null;
+
+    const paintProgress = () => {
+      progressFrame = 0;
+      const delegated = coreOwnsProgress();
+      if (delegated && !railVisible) return;
+      const h = document.documentElement;
+      // window.scrollY is reliable on mobile; documentElement.scrollTop can read 0 there
+      const st = window.scrollY || (document.scrollingElement || h).scrollTop || 0;
+      const p = Math.min(Math.max(st / maxScroll, 0), 1);
+      const railHeight = (p * 100) + '%';
+      if (railVisible && railHeight !== lastRailHeight) {
+        railFill.style.height = railHeight;
+        lastRailHeight = railHeight;
+      }
+      if (delegated) return;
+      const offset = C * (1 - p);
+      if (ring && offset !== lastRingOffset) {
+        ring.style.strokeDashoffset = offset;
+        lastRingOffset = offset;
+      }
+      const shown = lastShown ? st > 40 : st > 160;
+      if (toTop && shown !== lastShown) {
+        toTop.classList.toggle('is-shown', shown);
+        toTop.setAttribute?.('aria-hidden', String(!shown));
+        toTop.tabIndex = shown ? 0 : -1;
+        lastShown = shown;
+      }
+    };
+    const onScroll = () => {
+      // The core updater is queued and owns the deck ring and button. Do not
+      // read layout or paint over it from scroll, touchmove or the old sampler.
+      if (coreOwnsProgress()) {
+        window.__bqCoreGoUpUpdate();
+        if (!railVisible) return;
+      }
+      if (!progressFrame) progressFrame = requestAnimationFrame(paintProgress);
+    };
+    const refreshProgressMetrics = () => {
+      railVisible = !!(railFill && railFill.getClientRects().length);
+      if (railVisible || !coreOwnsProgress()) {
+        const h = document.documentElement;
+        maxScroll = Math.max(1, h.scrollHeight - h.clientHeight);
+      }
+      onScroll();
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('touchmove', onScroll, { passive: true });   // some mobile browsers throttle 'scroll'
+    window.addEventListener('resize', refreshProgressMetrics);
+    window.addEventListener('bq:css-ready', refreshProgressMetrics);
+    window.addEventListener('bq:gallery-built', refreshProgressMetrics);
+    document.addEventListener('bq:route', refreshProgressMetrics);
+    if (typeof ResizeObserver === 'function') {
+      new ResizeObserver(refreshProgressMetrics).observe(document.body);
+    }
+    window.addEventListener('popstate', () => setTimeout(onScroll, 140)); // re-check after back/forward room change
+    window.__bqOnScroll = onScroll;                                       // router calls this after navigating
+    refreshProgressMetrics();
+
+    /* In-app browsers (Google app, Gmail, Instagram webviews) sometimes DON'T
+       update CSS `dvh` when their toolbar collapses/expands, leaving the hero
+       too short → a blank gap below it. We mirror the REAL window.innerHeight
+       into a `--app-vh` custom property; the hero CSS uses it with a `100dvh`
+       fallback, so normal browsers are unchanged and webviews get the right
+       height that tracks the toolbar. */
+    let lastAppHeight = 0;
+    const setAppVh = () => {
+      const h = window.innerHeight;
+      if (h > 200 && h !== lastAppHeight) {
+        document.documentElement.style.setProperty('--app-vh', h + 'px');
+        lastAppHeight = h;
+      }
+    };
+    setAppVh();
+    /* re-measure a few times across the moment the viewport settles (toolbars
+       animate in/out over a few hundred ms after the app/tab regains focus) */
+    const setAppVhSoon = () => { setAppVh(); setTimeout(setAppVh, 60); setTimeout(setAppVh, 250); setTimeout(setAppVh, 600); };
+    window.addEventListener('resize', setAppVh, { passive: true });
+    window.addEventListener('orientationchange', () => setTimeout(setAppVh, 120));
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', setAppVh, { passive: true });
+      window.visualViewport.addEventListener('scroll', setAppVh, { passive: true });
+    }
+    /* The real fix for "hero is clipped after coming back to the browser": when the
+       tab/app was backgrounded the viewport often changed with NO resize event, so
+       --app-vh went stale. Re-measure on every kind of return so the hero is always
+       exactly full — on mobile and desktop, in every case. */
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) setAppVhSoon(); });
+    window.addEventListener('pageshow', setAppVhSoon);          /* incl. bfcache restore */
+    window.addEventListener('focus', setAppVhSoon);
+    window.addEventListener('load', setAppVhSoon);
+
+    /* ---- Return to the hero after a long pause in this document ----
+       Fresh loads keep their requested route. A restored or backgrounded tab
+       returns to the home hero only after the five-minute away timer. */
+    if ('scrollRestoration' in history) { try { history.scrollRestoration = 'manual'; } catch (e) {} }
+    const bqToTop  = () => { try { window.scrollTo(0, 0); } catch (e) {} };
+    const bqToHero = () => {
+      setAppVhSoon();
+      try {
+        if (window.__bqResetToHomeHero) { window.__bqResetToHomeHero(); return; }
+        else if (window.__bqShowRoom) window.__bqShowRoom('design');
+      } catch (e) {}
+      bqToTop();
+    };
+    /* bfcache / session restore can re-show an old scroll position. Do not snap
+       immediately; the same five-minute away timer below decides when to reset. */
+    let bqHiddenAt = 0;
+    const BQ_RESUME_RESET_MS = 5 * 60 * 1000;
+    const BQ_MOBILE_RESUME_RESET_MS = 5 * 60 * 1000;
+    const BQ_AWAY_KEY = 'bq_last_away_at';
+    const bqResumeDelay = () => {
+      try {
+        return window.matchMedia('(max-width: 1024px)').matches ? BQ_MOBILE_RESUME_RESET_MS : BQ_RESUME_RESET_MS;
+      } catch (e) {
+        return BQ_RESUME_RESET_MS;
+      }
+    };
+    const bqStoreAway = () => {
+      bqHiddenAt = Date.now();
+      try { sessionStorage.setItem(BQ_AWAY_KEY, String(bqHiddenAt)); } catch (e) {}
+    };
+    const bqStoredAwayAt = () => {
+      try { return parseInt(sessionStorage.getItem(BQ_AWAY_KEY) || '0', 10) || 0; } catch (e) { return 0; }
+    };
+    const bqClearAway = () => {
+      bqHiddenAt = 0;
+      try { sessionStorage.removeItem(BQ_AWAY_KEY); } catch (e) {}
+    };
+    // This script can load after pageshow. A new document must never inherit
+    // the previous document's away timer; bfcache preserves this script's state.
+    bqClearAway();
+    const bqResumeHome = () => { bqClearAway(); bqToHero(); };
+    const bqResumeIfAway = () => {
+      const at = bqHiddenAt || bqStoredAwayAt();
+      if (at && Date.now() - at > bqResumeDelay()) bqResumeHome();
+      else if (at) bqClearAway();
+    };
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) bqStoreAway();
+      else bqResumeIfAway();   /* reopened after leaving the browser → home hero */
+    });
+    window.addEventListener('pagehide', bqStoreAway);
+    window.addEventListener('blur', bqStoreAway);
+    window.addEventListener('focus', bqResumeIfAway);
+    window.addEventListener('pageshow', (event) => {
+      if (!event.persisted) { bqClearAway(); return; }
+      setTimeout(bqResumeIfAway, 60);
+    });
+
+    /* Some in-app browsers swallow 'scroll' events while their toolbar moves.
+       Sample during short interaction bursts instead of running a permanent
+       requestAnimationFrame loop for the entire lifetime of the page. */
+    let lastWatchY = -1, scrollWatchFrame = 0, scrollWatchUntil = 0;
+    const sampleScroll = (now) => {
+      if (coreOwnsProgress()) { scrollWatchFrame = 0; return; }
+      const y = window.scrollY || (document.scrollingElement || document.documentElement).scrollTop || 0;
+      if (y !== lastWatchY) {
+        lastWatchY = y;
+        onScroll();
+        if (window.__bqQueueSnap) window.__bqQueueSnap();
+      }
+      if (!document.hidden && now < scrollWatchUntil) scrollWatchFrame = requestAnimationFrame(sampleScroll);
+      else scrollWatchFrame = 0;
+    };
+    const watchScrollBriefly = (ms) => {
+      if (coreOwnsProgress()) return;
+      scrollWatchUntil = Math.max(scrollWatchUntil, performance.now() + (ms || 700));
+      if (!scrollWatchFrame && !document.hidden) scrollWatchFrame = requestAnimationFrame(sampleScroll);
+    };
+    window.addEventListener('touchstart', () => watchScrollBriefly(1400), { passive: true });
+    window.addEventListener('pointerdown', () => watchScrollBriefly(900), { passive: true });
+    window.addEventListener('wheel', () => watchScrollBriefly(900), { passive: true });
+    window.addEventListener('scroll', () => watchScrollBriefly(320), { passive: true });
+    window.addEventListener('keydown', (e) => {
+      if (['PageUp', 'PageDown', 'Home', 'End', ' ', 'ArrowUp', 'ArrowDown'].includes(e.key)) watchScrollBriefly(900);
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) watchScrollBriefly(700);
+      else if (scrollWatchFrame) { cancelAnimationFrame(scrollWatchFrame); scrollWatchFrame = 0; }
+    });
+    watchScrollBriefly(700);
+
+    // The fallback uses the same document owner as the core. Native scrolling
+    // can be interrupted by a new touch; repeated clicks cannot leave several
+    // animation loops and delayed hard resets fighting the visitor's scroll.
+    if (toTop && !window.__bqTopClickBound) toTop.addEventListener('click', () => {
+      const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+      if (window.__bqGoDocumentTop) window.__bqGoDocumentTop(behavior);
+      else window.scrollTo({ top:0, behavior });
+      onScroll();
+    });
+    if (toTop) window.__bqTopClickBound = true;
+
+    /* Mobile scroll is now PLAIN and free — no hero snapping at all (it caught in
+       too many places on touch). Keep a no-op so the rAF watcher / go-to-top that
+       reference __bqQueueSnap stay safe. */
+    window.__bqQueueSnap = function () {};
+  })();
+
+  /* =======================================================
+     3 · RAIL ROOM HOVER CARDS
+     ======================================================= */
+  (function railCards() {
+    const rail = $('.rail');
+    if (!rail) return;
+    const ROOMS = {
+      design:  { n: '01', name: 'Design', tag: 'Portfolio', count: '700+ works',
+                 desc: 'A living catalogue — official editorial, books, logos, posters, photography & video.',
+                 icon: 'fa-compass-drafting' },
+      panjamor: { n: '02', name: 'Panjamor', tag: 'Studio', count: 'Brand + print',
+                 desc: 'An office studio for identity, print, launch material and owner-ready handover.',
+                 icon: 'fa-fingerprint' },
+      blog:    { n: '03', name: 'The Journal', tag: 'Journal', count: '6 essays',
+                 desc: 'Short notes from the desk on typography, place, and the slow craft of design.',
+                 icon: 'fa-feather-pointed' },
+      work:    { n: '04', name: 'Selected Work', tag: 'Case Studies', count: 'Brand systems',
+                 desc: 'Brand identities in full — the brief, the marks, the palette, and the system in use.',
+                 icon: 'fa-folder-open' },
+      brandboard: { n: '05', name: 'The Brand Board', tag: 'Free Tool', count: 'Kurdish + Latin',
+                 desc: 'A free starter identity — your name in Kurdish and Latin, with a palette and type pairing.',
+                 icon: 'fa-swatchbook' },
+	      bio:     { n: '06', name: 'The Designer', tag: 'About', count: '2014 — now',
+	                 desc: 'A decade of practice in Hewlêr — experience, education, awards & languages.',
+	                 icon: 'fa-user-pen' },
+	      contact: { n: '07', name: "Let's talk.", tag: 'Enquiries', count: 'Replies in 48h',
+	                 desc: 'Pitch a project in one careful letter. Available for select commissions.',
+	                 icon: 'fa-paper-plane' },
+	    };
+
+    const card = document.createElement('div');
+    card.className = 'rail-card';
+    card.innerHTML = `
+      <div class="rail-card-body">
+        <span class="mono rail-card-tag" id="rcTag"></span>
+        <h4 class="rail-card-title" id="rcTitle"></h4>
+        <p class="rail-card-desc" id="rcDesc"></p>
+      </div>
+      <i class="fa-solid rail-card-icon" id="rcIcon" aria-hidden="true"></i>`;
+    document.body.appendChild(card);
+
+    const rcLang = () => document.documentElement.dataset.lang || 'en';
+    const trFor  = (route) => (window.ROOMCARD_I18N && window.ROOMCARD_I18N[rcLang()] && window.ROOMCARD_I18N[rcLang()][route]) || null;
+    let hideT;
+    const show = (link) => {
+      const route = link.dataset.route;
+      const r = ROOMS[route];
+      if (!r) return;
+      clearTimeout(hideT);
+      const tr = trFor(route);
+      const nm = (window.BQ_DICT && window.BQ_DICT['nav.' + route]) || r.name;
+      $('#rcTag', card).textContent = (tr && tr.tag) || r.tag;
+      $('#rcTitle', card).textContent = nm;
+      $('#rcDesc', card).textContent = (tr && tr.desc) || r.desc;
+      $('#rcIcon', card).className = `fa-solid ${r.icon} rail-card-icon`;
+      const b = link.getBoundingClientRect();
+      card.style.top = Math.max(16, Math.min(b.top + b.height / 2, window.innerHeight - 120)) + 'px';
+      card.classList.add('is-shown');
+    };
+    const hide = () => { hideT = setTimeout(() => card.classList.remove('is-shown'), 120); };
+
+    $$('.rail-link').forEach(link => {
+      if (!link.dataset.route) return;
+      link.addEventListener('mouseenter', () => show(link));
+      link.addEventListener('mouseleave', hide);
+    });
+    card.addEventListener('mouseenter', () => clearTimeout(hideT));
+    card.addEventListener('mouseleave', hide);
+  })();
+
+  /* Pencemor "View the work" → jump to the gallery */
+  $('#pencemorViewWork')?.addEventListener('click', () => {
+    const head = document.querySelector('#design .section.work .section-head') || document.getElementById('grid');
+    scrollTarget(head, { behavior: 'smooth', block: 'start' });
+  });
+
+  /* =======================================================
+     3a · PROFILE CARD — hover the Bq logo
+     ======================================================= */
+  (function profileCard() {
+    const logo = $('#railLogo'), card = $('#profileCard');
+    if (!logo || !card) return;
+    let t;
+    const show = () => { clearTimeout(t); card.classList.add('is-shown'); card.setAttribute('aria-hidden', 'false'); };
+    const hide = () => { clearTimeout(t); t = setTimeout(() => { card.classList.remove('is-shown'); card.setAttribute('aria-hidden', 'true'); }, 260); };
+    logo.addEventListener('mouseenter', show);
+    logo.addEventListener('mouseleave', hide);
+    card.addEventListener('mouseenter', show);
+    card.addEventListener('mouseleave', hide);
+  })();
+
+  /* =======================================================
+     4 · HERO — discipline cards + name portrait
+     ======================================================= */
+  (function heroInteract() {
+    const collectionCount = (k) => {
+      const col = window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS && window.BQ_GALLERY.COLLECTIONS[k];
+      return (col && ((col.files && col.files.length) || col.count)) || 0;
+    };
+
+    /* cursor-following preview — supports an album (3 photos) or a round portrait */
+    const float = document.createElement('div');
+    float.className = 'hero-float';
+    float.innerHTML = `
+      <div class="hf-album">
+        <img class="hf-a hf-a3" alt=""><img class="hf-a hf-a2" alt=""><img class="hf-a hf-a1" alt="">
+      </div>
+      <div class="hf-portrait"><img alt="Barakat Qurtas"/><span class="hf-portrait-ring"></span></div>
+      <div class="hf-meta">
+        <span class="hf-title"></span>
+        <span class="hf-sub mono"></span>
+        <span class="hf-go mono">${(window.BQ_DICT&&window.BQ_DICT["foot.view"])||"View section"} <i class="fa-solid fa-arrow-right"></i></span>
+      </div>`;
+    document.body.appendChild(float);
+    const album = $$('.hf-a', float);
+    const portraitImg = $('.hf-portrait img', float);
+    const hfTitle = $('.hf-title', float), hfSub = $('.hf-sub', float);
+
+    let raf;
+    const move = (e) => {
+      cancelAnimationFrame(raf);
+      const x = e.clientX, y = e.clientY;
+      raf = requestAnimationFrame(() => { float.style.left = x + 'px'; float.style.top = y + 'px'; });
+    };
+
+    /* discipline → tab + 3-image album + meta */
+    const DISC = {
+      'Brand Identity': { tab: 'logo',     count: () => collectionCount('logo'),
+        imgs: [`${CDN}/LogoDesign/Logo3.webp`, `${CDN}/LogoDesign/Logo14.webp`, `${CDN}/LogoDesign/Logo19.webp`] },
+      'Editorial':      { tab: 'official',  count: () => collectionCount('official'),
+        imgs: [`${CDN}/Official/Official7.webp`, `${CDN}/Official/Official94.webp`, `${CDN}/Official/Official132.webp`] },
+      'Posters':        { tab: 'posters',   count: () => collectionCount('posters'),
+        imgs: [`${CDN}/Poster/Poster6.webp`, `${CDN}/Poster/Poster14.webp`, `${CDN}/Poster/Poster7.webp`] },
+      'Book Design':    { tab: 'book',      count: () => collectionCount('book'),
+        imgs: [`${CDN}/Book/BookCover1.webp`, `${CDN}/Book/BookCover28.webp`, `${CDN}/Book/BookCover45.webp`] },
+      'Video':          { tab: 'video',     count: () => collectionCount('video'),
+        imgs: [`${CDN}/GeneralDesign/GDesign1.webp`, `${CDN}/GeneralDesign/GDesign17.webp`, `${CDN}/GeneralDesign/GDesign40.webp`] },
+    };
+
+    const goToSection = (tab) => {
+      const t = document.querySelector(`.tab[data-filter="${tab}"]`);
+      if (!t) return;
+      t.click();
+      /* scroll so the section header (title + info) is visible, not just images */
+      const head = document.getElementById('tabHeader') || document.getElementById('grid');
+      scrollTarget(head, { behavior: 'smooth', block: 'start' });
+    };
+
+    /* ---- Build a truly seamless marquee ----
+       Each of the two halves is filled with enough repeats of the 5
+       disciplines to exceed the container width, so translateX(-50%)
+       always lands on identical content — no stop, no gap, no jump. */
+    const track = $('.hero-marquee-track');
+    const wrap  = $('.hero-marquee');
+    const DISC_ORDER = ['Brand Identity', 'Editorial', 'Posters', 'Book Design', 'Video'];
+    const ICONS = { 'Brand Identity': 'fa-pen-nib', 'Editorial': 'fa-newspaper', 'Posters': 'fa-image', 'Book Design': 'fa-book', 'Video': 'fa-video' };
+    const DISC_KEY = { 'Brand Identity':'disc.brand','Editorial':'disc.editorial','Posters':'disc.posters','Book Design':'disc.book','Video':'disc.video' };
+    const discLabel = (d) => (window.BQ_DICT && window.BQ_DICT[DISC_KEY[d]]) || d;
+    let marqueeWidth = -1;
+    const buildMarquee = (force = false) => {
+      if (!track || !wrap) return;
+      const width = wrap.clientWidth;
+      // Phone browser bars resize the height while this strip stays identical.
+      // Replacing its children would restart the animation and force layout.
+      if (!force && width === marqueeWidth) return;
+      marqueeWidth = width;
+      const unit = DISC_ORDER.map(d =>
+        `<span class="hero-disc" data-disc="${d}"><i class="fa-solid ${ICONS[d]}"></i> ${discLabel(d)}</span><span class="hero-sep">✦</span>`
+      ).join('');
+      track.innerHTML = unit;                              // measure one set
+      const setW = track.scrollWidth || 900;
+      const reps = Math.max(2, Math.ceil((width * 1.25) / setW));
+      const half = unit.repeat(reps);
+      track.innerHTML = half + half;                       // two identical halves
+      /* constant speed (~55px/s) no matter how many copies */
+      const halfW = track.scrollWidth / 2;
+      track.style.animationDuration = Math.max(18, halfW / 55).toFixed(1) + 's';
+    };
+    buildMarquee();
+    window.__bqLangCb.push(() => buildMarquee(true));
+    let rb;
+    window.addEventListener('resize', () => {
+      if (!wrap || wrap.clientWidth === marqueeWidth) return;
+      clearTimeout(rb);
+      rb = setTimeout(() => buildMarquee(), 250);
+    }, { passive: true });
+    // Font metrics can change without a width change when web fonts finish.
+    document.fonts?.addEventListener('loadingdone', () => buildMarquee(true));
+
+    /* delegated discipline hover (survives marquee rebuild) */
+    let curDisc = null;
+    const showAlbum = (item) => {
+      const info = DISC[item.dataset.disc];
+      if (!info) return;
+      curDisc = item;
+      info.imgs.forEach((src, i) => { if (album[i]) album[i].src = src; });
+      hfTitle.textContent = discLabel(item.dataset.disc);
+      hfSub.textContent = (window.BQ_DICT && window.BQ_DICT['foot.view']) || 'View section';
+      float.classList.remove('is-portrait');
+      float.classList.add('is-shown', 'is-album');
+    };
+    if (track) {
+      track.addEventListener('mouseover', (e) => {
+        const item = e.target.closest('[data-disc]');
+        if (item && item !== curDisc) showAlbum(item);
+      });
+      track.addEventListener('mousemove', move);
+      track.addEventListener('mouseout', (e) => {
+        if (!e.relatedTarget || !track.contains(e.relatedTarget)) {
+          curDisc = null; float.classList.remove('is-shown', 'is-album');
+        }
+      });
+      track.addEventListener('click', (e) => {
+        const item = e.target.closest('[data-disc]');
+        if (item) goToSection(DISC[item.dataset.disc].tab);
+      });
+    }
+
+    /* name → round portrait — only over the actual letters */
+    $$('.hero-name').forEach(name => {
+      name.addEventListener('mouseenter', () => {
+        portraitImg.src = 'assets/portrait.webp?v=2';
+        hfTitle.textContent = 'Barakat Qurtas';
+        hfSub.textContent = (window.BQ_DICT && window.BQ_DICT['float.designer']) || 'Designer · Hewlêr';
+        float.classList.remove('is-album');
+        float.classList.add('is-shown', 'is-portrait');
+      });
+      name.addEventListener('mousemove', move);
+      name.addEventListener('mouseleave', () => float.classList.remove('is-shown', 'is-portrait'));
+    });
+  })();
+
+  /* Client marks retain stable geometry. Designed-by-hand buttons are owned
+     by gallery.js's lightbox; a second click handler used to switch the room
+     underneath that lightbox and unexpectedly reset the portfolio scroll. */
+
+  /* =======================================================
+     5b · FLYOUT INTENT — keep language/social menus open
+     for a grace period after the mouse leaves
+     ======================================================= */
+  (function flyoutIntent() {
+    if (window.__bqDesktopFlyoutsBound) return;
+    window.__bqDesktopFlyoutsBound = true;
+    const GRACE = 420; // ms — just enough to move the cursor across the gap
+    $$('.lang-hover, .social-hover').forEach(wrap => {
+      let t;
+      const trigger = wrap.querySelector(':scope > button[aria-haspopup]');
+      const setOpen = (open) => {
+        wrap.classList.toggle('is-hovering', open);
+        trigger?.setAttribute('aria-expanded', String(open));
+      };
+      const openIt = () => {
+        clearTimeout(t);
+        wrap.classList.remove('is-flyout-dismissed');
+        setOpen(true);
+      };
+      const closeNow = () => {
+        clearTimeout(t);
+        setOpen(false);
+      };
+      const closeIt = () => {
+        clearTimeout(t);
+        t = setTimeout(() => {
+          if (wrap.matches(':hover') || wrap.contains(document.activeElement)) return;
+          closeNow();
+        }, GRACE);
+      };
+      wrap.addEventListener('mouseenter', openIt);
+      wrap.addEventListener('mouseleave', closeIt);
+      wrap.addEventListener('focusin', openIt);
+      wrap.addEventListener('focusout', closeIt);
+      trigger?.addEventListener('click', () => {
+        if (wrap.classList.contains('is-flyout-dismissed')) openIt();
+      });
+      wrap.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        e.preventDefault();
+        try { trigger?.focus({ preventScroll: true }); } catch (err) { trigger?.focus(); }
+        wrap.classList.add('is-flyout-dismissed');
+        closeNow();
+      });
+    });
+  })();
+
+  /* =======================================================
+     5c · TAB HOVER CARDS — info card per portfolio tab (no image)
+     ======================================================= */
+  (function tabCards() {
+    if (window.__bqTabCardsBound) return;
+    const tabs = $$('.tab');
+    if (!tabs.length) return;
+    if (!window.matchMedia('(pointer: fine)').matches) return;  // hover only
+    window.__bqTabCardsBound = true;
+
+    const INFO = {
+      all:      { tag: 'Full catalogue',         desc: 'Every discipline gathered in one place — the complete body of work.' },
+      official: { tag: 'Official · Editorial',  desc: 'Editorial design — books, layouts, and official publications.' },
+      book:     { tag: 'Print · Covers',          desc: 'Book covers — typography, illustration, and print composition.' },
+      image:    { tag: 'Photography',             desc: 'Photo editing, composites, and editorial retouching.' },
+      logo:     { tag: 'Brand identity',          desc: 'Logos, wordmarks, and visual identities drawn by hand.' },
+      posters:  { tag: 'Print',                   desc: 'Cultural, political, and typographic poster series.' },
+      social:   { tag: 'Digital',                 desc: 'Social campaigns, grids, and digital storytelling.' },
+      events:   { tag: 'Identity',                desc: 'Ceremony materials, banners, and event identity design.' },
+      stationery: { tag: 'Stationery',            desc: 'Business cards, letterheads, invoices & receipts — the quiet system behind a brand.' },
+      video:    { tag: 'Motion',                  desc: 'Documentary edits, motion reels, and media coverage.' },
+      other:    { tag: 'Miscellany',              desc: 'Flex banners, type experiments, and the small things.' },
+    };
+
+    const card = document.createElement('div');
+    card.className = 'tab-card';
+    card.innerHTML = `
+      <span class="mono tab-card-tag" id="tcTag"></span>
+      <h4 class="tab-card-title" id="tcTitle"></h4>
+      <p class="tab-card-desc" id="tcDesc"></p>`;
+    document.body.appendChild(card);
+
+    const tcLang = () => document.documentElement.dataset.lang || 'en';
+    const infoFor = (f) => (window.TABCARD_I18N && window.TABCARD_I18N[tcLang()] && window.TABCARD_I18N[tcLang()][f]) || INFO[f];
+
+    let hideT;
+    const show = (tab) => {
+      const f = tab.dataset.filter;
+      const info = infoFor(f); if (!info) return;
+      clearTimeout(hideT);
+      const name = (tab.querySelector('.tab-label')?.textContent || f).trim();
+      $('#tcTag', card).textContent = info.tag;
+      $('#tcTitle', card).textContent = name;
+      $('#tcDesc', card).textContent = info.desc;
+
+      /* the filters are a vertical side menu now, so the card opens BESIDE the tab
+         (to its right), vertically centred and clamped to the viewport */
+      card.style.visibility = 'hidden'; card.classList.add('is-shown');
+      const cw = card.offsetWidth, ch = card.offsetHeight;
+      const b = tab.getBoundingClientRect();
+      let left = b.right + 14;
+      if (left + cw > window.innerWidth - 12) left = b.left - cw - 14;   // flip left if no room
+      let top = b.top + b.height / 2 - ch / 2;
+      top = Math.max(12, Math.min(top, window.innerHeight - ch - 12));
+      card.style.left = left + 'px';
+      card.style.top = top + 'px';
+      card.style.visibility = '';
+    };
+    const hide = () => { hideT = setTimeout(() => card.classList.remove('is-shown'), 100); };
+
+    tabs.forEach(tab => {
+      tab.addEventListener('mouseenter', () => show(tab));
+      tab.addEventListener('mouseleave', hide);
+      tab.addEventListener('click', () => card.classList.remove('is-shown'));
+    });
+    card.addEventListener('mouseenter', () => clearTimeout(hideT));
+    card.addEventListener('mouseleave', hide);
+  })();
+
+  /* =======================================================
+     6 · CHATBOT
+     ======================================================= */
+  (function chatbot() {
+    const triggers = [$('#railChat'), $('#railChatM')].filter(Boolean);
+    const panel = $('#chat'), body = $('#chatBody');
+    const form = $('#chatForm'), input = $('#chatText'), quick = $('#chatQuick'), min = $('#chatMin');
+    if (!triggers.length || !panel) return;
+
+    const KB = [
+      { k: ['service','services','what do you do','offer','do you'],
+        a: "I offer <b>brand identity & logo design</b>, <b>editorial & book covers</b>, <b>posters</b>, <b>social media</b>, <b>print & invoices</b>, and <b>video editing</b>. Want to see a category? Try the tabs in the Design room." },
+      { k: ['price','pricing','cost','how much','budget','rate'],
+        a: "Pricing depends on scope. Rough starting points:<br>• <b>Logo / mark</b> — $100–$1,500+<br>• <b>Brand identity</b> — $250–$2,500<br>• <b>Book cover</b> — $50–$100<br>• <b>Poster</b> — $15–$150<br>For an exact quote, send a brief via the Contact room." },
+      { k: ['time','timeline','how long','deadline','fast','urgent'],
+        a: "Typical timelines: a logo in <b>3–7 working days</b>, a full identity in <b>3–5 weeks</b>, a book cover in <b>1 week</b>. Rush work is possible — tell me your deadline." },
+      { k: ['contact','reach','email','phone','whatsapp','hire','start'],
+        a: "Easiest ways to reach Barakat:<br>• ✉️ <a href='mailto:hello@bqurtas.com'>hello@bqurtas.com</a><br>• 📱 <a href='https://wa.me/9647517884985' target='_blank' rel='noopener'>WhatsApp +964 751 788 4985</a><br>Or open the <b>Contact</b> room and send a pitch." },
+      { k: ['who','about','experience','barakat','you'],
+        a: "Barakat Qurtas is an independent graphic designer in <b>Erbil, Kurdistan</b>, working freelance since <b>2014</b> — 1000+ works across branding, editorial, print & digital." },
+      { k: ['language','languages','speak'],
+        a: "Barakat works in <b>Kurdish (Sorani & Kurmancî)</b>, <b>Arabic</b>, <b>English</b>, and some <b>French</b>." },
+      { k: ['book','cover'], a: "Book covers are a specialty — 99 covers and counting. Open the <b>Book</b> tab in the Design room to browse them." },
+      { k: ['logo','brand','identity'], a: "Logos & identities are my favourite work. See the <b>Logo</b> tab, or the “Designed by hand” marks on the home page." },
+      { k: ['official','government','presidency'], a: "I create official editorial for the Kurdistan Region Presidency — see the <b>Official</b> tab (168 works)." },
+      { k: ['hi','hello','hey','salam','silav','سڵاو','hái'], a: "Hello! 👋 I'm Barakat's studio assistant. Ask me about services, pricing, timelines, or how to start a project." },
+      { k: ['thanks','thank you','thx','سوپاس'], a: "You're welcome! Anything else you'd like to know? 🙂" },
+    ];
+    const FALLBACK = "I'm not sure about that one — but Barakat can help directly. Try the <b>Contact</b> room, or ask me about <i>services, pricing, timelines, or languages</i>.";
+
+    /* Bot copy intentionally uses a very small formatting vocabulary. Chat
+       history lives in localStorage, which users/extensions can modify, so
+       restore only that allowlist and never replay arbitrary saved markup. */
+    const safeChatHTML = (html) => {
+      const template = document.createElement('template');
+      template.innerHTML = String(html ?? '');
+      const allowed = new Set(['B', 'STRONG', 'I', 'EM', 'BR', 'A', 'SPAN']);
+      template.content.querySelectorAll('*').forEach((node) => {
+        if (!allowed.has(node.tagName)) {
+          node.replaceWith(document.createTextNode(node.textContent || ''));
+          return;
+        }
+        const href = node.tagName === 'A' ? node.getAttribute('href') : '';
+        const typingClass = node.tagName === 'SPAN' && node.classList.contains('chat-typing');
+        Array.from(node.attributes).forEach((attribute) => node.removeAttribute(attribute.name));
+        if (typingClass) node.className = 'chat-typing';
+        if (node.tagName === 'A') {
+          let target;
+          try { target = new URL(href || '', location.href); } catch (e) {}
+          if (!target || !['https:', 'mailto:'].includes(target.protocol)) {
+            node.replaceWith(...Array.from(node.childNodes));
+            return;
+          }
+          node.setAttribute('href', target.href);
+          node.setAttribute('rel', 'noopener noreferrer');
+          if (target.protocol === 'https:') node.setAttribute('target', '_blank');
+        }
+      });
+      return template.innerHTML;
+    };
+    const legacyChatText = (html) => {
+      const decoder = document.createElement('textarea');
+      decoder.innerHTML = String(html ?? '');
+      return decoder.value;
+    };
+
+    /* language-aware knowledge base */
+    const chatTr = () => (window.CHAT_I18N && window.CHAT_I18N[document.documentElement.dataset.lang || 'en']) || null;
+    const getKB = () => { const t = chatTr(); return (t && t.kb) || KB; };
+    const getFallback = () => { const t = chatTr(); return (t && t.fallback) || FALLBACK; };
+    const getGreet = () => { const t = chatTr(); return (t && t.greet) || "Hi! 👋 I'm the studio assistant. How can I help — <b>services</b>, <b>pricing</b>, or starting a <b>project</b>?"; };
+    const reply = (msg) => {
+      const m = msg.toLowerCase();
+      let best = null, score = 0;
+      // Search EVERY language's KB (current UI language first) so a question
+      // asked in any language is answered, whatever language the site is in.
+      const C = window.CHAT_I18N || {};
+      const cur = document.documentElement.dataset.lang || 'en';
+      const langs = [cur].concat(Object.keys(C).filter(l => l !== cur));
+      const kbs = langs.map(l => C[l] && C[l].kb).filter(Boolean);
+      (kbs.length ? kbs : [getKB()]).forEach(kb => kb.forEach(item => {
+        const s = item.k.reduce((acc, kw) => acc + (m.includes(kw.toLowerCase()) ? kw.length : 0), 0);
+        if (s > score) { score = s; best = item; }
+      }));
+      return best ? best.a : getFallback();
+    };
+
+    /* Recent conversation stays on this device, with a one-hour expiry. */
+    const HKEY = 'bq_chat_history';
+    const persist = () => {
+      try {
+        const msgs = Array.from(body.querySelectorAll('.chat-msg:not(.is-typing)'))
+          .map((el) => {
+            const who = el.classList.contains('chat-msg--me') ? 'me' : 'bot';
+            return { who, content: who === 'me' ? el.textContent : safeChatHTML(el.innerHTML) };
+          });
+        localStorage.setItem(HKEY, JSON.stringify({ ts: Date.now(), msgs: msgs.slice(-100) }));
+      } catch (e) {}
+    };
+    const add = (who, content, noPersist) => {
+      const el = document.createElement('div');
+      const safeWho = who === 'me' ? 'me' : 'bot';
+      el.className = `chat-msg chat-msg--${safeWho}`;
+      if (safeWho === 'me') el.textContent = String(content ?? '');
+      else el.innerHTML = safeChatHTML(content);
+      body.appendChild(el);
+      body.scrollTop = body.scrollHeight;
+      if (!noPersist) persist();
+      return el;
+    };
+    const HMAXAGE = 60 * 60 * 1000;   // chats older than 1 hour are cleared
+    const restore = () => {
+      let data = null;
+      try { data = JSON.parse(localStorage.getItem(HKEY) || 'null'); } catch (e) {}
+      const fresh = data && Array.isArray(data.msgs) && (Date.now() - (data.ts || 0) < HMAXAGE);
+      const msgs = fresh ? data.msgs : null;
+      if (!msgs) { try { localStorage.removeItem(HKEY); } catch (e) {} return false; }
+      msgs.forEach((m) => {
+        const who = m && m.who === 'me' ? 'me' : 'bot';
+        const content = m && Object.prototype.hasOwnProperty.call(m, 'content')
+          ? m.content
+          : (who === 'me' ? legacyChatText(m && m.html) : (m && m.html));
+        add(who, content, true);
+      });
+      return msgs.length > 0;
+    };
+    const typing = () => {
+      const el = add('bot', '<span class="chat-typing"><i></i><i></i><i></i></span>', true);
+      el.classList.add('is-typing');
+      return el;
+    };
+    const plainChatHTML = (text) => String(text ?? '')
+      .replace(/[&<>]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]))
+      .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n{3,}/g, '\n\n')
+      .replace(/\n/g, '<br>');
+    const recentTurns = () => {
+      const turns = Array.from(body.querySelectorAll('.chat-msg:not(.is-typing)')).slice(-12);
+      const messages = [];
+      let remaining = 6000;
+      for (const el of turns.reverse()) {
+        const content = el.textContent.trim().slice(0, 1500);
+        if (!content) continue;
+        if (content.length > remaining) break;
+        messages.unshift({ role: el.classList.contains('chat-msg--me') ? 'user' : 'assistant', content });
+        remaining -= content.length;
+      }
+      return messages;
+    };
+    const chatStatus = (state = 'ready') => {
+      const states = {
+        en: ['Studio assistant · AI', 'Thinking…', 'Saved studio guidance'],
+        ku: ['یاریدەدەری ستۆدیۆ · ژیری دەستکرد', 'بیر دەکەمەوە…', 'ڕێنماییە پاشەکەوتکراوەکانی ستۆدیۆ'],
+        ar: ['مساعد الاستوديو · ذكاء اصطناعي', 'أفكّر…', 'إرشادات الاستوديو المحفوظة'],
+        kmr: ['Alîkarê studyoyê · AI', 'Ez difikirim…', 'Rêberiya tomarkirî ya studyoyê'],
+        fr: ['Assistant du studio · IA', 'Je réfléchis…', 'Conseils du studio enregistrés'],
+        tr: ['Stüdyo asistanı · AI', 'Düşünüyorum…', 'Kayıtlı stüdyo rehberi'],
+        sv: ['Studioassistent · AI', 'Funderar…', 'Sparad studiovägledning']
+      };
+      const label = panel.querySelector('.chat-status [data-i18n]');
+      if (label) label.textContent = (states[document.documentElement.dataset.lang] || states.en)[state === 'thinking' ? 1 : state === 'saved' ? 2 : 0];
+    };
+    const setPending = (value) => {
+      pending = value;
+      form.setAttribute('aria-busy', String(value));
+      form.querySelector('button[type="submit"]').disabled = value;
+      quick.querySelectorAll('button').forEach(button => { button.disabled = value; });
+      chatStatus(value ? 'thinking' : 'ready');
+    };
+    let pending = false;
+    const botReply = async (msg) => {
+      const turns = recentTurns();
+      const t = typing();
+      const finish = (html) => {
+        t.classList.remove('is-typing');
+        t.innerHTML = html;
+        body.scrollTop = body.scrollHeight;
+        persist();
+        setPending(false);
+      };
+      const saved = safeChatHTML(reply(msg));
+      try {
+        const messages = turns.length && turns[turns.length - 1].role === 'user'
+          ? turns
+          : turns.concat([{ role: 'user', content: String(msg).slice(0, 1500) }]);
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lang: document.documentElement.dataset.lang || document.documentElement.lang || 'en',
+            messages
+          }),
+          signal: AbortSignal.timeout(50000)
+        });
+        const data = await response.json();
+        if (response.ok && data && data.ok === true && typeof data.text === 'string' && data.text.trim()) {
+          finish(plainChatHTML(data.text.trim()));
+          return;
+        }
+      } catch (e) {}
+      finish(saved);
+      chatStatus('saved');
+    };
+
+    const QUICK = [
+      { label: 'Services', q: 'services' }, { label: 'Pricing', q: 'pricing' },
+      { label: 'Timeline', q: 'timeline' }, { label: 'Contact', q: 'contact' }
+    ];
+    const getQuick = () => { const t = chatTr(); return (t && t.quick) || QUICK; };
+    const buildQuick = () => {
+      quick.innerHTML = '';
+      getQuick().forEach(item => {
+        const b = document.createElement('button');
+        b.className = 'chat-chip'; b.textContent = item.label;
+        b.addEventListener('click', () => send(item.q || item.label, item.label));
+        quick.appendChild(b);
+      });
+    };
+
+    const send = (text, display) => {
+      if (pending || !String(text).trim() || String(text).length > 1500) return;
+      setPending(true);
+      add('me', display || text);
+      botReply(text);
+    };
+
+    let greeted = false;
+    const backdrop = $('#chatBackdrop');
+    /* a quiet minute with no interaction → the chat closes itself */
+    let idleT = null, focusT = null, lastTrigger = null;
+    let resetDrag = () => {};
+    panel.toggleAttribute('inert', !panel.classList.contains('is-open'));
+    triggers.forEach(t => t.setAttribute('aria-expanded', String(panel.classList.contains('is-open'))));
+    const armIdle = () => {
+      clearTimeout(idleT);
+      idleT = setTimeout(() => {
+        if (pending || input?.value.trim() || document.activeElement === input) armIdle();
+        else close();
+      }, 60000);
+    };
+    const open = (trigger) => {
+      clearTimeout(focusT);
+      lastTrigger = trigger || document.activeElement;
+      if (window.__bqExclusive) window.__bqExclusive('chat');   // opening the chat closes Latest/menu/popovers
+      panel.removeAttribute('inert');
+      panel.classList.add('is-open');
+      backdrop && backdrop.classList.add('is-open');
+      triggers.forEach(t => { t.classList.add('is-active'); t.setAttribute('aria-expanded', 'true'); });
+      panel.setAttribute('aria-hidden', 'false');
+      armIdle();
+      chatStatus(pending ? 'thinking' : 'ready');
+      if (!greeted) {
+        greeted = true;
+        const hadHistory = restore();
+        if (!hadHistory) setTimeout(() => add('bot', getGreet()), 250);
+        buildQuick();
+      }
+      focusT = setTimeout(() => {
+        focusT = null;
+        if (panel.classList.contains('is-open') && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+          input?.focus({ preventScroll: true });
+        }
+      }, 300);
+    };
+    const close = () => {
+      clearTimeout(idleT);
+      clearTimeout(focusT);
+      focusT = null;
+      resetDrag();
+      const hadFocus = panel.contains(document.activeElement);
+      if (hadFocus) input?.blur();
+      if (hadFocus && lastTrigger && document.contains(lastTrigger)) {
+        lastTrigger.focus({ preventScroll: true });
+      }
+      panel.classList.remove('is-open');
+      panel.setAttribute('inert', '');
+      backdrop && backdrop.classList.remove('is-open');
+      triggers.forEach(t => { t.classList.remove('is-active'); t.setAttribute('aria-expanded', 'false'); });
+      panel.setAttribute('aria-hidden', 'true');
+      lastTrigger = null;
+    };
+    ['pointerdown', 'keydown', 'touchstart'].forEach((ev) =>
+      panel.addEventListener(ev, () => { if (panel.classList.contains('is-open')) armIdle(); }, { passive: true }));
+    window.__bqPanels = window.__bqPanels || {};
+    window.__bqPanels.chat = close;
+    triggers.forEach(t => t.addEventListener('click', () => panel.classList.contains('is-open') ? close() : open(t)));
+    min && min.addEventListener('click', close);
+    backdrop && backdrop.addEventListener('click', close);
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || !panel.classList.contains('is-open')) return;
+      e.preventDefault();
+      close();
+    });
+
+    /* mobile: drag the header downward to dismiss the sheet — firm (the sheet
+       tracks the finger and the page can't scroll under it) */
+    const cHead = panel.querySelector('.chat-head');
+    if (cHead) {
+      const isMobile = () => window.matchMedia('(max-width: 1024px)').matches;
+      let sy = null, dy = 0, drag = false;
+      const down = (y) => { if (!isMobile() || !panel.classList.contains('is-open')) return; sy = y; dy = 0; drag = true; panel.setAttribute('data-panel-dragging', ''); };
+      const move = (y, ev) => { if (!drag) return; dy = y - sy; if (dy < 0) dy = 0; if (dy > 3 && ev && ev.cancelable) ev.preventDefault(); panel.style.setProperty('--bq-panel-drag-y', `${dy}px`); };
+      const cancel = () => { drag = false; sy = null; dy = 0; panel.removeAttribute('data-panel-dragging'); panel.style.removeProperty('--bq-panel-drag-y'); };
+      resetDrag = cancel;
+      const up = () => { if (!drag) return; const dismiss = dy > 55; cancel(); if (dismiss) close(); };
+      cHead.addEventListener('touchstart', (e) => down(e.touches[0].clientY), { passive: true });
+      cHead.addEventListener('touchmove', (e) => move(e.touches[0].clientY, e), { passive: false });
+      cHead.addEventListener('touchend', up);
+      cHead.addEventListener('touchcancel', cancel);
+      cHead.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'touch') down(e.clientY); });
+      window.addEventListener('pointermove', (e) => { if (drag && e.pointerType !== 'touch') move(e.clientY, e); });
+      window.addEventListener('pointerup', () => { if (drag) up(); });
+      window.addEventListener('pointercancel', cancel);
+    }
+    /* rebuild quick chips in the new language, or when the lazy knowledge
+       base arrives after the first opening of the panel. */
+    const refreshChatKnowledge = () => {
+      if (greeted) { buildQuick(); setPending(pending); }
+      else chatStatus();
+    };
+    window.__bqLangCb.push(refreshChatKnowledge);
+    window.addEventListener('bq:chat-ready', refreshChatKnowledge);
+    chatStatus();
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = input.value.trim();
+      if (!v || pending) return;
+      input.value = '';
+      send(v);
+    });
+  })();
+
+  /* =======================================================
+     7 · SECRET STUDIO DASHBOARD
+     ======================================================= */
+  (function dashboard() {
+    const dash = $('#dash');
+    if (!dash) return;
+    const gate = $('#dashGate'), main = $('#dashMain'), view = $('#dashView');
+    const hint = $('#dashHint');
+    /* Publishing and analytics tokens are tab-scoped secrets. Older builds
+       persisted them indefinitely in localStorage; remove that residue and
+       require a fresh entry after the tab/browser session ends. */
+    try {
+      localStorage.removeItem('bq_edit_token');
+      localStorage.removeItem('bq_stats_token');
+    } catch (e) {}
+    const LOGOUT_PENDING_KEY = 'bq_dash_logout_pending';
+    let unlocked = false, logoutPending = false, logoutBusy = false;
+    const clearDashboardCredentials = () => {
+      unlocked = false;
+      for (const key of ['bq_dash_ok', 'bq_edit_token', 'bq_stats_token']) {
+        try { sessionStorage.removeItem(key); } catch (e) {}
+      }
+    };
+    try {
+      logoutPending = sessionStorage.getItem(LOGOUT_PENDING_KEY) === '1';
+      unlocked = !logoutPending && sessionStorage.getItem('bq_dash_ok') === '1';
+    } catch (e) {}
+    if (logoutPending) clearDashboardCredentials();
+
+    /* ---- Dashboard translations (follows the site language) ---- */
+    const DASH_I18N = {
+      en: { overview:'Overview', visitors:'Visitors', works:'Works', latest:'Latest', leads:'Leads', profile:'Profile', settings:'Settings', content:'Content', cases:'Projects', assistant:'Assistant',
+        gateTitle:'Enter access code', gatePrivate:'This console is private.', gatePh:'Access code', unlock:'Unlock', wrong:'✗ Wrong access code.', twoTitle:'Enter the verification code', twoNote:'A 6-digit code was emailed to the selected inbox. Check spam too.', twoChoose:'Send code to', twoPrimary:'Primary inbox', twoBackup:'Backup inbox', twoPh:'6-digit code', twoWrong:'✗ Wrong or expired code.', twoSending:'Sending code…', twoSetupBtn:'Set up 2FA (authenticator)', twoSetup1:'1) In Cloudflare set TOTP_SECRET to this (then Retry deployment):', twoSetup2:'2) Add the same key to Google Authenticator (manual entry: "Pencemor Studio"). Tap the key to copy.', twoSetupLink:'open in app',
+        oTotal:'Total works', oColl:'Collections', oLeads:'Leads stored', oLangs:'Languages', oBlogs:'Blog posts', oAdmins:'Admins', oWelcome:'Welcome back — your posts, project details and enquiries are stored privately in Cloudflare.',
+        lEmpty:'No leads yet. Pitches from the Contact form appear here.', lClear:'Clear all leads', lConfirm:'Delete all stored leads?',
+        pName:'Name', pTitle:'Title / role', pAvatar:'Avatar URL', pSave:'Save profile', pSaved:'✓ Saved', pNote:'Adding more admins needs a backend login system — that arrives with the content manager. For now this profile is yours, kept privately in this browser.',
+        sSplash:'Show intro splash on load', sTheme:'Theme', sLight:'Light', sDark:'Dark', sReset:'Reset saved preferences', sResetConfirm:'Reset saved preferences?', sDone:'Done.', sNote:'Open anytime with ⌘ / Ctrl + B, or 5× click the studio logo.',
+        vConnect:'Connect your analytics', vEnter:'Enter the STATS_TOKEN you set in Cloudflare.', vTokenPh:'Stats token', vConnectBtn:'Connect', vLoading:'Loading visitor data…',
+        tAi:'AI', tLang:'Language', tTheme:'Theme', tAddAdmin:'Add admin', tLogout:'Log out', tClose:'Close',
+        admYou:'Owner', admName:'Name', admEmail:'Email', admRole:'Role', admAdd:'Add admin', admEmpty:'No additional admins yet.', admRemove:'Remove', admNote:'Shared login across devices needs the backend login system; for now these admins are saved privately in this browser.', logoutAsk:'Log out of the console?' },
+      ku: { overview:'گشتی', visitors:'سەردانکەران', works:'کارەکان', latest:'نوێترین', leads:'داواکارییەکان', profile:'پرۆفایل', settings:'ڕێکخستن', content:'ناوەڕۆک', cases:'پڕۆژەکان', assistant:'یاریدەدەر',
+        gateTitle:'کۆدی چوونەژوورەوە بنووسە', gatePrivate:'ئەم کۆنسۆڵە تایبەتە.', gatePh:'کۆدی چوونەژوورەوە', unlock:'کردنەوە', wrong:'✗ کۆدەکە هەڵەیە.', twoTitle:'کۆدی پشتڕاستکردنەوە بنووسە', twoNote:'کۆدێکی ٦ ژمارەیی بۆ سندووقی هەڵبژێردراو نێردرا. سپامیش بپشکنە.', twoChoose:'کۆد بنێرە بۆ', twoPrimary:'سندووقی سەرەکی', twoBackup:'سندووقی یەدەک', twoPh:'کۆدی ٦ ژمارەیی', twoWrong:'✗ کۆد هەڵەیە یان بەسەرچووە.', twoSending:'ناردنی کۆد…', twoSetupBtn:'ڕێکخستنی 2FA (ئەپی ئۆتێنتیکەیتەر)', twoSetup1:'١) لە Cloudflare، TOTP_SECRET بکە بەمە (پاشان Retry deployment):', twoSetup2:'٢) هەمان کلیل بخە ناو Google Authenticator (داخڵکردنی دەستی: «Pencemor Studio»). کلیک لە کلیلەکە بکە بۆ کۆپی.', twoSetupLink:'لە ئەپ بیکەرەوە',
+        oTotal:'کۆی کارەکان', oColl:'کۆکراوەکان', oLeads:'داواکاری هەڵگیراو', oLangs:'زمانەکان', oBlogs:'بابەتی بلۆگ', oAdmins:'بەڕێوەبەران', oWelcome:'بەخێربێیتەوە — بابەتەکان، وردەکاریی پڕۆژەکان و داواکارییەکانت بە تایبەتی لە Cloudflare هەڵدەگیرێن.',
+        lEmpty:'هێشتا داواکاری نییە. پرۆژەکانی فۆڕمی پەیوەندی لێرە دەردەکەون.', lClear:'سڕینەوەی هەموو داواکارییەکان', lConfirm:'هەموو داواکارییە هەڵگیراوەکان بسڕێتەوە؟',
+        pName:'ناو', pTitle:'پلە / ڕۆڵ', pAvatar:'بەستەری وێنە', pSave:'پاشەکەوتکردنی پرۆفایل', pSaved:'✓ پاشەکەوتکرا', pNote:'زیادکردنی ئەدمینی زیاتر پێویستی بە سیستەمی چوونەژوورەوەی سێرڤەر هەیە — لەگەڵ بەڕێوەبەری ناوەڕۆکدا دێت. ئێستا ئەم پرۆفایلە هی تۆیە، بە تایبەتی لەم وێبگەڕەدا پارێزراوە.',
+        sSplash:'پیشاندانی سپلاشی دەستپێک', sTheme:'ڕووکار', sLight:'ڕووناک', sDark:'تاریک', sReset:'ڕێکخستنە پاشەکەوتکراوەکان بسڕەوە', sResetConfirm:'ڕێکخستنە پاشەکەوتکراوەکان بسڕێتەوە؟', sDone:'تەواوبوو.', sNote:'هەر کاتێک بە ⌘ / Ctrl + B بیکەرەوە، یان ٥ جار کلیک لە لۆگۆکە بکە.',
+        vConnect:'ئامارەکانت ببەستەوە', vEnter:'ئەو STATS_TOKENـەی لە Cloudflare دانراوە بنووسە.', vTokenPh:'تۆکنی ئامار', vConnectBtn:'بەستنەوە', vLoading:'بارکردنی زانیاری سەردانکەران…',
+        tAi:'AI', tLang:'زمان', tTheme:'ڕووکار', tAddAdmin:'زیادکردنی ئەدمین', tLogout:'چوونەدەرەوە', tClose:'داخستن',
+        admYou:'خاوەن', admName:'ناو', admEmail:'ئیمەیل', admRole:'ڕۆڵ', admAdd:'زیادکردنی ئەدمین', admEmpty:'هێشتا ئەدمینی زیاتر نییە.', admRemove:'لابردن', admNote:'چوونەژوورەوەی هاوبەش لەنێوان ئامێرەکان پێویستی بە سیستەمی سێرڤەرە؛ ئێستا ئەم ئەدمینانە بە تایبەتی لەم وێبگەڕەدا هەڵگیراون.', logoutAsk:'لە کۆنسۆڵ بچیتە دەرەوە؟' },
+      ar: { overview:'نظرة عامة', visitors:'الزوار', works:'الأعمال', leads:'الطلبات', profile:'الملف', settings:'الإعدادات', content:'المحتوى', cases:'المشاريع', assistant:'المساعد',
+        gateTitle:'أدخل رمز الدخول', gatePrivate:'هذه اللوحة خاصة.', gatePh:'رمز الدخول', unlock:'فتح', wrong:'✗ رمز خاطئ.', twoTitle:'أدخل رمز التحقق', twoNote:'تم إرسال رمز من ٦ أرقام إلى الصندوق المختار. افحص البريد المزعج أيضاً.', twoChoose:'أرسل الرمز إلى', twoPrimary:'الصندوق الأساسي', twoBackup:'الصندوق الاحتياطي', twoPh:'رمز من ٦ أرقام', twoWrong:'✗ رمز خاطئ أو منتهٍ.', twoSending:'جار إرسال الرمز…', twoSetupBtn:'إعداد 2FA (تطبيق المصادقة)', twoSetup1:'١) في Cloudflare اضبط TOTP_SECRET على هذا (ثم Retry deployment):', twoSetup2:'٢) أضف نفس المفتاح إلى Google Authenticator (إدخال يدوي: «Pencemor Studio»). انقر المفتاح للنسخ.', twoSetupLink:'افتح في التطبيق',
+        oTotal:'إجمالي الأعمال', oColl:'المجموعات', oLeads:'الطلبات المحفوظة', oLangs:'اللغات', oWelcome:'أهلاً بعودتك — تُحفظ مقالاتك وتفاصيل مشاريعك والطلبات بصورة خاصة في Cloudflare.',
+        lEmpty:'لا طلبات بعد. تظهر هنا مشاريع نموذج التواصل.', lClear:'مسح كل الطلبات', lConfirm:'حذف كل الطلبات المحفوظة؟',
+        pName:'الاسم', pTitle:'اللقب / الدور', pAvatar:'رابط الصورة', pSave:'حفظ الملف', pSaved:'✓ تم الحفظ', pNote:'إضافة مزيد من المشرفين تتطلب نظام تسجيل دخول خلفي — يأتي مع مدير المحتوى. حالياً هذا الملف خاص بك، محفوظ في هذا المتصفح.',
+        sSplash:'إظهار شاشة البداية', sTheme:'المظهر', sLight:'فاتح', sDark:'داكن', sReset:'إعادة تعيين التفضيلات', sResetConfirm:'إعادة تعيين التفضيلات المحفوظة؟', sDone:'تم.', sNote:'افتحها في أي وقت بـ ⌘ / Ctrl + B، أو انقر الشعار خمس مرات.',
+        vConnect:'اربط تحليلاتك', vEnter:'أدخل STATS_TOKEN الذي ضبطته في Cloudflare.', vTokenPh:'رمز الإحصاءات', vConnectBtn:'اتصال', vLoading:'تحميل بيانات الزوار…',
+        tAi:'AI', tLang:'اللغة', tTheme:'المظهر', tAddAdmin:'إضافة مشرف', tLogout:'تسجيل الخروج', tClose:'إغلاق',
+        admYou:'المالك', admName:'الاسم', admEmail:'البريد', admRole:'الدور', admAdd:'إضافة مشرف', admEmpty:'لا مشرفين إضافيين بعد.', admRemove:'إزالة', admNote:'تسجيل الدخول المشترك بين الأجهزة يحتاج نظام الخادم؛ حالياً هؤلاء المشرفون محفوظون في هذا المتصفح فقط.', logoutAsk:'تسجيل الخروج من اللوحة؟' },
+      kmr: { overview:'Giştî', visitors:'Mêvan', works:'Kar', leads:'Daxwaz', profile:'Profîl', settings:'Mîheng', content:'Naverok', cases:'Proje', assistant:'Alîkar',
+        gateTitle:'Koda gihiştinê binivîse', gatePrivate:'Ev konsol taybet e.', gatePh:'Koda gihiştinê', unlock:'Veke', wrong:'✗ Koda çewt.', twoTitle:'Koda piştrastkirinê binivîse', twoNote:'Koda 6-hejmarî ji qutiya hilbijartî re hate şandin. Spam jî kontrol bike.', twoChoose:'Kodê bişîne bo', twoPrimary:'Qutiya sereke', twoBackup:'Qutiya piştgir', twoPh:'Koda 6-hejmarî', twoWrong:'✗ Koda çewt an qediyayî.', twoSending:'Kod tê şandin…', twoSetupBtn:'Sazkirina 2FA (sepana erêkirinê)', twoSetup1:'1) Li Cloudflare TOTP_SECRET wiha saz bike (paşê Retry deployment):', twoSetup2:'2) Heman mifte têxe Google Authenticator (têketina destî: "Pencemor Studio"). Li mifte bitikîne ji bo kopî.', twoSetupLink:'di sepanê de veke',
+        oTotal:'Tevahiya karan', oColl:'Berhevok', oLeads:'Daxwazên tomarkirî', oLangs:'Ziman', oWelcome:'Bi xêr hatî — nivîs, hûrgiliyên projeyan û daxwazên te bi taybetî li Cloudflare tên tomarkirin.',
+        lEmpty:'Hêj daxwaz tune. Pêşniyarên forma têkiliyê li vir xuya dibin.', lClear:'Hemû daxwazan paqij bike', lConfirm:'Hemû daxwazên tomarkirî werin jêbirin?',
+        pName:'Nav', pTitle:'Sernav / rol', pAvatar:'Girêdana wêneyê', pSave:'Profîlê tomar bike', pSaved:'✓ Tomar bû', pNote:'Zêdekirina admînên din pêdivî bi sîstema têketinê ya backend heye — ew bi rêveberê naverokê re tê. Niha ev profîl ya te ye, bi taybetî di vê gerokê de tê parastin.',
+        sSplash:'Dîmena destpêkê nîşan bide', sTheme:'Tema', sLight:'Ronî', sDark:'Tarî', sReset:'Vebijarkên tomarkirî jê bibe', sResetConfirm:'Vebijarkên tomarkirî werin jêbirin?', sDone:'Qediya.', sNote:'Her dem bi ⌘ / Ctrl + B veke, an 5 caran li logoyê bitikîne.',
+        vConnect:'Analîtîkên xwe girêde', vEnter:'STATS_TOKEN ya ku te di Cloudflare de danî binivîse.', vTokenPh:'Tokena statîstîkê', vConnectBtn:'Girêde', vLoading:'Daneyên mêvanan tê barkirin…',
+        tAi:'AI', tLang:'Ziman', tTheme:'Tema', tAddAdmin:'Admîn zêde bike', tLogout:'Derkeve', tClose:'Bigire',
+        admYou:'Xwedî', admName:'Nav', admEmail:'E-name', admRole:'Rol', admAdd:'Admîn zêde bike', admEmpty:'Hêj admînên din tune.', admRemove:'Rake', admNote:'Têketina hevpar a di navbera amûran de pêdivî bi sîstema backend heye; niha ev admîn bi taybetî di vê gerokê de tên parastin.', logoutAsk:'Ji konsolê derkevî?' },
+      fr: { overview:'Aperçu', visitors:'Visiteurs', works:'Travaux', leads:'Demandes', profile:'Profil', settings:'Réglages', content:'Contenu', cases:'Projets', assistant:'Assistant',
+        gateTitle:"Entrez le code d'accès", gatePrivate:'Cette console est privée.', gatePh:"Code d'accès", unlock:'Déverrouiller', wrong:'✗ Code incorrect.', twoTitle:'Saisissez le code de vérification', twoNote:'Un code à 6 chiffres a été envoyé à la boîte choisie. Vérifiez aussi les spams.', twoChoose:'Envoyer le code à', twoPrimary:'Boîte principale', twoBackup:'Boîte de secours', twoPh:'Code à 6 chiffres', twoWrong:'✗ Code incorrect ou expiré.', twoSending:'Envoi du code…', twoSetupBtn:'Configurer la 2FA (authentification)', twoSetup1:'1) Dans Cloudflare, définissez TOTP_SECRET sur ceci (puis Retry deployment) :', twoSetup2:'2) Ajoutez la même clé à Google Authenticator (saisie manuelle : « Pencemor Studio »). Cliquez la clé pour copier.', twoSetupLink:'ouvrir dans l’app',
+        oTotal:'Total des travaux', oColl:'Collections', oLeads:'Demandes enregistrées', oLangs:'Langues', oWelcome:'Bon retour — vos articles, détails de projets et demandes sont enregistrés de façon privée dans Cloudflare.',
+        lEmpty:'Aucune demande pour l’instant. Les projets du formulaire de contact apparaissent ici.', lClear:'Effacer toutes les demandes', lConfirm:'Supprimer toutes les demandes enregistrées ?',
+        pName:'Nom', pTitle:'Titre / rôle', pAvatar:"URL de l'avatar", pSave:'Enregistrer le profil', pSaved:'✓ Enregistré', pNote:'Ajouter d’autres admins nécessite un système de connexion backend — il arrive avec le gestionnaire de contenu. Pour l’instant ce profil est le vôtre, gardé dans ce navigateur.',
+        sSplash:"Afficher l'intro au chargement", sTheme:'Thème', sLight:'Clair', sDark:'Sombre', sReset:'Réinitialiser les préférences', sResetConfirm:'Réinitialiser les préférences enregistrées ?', sDone:'Terminé.', sNote:'Ouvrez à tout moment avec ⌘ / Ctrl + B, ou cliquez 5× sur le logo.',
+        vConnect:'Connectez vos analyses', vEnter:'Saisissez le STATS_TOKEN défini dans Cloudflare.', vTokenPh:'Jeton de stats', vConnectBtn:'Connecter', vLoading:'Chargement des données visiteurs…',
+        tAi:'IA', tLang:'Langue', tTheme:'Thème', tAddAdmin:'Ajouter admin', tLogout:'Déconnexion', tClose:'Fermer',
+        admYou:'Propriétaire', admName:'Nom', admEmail:'E-mail', admRole:'Rôle', admAdd:'Ajouter admin', admEmpty:'Aucun admin supplémentaire.', admRemove:'Retirer', admNote:'Une connexion partagée entre appareils nécessite le système backend ; pour l’instant ces admins sont enregistrés dans ce navigateur.', logoutAsk:'Se déconnecter de la console ?' }
+    };
+    const TWOFA_VIA_NOTES = {
+      en: {
+        email: 'A 6-digit code was emailed to the selected inbox. Check spam too.',
+        totp: 'Enter the current 6-digit code from your authenticator app.',
+        sms: 'A 6-digit code was sent to your phone.'
+      },
+      ku: {
+        email: 'کۆدێکی ٦ ژمارەیی بۆ سندووقی هەڵبژێردراو نێردرا. سپامیش بپشکنە.',
+        totp: 'کۆدی ٦ ژمارەیی ئێستای ئەپی ئۆتێنتیکەیتەرەکەت بنووسە.',
+        sms: 'کۆدێکی ٦ ژمارەیی بۆ مۆبایلەکەت نێردرا.'
+      },
+      kmr: {
+        email: 'Koda 6-hejmarî ji qutiya hilbijartî re hate şandin. Spam jî kontrol bike.',
+        totp: 'Koda 6-hejmarî ya niha ji sepana erêkirinê binivîse.',
+        sms: 'Koda 6-hejmarî ji telefona te re hate şandin.'
+      },
+      ar: {
+        email: 'تم إرسال رمز من ٦ أرقام إلى الصندوق المختار. افحص البريد المزعج أيضاً.',
+        totp: 'أدخل الرمز الحالي المكوّن من ٦ أرقام من تطبيق المصادقة.',
+        sms: 'تم إرسال رمز من ٦ أرقام إلى هاتفك.'
+      },
+      fr: {
+        email: 'Un code à 6 chiffres a été envoyé à la boîte choisie. Vérifiez aussi les spams.',
+        totp: 'Saisissez le code actuel à 6 chiffres de votre application d’authentification.',
+        sms: 'Un code à 6 chiffres a été envoyé à votre téléphone.'
+      }
+    };
+    /* extra strings for the Visitors view (kept here so the long lang blocks above stay readable) */
+    Object.assign(DASH_I18N.en,  { vViews:'Page views', vVisitors:'Visitors', vViewsToday:'Views today', vVisToday:'Visitors today', v14:'Last 14 days', vTop:'Top pages', vCountries:'Countries', vRef:'Referrers', vDevices:'Devices', vRecent:'Recent visits', vNoVisits:'No visits yet', vNoData:'No data yet', vRefresh:'Refresh' });
+    Object.assign(DASH_I18N.ku,  { vViews:'بینین', vVisitors:'سەردانکەران', vViewsToday:'بینینی ئەمڕۆ', vVisToday:'سەردانی ئەمڕۆ', v14:'١٤ ڕۆژی ڕابردوو', vTop:'پەڕە بەرزەکان', vCountries:'وڵاتان', vRef:'سەرچاوەکان', vDevices:'ئامێرەکان', vRecent:'سەردانە نوێیەکان', vNoVisits:'هێشتا سەردان نییە', vNoData:'هێشتا داتا نییە', vRefresh:'نوێکردنەوە' });
+    Object.assign(DASH_I18N.kmr, { vViews:'Dîtin', vVisitors:'Mêvan', vViewsToday:'Dîtinên îro', vVisToday:'Mêvanên îro', v14:'14 rojên dawî', vTop:'Rûpelên jor', vCountries:'Welat', vRef:'Çavkanî', vDevices:'Amûr', vRecent:'Seredanên dawî', vNoVisits:'Hêj seredan tune', vNoData:'Hêj dane tune', vRefresh:'Nûke' });
+    Object.assign(DASH_I18N.ar,  { vViews:'المشاهدات', vVisitors:'الزوار', vViewsToday:'مشاهدات اليوم', vVisToday:'زوار اليوم', v14:'آخر ١٤ يوماً', vTop:'أهم الصفحات', vCountries:'الدول', vRef:'المصادر', vDevices:'الأجهزة', vRecent:'الزيارات الأخيرة', vNoVisits:'لا زيارات بعد', vNoData:'لا بيانات بعد', vRefresh:'تحديث' });
+    Object.assign(DASH_I18N.fr,  { vViews:'Pages vues', vVisitors:'Visiteurs', vViewsToday:"Vues aujourd'hui", vVisToday:"Visiteurs aujourd'hui", v14:'14 derniers jours', vTop:'Pages populaires', vCountries:'Pays', vRef:'Référents', vDevices:'Appareils', vRecent:'Visites récentes', vNoVisits:'Aucune visite', vNoData:'Aucune donnée', vRefresh:'Actualiser' });
+    /* Said when the server has no login configured (DASH_PIN, SESSION_SECRET,
+       the D1 binding or a second factor missing on Pages). "Wrong code" was
+       shown instead, which sent the owner hunting for a code that could
+       never have worked. */
+    Object.assign(DASH_I18N.en,  { notSetup:'Login is not set up on the server yet — add DASH_PIN, SESSION_SECRET, TOTP_SECRET and the D1 "DB" binding in Cloudflare Pages, then redeploy.' });
+    Object.assign(DASH_I18N.ku,  { notSetup:'چوونەژوورەوە هێشتا لەسەر سێرڤەر ڕێکنەخراوە — لە Cloudflare Pages ئەمانە زیاد بکە: DASH_PIN و SESSION_SECRET و TOTP_SECRET و D1 بە ناوی «DB»، پاشان Retry deployment بکە.' });
+    Object.assign(DASH_I18N.kmr, { notSetup:'Têketin hêj li ser serverê nehatiye sazkirin — li Cloudflare Pages DASH_PIN, SESSION_SECRET, TOTP_SECRET û D1 "DB" zêde bike, paşê dîsa deploy bike.' });
+    Object.assign(DASH_I18N.ar,  { notSetup:'تسجيل الدخول غير مُعدّ على الخادم بعد — أضف DASH_PIN وSESSION_SECRET وTOTP_SECRET وربط D1 باسم "DB" في Cloudflare Pages ثم أعد النشر.' });
+    Object.assign(DASH_I18N.fr,  { notSetup:'La connexion n’est pas encore configurée sur le serveur — ajoutez DASH_PIN, SESSION_SECRET, TOTP_SECRET et la liaison D1 « DB » dans Cloudflare Pages, puis redéployez.' });
+    Object.assign(DASH_I18N.en, {
+      checking:'Checking secure access…', networkError:'The login service could not be reached. Check your connection and try again.',
+      liveOnly:'Open Studio on the live HTTPS website. A file preview cannot sign in or publish.', openLive:'Open secure Studio',
+      staticPreview:'This local preview does not have a working Studio API. Open Studio on the live HTTPS website to sign in and publish.',
+      rateLimited:'Too many attempts. Wait before trying again.', deliveryFailed:'The verification code could not be delivered. Try the other configured inbox or contact the site owner.',
+      setupMissing:'Cloudflare setup is incomplete. Configure these items, then redeploy:', factorRequirement:'a second factor (TOTP_SECRET or a configured email/SMS provider)',
+      setupTitle:'Finish secure setup', setupNote:'Configure the missing server settings, redeploy, then check again. No access code can work until sign-in is configured.',
+      setupPublishNote:'Sign-in is ready. Configure publishing before uploading work.', setupLogin:'Sign in', setupPublishing:'Publishing', setupGuide:'Setup guide', setupRetry:'Check again',
+      sessionExpired:'Your secure session has expired. Sign in again.', studioNotSetup:'Publishing is not configured on Cloudflare yet. Check EDIT_TOKEN, GitHub publishing access and the DB binding.',
+      studioUpstreamAuth:'GitHub rejected the publishing request. Check the repository access configured in Cloudflare.',
+      studioGithubMissing:'GitHub publishing is not connected. Configure the work-upload service with repository write access.',
+      studioUnavailable:'Publication could not be confirmed. Check Show images before trying again.',
+      studioDatabaseUnavailable:'The secure publishing database could not be reached. Check the Cloudflare D1 binding and database health.',
+      studioServerFailed:'The publishing server returned an error. Check its logs using the error reference below.',
+      studioEdgeFailed:'Cloudflare returned an error for the publishing request. Check its logs using the reference below, and check Show images before retrying.',
+      studioResponseInvalid:'The publishing server returned an unreadable response. Check Show images before trying again.',
+      studioResponseLarge:'The publishing server returned a response that exceeds its size limit. Check the server logs.',
+      studioTimeout:'The publishing server timed out. Check Show images before trying again to avoid a duplicate upload.',
+      studioNetworkFailed:'The connection to the publishing service failed. Check Show images before trying again.',
+      editorRequired:'Connect your editor password in the Content tab first.'
+    });
+    Object.assign(DASH_I18N.ku, {
+      checking:'دەستگەیشتنی پارێزراو دەپشکنرێت…', networkError:'پەیوەندی بە خزمەتگوزاری چوونەژوورەوە نەکرا. ئینتەرنێتەکەت بپشکنە و دووبارە هەوڵ بدەوە.',
+      liveOnly:'ستۆدیۆ لە وێبسایتی زیندووی HTTPS بکەرەوە. پێشبینینی فایل ناتوانێت بچێتە ژوورەوە یان بڵاو بکاتەوە.', openLive:'ستۆدیۆی پارێزراو بکەرەوە',
+      staticPreview:'ئەم پێشبینینە ناوخۆییە API ـی کارای ستۆدیۆی نییە. بۆ چوونەژوورەوە و بڵاوکردنەوە، ستۆدیۆ لە وێبسایتی زیندووی HTTPS بکەرەوە.',
+      rateLimited:'ژمارەی هەوڵەکان زۆر بووە. کەمێک چاوەڕێ بکە پاشان هەوڵ بدەوە.', deliveryFailed:'کۆدی پشتڕاستکردنەوە نەنێردرا. سندووقە ڕێکخراوەکەی تر تاقی بکەوە یان پەیوەندی بە خاوەنی سایت بکە.',
+      setupMissing:'ڕێکخستنی Cloudflare تەواو نییە. ئەمانە ڕێک بخە، پاشان دووبارە بڵاوی بکەوە:', factorRequirement:'فاکتۆری دووەم (TOTP_SECRET یان خزمەتگوزاری ڕێکخراوی ئیمەیل/SMS)',
+      setupTitle:'ڕێکخستنی پارێزراو تەواو بکە', setupNote:'ڕێکخستنە کەمەکانی سێرڤەر تەواو بکە، دووبارە بڵاوی بکەوە و پاشان بپشکنەوە. تا چوونەژوورەوە ڕێکنەخرێت، هیچ کۆدێک کار ناکات.',
+      setupPublishNote:'چوونەژوورەوە ئامادەیە. پێش ئەپلۆدکردنی کار، بڵاوکردنەوە ڕێک بخە.', setupLogin:'چوونەژوورەوە', setupPublishing:'بڵاوکردنەوە', setupGuide:'ڕێبەری ڕێکخستن', setupRetry:'دووبارە بپشکنەوە',
+      sessionExpired:'ماوەی چوونەژوورەوەی پارێزراوت بەسەرچووە. دووبارە بچۆ ژوورەوە.', studioNotSetup:'بڵاوکردنەوە هێشتا لە Cloudflare ڕێکنەخراوە. EDIT_TOKEN و دەستگەیشتنی GitHub و بەستنی DB بپشکنە.',
+      studioUpstreamAuth:'GitHub داواکاری بڵاوکردنەوەی ڕەتکردەوە. دەستگەیشتنی ڕیپۆ لە Cloudflare بپشکنە.',
+      studioGithubMissing:'بڵاوکردنەوەی GitHub بەستراو نییە. خزمەتگوزاری work-upload بە دەسەڵاتی نووسینی ڕیپۆ ڕێکبخە.',
+      studioUnavailable:'بڵاوکردنەوە پشتڕاست نەکرایەوە. پێش هەوڵدانەوە، بەشی پیشاندانی وێنەکان بپشکنە.',
+      studioDatabaseUnavailable:'پەیوەندی بە داتابەیسی پارێزراوی بڵاوکردنەوە نەکرا. بەستنی D1 و دۆخی داتابەیسەکە لە Cloudflare بپشکنە.',
+      studioServerFailed:'سێرڤەری بڵاوکردنەوە هەڵەی گەڕاندەوە. بە ناسێنەری هەڵەکەی خوارەوە لۆگەکانی بپشکنە.',
+      studioEdgeFailed:'Cloudflare بۆ داواکاری بڵاوکردنەوە هەڵەی گەڕاندەوە. بە ناسێنەری خوارەوە لۆگەکانی بپشکنە، و پێش هەوڵدانەوە بەشی پیشاندانی وێنەکان بپشکنە.',
+      studioResponseInvalid:'وەڵامی سێرڤەری بڵاوکردنەوە نەخوێندرایەوە. پێش هەوڵدانەوە بەشی پیشاندانی وێنەکان بپشکنە.',
+      studioResponseLarge:'قەبارەی وەڵامی سێرڤەر لە سنوورەکەی زیاترە. لۆگەکانی سێرڤەر بپشکنە.',
+      studioTimeout:'کاتی چاوەڕوانی وەڵامی سێرڤەر تەواو بوو. بۆ ئەوەی وێنەکە دووبارە بار نەکرێت، پێش هەوڵدانەوە بەشی پیشاندانی وێنەکان بپشکنە.',
+      studioNetworkFailed:'پەیوەندی بە خزمەتگوزاری بڵاوکردنەوە پچڕا. پێش هەوڵدانەوە بەشی پیشاندانی وێنەکان بپشکنە.',
+      editorRequired:'سەرەتا پاسۆردی ئەدیتەر لە تابی ناوەڕۆک ببەستەوە.'
+    });
+    Object.assign(DASH_I18N.en, {
+      logoutTitle:'Console locked', logoutNote:'Private content is hidden on this device.',
+      logoutWorking:'Finishing secure sign-out…',
+      logoutFailed:'Server sign-out could not be confirmed. The console remains locked. Check your connection and retry to end the session.',
+      logoutRetry:'Retry sign-out'
+    });
+    Object.assign(DASH_I18N.ku, {
+      logoutTitle:'کۆنسۆڵ قفڵ کرا', logoutNote:'ناوەڕۆکی تایبەت لەم ئامێرە شاردراوەتەوە.',
+      logoutWorking:'چوونەدەرەوەی پارێزراو تەواو دەکرێت…',
+      logoutFailed:'چوونەدەرەوە لە سێرڤەر پشتڕاست نەکرایەوە. کۆنسۆڵ هەر قفڵە. پەیوەندییەکەت بپشکنە و بۆ کۆتاییهێنان بە سێشنەکە دووبارە هەوڵ بدەوە.',
+      logoutRetry:'دووبارە هەوڵی چوونەدەرەوە بدە'
+    });
+    Object.assign(DASH_I18N.ar, {
+      logoutTitle:'اللوحة مقفلة', logoutNote:'المحتوى الخاص مخفي على هذا الجهاز.',
+      logoutWorking:'جارٍ إكمال تسجيل الخروج الآمن…',
+      logoutFailed:'تعذّر تأكيد تسجيل الخروج من الخادم. تبقى اللوحة مقفلة. تحقق من الاتصال وأعد المحاولة لإنهاء الجلسة.',
+      logoutRetry:'إعادة محاولة تسجيل الخروج'
+    });
+    const SERVER_NOT_SET = ['not-configured', 'session-not-configured', 'no-db', 'twofa-unavailable', 'rate-limit-unavailable'];
+    // <html lang> holds the BCP-47 code (Sorani = ckb, Kurmanji = ku), so it
+    // read Sorani as English and Kurmanji as Sorani; data-lang is the site's key.
+    const curSiteLang = () => {
+      const root = document.documentElement;
+      return root.dataset.lang || ({ ckb: 'ku', ku: 'kmr' })[root.getAttribute('lang')] || root.getAttribute('lang') || 'en';
+    };
+    const curLang = () => { const l = curSiteLang(); return DASH_I18N[l] ? l : 'en'; };
+    const DT = (k) => (DASH_I18N[curLang()][k] ?? DASH_I18N.en[k] ?? k);
+    /* Each console page opens with its name and one line on what it is for. */
+    const DASH_PAGE_DESC = {
+      en: {
+        overview:'Your studio at a glance.', visitors:'Who visits the site and what they look at.',
+        works:'Add finished designs to the gallery, or take them down.', content:'Write, edit and publish Journal posts.',
+        cases:'Case studies for Selected Work.', latest:'Pin a work to the homepage bell for seven days.',
+        leads:'Project pitches sent from the contact form.', profile:'Your name, role and photo in this console.',
+        settings:'Preferences, two-step sign-in and the editor password.', ai:'Drafts, replies, captions and translations.',
+        admins:'People who help you run the studio.'
+      },
+      ku: {
+        overview:'تێڕوانینێکی گشتی بۆ ستۆدیۆکەت.', visitors:'کێ سەردانی سایتەکە دەکات و چی دەبینێت.',
+        works:'دیزاینی تەواوکراو بۆ گالەری زیاد بکە، یان لایبە.', content:'بابەتەکانی جۆرناڵ بنووسە، دەستکاری بکە و بڵاوی بکەوە.',
+        cases:'لێکۆڵینەوەی پرۆژەکان بۆ بەشی کارە هەڵبژێردراوەکان.', latest:'کارێک بۆ ماوەی حەوت ڕۆژ لە زەنگی پەڕەی سەرەکی دابنێ.',
+        leads:'داواکاری پرۆژەکان کە لە فۆرمی پەیوەندییەوە هاتوون.', profile:'ناو، ڕۆڵ و وێنەکەت لەم داشبۆردەدا.',
+        settings:'ڕێکخستنەکان، چوونەژوورەوەی دوو هەنگاوی و وشەی نهێنیی دەستکاریکەر.', ai:'ڕەشنووس، وەڵام، کەپشن و وەرگێڕان.',
+        admins:'ئەو کەسانەی یارمەتیت دەدەن لە بەڕێوەبردنی ستۆدیۆ.'
+      }
+    };
+    let dashPageKey = 'overview';
+    const paintPageHead = () => {
+      const title = $('#dashPageTitle'), desc = $('#dashPageDesc');
+      const key = dashPageKey;
+      if (title) title.textContent = key === 'ai' ? DT('tAi') : key === 'admins' ? DT('tAddAdmin') : DT(key);
+      if (desc) desc.textContent = (DASH_PAGE_DESC[curLang()] || {})[key] || DASH_PAGE_DESC.en[key] || '';
+    };
+    const loginSetupMessage = (requirements) => {
+      if (!requirements || typeof requirements !== 'object') return DT('notSetup');
+      const labels = { pin:'DASH_PIN', session:'SESSION_SECRET (32+ bytes)', database:'D1 / DB', secondFactor:DT('factorRequirement') };
+      const missing = Object.keys(labels).filter(key => requirements[key] === false).map(key => labels[key]);
+      return missing.length ? DT('setupMissing') + ' ' + missing.join(' · ') : DT('notSetup');
+    };
+    const loginError = (data, challenge = false) => {
+      const code = data && data.error;
+      if (SERVER_NOT_SET.includes(code)) return loginSetupMessage(data.requirements);
+      if (code === 'rate-limited' || code === 'too-many') return DT('rateLimited');
+      if (code === 'email-failed' || code === 'sms-failed') return DT('deliveryFailed');
+      if (code === 'network-error' || code === 'bad-response') return DT('networkError');
+      return DT(challenge ? 'twoWrong' : 'wrong');
+    };
+    const LANG_LABELS = { en: 'English', ku: 'کوردیی سۆرانی', kmr: 'Kurmancî', ar: 'العربية', fr: 'Français', tr: 'Türkçe', sv: 'Svenska' };
+    let loginConfigured = null;
+    let twoFAId = null, twoFAPin = '', twoFAClearTimer = 0;
+    const twoFANote = () => TWOFA_VIA_NOTES[curLang()]?.totp || TWOFA_VIA_NOTES.en.totp;
+    const checkingAccess = () => ({
+      en:'Checking access…', ku:'پشکنینی چوونەژوورەوە…', ar:'جارٍ التحقق من الدخول…',
+      kmr:'Gihiştin tê kontrolkirin…', fr:'Vérification de l’accès…'
+    }[curLang()] || 'Checking access…');
+    const ensure2FAChoice = () => {
+      // Older cached shells may still contain the retired inbox choices.
+      // Authentication now uses the owner's authenticator app exclusively.
+      const box = $('#dash2faChoice');
+      if (box) { box.hidden = true; box.innerHTML = ''; }
+    };
+    const localizeChrome = () => {
+      $$('.dash-tab').forEach(t => { const ic = t.querySelector('i'); t.innerHTML = (ic ? ic.outerHTML + ' ' : '') + DT(t.dataset.dash); });
+      const g = $('#dashGate'); if (g) {
+        const inChallenge = Boolean(twoFAId);
+        const h = g.querySelector('h3'); if (h) h.textContent = DT(inChallenge ? 'twoTitle' : 'gateTitle');
+        const p = g.querySelector('p.mono'); if (p) p.textContent = inChallenge ? twoFANote() : DT('gatePrivate');
+        const k = $('#dashKey'); if (k) {
+          k.placeholder = DT(inChallenge ? 'twoPh' : 'gatePh');
+          k.type = inChallenge ? 'text' : 'password';
+          k.inputMode = inChallenge ? 'numeric' : 'text';
+          k.autocomplete = inChallenge ? 'one-time-code' : 'current-password';
+          if (inChallenge) k.setAttribute('maxlength', '6'); else k.removeAttribute('maxlength');
+        }
+        const b = g.querySelector('button[type="submit"]'); if (b) b.innerHTML = DT('unlock') + ' <i class="fa-solid fa-arrow-right"></i>';
+        ensure2FAChoice();
+      }
+      // sidebar tool labels + language indicator
+      const tl = (id, k) => { const b = $(id); const s = b && b.querySelector('span'); if (s) s.textContent = DT(k); };
+      tl('#dashAi', 'tAi'); tl('#dashTheme', 'tTheme'); tl('#dashAddAdmin', 'tAddAdmin'); tl('#dashLogout', 'tLogout'); tl('#dashClose', 'tClose');
+      const ln = $('#dashLangNow'); if (ln) ln.textContent = LANG_LABELS[curSiteLang()] || 'English';
+      $$('#dashLangPop [data-lang]').forEach(b => b.classList.toggle('is-active', b.dataset.lang === curSiteLang()));
+      // keep the mobile bar's current-section label localized
+      const mc = $('#dashMbarCur'); const act = $('.dash-tab.is-active');
+      if (mc && act) mc.textContent = DT(act.dataset.dash);
+      paintPageHead();
+      if (logoutPending) showLogoutPending();
+    };
+
+    const clearTwoFA = () => {
+      twoFAId = null;
+      twoFAPin = '';
+      clearTimeout(twoFAClearTimer);
+      twoFAClearTimer = 0;
+    };
+    const showLoginSetup = (data) => {
+      const box = $('#dashSetup');
+      if (!box) return;
+      const requirements = data.requirements || {};
+      const loginLabels = { pin:'DASH_PIN', session:'SESSION_SECRET (32+ bytes)', database:'D1 / DB', secondFactor:DT('factorRequirement') };
+      const publishLabels = { editor:'EDIT_TOKEN', github:'GitHub publishing access' };
+      const missing = (labels) => Object.keys(labels).filter(key => requirements[key] === false).map(key => labels[key]);
+      const signIn = missing(loginLabels), publishing = missing(publishLabels);
+      box.hidden = data.configured !== false && !publishing.length;
+      $('#dashLoginForm').hidden = data.configured === false;
+      $('#dashSetupTitle').textContent = DT('setupTitle');
+      $('#dashSetupNote').textContent = DT(data.configured === false ? 'setupNote' : 'setupPublishNote');
+      $('#dashSetupLogin').hidden = !signIn.length;
+      $('#dashSetupLoginLabel').textContent = DT('setupLogin');
+      $('#dashSetupLoginMissing').textContent = signIn.join(' · ');
+      $('#dashSetupPublishing').hidden = !publishing.length;
+      $('#dashSetupPublishingLabel').textContent = DT('setupPublishing');
+      $('#dashSetupPublishingMissing').textContent = publishing.join(' · ');
+      $('#dashSetupGuide').firstChild.textContent = DT('setupGuide') + ' ';
+      $('#dashSetupRetry').firstChild.textContent = DT('setupRetry') + ' ';
+    };
+    const showGate = () => {
+      dash.classList.remove('is-full');
+      gate.hidden = false;
+      main.hidden = true;
+    };
+    const invalidateDashboardSession = () => {
+      unlocked = false;
+      try { sessionStorage.removeItem('bq_dash_ok'); } catch (e) {}
+      clearTwoFA();
+      showGate();
+      localizeChrome();
+    };
+    const isLoopbackPreview = () => ['localhost', '127.0.0.1', '[::1]', '::1'].includes(location.hostname);
+    const showLiveStudioGate = () => {
+      loginConfigured = false;
+      invalidateDashboardSession();
+      setGateBusy(false);
+      $('#dashLoginForm').hidden = true;
+      const choices = $('#dash2faChoice'); if (choices) choices.hidden = true;
+      const setup = $('#dashSetup'); if (setup) setup.hidden = true;
+      hint.textContent = DT(location.protocol === 'file:' ? 'liveOnly' : 'staticPreview') + ' ';
+      const live = document.createElement('a');
+      live.href = 'https://bqurtas.com/#studio';
+      live.textContent = DT('openLive');
+      hint.appendChild(live);
+    };
+    let gateEpoch = 0, gateBusy = false, gateRequest = null;
+    const setGateBusy = (busy) => {
+      gateBusy = busy;
+      const button = $('#dashLoginForm button[type="submit"]');
+      if (button) button.disabled = busy;
+      const retry = $('#dashSetupRetry'); if (retry) retry.disabled = busy;
+      $('#dashLoginForm')?.setAttribute('aria-busy', String(busy));
+    };
+    const requestLogin = async (payload) => {
+      const controller = new AbortController();
+      gateRequest = controller;
+      const timer = setTimeout(() => controller.abort(), 12_000);
+      try {
+        const response = await fetch('/api/2fa', {
+          method: payload ? 'POST' : 'GET',
+          credentials: 'same-origin', cache: 'no-store', signal: controller.signal,
+          headers: payload ? { 'Content-Type':'application/json', Accept:'application/json' } : { Accept:'application/json' },
+          ...(payload ? { body:JSON.stringify(payload) } : {})
+        });
+        const data = await response.json();
+        if (!payload && isLoopbackPreview() && (response.status === 404 || response.status === 405 || !data || typeof data.configured !== 'boolean')) return { error:'static-preview' };
+        return data && typeof data === 'object' && !Array.isArray(data) ? data : { error:'bad-response' };
+      } catch (error) { return { error:!payload && isLoopbackPreview() ? 'static-preview' : 'network-error' }; }
+      finally { clearTimeout(timer); if (gateRequest === controller) gateRequest = null; }
+    };
+    const showLogoutPending = () => {
+      showGate();
+      $('#dashLoginForm').hidden = true;
+      const setup = $('#dashSetup'); if (setup) setup.hidden = true;
+      const choices = $('#dash2faChoice'); if (choices) choices.hidden = true;
+      const title = gate.querySelector('h3'); if (title) title.textContent = DT('logoutTitle');
+      const note = gate.querySelector('p.mono'); if (note) note.textContent = DT('logoutNote');
+      hint.setAttribute('role', logoutBusy ? 'status' : 'alert');
+      hint.textContent = DT(logoutBusy ? 'logoutWorking' : 'logoutFailed');
+      let retry = $('#dashLogoutRetry');
+      if (!retry) {
+        retry = document.createElement('button');
+        retry.id = 'dashLogoutRetry';
+        retry.type = 'button';
+        retry.className = 'btn';
+        retry.addEventListener('click', () => finishDashboardLogout());
+        gate.appendChild(retry);
+      }
+      retry.hidden = false;
+      retry.disabled = logoutBusy;
+      retry.textContent = DT('logoutRetry');
+    };
+    const openDash = async () => {
+      // A still-open menu owns Tab navigation. Close public panels before
+      // showing Studio so their keyboard handlers cannot trap this gate.
+      window.__bqExclusive?.('studio');
+      gateRequest?.abort();
+      const epoch = ++gateEpoch;
+      clearTwoFA();
+      loginConfigured = null;
+      const setup = $('#dashSetup'); if (setup) setup.hidden = true;
+      $('#dashLoginForm').hidden = false;
+      dash.classList.add('is-open');
+      dash.setAttribute('aria-hidden', 'false');
+      hint.setAttribute('role', 'status');
+      localizeChrome();
+      /* Confirm the HttpOnly cookie on every open, including a new tab. A
+         sessionStorage flag neither grants access nor prevents session reuse. */
+      showGate();
+      // A failed sign-out must not reuse the still-valid cookie on reopen or
+      // reload. Only a confirmed retry may clear this tab's pending state.
+      if (logoutPending) { setGateBusy(false); showLogoutPending(); return; }
+      const logoutRetry = $('#dashLogoutRetry'); if (logoutRetry) logoutRetry.hidden = true;
+      if (location.protocol === 'file:') {
+        showLiveStudioGate();
+        return;
+      }
+      setGateBusy(true);
+      hint.textContent = DT('checking');
+      const data = await requestLogin();
+      if (epoch !== gateEpoch || !dash.classList.contains('is-open')) return;
+      setGateBusy(false);
+      if (data.error === 'static-preview') { showLiveStudioGate(); return; }
+      if (data.ok === true && data.authenticated === true) { unlocked = true; showConsole(); return; }
+      invalidateDashboardSession();
+      loginConfigured = typeof data.configured === 'boolean' ? data.configured : null;
+      showLoginSetup(data);
+      ensure2FAChoice();
+      hint.textContent = data.configured === false ? loginSetupMessage(data.requirements) : data.error ? loginError(data) : '';
+      if (data.configured === false && setup) {
+        hint.textContent = '';
+        $('#dashSetupRetry')?.focus();
+      } else $('#dashKey')?.focus();
+    };
+    const closeDash = () => {
+      ++gateEpoch;
+      gateRequest?.abort();
+      gateRequest = null;
+      setGateBusy(false);
+      clearTwoFA();
+      const key = $('#dashKey'); if (key) key.value = '';
+      dash.classList.remove('is-open');
+      dash.setAttribute('aria-hidden', 'true');
+    };
+
+    /* triggers: URL hash #studio, or Ctrl/Cmd+Shift+B, or 5 quick clicks on rail logo */
+    if (location.hash === '#studio') setTimeout(() => {
+      if (!dash.classList.contains('is-open')) openDash();
+    }, 0); // defer until showConsole exists; a cold shortcut may already open it
+    window.addEventListener('hashchange', () => { if (location.hash === '#studio') openDash(); });
+    window.addEventListener('bq:open-studio', openDash);
+    window.__bqOpenStudio = openDash;
+    $('#dashSetupRetry')?.addEventListener('click', () => {
+      if (gateBusy) return;
+      const key = $('#dashKey'); if (key) key.value = '';
+      openDash();
+    });
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') { e.preventDefault(); openDash(); }   // ⌘ / Ctrl + B
+      if (e.key === 'Escape') closeDash();
+    });
+    let clicks = 0, clickT;
+    $('.rail-logo')?.addEventListener('click', (e) => {
+      clicks++; clearTimeout(clickT);
+      clickT = setTimeout(() => clicks = 0, 600);
+      if (clicks >= 5) { e.preventDefault(); clicks = 0; openDash(); }
+    });
+    $('#dashClose')?.addEventListener('click', closeDash);
+    dash.addEventListener('click', (e) => { if (e.target === dash) closeDash(); });
+
+    const doUnlock = () => {
+      if (logoutPending) { showLogoutPending(); return; }
+      unlocked = true;
+      /* Storage can be unavailable in strict/private browser modes. The
+         signed HttpOnly cookie is the authority, so a failed display hint
+         must not interrupt a successful server-authenticated login. */
+      try { sessionStorage.setItem('bq_dash_ok', '1'); } catch (e) {}
+      clearTwoFA();
+      showConsole();
+    };
+    const enter2FA = () => {
+      const g = $('#dashGate'); if (!g) return;
+      const h = g.querySelector('h3'); if (h) h.textContent = DT('twoTitle');
+      const p = g.querySelector('p.mono');
+      if (p) p.textContent = twoFANote();
+      ensure2FAChoice();
+      localizeChrome();
+      const k = $('#dashKey'); if (k) { k.value = ''; k.placeholder = DT('twoPh'); k.focus(); }
+      hint.textContent = '';
+    };
+    $('#dashLoginForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (location.protocol === 'file:') { openDash(); return; }
+      if (logoutPending || gateBusy || loginConfigured === false) return;
+      const raw = $('#dashKey').value.trim();
+      // Authenticator codes may be entered with Kurdish or Arabic digits.
+      const val = twoFAId ? raw.replace(/[٠-٩۰-۹]/g, digit => String(digit.charCodeAt(0) - (digit <= '٩' ? 0x660 : 0x6f0))) : raw;
+      const epoch = gateEpoch;
+      // Step 2 — verify the selected second factor without overlapping requests.
+      if (twoFAId) {
+        if (!twoFAPin) {
+          clearTwoFA();
+          hint.textContent = DT('wrong');
+          $('#dashKey').value = '';
+          localizeChrome();
+          return;
+        }
+        if (!/^\d{6}$/.test(val)) { hint.textContent = DT('twoWrong'); return; }
+        setGateBusy(true);
+        const d = await requestLogin({ pin:twoFAPin, action:'verify', id:twoFAId, code:val });
+        if (epoch !== gateEpoch || !dash.classList.contains('is-open')) return;
+        setGateBusy(false);
+        if (d.ok === true) { doUnlock(); return; }
+        hint.textContent = loginError(d, true);
+        $('#dashKey').value = '';
+        if (['expired', 'too-many', 'bad-pin', 'not-configured'].includes(d.error)) {
+          clearTwoFA();
+          localizeChrome();
+        }
+        return;
+      }
+      // step 1 — the access code
+      if (!val) { hint.textContent = DT('wrong'); return; }
+      setGateBusy(true);
+      hint.textContent = checkingAccess();
+      $('#dashKey').value = '';
+      const d = await requestLogin({ pin:val, action:'send' });
+      if (epoch !== gateEpoch || !dash.classList.contains('is-open')) return;
+      setGateBusy(false);
+      if (d.ok === true && d.id) {
+        clearTwoFA();
+        twoFAPin = val; // memory-only, cleared on success, expiry, logout, or close
+        twoFAId = d.id;
+        twoFAClearTimer = setTimeout(() => {
+          clearTwoFA();
+          localizeChrome();
+          hint.textContent = DT('twoWrong');
+          const key = $('#dashKey'); if (key) key.value = '';
+        }, 5 * 60 * 1000);
+        enter2FA();
+        return;
+      }
+      clearTwoFA();
+      hint.textContent = loginError(d);
+    });
+
+    let inboxTotal = null;
+    const collections = () => (window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS) || {};
+
+    const OVERVIEW_ACTIONS = {
+      en: ['Your next update', 'Publish a work', 'Add a finished design to the gallery.', 'Edit the journal', 'Write a note or update an existing article.', 'Website portrait', 'Change your portrait and its light / dark appearance.'],
+      ku: ['نوێکردنەوەی داهاتووت', 'بڵاوکردنەوەی کارێک', 'دیزاینێکی تەواوکراو زیاد بکە بۆ گەلەری.', 'دەستکاریی ژوورناڵ', 'تێبینییەک بنووسە یان بابەتێک نوێ بکەرەوە.', 'پۆترێتی وێبسایت', 'وێنەکەت و شێوەی لایت و دارکی بگۆڕە.'],
+      ar: ['تحديثك التالي', 'انشر عملاً', 'أضف تصميماً منجزاً إلى المعرض.', 'حرّر المجلة', 'اكتب ملاحظة أو حدّث مقالة.', 'صورة الموقع', 'غيّر صورتك ومظهرها الفاتح والداكن.'],
+      kmr: ['Nûkirina te ya din', 'Karekî belav bike', 'Sêwiraneke temam li galeriyê zêde bike.', 'Rojnameyê biguherîne', 'Nîşeyekê binivîse an gotarekê nû bike.', 'Portreya malperê', 'Wêneyê xwe û dîmena wê ya ronî / tarî biguherîne.'],
+      fr: ['Votre prochaine mise à jour', 'Publier un travail', 'Ajoutez un design terminé à la galerie.', 'Modifier le journal', 'Écrivez une note ou actualisez un article.', 'Portrait du site', 'Changez votre portrait et son aspect clair / sombre.'],
+      tr: ['Sıradaki güncellemeniz', 'Bir çalışma yayımla', 'Tamamlanmış bir tasarımı galeriye ekleyin.', 'Günlüğü düzenle', 'Bir not yazın veya bir makaleyi güncelleyin.', 'Site portresi', 'Portrenizi ve açık / koyu görünümünü değiştirin.'],
+      sv: ['Din nästa uppdatering', 'Publicera ett arbete', 'Lägg till en färdig design i galleriet.', 'Redigera journalen', 'Skriv en anteckning eller uppdatera en artikel.', 'Webbplatsens porträtt', 'Ändra ditt porträtt och dess ljusa / mörka utseende.'],
+    };
+    const renderOverview = () => {
+      const colls = collections();
+      const total = Object.values(colls).reduce((a, c) => a + (c.count || 0), 0);
+      const cats = Object.keys(colls).length;
+      const admins = getAdmins().length + 1;          // +1 = you, the owner
+      const actions = OVERVIEW_ACTIONS[curLang()] || OVERVIEW_ACTIONS.en;
+      view.innerHTML = `
+        <section class="dash-overview-start" aria-labelledby="dashStartTitle">
+          <h3 id="dashStartTitle">${esc(actions[0])}</h3>
+          <div class="dash-quick-actions">
+            ${[['works', 'fa-arrow-up-from-bracket', 1], ['content', 'fa-feather-pointed', 3], ['profile', 'fa-user-pen', 5]].map(([tab, icon, index]) => `
+              <button type="button" class="dash-quick-action" data-overview-tab="${tab}">
+                <i class="fa-solid ${icon}" aria-hidden="true"></i>
+                <span><strong>${esc(actions[index])}</strong><small>${esc(actions[index + 1])}</small></span>
+                <i class="fa-solid fa-arrow-right dash-quick-arrow" aria-hidden="true"></i>
+              </button>`).join('')}
+          </div>
+        </section>
+        <div class="dash-cards">
+          <div class="dash-card"><span class="dash-card-n">${total}</span><span class="mono">${DT('oTotal')}</span></div>
+          <div class="dash-card"><span class="dash-card-n" id="dashOverviewBlogs" aria-live="polite">—</span><span class="mono">${DT('oBlogs')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${inboxTotal === null ? '—' : inboxTotal}</span><span class="mono">${DT('oLeads')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${cats}</span><span class="mono">${DT('oColl')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${admins}</span><span class="mono">${DT('oAdmins')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">7</span><span class="mono">${DT('oLangs')}</span></div>
+        </div>
+        <p class="dash-note mono">${DT('oWelcome')}</p>`;
+      view.querySelectorAll('[data-overview-tab]').forEach(button => {
+        button.addEventListener('click', () => {
+          const tab = button.dataset.overviewTab;
+          // Reuse the normal navigation and editor gate; shortcuts never
+          // grant access or publish anything on their own.
+          $(`#dashTabs .dash-tab[data-dash="${tab}"]`)?.click();
+          view.scrollTop = 0;
+          if (tab === 'profile') $('#websitePortrait')?.scrollIntoView({ block: 'start' });
+        });
+      });
+      // The public Journal cache can be uninitialized or omit drafts. Read the
+      // same Cloudflare list as Content; unknown is never presented as zero.
+      const blogCount = $('#dashOverviewBlogs');
+      if (editToken()) {
+        cmsApi({ action:'list' }).then(result => {
+          if ($('#dashOverviewBlogs') !== blogCount || !result?.ok || !Array.isArray(result.posts)) return;
+          blogCount.textContent = String(result.posts.length);
+        }).catch(() => {});
+      }
+    };
+    const wkApi = (payload) => studioCall('work-upload', payload);
+    const WK_I18N = {
+      en:  { note:'Upload a finished design — it is auto-resized, converted to WebP and pushed to its folder on GitHub. It shows in the gallery shortly.', cat:'Category / folder', file:'Choose image (any size or format)', upload:'Publish to gallery', reading:'Preparing…', ready:'Ready — click Publish', pick:'Choose an image first.', uploading:'Publishing to GitHub…', done:'Published ✓ — it appears in the gallery shortly.', updating:'updating gallery counts…', updated:'gallery and tab counts updated.', propagating:'refresh once if the new file is still propagating.', noToken:'A GitHub token isn’t set yet — add it once to turn publishing on.', connect:'Connect the editor first (Content tab).', fail:'Could not publish (works on the live site only).' },
+      ku:  { note:'دیزاینێکی تەواوکراو ئەپلۆد بکە — خۆکارانە ڕیسایز دەکرێت، دەکرێتە WebP و دەنێردرێت بۆ فۆڵدەرەکەی لە گیتهاب. بەمزووانە لە گەلەری دەردەکەوێت.', cat:'کاتگۆری / فۆڵدەر', file:'وێنە هەڵبژێرە (هەر سایز و فۆرماتێک)', upload:'بڵاوکردنەوە بۆ گەلەری', reading:'ئامادەکردن…', ready:'ئامادەیە — کلیکی بڵاوکردنەوە بکە', pick:'سەرەتا وێنەیەک هەڵبژێرە.', uploading:'بڵاو دەکرێتەوە بۆ گیتهاب…', done:'بڵاوکرایەوە ✓ — بەمزووانە لە گەلەری دەردەکەوێت.', updating:'ژمارەکانی گەلەری نوێ دەکرێنەوە…', updated:'گەلەری و ژمارەی تابەکان نوێکرانەوە.', propagating:'ئەگەر فایلە نوێیەکە هێشتا بڵاو نەبووبێتەوە جارێک نوێی بکەوە.', noToken:'تۆکنی گیتهاب دانەنراوە — جارێک دایبنێ بۆ چالاککردنی بڵاوکردنەوە.', connect:'سەرەتا ئەدیتەرەکە ببەستەوە (تابی ناوەڕۆک).', fail:'نەتوانرا بڵاو بکرێتەوە (تەنیا سایتی زیندوو).' },
+      kmr: { note:'Sêwiraneke temam bar bike — bixweber tê resizekirin, li WebP tê veguhertin û li peldanka wê ya GitHub tê tomarkirin. Di demek nêz de di galerîyê de xuya dibe.', cat:'Kategorî / peldank', file:'Wêne hilbijêre (her mezinahî an format)', upload:'Belav bike li galerîyê', reading:'Tê amadekirin…', ready:'Amade ye — Belavkirinê bitikîne', pick:'Pêşî wêneyek hilbijêre.', uploading:'Li GitHub tê belavkirin…', done:'Belav bû ✓ — di demek nêz de di galerîyê de xuya dibe.', updating:'hejmarên galerîyê tên nûkirin…', updated:'galerî û hejmarên taban hatin nûkirin.', propagating:'heke pela nû hêj belav nebûbe carekê nû bike.', noToken:'Tokena GitHub hêj nehatiye danîn — carekê dayne.', connect:'Pêşî edîtorê girêde (tabê Naverok).', fail:'Nehat belavkirin (tenê malpera zindî).' },
+      ar:  { note:'ارفع تصميماً منتهياً — يُعاد تحجيمه تلقائياً ويُحوّل إلى WebP ثم يُرفع إلى مجلده على GitHub. يظهر في المعرض قريباً.', cat:'التصنيف / المجلد', file:'اختر صورة (أي حجم أو صيغة)', upload:'نشر في المعرض', reading:'جارٍ التحضير…', ready:'جاهز — اضغط نشر', pick:'اختر صورة أولاً.', uploading:'جارٍ النشر إلى GitHub…', done:'تم النشر ✓ — سيظهر في المعرض قريباً.', updating:'جارٍ تحديث أعداد المعرض…', updated:'تم تحديث المعرض وأعداد التبويبات.', propagating:'حدّث الصفحة مرة إذا كان الملف الجديد ما زال قيد الانتشار.', noToken:'لم يُضبط رمز GitHub بعد — أضفه مرة لتفعيل النشر.', connect:'اربط المحرر أولاً (تبويب المحتوى).', fail:'تعذّر النشر (الموقع المباشر فقط).' },
+      fr:  { note:'Téléversez un design fini — il est redimensionné, converti en WebP et poussé dans son dossier sur GitHub. Il apparaît dans la galerie sous peu.', cat:'Catégorie / dossier', file:'Choisir une image (toute taille/format)', upload:'Publier dans la galerie', reading:'Préparation…', ready:'Prêt — cliquez sur Publier', pick:'Choisissez d’abord une image.', uploading:'Publication sur GitHub…', done:'Publié ✓ — il apparaît dans la galerie sous peu.', updating:'mise à jour des compteurs de la galerie…', updated:'galerie et compteurs des onglets mis à jour.', propagating:'rafraîchissez une fois si le nouveau fichier se propage encore.', noToken:'Le jeton GitHub n’est pas encore défini — ajoutez-le une fois.', connect:'Connectez d’abord l’éditeur (onglet Contenu).', fail:'Échec de la publication (site en ligne uniquement).' }
+    };
+    const WK_ACCESS_I18N = {
+      en:{ gate:'Connect gallery publishing', gateNote:'Sign in with your editor password to upload and manage works.', wrong:'The editor password is incorrect. Try again.', noToken:'GitHub publishing is not connected. Configure the work-upload service with repository write access.' },
+      ku:{ gate:'بەستنی بڵاوکردنەوەی گەلەری', gateNote:'بە پاسۆردی ئەدیتەر بچۆ ژوورەوە بۆ بارکردن و بەڕێوەبردنی کارەکان.', wrong:'پاسۆردی ئەدیتەر هەڵەیە. دووبارە هەوڵ بدەوە.', noToken:'بڵاوکردنەوەی GitHub بەستراو نییە. خزمەتگوزاری work-upload بە دەسەڵاتی نووسینی ڕیپۆ ڕێکبخە.' },
+      ar:{ gate:'ربط النشر في المعرض', gateNote:'سجّل الدخول بكلمة مرور المحرر لرفع الأعمال وإدارتها.', wrong:'كلمة مرور المحرر غير صحيحة. حاول مجدداً.', noToken:'النشر عبر GitHub غير متصل. اضبط خدمة work-upload بصلاحية الكتابة في المستودع.' },
+      kmr:{ gate:'Weşandina galerîyê girêde', gateNote:'Bi şîfreya edîtorê têkeve da ku karan bar bikî û birêve bibî.', wrong:'Şîfreya edîtorê çewt e. Dîsa biceribîne.', noToken:'Weşandina GitHub ne girêdayî ye. Xizmeta work-upload bi destûra nivîsandina repoyê saz bike.' },
+      fr:{ gate:'Connecter la publication du portfolio', gateNote:'Connectez-vous avec votre mot de passe éditeur pour publier et gérer vos travaux.', wrong:'Le mot de passe éditeur est incorrect. Réessayez.', noToken:'La publication GitHub n’est pas connectée. Configurez le service work-upload avec un accès en écriture au dépôt.' }
+    };
+    const renderWorks = (connectionError = '') => {
+      const colls = collections();
+      const W = { ...(WK_I18N[curLang()] || WK_I18N.en), ...(WK_ACCESS_I18N[curLang()] || WK_ACCESS_I18N.en) };
+      const C = (window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS) || {};
+      if (!editToken()) {
+        const t = CT_I18N[curLang()] || CT_I18N.en;
+        view.innerHTML = `<div class="dash-gate-inline">
+          <i class="fa-solid fa-cloud-arrow-up dash-gate-icon"></i>
+          <h3>${esc(W.gate)}</h3><p class="mono">${esc(W.gateNote)}</p>
+          <form id="wkTokenForm" class="dash-login"><input type="password" id="wkToken" placeholder="${esc(t.tokPh)}" autocomplete="off" required><button type="submit">${esc(t.conn)} <i class="fa-solid fa-arrow-right"></i></button></form>
+          <p class="dash-note mono" id="wkTokenMsg" role="status">${esc(connectionError)}</p></div>`;
+        let connecting = false;
+        const form = $('#wkTokenForm');
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          if (connecting) return;
+          const tokenIn = $('#wkToken'), button = $('#wkTokenForm button[type="submit"]'), message = $('#wkTokenMsg');
+          const token = tokenIn.value.trim(); if (!token) return;
+          connecting = true; button.disabled = true; tokenIn.value = '';
+          message.textContent = W.reading;
+          try { sessionStorage.setItem('bq_edit_token', token); } catch (e) {}
+          const folder = Object.values(C).find(collection => collection.ext !== 'mp4' && collection.folder)?.folder || 'GeneralDesign';
+          const result = await wkApi({ action:'list', folder });
+          connecting = false; button.disabled = false;
+          if ($('#wkTokenForm') !== form) return;
+          if (result && result.ok) { renderWorks(); return; }
+          if (result && result.error === 'unauthorized') {
+            try { sessionStorage.removeItem('bq_edit_token'); } catch (e) {}
+            message.textContent = W.wrong;
+          } else if (result && result.error === 'no_github_token') message.textContent = W.noToken;
+          else message.textContent = (result && (result.detail || result.error)) || W.fail;
+        });
+        return;
+      }
+      const seen = {};
+      const opts = Object.keys(C).filter(k => C[k].ext !== 'mp4' && C[k].folder).filter(k => { if (seen[C[k].folder]) return false; seen[C[k].folder] = 1; return true; })
+        .map(k => `<option value="${esc(C[k].folder)}">${esc(C[k].title || C[k].tag || k)}</option>`).join('');
+      const max = Math.max(...Object.values(colls).map(c => c.count || 0), 1);
+      view.innerHTML = `
+        <div class="dash-latest-form">
+          <p class="dash-note mono">${esc(W.note)}</p>
+          <label class="dash-field"><span class="mono">${esc(W.cat)}</span><select id="wkFolder">${opts}</select></label>
+          <label class="dash-field"><span class="mono">${esc(W.file)}</span><input id="wkFile" type="file" accept="image/*" class="cms-file"><span class="dash-note mono" id="wkMsg"></span></label>
+          <div class="dash-latest-prev" id="wkPrev" hidden><img src="" alt=""></div>
+          <button class="dash-btn dash-btn--go" id="wkUp" type="button" disabled><i class="fa-solid fa-cloud-arrow-up"></i> ${esc(W.upload)}</button>
+        </div>
+        <div class="dash-manage">
+          <div class="cms-head"><span class="mono cms-status">${W.manageTitle || 'Manage works — view & delete'}</span></div>
+          <div class="dash-mg-head">
+            <select id="wkMgFolder" class="dash-mg-sel">${opts}</select>
+            <button class="dash-btn" id="wkMgLoad"><i class="fa-solid fa-images"></i> ${W.manageBtn || 'Show images'}</button>
+          </div>
+          <div class="wk-grid" id="wkGrid"></div>
+        </div>
+        <div class="dash-bars">` + Object.entries(colls).map(([k, c]) =>
+        `<div class="dash-bar-row">
+           <span class="dash-bar-label">${c.tag || k}</span>
+           <span class="dash-bar"><span class="dash-bar-fill" data-css="width:${(c.count / max * 100).toFixed(1)}%"></span></span>
+           <span class="dash-bar-n mono">${c.count}</span>
+         </div>`).join('') + `</div>`;
+      let pend = null, preparation = 0, publishing = false;
+      const fileIn = $('#wkFile'), prev = $('#wkPrev'), msg = $('#wkMsg'), publish = $('#wkUp'), folderIn = $('#wkFolder');
+      fileIn.addEventListener('change', async (ev) => {
+        const current = ++preparation;
+        const file = ev.target.files && ev.target.files[0];
+        pend = null; prev.hidden = true; publish.disabled = true;
+        if (!file) { msg.textContent = ''; return; }
+        msg.textContent = W.reading;
+        try {
+          const b64 = await cmsResize(file, 1400, 0.78);
+          if (current !== preparation) return;
+          if (b64.length > 6000000) { msg.textContent = '✗ ' + (W.tooBig || 'Image is too large — please pick a smaller source image.'); return; }
+          pend = b64; prev.hidden = false; prev.querySelector('img').src = 'data:image/webp;base64,' + b64;
+          msg.textContent = W.ready; publish.disabled = publishing;
+        } catch (e) {
+          if (current === preparation) msg.textContent = '✗ ' + (W.imageError || 'Could not prepare this image. Choose a JPG, PNG or WebP image.');
+        }
+      });
+      publish.addEventListener('click', async () => {
+        if (publishing) return;
+        if (!pend) { msg.textContent = W.pick; return; }
+        publishing = true; publish.disabled = true; fileIn.disabled = true; folderIn.disabled = true;
+        msg.textContent = W.uploading;
+        try {
+          const d = await wkApi({ folder: folderIn.value, dataB64: pend, ext: 'webp' });
+          if (d && d.ok) {
+            try { sessionStorage.removeItem('bq_gallery_tree_v1'); } catch (e) {}
+            // A GitHub commit is queued for Pages, not proof that its manifest is live.
+            msg.textContent = publicationText('queued');
+            pend = null; fileIn.value = ''; prev.hidden = true;
+          }
+          else if (d && d.error === 'no_github_token') { msg.textContent = W.noToken; }
+          else if (d && (d.error === 'missing_token' || d.error === 'unauthorized')) {
+            try { sessionStorage.removeItem('bq_edit_token'); } catch (e) {}
+            renderWorks(W.wrong);
+          }
+          else { msg.textContent = '✗ ' + ((d && (d.detail || d.error)) || 'failed'); }
+        } catch (e) { msg.textContent = W.fail; }
+        finally {
+          publishing = false; fileIn.disabled = false; folderIn.disabled = false; publish.disabled = !pend;
+        }
+      });
+      /* ---- Manage works: list every image in a folder + delete one ---- */
+      const wkGrid = $('#wkGrid'), wkMgFolder = $('#wkMgFolder');
+      const mgThumb = (p) => '/assets/thumbs/' + p.split('/').map(encodeURIComponent).join('/');
+      const mgRaw = (p) => 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/' + p;
+      const loadMg = () => {
+        const folder = wkMgFolder.value;
+        wkGrid.innerHTML = `<p class="dash-dim mono">${W.loading || 'Loading…'}</p>`;
+        wkApi({ action: 'list', folder }).then((d) => {
+          if (!d || !d.ok) { wkGrid.innerHTML = `<p class="dash-dim mono">✗ ${esc((d && (d.detail || d.error)) || (W.connect || 'Could not load'))}</p>`; return; }
+          if (!d.files.length) { wkGrid.innerHTML = `<p class="dash-dim mono">${W.mgEmpty || 'No images in this folder yet.'}</p>`; return; }
+          wkGrid.innerHTML = `<p class="dash-dim mono">${d.files.length} ${W.mgCount || 'images'}</p><div class="wk-grid-inner">` + d.files.map((f) =>
+            `<div class="wk-cell" data-path="${esc(f.path)}" data-sha="${esc(f.sha)}"><img loading="lazy" src="${esc(mgThumb(f.path))}" data-raw="${esc(mgRaw(f.path))}" alt=""><button class="wk-del" type="button" aria-label="Delete"><i class="fa-solid fa-trash-can"></i></button></div>`).join('') + `</div>`;
+          wkGrid.querySelectorAll('.wk-cell img').forEach((img) => img.addEventListener('error', () => { if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = img.dataset.raw; } }));
+          wkGrid.querySelectorAll('.wk-del').forEach((b) => b.addEventListener('click', () => {
+            const cell = b.closest('.wk-cell'); const path = cell.dataset.path, sha = cell.dataset.sha;
+            if (!window.confirm((W.delAsk || 'Delete this image permanently?') + '\n' + path)) return;
+            b.disabled = true; cell.style.opacity = '0.45';
+            wkApi({ action: 'delete', path, sha }).then((r) => {
+              if (r && r.ok) cell.remove();
+              else { cell.style.opacity = '1'; b.disabled = false; window.alert('✗ ' + ((r && (r.detail || r.error)) || 'failed')); }
+            }).catch(() => { cell.style.opacity = '1'; b.disabled = false; window.alert(W.fail || 'Failed'); });
+          }));
+        }).catch(() => { wkGrid.innerHTML = `<p class="dash-dim mono">${W.fail || 'Could not load (live site only).'}</p>`; });
+      };
+      $('#wkMgLoad').addEventListener('click', loadMg);
+    };
+    const renderLeads = () => window.BQStudioInbox.render({
+      root:view, lang:curLang(), getToken:editToken,
+      onSessionRequired:invalidateDashboardSession,
+      onCount:count => { inboxTotal = count; }
+    });
+    const SET_I18N = {
+      en:  { twoH:'Two-factor (2FA)', edH:'Editor password', edNote:'The publish key for your works and blog. Connect the editor first (Content tab), then change it here. A strong one is safest.', edNew:'New editor password', edBtn:'Change', edGen:'Strong', min4:'✗ Use at least 4 characters', edConnect:'✗ Connect the editor first (Content tab)', edDone:'✓ Changed & reconnected.', edWrong:'✗ Current editor password is wrong', edFail:'✗ Failed (works on the live site only)' },
+      ku:  { twoH:'دوو-فاکتۆری (2FA)', edH:'پاسۆردی ئەدیتەر', edNote:'کلیلی بڵاوکردنی ئیش و بلۆگ. سەرەتا ئەدیتەر ببەستەوە (تابی ناوەڕۆک)، پاشان لێرە بیگۆڕە. بەهێز سەلامەتترە.', edNew:'پاسۆردی ئەدیتەری نوێ', edBtn:'گۆڕین', edGen:'بەهێز', min4:'✗ لانیکەم ٤ پیت', edConnect:'✗ سەرەتا ئەدیتەر ببەستەوە (تابی ناوەڕۆک)', edDone:'✓ گۆڕدرا و دووبارە بەستراوەوە.', edWrong:'✗ پاسۆردی ئەدیتەری ئێستا هەڵەیە', edFail:'✗ نەکرا (تەنیا سایتی زیندوو)' },
+      ar:  { twoH:'المصادقة الثنائية (2FA)', edH:'كلمة مرور المحرر', edNote:'مفتاح نشر أعمالك ومدوّنتك. اربط المحرر أولاً (تبويب المحتوى) ثم غيّره هنا. الأقوى أأمن.', edNew:'كلمة مرور محرر جديدة', edBtn:'تغيير', edGen:'قوية', min4:'✗ استخدم ٤ أحرف على الأقل', edConnect:'✗ اربط المحرر أولاً (تبويب المحتوى)', edDone:'✓ تم التغيير وإعادة الربط.', edWrong:'✗ كلمة مرور المحرر الحالية خاطئة', edFail:'✗ فشل (الموقع المباشر فقط)' },
+      kmr: { twoH:'Du-faktorî (2FA)', edH:'Şîfreya edîtorê', edNote:'Mifteya weşandina karên te û blogê. Pêşî edîtorê girêde (tabê Naverok), paşê li vir biguhêre. Ya bihêz ewletir e.', edNew:'Şîfreya edîtorê ya nû', edBtn:'Biguhêre', edGen:'Bihêz', min4:'✗ Bi kêmî 4 tîp', edConnect:'✗ Pêşî edîtorê girêde (tabê Naverok)', edDone:'✓ Hate guhertin û ji nû ve girêdan.', edWrong:'✗ Şîfreya edîtorê ya niha çewt e', edFail:'✗ Neserketî (tenê malpera zindî)' },
+      fr:  { twoH:'Double authentification (2FA)', edH:'Mot de passe éditeur', edNote:'La clé de publication de vos travaux et blog. Connectez d’abord l’éditeur (onglet Contenu), puis changez-la ici. Une forte est plus sûre.', edNew:'Nouveau mot de passe éditeur', edBtn:'Changer', edGen:'Fort', min4:'✗ Au moins 4 caractères', edConnect:'✗ Connectez d’abord l’éditeur (onglet Contenu)', edDone:'✓ Changé et reconnecté.', edWrong:'✗ Mot de passe éditeur actuel incorrect', edFail:'✗ Échec (site en ligne uniquement)' }
+    };
+    const renderSettings = () => {
+      const S = SET_I18N[curLang()] || SET_I18N.en;
+      view.innerHTML = `
+        <div class="dash-set">
+          <label class="dash-row"><span>${DT('sSplash')}</span>
+            <input type="checkbox" id="setSplash" ${localStorage.getItem('bq_splash') === 'off' ? '' : 'checked'}></label>
+          <label class="dash-row"><span>${DT('sTheme')}</span>
+            <select id="setTheme"><option value="light">${DT('sLight')}</option><option value="dark">${DT('sDark')}</option></select></label>
+          <button class="dash-btn" id="setReset"><i class="fa-solid fa-rotate"></i> ${DT('sReset')}</button>
+        </div>
+        <p class="dash-note mono">${DT('sNote')}</p>
+        <div class="dash-box">
+          <div class="dash-box-h"><i class="fa-solid fa-shield-halved"></i> ${S.twoH}</div>
+          <button class="dash-btn" id="gen2fa"><i class="fa-solid fa-shield-halved"></i> ${DT('twoSetupBtn')}</button>
+          <div id="twofaOut" hidden></div>
+        </div>
+        <div class="dash-box">
+          <div class="dash-box-h"><i class="fa-solid fa-key"></i> ${S.edH}</div>
+          <p class="dash-note mono">${S.edNote}</p>
+          <label class="dash-field"><span class="mono">${S.edNew}</span><input id="setNewTok" type="text" autocomplete="off" spellcheck="false"></label>
+          <div class="dash-mg-head">
+            <button class="dash-btn dash-btn--go" id="setTokBtn"><i class="fa-solid fa-key"></i> ${S.edBtn}</button>
+            <button class="dash-btn" id="setTokGen"><i class="fa-solid fa-dice"></i> ${S.edGen}</button>
+          </div>
+          <span class="dash-note mono" id="setTokMsg"></span>
+        </div>`;
+      $('#setSplash').addEventListener('change', (e) => localStorage.setItem('bq_splash', e.target.checked ? 'on' : 'off'));
+      const themeSel = $('#setTheme'); themeSel.value = document.documentElement.dataset.theme || 'light';
+      themeSel.addEventListener('change', (e) => {
+        const next = e.target.value === 'dark' ? 'dark' : 'light';
+        if (typeof window.__bqApplyTheme === 'function') window.__bqApplyTheme(next);
+        else {
+          document.documentElement.dataset.theme = next;
+          document.documentElement.style.colorScheme = next;
+          try { localStorage.setItem('bq_theme3', next); } catch (x) {}
+        }
+      });
+      $('#setReset').addEventListener('click', () => { if (confirm(DT('sResetConfirm'))) { ['bq_theme','bq_theme3','bq_lang','bq_splash'].forEach(k => localStorage.removeItem(k)); alert(DT('sDone')); } });
+      $('#gen2fa').addEventListener('click', () => {
+        const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        const r = crypto.getRandomValues(new Uint8Array(32));
+        let sec = ''; for (const b of r) sec += A[b % 32];
+        const uri = `otpauth://totp/Pencemor%20Studio?secret=${sec}&issuer=Pencemor`;
+        const out = $('#twofaOut'); out.hidden = false;
+        out.innerHTML = `<p class="dash-note mono">${DT('twoSetup1')}</p><code class="dash-secret" id="twoSec">${sec}</code>
+          <p class="dash-note mono">${DT('twoSetup2')}</p><a class="dash-note mono" href="${uri}">otpauth://… (${DT('twoSetupLink')})</a>`;
+        const c = $('#twoSec'); c.addEventListener('click', () => { try { navigator.clipboard.writeText(sec); c.classList.add('copied'); } catch (e) {} });
+      });
+      // The dashboard PIN is server-managed through Cloudflare's DASH_PIN secret.
+      // Only the separate editor publishing password is changeable from this UI.
+      $('#setTokGen')?.addEventListener('click', () => {
+        const A = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+        const r = crypto.getRandomValues(new Uint8Array(22)); let s = 'bqedit_';
+        for (const b of r) s += A[b % A.length];
+        const f = $('#setNewTok'); if (f) f.value = s;
+      });
+      $('#setTokBtn')?.addEventListener('click', () => {
+        const m = $('#setTokMsg'); const nt = ($('#setNewTok').value || '').trim();
+        if (nt.length < 4) { m.textContent = S.min4; return; }
+        if (!editToken()) { m.textContent = S.edConnect; return; }
+        m.textContent = '…';
+        studioCall('set-token', { new_token: nt })
+          .then(d => {
+            if (d && d.ok) { try { sessionStorage.setItem('bq_edit_token', nt); } catch (e) {} m.textContent = S.edDone; $('#setNewTok').value = ''; }
+            else if (d && d.error === 'unauthorized') { m.textContent = S.edWrong; }
+            else { m.textContent = '✗ ' + ((d && (d.detail || d.error)) || 'failed'); }
+          }).catch(() => { m.textContent = S.edFail; });
+      });
+    };
+    const esc = (s) => String(s || '').replace(/[<>&"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
+
+    /* ---- Shared pager for dashboard lists (Content, Latest, Leads…) ----
+       When a list grows past DASH_PER items it splits into pages. Returns the
+       pager markup + a wire() that hooks up the page buttons. */
+    const DASH_PER = 8;
+    const dashPager = (total, cur, onGo, per) => {
+      per = per || DASH_PER;
+      const pages = Math.max(1, Math.ceil(total / per));
+      if (pages <= 1) return { html: '', wire() {} };
+      cur = Math.min(Math.max(1, cur), pages);
+      let nums = '';
+      for (let n = 1; n <= pages; n++) nums += `<button type="button" class="dash-page${n === cur ? ' is-active' : ''}" data-pg="${n}">${n}</button>`;
+      const html = `<div class="dash-pager">`
+        + `<button type="button" class="dash-page dash-page--nav" data-pg="${cur - 1}"${cur <= 1 ? ' disabled' : ''} aria-label="Previous">‹</button>`
+        + nums
+        + `<button type="button" class="dash-page dash-page--nav" data-pg="${cur + 1}"${cur >= pages ? ' disabled' : ''} aria-label="Next">›</button>`
+        + `</div>`;
+      const wire = (root) => { if (!root) return; root.querySelectorAll('.dash-pager .dash-page').forEach(b => b.addEventListener('click', () => { if (b.disabled) return; const n = Number(b.dataset.pg); if (n >= 1 && n <= pages && n !== cur) onGo(n); })); };
+      return { html, wire };
+    };
+
+    /* ---- Owner profile (stored privately in this browser) ---- */
+    const PROFILE_DEFAULT = { name: 'Barakat Qurtas', title: 'Founder · Studio Pencemor', avatar: '/assets/avatar.webp' };
+    const safeAvatarUrl = (value) => {
+      const raw = String(value || '').trim();
+      if (!raw || raw.length > 2048) return '';
+      try {
+        const parsed = new URL(raw, location.href);
+        return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : '';
+      } catch (e) { return ''; }
+    };
+    const setAvatarBackground = (element, value) => {
+      if (!element) return false;
+      const url = safeAvatarUrl(value);
+      element.style.backgroundImage = url ? `url(${JSON.stringify(url)})` : '';
+      return Boolean(url);
+    };
+    const profile = () => { try { return Object.assign({}, PROFILE_DEFAULT, JSON.parse(localStorage.getItem('bq_profile') || '{}')); } catch (e) { return Object.assign({}, PROFILE_DEFAULT); } };
+    const syncHeaderProfile = () => {
+      const p = profile();
+      const nm = $('#dashSideName'); if (nm) nm.textContent = p.name;
+      const sub = $('#dashHeadSub'); if (sub) sub.textContent = p.title || 'Studio Console';
+      [ $('#dashSideAv'), $('#dashMbarAv') ].forEach((av) => {
+        if (!av) return;
+        if (setAvatarBackground(av, p.avatar)) { av.classList.add('has-av'); av.textContent = ''; }
+        else { av.style.backgroundImage = ''; av.classList.remove('has-av'); av.textContent = 'BQ'; }
+      });
+    };
+    const PORTRAIT_I18N = {
+      en:{ title:'Website portrait', note:'Change the portrait on your homepage and in “A short note”. Your English signature stays unchanged.', choose:'Choose a portrait', hint:'PNG, WebP or JPEG · up to 24 MB. A transparent PNG or WebP blends into the page. The website keeps its black-and-white style.', publish:'Publish portrait', reset:'Restore original portrait', connect:'Connect the editor', password:'Editor password', ready:'Preview ready — publish when you are happy with it.', preparing:'Preparing your portrait…', saving:'Publishing your portrait…', saved:'Portrait published ✓ — the website is updated.', restored:'Original portrait restored ✓', fail:'Could not update the portrait. Please try again.', invalid:'Choose a PNG, WebP or JPEG image under 24 MB.', large:'This image is too large after preparation. Please use a smaller image.', gate:'Enter your editor password to change the public website portrait.', wrong:'The editor password is incorrect.', lightPreview:'Light mode', darkPreview:'Dark mode', appearance:'Portrait in dark mode', invert:'Light lines for dark backgrounds', original:'Keep the original colours', saveAppearance:'Save appearance', appearanceReady:'Preview updated — save to apply it to the website.', appearanceSaved:'Portrait appearance saved ✓' },
+      ku:{ title:'وێنەی وێبسایت', note:'وێنەی سەرەتا و بەشی «A short note» لێرە بگۆڕە. واژۆی ئینگلیزییەکەت وەک خۆی دەمێنێتەوە.', choose:'وێنەیەک هەڵبژێرە', hint:'PNG، WebP یان JPEG · تا ٢٤ مێگابایت. PNG یان WebP ـی شەفاف لەگەڵ باگراوندەکە دەگونجێت. شێوازی ڕەش و سپی دەپارێزرێت.', publish:'بڵاوکردنەوەی وێنە', reset:'گەڕاندنەوەی وێنەی پێشوو', connect:'پەیوەستکردنی ئەدیتەر', password:'پاسۆردی ئەدیتەر', ready:'پێشبینین ئامادەیە — کاتێک بەدڵتە بڵاوی بکەرەوە.', preparing:'وێنەکە ئامادە دەکرێت…', saving:'وێنەکە بڵاو دەکرێتەوە…', saved:'وێنەکە بڵاو کرایەوە ✓ — وێبسایت نوێ کرایەوە.', restored:'وێنەی پێشوو گەڕایەوە ✓', fail:'نەتوانرا وێنەکە نوێ بکرێتەوە. دووبارە هەوڵ بدەوە.', invalid:'وێنەی PNG، WebP یان JPEG هەڵبژێرە، کەمتر لە ٢٤ مێگابایت.', large:'وێنەکە دوای ئامادەکردن هێشتا گەورەیە. وێنەیەکی بچووکتر بەکاربهێنە.', gate:'بۆ گۆڕینی وێنەی وێبسایت پاسۆردی ئەدیتەر بنووسە.', wrong:'پاسۆردی ئەدیتەر هەڵەیە.', lightPreview:'مۆدی ڕووناک', darkPreview:'مۆدی تاریک', appearance:'وێنە لە مۆدی تاریک', invert:'لاینە ڕووناکەکان بۆ باگراوندی تاریک', original:'ڕەنگە ئەسڵییەکان بپارێزە', saveAppearance:'پاشەکەوتکردنی دەرکەوتن', appearanceReady:'پێشبینین نوێ کرایەوە — بۆ وێبسایت پاشەکەوتی بکە.', appearanceSaved:'دەرکەوتنی وێنە پاشەکەوت کرا ✓' },
+      ar:{ title:'صورة الموقع', note:'غيّر صورتك في الصفحة الرئيسية وقسم «A short note». يبقى توقيعك الإنجليزي كما هو.', choose:'اختر صورة', hint:'PNG أو WebP أو JPEG · حتى 24 ميغابايت. تتناغم الصورة الشفافة مع خلفية الموقع. يبقى العرض بالأبيض والأسود.', publish:'نشر الصورة', reset:'استعادة الصورة الأصلية', connect:'ربط المحرر', password:'كلمة مرور المحرر', ready:'المعاينة جاهزة — انشر عندما تعجبك النتيجة.', preparing:'جارٍ تجهيز الصورة…', saving:'جارٍ نشر الصورة…', saved:'نُشرت الصورة ✓ — تم تحديث الموقع.', restored:'استُعيدت الصورة الأصلية ✓', fail:'تعذّر تحديث الصورة. حاول مجدداً.', invalid:'اختر صورة PNG أو WebP أو JPEG أصغر من 24 ميغابايت.', large:'الصورة كبيرة بعد التجهيز. استخدم صورة أصغر.', gate:'أدخل كلمة مرور المحرر لتغيير صورة الموقع العامة.', wrong:'كلمة مرور المحرر غير صحيحة.', lightPreview:'الوضع الفاتح', darkPreview:'الوضع الداكن', appearance:'الصورة في الوضع الداكن', invert:'خطوط فاتحة للخلفية الداكنة', original:'الاحتفاظ بالألوان الأصلية', saveAppearance:'حفظ المظهر', appearanceReady:'تم تحديث المعاينة — احفظ لتطبيقها على الموقع.', appearanceSaved:'تم حفظ مظهر الصورة ✓' }
+    };
+    const applyWebsitePortrait = (portrait) => {
+      const source = portrait?.url;
+      if (source && !/^\/api\/portrait\?image=[a-f0-9]{64}$/.test(source)) return false;
+      const variants = portrait?.variants || [];
+      if (!Array.isArray(variants) || variants.length > 3 || variants.some(variant =>
+        !/^(?:\/api\/portrait\?image=[a-f0-9]{64}|\/assets\/portraits\/[a-f0-9]{64}\.webp)$/.test(variant?.url || '')
+        || !Number.isInteger(variant.width) || variant.width < 1 || variant.width >= portrait.width)) return false;
+      const srcset = source && variants.length ? variants.map(variant => `${variant.url} ${variant.width}w`).concat(`${source} ${portrait.width}w`).join(', ') : '';
+      document.querySelectorAll('#heroPortrait img, .bio-teaser-portrait > img').forEach(image => {
+        const fallback = image.dataset.portraitDefault || image.getAttribute('src');
+        image.dataset.portraitDefault = fallback;
+        if (image.dataset.portraitDefaultSrcset === undefined) image.dataset.portraitDefaultSrcset = image.getAttribute('srcset') || '';
+        if (image.dataset.portraitDefaultSizes === undefined) image.dataset.portraitDefaultSizes = image.getAttribute('sizes') || '';
+        image.srcset = source ? srcset : image.dataset.portraitDefaultSrcset;
+        image.sizes = source && srcset ? '(max-width: 820px) and (max-height: 620px) min(48vw, 28svh), (max-width: 820px) min(68vw, clamp(184px, 31svh, 272px)), (max-height: 620px) 40svh, min(42vw, 52svh, 448px)' : source ? '' : image.dataset.portraitDefaultSizes;
+        image.src = source || fallback;
+        if (source) {
+          image.dataset.publicPortrait = 'true';
+          image.dataset.portraitDarkMode = portrait.dark_mode === 'original' ? 'original' : 'invert';
+        } else {
+          delete image.dataset.publicPortrait;
+          delete image.dataset.portraitDarkMode;
+        }
+        image.width = portrait?.width || Number(image.dataset.portraitDefaultWidth) || 768;
+        image.height = portrait?.height || Number(image.dataset.portraitDefaultHeight) || 768;
+      });
+      return true;
+    };
+    const renderWebsitePortrait = (connectionError = '') => {
+      const host = $('#websitePortrait');
+      if (!host) return;
+      const T = PORTRAIT_I18N[curLang()] || PORTRAIT_I18N.en;
+      const api = payload => studioCall('site-portrait', payload);
+      host.innerHTML = `<h3>${esc(T.title)}</h3><p class="dash-note">${esc(T.note)}</p>`;
+      if (!editToken()) {
+        host.innerHTML += `<p class="dash-note">${esc(T.gate)}</p><form id="portraitConnect" class="dash-login"><input type="password" aria-label="${esc(T.password)}" placeholder="${esc(T.password)}" autocomplete="off" required><button type="submit">${esc(T.connect)}</button></form><p id="portraitStatus" class="dash-note" role="status">${esc(connectionError)}</p>`;
+        const form = $('#portraitConnect'), message = $('#portraitStatus');
+        let connecting = false;
+        form.addEventListener('submit', async event => {
+          event.preventDefault(); if (connecting) return;
+          const input = form.querySelector('input'), button = form.querySelector('button');
+          const token = input.value.trim(); if (!token) return;
+          connecting = true; button.disabled = true; input.value = '';
+          try { sessionStorage.setItem('bq_edit_token', token); } catch {}
+          const result = await api({ action:'get' });
+          if ($('#websitePortrait') !== host) return;
+          connecting = false; button.disabled = false;
+          if (result?.ok) { renderWebsitePortrait(); return; }
+          if (result?.error === 'unauthorized') {
+            try { sessionStorage.removeItem('bq_edit_token'); } catch {}
+            message.textContent = T.wrong;
+          } else message.textContent = result?.detail || T.fail;
+        });
+        return;
+      }
+      const current = document.querySelector('#heroPortrait img')?.getAttribute('src') || '/assets/hero-sketch.webp';
+      host.innerHTML += `<div class="dash-portrait-previews">
+        <figure class="dash-portrait-preview dash-portrait-preview--light"><img id="portraitPreview" src="${esc(current)}" alt="${esc(T.title)}"><figcaption>${esc(T.lightPreview)}</figcaption></figure>
+        <figure class="dash-portrait-preview dash-portrait-preview--dark"><img id="portraitPreviewDark" src="${esc(current)}" alt="${esc(T.title)}"><figcaption>${esc(T.darkPreview)}</figcaption></figure></div>
+        <div class="dash-field dash-portrait-picker"><label for="portraitFile">${esc(T.choose)}</label><input id="portraitFile" type="file" accept="image/png,image/webp,image/jpeg" aria-describedby="portraitHint"></div>
+        <p id="portraitHint" class="dash-note">${esc(T.hint)}</p>
+        <label class="dash-field" for="portraitDarkMode"><span>${esc(T.appearance)}</span><select id="portraitDarkMode"><option value="invert">${esc(T.invert)}</option><option value="original">${esc(T.original)}</option></select></label>
+        <div class="dash-portrait-actions"><button id="portraitAppearance" class="dash-btn dash-btn--ghost" disabled>${esc(T.saveAppearance)}</button></div>
+        <div class="dash-portrait-actions"><button id="portraitPublish" class="dash-btn" disabled>${esc(T.publish)}</button><button id="portraitReset" class="dash-btn dash-btn--ghost">${esc(T.reset)}</button></div><p id="portraitStatus" class="dash-note" role="status" aria-live="polite"></p>`;
+      const input = $('#portraitFile'), publish = $('#portraitPublish'), reset = $('#portraitReset');
+      const preview = $('#portraitPreview'), previewDark = $('#portraitPreviewDark'), message = $('#portraitStatus');
+      const darkMode = $('#portraitDarkMode'), appearance = $('#portraitAppearance');
+      let prepared = null, revision = 0, busy = false;
+      let hasPortrait = /^\/api\/portrait\?image=[a-f0-9]{64}$/.test(current);
+      let savedMode = document.querySelector('#heroPortrait img')?.dataset.portraitDarkMode === 'original' ? 'original' : 'invert';
+      darkMode.value = savedMode;
+      const active = () => $('#portraitFile') === input;
+      const syncPreview = () => {
+        previewDark.src = preview.src;
+        previewDark.dataset.darkMode = (prepared || hasPortrait) ? darkMode.value : 'original';
+      };
+      const lock = state => {
+        input.disabled = state; reset.disabled = state; darkMode.disabled = state;
+        publish.disabled = state || !prepared;
+        appearance.disabled = state || !!prepared || !hasPortrait || darkMode.value === savedMode;
+      };
+      syncPreview(); lock(false);
+      darkMode.addEventListener('change', () => {
+        revision++; syncPreview(); lock(false); message.textContent = T.appearanceReady;
+      });
+      const reconnect = result => {
+        if (result?.error !== 'unauthorized' || !active()) return false;
+        try { sessionStorage.removeItem('bq_edit_token'); } catch {}
+        if (active()) renderWebsitePortrait(T.wrong);
+        return true;
+      };
+      api({ action:'get' }).then(result => {
+        if (reconnect(result)) return;
+        if (!active() || revision || !result?.ok) return;
+        if (applyWebsitePortrait(result.portrait)) {
+          hasPortrait = !!result.portrait;
+          savedMode = result.portrait?.dark_mode === 'original' ? 'original' : 'invert';
+          darkMode.value = savedMode;
+          preview.src = document.querySelector('#heroPortrait img')?.getAttribute('src') || current;
+          syncPreview(); lock(false);
+        }
+      });
+      input.addEventListener('change', async () => {
+        const version = ++revision, file = input.files?.[0];
+        prepared = null; lock(true); message.textContent = '';
+        preview.src = document.querySelector('#heroPortrait img')?.getAttribute('src') || current;
+        syncPreview();
+        if (!file) { lock(false); return; }
+        if (!/^image\/(png|webp|jpeg)$/.test(file.type) || file.size > 24 * 1024 * 1024) {
+          message.textContent = T.invalid; lock(false); return;
+        }
+        message.textContent = T.preparing;
+        try {
+          let dataB64 = await cmsResize(file, 1200, 0.88);
+          if (dataB64.length > 1333332) dataB64 = await cmsResize(file, 960, 0.8);
+          if (!active() || version !== revision) return;
+          if (dataB64.length > 1333332) throw new Error(T.large);
+          // Keep the original for the owner and high-density screens. Small
+          // transparent renditions share its publication and never increase
+          // the existing request budget or delay a later selection.
+          const variants = [];
+          let encodedSize = dataB64.length;
+          for (const width of [640, 960]) {
+            let smaller;
+            try { smaller = await cmsResize(file, width, 0.88); }
+            catch { break; } // optional rendition failure keeps the original usable
+            if (!active() || version !== revision) return;
+            if (smaller === dataB64 || variants.some(item => item.dataB64 === smaller)
+              || smaller.length >= dataB64.length || encodedSize + smaller.length > 1333332) continue;
+            variants.push({ dataB64:smaller });
+            encodedSize += smaller.length;
+          }
+          if (!active() || version !== revision) return;
+          prepared = { filename:file.name, contentType:'image/webp', dataB64, ...(variants.length ? { variants } : {}) };
+          preview.src = 'data:image/webp;base64,' + dataB64;
+          syncPreview(); message.textContent = T.ready;
+        } catch (error) {
+          if (active() && version === revision) message.textContent = error.message === T.large ? T.large : T.invalid;
+        } finally { if (active() && version === revision) lock(false); }
+      });
+      const save = async action => {
+        if (busy || (action === 'publish' && !prepared) || (action === 'appearance' && (prepared || !hasPortrait))) return;
+        busy = true; revision++; lock(true); message.textContent = T.saving;
+        const result = await api({ action, ...(action === 'publish' ? prepared : {}), ...(action !== 'reset' ? { dark_mode:darkMode.value } : {}) });
+        if (reconnect(result)) return;
+        if (result?.ok) applyWebsitePortrait(result.portrait);
+        if (!active()) return;
+        busy = false;
+        if (result?.ok) {
+          prepared = null; input.value = '';
+          hasPortrait = !!result.portrait;
+          savedMode = result.portrait?.dark_mode === 'original' ? 'original' : 'invert';
+          darkMode.value = savedMode;
+          preview.src = document.querySelector('#heroPortrait img')?.getAttribute('src') || current;
+          syncPreview();
+          message.textContent = action === 'reset' ? T.restored : action === 'appearance' ? T.appearanceSaved : T.saved;
+        } else message.textContent = result?.error === 'portrait-image-too-large' ? T.large : result?.detail || T.fail;
+        lock(false);
+      };
+      publish.addEventListener('click', () => save('publish'));
+      reset.addEventListener('click', () => save('reset'));
+      appearance.addEventListener('click', () => save('appearance'));
+    };
+    const renderProfile = () => {
+      const p = profile();
+      view.innerHTML = `
+        <div class="dash-prof-card">
+          <span class="dash-prof-av" id="dashProfAvatar"></span>
+          <div><strong>${esc(p.name)}</strong><span class="mono">${esc(p.title)}</span></div>
+        </div>
+        <div class="dash-set">
+          <label class="dash-field"><span class="mono">${DT('pName')}</span><input id="prfName" type="text" value="${esc(p.name)}"></label>
+          <label class="dash-field"><span class="mono">${DT('pTitle')}</span><input id="prfTitle" type="text" value="${esc(p.title)}"></label>
+          <label class="dash-field"><span class="mono">${DT('pAvatar')}</span><input id="prfAvatar" type="text" value="${esc(p.avatar)}"></label>
+          <button class="dash-btn" id="prfSave"><i class="fa-solid fa-floppy-disk"></i> ${DT('pSave')}</button>
+          <span class="mono dash-prof-saved" id="prfSaved" hidden>${DT('pSaved')}</span>
+        </div>
+        <p class="dash-note mono">${DT('pNote')}</p>
+        <section class="dash-website-portrait" id="websitePortrait"></section>`;
+      renderWebsitePortrait();
+      setAvatarBackground($('#dashProfAvatar'), p.avatar);
+      $('#prfSave')?.addEventListener('click', () => {
+        const np = { name: $('#prfName').value.trim() || PROFILE_DEFAULT.name, title: $('#prfTitle').value.trim(), avatar: $('#prfAvatar').value.trim() };
+        try { localStorage.setItem('bq_profile', JSON.stringify(np)); } catch (e) {}
+        syncHeaderProfile();
+        const s = $('#prfSaved'); if (s) { s.hidden = false; setTimeout(() => { s.hidden = true; }, 1800); }
+        renderProfile();
+      });
+    };
+
+    /* ---- Team & admins (saved privately in this browser until the backend login lands) ---- */
+    const getAdmins = () => { try { return JSON.parse(localStorage.getItem('bq_admins') || '[]'); } catch (e) { return []; } };
+    const setAdmins = (a) => { try { localStorage.setItem('bq_admins', JSON.stringify(a)); } catch (e) {} };
+    const renderAdmins = () => {
+      const p = profile(); const admins = getAdmins();
+      view.innerHTML = `
+        <div class="dash-prof-card">
+          <span class="dash-prof-av" id="dashAdminOwnerAvatar"></span>
+          <div><strong>${esc(p.name)}</strong><span class="mono">${DT('admYou')} · ${esc(p.title)}</span></div>
+        </div>
+        <div class="dash-admin-list" id="admList">${admins.length ? admins.map((a, i) => `
+          <div class="dash-admin-row"><div><strong>${esc(a.name)}</strong><span class="mono">${esc(a.role || '')}${a.email ? ' · ' + esc(a.email) : ''}</span></div><button class="dash-btn dash-btn--danger" data-rm="${i}"><i class="fa-solid fa-xmark"></i> ${DT('admRemove')}</button></div>`).join('') : `<p class="dash-note mono">${DT('admEmpty')}</p>`}</div>
+        <form class="dash-set" id="admForm">
+          <label class="dash-field"><span class="mono">${DT('admName')}</span><input id="admName" type="text"></label>
+          <label class="dash-field"><span class="mono">${DT('admEmail')}</span><input id="admEmail" type="email"></label>
+          <label class="dash-field"><span class="mono">${DT('admRole')}</span><input id="admRole" type="text"></label>
+          <button class="dash-btn" type="submit"><i class="fa-solid fa-user-plus"></i> ${DT('admAdd')}</button>
+        </form>
+        <p class="dash-note mono">${DT('admNote')}</p>`;
+      setAvatarBackground($('#dashAdminOwnerAvatar'), p.avatar);
+      $('#admForm')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = $('#admName').value.trim(); if (!name) return;
+        const a = getAdmins(); a.push({ name: name, email: $('#admEmail').value.trim(), role: $('#admRole').value.trim() }); setAdmins(a);
+        renderAdmins();
+      });
+      $$('#admList [data-rm]').forEach(b => b.addEventListener('click', () => { const a = getAdmins(); a.splice(+b.dataset.rm, 1); setAdmins(a); renderAdmins(); }));
+    };
+
+    /* ---- Blog manager — Cloudflare D1 content, GitHub media ---- */
+        const CT_I18N = {
+      en: { gate:'Publish to your blog', note:'Enter your edit token to write, edit and publish posts.', tokPh:'Edit token', conn:'Connect', newBtn:'Write new post', editBtn:'Edit', delBtn:'Delete', delAsk:'Delete this post permanently?', fTitle:'Title', fSub:'Subtitle', fTag:'Label', fCover:'Cover image link', fCoverPh:'/uploads/… or /assets/…', fAccent:'Accent', fMin:'Read (min)', fBody:'Body', fBodyPh:'Write your post here…  Leave one empty line between paragraphs.', fPub:'Published — visible on the site', save:'Publish', update:'Update', saving:'Publishing…', updating:'Updating…', translating:'Translating to all languages…', savedMsg:"Saved — it's on your blog now.", cancel:'Cancel', back:'All posts', loading:'Loading your posts…', empty:'No posts yet — write your first one.', err:'Could not reach the blog service (works on the live site).', needTitle:'Please add a title.', posts:'posts', draft:'draft', studio:'Advanced (raw database)' },
+      ku: { gate:'بڵاوکردنەوە بۆ بلۆگەکەت', note:'تۆکنی دەستکاریت بنووسە بۆ نووسین، دەستکاری و بڵاوکردنەوەی بابەت.', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', newBtn:'نووسینی بابەتی نوێ', editBtn:'دەستکاری', delBtn:'سڕینەوە', delAsk:'ئەم بابەتە بە تەواوی بسڕێتەوە؟', fTitle:'سەردێڕ', fSub:'ژێر-سەردێڕ', fTag:'لەیبڵ', fCover:'بەستەری وێنەی سەرەکی', fCoverPh:'/uploads/… یان /assets/…', fAccent:'ڕەنگ', fMin:'خوێندنەوە (خ)', fBody:'دەق', fBodyPh:'لێرە بابەتەکەت بنووسە…  دێڕێکی بەتاڵ لە نێوان پەرەگرافەکان بهێڵە.', fPub:'بڵاوکراوە — لەسەر سایت دیارە', save:'بڵاوکردنەوە', update:'نوێکردنەوە', saving:'بڵاودەکرێتەوە…', updating:'نوێدەکرێتەوە…', translating:'وەردەگێڕدرێت بۆ هەموو زمانەکان…', savedMsg:'پاشەکەوتکرا — ئێستا لەسەر بلۆگەکەتە.', cancel:'هەڵوەشاندنەوە', back:'هەموو بابەتەکان', loading:'بارکردنی بابەتەکانت…', empty:'هێشتا بابەت نییە — یەکەمیان بنووسە.', err:'نەگەیشتە خزمەتگوزاری بلۆگ (لەسەر سایتە زیندووەکە کاردەکات).', needTitle:'تکایە سەردێڕێک زیاد بکە.', posts:'بابەت', draft:'ڕەشنووس', studio:'پێشکەوتوو (داتابەیس)' },
+      ar: { gate:'انشر في مدونتك', note:'أدخل رمز التحرير للكتابة والتعديل والنشر.', tokPh:'رمز التحرير', conn:'اتصال', newBtn:'كتابة مقال جديد', editBtn:'تعديل', delBtn:'حذف', delAsk:'حذف هذا المقال نهائياً؟', fTitle:'العنوان', fSub:'العنوان الفرعي', fTag:'التصنيف', fCover:'رابط صورة الغلاف', fCoverPh:'/uploads/… أو /assets/…', fAccent:'اللون', fMin:'القراءة (د)', fBody:'النص', fBodyPh:'اكتب مقالك هنا…  اترك سطراً فارغاً بين الفقرات.', fPub:'منشور — ظاهر على الموقع', save:'نشر', update:'تحديث', saving:'جارٍ النشر…', updating:'جارٍ التحديث…', translating:'جارٍ الترجمة إلى كل اللغات…', savedMsg:'تم الحفظ — إنه الآن على مدونتك.', cancel:'إلغاء', back:'كل المقالات', loading:'جارٍ تحميل مقالاتك…', empty:'لا مقالات بعد — اكتب أول واحد.', err:'تعذّر الوصول إلى خدمة المدونة (تعمل على الموقع المباشر).', needTitle:'الرجاء إضافة عنوان.', posts:'مقالات', draft:'مسودة', studio:'متقدم (قاعدة البيانات)' },
+      kmr: { gate:'Li blogê biweşîne', note:'Ji bo nivîsîn, guhertin û weşandinê tokena xwe binivîse.', tokPh:'Tokena guhertinê', conn:'Girêde', newBtn:'Nivîsa nû binivîse', editBtn:'Biguhere', delBtn:'Jê bibe', delAsk:'Ev nivîs bi temamî were jêbirin?', fTitle:'Sernav', fSub:'Bin-sernav', fTag:'Etîket', fCover:'Girêdana wêneyê', fCoverPh:'/uploads/… an /assets/…', fAccent:'Reng', fMin:'Xwendin (deq)', fBody:'Nivîs', fBodyPh:'Nivîsa xwe li vir binivîse…  Rêzeke vala di navbera paragrafan de bihêle.', fPub:'Weşandî — li ser malperê xuya ye', save:'Biweşîne', update:'Nûve bike', saving:'Tê weşandin…', updating:'Tê nûvekirin…', translating:'Ji bo hemû zimanan tê wergerandin…', savedMsg:'Hat tomarkirin — niha li ser blogê ye.', cancel:'Betal', back:'Hemû nivîs', loading:'Nivîsên te tên barkirin…', empty:'Hêj nivîs tune — ya yekem binivîse.', err:'Negihîşt xizmeta blogê (li ser malpera zindî dixebite).', needTitle:'Ji kerema xwe sernavekê zêde bike.', posts:'nivîs', draft:'reşnivîs', studio:'Pêşketî (database)' },
+      fr: { gate:'Publier sur votre blog', note:"Saisissez votre jeton d'édition pour écrire, modifier et publier.", tokPh:"Jeton d'édition", conn:'Connecter', newBtn:'Écrire un article', editBtn:'Modifier', delBtn:'Supprimer', delAsk:'Supprimer définitivement cet article ?', fTitle:'Titre', fSub:'Sous-titre', fTag:'Étiquette', fCover:"Lien de l'image", fCoverPh:"/uploads/… ou /assets/…", fAccent:'Couleur', fMin:'Lecture (min)', fBody:'Texte', fBodyPh:'Écrivez votre article ici…  Laissez une ligne vide entre les paragraphes.', fPub:'Publié — visible sur le site', save:'Publier', update:'Mettre à jour', saving:'Publication…', updating:'Mise à jour…', translating:'Traduction dans toutes les langues…', savedMsg:"Enregistré — c'est sur votre blog.", cancel:'Annuler', back:'Tous les articles', loading:'Chargement de vos articles…', empty:'Aucun article — écrivez le premier.', err:'Service du blog inaccessible (fonctionne sur le site en ligne).', needTitle:'Veuillez ajouter un titre.', posts:'articles', draft:'brouillon', studio:'Avancé (base de données)' }
+    };
+    const editToken = () => { try { return sessionStorage.getItem('bq_edit_token') || ''; } catch (e) { return ''; } };
+
+    /* Privileged Studio calls always stay on this origin. A missing proxy or
+       network failure must never downgrade the signed two-factor session to a
+       direct request carrying an editor credential to a different origin. */
+    const studioFailure = (body, status = 0) => {
+      const http = Number.isInteger(status) && status >= 400 && status <= 599 ? `; HTTP ${status}` : '';
+      // Cloudflare problem responses have no `error` key. Keep only bounded
+      // reference fields; their explanatory text is never trusted UI copy.
+      if (body.cloudflare_error === true && Number.isInteger(body.error_code) && body.error_code >= 400 && body.error_code <= 1999) {
+        const ray = typeof body.ray_id === 'string' && /^[a-f0-9]{16}$/i.test(body.ray_id) ? `; Ray ID ${body.ray_id.toLowerCase()}` : '';
+        return { ok:false, error:'studio-edge-failed', detail:`${DT('studioEdgeFailed')} [studio-edge-failed${http}; Cloudflare ${body.error_code}${ray}]` };
+      }
+      const messages = {
+        'rate-limit-unavailable':'studioDatabaseUnavailable',
+        'studio-database-unavailable':'studioDatabaseUnavailable',
+        'studio-content-unavailable':'studioDatabaseUnavailable',
+        'studio-github-unavailable':'studioNetworkFailed',
+        'studio-github-timeout':'studioTimeout',
+        'studio-github-invalid':'studioResponseInvalid',
+        'studio-github-not-found':'studioGithubMissing',
+        'studio-github-conflict':'studioUnavailable',
+        'studio-github-folder-limit':'studioResponseLarge',
+        'studio-upstream-failed':'studioServerFailed',
+        'studio-upstream-invalid':'studioResponseInvalid',
+        'studio-upstream-too-large':'studioResponseLarge',
+        'studio-upstream-timeout':'studioTimeout',
+        'studio-upstream-unavailable':'studioNetworkFailed',
+        'studio-client-timeout':'studioTimeout',
+        'studio-unavailable':'studioNetworkFailed',
+        'bad_response':'studioResponseInvalid'
+      };
+      const code = Object.hasOwn(messages, body.error) ? body.error : 'studio-service-failed';
+      const upstream = Number.isInteger(body.upstreamStatus) && body.upstreamStatus >= 400 && body.upstreamStatus <= 599 ? `; upstream ${body.upstreamStatus}` : '';
+      return { ...body, detail:`${DT(messages[code] || 'studioUnavailable')} [${code}${http}${upstream}]` };
+    };
+    const studioCall = async (service, payload) => {
+      const token = editToken();
+      if (!token) return { error:'missing_token', detail:DT('editorRequired') };
+      try {
+        const res = await fetch('/api/studio/' + service, {
+          method:'POST', credentials:'same-origin', cache:'no-store',
+          headers:{ 'Content-Type':'application/json', Accept:'application/json', 'x-edit-token':token },
+          body:JSON.stringify(payload), signal:AbortSignal.timeout(65_000)
+        });
+        const parsed = await res.json().catch((error) => {
+          if (error && ['AbortError', 'TimeoutError'].includes(error.name)) throw error;
+          return null;
+        });
+        const body = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : { error:'bad_response' };
+        if (body.error === 'bad_response' && isLoopbackPreview()) {
+          showLiveStudioGate();
+          return { error:'static-preview', detail:DT('staticPreview') + ' https://bqurtas.com/#studio' };
+        }
+        if (body.error === 'session-required') {
+          invalidateDashboardSession();
+          hint.textContent = DT('sessionExpired');
+          return { ...body, detail:DT('sessionExpired') };
+        }
+        if (body.error === 'studio-proxy-not-configured') return { ...body, detail:DT('studioNotSetup') };
+        if (body.error === 'studio-upstream-auth' || body.error === 'studio-github-auth') return { ...body, detail:DT('studioUpstreamAuth') };
+        if (body.error === 'studio-github-not-configured') return { ...body, detail:DT('studioGithubMissing') };
+        if (res.status === 429) return { ...body, detail:DT('rateLimited') };
+        if (res.status >= 500 || body.error === 'bad_response' || body.error === 'studio-github-conflict' || body.error === 'studio-github-folder-limit') return studioFailure(body, res.status);
+        return body;
+      } catch (error) {
+        return studioFailure({ error:error && ['AbortError', 'TimeoutError'].includes(error.name) ? 'studio-client-timeout' : 'studio-unavailable' });
+      }
+    };
+
+    const PUBLICATION_I18N = {
+      en:{ queued:'Saved to GitHub ✓ — waiting for the website deployment. It is not live yet.', waiting:'The image is saved. Waiting for it to become available on the website…', ready:'Image is live ✓ — ready to publish.', retry:'Check again', failed:'Still waiting for deployment. Check again before publishing.', uploadFailed:'The image could not be uploaded.' },
+      ku:{ queued:'لە GitHub پاشەکەوت کرا ✓ — چاوەڕێی بڵاوکردنەوەی وێبسایتە. هێشتا لە پەخشی ڕاستەوخۆ نییە.', waiting:'وێنەکە پاشەکەوت کرا. چاوەڕێی بەردەستبوونی لەسەر وێبسایتەکەین…', ready:'وێنەکە لەسەر وێبسایتە ✓ — ئامادەی بڵاوکردنەوەیە.', retry:'دووبارە بپشکنە', failed:'هێشتا چاوەڕێی بڵاوکردنەوەیە. پێش بڵاوکردنەوە دووبارە بپشکنە.', uploadFailed:'نەتوانرا وێنەکە بار بکرێت.' },
+      ar:{ queued:'حُفظ على GitHub ✓ — بانتظار نشر الموقع. لم يظهر على الموقع بعد.', waiting:'حُفظت الصورة. ننتظر إتاحتها على الموقع…', ready:'الصورة متاحة ✓ — جاهزة للنشر.', retry:'تحقق مجدداً', failed:'لا يزال النشر جارياً. تحقق مجدداً قبل النشر.', uploadFailed:'تعذّر رفع الصورة.' },
+      kmr:{ queued:'Li GitHub hat tomarkirin ✓ — li benda weşandina malperê ye. Hêj ne zindî ye.', waiting:'Wêne hat tomarkirin. Li benda xuya bûna li malperê ne…', ready:'Wêne zindî ye ✓ — amade ye.', retry:'Dîsa kontrol bike', failed:'Hêj li benda weşandinê ye. Berî weşandinê dîsa kontrol bike.', uploadFailed:'Wêne nehat barkirin.' },
+      fr:{ queued:'Enregistré sur GitHub ✓ — en attente du déploiement du site. Pas encore en ligne.', waiting:'Image enregistrée. En attente de sa disponibilité sur le site…', ready:'Image en ligne ✓ — prête à publier.', retry:'Vérifier à nouveau', failed:'Déploiement toujours en attente. Vérifiez avant de publier.', uploadFailed:'Impossible de téléverser cette image.' }
+    };
+    const publicationText = key => (PUBLICATION_I18N[curLang()] || PUBLICATION_I18N.en)[key];
+    /* Uploads create a Git commit before Pages serves the file. Keep publishing
+       locked until the exact first-party WebP is available; never accept the
+       SPA's 200 HTML fallback as an image. Retry rechecks, it does not re-upload. */
+    const createStudioMediaGate = (container, saveButton) => {
+      let pending = 0;
+      const inputCounts = new Map();
+      const busy = () => pending > 0;
+      const upload = async ({ file, input, message, api, maxW = 1600, quality = 0.82, preview, ready }) => {
+        pending += 1; inputCounts.set(input, (inputCounts.get(input) || 0) + 1);
+        saveButton.disabled = true; input.disabled = true;
+        let finished = false;
+        const finish = () => {
+          if (finished) return;
+          finished = true; pending -= 1;
+          const remaining = Math.max(0, (inputCounts.get(input) || 1) - 1);
+          if (remaining) inputCounts.set(input, remaining); else inputCounts.delete(input);
+          if (container.isConnected) { input.disabled = remaining > 0; saveButton.disabled = busy(); }
+        };
+        try {
+          const dataB64 = await cmsResize(file, maxW, quality);
+          if (!container.isConnected) { finish(); return; }
+          // This generated, bounded WebP preview has no object-URL lifecycle or
+          // dependency on an unfinished deployment.
+          const result = await api({ action:'upload', filename:file.name, contentType:'image/webp', dataB64 });
+          if (!container.isConnected) { finish(); return; }
+          if (!result?.ok || !result.url) throw new Error(result?.detail || result?.error || publicationText('uploadFailed'));
+          const url = new URL(result.url, location.origin);
+          if (url.origin !== location.origin || !/^\/uploads\/[a-f0-9-]+\.webp$/.test(url.pathname) || url.search || url.hash) throw new Error(publicationText('uploadFailed'));
+          if (preview) preview('data:image/webp;base64,' + dataB64);
+          const check = async () => {
+            message.textContent = publicationText('waiting');
+            for (let attempt = 0; attempt < 12 && container.isConnected; attempt++) {
+              try {
+                const response = await fetch(url.href, { method:'HEAD', credentials:'same-origin', cache:'no-store', redirect:'error', signal:AbortSignal.timeout(8000) });
+                if (response.ok && /^image\/webp(?:;|$)/i.test(response.headers.get('content-type') || '')) {
+                  if (container.isConnected) { ready(url.href); message.textContent = publicationText('ready'); }
+                  finish(); return;
+                }
+              } catch (error) { /* A pending deployment is retried with a bounded budget. */ }
+              if (attempt < 11) await new Promise(resolve => setTimeout(resolve, 5000));
+            }
+            if (!container.isConnected) { finish(); return; }
+            message.textContent = publicationText('failed') + ' ';
+            const retry = document.createElement('button');
+            retry.type = 'button'; retry.className = 'dash-btn'; retry.textContent = publicationText('retry');
+            retry.addEventListener('click', () => { retry.disabled = true; check(); }, { once:true });
+            message.appendChild(retry);
+          };
+          check();
+        } catch (error) {
+          if (container.isConnected) message.textContent = '✗ ' + (error.message || publicationText('uploadFailed'));
+          finish();
+        }
+      };
+      return { busy, upload };
+    };
+
+    const cmsApi = (payload) => studioCall('blog-admin', payload);
+
+    /* Optional translations stay in Cloudflare Workers AI. Failure preserves
+       the author's text and never sends it to another translation provider. */
+    const TR_LANGS = { en:'en', ku:'ku', kmr:'kmr', ar:'ar', fr:'fr', tr:'tr', sv:'sv' };
+    let translationUnavailable = false;
+    const trOne = async (text, target) => {
+      if (translationUnavailable) return '';
+      try {
+        const r = await fetch('/api/translate', {
+          method:'POST', credentials:'same-origin', cache:'no-store',
+          headers:{ 'Content-Type':'application/json', 'x-edit-token':editToken() },
+          body:JSON.stringify({ text, target }), signal:AbortSignal.timeout(35_000)
+        });
+        if (!r.ok) { translationUnavailable = true; return ''; }
+        const result = await r.json();
+        return result.ok && typeof result.text === 'string' ? result.text : '';
+      } catch (e) { translationUnavailable = true; return ''; }
+    };
+    const trChunks = (s) => {
+      const chars = Array.from(String(s)), out = [];
+      for (let start = 0; start < chars.length; start += 2000) out.push(chars.slice(start, start + 2000).join(''));
+      return out;
+    };
+    const trText = async (text, tl) => {
+      const s = String(text || ''); if (!s.trim()) return '';
+      let out = '';
+      for (const c of trChunks(s)) {
+        if (!c.trim()) { out += c; continue; }
+        const r = await trOne(c, tl);
+        // A failed chunk must not publish a field containing mixed languages.
+        if (!r || !r.trim()) { translationUnavailable = true; return s; }
+        out += r;
+      }
+      return out;
+    };
+    // Translate a post into every language; languages run one-by-one (gentle on
+    // the endpoint) while a post's three fields translate together.
+    const buildI18n = async (post, onProgress, previous = {}) => {
+      translationUnavailable = false;
+      const langs = Object.keys(TR_LANGS), i18n = {};
+      for (let k = 0; k < langs.length; k++) {
+        const lang = langs[k], tl = TR_LANGS[lang];
+        const translateField = key => {
+          const existing = previous.i18n?.[lang]?.[key];
+          // Cover, category or publication-only edits must not erase an
+          // existing translation or spend another model request on it.
+          if (String(post[key] || '') === String(previous[key] || '') && typeof existing === 'string' && existing.trim()) return existing;
+          return trText(post[key], tl);
+        };
+        const [title, subtitle, body] = await Promise.all(['title', 'subtitle', 'body'].map(translateField));
+        i18n[lang] = {
+          title: (title && title.trim()) ? title : (post.title || ''),
+          subtitle: (subtitle && subtitle.trim()) ? subtitle : (post.subtitle || ''),
+          body: (body && body.trim()) ? body : (post.body || '')
+        };
+        if (onProgress) onProgress(k + 1, langs.length);
+      }
+      return i18n;
+    };
+
+    let CMS_POSTS = [];
+    const CT_X = {
+      en:  { fTag:'Category', fCover:'Cover image', uploading:'Uploading…', uploaded:'Uploaded ✓', fCoverHint:'Choose an image — it uploads automatically.' },
+      ku:  { fTag:'کەتەگۆری', fCover:'وێنەی سەرەکی', uploading:'بارکردن…', uploaded:'بارکرا ✓', fCoverHint:'وێنەیەک هەڵبژێرە — خۆکارانە بار دەبێت.' },
+      ar:  { fTag:'التصنيف', fCover:'صورة الغلاف', uploading:'جارٍ الرفع…', uploaded:'تم الرفع ✓', fCoverHint:'اختر صورة — تُرفع تلقائياً.' },
+      kmr: { fTag:'Kategorî', fCover:'Wêneyê bergê', uploading:'Tê barkirin…', uploaded:'Hat barkirin ✓', fCoverHint:'Wêneyek hilbijêre — bixweber tê barkirin.' },
+      fr:  { fTag:'Catégorie', fCover:'Image de couverture', uploading:'Téléversement…', uploaded:'Téléversé ✓', fCoverHint:'Choisissez une image — téléversée automatiquement.' }
+    };
+    const cmsResize = (file, maxW, q) => new Promise((resolve, reject) => {
+      const im = new Image();
+      const source = URL.createObjectURL(file);
+      im.onload = () => {
+        try {
+          if (!im.width || !im.height) throw new Error('image_error');
+          const scale = Math.min(1, maxW / Math.max(im.width, im.height));
+          const w = Math.max(1, Math.round(im.width * scale)), h = Math.max(1, Math.round(im.height * scale));
+          const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+          const context = cv.getContext('2d');
+          if (!context) throw new Error('image_processing_failed');
+          context.drawImage(im, 0, 0, w, h);
+          const encoded = cv.toDataURL('image/webp', q);
+          if (!encoded.startsWith('data:image/webp;base64,') || !encoded.split(',')[1]) throw new Error('webp_not_supported');
+          resolve(encoded.split(',')[1]);
+        } catch (e) { reject(e); }
+        finally { URL.revokeObjectURL(source); }
+      };
+      im.onerror = () => { URL.revokeObjectURL(source); reject(new Error('image_error')); };
+      im.src = source;
+    });
+    const cmsGate = () => {
+      const t = CT_I18N[curLang()] || CT_I18N.en;
+      view.innerHTML = `<div class="dash-gate-inline">
+        <i class="fa-solid fa-feather-pointed dash-gate-icon"></i>
+        <h3>${t.gate}</h3><p class="mono">${t.note}</p>
+        <form id="ctTokForm" class="dash-login"><input type="password" id="ctTok" placeholder="${t.tokPh}" autocomplete="off"><button type="submit">${t.conn} <i class="fa-solid fa-arrow-right"></i></button></form></div>`;
+      $('#ctTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#ctTok').value.trim(); if (!v) return; try { sessionStorage.setItem('bq_edit_token', v); } catch (x) {} renderContent(); });
+    };
+    let cmsPage = 1;
+    const drawCms = () => {
+      const t = CT_I18N[curLang()] || CT_I18N.en;
+      const total = CMS_POSTS.length;
+      const pages = Math.max(1, Math.ceil(total / DASH_PER));
+      if (cmsPage > pages) cmsPage = pages;
+      const start = (cmsPage - 1) * DASH_PER;
+      const pager = dashPager(total, cmsPage, (n) => { cmsPage = n; drawCms(); });
+      const rows = total ? CMS_POSTS.slice(start, start + DASH_PER).map((p, idx) => {
+        const i = start + idx;                                   // global index (reorder-safe)
+        const dd = p.date || (p.created_at ? new Date(p.created_at).toLocaleDateString('en', { month: 'short', year: 'numeric' }) : '');
+        const up = i === 0 ? ' disabled' : '', dn = i === total - 1 ? ' disabled' : '';
+        return `<div class="cms-row" data-id="${esc(String(p.id ?? ''))}">
+            <span class="dash-reorder"><button class="dash-ord" data-mv="-1" data-i="${i}"${up} aria-label="Up"><i class="fa-solid fa-chevron-up"></i></button><button class="dash-ord" data-mv="1" data-i="${i}"${dn} aria-label="Down"><i class="fa-solid fa-chevron-down"></i></button></span>
+            <span class="cms-row-t"><strong>${esc(p.title || '')}</strong><span class="mono">${esc(p.tag || 'Note')} · ${esc(dd)}${p.published === false ? ' · ' + t.draft : ''}</span></span>
+            <span class="cms-row-act">
+              <button class="cms-mini" data-act="edit" data-id="${esc(String(p.id ?? ''))}" title="${t.editBtn}"><i class="fa-solid fa-pen"></i></button>
+              <button class="cms-mini cms-mini--del" data-act="del" data-id="${esc(String(p.id ?? ''))}" title="${t.delBtn}"><i class="fa-solid fa-trash-can"></i></button>
+            </span></div>`;
+      }).join('') : `<p class="dash-dim mono">${t.empty}</p>`;
+      view.innerHTML = `
+        <div class="cms-head">
+          <button class="dash-btn dash-btn--go" id="ctNew"><i class="fa-solid fa-feather-pointed"></i> ${t.newBtn}</button>
+          <span class="mono cms-status">${total} ${t.posts}</span>
+        </div>
+        <div class="cms-list">${rows}</div>${pager.html}`;
+      $('#ctNew').addEventListener('click', () => cmsEdit(null));
+      view.querySelectorAll('.cms-mini').forEach((b) => b.addEventListener('click', () => {
+        const id = b.getAttribute('data-id'), act = b.getAttribute('data-act');
+        if (act === 'edit') cmsEdit(CMS_POSTS.find((p) => String(p.id) === String(id)));
+        else cmsDel(id);
+      }));
+      view.querySelectorAll('.dash-ord').forEach((b) => b.addEventListener('click', () => {
+        const i = Number(b.dataset.i), j = i + Number(b.dataset.mv);
+        if (j < 0 || j >= CMS_POSTS.length) return;
+        const tmp = CMS_POSTS[i]; CMS_POSTS[i] = CMS_POSTS[j]; CMS_POSTS[j] = tmp;   // swap, persist the new order
+        cmsPage = Math.floor(j / DASH_PER) + 1;                  // follow the moved item to its page
+        drawCms();
+        cmsApi({ action: 'reorder', ids: CMS_POSTS.map((x) => x.id) }).then(() => { if (window.__bqReloadBlog) window.__bqReloadBlog(); });
+      }));
+      pager.wire(view);
+    };
+    const cmsList = (notice = '') => {
+      const t = CT_I18N[curLang()] || CT_I18N.en;
+      view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i><br>${t.loading}</p>`;
+      cmsApi({ action: 'list' }).then(d => {
+        if (d && d.error === 'unauthorized') { try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
+        if (!d || !d.ok) { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${t.err}</p><button class="dash-btn" id="ctRetry"><i class="fa-solid fa-rotate"></i> ${t.conn}</button>`; const rb = $('#ctRetry'); if (rb) rb.addEventListener('click', cmsList); return; }
+        CMS_POSTS = Array.isArray(d.posts) ? d.posts : [];
+        cmsPage = 1;
+        drawCms();
+        if (typeof notice === 'string' && notice) {
+          const status = document.createElement('p');
+          status.className = 'dash-note'; status.setAttribute('role', 'status');
+          status.textContent = notice; view.prepend(status);
+        }
+      }).catch(() => { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${t.err}</p>`; });
+    };
+    const cmsDel = (id) => {
+      const t = CT_I18N[curLang()] || CT_I18N.en;
+      if (!window.confirm(t.delAsk)) return;
+      cmsApi({ action: 'delete', id: Number(id) }).then((d) => {
+        if (d && d.error === 'unauthorized') { try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
+        try { if (window.__bqReloadBlog) window.__bqReloadBlog(); } catch (x) {}
+        cmsList();
+      });
+    };
+    const cmsEdit = (post) => {
+      const t = Object.assign({}, CT_I18N.en, CT_I18N[curLang()] || {}, CT_X.en, CT_X[curLang()] || {});
+      const p = post || {};
+      const accent = p.accent || '#1a2740';
+      view.innerHTML = `
+        <div class="cms-head"><button class="dash-btn" id="ctBack"><i class="fa-solid fa-arrow-left"></i> ${t.back}</button>
+          <span class="mono cms-status">${p.id ? t.editBtn : t.newBtn}</span></div>
+        <form id="ctForm" class="cms-form">
+          <label class="cms-field"><span>${t.fTitle}</span><input id="cf_title" type="text" value="${esc(p.title || '')}" required></label>
+          <label class="cms-field"><span>${t.fSub}</span><input id="cf_sub" type="text" value="${esc(p.subtitle || '')}"></label>
+          <div class="cms-field"><span>${t.fTag}</span>
+            <div class="cms-cats" id="cf_cats"></div>
+            <input id="cf_tag" type="hidden" value="${esc(p.tag || 'Design')}">
+          </div>
+          <div class="cms-row2">
+            <label class="cms-field"><span>${t.fMin}</span><input id="cf_min" type="number" min="1" max="60" value="${esc(String(p.read_minutes || 4))}"></label>
+            <label class="cms-field cms-field--color"><span>${t.fAccent}</span><input id="cf_accent" type="color" value="${esc(accent)}"></label>
+          </div>
+          <label class="cms-field"><span>${t.fCover}</span>
+            <input id="cf_coverfile" type="file" accept="image/*" class="cms-file">
+            <input id="cf_cover" type="hidden" value="${esc(p.cover || '')}">
+            <span class="cms-uphint" id="cf_upmsg">${p.cover ? '' : t.fCoverHint}</span></label>
+          <div class="cms-cover-prev" id="cf_prev"${p.cover ? '' : ' hidden'}><img src="${esc(p.cover || '')}" alt=""></div>
+          <label class="cms-field"><span>${t.fBody}</span><textarea id="cf_body" rows="12" placeholder="${esc(t.fBodyPh)}">${esc(p.body || '')}</textarea></label>
+          <label class="cms-check"><input type="checkbox" id="cf_pub" ${p.published === false ? '' : 'checked'}> <span>${t.fPub}</span></label>
+          <div class="cms-actions">
+            <button type="submit" class="dash-btn dash-btn--go" id="ctSave"><i class="fa-solid fa-paper-plane"></i> ${p.id ? (t.update || 'Update') : t.save}</button>
+            <button type="button" class="dash-btn" id="ctCancel">${t.cancel}</button>
+            <span class="mono cms-savemsg" id="ctMsg"></span>
+          </div>
+        </form>`;
+      $('#ctBack').addEventListener('click', cmsList);
+      $('#ctCancel').addEventListener('click', cmsList);
+      // category chips — click to pick (value kept in the hidden #cf_tag)
+      (() => {
+        const PRESETS = ['Design', 'Logo', 'AI', 'Live', 'Branding', 'Print', 'Photography', 'Note'];
+        const wrap = $('#cf_cats'), hid = $('#cf_tag');
+        const cur = (p.tag || 'Design');
+        const list2 = PRESETS.slice();
+        if (cur && !PRESETS.some(c => c.toLowerCase() === cur.toLowerCase())) list2.unshift(cur);
+        const draw = () => { wrap.innerHTML = list2.map(c => `<button type="button" class="cms-cat${c.toLowerCase() === (hid.value || '').toLowerCase() ? ' is-active' : ''}" data-cat="${esc(c)}">${esc(c)}</button>`).join(''); };
+        draw();
+        wrap.addEventListener('click', (e) => { const b = e.target.closest('.cms-cat'); if (!b) return; hid.value = b.getAttribute('data-cat'); draw(); });
+      })();
+      const coverHidden = $('#cf_cover'), prev = $('#cf_prev'), upmsg = $('#cf_upmsg');
+      const media = createStudioMediaGate($('#ctForm'), $('#ctSave'));
+      $('#cf_coverfile').addEventListener('change', (ev) => {
+        const file = ev.target.files && ev.target.files[0]; if (!file) return;
+        upmsg.textContent = t.uploading;
+        media.upload({ file, input:ev.target, message:upmsg, api:cmsApi,
+          preview:url => { prev.hidden = false; prev.querySelector('img').src = url; },
+          ready:url => { coverHidden.value = url; prev.querySelector('img').src = url; }
+        });
+      });
+      $('#ctForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (media.busy()) return;
+        const title = $('#cf_title').value.trim();
+        const msg = $('#ctMsg');
+        if (!title) { msg.textContent = t.needTitle; return; }
+        const payload = { action: 'upsert', post: {
+          id: p.id || undefined, title,
+          subtitle: $('#cf_sub').value, tag: $('#cf_tag').value.trim() || 'Design',
+          read_minutes: Number($('#cf_min').value) || 4, accent: $('#cf_accent').value,
+          cover: $('#cf_cover').value.trim(), body: $('#cf_body').value, published: $('#cf_pub').checked
+        } };
+        const btn = $('#ctSave'); btn.disabled = true;
+        // Cloudflare translates before saving; unavailable translations retain
+        // the author's words and the editor is told which fallback occurred.
+        try {
+          const i18n = await buildI18n(payload.post, (done, total) => { msg.textContent = (t.translating || 'Translating…') + ' ' + done + '/' + total; }, p);
+          payload.i18n = i18n;
+        } catch (x) {}
+        payload.translate = false;
+        msg.textContent = (p.id ? (t.updating || t.saving) : t.saving);
+        cmsApi(payload).then((d) => {
+          btn.disabled = false;
+          if (d && d.error === 'unauthorized') { try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {} renderContent(); return; }
+          if (!d || !d.ok) { msg.textContent = '✗ ' + ((d && d.error) || ''); return; }
+          msg.textContent = t.savedMsg;
+          try { if (window.__bqReloadBlog) window.__bqReloadBlog(); } catch (x) {}
+          const translationNote = translationUnavailable
+            ? (curLang() === 'ku' ? 'بابەتەکە پاشەکەوت کرا. وەرگێڕان بەردەست نەبوو؛ دەقی ڕەسەن پارێزرا.' : 'Post saved. Translation was unavailable; the original text was preserved.') : '';
+          setTimeout(() => cmsList(translationNote), 800);
+        }).catch(() => { btn.disabled = false; msg.textContent = t.err; });
+      });
+    };
+    const renderContent = () => {
+      if (!editToken()) { cmsGate(); return; }
+      cmsList();
+    };
+
+    /* ---- AI assistant (private; proxied via /api/assistant) ---- */
+    const AT_I18N = {
+      en: { gate:'Connect the assistant', note:'Enter your EDIT_TOKEN (same as the content editor).', tokPh:'Edit token', conn:'Connect', ph:'Ask about clients, pricing, briefs, ideas…', send:'Send', intro:'Hello Barakat — I can help with client replies, quotes, briefs, ideas, captions and translation. Ask in any language.', clear:'Clear', thinking:'Thinking…', errKey:'The assistant is not configured in Cloudflare yet.', err:'The assistant is temporarily unavailable. Your conversation is saved.' },
+      ku: { gate:'بەستنەوەی یاریدەدەر', note:'EDIT_TOKENـەکەت بنووسە (هەمان تۆکنی ناوەڕۆک).', tokPh:'تۆکنی دەستکاری', conn:'بەستنەوە', ph:'دەربارەی کڕیار، نرخ، پلان، بیرۆکە بپرسە…', send:'ناردن', intro:'سڵاو بەرەکات — دەتوانم یارمەتیت بدەم لە وەڵامی کڕیار، نرخ، پلانی پڕۆژە، بیرۆکە، کاپشن و وەرگێڕان. بە هەر زمانێک بپرسە.', clear:'پاککردنەوە', thinking:'بیردەکاتەوە…', errKey:'یاریدەدەر هێشتا لە Cloudflare ڕێکنەخراوە.', err:'یاریدەدەر کاتییەن بەردەست نییە. گفتوگۆکەت پارێزراوە.' },
+      ar: { gate:'ربط المساعد', note:'أدخل EDIT_TOKEN (نفس رمز محرر المحتوى).', tokPh:'رمز التحرير', conn:'اتصال', ph:'اسأل عن العملاء، التسعير، الخطط، الأفكار…', send:'إرسال', intro:'مرحباً بركات — أساعدك في ردود العملاء، عروض الأسعار، الخطط، الأفكار، التعليقات والترجمة. اسأل بأي لغة.', clear:'مسح', thinking:'يفكر…', errKey:'المساعد غير مهيأ في Cloudflare بعد.', err:'المساعد غير متاح مؤقتاً. محادثتك محفوظة.' },
+      kmr: { gate:'Alîkar girêde', note:'EDIT_TOKEN ya xwe binivîse (heman tokena edîtorê).', tokPh:'Tokena guhertinê', conn:'Girêde', ph:'Li ser kirîar, biha, plan, fikiran bipirse…', send:'Bişîne', intro:'Slav Barakat — ez dikarim di bersivên kirîaran, bihayan, planan, fikiran, sernivîs û wergerê de alîkar bim. Bi her zimanî bipirse.', clear:'Paqij bike', thinking:'Difikire…', errKey:'Alîkar hêj li Cloudflare nehatiye mîhengkirin.', err:'Alîkar demkî ne berdest e. Axaftina te hatiye parastin.' },
+      fr: { gate:"Connecter l'assistant", note:'Saisissez votre EDIT_TOKEN (le même que l’éditeur).', tokPh:"Jeton d'édition", conn:'Connecter', ph:'Clients, tarifs, briefs, idées…', send:'Envoyer', intro:'Bonjour Barakat — je peux aider pour les réponses clients, devis, briefs, idées, légendes et traduction. Demandez dans n’importe quelle langue.', clear:'Effacer', thinking:'Réflexion…', errKey:'L’assistant n’est pas encore configuré dans Cloudflare.', err:'L’assistant est temporairement indisponible. Votre conversation est conservée.' }
+    };
+    const AT_ERRORS = {
+      en:{ network:'The connection to the assistant failed. Your conversation is saved.', timeout:'The assistant took too long to respond. Your conversation is saved; please try again.', invalid:'The assistant returned an unreadable response. Please try again.', upstream:'Cloudflare AI could not answer this request. Please try again shortly.', limit:'Please keep each message within 4,000 characters.', rate:'Too many requests. Wait a few minutes before trying again.', editor:'Reconnect with your editor password to use the assistant.' },
+      ku:{ network:'پەیوەندی بە یاریدەدەر پچڕا. گفتوگۆکەت پارێزراوە.', timeout:'کاتی چاوەڕوانی وەڵام تەواو بوو. گفتوگۆکەت پارێزراوە؛ دووبارە هەوڵ بدەوە.', invalid:'وەڵامی یاریدەدەر نەخوێندرایەوە. دووبارە هەوڵ بدەوە.', upstream:'Cloudflare AI نەیتوانی وەڵامی ئەم داواکارییە بداتەوە. کەمێک دواتر هەوڵ بدەوە.', limit:'تکایە هەر پەیامێک لە ٤٬٠٠٠ پیت زیاتر نەبێت.', rate:'داواکارییەکان زۆرن. چەند خولەکێک چاوەڕێ بکە و دووبارە هەوڵ بدەوە.', editor:'بۆ بەکارهێنانی یاریدەدەر، بە پاسۆردی ئەدیتەر دووبارە پەیوەست ببە.' },
+      ar:{ network:'انقطع الاتصال بالمساعد. محادثتك محفوظة.', timeout:'استغرق المساعد وقتاً طويلاً. محادثتك محفوظة؛ حاول مجدداً.', invalid:'تعذّرت قراءة رد المساعد. حاول مجدداً.', upstream:'تعذّر على Cloudflare AI الإجابة. حاول بعد قليل.', limit:'اجعل كل رسالة ضمن 4,000 حرف.', rate:'طلبات كثيرة. انتظر بضع دقائق ثم حاول مجدداً.', editor:'أعد الاتصال بكلمة مرور المحرر لاستخدام المساعد.' },
+      kmr:{ network:'Girêdana alîkar qut bû. Axaftina te parastî ye.', timeout:'Bersiva alîkar pir dirêj kir. Axaftin parastî ye; dîsa biceribîne.', invalid:'Bersiva alîkar nehat xwendin. Dîsa biceribîne.', upstream:'Cloudflare AI nikarî bersiv bide. Piştî demeke kurt dîsa biceribîne.', limit:'Her peyam di nav 4,000 tîpan de bihêle.', rate:'Daxwaz pir in. Çend deqeyan bisekine û dîsa biceribîne.', editor:'Bi şîfreya edîtorê dîsa girêde.' },
+      fr:{ network:'La connexion à l’assistant a échoué. Votre conversation est conservée.', timeout:'L’assistant a mis trop de temps à répondre. Votre conversation est conservée ; réessayez.', invalid:'La réponse de l’assistant est illisible. Réessayez.', upstream:'Cloudflare AI n’a pas pu répondre. Réessayez dans un instant.', limit:'Limitez chaque message à 4 000 caractères.', rate:'Trop de requêtes. Patientez quelques minutes avant de réessayer.', editor:'Reconnectez-vous avec votre mot de passe d’édition.' }
+    };
+    // The display keeps 40 messages; the API receives only the newest context
+    // within its message, character and UTF-8 body limits. Never discard the
+    // saved conversation merely because an upstream request failed.
+    const assistantContext = history => {
+      const messages = [];
+      let total = 0;
+      for (let i = history.length - 1; i >= 0 && messages.length < 20; i--) {
+        const message = history[i];
+        if (!message || !['user', 'assistant'].includes(message.role) || typeof message.content !== 'string') continue;
+        const content = message.content.trim().slice(0, 4000);
+        if (!content) continue;
+        if (total + content.length > 20000) break;
+        const next = [{ role:message.role, content }, ...messages];
+        if (new TextEncoder().encode(JSON.stringify({ messages:next })).length > 24 * 1024) break;
+        messages.unshift({ role:message.role, content });
+        total += content.length;
+      }
+      return messages;
+    };
+    const assistantCall = async (token, messages) => {
+      try {
+        const response = await fetch('/api/assistant', {
+          method:'POST', credentials:'same-origin', cache:'no-store',
+          headers:{ 'Content-Type':'application/json', Accept:'application/json', 'x-edit-token':token },
+          body:JSON.stringify({ messages }), signal:AbortSignal.timeout(35000)
+        });
+        const parsed = await response.json().catch(error => {
+          if (error && ['AbortError', 'TimeoutError'].includes(error.name)) throw error;
+          return null;
+        });
+        const data = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+        if (data.error === 'session-required' || (response.status === 401 && data.error !== 'unauthorized')) return { error:'session' };
+        if (data.error === 'unauthorized') return { error:'editor' };
+        if (response.status === 429) return { error:'rate' };
+        if (['not-configured', 'no-key', 'no-ai'].includes(data.error)) return { error:'configuration' };
+        if (data.error === 'invalid-messages' || response.status === 413) return { error:'limit' };
+        if (data.error === 'ai-upstream-failed') return { error:'upstream' };
+        if (response.ok && data.ok === true && typeof data.text === 'string' && data.text.trim() && data.text.length <= 24000) return { ok:true, text:data.text.trim() };
+        // Never echo upstream error strings, HTML, or exception messages.
+        return { error:response.status >= 500 ? 'unavailable' : 'invalid' };
+      } catch (error) {
+        return { error:error && ['AbortError', 'TimeoutError'].includes(error.name) ? 'timeout' : 'network' };
+      }
+    };
+    let assistantState;
+    const renderAssistant = () => {
+      const t = AT_I18N[curLang()] || AT_I18N.en;
+      const errors = AT_ERRORS[curLang()] || AT_ERRORS.en;
+      const token = editToken();
+      if (!token) {
+        view.innerHTML = `<div class="dash-gate-inline">
+          <i class="fa-solid fa-robot dash-gate-icon"></i>
+          <h3>${t.gate}</h3><p class="mono">${t.note}</p>
+          <form id="asTokForm" class="dash-login"><input type="password" id="asTok" placeholder="${t.tokPh}" autocomplete="off"><button type="submit">${t.conn} <i class="fa-solid fa-arrow-right"></i></button></form></div>`;
+        $('#asTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#asTok').value.trim(); if (!v) return; try { sessionStorage.setItem('bq_edit_token', v); } catch (x) {} renderAssistant(); });
+        return;
+      }
+      if (!assistantState) {
+        let saved = []; try { saved = JSON.parse(localStorage.getItem('bq_assist') || '[]'); } catch (e) {}
+        const history = Array.isArray(saved) ? saved.filter(m => m && ['user', 'assistant'].includes(m.role) && typeof m.content === 'string' && m.content.trim()).slice(-40).map(m => ({ role:m.role, content:m.content.slice(0, 24000) })) : [];
+        assistantState = { history, pending:false, error:'', draft:'' };
+      }
+      const state = assistantState;
+      const save = () => { state.history = state.history.slice(-40); try { localStorage.setItem('bq_assist', JSON.stringify(state.history)); } catch (e) {} };
+      view.innerHTML = `
+        <div class="asst">
+          <div class="asst-bar"><button class="dash-btn" id="asstClear"><i class="fa-solid fa-eraser"></i> ${t.clear}</button></div>
+          <div class="asst-msgs" id="asstMsgs" aria-live="polite"></div>
+          <form class="asst-form" id="asstForm"><input id="asstInput" type="text" maxlength="4000" placeholder="${t.ph}" aria-label="${t.ph}" autocomplete="off"><button id="asstSend" type="submit" aria-label="${t.send}"><i class="fa-solid fa-paper-plane"></i></button></form>
+        </div>`;
+      const msgs = $('#asstMsgs'), input = $('#asstInput'), form = $('#asstForm'), send = $('#asstSend'), clear = $('#asstClear');
+      input.value = state.draft;
+      const paint = () => {
+        if (!msgs.isConnected) return;
+        const errorText = state.error === 'configuration' ? t.errKey : (errors[state.error] || t.err);
+        msgs.innerHTML = `<div class="asst-msg asst-bot">${esc(t.intro)}</div>` +
+          state.history.map(m => `<div class="asst-msg asst-${m.role === 'user' ? 'me' : 'bot'}">${esc(m.content).replace(/\n/g, '<br>')}</div>`).join('') +
+          (state.pending ? `<div class="asst-msg asst-bot asst-typing">${esc(t.thinking)}</div>` : '') +
+          (state.error ? `<div class="asst-msg asst-bot" role="status">${esc(errorText)}</div>` : '');
+        input.readOnly = state.pending; send.disabled = state.pending; clear.disabled = state.pending;
+        form.setAttribute('aria-busy', String(state.pending));
+        msgs.scrollTop = msgs.scrollHeight;
+      };
+      state.paint = paint;
+      paint();
+      input.addEventListener('input', () => { state.draft = input.value; });
+      clear.addEventListener('click', () => {
+        if (state.pending) return;
+        state.history = []; state.error = ''; save(); paint();
+      });
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (state.pending) return;
+        const value = input.value.trim(); if (!value) return;
+        state.draft = input.value;
+        const messages = assistantContext([...state.history, { role:'user', content:value }]);
+        if (value.length > 4000 || !messages.length || messages[messages.length - 1].content !== value) { state.error = 'limit'; paint(); return; }
+        state.history.push({ role:'user', content:value }); save();
+        state.draft = ''; input.value = ''; state.error = ''; state.pending = true; paint();
+        const result = await assistantCall(token, messages);
+        state.pending = false;
+        if (result.ok) { state.history.push({ role:'assistant', content:result.text }); save(); }
+        else if (result.error === 'session') {
+          invalidateDashboardSession(); hint.textContent = DT('sessionExpired');
+        } else if (result.error === 'editor') {
+          try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {}
+          state.error = 'editor';
+          if ($('#asstMsgs')?.isConnected) renderAssistant();
+        } else state.error = result.error;
+        state.paint?.();
+      });
+    };
+
+    const flag = (cc) => (cc && cc.length === 2)
+      ? cc.toUpperCase().replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0))) : '🌐';
+    const ago = (ts) => { const s = (Date.now() - ts) / 1000;
+      if (s < 60) return 'just now';
+      if (s < 3600) return Math.floor(s / 60) + 'm ago';
+      if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+      return Math.floor(s / 86400) + 'd ago'; };
+    const safeCount = (value) => {
+      const count = Number(value);
+      return Number.isFinite(count) && count >= 0 ? Math.min(Math.floor(count), 1_000_000_000) : 0;
+    };
+    const bars = (rows, fmt) => {
+      const cleanRows = Array.isArray(rows) ? rows : [];
+      if (!cleanRows.length) return `<p class="dash-dim mono">${DT('vNoData')}</p>`;
+      const max = Math.max(...cleanRows.map(x => safeCount(x && x.c)), 1);
+      return cleanRows.map((r) => {
+        const count = safeCount(r && r.c);
+        return `<div class="dash-bar-row"><span class="dash-bar-label">${fmt(r || {})}</span><span class="dash-bar"><span class="dash-bar-fill" data-css="width:${(count / max * 100).toFixed(0)}%"></span></span><span class="dash-bar-n mono">${count}</span></div>`;
+      }).join('');
+    };
+
+    const renderVisitors = async () => {
+      let token = '';
+      try { token = sessionStorage.getItem('bq_stats_token') || ''; } catch (e) {}
+      if (!token) {
+        view.innerHTML = `<div class="dash-gate-inline">
+          <i class="fa-solid fa-chart-line dash-gate-icon"></i>
+          <h3>${DT('vConnect')}</h3>
+          <p class="mono">${DT('vEnter')}</p>
+          <form id="stTokForm" class="dash-login"><input type="password" id="stTok" placeholder="${DT('vTokenPh')}" autocomplete="off"><button type="submit">${DT('vConnectBtn')} <i class="fa-solid fa-arrow-right"></i></button></form></div>`;
+        $('#stTokForm').addEventListener('submit', (e) => { e.preventDefault();
+          const v = $('#stTok').value.trim(); if (!v) return;
+          try { sessionStorage.setItem('bq_stats_token', v); } catch (x) {} renderVisitors(); });
+        return;
+      }
+      view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i><br>${DT('vLoading')}</p>`;
+      let d;
+      /* The token travels in a header now, not the query string: a URL
+         carrying a secret ends up in history, in the service worker's cache and
+         in every log between here and the edge. Credentials are sent so the
+         signed admin session goes with it. */
+      try { d = await (await fetch('/api/stats', { headers: { 'x-stats-token': token }, credentials: 'same-origin' })).json(); }
+      catch (e) { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>Can't reach analytics — this works on the live site only, not local preview.</p>`; return; }
+
+      if (!d.ok) {
+        if (d.error === 'unauthorized') { try { sessionStorage.removeItem('bq_stats_token'); } catch (x) {}
+          view.innerHTML = `<p class="dash-empty mono">Wrong token.</p><button class="dash-btn" id="stRetry">Try again</button>`;
+          $('#stRetry').addEventListener('click', renderVisitors); return; }
+        if (d.error === 'no-db') { view.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-database"></i><br>Analytics database not connected yet.<br><small>Create a Cloudflare D1 database and bind it as <b>DB</b>.</small></p>`; return; }
+        view.innerHTML = `<p class="dash-empty mono">Analytics error: ${esc(d.error || '')}</p>`; return;
+      }
+
+      const series = (Array.isArray(d.series) ? d.series : []).map((point) => ({
+        d: String((point && point.d) || '').slice(0, 32),
+        c: safeCount(point && point.c)
+      }));
+      const sMax = Math.max(...series.map(s => s.c), 1);
+      const chart = series.map(s =>
+        `<span class="viz-day" title="${esc(s.d)} · ${s.c} views"><span class="viz-day-fill" data-css="height:${Math.max(8, (s.c / sMax * 100)).toFixed(0)}%"></span></span>`).join('');
+
+      view.innerHTML = `
+        <div class="dash-cards">
+          <div class="dash-card"><span class="dash-card-n">${safeCount(d.views)}</span><span class="mono">${DT('vViews')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${safeCount(d.visitors)}</span><span class="mono">${DT('vVisitors')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${safeCount(d.viewsToday)}</span><span class="mono">${DT('vViewsToday')}</span></div>
+          <div class="dash-card"><span class="dash-card-n">${safeCount(d.visitorsToday)}</span><span class="mono">${DT('vVisToday')}</span></div>
+        </div>
+        ${chart ? `<div class="viz-wrap"><span class="dash-dim mono">${DT('v14')}</span><div class="viz-chart">${chart}</div></div>` : ''}
+        <div class="dash-grid2">
+          <div><h4 class="dash-h mono">${DT('vTop')}</h4>${bars(d.paths, r => esc(r.path))}</div>
+          <div><h4 class="dash-h mono">${DT('vCountries')}</h4>${bars(d.countries, r => flag(r.country) + ' ' + esc(r.country || '—'))}</div>
+          <div><h4 class="dash-h mono">${DT('vRef')}</h4>${bars(d.referrers, r => esc(r.ref))}</div>
+          <div><h4 class="dash-h mono">${DT('vDevices')}</h4>${bars(d.devices, r => esc(r.device || '—'))}</div>
+        </div>
+        <h4 class="dash-h mono">${DT('vRecent')}</h4>
+        <div class="dash-recent">${(Array.isArray(d.recent) ? d.recent : []).length ? d.recent.map(r =>
+          `<div class="dash-recent-row mono"><span class="dash-recent-flag">${flag(r.country)}</span><span class="dash-recent-path">${esc(r.path)}</span><span class="dash-dim">${esc(r.device)}</span><span class="dash-dim">${ago(r.ts)}</span></div>`).join('')
+          : `<p class="dash-dim mono">${DT('vNoVisits')}</p>`}</div>
+        <button class="dash-btn" id="stRefresh"><i class="fa-solid fa-rotate"></i> ${DT('vRefresh')}</button>`;
+      $('#stRefresh')?.addEventListener('click', renderVisitors);
+    };
+
+    /* ---- Latest: hand-pin an important work to the homepage bell for a week ---- */
+    const latestApi = (payload) => studioCall('latest-admin', payload);
+    const LATEST_TABS = [['logo','Logos'],['book','Book Covers'],['image','Photography'],['posters','Posters'],['social','Social'],['events','Events'],['stationery','Stationery'],['official','Official'],['video','Video'],['other','Other'],['','']];
+    const TAB_EN = Object.fromEntries(LATEST_TABS);
+    const LA_I18N = {
+      en: { note:'Pin an important work to the homepage “Latest” bell. It shows for 7 days, then drops off on its own — alongside the new works the bell already finds automatically.', headline:'Headline', headlinePh:'e.g. New identity for Rwanga', opens:'Opens tab', room:'Design room (all)', image:'Image — choose a file (optional)', pin:'Pin to Latest', uploading:'Uploading…', uploaded:'Uploaded ✓', connect:'Connect the editor first (Content tab).', live:'Reachable on the live site only.', empty:'Nothing pinned right now.', need:'Add a headline.', saving:'Saving…', pinned:'Pinned ✓', fail:'Could not save (live site only).' },
+      ku: { note:'کارێکی گرینگ بچەسپێنە بە زەنگی «نوێترین»ی پەڕەی سەرەکی. بۆ ٧ ڕۆژ دەردەکەوێت، پاشان خۆی لادەچێت — لەگەڵ ئەو کارە نوێیانەی زەنگەکە خۆکارانە دەیاندۆزێتەوە.', headline:'ناونیشان', headlinePh:'نموونە: ناسنامەی نوێ بۆ ڕوانگە', opens:'کام تاب دەکاتەوە', room:'ژووری دیزاین (هەموو)', image:'وێنە — فایلێک هەڵبژێرە (ئیختیاری)', pin:'بیچەسپێنە بۆ نوێترین', uploading:'بارکردن…', uploaded:'بارکرا ✓', connect:'سەرەتا ئەدیتەرەکە ببەستەوە (تابی ناوەڕۆک).', live:'تەنیا لەسەر سایتە زیندووەکە بەردەستە.', empty:'هیچ شتێک نەچەسپێنراوە.', need:'ناونیشانێک زیاد بکە.', saving:'پاشەکەوت دەکرێت…', pinned:'چەسپێنرا ✓', fail:'نەتوانرا پاشەکەوت بکرێت (تەنیا سایتی زیندوو).' },
+      kmr:{ note:'Karekî girîng bi zengê “Nûtirîn” ê rûpela sereke ve girêde. 7 rojan xuya dibe, paşê bi xwe radibe — ligel karên nû yên ku zeng bi xweber dibîne.', headline:'Sernav', headlinePh:'mînak: Nasnameya nû ji bo Rwanga', opens:'Kîjan tabê vedike', room:'Jûra sêwiranê (hemû)', image:'Wêne — pelekê hilbijêre (bijarte)', pin:'Bi Nûtirîn ve girêde', uploading:'Bardike…', uploaded:'Barkir ✓', connect:'Pêşî edîtorê girêde (tabê Naverok).', live:'Tenê li ser malpera zindî berdest e.', empty:'Tu tişt nehatiye girêdan.', need:'Sernavekê zêde bike.', saving:'Tê tomarkirin…', pinned:'Girêdayî ✓', fail:'Nehat tomarkirin (tenê malpera zindî).' },
+      ar: { note:'ثبّت عملاً مهماً على جرس «الأحدث» في الصفحة الرئيسية. يظهر لمدة ٧ أيام ثم يختفي تلقائياً — إلى جانب الأعمال الجديدة التي يكتشفها الجرس تلقائياً.', headline:'العنوان', headlinePh:'مثال: هوية جديدة لرونگا', opens:'يفتح تبويب', room:'غرفة التصميم (الكل)', image:'صورة — اختر ملفاً (اختياري)', pin:'تثبيت في الأحدث', uploading:'جارٍ الرفع…', uploaded:'تم الرفع ✓', connect:'اربط المحرر أولاً (تبويب المحتوى).', live:'متاح على الموقع المباشر فقط.', empty:'لا شيء مثبّت حالياً.', need:'أضف عنواناً.', saving:'جارٍ الحفظ…', pinned:'تم التثبيت ✓', fail:'تعذّر الحفظ (الموقع المباشر فقط).' },
+      fr: { note:'Épinglez un travail important à la cloche « Dernières » de la page d’accueil. Il s’affiche 7 jours puis disparaît de lui-même — aux côtés des nouveaux travaux que la cloche détecte automatiquement.', headline:'Titre', headlinePh:'ex. Nouvelle identité pour Rwanga', opens:'Ouvre l’onglet', room:'Salle design (tout)', image:'Image — choisir un fichier (facultatif)', pin:'Épingler aux Dernières', uploading:'Téléversement…', uploaded:'Téléversé ✓', connect:'Connectez d’abord l’éditeur (onglet Contenu).', live:'Disponible uniquement sur le site en ligne.', empty:'Rien d’épinglé pour le moment.', need:'Ajoutez un titre.', saving:'Enregistrement…', pinned:'Épinglé ✓', fail:'Impossible d’enregistrer (site en ligne uniquement).' }
+    };
+    const LAT = (k) => (LA_I18N[curLang()] || LA_I18N.en)[k] || LA_I18N.en[k];
+    const tabName = (v) => (window.BQ_DICT && window.BQ_DICT['tab.' + v]) || TAB_EN[v] || v;
+    const renderLatest = () => {
+      const t = (k) => esc(LAT(k));
+      const opts = LATEST_TABS.map(([v]) => `<option value="${v}">${esc(v ? tabName(v) : LAT('room'))}</option>`).join('');
+      view.innerHTML = `
+        <p class="dash-note mono">${t('note')}</p>
+        <div class="dash-latest-form">
+          <label class="dash-field"><span class="mono">${t('headline')}</span><input id="laTitle" type="text" placeholder="${t('headlinePh')}"></label>
+          <label class="dash-field"><span class="mono">${t('opens')}</span><select id="laLink">${opts}</select></label>
+          <label class="dash-field"><span class="mono">${t('image')}</span>
+            <input id="laImageFile" type="file" accept="image/*" class="cms-file">
+            <input id="laImage" type="hidden">
+            <span class="dash-note mono" id="laUp"></span></label>
+          <div class="dash-latest-prev" id="laPrev" hidden><img src="" alt=""></div>
+          <button class="dash-btn" id="laAdd"><i class="fa-solid fa-bell"></i> ${t('pin')}</button>
+          <span class="dash-note mono" id="laMsg"></span>
+        </div>
+        <div class="dash-latest-list" id="laList"><p class="dash-empty mono"><i class="fa-solid fa-spinner fa-spin"></i></p></div>`;
+      const msg = $('#laMsg'), upmsg = $('#laUp'), prev = $('#laPrev');
+      const media = createStudioMediaGate($('#laAdd').closest('.dash-latest-form'), $('#laAdd'));
+      $('#laImageFile').addEventListener('change', (ev) => {
+        const file = ev.target.files && ev.target.files[0]; if (!file) return;
+        upmsg.textContent = LAT('uploading');
+        media.upload({ file, input:ev.target, message:upmsg, api:cmsApi, maxW:1200,
+          preview:url => { prev.hidden = false; prev.querySelector('img').src = url; },
+          ready:url => { $('#laImage').value = url; prev.querySelector('img').src = url; }
+        });
+      });
+      let LIST = [], latPage = 1;
+      const drawList = () => {
+        const list = $('#laList'); if (!list) return;
+        if (!LIST.length) { list.innerHTML = `<p class="dash-empty mono">${LAT('empty')}</p>`; return; }
+        const total = LIST.length;
+        const pages = Math.max(1, Math.ceil(total / DASH_PER));
+        if (latPage > pages) latPage = pages;
+        const start = (latPage - 1) * DASH_PER;
+        const pager = dashPager(total, latPage, (n) => { latPage = n; drawList(); });
+        list.innerHTML = LIST.slice(start, start + DASH_PER).map((it, idx) => {
+          const i = start + idx;                                   // global index (reorder-safe)
+          const left = Math.max(0, 7 - Math.floor((Date.now() - new Date(it.created_at).getTime()) / 86400000));
+          const up = i === 0 ? ' disabled' : '', dn = i === total - 1 ? ' disabled' : '';
+          return `<div class="dash-latest-row"><span class="dash-reorder"><button class="dash-ord" data-mv="-1" data-i="${i}"${up} aria-label="Up"><i class="fa-solid fa-chevron-up"></i></button><button class="dash-ord" data-mv="1" data-i="${i}"${dn} aria-label="Down"><i class="fa-solid fa-chevron-down"></i></button></span><span class="dash-latest-tag mono">${esc((it.link && tabName(it.link)) || it.tag || 'Featured')}</span><strong>${esc(it.title)}</strong><span class="mono dash-latest-left">${left}d</span><button class="dash-latest-del" data-id="${esc(String(it.id ?? ''))}" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button></div>`;
+        }).join('') + pager.html;
+        list.querySelectorAll('.dash-latest-del').forEach(b => b.addEventListener('click', () => { latestApi({ action: 'delete', id: Number(b.dataset.id) }).then(() => { loadList(); if (window.__bqReloadLatest) window.__bqReloadLatest(); }); }));
+        list.querySelectorAll('.dash-ord').forEach(b => b.addEventListener('click', () => {
+          const i = Number(b.dataset.i), j = i + Number(b.dataset.mv);
+          if (j < 0 || j >= LIST.length) return;
+          const t = LIST[i]; LIST[i] = LIST[j]; LIST[j] = t;   // swap, then persist the whole order
+          latPage = Math.floor(j / DASH_PER) + 1;              // follow the moved item to its page
+          drawList();
+          latestApi({ action: 'reorder', ids: LIST.map(x => x.id) }).then(() => { if (window.__bqReloadLatest) window.__bqReloadLatest(); });
+        }));
+        pager.wire(list);
+      };
+      const loadList = () => {
+        latestApi({ action: 'list' }).then(d => {
+          const list = $('#laList'); if (!list) return;
+          if (!d || !d.ok) {
+            const needTok = d && (d.error === 'missing_token' || d.error === 'unauthorized');
+            list.innerHTML = `<p class="dash-empty mono"><i class="fa-solid fa-plug-circle-xmark"></i><br>${needTok ? LAT('connect') : LAT('live')}</p>`;
+            return;
+          }
+          LIST = d.items || [];
+          drawList();
+        }).catch(() => {});
+      };
+      $('#laAdd').addEventListener('click', () => {
+        if (media.busy()) return;
+        const title = $('#laTitle').value.trim();
+        if (!title) { msg.textContent = LAT('need'); return; }
+        const link = $('#laLink').value, tag = TAB_EN[link] || 'Featured';
+        const image = $('#laImage').value.trim();
+        msg.textContent = LAT('saving');
+        latestApi({ action: 'add', item: { title, link, tag, image } }).then(d => {
+          if (d && d.ok) { $('#laTitle').value = ''; $('#laImage').value = ''; $('#laImageFile').value = ''; prev.hidden = true; upmsg.textContent = ''; msg.textContent = LAT('pinned'); loadList(); if (window.__bqReloadLatest) window.__bqReloadLatest(); }
+          else { msg.textContent = (d && (d.error === 'missing_token' || d.error === 'unauthorized')) ? LAT('connect') : LAT('fail'); }
+        }).catch(() => { msg.textContent = LAT('fail'); });
+      });
+      loadList();
+    };
+
+    /* ---- Projects / Case studies manager (Cloudflare D1 via projects-admin) ---- */
+    const PR_I18N = {
+      en: { gate:'Manage case studies', note:'Enter your edit token to add and edit projects.', conn:'Connect', tokPh:'Edit token', newBtn:'New case study', edit:'Edit', del:'Delete', delAsk:'Delete this project permanently?', back:'All projects', loading:'Loading…', empty:'No case studies yet — add your first.', fTitle:'Project title', fClient:'Client', fYear:'Year', fRole:'Role / scope', fTag:'Category', fAccent:'Accent colour', fCover:'Cover image', fSummary:'The brief (one strong paragraph)', fBody:'The story (separate paragraphs with a blank line)', fPalette:'Palette — one per line, e.g.  Clay #BD4A2C', fGallery:'In-use images', fPub:'Published — visible on the site', save:'Publish', update:'Update', translating:'Translating to all languages…', saving:'Saving…', saved:'Saved ✓', err:'Could not reach the service (works on the live site).', needTitle:'Please add a title.', uploading:'Uploading…', add:'Add', remove:'Remove' },
+      ku: { gate:'بەڕێوەبردنی تاوتوێی پڕۆژە', note:'تۆکنی دەستکاریت بنووسە بۆ زیادکردن و دەستکاری.', conn:'بەستنەوە', tokPh:'تۆکنی دەستکاری', newBtn:'تاوتوێی پڕۆژەی نوێ', edit:'دەستکاری', del:'سڕینەوە', delAsk:'ئەم پڕۆژەیە بە تەواوی بسڕێتەوە؟', back:'هەموو پڕۆژەکان', loading:'بارکردن…', empty:'هێشتا هیچ تاوتوێیەک نییە — یەکەمیان زیاد بکە.', fTitle:'ناونیشانی پڕۆژە', fClient:'کڕیار', fYear:'ساڵ', fRole:'ڕۆڵ / مەودا', fTag:'کەتەگۆری', fAccent:'ڕەنگی سەرەکی', fCover:'وێنەی سەرەکی', fSummary:'بریف (یەک پەرەگرافی بەهێز)', fBody:'چیرۆکەکە (پەرەگرافەکان بە دێڕی بەتاڵ جیابکەرەوە)', fPalette:'پاڵێت — هەر دێڕێک، نموونە  Clay #BD4A2C', fGallery:'وێنەکانی بەکارهێنان', fPub:'بڵاوکراوە — لەسەر سایت دیارە', save:'بڵاوکردنەوە', update:'نوێکردنەوە', translating:'وەردەگێڕدرێت بۆ هەموو زمانەکان…', saving:'پاشەکەوت دەکرێت…', saved:'پاشەکەوتکرا ✓', err:'نەگەیشتە خزمەتگوزاری (لەسەر سایتە زیندووەکە کاردەکات).', needTitle:'تکایە ناونیشانێک زیاد بکە.', uploading:'بارکردن…', add:'زیادکردن', remove:'لابردن' },
+      ar: { gate:'إدارة دراسات الحالة', note:'أدخل رمز التحرير للإضافة والتعديل.', conn:'اتصال', tokPh:'رمز التحرير', newBtn:'دراسة حالة جديدة', edit:'تعديل', del:'حذف', delAsk:'حذف هذا المشروع نهائياً؟', back:'كل المشاريع', loading:'جارٍ التحميل…', empty:'لا دراسات حالة بعد — أضف أول واحدة.', fTitle:'عنوان المشروع', fClient:'العميل', fYear:'السنة', fRole:'الدور / النطاق', fTag:'التصنيف', fAccent:'اللون الأساسي', fCover:'صورة الغلاف', fSummary:'الموجز (فقرة قوية واحدة)', fBody:'القصة (افصل الفقرات بسطر فارغ)', fPalette:'الألوان — واحد بكل سطر، مثل  Clay #BD4A2C', fGallery:'صور الاستخدام', fPub:'منشور — ظاهر على الموقع', save:'نشر', update:'تحديث', translating:'جارٍ الترجمة إلى كل اللغات…', saving:'جارٍ الحفظ…', saved:'تم الحفظ ✓', err:'تعذّر الوصول إلى الخدمة (تعمل على الموقع المباشر).', needTitle:'الرجاء إضافة عنوان.', uploading:'جارٍ الرفع…', add:'إضافة', remove:'حذف' },
+      kmr: { gate:'Birêvebirina lêkolînên rewşê', note:'Ji bo zêdekirin û guhertinê tokena xwe binivîse.', conn:'Girêde', tokPh:'Tokena guhertinê', newBtn:'Lêkolîna nû', edit:'Biguhere', del:'Jê bibe', delAsk:'Ev proje bi temamî were jêbirin?', back:'Hemû proje', loading:'Tê barkirin…', empty:'Hêj lêkolîn tune — ya yekem zêde bike.', fTitle:'Sernavê projeyê', fClient:'Mişterî', fYear:'Sal', fRole:'Rol / qad', fTag:'Kategorî', fAccent:'Rengê sereke', fCover:'Wêneyê bergê', fSummary:'Kurte (paragrafek xurt)', fBody:'Çîrok (paragrafan bi rêzeke vala veqetîne)', fPalette:'Palet — her rêz yek, mînak  Clay #BD4A2C', fGallery:'Wêneyên bikaranînê', fPub:'Weşandî — li ser malperê xuya ye', save:'Biweşîne', update:'Nûve bike', translating:'Ji bo hemû zimanan tê wergerandin…', saving:'Tê tomarkirin…', saved:'Hat tomarkirin ✓', err:'Negihîşt xizmetê (li ser malpera zindî dixebite).', needTitle:'Ji kerema xwe sernavekê zêde bike.', uploading:'Tê barkirin…', add:'Zêde bike', remove:'Rake' },
+      fr: { gate:'Gérer les études de cas', note:"Saisissez votre jeton d'édition pour ajouter et modifier.", conn:'Connecter', tokPh:"Jeton d'édition", newBtn:'Nouvelle étude de cas', edit:'Modifier', del:'Supprimer', delAsk:'Supprimer définitivement ce projet ?', back:'Tous les projets', loading:'Chargement…', empty:'Aucune étude de cas — ajoutez la première.', fTitle:'Titre du projet', fClient:'Client', fYear:'Année', fRole:'Rôle / périmètre', fTag:'Catégorie', fAccent:'Couleur d’accent', fCover:'Image de couverture', fSummary:'Le brief (un paragraphe fort)', fBody:'Le récit (séparez les paragraphes par une ligne vide)', fPalette:'Palette — une par ligne, ex.  Clay #BD4A2C', fGallery:'Images en usage', fPub:'Publié — visible sur le site', save:'Publier', update:'Mettre à jour', translating:'Traduction dans toutes les langues…', saving:'Enregistrement…', saved:'Enregistré ✓', err:'Service inaccessible (fonctionne sur le site en ligne).', needTitle:'Veuillez ajouter un titre.', uploading:'Téléversement…', add:'Ajouter', remove:'Retirer' }
+    };
+    const PR_EXTRA = {
+      en:  { fCoverUrl:'Or paste a cover image URL', fGalleryUrl:'Add one image URL', pick:'Pick real images from the portfolio', pickNote:'Choose from the live gallery, then use the image as the cover or add it to this case study.', pickCat:'Gallery category', pickLoad:'Show images', useCover:'Cover', useImage:'Add', galleryCount:'{n} images', noImage:'No image yet', preview:'Preview' },
+      ku:  { fCoverUrl:'یان بەستەری وێنەی سەرەکی دابنێ', fGalleryUrl:'بەستەری یەک وێنە زیاد بکە', pick:'وێنەی راستەقینە لە پۆرتفۆلیۆ هەڵبژێرە', pickNote:'لە گەلەریی زیندوو هەڵبژێرە، پاشان وێنەکە بکە بە وێنەی سەرەکی یان زیادیکە بۆ ئەم تاوتوێیە.', pickCat:'کەتەگۆریی گەلەری', pickLoad:'نیشاندانی وێنەکان', useCover:'سەرەکی', useImage:'زیادکردن', galleryCount:'{n} وێنە', noImage:'هێشتا وێنە نییە', preview:'پێشبینین' },
+      ar:  { fCoverUrl:'أو ألصق رابط صورة الغلاف', fGalleryUrl:'أضف رابط صورة واحدة', pick:'اختر صوراً حقيقية من الأعمال', pickNote:'اختر من المعرض الحي، ثم اجعل الصورة غلافاً أو أضفها إلى دراسة الحالة.', pickCat:'تصنيف المعرض', pickLoad:'عرض الصور', useCover:'غلاف', useImage:'إضافة', galleryCount:'{n} صور', noImage:'لا صورة بعد', preview:'معاينة' },
+      kmr: { fCoverUrl:'An girêdana wêneyê bergê lê zêde bike', fGalleryUrl:'Girêdana wêneyekê zêde bike', pick:'Wêneyên rastîn ji portfolioyê hilbijêre', pickNote:'Ji galerîya zindî hilbijêre, paşê wêneyê wek bergê bikar bîne an li vê lêkolînê zêde bike.', pickCat:'Kategorîya galerîyê', pickLoad:'Wêneyan nîşan bide', useCover:'Berg', useImage:'Zêde bike', galleryCount:'{n} wêne', noImage:'Hêj wêne tune', preview:'Pêşdîtin' },
+      fr:  { fCoverUrl:"Ou collez l'URL d'une image de couverture", fGalleryUrl:"Ajouter l'URL d'une image", pick:'Choisir de vraies images du portfolio', pickNote:"Choisissez depuis la galerie en ligne, puis utilisez l'image comme couverture ou ajoutez-la à cette étude.", pickCat:'Catégorie de galerie', pickLoad:'Afficher les images', useCover:'Couverture', useImage:'Ajouter', galleryCount:'{n} images', noImage:'Aucune image', preview:'Aperçu' }
+    };
+    Object.keys(PR_EXTRA).forEach(l => Object.assign(PR_I18N[l] || PR_I18N.en, PR_EXTRA[l]));
+    const PT = (k) => (PR_I18N[curLang()] || PR_I18N.en)[k] || PR_I18N.en[k] || k;
+    const prjApi = (payload) => studioCall('projects-admin', payload);
+    const projectAccent = (value) => /^#[0-9a-f]{6}$/i.test(String(value || '').trim()) ? String(value).trim() : '#bd4a2c';
+    const parsePalette = (txt) => String(txt || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => { const m = l.match(/(#[0-9a-fA-F]{3,8})\s*$/); const hex = m ? m[1] : ''; const name = (m ? l.slice(0, m.index) : l).replace(/[,:\s]+$/, '').trim(); return hex ? { name: name || hex, hex } : null; }).filter(Boolean);
+    const paletteToText = (arr) => (Array.isArray(arr) ? arr : []).map(s => (s.name ? s.name + ' ' : '') + (s.hex || '')).join('\n');
+    const projectGallery = (p) => (Array.isArray(p.gallery) ? p.gallery : []).map(x => typeof x === 'string' ? { url:x } : x).filter(x => x && x.url);
+    const projectThumb = (p) => p.cover || (projectGallery(p)[0] && projectGallery(p)[0].url) || '';
+    const galleryCountLabel = (n) => String(PT('galleryCount')).replace('{n}', n);
+    const pickThumb = (url, w) => (window.BQ_GALLERY && window.BQ_GALLERY.thumb && /^https?:\/\//.test(url)) ? window.BQ_GALLERY.thumb(url, w || 220) : url;
+    const buildProjectI18n = async (p, onProgress) => {
+      const langs = Object.keys(TR_LANGS), i18n = {}; const pick = (t, b) => (t && t.trim()) ? t : (b || '');
+      for (let k = 0; k < langs.length; k++) {
+        const tl = TR_LANGS[langs[k]];
+        const [title, client, role, tag, summary, body] = await Promise.all([trText(p.title, tl), trText(p.client, tl), trText(p.role, tl), trText(p.tag, tl), trText(p.summary, tl), trText(p.body, tl)]);
+        i18n[langs[k]] = { title: pick(title, p.title), client: pick(client, p.client), role: pick(role, p.role), tag: pick(tag, p.tag), summary: pick(summary, p.summary), body: pick(body, p.body) };
+        if (onProgress) onProgress(k + 1, langs.length);
+      }
+      return i18n;
+    };
+    const prjGate = () => {
+      view.innerHTML = `<div class="cms-gate"><h3>${esc(PT('gate'))}</h3><p class="dash-note mono">${esc(PT('note'))}</p>
+        <form id="prjTokForm" class="cms-tokform"><input id="prjTok" type="password" placeholder="${esc(PT('tokPh'))}" autocomplete="off"><button class="dash-btn dash-btn--go" type="submit">${esc(PT('conn'))}</button></form></div>`;
+      $('#prjTokForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#prjTok').value.trim(); if (!v) return; try { sessionStorage.setItem('bq_edit_token', v); } catch (x) {} renderCases(); });
+    };
+    const prjList = () => {
+      view.innerHTML = `<div class="cms-head"><span class="mono cms-status">${esc(PT('loading'))}</span><button class="dash-btn dash-btn--go" id="prjNew"><i class="fa-solid fa-plus"></i> ${esc(PT('newBtn'))}</button></div><div id="prjRows"></div>`;
+      $('#prjNew').addEventListener('click', () => prjForm({}));
+      prjApi({ action:'list' }).then((d) => {
+        if (d && (d.error === 'unauthorized' || d.error === 'missing_token')) { try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {} prjGate(); return; }
+        const rows = (d && d.projects) || [];
+        $('.cms-status').textContent = rows.length ? '' : PT('empty');
+        $('#prjRows').innerHTML = rows.map(p => {
+          const thumb = projectThumb(p);
+          const galN = projectGallery(p).length + (p.cover ? 1 : 0);
+          const accent = projectAccent(p.accent);
+          return `<div class="cms-row cms-row--project"><span class="cms-row-thumb" data-css="--accent:${accent}">${thumb ? `<img src="${esc(pickThumb(thumb, 180))}" alt="">` : `<i class="fa-solid fa-image"></i>`}</span>
+          <div class="cms-row-t"><strong>${esc(p.title)}</strong><span class="mono">${esc([p.client, p.year].filter(Boolean).join(' · '))}${p.published ? '' : ' · draft'}</span><span class="mono cms-row-meta"><span class="cms-row-dot" data-css="background:${accent}"></span>${galN ? esc(galleryCountLabel(galN)) : esc(PT('noImage'))}</span></div>
+          <div class="cms-row-act"><button class="dash-btn" data-edit="${esc(String(p.id ?? ''))}"><i class="fa-solid fa-pen"></i> ${esc(PT('edit'))}</button><button class="dash-btn dash-btn--danger" data-del="${esc(String(p.id ?? ''))}"><i class="fa-solid fa-trash"></i></button></div></div>`;
+        }).join('');
+        $('#prjRows').querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => prjForm(rows.find(x => String(x.id) === b.getAttribute('data-edit')) || {})));
+        $('#prjRows').querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm(PT('delAsk'))) return; prjApi({ action:'delete', id: Number(b.getAttribute('data-del')) }).then(() => { if (window.__bqReloadWork) window.__bqReloadWork(); prjList(); }); }));
+      }).catch(() => { $('.cms-status').textContent = PT('err'); });
+    };
+    const prjForm = (p) => {
+      let gal = projectGallery(p).slice();
+      const drawGal = () => { const g = $('#prjGalList'); if (!g) return; g.innerHTML = gal.map((x, i) => `<span class="cms-gal"><img src="${esc(x.url)}" alt=""><button type="button" data-rm="${i}" aria-label="remove">×</button></span>`).join(''); g.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => { gal.splice(Number(b.getAttribute('data-rm')), 1); drawGal(); })); };
+      const C = (window.BQ_GALLERY && window.BQ_GALLERY.COLLECTIONS) || {};
+      const pickOpts = Object.keys(C).filter(k => C[k].folder && C[k].ext !== 'mp4').map(k => `<option value="${esc(k)}">${esc(C[k].title || C[k].tag || k)}</option>`).join('');
+      view.innerHTML = `<form id="prjForm" class="cms-form">
+        <div class="cms-head"><button class="dash-btn" type="button" id="prjBack"><i class="fa-solid fa-arrow-left"></i> ${esc(PT('back'))}</button></div>
+        <div class="dash-grid-2">
+          <label class="dash-field"><span class="mono">${esc(PT('fTitle'))}</span><input id="pf_title" value="${esc(p.title || '')}"></label>
+          <label class="dash-field"><span class="mono">${esc(PT('fClient'))}</span><input id="pf_client" value="${esc(p.client || '')}"></label>
+          <label class="dash-field"><span class="mono">${esc(PT('fYear'))}</span><input id="pf_year" value="${esc(p.year || '')}"></label>
+          <label class="dash-field"><span class="mono">${esc(PT('fRole'))}</span><input id="pf_role" value="${esc(p.role || '')}"></label>
+          <label class="dash-field"><span class="mono">${esc(PT('fTag'))}</span><input id="pf_tag" value="${esc(p.tag || 'Brand Identity')}"></label>
+          <label class="dash-field"><span class="mono">${esc(PT('fAccent'))}</span><input id="pf_accent" type="color" value="${projectAccent(p.accent)}" class="cms-color"></label>
+        </div>
+        <label class="dash-field"><span class="mono">${esc(PT('fCover'))}</span><input id="pf_coverfile" type="file" accept="image/*" class="cms-file"><span class="dash-note mono" id="pf_upmsg"></span></label>
+        <label class="dash-field"><span class="mono">${esc(PT('fCoverUrl'))}</span><input id="pf_cover_url" type="url" value="${esc(p.cover || '')}" placeholder="https://…"></label>
+        <figure class="cms-cover-prev" id="pf_prev"${p.cover ? '' : ' hidden'}><img src="${esc(p.cover || '')}" alt=""></figure>
+        <input type="hidden" id="pf_cover" value="${esc(p.cover || '')}">
+        <label class="dash-field"><span class="mono">${esc(PT('fSummary'))}</span><textarea id="pf_summary" rows="3">${esc(p.summary || '')}</textarea></label>
+        <label class="dash-field"><span class="mono">${esc(PT('fBody'))}</span><textarea id="pf_body" rows="9">${esc(p.body || '')}</textarea></label>
+        <label class="dash-field"><span class="mono">${esc(PT('fPalette'))}</span><textarea id="pf_palette" rows="4" placeholder="Clay #BD4A2C">${esc(paletteToText(p.palette))}</textarea></label>
+        <label class="dash-field"><span class="mono">${esc(PT('fGallery'))}</span><input id="pf_galfile" type="file" accept="image/*" multiple class="cms-file"><span class="dash-note mono" id="pf_galmsg"></span></label>
+        <div class="dash-field"><span class="mono">${esc(PT('fGalleryUrl'))}</span><div class="cms-url-row"><input id="pf_galurl" type="url" placeholder="https://…"><button type="button" class="dash-btn" id="pf_addgal">${esc(PT('add'))}</button></div></div>
+        <div class="cms-gal-list" id="prjGalList"></div>
+        <div class="cms-pick">
+          <div class="cms-pick-head">
+            <div><strong>${esc(PT('pick'))}</strong><span class="mono">${esc(PT('pickNote'))}</span></div>
+            <div class="cms-pick-controls"><label class="dash-field"><span class="mono">${esc(PT('pickCat'))}</span><select id="prjPickColl">${pickOpts}</select></label><button type="button" class="dash-btn" id="prjPickLoad"><i class="fa-solid fa-images"></i> ${esc(PT('pickLoad'))}</button></div>
+          </div>
+          <div class="cms-pick-grid" id="prjPickGrid"></div>
+        </div>
+        <label class="cms-check"><input type="checkbox" id="pf_pub"${p.published ? ' checked' : ''}> <span>${esc(PT('fPub'))}</span></label>
+        <div class="cms-head"><button type="submit" class="dash-btn dash-btn--go" id="pf_save"><i class="fa-solid fa-paper-plane"></i> ${p.id ? esc(PT('update')) : esc(PT('save'))}</button><span class="dash-note mono" id="pf_msg"></span></div>
+      </form>`;
+      drawGal();
+      $('#prjBack').addEventListener('click', prjList);
+      const setCover = (url) => { $('#pf_cover').value = url || ''; $('#pf_cover_url').value = url || ''; const pr = $('#pf_prev'); pr.hidden = !url; if (url) pr.querySelector('img').src = url; };
+      $('#pf_cover_url').addEventListener('change', (ev) => setCover(ev.target.value.trim()));
+      const media = createStudioMediaGate($('#prjForm'), $('#pf_save'));
+      $('#pf_coverfile').addEventListener('change', (ev) => {
+        const file = ev.target.files && ev.target.files[0]; if (!file) return;
+        const message = $('#pf_upmsg'); message.textContent = PT('uploading');
+        media.upload({ file, input:ev.target, message, api:prjApi,
+          preview:url => { $('#pf_prev').hidden = false; $('#pf_prev img').src = url; }, ready:setCover
+        });
+      });
+      $('#pf_galfile').addEventListener('change', async (ev) => {
+        const input = ev.target, files = [...(input.files || [])];
+        const messages = $('#pf_galmsg'); messages.textContent = '';
+        for (const file of files) {
+          const message = document.createElement('span'); message.textContent = PT('uploading');
+          messages.appendChild(message);
+          // Keep temporary previews out of the payload; only confirmed URLs enter gal.
+          const previewImage = document.createElement('img'); previewImage.alt = '';
+          const previewCell = document.createElement('span'); previewCell.className = 'cms-gal'; previewCell.appendChild(previewImage);
+          await media.upload({ file, input, message, api:prjApi,
+            preview:url => { previewImage.src = url; messages.appendChild(previewCell); },
+            ready:url => { previewCell.remove(); gal.push({ url }); drawGal(); }
+          });
+        }
+        input.value = '';
+      });
+      $('#pf_addgal').addEventListener('click', () => { const inp = $('#pf_galurl'); const url = inp.value.trim(); if (!url) return; gal.push({ url }); inp.value = ''; drawGal(); });
+      const drawPick = async () => {
+        const grid = $('#prjPickGrid'), coll = $('#prjPickColl').value;
+        if (!grid || !window.BQ_GALLERY || !coll) return;
+        grid.innerHTML = `<p class="dash-note mono">${esc(PT('loading'))}</p>`;
+        try { await window.BQ_GALLERY.loadManifest(); } catch (e) {}
+        const items = window.BQ_GALLERY.items(coll).filter(it => it.type !== 'video').slice(0, 36);
+        grid.innerHTML = items.map((it) => `<figure class="cms-pick-card" data-url="${esc(it.url)}"><img src="${esc(pickThumb(it.url, 220))}" alt="" loading="lazy"><figcaption><span class="mono">${esc(it.title || '')}</span><button type="button" data-act="cover">${esc(PT('useCover'))}</button><button type="button" data-act="add">${esc(PT('useImage'))}</button></figcaption></figure>`).join('');
+      };
+      $('#prjPickLoad')?.addEventListener('click', drawPick);
+      $('#prjPickGrid')?.addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-act]'); if (!b) return;
+        const card = b.closest('.cms-pick-card'), url = card && card.dataset.url; if (!url) return;
+        if (b.dataset.act === 'cover') setCover(url); else { gal.push({ url }); drawGal(); }
+      });
+      $('#prjForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (media.busy()) return;
+        const msg = $('#pf_msg'); const title = $('#pf_title').value.trim();
+        if (!title) { msg.textContent = PT('needTitle'); return; }
+        const proj = { id: p.id || undefined, title, client: $('#pf_client').value.trim(), year: $('#pf_year').value.trim(), role: $('#pf_role').value.trim(), tag: $('#pf_tag').value.trim() || 'Brand Identity', accent: $('#pf_accent').value, cover: $('#pf_cover').value.trim(), summary: $('#pf_summary').value, body: $('#pf_body').value, palette: parsePalette($('#pf_palette').value), gallery: gal, published: $('#pf_pub').checked };
+        const btn = $('#pf_save'); btn.disabled = true;
+        let i18n = null;
+        try { i18n = await buildProjectI18n(proj, (d, n) => { msg.textContent = PT('translating') + ' ' + d + '/' + n; }); } catch (x) {}
+        msg.textContent = p.id ? PT('saving') : PT('saving');
+        prjApi({ action:'upsert', project: proj, i18n }).then((d) => {
+          btn.disabled = false;
+          if (d && (d.error === 'unauthorized' || d.error === 'missing_token')) { try { sessionStorage.removeItem('bq_edit_token'); } catch (x) {} prjGate(); return; }
+          if (!d || !d.ok) { msg.textContent = '✗ ' + ((d && d.error) || ''); return; }
+          msg.textContent = PT('saved');
+          if (window.__bqReloadWork) window.__bqReloadWork();
+          setTimeout(prjList, 700);
+        }).catch(() => { btn.disabled = false; msg.textContent = PT('err'); });
+      });
+    };
+    const renderCases = () => { if (!editToken()) { prjGate(); return; } prjList(); };
+
+    const VIEWS = { overview: renderOverview, visitors: renderVisitors, works: renderWorks, content: renderContent, cases: renderCases, latest: renderLatest, assistant: renderAssistant, admins: renderAdmins, leads: renderLeads, profile: renderProfile, settings: renderSettings };
+    const showConsole = () => {
+      if (logoutPending) { showLogoutPending(); return; }
+      gate.hidden = true; main.hidden = false;
+      dash.classList.add('is-full');           // console takes the full screen
+      syncHeaderProfile();
+      localizeChrome();
+      // Always land on Overview when the console opens — reset the sidebar highlight too
+      $$('.dash-tab').forEach(x => x.classList.toggle('is-active', x.dataset.dash === 'overview'));
+      setCur(DT('overview'), 'overview'); closeMenu();
+      renderOverview();
+    };
+    /* ---- Mobile menu: tap the bar to expand the nav, tap a section to collapse ---- */
+    const dashTabs = $('#dashTabs'), menuToggle = $('#dashMenuToggle'), mbarCur = $('#dashMbarCur');
+    const setCur = (label, key) => {
+      if (mbarCur && label) mbarCur.textContent = label;
+      if (key) dashPageKey = key;
+      paintPageHead();
+    };
+    const closeMenu = () => { dashTabs?.classList.remove('is-menu-open'); menuToggle?.setAttribute('aria-expanded', 'false'); };
+    menuToggle?.addEventListener('click', () => {
+      const open = dashTabs.classList.toggle('is-menu-open');
+      menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    // tap outside the open menu (e.g. on the content area) to collapse it
+    document.addEventListener('click', (e) => {
+      if (dashTabs?.classList.contains('is-menu-open') && !dashTabs.contains(e.target)) closeMenu();
+    });
+    /* open a non-tab view (AI, admins) from a sidebar tool — clear the nav highlight */
+    const openTool = (fn, label, key) => { $$('.dash-tab').forEach(x => x.classList.remove('is-active')); if (label) setCur(label, key); closeMenu(); (fn || renderOverview)(); };
+
+    // dark / light toggle
+    $('#dashTheme')?.addEventListener('click', () => {
+      const next = (document.documentElement.dataset.theme === 'dark') ? 'light' : 'dark';
+      if (typeof window.__bqApplyTheme === 'function') window.__bqApplyTheme(next);
+      else {
+        document.documentElement.dataset.theme = next;
+        document.documentElement.style.colorScheme = next;
+        try { localStorage.setItem('bq_theme3', next); } catch (e) {}
+      }
+    });
+    // AI + Add-admin sidebar tools
+    $('#dashAi')?.addEventListener('click', () => openTool(renderAssistant, DT('tAi'), 'ai'));
+    $('#dashAddAdmin')?.addEventListener('click', () => openTool(renderAdmins, DT('tAddAdmin'), 'admins'));
+    // Hide private content and erase tab credentials before contacting the
+    // server. A failed request stays locked and offers an explicit retry.
+    const finishDashboardLogout = async () => {
+      if (logoutBusy) return;
+      logoutPending = true;
+      logoutBusy = true;
+      try { sessionStorage.setItem(LOGOUT_PENDING_KEY, '1'); } catch (e) {}
+      ++gateEpoch;
+      gateRequest?.abort();
+      gateRequest = null;
+      setGateBusy(false);
+      clearTwoFA();
+      clearDashboardCredentials();
+      const key = $('#dashKey'); if (key) key.value = '';
+      view.innerHTML = '';
+      closeMenu();
+      showLogoutPending();
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 12_000);
+      let confirmed = false;
+      try {
+        const response = await fetch('/api/2fa', {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json', Accept:'application/json' },
+          credentials: 'same-origin', cache:'no-store', signal:controller.signal,
+          body: JSON.stringify({ action:'logout' })
+        });
+        const data = await response.json();
+        confirmed = response.ok && data?.ok === true;
+      } catch (e) {} // Offline, timeout and unreadable responses all require retry.
+      finally { clearTimeout(timer); logoutBusy = false; }
+      if (!confirmed) { showLogoutPending(); return; }
+      logoutPending = false;
+      try { sessionStorage.removeItem(LOGOUT_PENDING_KEY); } catch (e) {}
+      const retry = $('#dashLogoutRetry'); if (retry) retry.hidden = true;
+      closeDash();
+    };
+    $('#dashLogout')?.addEventListener('click', () => {
+      if (!confirm(DT('logoutAsk'))) return;
+      return finishDashboardLogout();
+    });
+    // Language picker (popover above the button)
+    const langPop = $('#dashLangPop');
+    $('#dashLang')?.addEventListener('click', (e) => { e.stopPropagation(); if (langPop) langPop.hidden = !langPop.hidden; });
+    langPop?.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => {
+      if (window.applyLang) window.applyLang(b.dataset.lang);
+      if (langPop) langPop.hidden = true;
+      localizeChrome();
+      const active = $('.dash-tab.is-active');
+      ((active && VIEWS[active.dataset.dash]) || renderOverview)();
+    }));
+    document.addEventListener('click', () => { if (langPop && !langPop.hidden) langPop.hidden = true; });
+    // Gate close — the login screen no longer has a top bar
+    $('#dashGateClose')?.addEventListener('click', closeDash);
+
+    $$('.dash-tab').forEach(t => t.addEventListener('click', () => {
+      $$('.dash-tab').forEach(x => x.classList.remove('is-active'));
+      t.classList.add('is-active');
+      setCur(DT(t.dataset.dash), t.dataset.dash);
+      closeMenu();
+      (VIEWS[t.dataset.dash] || renderOverview)();
+    }));
+  })();
+
+  /* =======================================================
+     8 · BLOG — data, pagination, rich hover preview, reader
+     ======================================================= */
+  (function blog() {
+    const layout = $('#blogIndex');
+    const list   = $('#blogList');
+    const reader = $('#reader');
+    if (!layout || !list) return;
+    const IMG = (p) => CDN ? `${CDN}/${p}` : '';
+    const AUTHOR = 'Barakat Qurtas';
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+    const hl = window.__bqHighlightTitle || ((s) => esc(s));
+    const safeAccent = (value) => /^#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(String(value || '').trim())
+      ? String(value).trim()
+      : '';
+
+    /* A post without a cover must not leave src="" / src="undefined" behind:
+       an empty src re-requests the page itself and "undefined" 404s, and both
+       paint a broken-image frame. Drop the attribute and hide the element. */
+    const setCover = (img, src) => {
+      if (!img) return;
+      if (src) { img.src = src; img.hidden = false; }
+      else { img.removeAttribute('src'); img.hidden = true; }
+    };
+
+    /* every note. Add more here and pagination grows automatically. */
+    const P = (num, tag, date, read, accent, img, title, sub, body) =>
+      ({ num, tag, date, read, accent, img: IMG(img), title, sub, body });
+    let POSTS = [
+    ];
+
+    const PAGE_SIZE = 8;
+    const slugify = (s) => String(s || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 60) || 'note';
+    POSTS.forEach((p) => { if (!p.slug) p.slug = String(p.num || slugify(p.title)); });   // built-ins: numeric link
+    let pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
+    let page = 1;
+
+    /* ----- rich preview ----- */
+    const els = {
+      ghost: $('#blogGhost'), card: $('#blogCard'),
+      img: $('#bcImg'), tag: $('#bcTag'), title: $('#bcTitle'),
+      sub: $('#bcSub'), meta: $('#bcMeta'), read: $('#bcRead'),
+    };
+    let curPost = null;
+    let previewTimer = 0;
+    let feedState = 'loading';
+    let feedRequest = 0;
+    const feedStatus = document.createElement('p');
+    feedStatus.className = 'blog-feed-status';
+    feedStatus.setAttribute('role', 'status');
+    feedStatus.setAttribute('aria-live', 'polite');
+    feedStatus.setAttribute('aria-atomic', 'true');
+    list.appendChild(feedStatus);
+    /* translate a post into the active language (falls back to English) */
+    const blogLang = () => (document.documentElement.dataset.lang || 'en');
+    const L = (p) => {
+      const cm = p._i18n && p._i18n[blogLang()];
+      const has = (v) => v && String(v).trim();
+      const toParas = (s) => String(s).split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean);
+      // Use the translation only for the fields it actually filled — a blank/
+      // whitespace value (e.g. a failed body translation) falls back to the
+      // original so the reader never shows an empty article.
+      if (cm && (has(cm.title) || has(cm.body))) {
+        return { num: p.num, accent: p.accent, img: p.img, read: p.read, tag: p.tag, date: p.date,
+                 title: has(cm.title) ? cm.title : p.title, sub: has(cm.subtitle) ? cm.subtitle : p.sub,
+                 body: has(cm.body) ? toParas(cm.body) : p.body };
+      }
+      const t = window.BLOG_I18N && window.BLOG_I18N[blogLang()] && window.BLOG_I18N[blogLang()][p.num];
+      if (!t) return p;
+      return { num: p.num, accent: p.accent, img: p.img, read: p.read,
+               tag: t.tag || p.tag, title: t.title || p.title, sub: t.sub || p.sub,
+               date: t.date || p.date, body: t.body || p.body };
+    };
+    const dT = (k, fb) => (window.BQ_DICT && window.BQ_DICT[k]) || fb;
+    const feedCopy = {
+      en: { loading: ['Loading the journal…', 'The latest notes are on their way.'], empty: ['No notes published yet.', 'New notes will appear here when they are published.'], error: ['The journal could not be loaded.', 'Please try again later.'] },
+      ku: { loading: ['ژوورناڵەکە بار دەکرێت…', 'نوێترین تێبینییەکان لە ڕێگادان.'], empty: ['هێشتا هیچ تێبینییەک بڵاو نەکراوەتەوە.', 'تێبینییە نوێکان دوای بڵاوکردنەوە لێرە دەردەکەون.'], error: ['نەتوانرا ژوورناڵەکە بار بکرێت.', 'تکایە دواتر دووبارە هەوڵ بدەوە.'] },
+      kmr: { loading: ['Rojname tê barkirin…', 'Nîşeyên herî nû di rê de ne.'], empty: ['Hêj nîşe nehatine weşandin.', 'Nîşeyên nû piştî weşandinê li vir xuya dibin.'], error: ['Rojname nehat barkirin.', 'Ji kerema xwe paşê dîsa biceribîne.'] },
+      ar: { loading: ['جارٍ تحميل المجلة…', 'أحدث الملاحظات في طريقها إليك.'], empty: ['لم تُنشر ملاحظات بعد.', 'ستظهر الملاحظات الجديدة هنا عند نشرها.'], error: ['تعذّر تحميل المجلة.', 'يرجى المحاولة لاحقاً.'] },
+      fr: { loading: ['Chargement du journal…', 'Les dernières notes arrivent.'], empty: ['Aucune note publiée pour le moment.', 'Les nouvelles notes apparaîtront ici après leur publication.'], error: ['Le journal n’a pas pu être chargé.', 'Veuillez réessayer plus tard.'] },
+      tr: { loading: ['Günlük yükleniyor…', 'En yeni notlar yolda.'], empty: ['Henüz yayımlanmış not yok.', 'Yeni notlar yayımlandığında burada görünecek.'], error: ['Günlük yüklenemedi.', 'Lütfen daha sonra tekrar deneyin.'] },
+      sv: { loading: ['Journalen laddas…', 'De senaste anteckningarna är på väg.'], empty: ['Inga anteckningar har publicerats ännu.', 'Nya anteckningar visas här när de publiceras.'], error: ['Journalen kunde inte laddas.', 'Försök igen senare.'] }
+    };
+    const renderFeedState = (state) => {
+      const ready = state === 'ready';
+      layout.dataset.blogState = state;
+      layout.setAttribute('aria-busy', String(feedState === 'loading'));
+      feedStatus.hidden = ready;
+      if (els.ghost) els.ghost.hidden = !ready;
+      if (ready) return;
+      clearTimeout(previewTimer);
+      curPost = null;
+      const [title, detail] = (feedCopy[blogLang()] || feedCopy.en)[state];
+      feedStatus.textContent = `${title} ${detail}`;
+      if (els.card) {
+        els.card.classList.remove('swapping');
+        els.card.style.background = '';
+        els.card.style.cursor = 'default';
+        els.card.removeAttribute('role');
+        els.card.removeAttribute('tabindex');
+        els.card.removeAttribute('aria-labelledby');
+      }
+      setCover(els.img, '');
+      if (els.title) els.title.textContent = title;
+      if (els.sub) els.sub.textContent = detail;
+      [els.tag, els.meta, els.read].forEach(el => { if (el) el.textContent = ''; });
+      els.card?.querySelectorAll('.blog-card-foot, .blog-card-cta').forEach(el => { el.hidden = true; });
+    };
+    const preview = (p) => {
+      if (!p || !els.card) return;
+      clearTimeout(previewTimer);
+      const q = L(p);
+      els.card.classList.add('swapping');
+      if (els.ghost) els.ghost.textContent = p.num;
+      els.card.style.background = safeAccent(p.accent);
+      previewTimer = setTimeout(() => {
+        curPost = p;
+        if (els.img)  setCover(els.img, q.img);
+        if (els.tag)  els.tag.textContent = q.tag;
+        if (els.title) els.title.innerHTML = hl(q.title);
+        if (els.sub)  els.sub.textContent = q.sub;
+        if (els.meta) els.meta.textContent = `${q.tag.toUpperCase()} · ${q.date.toUpperCase()}`;
+        if (els.read) els.read.textContent = dT('blog.min', '{n} MIN').replace('{n}', p.read);
+        els.card.style.cursor = 'pointer';
+        els.card.setAttribute('role', 'button');
+        els.card.setAttribute('tabindex', '0');
+        els.card.setAttribute('aria-labelledby', 'bcTitle');
+        els.card.querySelectorAll('.blog-card-foot, .blog-card-cta').forEach(el => { el.hidden = false; });
+        els.card.classList.remove('swapping');
+      }, 160);
+    };
+
+    /* the rich preview card is itself a shortcut into the post it's showing —
+       its "Click to read the full note" now actually opens that post. */
+    if (els.card) {
+      els.card.addEventListener('click', () => { if (curPost) openReader(curPost); });
+      els.card.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && curPost) { e.preventDefault(); openReader(curPost); } });
+    }
+
+    /* ----- render the current page of rows ----- */
+    let curCat = 'all';
+    const catNorm = (s) => String(s || '').trim().toLowerCase();
+    const viewPosts = () => curCat === 'all' ? POSTS : POSTS.filter(p => catNorm(L(p).tag) === curCat);
+    const renderFilters = () => {
+      const anchor = layout || list;
+      if (!anchor || !anchor.parentNode) return;
+      let bar = anchor.parentNode.querySelector('.blog-filters');
+      if (!bar) { bar = document.createElement('div'); bar.className = 'blog-filters'; anchor.parentNode.insertBefore(bar, anchor); }
+      bar.hidden = POSTS.length === 0;
+      const cats = []; const seen = {};
+      POSTS.forEach(p => { const c = (L(p).tag || '').trim(); const k = catNorm(c); if (c && !seen[k]) { seen[k] = 1; cats.push(c); } });
+      const allLabel = (window.BQ_DICT && window.BQ_DICT['blog.all']) || 'All';
+      const chip = (label, val, active) => `<button class="blog-filter${active ? ' is-active' : ''}" data-cat="${esc(catNorm(val))}">${esc(label)}</button>`;
+      bar.innerHTML = chip(allLabel, 'all', curCat === 'all') + cats.map(c => chip(c, c, catNorm(c) === curCat)).join('');
+      bar.querySelectorAll('.blog-filter').forEach(b => b.addEventListener('click', () => {
+        curCat = b.getAttribute('data-cat'); page = 1; renderPage();
+      }));
+    };
+    const renderPage = () => {
+      renderFilters();
+      list.querySelectorAll('.index-row, .index-inline').forEach(r => r.remove());
+      const FP = viewPosts();
+      pageCount = Math.max(1, Math.ceil(FP.length / PAGE_SIZE));
+      if (page > pageCount) page = 1;
+      const start = (page - 1) * PAGE_SIZE;
+      const slice = FP.slice(start, start + PAGE_SIZE);
+      renderFeedState(slice.length ? 'ready' : feedState === 'ready' ? 'empty' : feedState);
+      slice.forEach((p, i) => {
+        const q = L(p);
+        const a = document.createElement('a');
+        // a REAL link to the post's own page — crawlable for Google/AI and lets
+        // right-click / open-in-new-tab work; the click handler still does the
+        // smooth in-app open (preventDefault).
+        a.href = blogBase() + '/' + (p.slug || slugify(p.title));
+        a.className = 'index-row' + (i === 0 ? ' is-active' : '');
+        a.innerHTML =
+          `<span class="mono index-row-num">${esc(p.num)} / ${esc(String(FP.length).padStart(2,'0'))}</span>
+           <span class="index-row-title">${esc(q.title)}</span>
+           <span class="mono index-row-tag">${esc(q.tag)}</span>`;
+        a.addEventListener('mouseenter', () => { setActive(a); preview(p); });
+        a.addEventListener('focus', () => { setActive(a); preview(p); });
+        a.addEventListener('click', (e) => {
+          if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+          e.preventDefault();
+          // An article link opens the reader on every screen. Inserting a tall
+          // touch-only preview here pushed content beyond the pinned paper,
+          // where the following newsletter sheet could cover the title/CTA.
+          // The desktop's separate hover preview keeps its existing behaviour.
+          openReader(p);
+        });
+        list.appendChild(a);
+      });
+      if (slice[0]) preview(slice[0]);
+      const pager = $('#blogPager');
+      if (pager) pager.hidden = FP.length === 0;
+      renderPager();
+    };
+    const setActive = (row) => { list.querySelectorAll('.index-row').forEach(r => r.classList.remove('is-active')); row.classList.add('is-active'); };
+
+    /* ----- pager ----- */
+    const pagesWrap = $('#blogPages');
+    const goTo = (n) => { page = Math.min(Math.max(1, n), pageCount); renderPage(); scrollTarget(layout, { behavior: 'smooth', block: 'start' }); };
+    const renderPager = () => {
+      if (!pagesWrap) return;
+      pagesWrap.innerHTML = '';
+      for (let n = 1; n <= pageCount; n++) {
+        const b = document.createElement('button');
+        b.className = 'blog-page' + (n === page ? ' is-active' : '');
+        b.textContent = String(n).padStart(2, '0');
+        b.addEventListener('click', () => goTo(n));
+        pagesWrap.appendChild(b);
+      }
+      const prev = $('#blogPrev'), next = $('#blogNext');
+      if (prev) prev.disabled = page === 1;
+      if (next) next.disabled = page === pageCount;
+    };
+    $('#blogPrev')?.addEventListener('click', () => goTo(page - 1));
+    $('#blogNext')?.addEventListener('click', () => goTo(page + 1));
+    $('#blogGoForm')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const n = parseInt($('#blogGoInput').value, 10);
+      if (n >= 1 && n <= pageCount) { goTo(n); $('#blogGoInput').value = ''; }
+      else { const i = $('#blogGoInput'); i.value = ''; i.placeholder = `1–${pageCount}`; }
+    });
+
+    /* ----- reader (image, author, date, body, like, comments) ----- */
+    const rd = {
+      img: $('#rdImg'), tag: $('#rdTag'), title: $('#rdTitle'), date: $('#rdDate'),
+      read: $('#rdRead'), text: $('#rdText'), like: $('#rdLike'), likeCount: $('#rdLikeCount'),
+      commentCount: $('#rdCommentCount'), comments: $('#rdComments'),
+      cForm: $('#rdCommentForm'), cName: $('#rdCommentName'), cText: $('#rdCommentText'),
+      highlight: $('#rdHighlight'), prev: $('#rdPrev'), next: $('#rdNext'),
+      scroll: $('#rdScroll'), top: $('#rdTop'), moreGrid: $('#rdMoreGrid'),
+    };
+    let curNum = null;
+    let curPostObj = null;
+    const lkKey = (n) => `bq_blog_like_${n}`;
+    const cmKey = (n) => `bq_blog_cmts_${n}`;
+    const baseLikes = (n) => 11 + (parseInt(n, 10) * 7) % 30;
+    const getComments = (n) => { try { return JSON.parse(localStorage.getItem(cmKey(n)) || '[]'); } catch (e) { return []; } };
+    /* Shared engagement stays on this origin; browser-only demo notes are never published. */
+    const engagementRequest = async (payload) => {
+      const response = await fetch('/api/engagement', {
+        method:'POST', credentials:'same-origin', headers:{ 'Content-Type':'application/json' },
+        body:JSON.stringify(payload), signal:AbortSignal.timeout(15_000)
+      });
+      if (!response.ok) throw new Error('engagement-unavailable');
+      return response;
+    };
+    const profile = () => { try { return JSON.parse(localStorage.getItem('bq_blog_profile') || '{}'); } catch (e) { return {}; } };
+    const saveProfile = (pp) => { try { localStorage.setItem('bq_blog_profile', JSON.stringify(pp)); } catch (e) {} };
+    const myToken = () => { const pp = profile(); if (!pp.token) { pp.token = 'bq' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36); saveProfile(pp); } return pp.token; };
+    let curLikes = 0, curLiked = false;
+    const renderLike = () => {
+      if (rd.likeCount) rd.likeCount.textContent = curLikes;
+      rd.like.classList.toggle('is-liked', curLiked);
+      rd.like.setAttribute('aria-pressed', curLiked ? 'true' : 'false');
+    };
+    const renderCommentList = (l) => {
+      const cTpl = (window.BQ_DICT && window.BQ_DICT['blog.comments']) || '{n} comments';
+      rd.commentCount.textContent = cTpl.replace('{n}', l.length);
+      const empty = (window.BQ_DICT && window.BQ_DICT['blog.noComments']) || 'No comments yet — be the first to write one.';
+      rd.comments.innerHTML = l.length ? l.map(c =>
+        `<div class="reader-comment"><div class="reader-comment-head"><strong>${esc(c.name)}</strong><span class="mono">${new Date(c.at).toLocaleDateString()}</span></div><p>${esc(c.text)}</p></div>`).join('')
+        : `<p class="reader-comment-empty">${esc(empty)}</p>`;
+    };
+    const loadEngagement = (p) => {
+      if (p && p.id != null) {
+        curLikes = 0; curLiked = false; renderLike(); renderCommentList([]);
+        fetch('/api/engagement?post_id=' + encodeURIComponent(p.id) + '&token=' + encodeURIComponent(myToken()), { credentials:'same-origin', cache:'no-store', signal:AbortSignal.timeout(15_000) })
+          .then((r) => { if (!r.ok) throw new Error('engagement-unavailable'); return r.json(); })
+          .then((data) => {
+            if (curPostObj !== p) return;
+            if (!data || !Number.isSafeInteger(data.likes) || data.likes < 0 || !Array.isArray(data.comments)) throw new Error('engagement-invalid');
+            curLikes = data.likes; curLiked = data.liked === true; renderLike();
+            renderCommentList(data.comments.map((c) => ({ name:c.name, text:c.body, at:c.created_at })));
+          }).catch(() => {});
+      } else {
+        const liked = localStorage.getItem(lkKey(p.num)) === '1';
+        curLiked = liked; curLikes = baseLikes(p.num) + (liked ? 1 : 0); renderLike();
+        renderCommentList(getComments(p.num).slice().reverse());
+      }
+    };
+    const blogBase = () => { const lang = document.documentElement.dataset.lang || 'en'; return (lang && lang !== 'en' ? '/' + lang : '') + '/blog'; };
+    let curSlug = null, pendingSlug = null;
+    const findPostBySlug = (slug) => { const id = parseInt(slug, 10); return POSTS.find((p) => p.slug === slug || (p.id != null && p.id === id) || String(p.num) === slug) || null; };
+    const openReader = (p, fromPop) => {
+      pendingSlug = null;
+      const hydratingArticle = reader.dataset.serverPost === String(p.id || p.slug);
+      delete reader.dataset.serverPost;
+      curNum = p.num;
+      curPostObj = p;
+      curSlug = p.slug || slugify(p.title);
+      const q = L(p);
+      if (rd.img) { setCover(rd.img, q.img); rd.img.alt = String(q.title || ''); }
+      if (rd.tag) rd.tag.textContent = q.tag;
+      if (rd.title) rd.title.textContent = q.title;
+      if (rd.date) rd.date.textContent = (q.date || '').toUpperCase();
+      if (rd.read) rd.read.textContent = dT('blog.minRead', '{n} MIN READ').replace('{n}', p.read);
+      if (rd.highlight) rd.highlight.textContent = q.sub || p.sub || '';
+      if (rd.text) rd.text.innerHTML = (Array.isArray(q.body) ? q.body : [q.body]).map(x => `<p>${esc(x)}</p>`).join('');
+      if (rd.cName && !rd.cName.value) { const pn = profile().name; if (pn) rd.cName.value = pn; }   // prefill from the saved profile
+      loadEngagement(p);
+      renderMore(p);
+      reader.classList.add('is-open'); reader.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      if (rd.scroll && !hydratingArticle) rd.scroll.scrollTop = 0;
+      if (rd.top) rd.top.classList.remove('is-shown');
+      try { document.title = String(q.title || '').replace(/<[^>]+>/g, '') + ' — Barakat Qurtas'; } catch (e) {}
+      if (!fromPop) { try { history.pushState({ bqPost: curSlug }, '', blogBase() + '/' + curSlug); } catch (e) {} }
+    };
+    /* "More from the journal" grid + prev/next post navigation */
+    let curPrev = null, curNext = null;
+    const renderMore = (p) => {
+      const idx = POSTS.indexOf(p);
+      curPrev = idx > 0 ? POSTS[idx - 1] : null;
+      curNext = (idx > -1 && idx < POSTS.length - 1) ? POSTS[idx + 1] : null;
+      if (rd.prev) rd.prev.disabled = !curPrev;
+      if (rd.next) rd.next.disabled = !curNext;
+      const rel = [];
+      for (let i = 1; rel.length < 4 && i < POSTS.length; i++) { const q = POSTS[(Math.max(0, idx) + i) % POSTS.length]; if (q !== p && rel.indexOf(q) < 0) rel.push(q); }
+      if (rd.moreGrid) {
+        rd.moreGrid.innerHTML = rel.map(q => { const lq = L(q); return `<button class="reader-more-card" data-slug="${esc(q.slug || q.num)}"><span class="rm-img"><img src="${esc(lq.img)}" alt="" loading="lazy"></span><span class="rm-t"><span class="rm-tag">${esc(lq.tag || '')}</span><span class="rm-title">${esc(String(lq.title || '').replace(/<[^>]+>/g, ''))}</span></span></button>`; }).join('');
+        rd.moreGrid.querySelectorAll('.reader-more-card').forEach(b => b.addEventListener('click', () => { const q = findPostBySlug(b.getAttribute('data-slug')); if (q) { if (rd.scroll) rd.scroll.scrollTop = 0; openReader(q); } }));
+      }
+    };
+    const closeReaderDom = () => {
+      pendingSlug = null;
+      delete reader.dataset.serverPost;
+      reader.classList.remove('is-open'); reader.setAttribute('aria-hidden', 'true'); document.body.style.overflow = '';
+    };
+    const closeReader = () => {   // the × exits straight to the blog list
+      closeReaderDom();
+      if (/\/blog\/[^/]+/.test(location.pathname)) { try { history.replaceState(null, '', blogBase()); } catch (e) {} }
+    };
+    $('#readerClose')?.addEventListener('click', closeReader);
+    $('#readerBack')?.addEventListener('click', (e) => { e.preventDefault(); if (history.state && history.state.bqPost && history.length > 1) history.back(); else closeReader(); });
+    reader?.addEventListener('click', (e) => { if (e.target === reader) closeReader(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && reader.classList.contains('is-open')) closeReader(); });
+    rd.prev?.addEventListener('click', () => { if (curPrev) { if (rd.scroll) rd.scroll.scrollTop = 0; openReader(curPrev); } });
+    rd.next?.addEventListener('click', () => { if (curNext) { if (rd.scroll) rd.scroll.scrollTop = 0; openReader(curNext); } });
+    (function readerGoUp() {
+      if (!rd.top || !rd.scroll) return;
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let frame = 0;
+      const update = () => {
+        frame = 0;
+        const position = Math.max(0, rd.scroll.scrollTop || 0);
+        const shown = rd.top.classList.contains('is-shown') ? position > 40 : position > 160;
+        rd.top.classList.toggle('is-shown', shown);
+        rd.top.setAttribute('aria-hidden', String(!shown));
+        rd.top.tabIndex = shown ? 0 : -1;
+      };
+      const queue = () => { if (!frame) frame = requestAnimationFrame(update); };
+      rd.top.addEventListener('click', () => {
+        rd.scroll.scrollTo({ top:0, behavior:reduced.matches ? 'auto' : 'smooth' });
+        queue();
+      });
+      rd.scroll.addEventListener('scroll', queue, { passive:true });
+      rd.scroll.addEventListener('touchmove', queue, { passive:true });
+      window.addEventListener('pageshow', queue);
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) queue(); });
+      update();
+    })();
+    rd.like?.addEventListener('click', () => {
+      const p = curPostObj; if (!p) return;
+      if (p.id != null) {
+        const wasLiked = curLiked, previousCount = curLikes;
+        rd.like.disabled = true;
+        curLiked = !wasLiked; curLikes = Math.max(0, previousCount + (wasLiked ? -1 : 1)); renderLike();
+        engagementRequest({ action:wasLiked ? 'unlike' : 'like', post_id:p.id, token:myToken() })
+          .catch(() => { if (curPostObj === p) { curLiked = wasLiked; curLikes = previousCount; renderLike(); } })
+          .finally(() => { rd.like.disabled = false; });
+      } else {
+        const liked = localStorage.getItem(lkKey(p.num)) === '1';
+        if (liked) localStorage.removeItem(lkKey(p.num)); else localStorage.setItem(lkKey(p.num), '1');
+        curLiked = !liked; curLikes = baseLikes(p.num) + (curLiked ? 1 : 0); renderLike();
+      }
+    });
+    rd.cForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const p = curPostObj; if (!p) return;
+      const name = (rd.cName.value || '').trim() || dT('blog.anon', 'Anonymous');
+      const text = (rd.cText.value || '').trim();
+      if (!text) { rd.cText.focus(); return; }
+      const pp = profile(); pp.name = name; saveProfile(pp);   // remember the visitor for next time (lightweight profile)
+      if (p.id != null) {
+        const btn = rd.cForm.querySelector('button[type="submit"], button:not([type])'); if (btn) btn.disabled = true;
+        let status = rd.cForm.querySelector('[data-comment-status]');
+        if (status) status.textContent = '';
+        engagementRequest({ action:'comment', post_id:p.id, name, body:text })
+          .then(() => { if (curPostObj === p) { rd.cText.value = ''; loadEngagement(p); } })
+          .catch(() => {
+            if (curPostObj !== p) return;
+            if (!status) {
+              status = document.createElement('p'); status.dataset.commentStatus = '';
+              status.setAttribute('role', 'status'); rd.cForm.appendChild(status);
+            }
+            status.textContent = dT('blog.commentFailed', 'Could not publish your comment. Your text is still here; please try again.');
+          }).finally(() => { if (btn) btn.disabled = false; });
+      } else {
+        const l = getComments(p.num); l.push({ name, text, at: Date.now() });
+        try { localStorage.setItem(cmKey(p.num), JSON.stringify(l)); } catch (x) {}
+        rd.cText.value = ''; renderCommentList(getComments(p.num).slice().reverse());
+      }
+    });
+    /* share — open the native share sheet or copy the link; the shared link
+       carries the post's own cover (rewritten by the Pages Function). */
+    $('#rdShare')?.addEventListener('click', async () => {
+      const url = location.origin + blogBase() + '/' + (curSlug || '');
+      const title = String((curPostObj && L(curPostObj).title) || 'Barakat Qurtas').replace(/<[^>]+>/g, '');
+      if (navigator.share) { try { await navigator.share({ title, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+      try { await navigator.clipboard.writeText(url); const b = $('#rdShare'); if (b) { b.classList.add('is-copied'); setTimeout(() => b.classList.remove('is-copied'), 1600); } } catch (e) {}
+    });
+    /* deep-link + back/forward: keep the reader in sync with /blog/<slug> */
+    window.__bqOpenPostSlug = (slug) => { if (!slug) return; const p = findPostBySlug(slug); if (p) openReader(p, true); else pendingSlug = slug; };
+    window.__bqCloseReader = () => { pendingSlug = null; if (reader.classList.contains('is-open')) closeReaderDom(); };
+    window.addEventListener('popstate', () => {
+      const m = location.pathname.match(/\/blog\/([^\/?#]+)/);
+      if (m) { const slug = decodeURIComponent(m[1]); if (!(curSlug === slug && reader.classList.contains('is-open'))) window.__bqOpenPostSlug(slug); }
+      else window.__bqCloseReader();
+    });
+    /* opened straight at /blog/<slug> (deep link / refresh) — built-ins open now, DB posts after they load */
+    (function () { const m = location.pathname.match(/\/blog\/([^\/?#]+)/); if (m) { const slug = decodeURIComponent(m[1]); const p = findPostBySlug(slug); if (p) openReader(p, true); else pendingSlug = slug; } })();
+
+    renderPage();
+        /* Studio-managed posts from Cloudflare D1.
+       Rebuilt from the built-ins on each call (idempotent), so publishing from
+       the dashboard can refresh the live blog instantly via window.__bqReloadBlog.
+       The publishable key is public/safe; row-level security keeps the table
+       read-only for visitors, while writes go through the secure Edge Function. */
+    /* homepage "Latest from the blog" — auto-fills with the newest posts (DB first), updates on publish */
+    const renderLatest = () => {
+      const grid = document.querySelector('.latest-blog-grid');
+      if (!grid) return;
+      const latest = POSTS.slice(0, 3);
+      if (!latest.length) return;
+      grid.innerHTML = latest.map((p) => {
+        const q = L(p);
+        const title = String(q.title || '').replace(/<[^>]+>/g, '');
+        // a REAL link to the post's own page — crawlable for Google/AI, opens in a
+        // new tab on middle/ctrl-click, while a normal click still does the smooth
+        // in-app reader (preventDefault below).
+        const href = blogBase() + '/' + (p.slug || slugify(q.title || p.title || ''));
+        return `<a class="blog-card" href="${esc(href)}" data-slug="${esc(p.slug || p.num)}">
+          <span class="blog-card-plate" aria-hidden="true"></span>
+          <span class="mono blog-meta"><i class="fa-solid fa-calendar"></i> ${esc(q.date || '')} · <i class="fa-solid fa-clock"></i> ${esc(String(p.read || 4))} min</span>
+          <h3>${esc(title)}</h3>
+          <p>${esc(q.sub || '')}</p>
+          <span class="blog-more"><span>${dT('blog.more', 'Read the essay')}</span> <i class="fa-solid fa-arrow-right"></i></span>
+        </a>`;
+      }).join('');
+      grid.querySelectorAll('.blog-card').forEach((c) => {
+        c.addEventListener('click', (e) => {
+          if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+          e.preventDefault(); const p = findPostBySlug(c.getAttribute('data-slug')); if (p) openReader(p);
+        });
+      });
+    };
+
+    const BUILTIN_POSTS = POSTS.slice();
+    const loadCmsPosts = () => {
+      const request = ++feedRequest;
+      feedState = 'loading';
+      layout.setAttribute('aria-busy', 'true');
+      if (!POSTS.length) renderFeedState('loading');
+      return fetch('/api/journal', { credentials:'same-origin', cache:'no-store', signal:AbortSignal.timeout(15_000) })
+        .then((r) => {
+          if (!r.ok) throw new Error('journal-http-error');
+          return r.json();
+        }).then((rows) => {
+          if (request !== feedRequest) return;
+          if (!Array.isArray(rows)) throw new Error('journal-invalid-feed');
+          const cms = rows.map((p) => ({
+            num: String(p.num || p.id || ''),
+            id: p.id,
+            slug: String(p.id),
+            tag: p.tag || 'Note',
+            date: p.date || (p.created_at ? new Date(p.created_at).toLocaleDateString('en', { month: 'short', year: 'numeric' }) : ''),
+            read: p.read_minutes || 4,
+            accent: p.accent || '#1a2740',
+            img: p.cover || '',
+            title: p.title || '',
+            sub: p.subtitle || '',
+            body: String(p.body || '').split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean),
+            _i18n: p.i18n || null
+          }));
+          POSTS = cms;   // DB is the ONLY source — when it's empty the blog is empty (no demo posts), until the owner writes their own
+          feedState = 'ready';
+          try { window.__bqBlogCount = POSTS.length; } catch (e) {}   // live blog count for the dashboard overview
+          pageCount = Math.ceil(POSTS.length / PAGE_SIZE);
+          if (page > pageCount) page = 1;
+          renderPage();
+          renderLatest();
+          if (pendingSlug) {
+            const slug = pendingSlug;
+            pendingSlug = null;
+            // Closing the server-rendered reader or leaving its route while
+            // this request is pending must not reopen it when the feed arrives.
+            const route = location.pathname.match(/\/blog\/([^/?#]+)\/?$/);
+            if (route && decodeURIComponent(route[1]) === slug) {
+              const p = findPostBySlug(slug);
+              if (p) openReader(p, true);
+            }
+          }
+        }).catch(() => {
+          if (request !== feedRequest) return;
+          feedState = 'error';
+          renderPage();
+        });
+    };
+    try { window.__bqBlogCount = POSTS.length; } catch (e) {}   // initial count (built-ins) before the CMS fetch resolves
+    loadCmsPosts();
+    window.__bqReloadBlog = loadCmsPosts;
+    window.__bqLangCb.push(() => {
+      curCat = 'all';
+      renderPage();
+      renderLatest();
+      if (reader && reader.classList.contains('is-open') && curPostObj) {
+        const q = L(curPostObj);
+        if (rd.tag) rd.tag.textContent = q.tag;
+        if (rd.title) rd.title.textContent = q.title;
+        if (rd.date) rd.date.textContent = (q.date || '').toUpperCase();
+        if (rd.read) rd.read.textContent = dT('blog.minRead', '{n} MIN READ').replace('{n}', curPostObj.read);
+        if (rd.text) rd.text.innerHTML = (Array.isArray(q.body) ? q.body : [q.body]).map(x => `<p>${esc(x)}</p>`).join('');
+        if (rd.img) rd.img.alt = String(q.title || '');
+        loadEngagement(curPostObj);
+      }
+    });
+  })();
+
+  /* =======================================================
+     9 · SUBSCRIBE
+     ======================================================= */
+  (function subscribe() {
+    const form = $('#subscribeForm');
+    if (!form) return;
+    const email = $('#subEmail'), status = $('#subStatus');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = (email.value || '').trim();
+      const D = window.BQ_DICT || {};
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
+        status.style.color = 'var(--ink-soft)';
+        status.textContent = D['sub.bad'] || '✗ Please enter a valid email.';
+        return;
+      }
+      const okMsg = D['sub.ok'] || '✓ Subscribed. Welcome to the journal.';
+      const dupMsg = D['sub.dup'] || '✓ You are already subscribed — thank you.';
+      const errMsg = D['sub.fail'] || '✗ Could not subscribe — please try again.';
+      status.style.color = 'var(--ink-muted)';
+      status.textContent = '…';
+      fetch('/api/subscribe', {
+        method: 'POST',
+        credentials:'same-origin', signal:AbortSignal.timeout(15_000),
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({ email: v, lang: (document.documentElement.dataset.lang || 'en') })
+      }).then(r => {
+        if (r.ok) { status.style.color = 'var(--ink)'; status.textContent = okMsg; email.value = ''; }
+        else if (r.status === 409) { status.style.color = 'var(--ink)'; status.textContent = dupMsg; email.value = ''; }
+        else { status.style.color = 'var(--ink-soft)'; status.textContent = errMsg; }
+      }).catch(() => { status.style.color = 'var(--ink-soft)'; status.textContent = errMsg; });
+    });
+  })();
+
+})();
+
+
+
+/* =======================================================
+   LATEST UPDATES — notification bell (rail + dock)
+   Shows posts added in the last 7 days; badge while any are fresh.
+   ======================================================= */
+(function latest() {
+  const $ = (s) => document.querySelector(s);
+  const panel = $('#latestPanel'), backdrop = $('#latestBackdrop'), list = $('#latestList');
+  if (!panel || !list) return;
+  const bell = $('#railLatest'), bellM = $('#railLatestM');
+  const badge = $('#railLatestBadge'), badgeM = $('#railLatestBadgeM');
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+  const WEEK = 7 * 24 * 60 * 60 * 1000;
+  const dict = () => window.BQ_DICT || {};
+  const lang = () => document.documentElement.dataset.lang || 'en';
+  let items = [], workItems = [], pinItems = [];
+  const galleryWorks = () => {
+    const gallery = window.BQ_GALLERY;
+    return gallery ? Object.keys(gallery.COLLECTIONS).flatMap(coll => gallery.items(coll)) : [];
+  };
+  const workTitle = (item) => {
+    const prefix = window.GAL_I18N?.[lang()]?.[item.coll]?.title || item.titlePrefix || item.tag;
+    const digits = String(item.index).padStart(2, '0');
+    return `${prefix} ${/^(ku|ar)$/.test(lang()) ? digits.replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : digits}`;
+  };
+  const findImageWork = (source, cat) => [...workItems, ...galleryWorks()].find(item =>
+    (!cat || item.cat === cat) && [item.url, item.rawUrl, window.BQ_GALLERY?.thumb(item.url), item.poster]
+      .filter(Boolean).some(url => {
+        try { return new URL(url, location.origin).href === new URL(source, location.origin).href; }
+        catch { return false; }
+      }));
+  // Resolve cached paths against today's canonical catalogue. A deleted work or
+  // duplicate alias must not become a broken notification or open another work.
+  const normalizeWorkItems = (paths) => {
+    const added = new Set((Array.isArray(paths) ? paths : []).filter(path => typeof path === 'string'));
+    return galleryWorks().filter(item => added.has(decodeURIComponent(item.url.replace(/^\/media\//, ''))));
+  };
+  const previewImage = (source, item) => {
+    if (!source) return '';
+    const dimensions = item?.width > 0 && item?.height > 0
+      ? ` width="${item.width}" height="${item.height}"` : '';
+    return `<img class="latest-item-img" src="${esc(source)}" alt="" loading="lazy" decoding="async"${dimensions}>`;
+  };
+
+  /* a quiet minute with no interaction → Latest closes itself */
+  let idleT = null, lastTrigger = null;
+  let resetDrag = () => {};
+  const triggers = [bell, bellM].filter(Boolean);
+  panel.toggleAttribute('inert', !panel.classList.contains('is-open'));
+  triggers.forEach(t => t.setAttribute('aria-expanded', String(panel.classList.contains('is-open'))));
+  const armIdle = () => { clearTimeout(idleT); idleT = setTimeout(() => close(), 60000); };
+  const open = (trigger) => {
+    window.__bqLatestFeed?.refresh();
+    if (window.__bqExclusive) window.__bqExclusive('latest');
+    lastTrigger = trigger || document.activeElement;
+    panel.removeAttribute('inert');
+    panel.classList.add('is-open');
+    panel.setAttribute('aria-hidden', 'false');
+    triggers.forEach(t => t.setAttribute('aria-expanded', 'true'));
+    backdrop && backdrop.classList.add('is-open');
+    armIdle();
+  };
+  const close = () => {
+    clearTimeout(idleT);
+    resetDrag();
+    if (panel.contains(document.activeElement) && lastTrigger && document.contains(lastTrigger)) {
+      lastTrigger.focus({ preventScroll: true });
+    }
+    panel.classList.remove('is-open');
+    panel.setAttribute('inert', '');
+    panel.setAttribute('aria-hidden', 'true');
+    triggers.forEach(t => t.setAttribute('aria-expanded', 'false'));
+    backdrop && backdrop.classList.remove('is-open');
+    lastTrigger = null;
+  };
+  ['pointerdown', 'touchstart', 'wheel'].forEach((ev) =>
+    panel.addEventListener(ev, () => { if (panel.classList.contains('is-open')) armIdle(); }, { passive: true }));
+  window.__bqPanels = window.__bqPanels || {};
+  window.__bqPanels.latest = close;
+  const toggle = (event) => (panel.classList.contains('is-open') ? close() : open(event?.currentTarget));
+  const setBadge = () => { const on = (items.length + workItems.length + pinItems.length) > 0; if (badge) badge.hidden = !on; if (badgeM) badgeM.hidden = !on; };
+
+  const goRoom = (route) => {
+    if (window.__bqGoRoom) window.__bqGoRoom(route, true);
+    else if (window.__bqShowRoom) window.__bqShowRoom(route);
+  };
+  let cancelDestination = () => {};
+  const afterRoom = (route, fn) => {
+    cancelDestination();
+    let frame = 0, timeout = 0;
+    const cancel = () => {
+      document.removeEventListener('bq:route', arrived);
+      cancelAnimationFrame(frame);
+      clearTimeout(timeout);
+    };
+    const arrived = () => {
+      cancel();
+      // The router emits before it finishes focus, URL and modal cleanup.
+      // Open only after that work; never guess the curtain's duration.
+      if (document.body.dataset.room === route) frame = requestAnimationFrame(() => {
+        if (document.body.dataset.room === route) fn();
+      });
+    };
+    cancelDestination = cancel;
+    document.addEventListener('bq:route', arrived, { once: true });
+    timeout = setTimeout(cancel, 5000);
+    goRoom(route);
+  };
+  const goTab = (cat, onReady) => {
+    afterRoom('design', () => {
+      const tabs = Array.from(document.querySelectorAll('.tab[data-filter]'));
+      const tb = tabs.find(tab => tab.dataset.filter === String(cat || ''))
+        || tabs.find(tab => tab.dataset.filter === 'all');
+      if (!tb) return;
+      tb.click();
+      const target = document.querySelector('.section.work');
+      if (target && !window.__bqScrollPaperTarget?.(target, { behavior: 'auto', block: 'start' })) {
+        target.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
+      onReady?.();
+    });
+  };
+  const goWork = (item) => goTab(item.cat, () => {
+    // Read from the full catalogue, not the shuffled/partly loaded DOM batch.
+    const works = galleryWorks().filter(work => work.cat === item.cat);
+    const index = works.findIndex(work => work.coll === item.coll && work.index === item.index);
+    if (index < 0) {
+      // The compact feed can arrive before the full gallery manifest. Its
+      // canonical destination already exists, so never discard the click.
+      location.assign(`/design/${encodeURIComponent(item.coll)}/${item.index}`);
+      return;
+    }
+    if (window.__bqOpenLightboxPool) window.__bqOpenLightboxPool(works.map(work => ({
+      full: work.url, raw: work.rawUrl, type: work.type, title: workTitle(work)
+    })), index);
+    else location.assign(`/design/${encodeURIComponent(item.coll)}/${item.index}`);
+  });
+
+  const render = () => {
+    const L = lang();
+    const pinHtml = pinItems.map((p) => {
+      const item = p.image ? findImageWork(p.image, p.link) : null;
+      const img = p.image ? previewImage(p.image, item) : `<span class="latest-item-img latest-item-img--pin"><i class="fa-solid fa-star"></i></span>`;
+      const tg = (p.link && dict()['tab.' + p.link]) || p.tag || 'Featured';
+      return `<button class="latest-item latest-item--pin" data-kind="pin" data-link="${esc(p.link || '')}">${img}<span class="latest-item-body"><span class="latest-item-tag"><span class="latest-item-new"></span>${esc(tg)}</span><span class="latest-item-title">${esc(String(p.title || ''))}</span></span></button>`;
+    }).join('');
+    const workHtml = workItems.map((w) => {
+      const name = dict()['tab.' + w.cat] || w.cat;
+      const thumb = w.type === 'video' ? w.poster : (window.BQ_GALLERY?.thumb(w.url) || w.url);
+      return `<button class="latest-item" data-kind="work" data-coll="${esc(w.coll)}" data-index="${w.index}">${previewImage(thumb, w)}<span class="latest-item-body"><span class="latest-item-tag"><span class="latest-item-new"></span>${esc(name)}</span><span class="latest-item-title">${esc(workTitle(w))}</span></span></button>`;
+    }).join('');
+    const blogHtml = items.map((p) => {
+      const tr = (p.i18n && p.i18n[L]) || {};
+      const title = esc(String(tr.title || p.title || '').replace(/<[^>]+>/g, ''));
+      const isNew = (Date.now() - new Date(p.created_at).getTime()) < WEEK;
+      return `<button class="latest-item" data-kind="post" data-id="${esc(String(p.id))}">${previewImage(p.cover)}<span class="latest-item-body"><span class="latest-item-tag">${isNew ? '<span class="latest-item-new"></span>' : ''}${esc(p.tag || 'Note')}</span><span class="latest-item-title">${title}</span></span></button>`;
+    }).join('');
+    if (!pinHtml && !workHtml && !blogHtml) { list.innerHTML = `<p class="latest-empty">${esc(dict()['latest.empty'] || 'No new updates this week.')}</p>`; return; }
+    list.innerHTML = pinHtml + workHtml + blogHtml;
+    list.querySelectorAll('.latest-item').forEach((b) => b.addEventListener('click', () => {
+      close();
+      const kind = b.getAttribute('data-kind');
+      if (kind === 'work') {
+        const item = [...workItems, ...galleryWorks()].find(w => w.coll === b.getAttribute('data-coll') && w.index === Number(b.getAttribute('data-index')));
+        if (item) goWork(item);
+      } else if (kind === 'pin') {
+        const link = b.getAttribute('data-link') || '';
+        const image = b.querySelector('img')?.getAttribute('src');
+        const item = image ? findImageWork(image, link) : null;
+        if (item) goWork(item);
+        else if (link) goTab(link);
+        else goRoom('design');
+      } else {
+        const id = b.getAttribute('data-id');
+        afterRoom('blog', () => { if (window.__bqOpenPostSlug) window.__bqOpenPostSlug(id); });
+      }
+    }));
+  };
+
+  const load = () => {
+    const feed = window.__bqLatestFeed?.snapshot();
+    if (!feed) return;
+    items = feed.posts; pinItems = feed.pins; workItems = feed.works;
+    setBadge(); render();
+  };
+
+  bell && bell.addEventListener('click', toggle);
+  bellM && bellM.addEventListener('click', toggle);
+  $('#latestClose') && $('#latestClose').addEventListener('click', close);
+  backdrop && backdrop.addEventListener('click', close);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && panel.classList.contains('is-open')) { e.preventDefault(); close(); } });
+  /* mobile: drag the header down to dismiss — same firm gesture as the chat sheet */
+  const lHead = panel.querySelector('.latest-panel-head');
+  if (lHead) {
+    const isMobile = () => window.matchMedia('(max-width: 1024px)').matches;
+    let sy = null, dy = 0, drag = false;
+    const down = (y) => { if (!isMobile() || !panel.classList.contains('is-open')) return; sy = y; dy = 0; drag = true; panel.setAttribute('data-panel-dragging', ''); };
+    const move = (y, ev) => { if (!drag) return; dy = y - sy; if (dy < 0) dy = 0; if (dy > 3 && ev && ev.cancelable) ev.preventDefault(); panel.style.setProperty('--bq-panel-drag-y', `${dy}px`); };
+    const cancel = () => { drag = false; sy = null; dy = 0; panel.removeAttribute('data-panel-dragging'); panel.style.removeProperty('--bq-panel-drag-y'); };
+    resetDrag = cancel;
+    const up = () => { if (!drag) return; const dismiss = dy > 55; cancel(); if (dismiss) close(); };
+    lHead.addEventListener('touchstart', (e) => down(e.touches[0].clientY), { passive: true });
+    lHead.addEventListener('touchmove', (e) => move(e.touches[0].clientY, e), { passive: false });
+    lHead.addEventListener('touchend', up);
+    lHead.addEventListener('touchcancel', cancel);
+    lHead.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'touch') down(e.clientY); });
+    window.addEventListener('pointermove', (e) => { if (drag && e.pointerType !== 'touch') move(e.clientY, e); });
+    window.addEventListener('pointerup', () => { if (drag) up(); });
+    window.addEventListener('pointercancel', cancel);
+  }
+  if (window.__bqLangCb) window.__bqLangCb.push(render);
+  window.addEventListener('bq:latest', load);
+  load();
+  window.__bqReloadLatest = () => window.__bqLatestFeed?.refresh();
+})();

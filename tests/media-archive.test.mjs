@@ -1,0 +1,315 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile, stat, mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import { archiveAssets, buildMediaArchive, generateMediaArchive } from '../scripts/generate-media-archive.mjs';
+import { catalogFromManifest, mediaPath, workPath } from '../functions/_gallery-catalog.js';
+import { onRequest } from '../functions/[[route]].js';
+import { createRequestHandler, resolveRequestTarget } from '../scripts/dev-server.mjs';
+import http from 'node:http';
+import zlib from 'node:zlib';
+import vm from 'node:vm';
+import { MEDIA_ARCHIVE_ROUTES } from '../functions/_media-archive-routes.js';
+
+const root = path.resolve(new URL('..', import.meta.url).pathname);
+const manifest = JSON.parse(await readFile(path.join(root, 'preview_site/assets/gallery-manifest.json'), 'utf8'));
+const assets = await archiveAssets(path.join(root, 'preview_site'));
+const generated = buildMediaArchive(manifest, assets);
+const catalog = catalogFromManifest(manifest);
+
+test('each collection lists a canonical work once and keeps cross-collection membership', () => {
+  const pages = [...generated.files].filter(([name]) => name.startsWith('archive/') && name !== 'archive/index.html');
+  const cards = pages.flatMap(([, html]) => [...html.matchAll(/<article class="card" id="([^"]+)">([\s\S]*?)<\/article>/g)]);
+  const targets = new Set();
+  for (const item of catalog.byPath.values()) {
+    const owner = item.canonical || item;
+    const card = cards.filter(([, id]) => id === `work-${item.coll}-${item.index}`);
+    const target = `${item.coll}|${owner.path}`;
+    if (targets.has(target)) {
+      assert.equal(card.length, 0, `${item.path} does not duplicate a work in this collection`);
+      continue;
+    }
+    targets.add(target);
+    assert.equal(card.length, 1, item.path);
+    assert.ok(card[0][2].includes(`href="${workPath(owner.coll, owner.index)}"`), `${item.path} opens its work page`);
+    if (item.type === 'image') assert.ok(card[0][2].includes(`src="${mediaPath(owner.path)}"`), `${item.path} uses its first-party media URL`);
+  }
+  assert.equal(cards.length, targets.size);
+});
+
+
+test('archive totals describe unique canonical images rather than repeated collection entries', () => {
+  const uniqueImages = [...catalog.byPath.values()].filter(item => item.type === 'image' && !item.canonical).length;
+  const uniqueVideos = [...catalog.byPath.values()].filter(item => item.type === 'video' && !item.canonical).length;
+  const home = generated.files.get('archive/index.html');
+  assert.ok(uniqueImages < manifest.images.length, 'the real catalogue includes cross-collection aliases');
+  assert.equal(generated.imageCount, uniqueImages);
+  assert.equal(generated.videoCount, uniqueVideos);
+  assert.ok(home.includes(`<dt>Unique images</dt><dd>${uniqueImages}</dd>`));
+  assert.ok(home.includes(`Browse ${uniqueImages} unique images and ${uniqueVideos} videos`));
+});
+
+test('deduplication updates collection navigation, pagination and totals without renumbering work URLs', () => {
+  const entry = (path, index, hash) => ({ path, index, hash, width: 480, height: 640 });
+  const sample = { images: [
+    entry('GeneralDesign/a.webp', 10, '1111111111111111'),
+    entry('GeneralDesign/b.webp', 20, '1111111111111111'),
+    entry('Book/a.webp', 3, '1111111111111111'),
+    entry('Book/b.webp', 8, '1111111111111111'),
+    entry('Photos/a.webp', 7, '2222222222222222'),
+    entry('Photos/b.webp', 14, '2222222222222222'),
+    entry('LogoDesign/a.webp', 29, '3333333333333333')
+  ], videos: [] };
+  const result = buildMediaArchive(sample, { pageSize: 1 });
+  assert.equal(result.imageCount, 3);
+  assert.equal(result.pages.length, 5, 'four collections and the archive home, no empty second pages');
+  for (const [slug, id, href] of [
+    ['design', 'general-10', '/design/book/3'],
+    ['books', 'book-3', '/design/book/3'],
+    ['photos', 'image-7', '/design/image/7'],
+    ['logos', 'logo-29', '/design/logo/29']
+  ]) {
+    const html = result.files.get(`archive/${slug}/index.html`);
+    assert.equal((html.match(/<article class="card"/g) || []).length, 1, slug);
+    assert.ok(html.includes(`id="work-${id}"`), slug);
+    assert.ok(html.includes(`href="${href}"`), slug);
+    assert.ok(html.includes('1 images in this collection'), slug);
+    assert.ok(html.includes('Showing 1–1 <span>of 1 images'), slug);
+    assert.ok(html.includes('Photography<span>1</span>'), slug);
+    assert.doesNotMatch(html, /rel="next"/);
+  }
+  assert.ok(result.files.get('archive/index.html').includes('<dt>Unique images</dt><dd>3</dd>'));
+});
+
+test('archive images stay first-party so the archive CSP can stay img-src self', async () => {
+  const headers = await readFile(path.join(root, 'preview_site/_headers'), 'utf8');
+  assert.match(headers, /\/archive\/\*[\s\S]*?img-src 'self';/);
+  for (const [name, html] of generated.files) {
+    if (!name.endsWith('.html')) continue;
+    for (const [, src] of html.matchAll(/<img\b[^>]*\bsrc="([^"]+)"/g)) assert.match(src, /^\/(?:media|assets)\//, `${name}: ${src}`);
+    for (const [, set] of html.matchAll(/\bsrcset="([^"]+)"/g)) for (const candidate of set.split(', ')) assert.match(candidate, /^\/(?:media|assets)\/\S+ \d+w$/, `${name}: ${candidate}`);
+  }
+});
+
+test('cards offer the existing thumbnail at its real width and keep the original as src', async () => {
+  let cards = 0;
+  for (const [name, html] of generated.files) {
+    for (const [tag] of html.matchAll(/<img\b[^>]*>/g)) {
+      const set = tag.match(/srcset="([^"]+)"/)?.[1];
+      if (!set) continue;
+      cards += 1;
+      const [thumb, original] = set.split(', ');
+      const [thumbUrl, thumbWidth] = thumb.split(' ');
+      assert.equal(original.split(' ')[0], tag.match(/src="([^"]+)"/)[1], `${name}: src stays the original`);
+      const bytes = await readFile(path.join(root, 'preview_site', decodeURIComponent(thumbUrl)));
+      assert.ok(bytes.length > 0 && parseInt(thumbWidth, 10) > 0 && parseInt(thumbWidth, 10) < parseInt(original.split(' ')[1], 10), `${name}: ${thumb}`);
+      assert.match(tag, /sizes="\(max-width: 600px\)/);
+    }
+  }
+  assert.ok(cards >= manifest.images.length - 5, `${cards} cards carry a thumbnail candidate`);
+});
+
+test('the archive uses the split Manrope faces from fonts.css, not the full file', async () => {
+  const page = generated.files.get('archive/index.html');
+  assert.doesNotMatch(page, /manrope-full/);
+  const faces = [...page.matchAll(/@font-face\{font-family:Manrope;src:url\(([^)]+)\) format\('woff2'\);font-display:swap;unicode-range:[^}]+\}/g)];
+  assert.equal(faces.length, 2);
+  for (const [, url] of faces) assert.ok((await readFile(path.join(root, 'preview_site', url))).length > 0, url);
+});
+
+test('all archive pages are reachable by HTML links without script or button interactions', () => {
+  const queue = ['/archive/'], visited = new Set();
+  while (queue.length) {
+    const route = queue.shift();
+    if (visited.has(route)) continue;
+    visited.add(route);
+    const html = generated.files.get(`${route.slice(1)}index.html`);
+    assert.ok(html, `linked page exists: ${route}`);
+    assert.match(html, new RegExp(`rel="canonical" href="https://bqurtas\\.com${route}"`));
+    assert.doesNotMatch(html, /data-src=|noindex/);
+    const scripts = [...html.matchAll(/<script\b[^>]*>[\s\S]*?<\/script>/g)].map(([tag]) => tag);
+    assert.match(scripts.shift(), /^<script src="\/js\/appearance\.js\?v=[a-f0-9]{12}"><\/script>$/, 'appearance applies before paint without a third-party request');
+    assert.deepEqual(scripts, [`<script defer src="/${assets.motionScript.path}"></script>`], 'only the local progressive enhancement script is allowed');
+    for (const match of html.matchAll(/<a\b[^>]*href="(\/archive\/[^"#]*)"/g)) queue.push(match[1]);
+  }
+  assert.equal(visited.size, generated.pages.length);
+  const page2 = generated.files.get('archive/books/2/index.html');
+  assert.match(page2, /rel="prev" href="\/archive\/books\/"/);
+  assert.match(page2, /rel="next" href="\/archive\/books\/3\/"/);
+  assert.ok((page2.match(/<img /g) || []).length <= 24, 'each page keeps its image payload bounded');
+});
+
+test('the gallery sitemap lists exactly the generated archive pages', () => {
+  const xml = generated.files.get('sitemap-gallery.xml');
+  const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
+  assert.deepEqual(locs.sort(), generated.pages.map(route => `https://bqurtas.com${route}`).sort());
+  assert.equal(generated.files.has('sitemap-images.xml'), false, 'the image sitemap belongs to generate-image-sitemap.mjs');
+});
+
+test('invalid paths and duplicate catalogue media fail the build instead of producing bad public URLs', () => {
+  for (const item of [{ ...manifest.images[0], path: '../escape.webp' }, { ...manifest.images[0], width: 0 }]) {
+    assert.throws(() => buildMediaArchive({ images: [item], videos: [] }));
+  }
+  assert.throws(() => buildMediaArchive({ images: [manifest.images[0], manifest.images[0]], videos: [] }));
+});
+
+test('generation is deterministic and removes only obsolete generated pages', async t => {
+  const temp = await mkdtemp(path.join(os.tmpdir(), 'bq-media-archive-'));
+  t.after(() => rm(temp, { recursive: true, force: true }));
+  const siteRoot = path.join(temp, 'preview_site');
+  await mkdir(path.join(siteRoot, 'archive/manual'), { recursive: true });
+  await mkdir(path.join(siteRoot, 'css'), { recursive: true });
+  await writeFile(path.join(siteRoot, 'css/fonts.css'), await readFile(path.join(root, 'preview_site/css/fonts.css')));
+  await writeFile(path.join(siteRoot, 'archive/manual/index.html'), '<h1>Authored archive page</h1>');
+  const sample = { images: [manifest.images[0], manifest.images.at(-1)], videos: [] };
+  await generateMediaArchive({ root: temp, manifest: sample });
+  const target = path.join(siteRoot, 'archive/books/index.html');
+  const before = await stat(target);
+  await generateMediaArchive({ root: temp, manifest: sample });
+  assert.equal((await stat(target)).mtimeMs, before.mtimeMs, 'unchanged builds do not rewrite pages');
+  await generateMediaArchive({ root: temp, manifest: { images: [sample.images[0]], videos: [] } });
+  await assert.rejects(stat(path.join(siteRoot, 'archive/ticker-logos/index.html')), { code: 'ENOENT' });
+  assert.match(await readFile(path.join(siteRoot, 'archive/manual/index.html'), 'utf8'), /Authored archive page/);
+});
+
+test('new archive pagination is tracked on the first build and successive builds use identical clients', async t => {
+  const temp = await mkdtemp(path.join(os.tmpdir(), 'bq-archive-analytics-'));
+  t.after(() => rm(temp, { recursive:true, force:true }));
+  const siteRoot = path.join(temp, 'preview_site');
+  await mkdir(path.join(siteRoot, 'css'), { recursive:true });
+  await writeFile(path.join(siteRoot, 'css/fonts.css'), await readFile(path.join(root, 'preview_site/css/fonts.css')));
+  const nextPage = Math.max(1, ...[...MEDIA_ARCHIVE_ROUTES].map(route => Number(/^\/archive\/books\/(\d+)\/$/.exec(route)?.[1] || 0))) + 1;
+  const newRoute = `/archive/books/${nextPage}/`;
+  assert.equal(MEDIA_ARCHIVE_ROUTES.has(newRoute),false,'the module loaded before this build does not know the new page');
+  const sample = { images:Array.from({length:(nextPage - 1) * 24 + 1},(_,i)=>({
+    path:`Book/new-${i}.webp`, index:i + 1, width:480, height:640, hash:i.toString(16).padStart(16,'0')
+  })), videos:[] };
+  const first = await generateMediaArchive({root:temp,manifest:sample});
+  const second = await generateMediaArchive({root:temp,manifest:sample});
+  assert.equal(first.analyticsClient,second.analyticsClient);
+  assert.deepEqual([...first.files],[...second.files],'the first build already contains the final content-addressed archive script');
+  assert.ok([...first.files].find(([file])=>file.endsWith('.min.js'))[1].includes(newRoute));
+  const visits = [];
+  const tasks = [];
+  const client = first.analyticsClient.slice(first.analyticsClient.indexOf('/* First-party, cookieless visit counting'));
+  vm.runInNewContext(client, {
+    location:{protocol:'https:',hostname:'bqurtas.com',pathname:newRoute},
+    window:{__bqPrivacy:{choice:()=> 'allowed'},addEventListener(){}},
+    document:{readyState:'complete',visibilityState:'visible',documentElement:{lang:'en'},addEventListener(){}},
+    navigator:{sendBeacon(url,data){visits.push(JSON.parse(data).p);return true;}},
+    history:{}, URL, setTimeout(fn){tasks.push(fn);return fn;}, clearTimeout(){}
+  });
+  for(const task of tasks) task();
+  assert.deepEqual(visits,[newRoute],'consented visitors to the newly generated route are counted immediately');
+  const shrunk = await generateMediaArchive({root:temp,manifest:{images:[sample.images[0]],videos:[]}});
+  assert.ok(!shrunk.analyticsClient.includes(newRoute),'removed pages leave the allowlist in the same build');
+});
+
+test('archive and work pages tell Cloudflare not to inject scripts, and arrive gzipped instead', async () => {
+  const work = '/design/general/1';
+  const manifestBody = await readFile(path.join(root, 'preview_site/assets/gallery-manifest.json'));
+  const env = { ASSETS: { fetch: async () => new Response(manifestBody, { headers: { 'Content-Type': 'application/json' } }) } };
+  for (const [route, context] of [['/archive/books/2/', { env: {}, next: () => new Response('<!doctype html><p>static archive</p>', { headers: { 'Cache-Control': 'public, max-age=0, must-revalidate', ETag: '"abc"' } }) }], [work, { env, next: () => new Response('incorrect fallback') }]]) {
+    const plain = await onRequest({ ...context, request: new Request(`https://bqurtas.com${route}`, { headers: { Accept: 'text/html' } }) });
+    assert.equal(plain.status, 200, route);
+    assert.match(plain.headers.get('cache-control'), /no-transform/, route);
+    assert.equal(plain.headers.get('content-encoding'), null);
+    const unNonce = (html) => html.replace(/nonce-?[="']*[0-9a-f]{32}/g, 'nonce');
+    const identity = unNonce(await plain.text());
+    const zipped = await onRequest({ ...context, request: new Request(`https://bqurtas.com${route}`, { headers: { Accept: 'text/html', 'Accept-Encoding': 'br, gzip' } }) });
+    assert.equal(zipped.headers.get('content-encoding'), 'gzip', route);
+    assert.match(zipped.headers.get('vary'), /Accept-Encoding/);
+    assert.equal(unNonce(zlib.gunzipSync(Buffer.from(await zipped.arrayBuffer())).toString()), identity, route);
+    if (zipped.headers.get('etag')) assert.match(zipped.headers.get('etag'), /^W\//);
+  }
+  const headers = await readFile(path.join(root, 'preview_site/_headers'), 'utf8');
+  assert.match(headers, /\/archive\/\*\n  Cache-Control: [^\n]*no-transform/);
+});
+
+test('the local preview serves archive images and the work pages the cards open', async t => {
+  const server = http.createServer(createRequestHandler(path.join(root, 'preview_site')));
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => server.close());
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const image = await fetch(`${base}/media/GeneralDesign/GDesign1.webp`);
+  assert.equal(image.status, 200);
+  assert.equal(image.headers.get('content-type'), 'image/webp');
+  assert.equal((await fetch(`${base}/media/GeneralDesign/not-in-the-manifest.webp`)).status, 404);
+  assert.equal((await fetch(`${base}/media/..%2Fpackage.json`)).status, 404);
+  const page = await fetch(`${base}/design/general/1`);
+  assert.equal(page.status, 200);
+  assert.match(await page.text(), /\/media\/GeneralDesign\/GDesign1\.webp/);
+  assert.equal((await fetch(`${base}/design/general/99999`)).status, 404);
+});
+
+test('edge and local server preserve standalone archive pages instead of returning the application shell', async () => {
+  for (const route of ['/archive/', '/archive/books/2/', '/archive/videos/']) {
+    const response = await onRequest({ request: new Request(`https://bqurtas.com${route}`, { headers: { Accept: 'text/html' } }), env: {}, next: () => new Response('static archive') });
+    assert.equal(await response.text(), 'static archive');
+    const local = resolveRequestTarget(route);
+    assert.equal(local.status, 200);
+    assert.ok(local.filePath.endsWith(`${route}index.html`));
+    assert.equal(local.spaFallback, undefined);
+  }
+  assert.equal(resolveRequestTarget('/archive/not-a-category/').status, 404);
+});
+
+test('unknown archive URLs are real 404s even when a downstream fallback would return the SPA shell', async () => {
+  for (const route of ['/archive/not-a-category/', '/archive/books/999/', '/archive/books/1/', '/archive/books/2/extra', '/ARCHIVE/']) {
+    for (const method of ['GET', 'HEAD']) {
+      let reachedFallback = false;
+      const response = await onRequest({ request: new Request(`https://bqurtas.com${route}`, { method }), env: {}, next: () => {
+        reachedFallback = true;
+        return new Response('<html>SPA shell</html>', { status: 200 });
+      } });
+      assert.equal(response.status, 404, `${method} ${route}`);
+      assert.equal(response.headers.get('x-robots-tag'), 'noindex, nofollow');
+      assert.equal(reachedFallback, false);
+      if (method === 'HEAD') assert.equal(await response.text(), '');
+    }
+  }
+});
+
+test('the retired watch pages and video sitemap are not served', async () => {
+  for (const route of ['/watch/', '/watch/videos1/', '/sitemap-videos.xml']) {
+    const response = await onRequest({ request: new Request(`https://bqurtas.com${route}`, { headers: { Accept: 'text/html' } }), env: {}, next: () => new Response('<html>SPA shell</html>') });
+    assert.equal(response.status, 404, route);
+  }
+});
+
+test('known archive aliases redirect to their exact canonical URL and retain the query', async () => {
+  for (const [route, destination] of [['/archive', '/archive/'], ['/archive/books/2', '/archive/books/2/'], ['/archive/books/2/index.html', '/archive/books/2/']]) {
+    const response = await onRequest({ request: new Request(`https://bqurtas.com${route}?ref=portfolio`), env: {}, next: () => new Response('incorrect fallback') });
+    assert.equal(response.status, 301, route);
+    assert.equal(response.headers.get('location'), `https://bqurtas.com${destination}?ref=portfolio`);
+  }
+});
+
+test('each edge media sitemap returns its own generated XML for GET and HEAD', async () => {
+  const bodies = {
+    '/sitemap-images.xml': await readFile(path.join(root, 'preview_site/sitemap-images.xml'), 'utf8'),
+    '/sitemap-gallery.xml': generated.files.get('sitemap-gallery.xml')
+  };
+  for (const [route, source] of [['/sitemap-images.xml', '/sitemap-images.xml'], ['/sitemap-gallery.xml', '/sitemap-gallery.xml'], ['/sitemap-media.xml', '/sitemap-images.xml']]) {
+    for (const method of ['GET', 'HEAD']) {
+      const response = await onRequest({ request: new Request(`https://bqurtas.com${route}`, { method }), env: { ASSETS: { fetch: async url => {
+        assert.equal(url.pathname, source);
+        return new Response(bodies[source], { headers: { ETag: 'old' } });
+      } } }, next: () => new Response('incorrect fallback') });
+      assert.equal(response.status, 200);
+      assert.match(response.headers.get('content-type'), /application\/xml/);
+      assert.match(response.headers.get('cache-control'), /no-store/);
+      assert.equal(response.headers.get('etag'), null);
+      assert.equal(await response.text(), method === 'HEAD' ? '' : bodies[source]);
+    }
+  }
+});
+
+test('all generated outputs are current and every sitemap is advertised in robots.txt', async () => {
+  for (const [name, contents] of generated.files) assert.equal(await readFile(path.join(root, 'preview_site', name), 'utf8'), contents, `${name}: run npm run build`);
+  assert.equal(await readFile(path.join(root, 'functions/_media-archive-routes.js'), 'utf8'), generated.routeModule, 'edge routing matches the generated pages');
+  const robots = await readFile(path.join(root, 'preview_site/robots.txt'), 'utf8');
+  for (const name of ['sitemap.xml', 'sitemap-images.xml', 'sitemap-gallery.xml']) assert.ok(robots.includes(`Sitemap: https://bqurtas.com/${name}`));
+  assert.ok(!robots.includes('sitemap-videos.xml'));
+});

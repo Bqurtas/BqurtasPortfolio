@@ -1,0 +1,364 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { once } from 'node:events';
+import { readFile, mkdtemp, mkdir, writeFile, symlink, rm } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import vm from 'node:vm';
+import {
+  contentHash,
+  fingerprintQuotedAssets,
+  fingerprintVersionedLocalAssets,
+  serviceWorkerVersion,
+  useMinifiedStylesheets,
+  stripStaticBlogPosts,
+  stripUnverifiedStaticDates
+} from '../scripts/build-assets.mjs';
+import {
+  DEFAULT_HOST,
+  isSpaRoute,
+  resolveRequestTarget,
+  startDevServer
+} from '../scripts/dev-server.mjs';
+import { validateStructure } from '../scripts/validate-structure.mjs';
+
+const siteRoot = new URL('../preview_site/', import.meta.url);
+
+test('built code references are content-addressed and structural validation passes', async () => {
+  assert.deepEqual(await validateStructure(), []);
+
+  const html = await readFile(new URL('index.html', siteRoot), 'utf8');
+  const notFound = await readFile(new URL('404.html', siteRoot), 'utf8');
+  const sw = await readFile(new URL('sw.js', siteRoot), 'utf8');
+  assert.match(html, /css\/modern-framer\.min\.css\?v=[a-f0-9]{12}/);
+  assert.match(html, /css\/experience\.min\.css\?v=[a-f0-9]{12}/);
+  assert.match(html, /css\/polish\.min\.css\?v=[a-f0-9]{12}/);
+  assert.match(html, /site\.webmanifest\?v=[a-f0-9]{12}/);
+  const heroHash = contentHash(await readFile(new URL('assets/hero-sketch.webp', siteRoot)));
+  assert.ok(html.includes(`assets/hero-sketch.webp?v=${heroHash}`));
+  assert.match(notFound, /css\/fonts\.css\?v=[a-f0-9]{12}/);
+  assert.equal(sw.match(/const SW_VERSION = '([^']+)'/)[1], serviceWorkerVersion(sw, html));
+});
+
+test('overlay minification keeps cascade order and only rewrites local stylesheet references', () => {
+  const source = '<link href="css/modern-framer.css?v=old"><link href="css/experience.min.css?v=old">'
+    + '<link href="css/polish.css?v=old"><link href="https://example.com/css/polish.css">';
+  const output = useMinifiedStylesheets(source);
+  assert.equal(output, '<link href="css/modern-framer.min.css?v=old"><link href="css/experience.min.css?v=old">'
+    + '<link href="css/polish.min.css?v=old"><link href="https://example.com/css/polish.css">');
+  assert.equal(useMinifiedStylesheets(output), output);
+  assert.equal(useMinifiedStylesheets("'/css/polish.css?v=old'"), "'/css/polish.min.css?v=old'");
+});
+
+test('fingerprinting and static-sitemap cleanup are deterministic', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'bq-build-'));
+  try {
+    await mkdir(path.join(root, 'js'));
+    await writeFile(path.join(root, 'js/app.js'), 'console.log("stable");\n');
+    const input = '<script src="js/app.js?v=old"></script>';
+    const expected = contentHash(Buffer.from('console.log("stable");\n'));
+    const onceBuilt = await fingerprintQuotedAssets(input, root);
+    const twiceBuilt = await fingerprintQuotedAssets(onceBuilt, root);
+    assert.equal(onceBuilt, `<script src="js/app.js?v=${expected}"></script>`);
+    assert.equal(twiceBuilt, onceBuilt);
+
+    const versioned = await fingerprintVersionedLocalAssets('<script src="js/app.js?v=1"></script>', root);
+    assert.equal(versioned, onceBuilt);
+
+    const sitemap = '<urlset>\n  <url><loc>https://bqurtas.com/blog/8</loc></url>\n  <url><loc>https://bqurtas.com/ku/blog/000</loc></url>\n  <url><loc>https://bqurtas.com/design</loc></url>\n</urlset>\n';
+    const stripped = stripStaticBlogPosts(sitemap);
+    assert.doesNotMatch(stripped, /\/blog\/8/);
+    assert.doesNotMatch(stripped, /\/blog\/000/);
+    assert.match(stripped, /\/design/);
+    assert.equal(stripStaticBlogPosts(stripped), stripped);
+    const withoutDates = stripUnverifiedStaticDates('<urlset>\n  <url><loc>https://bqurtas.com/</loc>\n    <lastmod>2026-08-31</lastmod>\n  </url>\n</urlset>');
+    assert.doesNotMatch(withoutDates, /lastmod/);
+    assert.match(withoutDates, /https:\/\/bqurtas\.com\//);
+    assert.equal(stripUnverifiedStaticDates(withoutDates), withoutDates);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+async function loadServiceWorker({
+  failAsset = '',
+  offline = false,
+  cachePutFails = false,
+  cacheReadFails = false,
+  cachedAssetUrl = '',
+  basicNetworkResponse = false
+} = {}) {
+  const handlers = {};
+  const added = [];
+  const offlinePage = new Response('offline shell');
+  let skipped = false;
+  let fetchCount = 0;
+  let putCount = 0;
+  let matchCount = 0;
+  const cache = {
+    async add(asset) {
+      added.push(asset);
+      if (asset === failAsset) throw new Error('simulated missing asset');
+    },
+    async keys() { return []; },
+    async match(request) {
+      matchCount += 1;
+      if (cacheReadFails) throw new Error('simulated cache read failure');
+      const key = typeof request === 'string' ? request : request.url;
+      if (key === '/index.html') return offlinePage.clone();
+      return key === cachedAssetUrl ? new Response('cached asset') : undefined;
+    },
+    async put() {
+      putCount += 1;
+      if (cachePutFails) throw new Error('simulated cache write failure');
+    },
+    async delete() { return true; }
+  };
+  const caches = {
+    async open() { return cache; },
+    async keys() { return []; },
+    async delete() { return true; },
+    async match() { throw new Error('must never read another release cache'); }
+  };
+  const context = {
+    URL,
+    Response,
+    Promise,
+    Error,
+    caches,
+    console: { warn() {} },
+    fetch: async () => {
+      fetchCount += 1;
+      if (offline) throw new Error('offline');
+      const response = new Response('network', { headers: { 'Content-Type': 'text/html' } });
+      if (basicNetworkResponse) Object.defineProperty(response, 'type', { value: 'basic' });
+      return response;
+    },
+    self: {
+      location: { origin: 'https://bqurtas.com' },
+      clients: { async claim() {} },
+      addEventListener(type, handler) { handlers[type] = handler; },
+      async skipWaiting() { skipped = true; }
+    }
+  };
+  const source = await readFile(new URL('sw.js', siteRoot), 'utf8');
+  vm.runInNewContext(source, context);
+  return {
+    handlers,
+    added,
+    get skipped() { return skipped; },
+    get fetchCount() { return fetchCount; },
+    get putCount() { return putCount; },
+    get matchCount() { return matchCount; }
+  };
+}
+
+test('service worker installs an offline shell even when a secondary asset fails', async () => {
+  const worker = await loadServiceWorker({ failAsset: '/favicon.ico' });
+  let install;
+  worker.handlers.install({ waitUntil(promise) { install = promise; } });
+  await install;
+  assert.ok(worker.added.includes('/index.html'));
+  assert.equal(worker.skipped, true);
+});
+
+test('service worker never intercepts API requests and serves first-install offline navigation', async () => {
+  const apiWorker = await loadServiceWorker();
+  let intercepted = false;
+  apiWorker.handlers.fetch({
+    request: { method: 'GET', url: 'https://bqurtas.com/api/stats', headers: new Headers(), mode: 'cors' },
+    respondWith() { intercepted = true; },
+    waitUntil() {}
+  });
+  assert.equal(intercepted, false);
+  assert.equal(apiWorker.fetchCount, 0);
+
+  const offlineWorker = await loadServiceWorker({ offline: true });
+  let responsePromise;
+  offlineWorker.handlers.fetch({
+    request: { method: 'GET', url: 'https://bqurtas.com/design/logo', headers: new Headers({ Accept: 'text/html' }), mode: 'navigate' },
+    respondWith(value) { responsePromise = value; },
+    waitUntil() {}
+  });
+  const response = await responsePromise;
+  assert.equal(await response.text(), 'offline shell');
+});
+
+test('service worker keeps a successful navigation when Cache Storage writes fail', async () => {
+  const worker = await loadServiceWorker({ cachePutFails: true, basicNetworkResponse: true });
+  let responsePromise;
+  worker.handlers.fetch({
+    request: { method: 'GET', url: 'https://bqurtas.com/bio', headers: new Headers({ Accept: 'text/html' }), mode: 'navigate' },
+    respondWith(value) { responsePromise = value; },
+    waitUntil() {}
+  });
+
+  const response = await responsePromise;
+  assert.equal(await response.text(), 'network');
+  assert.equal(worker.fetchCount, 1);
+  assert.equal(worker.putCount, 1);
+});
+
+test('service worker does not fetch an immutable fingerprint that is already cached', async () => {
+  const assetUrl = 'https://bqurtas.com/js/main.v420.min.js?v=012345abcdef';
+  const worker = await loadServiceWorker({ cachedAssetUrl: assetUrl, offline: true });
+  let responsePromise;
+  worker.handlers.fetch({
+    request: { method: 'GET', url: assetUrl, headers: new Headers({ Accept: '*/*' }), mode: 'cors' },
+    respondWith(value) { responsePromise = value; },
+    waitUntil() { assert.fail('immutable cache hit must not schedule network work'); }
+  });
+
+  const response = await responsePromise;
+  assert.equal(await response.text(), 'cached asset');
+  assert.equal(worker.fetchCount, 0);
+});
+
+test('content-named fonts are cache-first but an explicit refresh still reaches the network', async () => {
+  const assetUrl = 'https://bqurtas.com/font-assets/0123456789abcdef-Body.woff2';
+  for (const cache of ['default', 'reload', 'no-store']) {
+    const worker = await loadServiceWorker({ cachedAssetUrl: assetUrl });
+    let responsePromise;
+    worker.handlers.fetch({
+      request: { method: 'GET', url: assetUrl, headers: new Headers(), mode: 'cors', cache },
+      respondWith(value) { responsePromise = value; },
+      waitUntil() { assert.fail('immutable fonts do not need background refreshes'); }
+    });
+    assert.equal(await (await responsePromise).text(), cache === 'default' ? 'cached asset' : 'network');
+    assert.equal(worker.fetchCount, cache === 'default' ? 0 : 1);
+    if (cache === 'no-store') assert.equal(worker.putCount, 0);
+  }
+});
+
+test('service worker leaves non-app documents and live metadata to the network', async () => {
+  const worker = await loadServiceWorker({ basicNetworkResponse: true });
+  for (const pathname of ['/404.html', '/missing-page', '/blog/0', '/autodiscover/autodiscover.xml', '/sitemap-gallery.xml', '/llms.txt',
+    // Work pages and same-origin media always come from the network.
+    '/design/book/7', '/ku/design/book/7', '/media/Book/BookCover7.webp', '/media/Videos/Videos26.mp4']) {
+    for (const mode of ['navigate', 'cors']) {
+      worker.handlers.fetch({
+        request: { method: 'GET', url: `https://bqurtas.com${pathname}`, headers: new Headers({ Accept: mode === 'navigate' ? 'text/html' : '*/*' }), mode },
+        respondWith() { assert.fail(`must not intercept ${pathname} (${mode})`); },
+        waitUntil() {}
+      });
+    }
+  }
+  assert.equal(worker.putCount, 0);
+});
+
+test('service worker returns a network error cleanly when offline storage is unavailable', async () => {
+  const worker = await loadServiceWorker({ offline: true, cacheReadFails: true });
+  let responsePromise;
+  worker.handlers.fetch({
+    request: { method: 'GET', url: 'https://bqurtas.com/ku/bio', headers: new Headers({ Accept: 'text/html' }), mode: 'navigate' },
+    respondWith(value) { responsePromise = value; },
+    waitUntil() {}
+  });
+  const response = await responsePromise;
+  assert.equal(response.type, 'error');
+});
+
+test('explicit asset refresh returns the network copy and updates the release cache', async () => {
+  for (const cache of ['reload', 'no-cache']) {
+    for (const version of ['403', '012345abcdef']) {
+      const assetUrl = `https://bqurtas.com/assets/gallery-manifest.json?v=${version}`;
+      const worker = await loadServiceWorker({ cachedAssetUrl: assetUrl });
+      let responsePromise;
+      worker.handlers.fetch({
+        request: { method: 'GET', url: assetUrl, headers: new Headers(), mode: 'cors', cache },
+        respondWith(value) { responsePromise = value; },
+        waitUntil() { assert.fail('explicit refresh must wait for the fresh response'); }
+      });
+      assert.equal(await (await responsePromise).text(), 'network');
+      assert.equal(worker.fetchCount, 1);
+      assert.equal(worker.putCount, 1);
+    }
+  }
+});
+
+test('explicit asset refresh can use its release cache when the network is offline', async () => {
+  const assetUrl = 'https://bqurtas.com/assets/gallery-manifest.json?v=403';
+  const worker = await loadServiceWorker({ cachedAssetUrl: assetUrl, offline: true });
+  let responsePromise;
+  worker.handlers.fetch({
+    request: { method: 'GET', url: assetUrl, headers: new Headers(), mode: 'cors', cache: 'reload' },
+    respondWith(value) { responsePromise = value; },
+    waitUntil() {}
+  });
+  assert.equal(await (await responsePromise).text(), 'cached asset');
+  assert.equal(worker.fetchCount, 1);
+  assert.equal(worker.putCount, 0);
+});
+
+test('no-store assets never read or write Cache Storage, even when an old copy exists', async () => {
+  const assetUrl = 'https://bqurtas.com/assets/gallery-manifest.json?v=012345abcdef';
+  for (const offline of [false, true]) {
+    const worker = await loadServiceWorker({ cachedAssetUrl: assetUrl, offline });
+    let responsePromise;
+    worker.handlers.fetch({
+      request: { method: 'GET', url: assetUrl, headers: new Headers(), mode: 'cors', cache: 'no-store' },
+      respondWith(value) { responsePromise = value; },
+      waitUntil() { assert.fail('no-store requests must not schedule cache updates'); }
+    });
+    if (offline) await assert.rejects(responsePromise, /offline/);
+    else assert.equal(await (await responsePromise).text(), 'network');
+    assert.equal(worker.fetchCount, 1);
+    assert.equal(worker.putCount, 0);
+    assert.equal(worker.matchCount, 0);
+  }
+});
+
+test('dev-server path resolution rejects traversal, malformed escapes and escaping symlinks', async () => {
+  const parent = await mkdtemp(path.join(os.tmpdir(), 'bq-dev-'));
+  const root = path.join(parent, 'site');
+  const outside = path.join(parent, 'outside');
+  try {
+    await mkdir(path.join(root, 'assets'), { recursive: true });
+    await mkdir(outside);
+    await writeFile(path.join(root, 'index.html'), 'INDEX');
+    await writeFile(path.join(root, 'assets/app.js'), 'APP');
+    await writeFile(path.join(outside, 'secret.txt'), 'SECRET');
+    await symlink(outside, path.join(root, 'escape'));
+
+    assert.equal(resolveRequestTarget('/..%2foutside/secret.txt', root).status, 403);
+    assert.equal(resolveRequestTarget('/%E0%A4%A', root).status, 400);
+    assert.equal(resolveRequestTarget('/escape/secret.txt', root).status, 403);
+    assert.equal(resolveRequestTarget('/missing.js', root).status, 404);
+    assert.equal(resolveRequestTarget('/design/logo', root).spaFallback, true);
+    assert.equal(resolveRequestTarget('/assets/app.js', root).spaFallback, undefined);
+  } finally {
+    await rm(parent, { recursive: true, force: true });
+  }
+});
+
+test('dev server stays on loopback and only falls back for known application routes', async () => {
+  assert.equal(DEFAULT_HOST, '127.0.0.1');
+  assert.equal(isSpaRoute('/ku/design/stationery'), true);
+  assert.equal(isSpaRoute('/ar/design/certificate'), true);
+  assert.equal(isSpaRoute('/blog/12'), true);
+  assert.equal(isSpaRoute('/blog/0'), false);
+  assert.equal(isSpaRoute('/missing-file.js'), false);
+  assert.throws(() => startDevServer({ host: '0.0.0.0', watch: false }), /non-loopback/);
+
+  const root = await mkdtemp(path.join(os.tmpdir(), 'bq-server-'));
+  await writeFile(path.join(root, 'index.html'), 'INDEX');
+  const server = startDevServer({ port: 0, root, watch: false });
+  try {
+    await once(server, 'listening');
+    const address = server.address();
+    assert.equal(address.address, '127.0.0.1');
+    const base = `http://127.0.0.1:${address.port}`;
+
+    const route = await fetch(`${base}/fr/contact`);
+    assert.equal(route.status, 200);
+    assert.equal(await route.text(), 'INDEX');
+
+    const missingAsset = await fetch(`${base}/missing.js`);
+    assert.equal(missingAsset.status, 404);
+    assert.equal(await missingAsset.text(), 'Not Found');
+  } finally {
+    server.close();
+    await once(server, 'close');
+    await rm(root, { recursive: true, force: true });
+  }
+});

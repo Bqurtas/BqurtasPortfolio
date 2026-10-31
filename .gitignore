@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Editor / tooling
+.claude/
+.vscode/
+node_modules/
+*.log
+
+# Archived experiments (local-only, not deployed)
+_attic/
