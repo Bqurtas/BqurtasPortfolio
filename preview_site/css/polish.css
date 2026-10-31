@@ -1494,7 +1494,9 @@ html body #design#design#design > .section.practice-note .bio-teaser-grid .stats
    so the suffix and the row never shift while the number is counting. */
 html body #design#design#design > .section.practice-note .bio-teaser-grid .stats .stat .stat-digits {
   display: inline-grid;
+  justify-items: end;
   font-variant-numeric: lining-nums tabular-nums;
+  transition: none !important;
 }
 
 html body #design#design#design > .section.practice-note .bio-teaser-grid .stats .stat .stat-sizer,
@@ -5548,17 +5550,99 @@ html body #design#design#design > .section.practice-note .bio-teaser-grid .stats
   padding: clamp(12px, 1.8vh, 18px) clamp(10px, 1.4vw, 16px) !important;
 }
 
-/* Book covers and logos are transparent artwork. The gray plate behind them
-   is the shape; the picture stays. */
+/* Book covers and logos are transparent artwork. No plate, and no shadow
+   under the picture on hover — the image itself lifts and clears. */
 html body #design#design#design #grid .card:is([data-cat="book"], [data-cat="logo"]) :is(.card-art, .card-art--photo) {
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
+  overflow: visible !important;
+}
+
+html body #design#design#design #grid .card:is([data-cat="book"], [data-cat="logo"]) :is(.card-hover-shade, .card-art::before, .card-art::after) {
+  opacity: 0 !important;
+  background: none !important;
+  background-image: none !important;
+}
+
+html body #design#design#design #grid .card:is([data-cat="book"], [data-cat="logo"]) .card-art :is(img, video) {
+  transform: translate3d(0, 0, 0) scale(1) !important;
+  filter: none !important;
+  transition: transform .48s cubic-bezier(.22, 1, .36, 1), filter .48s ease !important;
+}
+
+html body #design#design#design #grid .card:is([data-cat="book"], [data-cat="logo"]):is(:hover, :focus-within) .card-art :is(img, video) {
+  transform: translate3d(0, -7px, 0) scale(1.04) !important;
+  filter: contrast(1.06) saturate(1.05) brightness(1.03) !important;
+}
+
+html body #design#design#design .logos-section :is(.logo-mark--ticker, .logo-mark--client, .logo-chip) img {
+  transition: transform .48s cubic-bezier(.22, 1, .36, 1), filter .48s ease !important;
+}
+
+html body #design#design#design .logos-section :is(.logo-mark--ticker, .logo-mark--client, .logo-chip):is(:hover, :focus-visible) img {
+  transform: translate3d(0, -5px, 0) scale(1.06) !important;
+}
+
+/* Clarity stays on the client marks. A filter on the ticker would trap
+   mix-blend-mode and paint a plate behind the drawing. */
+html body #design#design#design .logos-section :is(.logo-mark--client, .logo-chip):is(:hover, :focus-visible) img {
+  filter: contrast(1.06) saturate(1.05) brightness(1.03) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body #design#design#design #grid .card:is([data-cat="book"], [data-cat="logo"]) .card-art :is(img, video),
+  html body #design#design#design #grid .card:is([data-cat="book"], [data-cat="logo"]):is(:hover, :focus-within) .card-art :is(img, video),
+  html body #design#design#design .logos-section :is(.logo-mark--ticker, .logo-mark--client, .logo-chip) img,
+  html body #design#design#design .logos-section :is(.logo-mark--ticker, .logo-mark--client, .logo-chip):is(:hover, :focus-visible) img {
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
 }
 
 @layer bq-flat {
-  html body #design#design #grid .card:is([data-cat="book"], [data-cat="logo"]) .card-art,
-  html body #design#design #grid .card:is([data-cat="book"], [data-cat="logo"]) .card-art::after {
+  html body #design#design #grid .card:is([data-cat="book"], [data-cat="logo"]),
+  html body #design#design #grid .card:is([data-cat="book"], [data-cat="logo"]) :is(:hover, :focus-within),
+  html body #design#design #grid .card:is([data-cat="book"], [data-cat="logo"]) :is(.card-art, .card-art--photo, .card-hover-shade, .card-open),
+  html body #design#design #grid .card:is([data-cat="book"], [data-cat="logo"]) :is(.card-art, .card-art--photo)::before,
+  html body #design#design #grid .card:is([data-cat="book"], [data-cat="logo"]) :is(.card-art, .card-art--photo)::after,
+  html body #design#design #grid .card:is([data-cat="book"], [data-cat="logo"]) :is(img, video),
+  html body #design#design#design .logos-section :is(.logo-mark, .logo-chip, .logo-mark img, .logo-chip img, .logo-mark:hover, .logo-chip:hover, .logo-mark:hover img, .logo-chip:hover img) {
     box-shadow: none !important;
+    text-shadow: none !important;
   }
+}
+
+/* The open journal sits above the decorative cursor (reader z-index 100001,
+   cursor marks at 10002). cursor:none then leaves no pointer on the note.
+   Keep the custom cursor on the rest of the site; this surface uses the
+   system cursor so links, buttons, scrolling and text selection stay usable. */
+html.bq-cursor-on body #reader#reader,
+html.bq-cursor-on body #reader#reader * {
+  cursor: auto !important;
+}
+html.bq-cursor-on body #reader#reader :is(a, button, [role="button"], summary, label[for], select, .reader-more-card) {
+  cursor: pointer !important;
+}
+html.bq-cursor-on body #reader#reader :is(.reader-title, .reader-highlight, .reader-text, .reader-comment p) {
+  cursor: text !important;
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+html.bq-cursor-on body #reader#reader :is(.reader-title, .reader-highlight, .reader-text) :is(a, button, [role="button"]) {
+  cursor: pointer !important;
+}
+html.bq-cursor-on body #reader#reader :is(input, textarea, [contenteditable="true"]) {
+  cursor: text !important;
+}
+html.bq-cursor-on body #reader#reader :is(button, input, select):disabled {
+  cursor: not-allowed !important;
+}
+html body #reader#reader.is-open,
+html body #reader#reader.is-open :is(.reader-panel, .reader-bar, .reader-scroll, .reader-body, .reader-text) {
+  pointer-events: auto !important;
+}
+html:has(#reader.is-open) :is(.cursor-dot, .cursor-ring) {
+  visibility: hidden !important;
 }

@@ -1659,15 +1659,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const animateCount = (el) => {
     const target = parseInt(el.dataset.count, 10) || 0;
     const text = prepareStat(el);
-    if (el.dataset.counted === '1' && statMotionReduced()) return;
-    /* Long enough to read as counting (1 → 25, 1 → 1,000), still under a
-       second. A steep ease-out finished on the final figure before the
-       rise fade made the number visible, so it looked frozen. */
-    const duration = 820;
+    if (statMotionReduced()) {
+      if (text.data !== statDigits(target)) text.data = statDigits(target);
+      el.dataset.counted = '1';
+      return;
+    }
+    /* Writes the text node only. No layout or style reads in the frame, so
+       the climb cannot fight the sheet's transform. */
+    const duration = 780;
     const startTime = performance.now();
     const step = (now) => {
       const t = Math.min((now - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - t, 1.35);
+      const eased = 1 - Math.pow(1 - t, 1.55);
       const v = t >= 1 ? target : Math.max(1, Math.round(eased * target));
       const value = statDigits(v);
       if (text.data !== value) text.data = value;
@@ -1692,7 +1695,7 @@ document.addEventListener('DOMContentLoaded', () => {
       entries.forEach(e => {
         if (e.isIntersecting) {
           e.target.classList.add('is-in');
-          if (e.target.classList.contains('stat')) queueStatCount();
+          if (e.target.classList.contains('stat')) requestStatCount();
           io.unobserve(e.target);
         }
       });
@@ -1728,67 +1731,90 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   routerReady = true;   // from here on, language switches update the URL prefix
 
-  /* The paper stack sticks every sheet in the same viewport slot, and the
-     note's figures also fade in (.reveal / .bq-rise, opacity 0). A rect check
-     alone started the climb while the glyphs were still invisible, and the
-     number was already final when the fade arrived. Count only once the
-     figure is on the front sheet AND painted. */
+  /* The figures rise on their own (clip, transform, blur) for most of a
+     second. Polling getComputedStyle / getBoundingClientRect every frame, and
+     rewriting the digits while that entrance was still running, forced layout
+     in the same frames the sheet was moving — the hitch at first appearance.
+     The hidden sizer already holds the final width. Climb only after the
+     entrance transitions have finished, and only write text from then on. */
   document.querySelectorAll('.practice-note .stat-num').forEach((numEl) => prepareStat(numEl));
-  const statWait = new WeakMap();
-  const statOnStage = (stat) => {
-    const sheet = stat.closest('.section.practice-note');
-    if (!sheet || sheet.classList.contains('is-paper-measuring')) return false;
-    if (sheet.classList.contains('is-paper-gone')) return false;
-    const viewH = window.innerHeight || document.documentElement.clientHeight || 0;
-    if (!viewH) return false;
-    const sheetBox = sheet.getBoundingClientRect();
-    if (sheetBox.top > viewH * 0.72 || sheetBox.bottom < viewH * 0.22) return false;
-    const box = stat.getBoundingClientRect();
-    return box.width > 0 && box.top < viewH * 0.92 && box.bottom > viewH * 0.12;
+  if (document.fonts && document.fonts.load) document.fonts.load('700 40px Fraunces').catch(() => {});
+  const statFontReady = () => {
+    if (!document.fonts || !document.fonts.load) return Promise.resolve();
+    return Promise.race([
+      document.fonts.load('700 40px Fraunces').catch(() => {}),
+      new Promise((resolve) => { setTimeout(resolve, 600); }),
+    ]);
   };
-  const statPainted = (stat) => {
-    const cs = getComputedStyle(stat);
-    if (cs.visibility === 'hidden' || cs.display === 'none') return false;
-    return parseFloat(cs.opacity) >= 0.92;
+  const entranceSettled = (stat) => new Promise((resolve) => {
+    if (statMotionReduced()) { resolve(); return; }
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
+    const watch = (retried) => {
+      if (settled) return;
+      const anims = typeof stat.getAnimations === 'function' ? stat.getAnimations() : [];
+      const live = anims.filter((anim) => anim.playState === 'running' || anim.playState === 'pending');
+      if (!live.length) {
+        /* A delayed rise is not always listed until the delay ends. One
+           recheck covers that; a second empty read means the entrance is over. */
+        if (!retried) {
+          const delay = parseFloat(stat.style.getPropertyValue('--bq-rise-delay')) || 0;
+          setTimeout(() => watch(true), Math.min(720, delay + 48));
+          return;
+        }
+        finish();
+        return;
+      }
+      const cap = setTimeout(finish, 1600);
+      Promise.all(live.map((anim) => anim.finished.catch(() => {}))).then(() => {
+        clearTimeout(cap);
+        finish();
+      });
+    };
+    requestAnimationFrame(() => requestAnimationFrame(() => watch(false)));
+    setTimeout(finish, 1800);
+  });
+  const practiceStats = () => Array.from(document.querySelectorAll('.practice-note .stat'));
+  const releaseStatWatch = () => {
+    const stats = practiceStats();
+    if (!stats.length || !stats.every((stat) => stat.querySelector('.stat-num')?.dataset.counted)) return;
+    window.removeEventListener('scroll', requestStatCount);
+    window.removeEventListener('resize', requestStatCount);
+    clearTimeout(statSettleTimer);
   };
   const queueStatCount = () => {
-    let pending = false;
-    let waitingForPaint = false;
-    document.querySelectorAll('.practice-note .stat').forEach((stat) => {
-      const numEl = stat.querySelector('.stat-num');
-      if (!numEl || numEl.dataset.counted) return;
-      if (!statOnStage(stat)) {
-        statWait.delete(stat);
-        pending = true;
+    const stats = practiceStats();
+    if (!stats.length) { releaseStatWatch(); return; }
+    const nums = stats.map((stat) => stat.querySelector('.stat-num')).filter(Boolean);
+    if (!nums.length || nums.every((numEl) => numEl.dataset.counted)) { releaseStatWatch(); return; }
+    if (nums.some((numEl) => numEl.dataset.armed)) return;
+    const sheet = stats[0].closest('.section.practice-note');
+    if (!sheet || sheet.classList.contains('is-paper-measuring') || sheet.classList.contains('is-paper-gone')) return;
+    if (stats.some((stat) => !stat.classList.contains('is-risen'))) return;
+    nums.forEach((numEl) => { numEl.dataset.armed = '1'; });
+    Promise.all([statFontReady(), ...stats.map((stat) => entranceSettled(stat))]).then(() => {
+      if (sheet.classList.contains('is-paper-gone') || sheet.classList.contains('is-paper-measuring')) {
+        nums.forEach((numEl) => { delete numEl.dataset.armed; });
         return;
       }
-      const waited = statWait.get(stat) || performance.now();
-      if (!statWait.has(stat)) statWait.set(stat, waited);
-      /* If the fade never quite reaches opaque, still climb rather than
-         sitting on 1. A second on stage is enough to decide. */
-      if (!statPainted(stat) && performance.now() - waited < 1000) {
-        pending = true;
-        waitingForPaint = true;
-        return;
-      }
-      statWait.delete(stat);
-      numEl.dataset.counted = '1';
-      animateCount(numEl);
+      nums.forEach((numEl) => {
+        if (numEl.dataset.counted) return;
+        numEl.dataset.counted = '1';
+        animateCount(numEl);
+      });
+      releaseStatWatch();
     });
-    if (!pending) {
-      window.removeEventListener('scroll', requestStatCount);
-      window.removeEventListener('resize', requestStatCount);
-    } else if (waitingForPaint && !document.hidden) {
-      requestStatCount();
-    }
   };
-  let statCountFrame = 0;
+  let statSettleTimer = 0;
   const requestStatCount = () => {
-    if (statCountFrame) return;
-    statCountFrame = requestAnimationFrame(() => {
-      statCountFrame = 0;
-      queueStatCount();
-    });
+    clearTimeout(statSettleTimer);
+    /* Wait until scrolling pauses. A rect or style read on the scroll frame
+       is what stuttered the entrance. */
+    statSettleTimer = setTimeout(queueStatCount, 180);
   };
   window.addEventListener('scroll', requestStatCount, { passive: true });
   window.addEventListener('resize', requestStatCount, { passive: true });
