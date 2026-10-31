@@ -4863,6 +4863,23 @@ html:root[data-theme="dark"] body.footer-under-dock .mobilebar.mobilebar :is(.mo
 html:root[data-theme="dark"] body.footer-under-dock .rail.rail :is(.rail-link, .rail-icon, .rail-chat, .rail-chat i, .lang-current, #langCurrentCode, .social-current, .social-current i, .theme-btn, .theme-btn i, .rail-action-label, .rail-logo-mark, .rail-logo-name, .rail-logo-role, .rail-room-name) {
   color: #141414 !important;
 }
+/* The three bars are drawn with currentColor. Tie them to the button so they
+   follow the theme, and the footer swap below, without a second ink of their own. */
+html body .rail.rail #railMenu.rail-menu,
+html body .rail.rail #railMenu.rail-menu .rail-menu-bars i {
+  color: var(--ink) !important;
+}
+html body .rail.rail #railMenu.rail-menu .rail-menu-bars i {
+  background-color: currentColor !important;
+}
+html:root body.footer-under-dock .rail.rail #railMenu.rail-menu,
+html:root body.footer-under-dock .rail.rail #railMenu.rail-menu .rail-menu-bars i {
+  color: #f6f6f2 !important;
+}
+html:root[data-theme="dark"] body.footer-under-dock .rail.rail #railMenu.rail-menu,
+html:root[data-theme="dark"] body.footer-under-dock .rail.rail #railMenu.rail-menu .rail-menu-bars i {
+  color: #141414 !important;
+}
 html:root body.footer-under-dock .mobilebar.mobilebar .mobilebar-cta,
 html:root body.footer-under-dock .rail.rail .design-cta {
   background: #f4f3ef !important;
@@ -4938,35 +4955,59 @@ html:root[data-theme="dark"] body .rail.rail #designCta.design-cta > span[data-i
    which is the same colour as the icon in both themes, so the mouse
    appeared to do nothing. */
 @media (hover: hover) and (pointer: fine) {
-  html body .mobilebar.mobilebar .mobilebar-btn:is(:hover, :focus-visible),
-  html body .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle, #railMenu):is(:hover, :focus-visible) {
+  html body .mobilebar.mobilebar .mobilebar-btn:not(#menuToggle):not(.menu-toggle-btn):is(:hover, :focus-visible),
+  html body .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle):is(:hover, :focus-visible) {
     background-color: var(--ink) !important;
     color: var(--bg) !important;
   }
-  html body .mobilebar.mobilebar .mobilebar-btn:is(:hover, :focus-visible) :is(i, .menu-icon, #langCurrentCodeM),
-  html body .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle, #railMenu):is(:hover, :focus-visible) :is(i, .rail-icon, #langCurrentCode, .rail-action-label) {
+  html body .mobilebar.mobilebar .mobilebar-btn:not(#menuToggle):not(.menu-toggle-btn):is(:hover, :focus-visible) :is(i, #langCurrentCodeM),
+  html body .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle):is(:hover, :focus-visible) :is(i, .rail-icon, #langCurrentCode, .rail-action-label) {
     color: var(--bg) !important;
     background-color: transparent !important;
   }
-  html:root body.footer-under-dock .mobilebar.mobilebar .mobilebar-btn:is(:hover, :focus-visible),
-  html:root body.footer-under-dock .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle, #railMenu):is(:hover, :focus-visible) {
+  html:root body.footer-under-dock .mobilebar.mobilebar .mobilebar-btn:not(#menuToggle):not(.menu-toggle-btn):is(:hover, :focus-visible),
+  html:root body.footer-under-dock .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle):is(:hover, :focus-visible) {
     background-color: #f6f6f2 !important;
     color: #141414 !important;
   }
-  html:root body.footer-under-dock .mobilebar.mobilebar .mobilebar-btn:is(:hover, :focus-visible) :is(i, .menu-icon, #langCurrentCodeM),
-  html:root body.footer-under-dock .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle, #railMenu):is(:hover, :focus-visible) :is(i, .rail-icon, #langCurrentCode, .rail-action-label) {
+  html:root body.footer-under-dock .mobilebar.mobilebar .mobilebar-btn:not(#menuToggle):not(.menu-toggle-btn):is(:hover, :focus-visible) :is(i, #langCurrentCodeM),
+  html:root body.footer-under-dock .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle):is(:hover, :focus-visible) :is(i, .rail-icon, #langCurrentCode, .rail-action-label) {
     background-color: transparent !important;
     color: #141414 !important;
   }
-  html:root[data-theme="dark"] body.footer-under-dock .mobilebar.mobilebar .mobilebar-btn:is(:hover, :focus-visible),
-  html:root[data-theme="dark"] body.footer-under-dock .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle, #railMenu):is(:hover, :focus-visible) {
+  html:root[data-theme="dark"] body.footer-under-dock .mobilebar.mobilebar .mobilebar-btn:not(#menuToggle):not(.menu-toggle-btn):is(:hover, :focus-visible),
+  html:root[data-theme="dark"] body.footer-under-dock .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle):is(:hover, :focus-visible) {
     background-color: #141414 !important;
     color: #f6f6f2 !important;
   }
-  html:root[data-theme="dark"] body.footer-under-dock .mobilebar.mobilebar .mobilebar-btn:is(:hover, :focus-visible) :is(i, .menu-icon, #langCurrentCodeM),
-  html:root[data-theme="dark"] body.footer-under-dock .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle, #railMenu):is(:hover, :focus-visible) :is(i, .rail-icon, #langCurrentCode, .rail-action-label) {
+  html:root[data-theme="dark"] body.footer-under-dock .mobilebar.mobilebar .mobilebar-btn:not(#menuToggle):not(.menu-toggle-btn):is(:hover, :focus-visible) :is(i, #langCurrentCodeM),
+  html:root[data-theme="dark"] body.footer-under-dock .rail.rail :is(.rail-link, .rail-chat, .lang-current, .social-current, .theme-btn, #themeToggle):is(:hover, :focus-visible) :is(i, .rail-icon, #langCurrentCode, .rail-action-label) {
     background-color: transparent !important;
     color: #f6f6f2 !important;
+  }
+  /* The three-line opener keeps its line shift. These selectors match the
+     invert rules above, then refuse the disc and the ink swap. */
+  html body .mobilebar.mobilebar #menuToggle.menu-toggle-btn:is(:hover, :focus-visible),
+  html body .rail.rail #railMenu.rail-menu:is(:hover, :focus-visible),
+  html:root body.footer-under-dock .mobilebar.mobilebar #menuToggle.menu-toggle-btn:is(:hover, :focus-visible),
+  html:root body.footer-under-dock .rail.rail #railMenu.rail-menu:is(:hover, :focus-visible),
+  html:root[data-theme="dark"] body.footer-under-dock .mobilebar.mobilebar #menuToggle.menu-toggle-btn:is(:hover, :focus-visible),
+  html:root[data-theme="dark"] body.footer-under-dock .rail.rail #railMenu.rail-menu:is(:hover, :focus-visible) {
+    background-color: transparent !important;
+    background-image: none !important;
+    color: inherit !important;
+  }
+  html body .rail.rail #railMenu.rail-menu:is(:hover, :focus-visible) .rail-menu-bars i,
+  html:root body.footer-under-dock .rail.rail #railMenu.rail-menu:is(:hover, :focus-visible) .rail-menu-bars i,
+  html:root[data-theme="dark"] body.footer-under-dock .rail.rail #railMenu.rail-menu:is(:hover, :focus-visible) .rail-menu-bars i {
+    background-color: currentColor !important;
+    color: inherit !important;
+  }
+  html body .mobilebar.mobilebar #menuToggle.menu-toggle-btn:is(:hover, :focus-visible) .menu-icon,
+  html:root body.footer-under-dock .mobilebar.mobilebar #menuToggle.menu-toggle-btn:is(:hover, :focus-visible) .menu-icon,
+  html:root[data-theme="dark"] body.footer-under-dock .mobilebar.mobilebar #menuToggle.menu-toggle-btn:is(:hover, :focus-visible) .menu-icon {
+    background-color: transparent !important;
+    color: inherit !important;
   }
   html body .mobilebar.mobilebar .mobilebar-cta:is(:hover, :focus-visible),
   html body .rail.rail .design-cta:is(:hover, :focus-visible) {
@@ -5077,4 +5118,323 @@ html:root[data-theme="dark"] body .rail.rail #designCta.design-cta > span[data-i
     display: none !important;
     box-shadow: none !important;
   }
+}
+
+/* ============================================================================
+   Classic glass for the shaped chrome that sits on the paper.
+   Same frost as the menu strip: a translucent fill, a vertical sheen, and
+   blur, with no stroke. The big chapter sheets stay paper. Photographs,
+   video, and artwork stay images. The talk circle stays the solid inverted
+   mark. The hamburger is not in this block, so its hover stays a line shift
+   without a filled disc.
+   ========================================================================== */
+html:root {
+  --bq-glass: color-mix(in srgb, #f4f3ef 46%, transparent);
+  --bq-glass-strong: color-mix(in srgb, #f4f3ef 72%, transparent);
+  --bq-glass-sheen: linear-gradient(180deg, rgb(255 255 255 / .42), rgb(255 255 255 / .08));
+}
+html:root[data-theme="dark"] {
+  --bq-glass: color-mix(in srgb, #141414 34%, transparent);
+  --bq-glass-strong: color-mix(in srgb, #141414 62%, transparent);
+  --bq-glass-sheen: linear-gradient(180deg, rgb(255 255 255 / .2), rgb(255 255 255 / .04));
+}
+
+html body :is(
+  #design#design#design .tabs .tab,
+  #design#design#design .load-more-btn,
+  #design#design#design .hero-cta,
+  #design#design#design .service-cta,
+  #design#design#design .bio-teaser-link,
+  #design#design#design .latest-blog-all,
+  #design#design#design .latest-blog .blog-card,
+  #bio#bio#bio .bio-teaser-link,
+  #bio#bio#bio .bio-chapter-index,
+  #bio#bio#bio .room-hero-return,
+  #blog#blog#blog .room-hero-return,
+  #contact#contact#contact .room-hero-return,
+  #blog#blog#blog .blog-filter,
+  #blog#blog#blog :is(.blog-pager-arrow, .blog-page, .blog-pager-go button),
+  #blog#blog#blog .subscribe-field,
+  #blog#blog#blog .subscribe-form button,
+  #blog#blog#blog .index-card--blog,
+  #blog#blog#blog .blog-card-tag,
+  #contact#contact#contact#contact .contact-quick .qc-card,
+  #contact#contact#contact .pitch-submit,
+  #bio#bio#bio .index-card--honor,
+  .profile-card,
+  .profile-card-btn,
+  .lang-flyout,
+  .social-flyout,
+  .mobilebar-pop,
+  #chat#chat,
+  #latestPanel#latestPanel,
+  #chat#chat .chat-chip,
+  #chat#chat .chat-input input,
+  #chat#chat .chat-input button,
+  #chat#chat .chat-msg--me,
+  #chat#chat .chat-min,
+  #latestPanel#latestPanel .latest-panel-close,
+  .cookie-card,
+  .cookie-card button,
+  #toTop#toTop,
+  #design#design #grid .card-video-badge
+) {
+  background-color: var(--bq-glass) !important;
+  background-image: var(--bq-glass-sheen) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.6) !important;
+  backdrop-filter: blur(22px) saturate(1.6) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--ink) !important;
+}
+
+/* Selected and pressed marks stay glass, only a little denser, so the label
+   never flips to the opposite ink. */
+html body :is(
+  #design#design#design .tabs .tab.is-active,
+  #design#design#design .tabs .tab:is(:hover, :focus-visible),
+  #blog#blog#blog .blog-filter.is-active,
+  #blog#blog#blog .blog-filter:is(:hover, :focus-visible),
+  #blog#blog#blog .blog-page.is-active,
+  #blog#blog#blog :is(.blog-pager-arrow, .blog-page, .blog-pager-go button):is(:hover, :focus-visible),
+  #design#design#design .load-more-btn:is(:hover, :focus-visible),
+  #design#design#design .hero-cta:is(:hover, :focus-visible),
+  #design#design#design .service-cta:is(:hover, :focus-visible),
+  #design#design#design .bio-teaser-link:is(:hover, :focus-visible),
+  #design#design#design .latest-blog-all:is(:hover, :focus-visible),
+  #bio#bio#bio .bio-teaser-link:is(:hover, :focus-visible),
+  :is(#bio#bio#bio, #blog#blog#blog, #contact#contact#contact) .room-hero-return:is(:hover, :focus-visible),
+  #blog#blog#blog .subscribe-form button:is(:hover, :focus-visible),
+  #contact#contact#contact .pitch-submit:is(:hover, :focus-visible),
+  #contact#contact#contact#contact .contact-quick .qc-card:is(:hover, :focus-visible),
+  .profile-card-btn:is(:hover, :focus-visible),
+  #chat#chat .chat-chip:is(:hover, :focus-visible),
+  #chat#chat .chat-input button:is(:hover, :focus-visible),
+  #chat#chat .chat-min:is(:hover, :focus-visible),
+  #latestPanel#latestPanel .latest-panel-close:is(:hover, :focus-visible),
+  .cookie-card button:is(:hover, :focus-visible),
+  #toTop#toTop:is(:hover, :focus-visible),
+  .lang-flyout :is(.lang-opt, .social-opt):is(:hover, :focus-visible, .is-active),
+  .social-flyout .social-opt:is(:hover, :focus-visible),
+  .mobilebar-pop :is(.mobile-lang, a, .share-page-btn):is(:hover, :focus-visible, .is-active)
+) {
+  background-color: var(--bq-glass-strong) !important;
+  background-image: var(--bq-glass-sheen) !important;
+  border: 0 !important;
+  color: var(--ink) !important;
+}
+
+html body :is(
+  #design#design#design .tabs .tab,
+  #design#design#design .tabs .tab i,
+  #design#design#design .hero-cta,
+  #design#design#design .hero-cta i,
+  #design#design#design .hero-cta .hero-cta-txt,
+  #design#design#design .load-more-btn,
+  #design#design#design .load-more-btn i,
+  #design#design#design .service-cta,
+  #design#design#design .service-cta i,
+  #design#design#design .latest-blog .blog-card,
+  #design#design#design .latest-blog .blog-card :is(h3, p, .blog-meta, .blog-more, i),
+  #blog#blog#blog .blog-filter,
+  #blog#blog#blog .blog-page,
+  #blog#blog#blog .subscribe-form button,
+  #blog#blog#blog .subscribe-field,
+  #blog#blog#blog .subscribe-field input,
+  #blog#blog#blog .index-card--blog,
+  #blog#blog#blog .blog-card-tag,
+  #contact#contact#contact .pitch-submit,
+  #contact#contact#contact .pitch-submit i,
+  #contact#contact#contact#contact .qc-card,
+  #contact#contact#contact#contact .qc-card > i,
+  #bio#bio#bio .index-card--honor,
+  .profile-card,
+  .profile-card-btn,
+  .profile-card-btn i,
+  .lang-flyout :is(.lang-opt, .lang-opt i, .lang-head),
+  .social-flyout :is(.social-opt, .social-opt i, .social-opt small),
+  .mobilebar-pop :is(.mobile-lang, a, .share-page-btn, i),
+  #chat#chat,
+  #chat#chat :is(.chat-head, .chat-head-id strong, .chat-status, .chat-min, .chat-min i, .chat-chip, .chat-msg, .chat-input button, .chat-input button i),
+  #latestPanel#latestPanel,
+  #latestPanel#latestPanel :is(.latest-panel-head, .latest-panel-title, .latest-panel-title i, .latest-panel-close, .latest-panel-close i),
+  .cookie-card,
+  .cookie-card button,
+  #toTop#toTop,
+  #toTop#toTop i,
+  #design#design #grid .card-video-badge,
+  #design#design #grid .card-video-badge i
+) {
+  color: var(--ink) !important;
+}
+
+/* Filter row: separate glass chips, no rule under the row and no gold underline. */
+html body #design#design#design .tabs-wrap,
+html body #design#design#design > .section.work > .tabs-wrap {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html body #design#design#design .tabs-row {
+  border: 0 !important;
+  gap: 8px !important;
+}
+html body #design#design#design .tabs .tab {
+  border-radius: 16px !important;
+}
+html body #design#design#design .tabs .tab::after,
+html body #design#design#design .hero-cta::before,
+html body #design#design#design .hero-cta::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+
+/* Service rows become glass bars. The open copy stays on the paper. */
+html body #design#design#design #services#services .service-accordion,
+html body #design#design#design #services#services .service-accordion .service-panel {
+  border: 0 !important;
+  background: none !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+html body #design#design#design #services#services .service-accordion {
+  gap: 8px !important;
+}
+html body #design#design#design #services#services .service-accordion .service-panel .service-trigger,
+html body #design#design#design #services#services .service-panel:not(.is-active) .service-trigger:is(:hover, :focus-visible),
+html body #design#design#design #services#services .service-panel.is-active .service-trigger {
+  border: 0 !important;
+  border-radius: 16px !important;
+  background-color: var(--bq-glass) !important;
+  background-image: var(--bq-glass-sheen) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.6) !important;
+  backdrop-filter: blur(22px) saturate(1.6) !important;
+  box-shadow: none !important;
+  color: var(--ink) !important;
+}
+html body #design#design#design #services#services .service-panel.is-active .service-trigger,
+html body #design#design#design #services#services .service-panel .service-trigger:is(:hover, :focus-visible) {
+  background-color: var(--bq-glass-strong) !important;
+}
+html body #design#design#design #services#services .service-accordion .service-panel .service-trigger .service-toggle,
+html body #design#design#design #services#services .service-accordion .service-panel.is-active .service-trigger .service-toggle {
+  border: 0 !important;
+  background-color: var(--bq-glass-strong) !important;
+  background-image: var(--bq-glass-sheen) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.6) !important;
+  backdrop-filter: blur(22px) saturate(1.6) !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+}
+html body #design#design#design #services#services .service-accordion .service-panel .service-toggle i,
+html body #design#design#design #services#services .service-accordion .service-panel.is-active .service-trigger .service-toggle i {
+  color: var(--ink) !important;
+  background: transparent !important;
+}
+
+/* Contact entries and the honour plate read as glass cards, theme ink. */
+html body #contact#contact#contact#contact .contact-quick {
+  gap: 8px !important;
+}
+html body #contact#contact#contact#contact .contact-quick .qc-card,
+html body #contact#contact#contact#contact .contact-quick .qc-card:is(:hover, :focus-visible) {
+  border-radius: 16px !important;
+  padding: 18px 16px !important;
+  transform: none !important;
+}
+html body #contact#contact#contact#contact .qc-card > i,
+html body #contact#contact#contact#contact .qc-card:is(:hover, :focus-visible) > i {
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--ink) !important;
+}
+html body #bio#bio#bio .index-card--honor {
+  border-radius: 18px !important;
+}
+html body #blog#blog#blog .index-card--blog {
+  border-radius: 18px !important;
+  overflow: hidden !important;
+}
+html body #blog#blog#blog .blog-card-tag {
+  border-radius: 999px !important;
+}
+html body #blog#blog#blog .blog-card-foot {
+  border: 0 !important;
+}
+html body #blog#blog#blog :is(.blog-filter, .subscribe-form button, .blog-page) {
+  border-radius: 999px !important;
+}
+html body #blog#blog#blog .subscribe-field {
+  border-radius: 16px !important;
+}
+html body :is(#design#design#design, #bio#bio#bio) :is(.hero-cta, .load-more-btn, .service-cta, .bio-teaser-link, .latest-blog-all, .room-hero-return, .profile-card-btn) {
+  border-radius: 999px !important;
+}
+html body #design#design#design .latest-blog .blog-card {
+  border-radius: 18px !important;
+}
+html body .profile-card,
+html body #chat#chat,
+html body #latestPanel#latestPanel,
+html body .cookie-card,
+html body :is(.lang-flyout, .social-flyout, .mobilebar-pop) {
+  border-radius: 22px !important;
+}
+html body :is(#chat#chat .chat-head, #latestPanel#latestPanel .latest-panel-head, #chat#chat .chat-input, #chat#chat .chat-msg--bot) {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  color: var(--ink) !important;
+}
+html body .mobilebar-pop::after {
+  display: none !important;
+}
+html body #chat#chat .chat-ava {
+  border: 0 !important;
+  background: transparent !important;
+}
+html body #toTop#toTop,
+html body #design#design #grid .card-video-badge,
+html body #chat#chat .chat-input button,
+html body #chat#chat .chat-min,
+html body #latestPanel#latestPanel .latest-panel-close,
+html body #bio#bio#bio .bio-chapter-index {
+  border-radius: 50% !important;
+}
+
+/* The picture stays a picture. Glass is only the chrome around it. */
+/* The hero invitation is a line of type on the paper, not a pill. The shared
+   glass list is specific enough to repaint it, so this puts the underline back. */
+html body #design#design#design#design .hero-editorial .hero-cta,
+html body #design#design#design#design .hero-editorial .hero-cta:is(:hover, :focus-visible) {
+  background-color: transparent !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border: 0 !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 45%, transparent) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: var(--ink) !important;
+}
+
+html body :is(
+  #design#design #grid .card-art,
+  #design#design #grid .card-art img,
+  #design#design #grid .card-art video,
+  #design#design .hero-portrait,
+  #design#design .hero-portrait img,
+  #blog#blog#blog .blog-card-cover,
+  #blog#blog#blog .blog-card-cover img,
+  #blog#blog#blog .blog-card-author img,
+  .profile-card-photo,
+  .profile-card-photo img,
+  #chat#chat .chat-ava img
+) {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }
