@@ -1465,6 +1465,14 @@ html body #design#design#design > .section.practice-note .bio-teaser-grid .stats
   direction: ltr;
   unicode-bidi: isolate;
   margin: 0 !important;
+  font-family: Fraunces, serif !important;
+  /* Fraunces loads 300–700. 400 was the thin cut; 700 is the heaviest
+     master that actually ships. Pin wght and a stouter optical size so
+     the browser cannot fall back to the hairline display face. */
+  font-weight: 700 !important;
+  font-synthesis: none !important;
+  font-optical-sizing: none !important;
+  font-variation-settings: "wght" 700, "opsz" 18, "SOFT" 0, "WONK" 0 !important;
   font-size: clamp(21px, min(5.6vw, 3.6vh), 40px) !important;
   line-height: 1.12 !important;
   letter-spacing: -.02em !important;
@@ -1472,6 +1480,14 @@ html body #design#design#design > .section.practice-note .bio-teaser-grid .stats
   font-feature-settings: "tnum" 1;
   color: var(--ink) !important;
   white-space: nowrap !important;
+}
+
+html body #design#design#design > .section.practice-note .bio-teaser-grid .stats .stat .stat-num :is(.stat-digits, .stat-sizer, .stat-live, .stat-plus) {
+  font-family: inherit !important;
+  font-weight: 700 !important;
+  font-synthesis: none !important;
+  font-optical-sizing: none !important;
+  font-variation-settings: "wght" 700, "opsz" 18, "SOFT" 0, "WONK" 0 !important;
 }
 
 /* The sizer reserves the final figure (1,000). Digits grow toward the +
