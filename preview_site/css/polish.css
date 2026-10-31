@@ -5646,3 +5646,370 @@ html body #reader#reader.is-open :is(.reader-panel, .reader-bar, .reader-scroll,
 html:has(#reader.is-open) :is(.cursor-dot, .cursor-ring) {
   visibility: hidden !important;
 }
+
+/* Biography kit and certificates fill their sheet the way the other chapters
+   do. The marks stay images on paper — no second glass pane, no inner track
+   while the chapter still fits. */
+html body #bio#bio#bio#bio#bio > :is(.bio-kit-sheet, .bio-proof-sheet) {
+  --bq-paper-content-max: 100%;
+}
+html body #bio#bio#bio#bio#bio.paper-stack > :is(.bio-kit-sheet, .bio-proof-sheet)[data-paper-fit] > .paper-scroll {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: stretch !important;
+  overflow: hidden !important;
+}
+html body #bio#bio#bio#bio#bio.paper-stack > :is(.bio-kit-sheet, .bio-proof-sheet) > .paper-scroll-meter {
+  display: none !important;
+}
+html body #bio#bio#bio#bio#bio.paper-stack > .bio-proof-sheet[data-paper-fit] > .paper-scroll > .sheet-mid {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-self: stretch !important;
+  inline-size: 100% !important;
+  max-inline-size: 100% !important;
+  min-block-size: 0 !important;
+  block-size: auto !important;
+}
+html body #bio#bio#bio#bio#bio.paper-stack > .bio-kit-sheet[data-paper-fit] > .paper-scroll > .sheet-mid {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-self: stretch !important;
+  inline-size: 100% !important;
+  max-inline-size: 100% !important;
+  min-block-size: 0 !important;
+  block-size: auto !important;
+  overflow: hidden !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-proof-sheet .bio-block {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  min-block-size: 0 !important;
+  inline-size: 100% !important;
+  block-size: 100% !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-kit-sheet .bio-block {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  inline-size: 100% !important;
+  min-block-size: 0 !important;
+  block-size: auto !important;
+  overflow: hidden !important;
+}
+html body #bio#bio#bio#bio#bio > :is(.bio-kit-sheet, .bio-proof-sheet) :is(.bio-chapter-heading, .bio-block-title) {
+  float: none !important;
+  clear: none !important;
+  inline-size: auto !important;
+  max-inline-size: none !important;
+  margin-inline-start: 0 !important;
+  flex: 0 0 auto !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-kit-sheet .bio-block-title {
+  margin-block-end: clamp(8px, 1.4vh, 16px) !important;
+  font-size: clamp(26px, 3.4vh, 40px) !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-kit-sheet .bio-block-lede {
+  margin: 0 0 clamp(10px, 1.6vh, 18px) !important;
+  font-size: clamp(14px, 1.8vh, 18px) !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-kit-sheet .bio-tools-directory {
+  flex: 1 1 auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+  align-content: stretch !important;
+  gap: clamp(16px, 2.2vh, 28px) clamp(28px, 4vw, 64px) !important;
+  min-block-size: 0 !important;
+  margin-inline-start: 0 !important;
+  inline-size: 100% !important;
+  overflow: hidden !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-kit-sheet .tools-group {
+  display: flex !important;
+  flex-direction: column !important;
+  min-block-size: 0 !important;
+  overflow: hidden !important;
+  padding-block-start: clamp(8px, 1.2vh, 14px) !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-kit-sheet .tools-cat {
+  flex: 0 0 auto !important;
+  margin: 0 0 clamp(8px, 1.2vh, 14px) !important;
+  font-size: clamp(11px, 1.4vh, 13px) !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-kit-sheet .tools-grid {
+  flex: 1 1 auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-auto-rows: minmax(0, 1fr) !important;
+  align-content: stretch !important;
+  align-items: center !important;
+  gap: clamp(6px, 1vh, 14px) clamp(12px, 1.6vw, 22px) !important;
+  min-block-size: 0 !important;
+  overflow: hidden !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-kit-sheet .tools-grid .tool {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: clamp(8px, 1vh, 12px) !important;
+  min-inline-size: 0 !important;
+  min-block-size: 0 !important;
+  max-block-size: 100% !important;
+  overflow: hidden !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-kit-sheet .tool-ic,
+html body #bio#bio#bio#bio#bio > .bio-kit-sheet .tool-ic img {
+  flex: 0 1 auto !important;
+  inline-size: clamp(28px, 4.4vh, 48px) !important;
+  block-size: clamp(28px, 4.4vh, 48px) !important;
+  max-inline-size: 100% !important;
+  max-block-size: 100% !important;
+  aspect-ratio: 1 !important;
+  object-fit: contain !important;
+  box-shadow: none !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-kit-sheet .tool-name {
+  font-size: clamp(14px, 1.8vh, 18px) !important;
+  line-height: 1.2 !important;
+  text-align: start !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-kit-sheet .tool-ic--txt {
+  font-size: clamp(12px, 1.5vh, 16px) !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-kit-sheet .tools-typing {
+  flex: 0 0 auto !important;
+  margin-block-start: clamp(8px, 1.2vh, 14px) !important;
+  padding-inline-end: 52px !important;
+  font-size: clamp(13px, 1.6vh, 16px) !important;
+}
+
+html body #bio#bio#bio#bio#bio > .bio-proof-sheet .bio-block-title {
+  margin-block-end: clamp(10px, 1.6vh, 18px) !important;
+  font-size: clamp(26px, 3.4vh, 40px) !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-proof-sheet .cert-grid {
+  flex: 1 1 auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-auto-rows: minmax(0, 1fr) !important;
+  align-content: stretch !important;
+  gap: clamp(10px, 1.6vh, 18px) !important;
+  min-block-size: 0 !important;
+  margin: 0 !important;
+  margin-inline-start: 0 !important;
+  inline-size: 100% !important;
+  block-size: auto !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-proof-sheet .cert-item {
+  display: flex !important;
+  flex-direction: column !important;
+  min-inline-size: 0 !important;
+  min-block-size: 0 !important;
+  block-size: 100% !important;
+  gap: 6px !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-proof-sheet .cert-img-wrap {
+  position: relative !important;
+  flex: 1 1 auto !important;
+  aspect-ratio: auto !important;
+  inline-size: 100% !important;
+  block-size: auto !important;
+  min-block-size: 0 !important;
+  max-block-size: none !important;
+  overflow: hidden !important;
+  border: 1px solid var(--bio-rule) !important;
+  border-radius: 8px !important;
+  background: color-mix(in srgb, var(--ink) 3%, var(--bg)) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-proof-sheet .cert-img-wrap img {
+  position: absolute !important;
+  inset: 0 !important;
+  inline-size: 100% !important;
+  block-size: 100% !important;
+  object-fit: contain !important;
+  filter: none !important;
+}
+html body #bio#bio#bio#bio#bio > .bio-proof-sheet .cert-label {
+  flex: 0 0 auto !important;
+  font-size: clamp(11px, 1.4vh, 13px) !important;
+  line-height: 1.35 !important;
+}
+
+@media (max-width: 820px) {
+  html body #bio#bio#bio#bio#bio > .bio-kit-sheet .bio-tools-directory {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: repeat(4, minmax(0, 1fr)) !important;
+    gap: clamp(6px, 1vh, 12px) !important;
+  }
+  html body #bio#bio#bio#bio#bio > .bio-kit-sheet .tools-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: clamp(8px, 1.2vh, 12px) !important;
+  }
+  html body #bio#bio#bio#bio#bio > .bio-kit-sheet .tools-grid .tool {
+    display: grid !important;
+    grid-template-columns: clamp(30px, 4.4vh, 42px) minmax(0, 1fr) !important;
+    direction: ltr;
+  }
+  html body #bio#bio#bio#bio#bio > .bio-kit-sheet .tool-ic,
+  html body #bio#bio#bio#bio#bio > .bio-kit-sheet .tool-ic img {
+    max-inline-size: min(34px, 100%) !important;
+    max-block-size: 100% !important;
+  }
+  html body #bio#bio#bio#bio#bio > .bio-kit-sheet .tool-name {
+    font-size: clamp(13px, 1.7vh, 16px) !important;
+    line-height: 1.2 !important;
+    text-align: start !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+  }
+  html body #bio#bio#bio#bio#bio > .bio-kit-sheet .tools-typing {
+    padding-inline: 0 56px !important;
+    white-space: normal !important;
+    overflow-wrap: break-word !important;
+  }
+  html body #bio#bio#bio#bio#bio > .bio-proof-sheet .cert-grid {
+    gap: clamp(8px, 1.2vh, 12px) !important;
+  }
+}
+
+/* Open journal: title, reading measure, and the four actions as classic
+   glass. The system cursor stays — this surface does not hide it. */
+html body #reader#reader .reader-body {
+  padding-block: clamp(28px, 5vh, 48px) clamp(28px, 4vh, 40px) !important;
+}
+html body #reader#reader .reader-tag {
+  margin-block-end: 12px !important;
+  letter-spacing: .16em !important;
+}
+html body #reader#reader .reader-title {
+  margin: 0 0 16px !important;
+  max-inline-size: 18ch !important;
+  font-family: Fraunces, Georgia, serif !important;
+  font-weight: 560 !important;
+  font-size: clamp(36px, 5vw, 58px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: -.034em !important;
+  color: var(--ink) !important;
+}
+html body #reader#reader .reader-meta {
+  margin-block-end: 22px !important;
+  padding-block-end: 18px !important;
+  border-block-end: 1px solid color-mix(in srgb, var(--ink) 12%, transparent) !important;
+}
+html body #reader#reader .reader-highlight {
+  margin-block-end: 22px !important;
+  font-size: clamp(18px, 2vw, 24px) !important;
+  line-height: 1.45 !important;
+  color: var(--ink) !important;
+}
+html body #reader#reader .reader-text {
+  max-inline-size: 62ch !important;
+  font-size: clamp(17px, 1.15vw, 19px) !important;
+  line-height: 1.75 !important;
+  color: color-mix(in srgb, var(--ink) 84%, transparent) !important;
+}
+html body #reader#reader .reader-text p {
+  margin-block-end: 1.15em !important;
+}
+html body #reader#reader .reader-engage {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 36px 0 22px !important;
+  padding-block-start: 20px !important;
+  border: 0 !important;
+  border-block-start: 1px solid color-mix(in srgb, var(--ink) 12%, transparent) !important;
+}
+html body #reader#reader :is(.reader-like, .reader-share, .reader-engage-count, .reader-comment-form button) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  min-block-size: 44px !important;
+  min-inline-size: 44px !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background-color: var(--bq-glass) !important;
+  background-image: var(--bq-glass-sheen) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.6) !important;
+  backdrop-filter: blur(22px) saturate(1.6) !important;
+  box-shadow: none !important;
+  color: var(--ink) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: .02em !important;
+  text-transform: none !important;
+  line-height: 1 !important;
+}
+html body #reader#reader :is(.reader-like, .reader-share, .reader-comment-form button) {
+  cursor: pointer !important;
+  transition: transform .18s cubic-bezier(.22, 1, .36, 1), background-color .18s ease !important;
+}
+html body #reader#reader :is(.reader-like, .reader-share, .reader-comment-form button):is(:hover, :focus-visible) {
+  background-color: var(--bq-glass-strong) !important;
+  background-image: var(--bq-glass-sheen) !important;
+  color: var(--ink) !important;
+  border: 0 !important;
+}
+html body #reader#reader :is(.reader-like, .reader-share, .reader-comment-form button):active {
+  transform: translateY(1px) scale(.97) !important;
+}
+html body #reader#reader :is(.reader-like, .reader-share, .reader-engage-count) :is(i, small, span) {
+  color: var(--ink) !important;
+}
+html body #reader#reader .reader-like.is-liked {
+  background-color: var(--bq-glass-strong) !important;
+  border: 0 !important;
+}
+html body #reader#reader .reader-like.is-liked i {
+  color: #b4233e !important;
+}
+html[data-theme="dark"] body #reader#reader .reader-like.is-liked i {
+  color: #e8607a !important;
+}
+html body #reader#reader .reader-share.is-copied {
+  background-color: var(--bq-glass-strong) !important;
+  color: var(--ink) !important;
+  border: 0 !important;
+}
+html body #reader#reader .reader-share.is-copied :is(i, small) {
+  color: var(--ink) !important;
+}
+html body #reader#reader .reader-comment-form {
+  gap: 12px !important;
+}
+html body #reader#reader .reader-comment-form :is(input, textarea) {
+  border: 0 !important;
+  border-radius: 14px !important;
+  background-color: var(--bq-glass) !important;
+  background-image: var(--bq-glass-sheen) !important;
+  color: var(--ink) !important;
+  font-size: 16px !important;
+}
+html[dir="rtl"] body #reader#reader .reader-title {
+  font-family: "Noto Kufi Arabic", sans-serif !important;
+  letter-spacing: 0 !important;
+  line-height: 1.35 !important;
+  max-inline-size: 22ch !important;
+}

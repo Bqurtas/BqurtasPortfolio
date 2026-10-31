@@ -1632,7 +1632,7 @@ document.addEventListener('DOMContentLoaded', () => {
       sizer.textContent = statDigits(target);
       live = document.createElement('span');
       live.className = 'stat-live';
-      live.appendChild(document.createTextNode(statDigits(1)));
+      live.appendChild(document.createTextNode('0'));
       digits.setAttribute('aria-hidden', 'true');
       digits.append(sizer, live);
       const plus = document.createElement('span');
@@ -1651,8 +1651,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (statMotionReduced()) {
       if (text.data !== statDigits(target)) text.data = statDigits(target);
       el.dataset.counted = '1';
-    } else if (!el.dataset.counted && text.data !== statDigits(1)) {
-      text.data = statDigits(1);
+    } else if (!el.dataset.counted && text.data !== '0') {
+      text.data = '0';
     }
     return text;
   };
@@ -1671,12 +1671,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const step = (now) => {
       const t = Math.min((now - startTime) / duration, 1);
       const eased = 1 - Math.pow(1 - t, 1.55);
-      const v = t >= 1 ? target : Math.max(1, Math.round(eased * target));
+      const v = t >= 1 ? target : Math.round(eased * target);
       const value = statDigits(v);
       if (text.data !== value) text.data = value;
       if (t < 1) requestAnimationFrame(step);
     };
-    if (text.data !== statDigits(1)) text.data = statDigits(1);
+    if (text.data !== '0') text.data = '0';
     requestAnimationFrame(step);
   };
 
@@ -1778,7 +1778,36 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(() => requestAnimationFrame(() => watch(false)));
     setTimeout(finish, 1800);
   });
-  const practiceStats = () => Array.from(document.querySelectorAll('.practice-note .stat'));
+  const practiceStats = () => Array.from(document.querySelectorAll('#design.room:not(.is-hidden) > .practice-note .stat'));
+  /* Phone paper is transformed and stacked, so IntersectionObserver can report
+     the note while it is still off-screen or already finished. The live sheet's
+     own box is the check: covered, hidden and measuring copies do not count. */
+  const statPhone = () => typeof matchMedia === 'function'
+    && matchMedia('(max-width: 820px), (hover: none), (pointer: coarse)').matches;
+  const statsAreVisible = (sheet, stats) => {
+    if (!sheet || sheet.classList.contains('is-paper-gone') || sheet.classList.contains('is-paper-measuring')) return false;
+    const room = sheet.closest('.room');
+    if (!room || room.classList.contains('is-hidden')) return false;
+    const fade = parseFloat(sheet.style.getPropertyValue('--bq-fade')) || 0;
+    if (fade > 0.12) return false;
+    const vh = window.innerHeight || 1;
+    const vw = window.innerWidth || 1;
+    const sheetRect = sheet.getBoundingClientRect();
+    if (sheetRect.height < 40 || sheetRect.top > vh * 0.45 || sheetRect.bottom < vh * 0.5) return false;
+    const list = sheet.querySelector('.stats');
+    const rect = (list || stats[0]).getBoundingClientRect();
+    if (rect.width < 8 || rect.height < 8) return false;
+    const visH = Math.min(rect.bottom, vh) - Math.max(rect.top, 0);
+    const visW = Math.min(rect.right, vw) - Math.max(rect.left, 0);
+    if (visH < rect.height * 0.55 || visW < rect.width * 0.45) return false;
+    const probe = stats[0].querySelector('.stat-num') || stats[0];
+    const probeRect = probe.getBoundingClientRect();
+    const hit = document.elementFromPoint(
+      Math.min(vw - 2, Math.max(1, probeRect.left + probeRect.width / 2)),
+      Math.min(vh - 2, Math.max(1, probeRect.top + probeRect.height / 2))
+    );
+    return Boolean(hit && sheet.contains(hit));
+  };
   const releaseStatWatch = () => {
     const stats = practiceStats();
     if (!stats.length || !stats.every((stat) => stat.querySelector('.stat-num')?.dataset.counted)) return;
@@ -1793,11 +1822,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!nums.length || nums.every((numEl) => numEl.dataset.counted)) { releaseStatWatch(); return; }
     if (nums.some((numEl) => numEl.dataset.armed)) return;
     const sheet = stats[0].closest('.section.practice-note');
-    if (!sheet || sheet.classList.contains('is-paper-measuring') || sheet.classList.contains('is-paper-gone')) return;
-    if (stats.some((stat) => !stat.classList.contains('is-risen'))) return;
-    nums.forEach((numEl) => { numEl.dataset.armed = '1'; });
-    Promise.all([statFontReady(), ...stats.map((stat) => entranceSettled(stat))]).then(() => {
-      if (sheet.classList.contains('is-paper-gone') || sheet.classList.contains('is-paper-measuring')) {
+    if (!statsAreVisible(sheet, stats)) {
+      const top = sheet ? sheet.getBoundingClientRect().top : 9999;
+      const vh = window.innerHeight || 1;
+      /* The stack can still be settling on the frame the scroll stops. Keep
+         looking while the note is actually on the phone, then give up until
+         the next scroll so an off-screen sheet never counts. */
+      if (top < vh * 0.85 && top > -40 && statTries < 8) {
+        statTries += 1;
+        clearTimeout(statRetry);
+        statRetry = setTimeout(queueStatCount, 50);
+      }
+      return;
+    }
+    statTries = 0;
+    /* Desktop still waits for the rise so the count does not run under the
+       entrance. Phones paint the figures immediately, so visibility is enough. */
+    if (!statPhone() && stats.some((stat) => !stat.classList.contains('is-risen'))) return;
+    const begin = () => {
+      if (!statsAreVisible(sheet, stats)) {
         nums.forEach((numEl) => { delete numEl.dataset.armed; });
         return;
       }
@@ -1807,13 +1850,34 @@ document.addEventListener('DOMContentLoaded', () => {
         animateCount(numEl);
       });
       releaseStatWatch();
-    });
+    };
+    if (statPhone() || statMotionReduced()) {
+      begin();
+      return;
+    }
+    if (nums.some((numEl) => numEl.dataset.armed)) return;
+    nums.forEach((numEl) => { numEl.dataset.armed = '1'; });
+    Promise.all([statFontReady(), ...stats.map((stat) => entranceSettled(stat))]).then(begin);
   };
   let statSettleTimer = 0;
+  let statRetry = 0;
+  let statTries = 0;
   const requestStatCount = () => {
+    /* Phones keep emitting resize while the dock follows the browser bar.
+       Resetting the wait on every one of those events postponed the count
+       until the bar went still. One short wait is enough; desktop still
+       waits for the scroll to pause so the entrance is not measured mid-move. */
+    if (statPhone()) {
+      if (statSettleTimer) return;
+      statTries = 0;
+      statSettleTimer = setTimeout(() => {
+        statSettleTimer = 0;
+        queueStatCount();
+      }, 40);
+      return;
+    }
     clearTimeout(statSettleTimer);
-    /* Wait until scrolling pauses. A rect or style read on the scroll frame
-       is what stuttered the entrance. */
+    statTries = 0;
     statSettleTimer = setTimeout(queueStatCount, 180);
   };
   window.addEventListener('scroll', requestStatCount, { passive: true });
@@ -3324,12 +3388,21 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
          only the fallback below the smallest legible size. The hero never
          becomes a nested scroller. */
       if (sheet.classList.contains('section')) {
-        sheet.dataset.paperScroll = 'inner';
         sheet.dataset.paperFit = '';
+        /* Certificates and the software kit are fitted to the sheet. They do
+           not get a reading spacer or an inner track. */
+        const fittedBio = id === 'bio' && (
+          sheet.classList.contains('bio-kit-sheet') || sheet.classList.contains('bio-proof-sheet')
+        );
+        if (fittedBio) {
+          delete sheet.dataset.paperScroll;
+          sheet.classList.remove('room-sheet--scroll');
+        } else {
+          sheet.dataset.paperScroll = 'inner';
+        }
         // Certificates and compact biography directories fit independently;
         // neither should shrink the long biography's reading type.
-        if (id === 'bio' && !sheet.classList.contains('bio-proof-sheet')
-          && !compactBioPaper(sheet)) sheet.dataset.paperFitGroup = 'bio';
+        if (id === 'bio' && !fittedBio && !compactBioPaper(sheet)) sheet.dataset.paperFitGroup = 'bio';
         else delete sheet.dataset.paperFitGroup;
       } else {
         delete sheet.dataset.paperScroll;

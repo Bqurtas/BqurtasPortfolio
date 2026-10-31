@@ -9,7 +9,7 @@
   <link rel="preload" as="style" href="css/modern-framer.min.css?v=618db1d097f1" />
   <link rel="preload" as="style" href="css/fonts.css?v=6bd89c103953" />
   <link rel="preload" as="style" href="css/experience.min.css?v=591ff4b19b30" />
-  <link rel="preload" as="style" href="css/polish.min.css?v=6ef16e61ae51" />
+  <link rel="preload" as="style" href="css/polish.min.css?v=7b4b58391115" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#fbfbfa" />
   <meta name="color-scheme" content="light dark" />
@@ -784,7 +784,7 @@
   <link rel="stylesheet" href="css/fonts.css?v=6bd89c103953">
   <link rel="stylesheet" href="css/experience.min.css?v=591ff4b19b30">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.min.css?v=6ef16e61ae51">
+  <link rel="stylesheet" href="css/polish.min.css?v=7b4b58391115">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=6dee64a9a95d" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=6dee64a9a95d"></noscript>
 
@@ -1762,7 +1762,7 @@
       </div>
 
 
-      <div class="section bio-proof-sheet room-sheet--scroll">
+      <div class="section bio-proof-sheet">
         <div class="sheet-mid">
         <div class="bio-block" data-wm="&#xf559;">
           <h3 class="bio-block-title"><span class="bio-chapter-index mono" aria-hidden="true">07</span><i class="fa-solid fa-award"></i> <span data-i18n="bio.certificates">Certificates &amp; Honours</span></h3>
@@ -2263,7 +2263,7 @@
     }catch(e){}})();
   </script>
   <script defer src="js/latest-feed.min.js?v=76465997249c"></script>
-  <script defer src="js/main.v420.min.js?v=6bd0d32de1b6"></script>
+  <script defer src="js/main.v420.min.js?v=f63e9344a050"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2438,7 +2438,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=aadff295be21', { updateViaCache: 'none' })
+            .register('/sw.js?v=c2d2858f53f2', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });
