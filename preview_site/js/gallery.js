@@ -1,0 +1,716 @@
+/* =========================================================
+   Barakat Qurtas — Dynamic Gallery
+   Local image thumbnails and first-party image/film streaming
+   ========================================================= */
+
+window.BQ_GALLERY = {
+
+  MEDIA_BASE: '/media',
+  RAW_BASE: 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main',
+  REPO:     'Bqurtas/BqurtasPortfolio',
+  BRANCH:   'main',
+  _loaded:  false,
+  _ok:      false,
+  _manifestPromise: null,
+
+  /* Each collection: folder, file prefix, extension, count,
+     cat = data-cat used for tab filtering (defaults to key),
+     tag = display label, icon = FA class, title = card heading */
+  COLLECTIONS: {
+    general:     { folder: 'GeneralDesign', prefix: 'GDesign',     ext: 'webp', count: 84,  cat: 'general',     tag: 'Design',        icon: 'fa-grip',           title: 'Design' },
+    book:        { folder: 'Book',          prefix: 'BookCover',   ext: 'webp', count: 99,  cat: 'book',        tag: 'Book',          icon: 'fa-book',           title: 'Book Cover' },
+    official:    { folder: 'Official',      prefix: 'Official',    ext: 'webp', count: 168, cat: 'official',    tag: 'Official',      icon: 'fa-landmark',       title: 'Official' },
+    posters:     { folder: 'Poster',        prefix: 'Poster',      ext: 'webp', count: 18,  cat: 'posters',     tag: 'Poster',        icon: 'fa-image',          title: 'Poster' },
+    social:      { folder: 'SocialMedia',   prefix: 'SMedia',      ext: 'webp', count: 19,  cat: 'social',      tag: 'Social',        icon: 'fa-hashtag',        title: 'Social Media' },
+    logo:        { folder: 'LogoDesign',    prefix: 'Logo',        ext: 'webp', count: 28,  cat: 'logo',        tag: 'Logo',          icon: 'fa-pen-nib',        title: 'Logo' },
+    tickerlogo:  { folder: 'TickerLogo',    prefix: 'TickerLogo',  ext: 'webp', count: 8,   cat: 'tickerlogo',  tag: 'Logo',          icon: 'fa-pen-nib',        title: 'Ticker Logo',
+                   files: ['TickerLogo2.webp','TickerLogo3.webp','TickerLogo5.webp','TickerLogo6.webp','TickerLogo9.webp','TickerLogo10.webp','TickerLogo12.webp','TickerLogo13.webp'] },
+    events:      { folder: 'EventandCon',   prefix: 'Event',       ext: 'webp', count: 16,  cat: 'events',      tag: 'Events',        icon: 'fa-calendar-day',   title: 'Event' },
+    business:    { folder: 'Businesscard',  prefix: 'Bcard',       ext: 'webp', count: 11,  cat: 'stationery',  tag: 'Business Card', icon: 'fa-id-card',        title: 'Business Card' },
+    invoices:    { folder: 'Invoice',       prefix: 'Invoice',     ext: 'webp', count: 12,  cat: 'stationery',  tag: 'Invoice',       icon: 'fa-file-invoice',   title: 'Invoice' },
+    image:       { folder: 'Photos',        prefix: 'Photo',       ext: 'webp', count: 147, cat: 'image',       tag: 'Photo',         icon: 'fa-camera',         title: 'Photo' },
+    other:       { folder: 'Other',         prefix: 'Other',       ext: 'webp', count: 45,  cat: 'other',       tag: 'Other',         icon: 'fa-ellipsis',       title: 'Other' },
+    certificate: { folder: 'Certificate',   prefix: 'Certificate', ext: 'webp', count: 16,  cat: 'certificate', tag: 'Certificate',   icon: 'fa-award',          title: 'Certificate' },
+    flex:        { folder: 'Flex',          prefix: 'Flex',        ext: 'webp', count: 13,  cat: 'other',       tag: 'Other',         icon: 'fa-ellipsis',       title: 'Flex' },
+    video:       { folder: 'Videos',        prefix: 'Videos',      ext: 'mp4',  count: 30,  cat: 'video',       tag: 'Video',         icon: 'fa-video',          title: 'Video' },
+  },
+
+  /* Original images and films use the same first-party endpoint as their
+     work pages. Cloudflare serves the allowlisted GitHub files and byte ranges. */
+  url(coll, i) {
+    const c = this.COLLECTIONS[coll];
+    if (!c) return '';
+    const file = c.indexFiles ? c.indexFiles[i]
+      : c.files && c.files[i - 1] != null ? c.files[i - 1] : `${c.prefix}${i}.${c.ext}`;
+    if (!file) return '';
+    return `${this.MEDIA_BASE}/${c.folder}/${encodeURIComponent(file)}`;
+  },
+
+  /* One direct GitHub fallback for the same file during an edge outage. */
+  rawUrl(coll, i) {
+    const c = this.COLLECTIONS[coll];
+    if (!c) return '';
+    if (c.indexFiles) return c.indexFiles[i] ? `${this.RAW_BASE}/${c.folder}/${encodeURIComponent(c.indexFiles[i])}` : '';
+    if (c.files && c.files[i - 1] != null)
+      return `${this.RAW_BASE}/${c.folder}/${encodeURIComponent(c.files[i - 1])}`;
+    return `${this.RAW_BASE}/${c.folder}/${c.prefix}${i}.${c.ext}`;
+  },
+
+  /* Gallery cards use local thumbnails; the lightbox keeps the original. */
+  thumb(url) {
+    /* A missing local thumbnail falls back to its canonical original through
+       the element's single, bounded error handler. */
+    const source = String(url || '');
+    const base = [this.MEDIA_BASE, 'https://bqurtas.com' + this.MEDIA_BASE, this.RAW_BASE]
+      .find(prefix => source.startsWith(prefix + '/'));
+    if (base) return '/assets/thumbs/' + source.slice(base.length + 1);
+    return source;
+  },
+
+  dimsFromRatio(ratio, width) {
+    const parts = String(ratio || '4 / 5').split('/');
+    const w = parseFloat(parts[0]) || 4;
+    const h = parseFloat(parts[1]) || 5;
+    const outW = width || 820;
+    return { width: outW, height: Math.max(1, Math.round(outW * h / w)) };
+  },
+
+  items(coll) {
+    const c   = this.COLLECTIONS[coll];
+    if (!c) return [];
+    const cat = c.cat || coll;
+    const n   = Array.isArray(c.files) ? c.files.length : c.count;
+    const out = [];
+    for (let i = 1; i <= n; i++) {
+      const fname = c.files ? c.files[i - 1] : null;
+      const metadata = c.dimensions?.[fname || `${c.prefix}${i}.${c.ext}`];
+      const index = metadata?.index || i;
+      const type  = fname ? (/\.(mp4|webm|mov)$/i.test(fname) ? 'video' : 'image')
+                          : (c.ext === 'mp4' ? 'video' : 'image');
+      out.push({ coll, cat, index, type,
+        url:    this.url(coll, index),
+        rawUrl: this.rawUrl(coll, index),
+        width: metadata?.width || 0,
+        height: metadata?.height || 0,
+        poster: metadata?.poster || '',
+        title:  `${c.title} ${String(index).padStart(2, '0')}`,
+        titlePrefix: c.title,
+        tag: c.tag, icon: c.icon,
+      });
+    }
+    return out;
+  },
+
+  /* ── First-party gallery manifest ─────────────────────────────────────
+     Original image/video dimensions reserve the exact authored aspect ratio
+     before thumbnails load. Thumbnail pixel rounding never shapes the frame. */
+  async loadManifest({ force = false } = {}) {
+    // Concurrent callers must wait for the same manifest, not build from the
+    // static catalogue while the first request is still in flight.
+    if (this._manifestPromise) return this._manifestPromise;
+    if (this._loaded && !force) return this._ok;
+    this._manifestPromise = (async () => {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      try {
+      const response = await fetch('assets/gallery-manifest.json?v=403', {
+        cache: force ? 'reload' : 'no-cache', signal: controller.signal,
+      });
+      if (!response.ok) throw new Error('gallery manifest unavailable');
+      const manifest = await response.json();
+      if (!Array.isArray(manifest.images) || !Array.isArray(manifest.videos)) {
+        throw new Error('invalid gallery manifest');
+      }
+      const records = [...manifest.images, ...manifest.videos];
+      const byFolder = Object.create(null);
+      const indices = Object.create(null);
+      const knownFolders = new Set(Object.values(this.COLLECTIONS).map(c => c.folder));
+      const seen = new Set();
+      records.forEach((record) => {
+        if (!record || typeof record.path !== 'string' || seen.has(record.path) ||
+            !Number.isFinite(record.width) || record.width <= 0 ||
+            !Number.isFinite(record.height) || record.height <= 0) return;
+        const slash = record.path.indexOf('/');
+        if (slash < 0 || record.path.indexOf('/', slash + 1) >= 0) return;
+        const folder = record.path.slice(0, slash);
+        const file = record.path.slice(slash + 1);
+        if (!knownFolders.has(folder) || !/^[^\\/]+\.(webp|png|jpe?g|avif|gif|mp4|webm|mov)$/i.test(file)) return;
+        const list = byFolder[folder] || (byFolder[folder] = []);
+        const index = record.index === undefined ? list.length + 1 : record.index;
+        const used = indices[folder] || (indices[folder] = new Set());
+        if (!Number.isSafeInteger(index) || index < 1 || used.has(index)) return;
+        used.add(index);
+        seen.add(record.path);
+        list.push({
+          file, index,
+          width: record.width,
+          height: record.height,
+          // Only the exact first-party frame generated for this film is used.
+          poster: record.poster === `/assets/thumbs/${record.path.replace(/\.(mp4|webm|mov)$/i, '.jpg')}`
+            ? record.poster : '',
+        });
+      });
+      if (records.length && !seen.size) throw new Error('gallery manifest has no valid media');
+      for (const key of Object.keys(this.COLLECTIONS)) {
+        const collection = this.COLLECTIONS[key];
+        const list = byFolder[collection.folder] || [];
+        collection.files = list.map((record) => record.file);
+        collection.indexFiles = Object.fromEntries(list.map((record) => [record.index, record.file]));
+        collection.dimensions = Object.fromEntries(list.map((record) => [record.file, record]));
+        collection.count = collection.files.length;
+      }
+      this._loaded = true;
+      return (this._ok = true);
+      } catch (e) {
+        // Keep a previously loaded catalogue usable during a transient outage.
+        return this._ok;
+      } finally {
+        clearTimeout(timeout);
+      }
+    })();
+    try { return await this._manifestPromise; }
+    finally { this._manifestPromise = null; }
+  },
+
+  /* Every fallback is attempted at most once. One owner per media element
+     avoids capture/bubble error handlers fighting over the next URL. */
+  bindMediaFallback(media, sources, onExhausted) {
+    const attempted = new Set();
+    const normalize = (src) => {
+      try { const url = new URL(src, document.baseURI); url.hash = ''; return url.href; }
+      catch (e) { return String(src || '').split('#')[0]; }
+    };
+    const advance = () => {
+      attempted.add(normalize(media.currentSrc || media.src));
+      const next = sources.find(src => src && !attempted.has(normalize(src)));
+      if (next) {
+        attempted.add(normalize(next));
+        media.src = next;
+      } else if (!media.dataset.mediaExhausted) {
+        media.dataset.mediaExhausted = 'true';
+        onExhausted?.();
+      }
+    };
+    media.addEventListener('error', advance);
+    return () => media.removeEventListener('error', advance);
+  },
+
+  syncCardDimensions(card, media, item) {
+    const video = media.tagName === 'VIDEO';
+    const width = video ? media.videoWidth : media.naturalWidth;
+    const height = video ? media.videoHeight : media.naturalHeight;
+    if (!Number.isFinite(width) || width <= 0 || !Number.isFinite(height) || height <= 0) return false;
+    const known = Number.isFinite(item.width) && item.width > 0
+      && Number.isFinite(item.height) && item.height > 0;
+    if (known) {
+      const source = (media.currentSrc || media.src || '').split('#')[0];
+      // A 320px thumbnail can round by half a pixel. Keep the exact original
+      // manifest ratio rather than resizing every card as its thumbnail lands.
+      if (!video && source !== item.url && source !== item.rawUrl) return false;
+      if (Math.abs(height - width * item.height / item.width) <= 0.5) return false;
+    }
+    item.width = width;
+    item.height = height;
+    card.style.setProperty('--card-ratio', `${width} / ${height}`);
+    media.setAttribute('width', String(width));
+    media.setAttribute('height', String(height));
+    // Missing metadata, or a changed original reached through a fallback,
+    // needs one geometry update. Repeated load/metadata events are no-ops.
+    try {
+      window.dispatchEvent(new CustomEvent('bq:gallery-dimensions', {
+        detail: { coll: item.coll, index: item.index, width, height },
+      }));
+    } catch (e) {}
+    return true;
+  },
+
+  createVideoPreviews({ root = null } = {}) {
+    const playing = new Set();
+    const preloadVideos = new Map();
+    const preloadTargets = new Map();
+    const posterLoads = new WeakMap();
+    const posterReady = new WeakMap();
+    const pauseBound = new WeakSet();
+    const hydrate = (video, allowDetached = false) => {
+      // An intersection record can arrive after a category change detached
+      // the card. Wait for its next appearance before starting that request.
+      if (!video || (!video.isConnected && !allowDetached) || video.dataset.mediaExhausted) return false;
+      if (!video.src && video.dataset.src) {
+        video.preload = 'metadata';
+        video.src = video.dataset.src + '#t=0.1';
+      }
+      return !!video.src;
+    };
+    const stopWatchingPlayback = (video) => {
+      playing.delete(video);
+      playbackWatcher?.unobserve(video);
+    };
+    const pause = (video) => {
+      if (!video) return;
+      stopWatchingPlayback(video);
+      if (!video.paused) video.pause();
+    };
+    const canObserve = typeof IntersectionObserver === 'function';
+    const stopWatchingPrefetch = (video) => {
+      const target = preloadTargets.get(video);
+      if (!target) return;
+      preloadWatcher?.unobserve(target);
+      preloadTargets.delete(video);
+      preloadVideos.delete(target);
+    };
+    /* A real poster needs a small JPEG, rather than an MP4 request and a
+       native video decoder, to show its first frame. Keep the existing nearby
+       prefetch distance and fall back to video metadata if that JPEG fails.
+       Its intrinsic dimensions never replace the film's exact frame ratio. */
+    const preview = (video, allowDetached = false) => {
+      if (!video || (!video.isConnected && !allowDetached) || video.dataset.mediaExhausted) return false;
+      const existing = posterLoads.get(video);
+      if (video.dataset.poster && existing !== 'failed') {
+        if (existing === 'ready') return true;
+        if (existing) return false;
+        const poster = document.createElement('img');
+        posterLoads.set(video, poster);
+        poster.decoding = 'async';
+        poster.fetchPriority = 'low';
+        poster.addEventListener('load', () => {
+          posterLoads.set(video, 'ready');
+          video.poster = video.dataset.poster;
+          if (!video.dataset.mediaExhausted) posterReady.get(video)?.();
+          stopWatchingPrefetch(video);
+        }, { once: true });
+        poster.addEventListener('error', () => {
+          posterLoads.set(video, 'failed');
+          // A removed/reset card must not start a late network request.
+          if ((allowDetached || preloadTargets.has(video)) && hydrate(video, allowDetached)) stopWatchingPrefetch(video);
+        }, { once: true });
+        poster.src = video.dataset.poster;
+        return false;
+      }
+      return hydrate(video, allowDetached);
+    };
+    // Observe the sized frame, whose geometry remains available while the
+    // media contents are skipped. A ready preview leaves the observer.
+    const preloadWatcher = canObserve ? new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const video = preloadVideos.get(entry.target);
+        if (entry.isIntersecting && preview(video)) stopWatchingPrefetch(video);
+      });
+    }, { root, rootMargin: '1200px 0px' }) : null;
+    // Only the currently playing previews need visibility notifications.
+    // Paused video covers keep their source/frame without further observers.
+    const playbackWatcher = canObserve ? new IntersectionObserver(entries => {
+      entries.forEach(entry => { if (!entry.isIntersecting) pause(entry.target); });
+    }) : null;
+    const pauseAll = () => Array.from(playing).forEach(pause);
+    return {
+      observe(video, onPosterReady) {
+        if (onPosterReady) posterReady.set(video, onPosterReady);
+        if (!pauseBound.has(video)) {
+          pauseBound.add(video);
+          video.addEventListener('pause', () => { if (video.paused) stopWatchingPlayback(video); });
+        }
+        if (preloadWatcher) {
+          stopWatchingPrefetch(video);
+          const target = video.closest?.('.card-art') || video;
+          preloadVideos.set(target, video);
+          preloadTargets.set(video, target);
+          preloadWatcher.observe(target);
+        }
+        else preview(video, true);
+      },
+      play(video) {
+        if (!hydrate(video) || !video.paused) return;
+        stopWatchingPrefetch(video);
+        playing.add(video);
+        playbackWatcher?.observe(video);
+        video.play().catch(() => { if (video.paused) stopWatchingPlayback(video); });
+      },
+      pause,
+      pauseAll,
+      forget(video) {
+        stopWatchingPrefetch(video);
+        pause(video);
+      },
+      reset() {
+        pauseAll();
+        preloadWatcher?.disconnect();
+        preloadVideos.clear();
+        preloadTargets.clear();
+        playbackWatcher?.disconnect();
+      },
+    };
+  },
+
+  all() {
+    const list = [];
+    for (const k of Object.keys(this.COLLECTIONS)) list.push(...this.items(k));
+    return list;
+  },
+};
+
+/* =========================================================
+   Build cards inside #grid
+   ========================================================= */
+document.addEventListener('DOMContentLoaded', async () => {
+  const grid = document.getElementById('grid');
+  if (!grid) return;
+
+  /* Auto-discover real folder contents before building cards. This keeps each
+     48-card batch based on files that actually exist, instead of rendering stale
+     static counts and then losing cards after image errors. */
+  await window.BQ_GALLERY.loadManifest();
+
+  /* Remove loading spinner */
+  const loader = document.getElementById('galleryLoading');
+  if (loader) loader.remove();
+
+  /* ---- language-aware card labels (tag + title) ---- */
+  const galLang = () => (document.documentElement.dataset.lang || 'en');
+  const galDigits = (s) => (galLang() === 'ku' || galLang() === 'ar')
+    ? String(s).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : String(s);
+  const galTag = (coll, fb) => {
+    const t = window.GAL_I18N && window.GAL_I18N[galLang()] && window.GAL_I18N[galLang()][coll];
+    if (t && t.tag) return t.tag;
+    const c = window.BQ_GALLERY.COLLECTIONS[coll];
+    return (c && c.tag) || fb || '';
+  };
+  const galTitle = (coll, i, fb) => {
+    const t = window.GAL_I18N && window.GAL_I18N[galLang()] && window.GAL_I18N[galLang()][coll];
+    const c = window.BQ_GALLERY.COLLECTIONS[coll];
+    const pfx = (t && t.title) || (c && c.title) || fb || '';
+    return `${pfx} ${galDigits(String(i).padStart(2, '0'))}`;
+  };
+  const galViewLabel = (title) => `${(window.BQ_DICT && window.BQ_DICT['a11y.view']) || 'View'} ${title}`;
+  /* The alt text also names the author, so an image met on its own (image
+     search, a saved copy) still says whose work it is. */
+  const galAlt = (title) => `${title} — ${({ ku: 'بەرەکات قورتاس', ar: 'بركات قرطاس' })[galLang()] || 'Barakat Qurtas'}`;
+  const unavailableLabel = () => ({
+    ku: 'پێشبینین بەردەست نییە', ar: 'المعاينة غير متاحة', kmr: 'Pêşdîtin ne berdest e',
+    fr: 'Aperçu indisponible', tr: 'Önizleme kullanılamıyor', sv: 'Förhandsvisning saknas',
+  }[galLang()] || 'Preview unavailable');
+  const ORDER = [
+    'general','official','book','image','logo',
+    'posters','social','events','business','invoices',
+    'flex','video','other','certificate'
+  ];
+
+  const videoPreviews = window.BQ_GALLERY.createVideoPreviews({ root: grid.closest('.work-vp') });
+
+  const buildCard = (item) => {
+    const article = document.createElement('article');
+    // Design works (logos, book covers, stationery, etc.) are exported with
+    // transparency — give them a clean white plate instead of the dark block
+    // that otherwise shows through. Photos/posters/social are full-bleed, left dark.
+    const PLATE_CATS = { book: 1, logo: 1, stationery: 1, events: 1, general: 1, other: 1, certificate: 1 };
+    const plate = /\.png(\?|$)/i.test(item.url || '') || !!PLATE_CATS[item.cat];
+    article.className = 'card card--photo card--pending-media' + (plate ? ' card--plate' : '');
+    const fallbackRatio = item.type === 'video' ? '16 / 9' : '4 / 5';
+    const dims = Number.isFinite(item.width) && item.width > 0 && Number.isFinite(item.height) && item.height > 0
+      ? { width: item.width, height: item.height }
+      : window.BQ_GALLERY.dimsFromRatio(fallbackRatio, item.type === 'video' ? 1280 : 320);
+    const cardRatio = `${dims.width} / ${dims.height}`;
+    article.style.setProperty('--card-ratio', cardRatio);
+    const dispTag   = galTag(item.coll, item.tag);
+    const dispTitle = galTitle(item.coll, item.index, item.titlePrefix || item.tag);
+    article.dataset.cat   = item.cat;
+    article.dataset.coll  = item.coll;
+    article.dataset.idx   = item.index;
+    article.dataset.full  = item.url;
+    article.dataset.raw   = item.rawUrl;
+    article.dataset.title = dispTitle;
+    article.dataset.type  = item.type;
+
+    // Cards are small (<=280px) on every screen, so load a resized WebP for ALL
+    // images at 320px. Videos and the
+    // zoom lightbox (data-full) still use the ORIGINAL full file, so quality is
+    // untouched where it shows big. Cuts multi-MB originals to small thumbnails.
+    const imgSrc = (item.type !== 'video') ? window.BQ_GALLERY.thumb(item.url, 320) : item.url;
+    /* Each film has its own exported frame, rather than the old generic
+       social-share cover. Fetch that small image near the viewport; the MP4
+       stays untouched until playback, or a missing frame needs a fallback. */
+    const mediaHtml = item.type === 'video'
+      ? `<video muted loop playsinline preload="none" data-src="${item.url}"${item.poster ? ` data-poster="${item.poster}"` : ''} title="${dispTitle}" width="${dims.width}" height="${dims.height}"></video>`
+      : `<img loading="lazy" decoding="async" fetchpriority="low" src="${imgSrc}" alt="${galAlt(dispTitle)}" width="${dims.width}" height="${dims.height}" />`;
+
+    /* A real link to the work's own page (/design/book/7), so crawlers can
+       reach every work. A plain click still opens the lightbox (main.js
+       prevents the navigation); a modified or middle click opens the page. */
+    article.innerHTML = `
+      <a class="card-open" href="/design/${item.coll}/${item.index}" aria-label="${galViewLabel(dispTitle)}">
+        <span class="card-art card-art--photo">
+          ${mediaHtml}
+          ${item.type === 'video' ? '<span class="card-video-badge" aria-hidden="true"><i class="fa-solid fa-play"></i></span>' : ''}
+          <span class="card-hover-shade" aria-hidden="true"></span>
+        </span>
+      </a>
+      <div class="card-caption">
+        <h3 class="card-title">${dispTitle}</h3>
+        <span class="card-tag">${dispTag}</span>
+      </div>`;
+
+    // Keep the keyboard parity the <button> had: Space opens the work too.
+    article.querySelector('.card-open')?.addEventListener('keydown', (event) => {
+      if (event.key !== ' ' && event.key !== 'Spacebar') return;
+      event.preventDefault();
+      event.currentTarget.click();
+    });
+
+    /* Preserve the catalogue and masonry position even if a CDN is down. */
+    const media = article.querySelector('img, video');
+    const syncDimensions = () => window.BQ_GALLERY.syncCardDimensions(article, media, item);
+    const markReady = () => {
+      syncDimensions();
+      article.classList.add('card--media-ready');
+    };
+    if (item.type === 'video') media.addEventListener('loadedmetadata', syncDimensions);
+    media.addEventListener(item.type === 'video' ? 'loadeddata' : 'load', markReady);
+    if (media.tagName === 'IMG' && media.complete && media.naturalHeight) markReady();
+    window.BQ_GALLERY.bindMediaFallback(media, [item.url, item.rawUrl], () => {
+      article.classList.add('card--media-error');
+      article.classList.remove('card--media-ready');
+      if (media.tagName === 'VIDEO') videoPreviews.forget(media);
+      const status = document.createElement('span');
+      status.className = 'card-media-status';
+      status.textContent = unavailableLabel();
+      article.querySelector('.card-art').appendChild(status);
+    });
+    if (media.tagName === 'VIDEO') videoPreviews.observe(media, () => article.classList.add('card--media-ready'));
+    return article;
+  };
+
+  /* Build every card once into a shared array — main.js masonry handles
+     placement, filtering, and pagination. */
+  const fmtCount = (n) => n >= 100 ? String(n) : String(n).padStart(2, '0');
+  const computeGalleryCounts = () => {
+    const cats = {};
+    Object.entries(window.BQ_GALLERY.COLLECTIONS || {}).forEach(([key, coll]) => {
+      if (coll) cats[coll.cat || key] = 0;
+    });
+    if (Array.isArray(window.BQ_ALL_CARDS)) {
+      window.BQ_ALL_CARDS.forEach(entry => {
+        if (!entry || !entry.cat) return;
+        cats[entry.cat] = (cats[entry.cat] || 0) + 1;
+      });
+    } else {
+      Object.entries(window.BQ_GALLERY.COLLECTIONS || {}).forEach(([key, coll]) => {
+        if (coll) cats[coll.cat || key] += Array.isArray(coll.files) ? coll.files.length : (coll.count || 0);
+      });
+    }
+    return { total: Object.values(cats).reduce((sum, n) => sum + n, 0), cats };
+  };
+  const syncGalleryCounts = () => {
+    const counts = computeGalleryCounts();
+    document.querySelectorAll('.tab[data-filter]').forEach(tab => {
+      const n = tab.dataset.filter === 'all' ? counts.total : counts.cats[tab.dataset.filter];
+      if (n === undefined) return;
+      if (tab.dataset.workCount !== String(n)) tab.dataset.workCount = String(n);
+      const el = tab.querySelector('.tab-count');
+      const label = fmtCount(n);
+      if (el && el.textContent !== label) el.textContent = label;
+    });
+    try { window.dispatchEvent(new CustomEvent('bq:gallery-counts', { detail: counts })); } catch (e) {}
+    return counts;
+  };
+  window.__bqGalleryCounts = computeGalleryCounts;
+  window.__bqBuildGalleryCard = buildCard;
+  const galleryEntries = () => {
+    const entries = [];
+    ORDER.forEach(coll => {
+      window.BQ_GALLERY.items(coll).forEach(item => {
+        entries.push({ el: null, item, cat: item.cat, type: item.type, coll: item.coll });
+      });
+    });
+    return entries;
+  };
+  const buildGalleryCards = () => {
+    window.BQ_ALL_CARDS = galleryEntries();
+    return syncGalleryCounts();
+  };
+  /* Keep the full catalogue as light data records. Cards become DOM only when
+     a visible batch needs them, which avoids hundreds of off-screen nodes and
+     long tasks while preserving filters, counts and the complete catalogue. */
+  (() => {
+    window.BQ_ALL_CARDS = galleryEntries();
+    syncGalleryCounts();
+    try { window.dispatchEvent(new CustomEvent('bq:gallery-built')); } catch (e) {}
+  })();
+  window.__bqRefreshGalleryFromManifest = async () => {
+    await window.BQ_GALLERY.loadManifest({ force: true });
+    videoPreviews.reset();
+    const counts = buildGalleryCards();
+    if (window.__bqInitLightbox) window.__bqInitLightbox();
+    if (window.__bqRenderGallery) window.__bqRenderGallery(true);
+    if (window.__bqRelocalizeGallery) window.__bqRelocalizeGallery();
+    return counts;
+  };
+
+  /* ── Certificate gallery in Biography room ── */
+  const certGrid = document.getElementById('certGrid');
+  if (certGrid) {
+    document.getElementById('certLoading')?.remove();
+    window.BQ_GALLERY.items('certificate').forEach(item => {
+      const div = document.createElement('button');
+      const dispTitle = galTitle('certificate', item.index, item.titlePrefix);
+      div.type = 'button';
+      div.className = 'cert-item';
+      div.dataset.coll  = 'certificate';
+      div.dataset.idx   = item.index;
+      div.dataset.full  = item.url;
+      div.dataset.title = dispTitle;
+      div.dataset.type  = 'image';
+      div.setAttribute('aria-label', galViewLabel(dispTitle));
+      div.innerHTML = `
+        <span class="cert-img-wrap">
+          <img loading="lazy" decoding="async" width="${item.width || 640}" height="${item.height || 880}" src="${window.BQ_GALLERY.thumb(item.url, 320)}" data-full="${item.url}" data-raw="${item.rawUrl}" alt="${galAlt(dispTitle)}" />
+          <span class="cert-zoom"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+        </span>
+        <span class="mono cert-label">${dispTitle}</span>`;
+      certGrid.appendChild(div);
+    });
+
+    /* error fallback for cert images: raw.githubusercontent once, then drop */
+    certGrid.querySelectorAll('img').forEach(img => {
+      window.BQ_GALLERY.bindMediaFallback(img, [img.dataset.full, img.dataset.raw], () => {
+        img.closest('.cert-item')?.remove();
+      });
+    });
+
+    /* open lightbox on cert click */
+    certGrid.addEventListener('click', e => {
+      const item = e.target.closest('.cert-item');
+      if (!item) return;
+      const items = [...certGrid.querySelectorAll('.cert-item')];
+      const pool  = items.map(el => ({
+        full: el.dataset.full, title: el.dataset.title, type: 'image', sourceEl: el,
+      }));
+      if (window.__bqOpenLightboxPool) window.__bqOpenLightboxPool(pool, items.indexOf(item));
+    });
+  }
+
+  /* Play video on card hover (event delegation survives masonry re-layout) */
+  const hoverMotion = matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
+  grid.addEventListener('mouseover', e => {
+    // Scrolling can move several covers under a stationary mouse. That is
+    // not playback intent and must not start a decoder for every passing film.
+    if (!hoverMotion.matches || navigator.connection?.saveData
+      || document.documentElement.classList.contains('bq-scrolling')) return;
+    const card = e.target.closest('.card--photo');
+    if (!card || card.dataset.type !== 'video' || card.contains(e.relatedTarget)) return;
+    const vid  = card?.querySelector('video');
+    if (!vid || vid.dataset.mediaExhausted) return;
+    videoPreviews.play(vid);
+  });
+  grid.addEventListener('mouseout', e => {
+    const card = e.target.closest('.card--photo');
+    if (!card || card.dataset.type !== 'video' || card.contains(e.relatedTarget)) return;
+    const vid  = card?.querySelector('video');
+    videoPreviews.pause(vid);
+  });
+  const pausePreviews = () => videoPreviews.pauseAll();
+  document.addEventListener('visibilitychange', () => { if (document.hidden) pausePreviews(); });
+  document.addEventListener('bq:route', pausePreviews);
+  document.addEventListener('bq:lightbox-open', pausePreviews);
+  hoverMotion.addEventListener?.('change', () => { if (!hoverMotion.matches) pausePreviews(); });
+
+  /* Lightbox, then render the gallery via the masonry engine in main.js */
+  if (window.__bqInitLightbox)  window.__bqInitLightbox();
+  if (window.__bqRenderGallery) window.__bqRenderGallery(true);
+
+  /* ---- relocalize every card + certificate label on language switch ---- */
+  window.__bqRelocalizeGallery = () => {
+    (window.BQ_ALL_CARDS || []).forEach(entry => {
+      const card = entry.el; if (!card) return;
+      const coll = card.dataset.coll; if (!coll) return;
+      const title = galTitle(coll, card.dataset.idx, '');
+      card.dataset.title = title;
+      const tg = card.querySelector('.card-tag');
+      if (tg) tg.textContent = galTag(coll, '');
+      const tt = card.querySelector('.card-title'); if (tt) tt.textContent = title;
+      const open = card.querySelector('.card-open'); if (open) open.setAttribute('aria-label', galViewLabel(title));
+      const media = card.querySelector('img, video');
+      if (media) { if (media.tagName === 'IMG') media.alt = galAlt(title); else media.title = title; }
+      const status = card.querySelector('.card-media-status');
+      if (status) status.textContent = unavailableLabel();
+    });
+    document.querySelectorAll('#certGrid .cert-item').forEach(div => {
+      const title = galTitle('certificate', div.dataset.idx, 'Certificate');
+      div.dataset.title = title;
+      const lbl = div.querySelector('.cert-label'); if (lbl) lbl.textContent = title;
+      const img = div.querySelector('img'); if (img) img.alt = galAlt(title);
+      div.setAttribute('aria-label', galViewLabel(title));
+    });
+    document.querySelectorAll('.logo-marquee-track .logo-mark--ticker').forEach(mark => {
+      const title = galTitle('tickerlogo', mark.dataset.idx, 'Ticker Logo');
+      mark.dataset.title = title;
+      mark.setAttribute('aria-label', galViewLabel(galTag('logo', 'Logos')));
+      mark.setAttribute('href', logoPortfolioHref());
+      const img = mark.querySelector('img'); if (img) img.alt = title;
+    });
+  };
+  window.__bqLangCb = window.__bqLangCb || [];
+  window.__bqLangCb.push(() => window.__bqRelocalizeGallery());
+
+  /* ── WorkWith: all sixteen marks stay together in a stationary grid. ── */
+  const logoPortfolioHref = () => {
+    const language = galLang();
+    return (language === 'en' ? '' : '/' + language) + '/design/logo';
+  };
+  const logosGrid = document.querySelector('.logos-grid--clients');
+  if (logosGrid) {
+    const gallery = window.BQ_GALLERY;
+    // These marks identify the organisations in this section; they are
+    // informative images, not decorative or clickable gallery controls.
+    const clientNames = [
+      'Kurdistan Region Presidency', 'Baregayê Barzanî',
+      'Kurdistan Regional Government', 'Kurdistan Democratic Party',
+      'Ministry of Martyrs and Anfal Affairs', 'Kurdistan Democratic Youth Union',
+      'Ministry of Health — Kurdistan Regional Government', 'Kurdistan Women’s Union',
+      'Salahaddin University — Erbil', 'Kurdistan TV', 'Soran University',
+      'Coordinating Network Organizations', 'Erbil International Fair',
+      'Basir Medical Center', 'Mêxek Book Shop', 'Qandil Center'
+    ];
+    const wLogos = clientNames.map((name, i) => ({ file:`WorkLogo${i + 1}.webp`, name }));
+    logosGrid.removeAttribute('aria-busy');
+    logosGrid.removeAttribute('data-logos-empty');
+    logosGrid.innerHTML = wLogos.map(({ file, name }) =>
+      `<div class="logo-mark logo-mark--client">
+         <img src="/assets/clients/${file}" data-client-file="${file}" alt="${name}" loading="lazy" decoding="async" width="180" height="135" />
+       </div>`
+    ).join('');
+    const images = Array.from(logosGrid.querySelectorAll('img'));
+    images.forEach(img => gallery.bindMediaFallback(img, [
+      `${gallery.MEDIA_BASE}/WorkWith/${img.dataset.clientFile}`,
+      `${gallery.RAW_BASE}/WorkWith/${img.dataset.clientFile}`
+    ]));
+    const loadMarks = () => images.forEach(img => { img.loading = 'eager'; });
+    if (typeof IntersectionObserver === 'function') {
+      const loader = new IntersectionObserver(entries => {
+        if (!entries.some(entry => entry.isIntersecting)) return;
+        loadMarks();
+        loader.disconnect();
+      }, { rootMargin: '600px 0px' });
+      loader.observe(logosGrid);
+    } else loadMarks();
+  }
+
+  /* ── TickerLogo: compact designed marks move in two equal loop halves. ── */
+  const marqueeTrack = document.querySelector('.logo-marquee-track');
+  if (marqueeTrack) {
+    const logos = (window.BQ_GALLERY.items('tickerlogo') || []).slice(0, 8);
+    marqueeTrack.removeAttribute('aria-busy');
+    marqueeTrack.innerHTML = [...logos, ...logos].map((item, position) => {
+      const src = item.url;
+      /* A real category link keeps keyboard, touch and open-in-new-tab
+         navigation available. Every mark leads to the complete Logo tab. */
+      const title = galTitle('tickerlogo', item.index, 'Ticker Logo');
+      const duplicate = position >= logos.length ? ' data-loop-copy aria-hidden="true" tabindex="-1"' : '';
+      return `<a href="${logoPortfolioHref()}" class="logo-mark logo-mark--img logo-mark--ticker" data-full="${src}" data-coll="tickerlogo" data-idx="${item.index}" data-title="${title}" aria-label="${galViewLabel(galTag('logo', 'Logos'))}"${duplicate}>
+         <img src="${window.BQ_GALLERY.thumb(src, 180)}" data-full="${src}" data-raw="${item.rawUrl}" alt="${title}" loading="lazy" decoding="async" width="180" height="135" />
+       </a>`
+    }).join('');
+    marqueeTrack.querySelectorAll('img').forEach(img =>
+      // Keep the cell on exhaustion so the two loop halves cannot change size.
+      window.BQ_GALLERY.bindMediaFallback(img, [img.dataset.full, img.dataset.raw])
+    );
+  }
+});

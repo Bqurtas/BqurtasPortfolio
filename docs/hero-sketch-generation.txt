@@ -1,0 +1,36 @@
+Homepage portrait artwork — 25 October 2026
+
+Final output: preview_site/assets/hero-sketch.webp (768 x 768, RGBA WebP).
+Generated and refined with the built-in image_gen tool, not the CLI.
+Identity reference: preview_site/assets/portrait.webp (original unchanged).
+Drawing-technique reference: the user's supplied editorial illustrated portrait.
+The final image was resized and encoded as WebP with its generated alpha preserved.
+The hero and practice note reuse the same asset with an image-only grayscale
+filter, approved after a local preview. Surrounding orbit icons keep their own animation.
+
+Current selected artwork: the original approved transparent sketch was restored
+at the owner's request after trying the facial refinement below. The CSS radial
+fade was removed. The file's own alpha supplies the natural transparent edges;
+there is no CSS mask or background fill. Original fingerprint: 0a32dc9eafb1.
+
+Trial facial refinement (superseded) — 25 October 2026
+The owner requested a slightly slimmer face and publication. Edited with the
+built-in image_gen tool, preserving the existing transparent pencil portrait.
+Output was encoded at the same 768 x 768 dimensions with alpha preserved.
+The existing image-only monochrome presentation and site layout remain unchanged.
+
+Facial refinement prompt:
+
+Use case: identity-preserve precise portrait edit. Edit ONLY the supplied portrait cutout for its owner's website. The owner requests a small natural reduction of facial fullness. Make the cheeks and lower jaw subtly slimmer, approximately 5–7% narrower in the lower face only, enough to look a little leaner yet remain unmistakably exactly the same man. Keep face length, forehead, eyes, eyebrows, nose, lips, hair, beard, age, expression and gaze unchanged. Do not create hollow cheeks or a sharp artificial V jaw. Preserve head size and position, hair volume, both shoulders, hand under chin, fingers, shirt folds, pose, overall silhouette, framing and original pencil/crosshatching technique. Everything outside the cheek/jaw region must remain visually identical. Preserve the same color palette as the input; the website already renders the image in monochrome, so do not change tones or style. Maintain square composition and genuine transparent alpha background, with no paper fill, yellow or beige fringe, halo, shadow, border, new objects, text or watermark. A subtle natural facial refinement only; preserve the original likeness and all other artwork.
+
+Final refinement prompt to preserve the original soft artwork edges:
+
+Precise identity-preserving portrait refinement. IMAGE 1 is the original approved transparent pencil artwork and must be kept as the base. IMAGE 2 shows the requested subtly slimmer cheeks and jaw. Transfer ONLY that small cheek/jaw slimness from IMAGE 2 into IMAGE 1. Preserve IMAGE 1's exact hair, eyes, eyebrows, nose, mouth, expression, facial length, hand-under-chin pose, shoulders, shirt, shirt folds, color, composition, and especially its delicate unfinished soft sketch edges and feathered transparent lower shoulder silhouette. Do not copy IMAGE 2's harder shirt outline or more solid lower edge. Lower shirt strokes must gradually feather into alpha just like IMAGE 1, without a solid traced rim. Face should be only slightly slimmer than IMAGE 1, natural and clearly the same man, not gaunt or artificially narrowed. Keep all unedited pixels as faithful to IMAGE 1 as possible. Real transparent alpha background, no halo, paper color, filled background, text, or watermark. Single square cutout.
+
+Original drawing prompt:
+
+Use case: style-transfer, identity-preserve. Create one genuinely transparent hand-drawn portrait for a design portfolio. INPUT1 is the subject identity and pose; INPUT2 is the precise artistic technique reference. Redraw the REAL MAN FROM INPUT1 using the same clearly visible ink-and-colored-pencil rendering, dense fine crosshatching, warm ochre skin pigments, dry-brush edges and handmade engraved/editorial feeling as INPUT2. Match INPUT2's strength of artistic texture and drawing, rather than giving a filtered photograph or glossy digital airbrushing. Keep INPUT1's exact natural face, eye shape, nose, mouth, cheek width and tapered jaw, short swept hair, close moustache/goatee, age, friendly expression, white/light-blue shirt and hand beneath chin. Do not transfer INPUT2's identity, curly hair, full beard or dark jacket. Do not widen or puff the face; no artificial slimming either. Facial features remain accurate and attractive through careful observation of INPUT1. Every facial plane, hair and shirt fold should be drawn with the same fine dark lines and warm muted color washes as INPUT2; eyes remain natural in size, no cartoon outlines. Square centered bust composition, full head and both shoulders contained, hand anatomy correct. Organic unfinished shoulder and lower-shirt strokes, subject fills about88percent of square. ABSOLUTELY NO paper/background: background is transparent alpha; no cream rectangle, paper texture behind the figure, no badge/circle/frame/halo or drop shadow. Retain warm ivory/ochre and pale blue pigment only INSIDE the figure so it also reads on a dark site. No text, signature or watermark. Output RGBA transparent cutout. Priority: exact identity of input1 + unmistakable hand-drawn technique matching input2.
+
+Final edge refinement prompt:
+
+Precise image edit of the supplied transparent portrait illustration. Change ONLY the outer silhouette and edge pigment: remove every yellow, ochre, beige or warm paper-colored fringe, halo or fleck around the hair, ears, shoulders, sleeves and lower edge. The surrounding background must remain genuine fully transparent alpha, never filled with a color. At the shirt boundary use only neutral ivory/white, pale blue and graphite strokes that taper directly into transparent alpha, with no colored rim or paper residue. Keep all face pixels/geometry, facial proportions, likeness, eyes, skin tone, expression, hairstyle, hand-under-chin pose, composition and the existing strong fine-pencil hand-drawn texture visually unchanged. Do not redraw the person differently, do not widen the face, do not smooth out the drawing. Keep all of the artwork inside the canvas, with a small clear margin around hair and lower strokes. This cutout will sit on both off-white and charcoal website backgrounds so the outside must be truly transparent without any yellow tint. No text, watermark, frame, circle or shadow. Preserve RGBA transparency.

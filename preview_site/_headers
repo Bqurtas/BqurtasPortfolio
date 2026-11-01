@@ -1,0 +1,143 @@
+# Security + caching headers for Cloudflare Pages
+# NOTE: the HTML pages themselves are served fresh (no long cache) so site
+# updates always show immediately. Only static files get a short cache.
+
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=(), interest-cohort=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Permitted-Cross-Domain-Policies: none
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  # Cloudflare Pages serves assets with a wildcard "Access-Control-Allow-Origin: *"
+  # by default. The site is fully self-contained (all fetches are same-origin, which
+  # don't need CORS), so pin the header to our own origin — no wildcard, nothing for
+  # a third-party site to read cross-origin. This overrides the Pages default.
+  Access-Control-Allow-Origin: https://bqurtas.com
+  # NOTE: the Content-Security-Policy is set per-request by functions/[[route]].js
+  # so it can carry a fresh nonce (nonce-based script-src, no 'unsafe-inline' for
+  # scripts → XSS-effective). It is intentionally NOT set here to avoid a second,
+  # conflicting CSP header on the HTML responses.
+  # NOTE: no Cache-Control here on purpose. Cloudflare _headers CONCATENATES every
+  # matching rule's same-named header, so a Cache-Control on /* would be merged
+  # into /css, /js and /assets (e.g. "no-cache, max-age=86400") and the most
+  # restrictive directive would win — killing their cache. So the HTML shell's
+  # cache is set ONLY by functions/[[route]].js (browser revalidation +
+  # CDN-Cache-Control: no-store), and static files get their own rules below.
+
+# The bare root "/" maps to index.html and Cloudflare re-applies its platform
+# wildcard CORS to it specifically (every other path — /index.html, /bio,
+# /design, /css, /js — already honours the /* pin above). An exact "/" rule
+# pins the homepage too.
+/
+  Access-Control-Allow-Origin: https://bqurtas.com
+  Cache-Control: no-store, max-age=0
+  CDN-Cache-Control: no-store
+  Cloudflare-CDN-Cache-Control: no-store
+
+/index.html
+  Access-Control-Allow-Origin: https://bqurtas.com
+  Cache-Control: no-store, max-age=0
+  CDN-Cache-Control: no-store
+  Cloudflare-CDN-Cache-Control: no-store
+
+/site.webmanifest
+  Content-Type: application/manifest+json
+  Cache-Control: no-store
+  CDN-Cache-Control: no-store
+  Cloudflare-CDN-Cache-Control: no-store
+
+/favicon.ico
+  Content-Type: image/x-icon
+  Cache-Control: public, max-age=31536000, immutable
+
+/sitemap.xml
+  Content-Type: application/xml; charset=utf-8
+  Cache-Control: no-store
+  CDN-Cache-Control: no-store
+  Cloudflare-CDN-Cache-Control: no-store
+
+/sitemap-images.xml
+  Content-Type: application/xml; charset=utf-8
+  Cache-Control: no-store
+
+/sitemap-gallery.xml
+  Content-Type: application/xml; charset=utf-8
+  Cache-Control: no-store
+
+# Standalone archive: local code; the Umami collection endpoint is used only
+# after the visitor grants the current Cloudflare + Umami statistics consent.
+/archive/*
+  Cache-Control: public, max-age=0, must-revalidate, no-transform
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; font-src 'self'; img-src 'self'; connect-src 'self' https://gateway.umami.is/api/send; base-uri 'none'; form-action 'none'; frame-ancestors 'self'
+
+/robots.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: no-store
+  CDN-Cache-Control: no-store
+  Cloudflare-CDN-Cache-Control: no-store
+
+/sw.js
+  # The one file that must never be edge-cached. Every other asset carries a
+  # ?v= fingerprint, so a new build is a new URL — but sw.js is fetched at a
+  # fixed path, and it is the file that decides how fresh everything else is.
+  # Cached at the edge, a superseded worker keeps serving its own old cache to
+  # returning visitors long after a deploy.
+  Content-Type: text/javascript; charset=utf-8
+  Cache-Control: no-store
+  CDN-Cache-Control: no-store
+  Cloudflare-CDN-Cache-Control: no-store
+
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: no-store
+  CDN-Cache-Control: no-store
+  Cloudflare-CDN-Cache-Control: no-store
+
+# Many portfolio images keep stable filenames between releases, so revalidate
+# them daily instead of pinning an old visual in a visitor's cache for a year.
+/assets/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+# Byte-for-byte font copies carry a content hash in their filename. Keep them
+# outside /assets/* so Cloudflare does not concatenate its daily cache policy.
+/font-assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# CSS/JS are ?v-versioned, so a new edit is a new URL.
+/css/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/js/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/vendor/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/.well-known/security.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=86400
+
+/security.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=86400
+
+/.well-known/mta-sts.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=86400
+
+/.well-known/autoconfig/mail/config-v1.1.xml
+  Content-Type: application/xml; charset=utf-8
+  Cache-Control: public, max-age=86400
+  X-Robots-Tag: noindex
+
+/mail/config-v1.1.xml
+  Content-Type: application/xml; charset=utf-8
+  Cache-Control: public, max-age=86400
+  X-Robots-Tag: noindex
+
+/autodiscover/autodiscover.xml
+  Content-Type: text/xml; charset=utf-8
+  Cache-Control: public, max-age=3600
+  X-Robots-Tag: noindex

@@ -1,0 +1,270 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { DatabaseSync } from 'node:sqlite';
+
+import { hasSession, issueSession, readJson } from '../functions/api/_session.js';
+import { onRequestGet as twoFactorStatus, onRequestPost as twoFactorPost } from '../functions/api/2fa.js';
+import { onRequestPost as contentPost } from '../functions/api/content.js';
+import { onRequestGet as statsGet } from '../functions/api/stats.js';
+import { onRequestPost as assistantPost } from '../functions/api/assistant.js';
+import { onRequestPost as hitPost } from '../functions/api/hit.js';
+
+const ORIGIN = 'https://bqurtas.com';
+const SESSION_SECRET = 'a-strong-independent-session-secret-32-bytes';
+
+function sessionStore(t) {
+  const sqlite = new DatabaseSync(':memory:');
+  t.after(() => sqlite.close());
+  return { prepare(sql) {
+    let values = [];
+    return {
+      bind(...args) { values = args; return this; },
+      async run() { return { meta: { changes: Number(sqlite.prepare(sql).run(...values).changes) } }; },
+      async first() { return sqlite.prepare(sql).get(...values) || null; }
+    };
+  } };
+}
+
+async function signedCookie(env = { SESSION_SECRET }) {
+  const setCookie = await issueSession(env);
+  return setCookie.split(';', 1)[0];
+}
+
+test('admin sessions use an independent strong __Host cookie', async (t) => {
+  assert.equal(await issueSession({ DASH_PIN: 'pin', EDIT_TOKEN: 'token' }), null);
+  assert.equal(await issueSession({ SESSION_SECRET: 'too-short' }), null);
+
+  const value = await issueSession({ SESSION_SECRET });
+  assert.match(value, /^__Host-bq_admin_session=/);
+  assert.match(value, /; Path=\/;/);
+  assert.match(value, /; HttpOnly;/);
+  assert.match(value, /; Secure;/);
+  assert.match(value, /; SameSite=Strict$/);
+
+  const request = new Request(`${ORIGIN}/api/2fa`, { headers: { Cookie: value.split(';', 1)[0] } });
+  assert.equal(await hasSession(request, { SESSION_SECRET, DB: sessionStore(t) }), true);
+  assert.equal(await hasSession(request, { SESSION_SECRET }), false, 'revocation checks fail closed without D1');
+  assert.equal(await hasSession(request, { SESSION_SECRET: `${SESSION_SECRET}!different` }), false);
+});
+
+test('2FA status is server-backed and logout expires the host cookie', async (t) => {
+  const cookie = await signedCookie();
+  const status = await twoFactorStatus({
+    request: new Request(`${ORIGIN}/api/2fa`, { headers: { Cookie: cookie } }),
+    env: { SESSION_SECRET, DASH_PIN: '123456', TOTP_SECRET: 'JBSWY3DPEHPK3PXP', DB: sessionStore(t) }
+  });
+  assert.deepEqual(await status.json(), {
+    ok: true,
+    configured: true,
+    authenticated: true,
+    requirements: { pin: true, session: true, database: true, secondFactor: true, editor: false, github: false }
+  });
+
+  const logout = await twoFactorPost({
+    request: new Request(`${ORIGIN}/api/2fa`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: ORIGIN, Cookie: cookie },
+      body: JSON.stringify({ action: 'logout' })
+    }),
+    env: {}
+  });
+  assert.equal(logout.status, 200);
+  assert.match(logout.headers.get('set-cookie'), /^__Host-bq_admin_session=;/);
+  assert.match(logout.headers.get('cache-control'), /no-store/);
+});
+
+test('2FA uses the authenticator even when retired delivery keys remain configured', async (t) => {
+  let submitted;
+  t.mock.method(globalThis, 'fetch', async (url, init) => {
+    submitted = { url, body: JSON.parse(init.body) };
+    return new Response('{}', { status: 200 });
+  });
+  const statement = {
+    bind() { return this; },
+    async run() { return { meta: { changes: 1 } }; }
+  };
+  const response = await twoFactorPost({
+    request: new Request(`${ORIGIN}/api/2fa`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: ORIGIN, 'User-Agent': 'test', 'CF-Connecting-IP': '192.0.2.2' },
+      body: JSON.stringify({ action: 'send', pin: '123456', recipient: 'primary' })
+    }),
+    env: {
+      SESSION_SECRET,
+      DASH_PIN: '123456',
+      TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
+      WEB3FORMS_KEY: 'primary-key',
+      TWOFA_SENDER_EMAIL: 'security@example.com',
+      DB: { prepare: () => statement },
+      RATE_LIMITER: { limit: async () => ({ success: true }) }
+    }
+  });
+  const result = await response.json();
+  assert.deepEqual(result, { ok: true, id: 'totp', via: 'totp' });
+  assert.equal(submitted, undefined, 'login codes must never leave Cloudflare');
+});
+
+test('content mutations require both the signed session and edit header', async (t) => {
+  const cookie = await signedCookie();
+  const env = { SESSION_SECRET, EDIT_TOKEN: 'edit-secret', DB: sessionStore(t) };
+  const body = JSON.stringify({ title: 'Test' });
+  const base = { method: 'POST', body, headers: { 'Content-Type': 'application/json', Origin: ORIGIN } };
+
+  const tokenOnly = await contentPost({
+    request: new Request(`${ORIGIN}/api/content`, { ...base, headers: { ...base.headers, 'x-edit-token': 'edit-secret' } }),
+    env
+  });
+  assert.equal(tokenOnly.status, 401);
+  assert.equal((await tokenOnly.json()).error, 'session-required');
+
+  const sessionOnly = await contentPost({
+    request: new Request(`${ORIGIN}/api/content`, { ...base, headers: { ...base.headers, Cookie: cookie } }),
+    env
+  });
+  assert.equal(sessionOnly.status, 401);
+  assert.equal((await sessionOnly.json()).error, 'unauthorized');
+});
+
+test('2FA setup diagnostics disclose only requirement booleans, never credential values', async () => {
+  const response = await twoFactorStatus({
+    request: new Request(`${ORIGIN}/api/2fa`),
+    env: { SESSION_SECRET, EDIT_TOKEN: 'private-editor-credential', GITHUB_TOKEN: 'private-github-credential' }
+  });
+  const body = await response.json();
+  assert.equal(body.configured, false);
+  assert.equal(body.authenticated, false);
+  assert.deepEqual(body.requirements, { pin: false, session: true, database: false, secondFactor: false, editor: true, github: true });
+  assert.doesNotMatch(JSON.stringify(body), /private-editor-credential|private-github-credential|a-strong-independent/);
+});
+
+test('missing sessions reject private requests before querying the editor credential store', async () => {
+  let databaseCalls = 0;
+  const env = {
+    SESSION_SECRET,
+    EDIT_TOKEN: 'edit-secret',
+    DB: { prepare() { databaseCalls += 1; throw new Error('must not be called'); } }
+  };
+  const response = await contentPost({
+    request: new Request(`${ORIGIN}/api/content`, {
+      method: 'POST',
+      headers: { Origin: ORIGIN, 'Content-Type': 'application/json', 'x-edit-token': 'edit-secret' },
+      body: JSON.stringify({ title: 'Unauthorized request' })
+    }),
+    env
+  });
+  assert.equal(response.status, 401);
+  assert.equal((await response.json()).error, 'session-required');
+  assert.equal(databaseCalls, 0);
+});
+
+test('analytics token in a URL is never accepted', async () => {
+  const cookie = await signedCookie();
+  const response = await statsGet({
+    request: new Request(`${ORIGIN}/api/stats?token=stats-secret`, {
+      headers: { Origin: ORIGIN, Cookie: cookie }
+    }),
+    env: { SESSION_SECRET, STATS_TOKEN: 'stats-secret', DB: {} }
+  });
+  assert.equal(response.status, 401);
+});
+
+test('assistant rejects cross-origin, partial auth and oversized prompts before model use', async () => {
+  const cookie = await signedCookie();
+  const env = {
+    SESSION_SECRET,
+    EDIT_TOKEN: 'edit-secret',
+    DB: {
+      prepare() {
+        return {
+          bind() { return this; },
+          async run() { return { meta: { changes: 1 } }; },
+          async first() { return null; }
+        };
+      }
+    },
+    RATE_LIMITER: { limit: async () => ({ success: true }) }
+  };
+  const message = JSON.stringify({ messages: [{ role: 'user', content: 'hello' }] });
+
+  const partial = await assistantPost({
+    request: new Request(`${ORIGIN}/api/assistant`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Origin: ORIGIN, 'x-edit-token': 'edit-secret' }, body: message
+    }),
+    env
+  });
+  assert.equal(partial.status, 401);
+
+  const crossOrigin = await assistantPost({
+    request: new Request(`${ORIGIN}/api/assistant`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Origin: 'https://evil.example', Cookie: cookie, 'x-edit-token': 'edit-secret' }, body: message
+    }),
+    env
+  });
+  assert.equal(crossOrigin.status, 403);
+
+  const oversized = await assistantPost({
+    request: new Request(`${ORIGIN}/api/assistant`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: ORIGIN, Cookie: cookie, 'x-edit-token': 'edit-secret' },
+      body: JSON.stringify({ messages: [{ role: 'user', content: 'x'.repeat(25_000) }] })
+    }),
+    env
+  });
+  assert.equal(oversized.status, 413);
+});
+
+test('hit collection fails closed without any strong private analytics key', async () => {
+  const response = await hitPost({
+    request: new Request(`${ORIGIN}/api/hit`, {
+      method: 'POST',
+      headers: { Origin: ORIGIN, 'User-Agent': 'Mozilla/5.0', 'CF-Connecting-IP': '192.0.2.1' },
+      body: JSON.stringify({ p: '/', l: 'en' })
+    }),
+    env: { DB: {} }
+  });
+  assert.equal(response.status, 204);
+  assert.match(response.headers.get('cloudflare-cdn-cache-control'), /no-store/);
+});
+
+test('JSON payload limits stop chunked bodies before reading the complete upload', async () => {
+  let canceled = false;
+  let readCount = 0;
+  const body = new ReadableStream({
+    pull(controller) {
+      readCount += 1;
+      controller.enqueue(new Uint8Array(32));
+      if (readCount === 100) controller.close();
+    },
+    cancel() { canceled = true; }
+  });
+  const request = new Request(`${ORIGIN}/api/2fa`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body, duplex: 'half'
+  });
+  await assert.rejects(readJson(request, 64), (error) => error.status === 413);
+  assert.equal(canceled, true);
+  assert.ok(readCount < 10, `read ${readCount} chunks before enforcing the limit`);
+});
+
+test('JSON input validates actual UTF-8 bytes, fragmented characters and object shape', async () => {
+  const source = new TextEncoder().encode(JSON.stringify({ title: 'کوردستان' }));
+  const fragmented = new ReadableStream({
+    start(controller) {
+      for (const byte of source) controller.enqueue(new Uint8Array([byte]));
+      controller.close();
+    }
+  });
+  assert.deepEqual(await readJson(new Request(`${ORIGIN}/api/content`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: fragmented, duplex: 'half'
+  }), source.length), { title: 'کوردستان' });
+
+  for (const body of ['null', '[]', new Uint8Array([0xff])]) {
+    const request = new Request(`${ORIGIN}/api/content`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body
+    });
+    await assert.rejects(readJson(request), (error) => error.code === 'bad-json');
+  }
+  const oversized = new Request(`${ORIGIN}/api/content`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': '1' }, body: source
+  });
+  await assert.rejects(readJson(oversized, source.length - 1), (error) => error.status === 413);
+});

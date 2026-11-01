@@ -1,0 +1,9 @@
+# The edge Function redirects www to the canonical apex host. Pages redirect
+# rules accept relative source paths, so host redirects belong in the Function.
+
+# Some scanners and clients still look for the legacy root path.
+/security.txt  /.well-known/security.txt  301
+
+# Deep links are served by functions/[[route]].js. Do not add a wildcard
+# index.html fallback here: it would turn missing scripts, images and arbitrary
+# extension URLs into misleading 200 HTML responses.

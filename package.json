@@ -1,0 +1,16 @@
+{
+  "name": "bqurtas-portfolio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-assets.mjs",
+    "dev": "node scripts/build-assets.mjs && node scripts/dev-server.mjs",
+    "check:syntax": "find preview_site/js functions scripts -type f \\( -name '*.js' -o -name '*.mjs' \\) -print0 | xargs -0 -n1 node --check",
+    "validate": "node scripts/validate-site.mjs",
+    "test": "npm run check:syntax && npm run validate && node --test tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "csso": "^5.0.5",
+    "terser": "5.44.0"
+  }
+}
