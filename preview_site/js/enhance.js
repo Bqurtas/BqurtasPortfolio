@@ -838,6 +838,7 @@
       panel.setAttribute('aria-hidden', 'false');
       armIdle();
       chatStatus(pending ? 'thinking' : 'ready');
+      requestAnimationFrame(() => fitChatField());
       if (!greeted) {
         greeted = true;
         const hadHistory = restore();
@@ -903,13 +904,31 @@
     }
     /* rebuild quick chips in the new language, or when the lazy knowledge
        base arrives after the first opening of the panel. */
-    const refreshChatKnowledge = () => {
-      if (greeted) { buildQuick(); setPending(pending); }
-      else chatStatus();
+    let placeholderProbe = null;
+    const placeholderHeight = (style) => {
+      const text = input.placeholder || '';
+      const width = input.clientWidth;
+      if (!text || width < 2) return 0;
+      if (!placeholderProbe) {
+        placeholderProbe = document.createElement('div');
+        placeholderProbe.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(placeholderProbe);
+      }
+      const probe = placeholderProbe;
+      probe.style.cssText = 'position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;';
+      probe.style.width = `${width}px`;
+      probe.style.fontFamily = style.fontFamily;
+      probe.style.fontSize = style.fontSize;
+      probe.style.fontWeight = style.fontWeight;
+      probe.style.fontStyle = style.fontStyle;
+      probe.style.letterSpacing = style.letterSpacing;
+      probe.style.lineHeight = style.lineHeight;
+      probe.style.padding = `${style.paddingTop} ${style.paddingRight} ${style.paddingBottom} ${style.paddingLeft}`;
+      probe.style.direction = style.direction;
+      probe.style.textAlign = style.textAlign;
+      probe.textContent = text;
+      return probe.offsetHeight;
     };
-    window.__bqLangCb.push(refreshChatKnowledge);
-    window.addEventListener('bq:chat-ready', refreshChatKnowledge);
-    chatStatus();
     const fitChatField = () => {
       if (!input || input.tagName !== 'TEXTAREA') return;
       const style = getComputedStyle(input);
@@ -917,12 +936,37 @@
       const pad = (parseFloat(style.paddingTop) || 0) + (parseFloat(style.paddingBottom) || 0);
       const maxLines = 5;
       input.style.height = 'auto';
-      const lines = Math.max(1, Math.ceil((input.scrollHeight - pad - 1) / line));
+      let needed = input.scrollHeight;
+      if (!input.value) needed = Math.max(needed, placeholderHeight(style));
+      const lines = Math.max(1, Math.ceil((needed - pad - 1) / line));
       const shown = Math.min(lines, maxLines);
-      input.style.height = `${Math.ceil(pad + line * shown)}px`;
-      input.style.overflowY = lines > maxLines ? 'auto' : 'hidden';
+      const nextHeight = `${Math.ceil(pad + line * shown)}px`;
+      if (input.style.height !== nextHeight) input.style.height = nextHeight;
+      const overflow = lines > maxLines ? 'auto' : 'hidden';
+      if (input.style.overflowY !== overflow) input.style.overflowY = overflow;
     };
+    const refreshChatKnowledge = () => {
+      if (greeted) { buildQuick(); setPending(pending); }
+      else chatStatus();
+      fitChatField();
+    };
+    window.__bqLangCb.push(refreshChatKnowledge);
+    window.addEventListener('bq:chat-ready', refreshChatKnowledge);
+    chatStatus();
     input.addEventListener('input', fitChatField);
+    if (typeof ResizeObserver === 'function') {
+      let frame = 0;
+      let lastWidth = input.clientWidth;
+      new ResizeObserver(() => {
+        const width = input.clientWidth;
+        if (width === lastWidth) return;
+        lastWidth = width;
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(fitChatField);
+      }).observe(input);
+    }
+    document.fonts?.ready.then(() => fitChatField());
+    fitChatField();
     input.addEventListener('keydown', (event) => {
       if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
       event.preventDefault();

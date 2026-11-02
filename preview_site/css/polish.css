@@ -6012,3 +6012,37 @@ html body #chat#chat #chatText#chatText {
 html body #chat#chat #chatText#chatText::-webkit-scrollbar {
   display: none !important;
 }
+
+/* The name and the status sit a little apart, centred on the portrait.
+   The classic hairline sits under them, inset from both sides. */
+html body #chat#chat .chat-head {
+  align-items: center !important;
+  position: relative !important;
+  border-bottom: 0 !important;
+  padding-bottom: 18px !important;
+}
+html body #chat#chat .chat-head::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 18px !important;
+  right: 18px !important;
+  bottom: 0 !important;
+  height: 1px !important;
+  background: var(--line) !important;
+  pointer-events: none !important;
+}
+html body #chat#chat .chat-head-id {
+  align-items: center !important;
+}
+html body #chat#chat .chat-head-id > div {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+}
+html body #chat#chat .chat-head-id strong,
+html body #chat#chat .chat-status {
+  line-height: 1.15 !important;
+}
