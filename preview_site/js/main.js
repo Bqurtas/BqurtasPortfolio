@@ -3254,6 +3254,10 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       }
       suppressNextPreserve = false;
       queue();
+      /* The portfolio card's pin is the deck's own end. Refresh it after this
+         deck has its final paper heights, or the card unpins when the next
+         sheet arrives and the portfolio shape rises under it. */
+      if (root.id === 'design') window.__bqSyncWorkPin?.();
     };
 
     const queueMeasure = () => {
@@ -3537,6 +3541,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     };
     let overflow = 0;
     let cardH = 0;
+    let pinStay = 0;        /* extra track past the hand-off, so the card unpins with the deck */
     let collapseDist = 0;   /* how far the head slides up before the tabs pin (mobile) */
     const nextSheet = () => {
       const n = track.nextElementSibling;
@@ -3597,19 +3602,38 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       overflow = Math.max(0, reelH - vpH);
       const floor = Number(track.dataset.overflowFloor);
       if (Number.isFinite(floor) && floor > 0) overflow = Math.max(overflow, floor);
-      /* track = card + gallery-scroll + ONE card-height of HOLD. The hold is the
-         window in which the NEXT sheet ("What I do") RISES up over the still-pinned
-         card — the same scroll-driven "next sheet climbs over the previous" as every
-         other sheet on the page, so it comes up WITH the scroll and never pops in
-         suddenly (owner, said many times). The reel scrolls through `overflow`,
-         then the card stays pinned a card-height while the next sheet rises over it. */
-      track.style.setProperty('--work-track-h', (cardH * 2 + overflow) + 'px');
-      /* Overlap the next sheet by ONE card-height in fixed px (not the dvh CSS
-         margin, which drifts as the mobile address bar hides and desyncs the
-         hand-off). It starts to rise as the reel finishes and finishes covering as
-         the card unpins — a plain sticky rise, no pull-up, no occlusion, no cut. */
+      /* track = card + gallery-scroll + ONE card-height of HOLD, then enough
+         extra length that the pinned card leaves with the rest of the deck.
+         The hold is the window in which the NEXT sheet ("What I do") RISES up
+         over the still-pinned card. The reel scrolls through `overflow`, then
+         the card stays pinned while that sheet climbs over it. A sticky box is
+         pushed out by the bottom of its own track, so a track that ended at the
+         hold let the portfolio shape rise the moment "What I do" reached the
+         pin — every other sheet stays put until the deck itself ends. */
+      const baseTrack = cardH * 2 + overflow;
+      /* Read the deck before writing the track. Resetting the track to the
+         base length first pulls every later sheet up — the next measure then
+         sees a short deck and deletes the extension, so the card rises again.
+         An extension that is already applied ends at the deck, and the
+         following margin cancels it, so this distance stays the same. */
       const next = nextSheet();
-      if (next) next.style.setProperty('margin-top', (-cardH) + 'px', 'important');
+      const deck = track.parentElement;
+      let stay = 0;
+      if (deck && typeof deck.getBoundingClientRect === 'function') {
+        const padBottom = parseFloat(getComputedStyle(deck).paddingBottom) || 0;
+        const deckContentBottom = deck.getBoundingClientRect().bottom + window.scrollY - padBottom;
+        const currentTrack = track.getBoundingClientRect().height;
+        const missing = Math.max(0, baseTrack - currentTrack);
+        stay = Math.max(0, Math.round(deckContentBottom + missing - trackOrigin - baseTrack));
+      }
+      pinStay = stay;
+      track.style.setProperty('--work-track-h', (baseTrack + stay) + 'px');
+      /* Overlap the next sheet by the hold plus the extra pin length, in fixed
+         px (not the dvh CSS margin, which drifts as the mobile address bar
+         hides and desyncs the hand-off). The extra overlap cancels the extra
+         track, so the page does not grow and the next sheet still arrives as
+         the reel finishes. */
+      if (next) next.style.setProperty('margin-top', (-(cardH + stay)) + 'px', 'important');
     };
     /* getComputedStyle is a style-recalc barrier; this was being called several
        times per scroll event for a value that only changes on resize. Cached,
@@ -3690,7 +3714,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       // needed after another scroll module has written its own transforms.
       // Menu motion is excluded above; closure remeasures the real origin.
       const trackTop = trackOrigin - window.scrollY;
-      const cardTop = Math.min(Math.max(g, trackTop), trackTop + cardH + overflow);
+      const cardTop = Math.min(Math.max(g, trackTop), trackTop + cardH + overflow + pinStay);
       const local = g - trackTop;
       let entryClip = 0;
       if (phoneEntry.matches) {
@@ -3809,6 +3833,15 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
           window.scrollTo({ top: targetY, left: 0, behavior: 'auto' });
         }
       }
+      drive();
+    };
+    /* The deck measures its papers after this track. Syncing here, without
+       restoring a scroll offset, keeps the pin extension on the deck's final
+       height instead of the height from the first gallery frame. */
+    window.__bqSyncWorkPin = () => {
+      if (document.body.dataset.room !== 'design') return;
+      if (track.dataset.holdTrack === '1') return;
+      measure();
       drive();
     };
     /* Sending the reel home. remeasure() restores the saved reading position
