@@ -3098,6 +3098,12 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
 /* Google card brand colour (LinkedIn/Behance set theirs next to the card styles).
    The mark keeps its WHITE icon on the brand background — never brand-on-brand. */
 .bio-social--google { --brand: #4285f4; }
+/* Recognition & Sources cards: press, Amazon, the London edition. The
+   Presidency card keeps the default gold. Tones stay dark enough to read
+   as 10px eyebrow text on the paper. */
+.bio-social--sun    { --brand: #b4531b; }
+.bio-social--amazon { --brand: #c45500; }
+.bio-social--london { --brand: #1f3a93; }
 /* Mobile: COMPACT the bio-card contents so everything FITS the equal cards —
    smaller type and tighter grids instead of clipping anything. */
 @media (max-width: 820px) {

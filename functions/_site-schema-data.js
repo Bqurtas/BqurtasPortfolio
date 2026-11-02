@@ -77,9 +77,10 @@ export const SITE_SCHEMA = {
         "Creative Technologist",
         "Graphic & Motion Designer",
         "Photographer",
-        "Content Producer"
+        "Content Producer",
+        "Technical & Art Director, Sun of Erbil"
       ],
-      "description": "Barakat Qurtas is a Kurdish multidisciplinary designer, creative technologist, photographer and producer in Hewlêr, Kurdistan Region of Iraq. Since 2014, his practice has connected brand identity, editorial and print, campaigns, social content, photography, motion, AI-assisted production and web experiences.",
+      "description": "Barakat Qurtas is a Kurdish multidisciplinary designer, creative technologist, photographer and producer in Hewlêr, Kurdistan Region of Iraq. Since 2014, his practice has connected brand identity, editorial and print, campaigns, social content, photography, motion, AI-assisted production and web experiences. His work has been honoured by the Kurdistan Region Presidency; he is the Technical & Art Director on the masthead of Sun of Erbil and is credited in books published on Amazon and in London. The archive on this site documents more than 1,000 finished works made for about 25 organisations.",
       "url": "https://bqurtas.com/",
       "image": "https://bqurtas.com/assets/portrait.webp",
       "email": "hello@bqurtas.com",
@@ -185,17 +186,25 @@ export const SITE_SCHEMA = {
         "sameAs": "https://su.edu.krd/"
       },
       "award": [
+        "Certificate of Appreciation for the publication “Presidential Moments” — Idris Nechirvan Barzani, 2025",
         "Shield of Honor & Certificate of Appreciation — Nuche Net Agency, 2025",
-        "Honorary Gift of the Office of the President — Kurdistan Region Presidency, 2024",
+        "Honorary Gift of the Office of the President, Kurdish Journalism Day — Kurdistan Region Presidency, 2024",
+        "Honorary Medal of the President of the Kurdistan Region",
         "Shield of Honor — Soran University, 2023",
         "Honor & Appreciation, World Volunteer Day — Governor of Erbil, 2020",
-        "Respect & Appreciation — Coordination Network of Organizations, 2020"
+        "Respect & Appreciation — Coordination Network of Organizations, 2020",
+        "Thanks & Appreciation — Rwanga Foundation"
       ],
-      "worksFor": {
-        "@type": "Organization",
-        "name": "Directorate of Media Affairs, Kurdistan Region Presidency",
-        "sameAs": "https://presidency.gov.krd/en/home"
-      },
+      "worksFor": [
+        {
+          "@type": "Organization",
+          "name": "Directorate of Media Affairs, Kurdistan Region Presidency",
+          "sameAs": "https://presidency.gov.krd/en/home"
+        },
+        {
+          "@id": "https://sunoferbil.com/#organization"
+        }
+      ],
       "affiliation": [
         {
           "@type": "Organization",
@@ -212,6 +221,61 @@ export const SITE_SCHEMA = {
         {
           "@type": "Organization",
           "name": "Justice NGO for Lagan Issues"
+        }
+      ],
+      "hasCredential": [
+        {
+          "@type": "EducationalOccupationalCredential",
+          "name": "Graphic Design Masterclass — Learn GREAT Design (2020)",
+          "credentialCategory": "Certificate of Completion",
+          "recognizedBy": {
+            "@type": "Organization",
+            "name": "Udemy"
+          }
+        },
+        {
+          "@type": "EducationalOccupationalCredential",
+          "name": "The Fundamentals of Digital Marketing (2020)",
+          "credentialCategory": "Certificate of Achievement",
+          "recognizedBy": {
+            "@type": "Organization",
+            "name": "Google Digital Garage"
+          }
+        },
+        {
+          "@type": "EducationalOccupationalCredential",
+          "name": "Creative Photography Techniques (2021)",
+          "credentialCategory": "Certificate of Completion",
+          "recognizedBy": {
+            "@type": "Organization",
+            "name": "LinkedIn Learning"
+          }
+        },
+        {
+          "@type": "EducationalOccupationalCredential",
+          "name": "Video editing: a technical and creative vision",
+          "credentialCategory": "Course certificate",
+          "recognizedBy": {
+            "@type": "Organization",
+            "name": "Al Jazeera Media Institute"
+          }
+        },
+        {
+          "@type": "EducationalOccupationalCredential",
+          "name": "Introduction to Generative AI Learning Path (2026)",
+          "credentialCategory": "Specialization certificate",
+          "recognizedBy": {
+            "@type": "Organization",
+            "name": "Google Cloud on Coursera"
+          }
+        }
+      ],
+      "subjectOf": [
+        {
+          "@id": "https://bqurtas.com/#book-stations-of-my-life"
+        },
+        {
+          "@id": "https://bqurtas.com/#book-oppressed-kurds"
         }
       ]
     },
@@ -399,6 +463,85 @@ export const SITE_SCHEMA = {
           }
         }
       ]
+    },
+    {
+      "@type": "NewsMediaOrganization",
+      "@id": "https://sunoferbil.com/#organization",
+      "name": "Sun of Erbil",
+      "url": "https://sunoferbil.com/",
+      "slogan": "A different light on the world",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Erbil",
+        "addressRegion": "Kurdistan Region",
+        "addressCountry": "IQ"
+      },
+      "employee": {
+        "@type": "Role",
+        "roleName": "Technical & Art Director",
+        "employee": {
+          "@id": "https://bqurtas.com/#person"
+        }
+      }
+    },
+    {
+      "@type": "Book",
+      "@id": "https://bqurtas.com/#book-stations-of-my-life",
+      "name": "Stations of My Life: From Shorja to America",
+      "author": {
+        "@type": "Person",
+        "name": "Muhammed Qazi"
+      },
+      "contributor": {
+        "@id": "https://bqurtas.com/#person"
+      },
+      "bookFormat": "https://schema.org/EBook",
+      "datePublished": "2023-12-28",
+      "isbn": "9798989813902",
+      "url": "https://www.amazon.co.uk/Stations-My-Life-Shorja-America-ebook/dp/B0CR6XPWTP",
+      "description": "Memoir published on Amazon Kindle; Barakat Qurtas is listed among its contributors."
+    },
+    {
+      "@type": "Book",
+      "@id": "https://bqurtas.com/#book-oppressed-kurds",
+      "name": "المستضعفون الكورد وإخوانهم المسلمون",
+      "alternateName": "The Oppressed Kurds and Their Muslim Brothers",
+      "inLanguage": "ar",
+      "author": {
+        "@type": "Person",
+        "name": "Jamal Nebez"
+      },
+      "contributor": {
+        "@type": "Role",
+        "roleName": "Cover designer",
+        "contributor": {
+          "@id": "https://bqurtas.com/#person"
+        }
+      },
+      "publisher": [
+        {
+          "@type": "Organization",
+          "name": "Kurdname",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "London",
+            "addressCountry": "GB"
+          }
+        },
+        {
+          "@type": "Organization",
+          "name": "WKA",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "London",
+            "addressCountry": "GB"
+          }
+        }
+      ],
+      "datePublished": "2020",
+      "isbn": "0952995158",
+      "url": "https://www.hewalname.com/ku/wp-content/uploads/2022/12/%D8%A7%D9%84%D9%85%D8%B3%D8%AA%D8%B6%D8%B9%D9%81%D9%88%D9%86-%D8%A7%D9%84%DA%A9%D8%B1%D8%AF-%D9%88%D8%A7%D8%AE%D9%88%D8%A7%D9%86%D9%87%D9%85-%D8%A7%D9%84%D9%85%D8%B3%D9%84%D9%85%D9%88%D9%86.pdf",
+      "description": "Arabic-language book first issued in London in 1997; its colophon credits Barakat Qurtas Babakr as cover designer."
     }
   ]
 };

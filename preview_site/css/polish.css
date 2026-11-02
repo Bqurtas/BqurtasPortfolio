@@ -2315,7 +2315,7 @@ html.bq-reactive-motion body :is(#design#design, #bio#bio, #blog#blog, #contact#
   html body #contact#contact#contact .qc-card :is(p, span) { white-space: normal !important; overflow-wrap: anywhere; }
   html body #bio#bio#bio .tools-grid .tool { inline-size: 100% !important; min-inline-size: 0 !important; }
   /* Oversized watermark glyphs must not determine the fit of phone chapters. */
-  html body #bio#bio#bio :is(.bio-connect-sheet, .bio-docs-sheet) .bio-social[data-wm]::before {
+  html body #bio#bio#bio :is(.bio-connect-sheet, .bio-press-sheet, .bio-docs-sheet) .bio-social[data-wm]::before {
     display: none !important;
   }
   html body #bio#bio#bio .bio-docs-sheet .bio-connect-links--docs {
@@ -3645,10 +3645,10 @@ html body #bio#bio#bio .bio-education-sheet .bio-card .bio-sub { color: var(--in
 /* The honours preview stays monochrome and readable instead of oversized. */
 html body #bio#bio#bio .index-layout--honors { display: grid !important; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr) !important; gap: 32px !important; align-items: start !important; }
 html body #bio#bio#bio .index-layout--honors .index-ghost { display: none !important; }
-html body #bio#bio#bio .index-layout--honors .index-row { display: grid !important; grid-template-columns: 50px minmax(0, 1fr) 35px !important; align-items: baseline !important; gap: 12px !important; min-block-size: 56px !important; padding: 18px 0 !important; border: 0 !important; border-block-end: 1px solid var(--bio-rule) !important; border-radius: 0 !important; background: transparent !important; }
+html body #bio#bio#bio .index-layout--honors .index-row { display: grid !important; grid-template-columns: 56px minmax(0, 1fr) 35px !important; align-items: baseline !important; gap: 12px !important; min-block-size: 56px !important; padding: 18px 0 !important; border: 0 !important; border-block-end: 1px solid var(--bio-rule) !important; border-radius: 0 !important; background: transparent !important; }
 html body #bio#bio#bio .index-layout--honors .index-row.is-active { border-block-end-color: var(--ink) !important; }
 html body #bio#bio#bio .index-row-title { font-size: 13px !important; font-weight: 500 !important; line-height: 1.8 !important; }
-html body #bio#bio#bio :is(.index-row-num, .index-row-tag) { font-size: 10px !important; line-height: 1.8 !important; color: var(--bio-muted) !important; }
+html body #bio#bio#bio :is(.index-row-num, .index-row-tag) { font-size: 10px !important; line-height: 1.8 !important; color: var(--bio-muted) !important; white-space: nowrap !important; }
 html body #bio#bio#bio .index-layout--honors .index-preview { display: block !important; position: static !important; min-inline-size: 0 !important; block-size: auto !important; min-block-size: 0 !important; }
 html body #bio#bio#bio .index-card--honor { display: flex !important; flex-direction: column !important; inline-size: 100% !important; block-size: auto !important; min-block-size: 0 !important; padding: 24px !important; border: 1px solid var(--bio-rule) !important; border-radius: 12px !important; background: var(--ink) !important; color: var(--bg) !important; box-shadow: none !important; }
 html body #bio#bio#bio .index-card--honor :is(.index-card-top, .index-card-body, .index-card-foot) { position: static !important; inset: auto !important; padding: 0 !important; margin: 0 !important; border: 0 !important; }
@@ -3716,7 +3716,7 @@ html body #bio#bio#bio .bio-docs-sheet .bio-social-title { font-size: clamp(26px
   html body #bio#bio#bio#bio .bio-kit-sheet .tools-typing { margin-block-start: 14px !important; padding-block-start: 10px !important; padding-left: max(32px, calc(32px / var(--bq-paper-fit, 1))) !important; }
   html body #bio#bio#bio .bio-block-title { font-size: 23px !important; gap: 11px !important; }
   html body #bio#bio#bio .index-layout--honors { grid-template-columns: minmax(0, 1fr) !important; }
-  html body #bio#bio#bio .index-layout--honors .index-row { grid-template-columns: 42px minmax(0, 1fr) 32px !important; gap: 8px !important; padding-block: 16px !important; }
+  html body #bio#bio#bio .index-layout--honors .index-row { grid-template-columns: 48px minmax(0, 1fr) 32px !important; gap: 8px !important; padding-block: 16px !important; }
   html body #bio#bio#bio .index-row-title { font-size: 12px !important; }
   html body #bio#bio#bio .index-card--honor { padding: 22px !important; }
   html body #bio#bio#bio .langs-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; column-gap: 18px !important; }

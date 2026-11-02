@@ -48,6 +48,20 @@ window.I18N.en = Object.assign(window.I18N.en || {}, {
     'bio.orgs': 'Organizations',
     'bio.services': 'Services Provided',
     'bio.certificates': 'Certificates & Honours',
+    "bio.press": "Recognition & Sources",
+    "bio.press.lede": "Evidence, not adjectives: more than 1,000 finished works in the archive, about 25 organisations served since 2014, honours from the Kurdistan Region Presidency, and a name credited in print and press well beyond Kurdistan.",
+    "pr.sun.eye": "Press · Masthead",
+    "pr.sun.title": "Art Director at <em>Sun of Erbil</em>",
+    "pr.sun.desc": "Listed on the masthead of Sun of Erbil, the Erbil-based news and opinion outlet, as Technical & Art Director.",
+    "pr.amz.eye": "Print · Amazon Kindle",
+    "pr.amz.title": "Credited on <em>Amazon</em>",
+    "pr.amz.desc": "Named among the contributors to Stations of My Life: From Shorja to America, Muhammed Qazi's memoir published on Amazon in December 2023.",
+    "pr.uk.eye": "Print · London",
+    "pr.uk.title": "Cover designer of a <em>London</em> edition",
+    "pr.uk.desc": "Credited as cover designer in Jamal Nebez's The Oppressed Kurds and Their Muslim Brothers, published in London by Kurdname and WKA (electronic edition, 2020).",
+    "pr.krp.eye": "Institution · Kurdistan Region Presidency",
+    "pr.krp.title": "Designer to the <em>Presidency</em>",
+    "pr.krp.desc": "Designer at the Directorate of Media Affairs of the Kurdistan Region Presidency since 2021, honoured by the Office of the President on Kurdish Journalism Day 2024.",
 
     'contact.label': 'Contact Room',
     'contact.title': 'Start a <em>conversation</em>.',
@@ -755,6 +769,9 @@ window.I18N_EXTRA_B = {
   "h3.t": "Shield of Honor — Soran",
   "h4.t": "World Volunteer Day",
   "h5.t": "Respect &amp; Appreciation",
+  "h6.t": "Honorary Medal — President",
+  "h7.t": "“Presidential Moments”",
+  "h8.t": "Rwanga Foundation",
   "lng.ar": "Arabic",
   "lng.en": "English",
   "lng.fr": "French",
@@ -822,6 +839,9 @@ window.I18N_EXTRA_B = {
   "h3.t": "قەڵغانی ڕێز — سۆران",
   "h4.t": "ڕۆژی جیهانیی خۆبەخش",
   "h5.t": "ڕێز و پێزانین",
+  "h6.t": "مەدالیای فەخری — سەرۆکی هەرێم",
+  "h7.t": "«Presidential Moments»",
+  "h8.t": "دەزگای ڕوانگە",
   "lng.ar": "عەرەبی",
   "lng.en": "ئینگلیزی",
   "lng.fr": "فەرەنسی",
@@ -889,6 +909,9 @@ window.I18N_EXTRA_B = {
   "h3.t": "Mertala Rûmetê — Soran",
   "h4.t": "Roja Cîhanî ya Dilxwazan",
   "h5.t": "Rêz û Spasdarî",
+  "h6.t": "Medalya Rûmetê — Serokê Herêmê",
+  "h7.t": "«Presidential Moments»",
+  "h8.t": "Weqfa Rwanga",
   "lng.ar": "Erebî",
   "lng.en": "Îngilîzî",
   "lng.fr": "Fransî",
@@ -956,6 +979,9 @@ window.I18N_EXTRA_B = {
   "h3.t": "درع التكريم — سوران",
   "h4.t": "اليوم العالمي للتطوع",
   "h5.t": "احترام وتقدير",
+  "h6.t": "الوسام الفخري — رئيس الإقليم",
+  "h7.t": "«Presidential Moments»",
+  "h8.t": "مؤسسة روانكه",
   "lng.ar": "العربية",
   "lng.en": "الإنجليزية",
   "lng.fr": "الفرنسية",
@@ -1023,6 +1049,9 @@ window.I18N_EXTRA_B = {
   "h3.t": "Bouclier d’honneur — Soran",
   "h4.t": "Journée mondiale du bénévolat",
   "h5.t": "Respect & reconnaissance",
+  "h6.t": "Médaille d'honneur — Président",
+  "h7.t": "« Presidential Moments »",
+  "h8.t": "Fondation Rwanga",
   "lng.ar": "Arabe",
   "lng.en": "Anglais",
   "lng.fr": "Français",
@@ -1141,7 +1170,7 @@ window.BLOG_I18N = {"ku": {"01": {"tag": "ئەدیتۆریاڵ", "title": "لە�
 /* ===== Chatbot knowledge base — per language ===== */
 
 /* ===== Honors (bio room preview card) — per language ===== */
-window.HONORS_I18N = {"ku": {"01": {"title": "قەڵغانی ڕێز و بڕوانامەی پێزانین", "sub": "بۆ هاوکاری و ڕێکخستنی ئاهەنگی ناساندنی کتێب.", "tag": "ئاژانسی نووچە نێت"}, "02": {"title": "دیاریی ڕێزی نووسینگەی سەرۆک", "sub": "بۆ کاری بەردەوامی لە ڕۆژنامەوانی و دیزاینی ڕۆژنامە — سەرۆکایەتیی هەرێمی کوردستان.", "tag": "نووسینگەی سەرۆک"}, "03": {"title": "قەڵغانی ڕێز", "sub": "بۆ ڕێکخستنی کۆنفرانسی بەشی مێژوو لە زانکۆی سۆران.", "tag": "زانکۆی سۆران"}, "04": {"title": "ڕێز و پێزانین — ڕۆژی جیهانیی خۆبەخش", "sub": "بۆ کاری خۆبەخشیی بەردەوام لەگەڵ تۆڕی هەماهەنگیی ڕێکخراوەکانی پارێزگای هەولێر.", "tag": "پارێزگاری هەولێر"}, "05": {"title": "ڕێز و پێزانین", "sub": "بۆ ڕێکخستنی کۆنفرانسی ڕۆژی جیهانیی لاوان — تۆڕی هەماهەنگیی ڕێکخراوەکان.", "tag": "تۆڕی CNO"}}, "kmr": {"01": {"title": "Mertala Rûmetê û Sertîfîkaya Spasdariyê", "sub": "Ji bo hevkarî û rêxistina merasîma danasîna pirtûkê.", "tag": "Ajansa Nuche Net"}, "02": {"title": "Diyariya Rûmetê ya Nivîsgeha Serok", "sub": "Ji bo karê wî yê berdewam di rojnamegerî û sêwirana rojnameyê de — Serokatiya Herêma Kurdistanê.", "tag": "Nivîsgeha Serok"}, "03": {"title": "Mertala Rûmetê", "sub": "Ji bo rêxistina konferansa Beşa Dîrokê li Zanîngeha Soran.", "tag": "Zanîngeha Soran"}, "04": {"title": "Rûmet û Spasdarî — Roja Cîhanî ya Dilxwazan", "sub": "Ji bo karê dilxwaziyê yê berdewam bi Tora Hevrêziya Rêxistinên Parêzgeha Hewlêrê re.", "tag": "Walîtiya Hewlêrê"}, "05": {"title": "Rêz û Spasdarî", "sub": "Ji bo rêxistina Konferansa Roja Cîhanî ya Ciwanan — Tora Hevrêziya Rêxistinan.", "tag": "Tora CNO"}}, "ar": {"01": {"title": "درع التكريم وشهادة تقدير", "sub": "لتعاونه وتنسيقه في تنظيم حفل إشهار الكتاب.", "tag": "وكالة نوجة نت"}, "02": {"title": "هدية تكريمية من مكتب الرئيس", "sub": "لعمله المستمر في الصحافة وتصميم الصحف — رئاسة إقليم كردستان.", "tag": "مكتب الرئيس"}, "03": {"title": "درع التكريم", "sub": "لتنظيم مؤتمر قسم التاريخ في جامعة سوران.", "tag": "جامعة سوران"}, "04": {"title": "تكريم وتقدير — اليوم العالمي للتطوع", "sub": "للعمل التطوعي المستمر مع شبكة تنسيق منظمات محافظة أربيل.", "tag": "محافظة أربيل"}, "05": {"title": "احترام وتقدير", "sub": "لتنظيم مؤتمر اليوم العالمي للشباب — شبكة تنسيق المنظمات.", "tag": "شبكة CNO"}}, "fr": {"01": {"title": "Bouclier d'honneur et certificat d'appréciation", "sub": "Pour la coopération et la coordination de la cérémonie de lancement du livre.", "tag": "Agence Nuche Net"}, "02": {"title": "Cadeau honorifique du Cabinet du Président", "sub": "Pour son travail continu en journalisme et design de presse — Présidence de la Région du Kurdistan.", "tag": "Cabinet du Président"}, "03": {"title": "Bouclier d'honneur", "sub": "Pour l'organisation de la conférence du département d'histoire à l'Université de Soran.", "tag": "Université de Soran"}, "04": {"title": "Honneur et reconnaissance — Journée mondiale du bénévolat", "sub": "Pour le bénévolat continu avec le Réseau de coordination des organisations de la province d'Erbil.", "tag": "Gouvernorat d'Erbil"}, "05": {"title": "Respect et reconnaissance", "sub": "Pour l'organisation de la Conférence de la Journée mondiale de la jeunesse — Réseau de coordination des organisations.", "tag": "Réseau CNO"}}};
+window.HONORS_I18N = {"ku": {"01": {"title": "قەڵغانی ڕێز و بڕوانامەی پێزانین", "sub": "بۆ هاوکاری و ڕێکخستنی ئاهەنگی ناساندنی کتێب.", "tag": "ئاژانسی نووچە نێت"}, "02": {"title": "دیاریی ڕێزی نووسینگەی سەرۆک", "sub": "بە بۆنەی ڕۆژی ڕۆژنامەگەریی کوردی، بۆ کاری بەردەوامی لە ڕۆژنامەوانی و دیزاینی ڕۆژنامە — سەرۆکایەتیی هەرێمی کوردستان.", "tag": "نووسینگەی سەرۆک"}, "03": {"title": "قەڵغانی ڕێز", "sub": "بۆ ڕێکخستنی کۆنفرانسی بەشی مێژوو لە زانکۆی سۆران.", "tag": "زانکۆی سۆران"}, "04": {"title": "ڕێز و پێزانین — ڕۆژی جیهانیی خۆبەخش", "sub": "بۆ کاری خۆبەخشیی بەردەوام لەگەڵ تۆڕی هەماهەنگیی ڕێکخراوەکانی پارێزگای هەولێر.", "tag": "پارێزگاری هەولێر"}, "05": {"title": "ڕێز و پێزانین", "sub": "بۆ ڕێکخستنی کۆنفرانسی ڕۆژی جیهانیی لاوان — تۆڕی هەماهەنگیی ڕێکخراوەکان.", "tag": "تۆڕی CNO"}, "06": {"title": "مەدالیای فەخریی سەرۆکی هەرێمی کوردستان", "sub": "مەدالیای فەخری، پێشکەشکراو لەلایەن سەرۆکی هەرێمی کوردستانەوە.", "tag": "سەرۆکی هەرێمی کوردستان"}, "07": {"title": "بڕوانامەی پێزانین — «Presidential Moments»", "sub": "لە ئیدریس نێچیرڤان بارزانییەوە، بە پێزانین بۆ بەشداریی لە بڵاوکردنەوەی «Presidential Moments».", "tag": "ئیدریس نێچیرڤان بارزانی"}, "08": {"title": "سوپاس و پێزانین — دەزگای ڕوانگە", "sub": "نامەی سوپاس و پێزانین لە سەرۆکی دەزگای ڕوانگەوە.", "tag": "دەزگای ڕوانگە"}}, "kmr": {"01": {"title": "Mertala Rûmetê û Sertîfîkaya Spasdariyê", "sub": "Ji bo hevkarî û rêxistina merasîma danasîna pirtûkê.", "tag": "Ajansa Nuche Net"}, "02": {"title": "Diyariya Rûmetê ya Nivîsgeha Serok", "sub": "Bi boneya Roja Rojnamegeriya Kurdî, ji bo karê wî yê berdewam di rojnamegerî û sêwirana rojnameyê de — Serokatiya Herêma Kurdistanê.", "tag": "Nivîsgeha Serok"}, "03": {"title": "Mertala Rûmetê", "sub": "Ji bo rêxistina konferansa Beşa Dîrokê li Zanîngeha Soran.", "tag": "Zanîngeha Soran"}, "04": {"title": "Rûmet û Spasdarî — Roja Cîhanî ya Dilxwazan", "sub": "Ji bo karê dilxwaziyê yê berdewam bi Tora Hevrêziya Rêxistinên Parêzgeha Hewlêrê re.", "tag": "Walîtiya Hewlêrê"}, "05": {"title": "Rêz û Spasdarî", "sub": "Ji bo rêxistina Konferansa Roja Cîhanî ya Ciwanan — Tora Hevrêziya Rêxistinan.", "tag": "Tora CNO"}, "06": {"title": "Medalyaya Rûmetê ya Serokê Herêma Kurdistanê", "sub": "Medalyaya rûmetê, ji aliyê Serokê Herêma Kurdistanê ve hatiye pêşkêşkirin.", "tag": "Serokê Herêma Kurdistanê"}, "07": {"title": "Sertîfîkaya Spasdariyê — «Presidential Moments»", "sub": "Ji Îdrîs Nêçîrvan Barzanî, ji bo beşdariya wî di weşandina «Presidential Moments» de.", "tag": "Îdrîs Nêçîrvan Barzanî"}, "08": {"title": "Spas û Qedirzanîn — Weqfa Rwanga", "sub": "Nameya spas û qedirzaniyê ji serokê Weqfa Rwanga.", "tag": "Weqfa Rwanga"}}, "ar": {"01": {"title": "درع التكريم وشهادة تقدير", "sub": "لتعاونه وتنسيقه في تنظيم حفل إشهار الكتاب.", "tag": "وكالة نوجة نت"}, "02": {"title": "هدية تكريمية من مكتب الرئيس", "sub": "بمناسبة يوم الصحافة الكردية، لعمله المستمر في الصحافة وتصميم الصحف — رئاسة إقليم كردستان.", "tag": "مكتب الرئيس"}, "03": {"title": "درع التكريم", "sub": "لتنظيم مؤتمر قسم التاريخ في جامعة سوران.", "tag": "جامعة سوران"}, "04": {"title": "تكريم وتقدير — اليوم العالمي للتطوع", "sub": "للعمل التطوعي المستمر مع شبكة تنسيق منظمات محافظة أربيل.", "tag": "محافظة أربيل"}, "05": {"title": "احترام وتقدير", "sub": "لتنظيم مؤتمر اليوم العالمي للشباب — شبكة تنسيق المنظمات.", "tag": "شبكة CNO"}, "06": {"title": "الوسام الفخري لرئيس إقليم كردستان", "sub": "وسام فخري مقدَّم من رئيس إقليم كردستان.", "tag": "رئيس إقليم كردستان"}, "07": {"title": "شهادة تقدير — «Presidential Moments»", "sub": "من إدريس نيجيرفان بارزاني، تقديرًا لمساهمته في إصدار منشور «Presidential Moments».", "tag": "إدريس نيجيرفان بارزاني"}, "08": {"title": "شكر وتقدير — مؤسسة روانكه", "sub": "رسالة شكر وتقدير من رئيس مؤسسة روانكه.", "tag": "مؤسسة روانكه"}}, "fr": {"01": {"title": "Bouclier d'honneur et certificat d'appréciation", "sub": "Pour la coopération et la coordination de la cérémonie de lancement du livre.", "tag": "Agence Nuche Net"}, "02": {"title": "Cadeau honorifique du Cabinet du Président", "sub": "Remis lors de la Journée du journalisme kurde, pour son travail continu en journalisme et design de presse — Présidence de la Région du Kurdistan.", "tag": "Cabinet du Président"}, "03": {"title": "Bouclier d'honneur", "sub": "Pour l'organisation de la conférence du département d'histoire à l'Université de Soran.", "tag": "Université de Soran"}, "04": {"title": "Honneur et reconnaissance — Journée mondiale du bénévolat", "sub": "Pour le bénévolat continu avec le Réseau de coordination des organisations de la province d'Erbil.", "tag": "Gouvernorat d'Erbil"}, "05": {"title": "Respect et reconnaissance", "sub": "Pour l'organisation de la Conférence de la Journée mondiale de la jeunesse — Réseau de coordination des organisations.", "tag": "Réseau CNO"}, "06": {"title": "Médaille d'honneur du Président de la Région du Kurdistan", "sub": "Médaille d'honneur remise par le Président de la Région du Kurdistan.", "tag": "Président de la Région du Kurdistan"}, "07": {"title": "Certificat d'appréciation — « Presidential Moments »", "sub": "D'Idris Nechirvan Barzani, en reconnaissance de sa contribution à la publication « Presidential Moments ».", "tag": "Idris Nechirvan Barzani"}, "08": {"title": "Remerciements et reconnaissance — Fondation Rwanga", "sub": "Lettre de remerciements et de reconnaissance du directeur de la Fondation Rwanga.", "tag": "Fondation Rwanga"}}};
 window.I18N_EXTRA_H = {"en": {"hon.vol": "AWARD №{num} · {year}", "hon.issued": "ISSUED BY {tag}"}, "ku": {"hon.vol": "خەڵات №{num} · {year}", "hon.issued": "پێشکەشکراو لەلایەن {tag}"}, "kmr": {"hon.vol": "XELAT №{num} · {year}", "hon.issued": "JI ALIYÊ {tag}"}, "ar": {"hon.vol": "جائزة №{num} · {year}", "hon.issued": "مُقدَّمة من {tag}"}, "fr": {"hon.vol": "PRIX №{num} · {year}", "hon.issued": "DÉCERNÉ PAR {tag}"}};
 Object.keys(window.I18N_EXTRA_H).forEach(function(l){ if(window.I18N[l]) Object.assign(window.I18N[l], window.I18N_EXTRA_H[l]); });
 

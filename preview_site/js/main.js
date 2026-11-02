@@ -2207,9 +2207,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const sub   = (tr && tr.sub)   || d.sub;
     const tag   = (tr && tr.tag)   || d.tag;
     const loc   = (s) => (currentLang === 'ku' || currentLang === 'ar') ? String(s).replace(/[0-9]/g, x => '٠١٢٣٤٥٦٧٨٩'[x]) : String(s);
-    const year  = d.date.split(' ').pop();
+    const year  = (d.date || '').split(' ').pop();
     const set = (id, v, html) => { const el = document.getElementById(id); if (el) { if (html) el.innerHTML = v; else el.textContent = v; } };
-    set('hcVol',  (dict['hon.vol'] || 'AWARD №{num} · {year}').replace('{num}', loc(d.num)).replace('{year}', loc(year)));
+    /* An honour whose date is not recorded keeps its number and drops the year. */
+    const vol = dict['hon.vol'] || 'AWARD №{num} · {year}';
+    set('hcVol',  (year ? vol : vol.replace(/\s*·\s*\{year\}/, '')).replace('{num}', loc(d.num)).replace('{year}', loc(year)));
     set('hcTitle', highlightTitle(title), true);
     set('hcSub',  sub);
     set('hcMeta', (dict['hon.issued'] || 'ISSUED BY {tag}').replace('{tag}', tag.toUpperCase()));
@@ -2521,7 +2523,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   const PAPER_FIT_STEPS = 7;
   const compactBioPaper = (sheet) => [
     'bio-kit-sheet', 'bio-proof-sheet', 'bio-record-sheet', 'bio-education-sheet',
-    'bio-honors-sheet', 'bio-world-sheet', 'bio-connect-sheet', 'bio-docs-sheet',
+    'bio-honors-sheet', 'bio-press-sheet', 'bio-world-sheet', 'bio-connect-sheet', 'bio-docs-sheet',
   ].some(name => sheet.classList.contains(name));
   const lastPaperFit = new WeakMap();
   /* Section content follows the viewport's height even while it comfortably

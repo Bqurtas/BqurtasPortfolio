@@ -8,8 +8,8 @@
        Their stylesheet links stay below in the original cascade order. -->
   <link rel="preload" as="style" href="css/modern-framer.min.css?v=618db1d097f1" />
   <link rel="preload" as="style" href="css/fonts.css?v=6bd89c103953" />
-  <link rel="preload" as="style" href="css/experience.min.css?v=591ff4b19b30" />
-  <link rel="preload" as="style" href="css/polish.min.css?v=d52a9b9299bd" />
+  <link rel="preload" as="style" href="css/experience.min.css?v=d78921b4a98f" />
+  <link rel="preload" as="style" href="css/polish.min.css?v=5f3d5d962a7d" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#fbfbfa" />
   <meta name="color-scheme" content="light dark" />
@@ -170,9 +170,10 @@
         "Creative Technologist",
         "Graphic & Motion Designer",
         "Photographer",
-        "Content Producer"
+        "Content Producer",
+        "Technical & Art Director, Sun of Erbil"
       ],
-      "description": "Barakat Qurtas is a Kurdish multidisciplinary designer, creative technologist, photographer and producer in Hewlêr, Kurdistan Region of Iraq. Since 2014, his practice has connected brand identity, editorial and print, campaigns, social content, photography, motion, AI-assisted production and web experiences.",
+      "description": "Barakat Qurtas is a Kurdish multidisciplinary designer, creative technologist, photographer and producer in Hewlêr, Kurdistan Region of Iraq. Since 2014, his practice has connected brand identity, editorial and print, campaigns, social content, photography, motion, AI-assisted production and web experiences. His work has been honoured by the Kurdistan Region Presidency; he is the Technical & Art Director on the masthead of Sun of Erbil and is credited in books published on Amazon and in London. The archive on this site documents more than 1,000 finished works made for about 25 organisations.",
       "url": "https://bqurtas.com/",
       "image": "https://bqurtas.com/assets/portrait.webp",
       "email": "hello@bqurtas.com",
@@ -278,17 +279,25 @@
         "sameAs": "https://su.edu.krd/"
       },
       "award": [
+        "Certificate of Appreciation for the publication “Presidential Moments” — Idris Nechirvan Barzani, 2025",
         "Shield of Honor & Certificate of Appreciation — Nuche Net Agency, 2025",
-        "Honorary Gift of the Office of the President — Kurdistan Region Presidency, 2024",
+        "Honorary Gift of the Office of the President, Kurdish Journalism Day — Kurdistan Region Presidency, 2024",
+        "Honorary Medal of the President of the Kurdistan Region",
         "Shield of Honor — Soran University, 2023",
         "Honor & Appreciation, World Volunteer Day — Governor of Erbil, 2020",
-        "Respect & Appreciation — Coordination Network of Organizations, 2020"
+        "Respect & Appreciation — Coordination Network of Organizations, 2020",
+        "Thanks & Appreciation — Rwanga Foundation"
       ],
-      "worksFor": {
-        "@type": "Organization",
-        "name": "Directorate of Media Affairs, Kurdistan Region Presidency",
-        "sameAs": "https://presidency.gov.krd/en/home"
-      },
+      "worksFor": [
+        {
+          "@type": "Organization",
+          "name": "Directorate of Media Affairs, Kurdistan Region Presidency",
+          "sameAs": "https://presidency.gov.krd/en/home"
+        },
+        {
+          "@id": "https://sunoferbil.com/#organization"
+        }
+      ],
       "affiliation": [
         {
           "@type": "Organization",
@@ -305,6 +314,61 @@
         {
           "@type": "Organization",
           "name": "Justice NGO for Lagan Issues"
+        }
+      ],
+      "hasCredential": [
+        {
+          "@type": "EducationalOccupationalCredential",
+          "name": "Graphic Design Masterclass — Learn GREAT Design (2020)",
+          "credentialCategory": "Certificate of Completion",
+          "recognizedBy": {
+            "@type": "Organization",
+            "name": "Udemy"
+          }
+        },
+        {
+          "@type": "EducationalOccupationalCredential",
+          "name": "The Fundamentals of Digital Marketing (2020)",
+          "credentialCategory": "Certificate of Achievement",
+          "recognizedBy": {
+            "@type": "Organization",
+            "name": "Google Digital Garage"
+          }
+        },
+        {
+          "@type": "EducationalOccupationalCredential",
+          "name": "Creative Photography Techniques (2021)",
+          "credentialCategory": "Certificate of Completion",
+          "recognizedBy": {
+            "@type": "Organization",
+            "name": "LinkedIn Learning"
+          }
+        },
+        {
+          "@type": "EducationalOccupationalCredential",
+          "name": "Video editing: a technical and creative vision",
+          "credentialCategory": "Course certificate",
+          "recognizedBy": {
+            "@type": "Organization",
+            "name": "Al Jazeera Media Institute"
+          }
+        },
+        {
+          "@type": "EducationalOccupationalCredential",
+          "name": "Introduction to Generative AI Learning Path (2026)",
+          "credentialCategory": "Specialization certificate",
+          "recognizedBy": {
+            "@type": "Organization",
+            "name": "Google Cloud on Coursera"
+          }
+        }
+      ],
+      "subjectOf": [
+        {
+          "@id": "https://bqurtas.com/#book-stations-of-my-life"
+        },
+        {
+          "@id": "https://bqurtas.com/#book-oppressed-kurds"
         }
       ]
     },
@@ -492,6 +556,85 @@
           }
         }
       ]
+    },
+    {
+      "@type": "NewsMediaOrganization",
+      "@id": "https://sunoferbil.com/#organization",
+      "name": "Sun of Erbil",
+      "url": "https://sunoferbil.com/",
+      "slogan": "A different light on the world",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Erbil",
+        "addressRegion": "Kurdistan Region",
+        "addressCountry": "IQ"
+      },
+      "employee": {
+        "@type": "Role",
+        "roleName": "Technical & Art Director",
+        "employee": {
+          "@id": "https://bqurtas.com/#person"
+        }
+      }
+    },
+    {
+      "@type": "Book",
+      "@id": "https://bqurtas.com/#book-stations-of-my-life",
+      "name": "Stations of My Life: From Shorja to America",
+      "author": {
+        "@type": "Person",
+        "name": "Muhammed Qazi"
+      },
+      "contributor": {
+        "@id": "https://bqurtas.com/#person"
+      },
+      "bookFormat": "https://schema.org/EBook",
+      "datePublished": "2023-12-28",
+      "isbn": "9798989813902",
+      "url": "https://www.amazon.co.uk/Stations-My-Life-Shorja-America-ebook/dp/B0CR6XPWTP",
+      "description": "Memoir published on Amazon Kindle; Barakat Qurtas is listed among its contributors."
+    },
+    {
+      "@type": "Book",
+      "@id": "https://bqurtas.com/#book-oppressed-kurds",
+      "name": "المستضعفون الكورد وإخوانهم المسلمون",
+      "alternateName": "The Oppressed Kurds and Their Muslim Brothers",
+      "inLanguage": "ar",
+      "author": {
+        "@type": "Person",
+        "name": "Jamal Nebez"
+      },
+      "contributor": {
+        "@type": "Role",
+        "roleName": "Cover designer",
+        "contributor": {
+          "@id": "https://bqurtas.com/#person"
+        }
+      },
+      "publisher": [
+        {
+          "@type": "Organization",
+          "name": "Kurdname",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "London",
+            "addressCountry": "GB"
+          }
+        },
+        {
+          "@type": "Organization",
+          "name": "WKA",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "London",
+            "addressCountry": "GB"
+          }
+        }
+      ],
+      "datePublished": "2020",
+      "isbn": "0952995158",
+      "url": "https://www.hewalname.com/ku/wp-content/uploads/2022/12/%D8%A7%D9%84%D9%85%D8%B3%D8%AA%D8%B6%D8%B9%D9%81%D9%88%D9%86-%D8%A7%D9%84%DA%A9%D8%B1%D8%AF-%D9%88%D8%A7%D8%AE%D9%88%D8%A7%D9%86%D9%87%D9%85-%D8%A7%D9%84%D9%85%D8%B3%D9%84%D9%85%D9%88%D9%86.pdf",
+      "description": "Arabic-language book first issued in London in 1997; its colophon credits Barakat Qurtas Babakr as cover designer."
     }
   ]
 }
@@ -702,9 +845,9 @@
       html:is(.bq-shell-timeout,.bq-css-timeout):not([data-bq-shell-ready="1"]) body .room.paper-stack > :is(.hero,.room-hero).paper-sheet > .paper-scroll{overflow-y:auto!important;overscroll-behavior:auto!important}
     }
   </style>
-  <link rel="preload" as="style" href="css/style.v417.min.css?v=8bfbc6a3e888" data-href="css/style.v417.min.css?v=8bfbc6a3e888" fetchpriority="high" id="bqFullCss">
+  <link rel="preload" as="style" href="css/style.v417.min.css?v=6d64a1d15709" data-href="css/style.v417.min.css?v=6d64a1d15709" fetchpriority="high" id="bqFullCss">
   <link rel="stylesheet" href="css/modern-framer.min.css?v=618db1d097f1">
-  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=8bfbc6a3e888"></noscript>
+  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=6d64a1d15709"></noscript>
   <script>
     (function () {
       var root = document.documentElement;
@@ -782,9 +925,9 @@
     }());
   </script>
   <link rel="stylesheet" href="css/fonts.css?v=6bd89c103953">
-  <link rel="stylesheet" href="css/experience.min.css?v=591ff4b19b30">
+  <link rel="stylesheet" href="css/experience.min.css?v=d78921b4a98f">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.min.css?v=d52a9b9299bd">
+  <link rel="stylesheet" href="css/polish.min.css?v=5f3d5d962a7d">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=6dee64a9a95d" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=6dee64a9a95d"></noscript>
 
@@ -1674,7 +1817,7 @@
                  data-title="Shield of Honor &amp; Certificate of Appreciation"
                  data-sub="For the cooperation and coordination of organizing the book launch ceremony."
                  data-accent="#5a1a1a">
-                <span class="mono index-row-num">01 / 05</span>
+                <span class="mono index-row-num">01 / 08</span>
                 <span class="index-row-title" data-i18n="h1.t">Shield of Honor &amp; Certificate</span>
                 <span class="mono index-row-tag">2025</span>
               </a>
@@ -1682,9 +1825,9 @@
               <a href="#" class="index-row"
                  data-num="02" data-icon="fa-medal" data-tag="Office of the President" data-date="Apr 2024"
                  data-title="Honorary Gift of the Office of the President"
-                 data-sub="For his continued work in journalism and newspaper design — Kurdistan Region Presidency."
+                 data-sub="Presented on Kurdish Journalism Day for his continued work in journalism and newspaper design — Kurdistan Region Presidency."
                  data-accent="#1a2740">
-                <span class="mono index-row-num">02 / 05</span>
+                <span class="mono index-row-num">02 / 08</span>
                 <span class="index-row-title" data-i18n="h2.t">Honorary Gift — Presidency</span>
                 <span class="mono index-row-tag">2024</span>
               </a>
@@ -1694,7 +1837,7 @@
                  data-title="Shield of Honor"
                  data-sub="For organizing the conference of the Department of History at Soran University."
                  data-accent="#2a1a0e">
-                <span class="mono index-row-num">03 / 05</span>
+                <span class="mono index-row-num">03 / 08</span>
                 <span class="index-row-title" data-i18n="h3.t">Shield of Honor — Soran</span>
                 <span class="mono index-row-tag">2023</span>
               </a>
@@ -1704,7 +1847,7 @@
                  data-title="Honor &amp; Appreciation — World Volunteer Day"
                  data-sub="For continuous volunteer work with the Coordination Network of Organizations of Erbil Province."
                  data-accent="#0e1a26">
-                <span class="mono index-row-num">04 / 05</span>
+                <span class="mono index-row-num">04 / 08</span>
                 <span class="index-row-title" data-i18n="h4.t">World Volunteer Day</span>
                 <span class="mono index-row-tag">2020</span>
               </a>
@@ -1714,9 +1857,39 @@
                  data-title="Respect &amp; Appreciation"
                  data-sub="For organizing the World Youth Day Conference — Coordination Network of Organizations."
                  data-accent="#3a2616">
-                <span class="mono index-row-num">05 / 05</span>
+                <span class="mono index-row-num">05 / 08</span>
                 <span class="index-row-title" data-i18n="h5.t">Respect &amp; Appreciation</span>
                 <span class="mono index-row-tag">2020</span>
+              </a>
+
+              <a href="#" class="index-row"
+                 data-num="06" data-icon="fa-medal" data-tag="President of the Kurdistan Region" data-date=""
+                 data-title="Honorary Medal of the President of the Kurdistan Region"
+                 data-sub="Honorary medal presented by the President of the Kurdistan Region."
+                 data-accent="#1a2740">
+                <span class="mono index-row-num">06 / 08</span>
+                <span class="index-row-title" data-i18n="h6.t">Honorary Medal — President</span>
+                <span class="mono index-row-tag">—</span>
+              </a>
+
+              <a href="#" class="index-row"
+                 data-num="07" data-icon="fa-award" data-tag="Idris Nechirvan Barzani" data-date="Oct 2025"
+                 data-title="Certificate of Appreciation — Presidential Moments"
+                 data-sub="From Idris Nechirvan Barzani, in recognition of his contribution to the publication “Presidential Moments”."
+                 data-accent="#2a1a0e">
+                <span class="mono index-row-num">07 / 08</span>
+                <span class="index-row-title" data-i18n="h7.t">“Presidential Moments”</span>
+                <span class="mono index-row-tag">2025</span>
+              </a>
+
+              <a href="#" class="index-row"
+                 data-num="08" data-icon="fa-ribbon" data-tag="Rwanga Foundation" data-date=""
+                 data-title="Thanks &amp; Appreciation — Rwanga Foundation"
+                 data-sub="Letter of thanks and appreciation from the head of the Rwanga Foundation."
+                 data-accent="#0e1a26">
+                <span class="mono index-row-num">08 / 08</span>
+                <span class="index-row-title" data-i18n="h8.t">Rwanga Foundation</span>
+                <span class="mono index-row-tag">—</span>
               </a>
             </div>
 
@@ -1744,10 +1917,66 @@
         </div>
       </div>
 
+      <!-- Chapter 06 — the public record behind the biography: press, print and
+           institutional recognition, each pointing at its outside source. -->
+      <div class="section bio-press-sheet">
+        <div class="sheet-mid">
+        <header class="bio-chapter-heading">
+          <h3 class="bio-block-title"><span class="bio-chapter-index mono" aria-hidden="true">06</span><i class="fa-solid fa-newspaper" aria-hidden="true"></i> <span data-i18n="bio.press">Recognition &amp; Sources</span></h3>
+          <p class="bio-block-lede" data-i18n="bio.press.lede">Evidence, not adjectives: more than 1,000 finished works in the archive, about 25 organisations served since 2014, honours from the Kurdistan Region Presidency, and a name credited in print and press well beyond Kurdistan.</p>
+        </header>
+        <div class="bio-connect-links bio-connect-links--press">
+        <a class="bio-block bio-social bio-social--sun" href="https://sunoferbil.com/" target="_blank" rel="noopener">
+          <span class="bio-social-mark"><i class="fa-solid fa-newspaper"></i></span>
+          <div class="bio-social-text">
+            <span class="mono bio-social-eyebrow" data-i18n="pr.sun.eye">Press · Masthead</span>
+            <h3 class="bio-social-title" data-i18n="pr.sun.title">Art Director at <em>Sun of Erbil</em></h3>
+            <p class="bio-social-desc" data-i18n="pr.sun.desc">Listed on the masthead of Sun of Erbil, the Erbil-based news and opinion outlet, as Technical &amp; Art Director.</p>
+            <span class="bio-social-handle mono">sunoferbil.com</span>
+          </div>
+          <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+        </a>
+
+        <a class="bio-block bio-social bio-social--amazon" href="https://www.amazon.co.uk/Stations-My-Life-Shorja-America-ebook/dp/B0CR6XPWTP" target="_blank" rel="noopener">
+          <span class="bio-social-mark"><i class="fa-solid fa-book-open"></i></span>
+          <div class="bio-social-text">
+            <span class="mono bio-social-eyebrow" data-i18n="pr.amz.eye">Print · Amazon Kindle</span>
+            <h3 class="bio-social-title" data-i18n="pr.amz.title">Credited on <em>Amazon</em></h3>
+            <p class="bio-social-desc" data-i18n="pr.amz.desc">Named among the contributors to Stations of My Life: From Shorja to America, Muhammed Qazi's memoir published on Amazon in December 2023.</p>
+            <span class="bio-social-handle mono">amazon.co.uk · B0CR6XPWTP</span>
+          </div>
+          <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+        </a>
+
+        <a class="bio-block bio-social bio-social--london" href="https://www.hewalname.com/ku/wp-content/uploads/2022/12/%D8%A7%D9%84%D9%85%D8%B3%D8%AA%D8%B6%D8%B9%D9%81%D9%88%D9%86-%D8%A7%D9%84%DA%A9%D8%B1%D8%AF-%D9%88%D8%A7%D8%AE%D9%88%D8%A7%D9%86%D9%87%D9%85-%D8%A7%D9%84%D9%85%D8%B3%D9%84%D9%85%D9%88%D9%86.pdf" target="_blank" rel="noopener">
+          <span class="bio-social-mark"><i class="fa-solid fa-book"></i></span>
+          <div class="bio-social-text">
+            <span class="mono bio-social-eyebrow" data-i18n="pr.uk.eye">Print · London</span>
+            <h3 class="bio-social-title" data-i18n="pr.uk.title">Cover designer of a <em>London</em> edition</h3>
+            <p class="bio-social-desc" data-i18n="pr.uk.desc">Credited as cover designer in Jamal Nebez's The Oppressed Kurds and Their Muslim Brothers, published in London by Kurdname and WKA (electronic edition, 2020).</p>
+            <span class="bio-social-handle mono">hewalname.com · PDF · ISBN 0 9529951 5 8</span>
+          </div>
+          <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+        </a>
+
+        <a class="bio-block bio-social bio-social--presidency" href="https://presidency.gov.krd/en/home" target="_blank" rel="noopener">
+          <span class="bio-social-mark"><i class="fa-solid fa-landmark"></i></span>
+          <div class="bio-social-text">
+            <span class="mono bio-social-eyebrow" data-i18n="pr.krp.eye">Institution · Kurdistan Region Presidency</span>
+            <h3 class="bio-social-title" data-i18n="pr.krp.title">Designer to the <em>Presidency</em></h3>
+            <p class="bio-social-desc" data-i18n="pr.krp.desc">Designer at the Directorate of Media Affairs of the Kurdistan Region Presidency since 2021, honoured by the Office of the President on Kurdish Journalism Day 2024.</p>
+            <span class="bio-social-handle mono">presidency.gov.krd</span>
+          </div>
+          <span class="bio-social-go mono"><span data-i18n="soc.open">Open</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+        </a>
+        </div>
+        </div>
+      </div>
+
       <div class="section bio-world-sheet">
         <div class="sheet-mid">
         <div class="bio-block" data-wm="&#xf1ab;">
-          <h3 class="bio-block-title"><span class="bio-chapter-index mono" aria-hidden="true">06</span><i class="fa-solid fa-language"></i> <span data-i18n="bio.languages">Languages</span></h3>
+          <h3 class="bio-block-title"><span class="bio-chapter-index mono" aria-hidden="true">07</span><i class="fa-solid fa-language"></i> <span data-i18n="bio.languages">Languages</span></h3>
           <div class="langs-grid">
             <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4 data-i18n="lng.ar">Arabic</h4><p data-i18n="lp.full">Full professional proficiency</p><div class="lang-bar"><span data-css="width:95%"></span></div></div></div>
             <div class="lang-item"><i class="fa-solid fa-globe"></i><div><h4 data-i18n="lng.en">English</h4><p data-i18n="lp.enNote">Elementary proficiency · Duolingo Score 10 (May 2026)</p><div class="lang-bar"><span data-css="width:45%"></span></div></div></div>
@@ -1765,7 +1994,7 @@
       <div class="section bio-proof-sheet">
         <div class="sheet-mid">
         <div class="bio-block" data-wm="&#xf559;">
-          <h3 class="bio-block-title"><span class="bio-chapter-index mono" aria-hidden="true">07</span><i class="fa-solid fa-award"></i> <span data-i18n="bio.certificates">Certificates &amp; Honours</span></h3>
+          <h3 class="bio-block-title"><span class="bio-chapter-index mono" aria-hidden="true">08</span><i class="fa-solid fa-award"></i> <span data-i18n="bio.certificates">Certificates &amp; Honours</span></h3>
           <div class="cert-grid" id="certGrid">
             <div class="gallery-loading" id="certLoading">
               <i class="fa-solid fa-circle-notch fa-spin"></i>
@@ -1778,7 +2007,7 @@
 
       <div class="section bio-connect-sheet">
         <div class="sheet-mid">
-        <header class="bio-chapter-heading"><h3 class="bio-block-title"><span class="bio-chapter-index mono" aria-hidden="true">08</span><span data-i18n="f.connect">Connect</span></h3></header>
+        <header class="bio-chapter-heading"><h3 class="bio-block-title"><span class="bio-chapter-index mono" aria-hidden="true">09</span><span data-i18n="f.connect">Connect</span></h3></header>
         <div class="bio-connect-links">
         <a class="bio-block bio-social bio-social--linkedin" data-wm="&#xf08c;" href="https://www.linkedin.com/in/bqurtas/" target="_blank" rel="noopener me">
           <span class="bio-social-mark"><i class="fa-brands fa-linkedin-in"></i></span>
@@ -2234,7 +2463,7 @@
     </article>
   </div>
 
-  <script defer src="js/i18n.v420.min.js?v=8acc8ffa1d80"></script>
+  <script defer src="js/i18n.v420.min.js?v=8547520b8fd5"></script>
   <!-- Non-English visitors need the extra dictionaries before first render;
        English (the default + PSI) never loads them, keeping the parse light.
        applyLang() can also fetch this on its own, but starting it here — in
@@ -2251,7 +2480,7 @@
       var lang=u;
       if(lang && lang!=='en'){
         window.__i18nMoreLoading=true; window.__i18nMoreCbs=window.__i18nMoreCbs||[];
-        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=419e1c08ee15'; s.async=false;
+        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=0bb127093b7e'; s.async=false;
         s.onload=function(){
           window.__i18nMoreLoaded=true; window.__i18nMoreLoading=false;
           var cbs=(window.__i18nMoreCbs||[]).slice(); window.__i18nMoreCbs=[];
@@ -2263,7 +2492,7 @@
     }catch(e){}})();
   </script>
   <script defer src="js/latest-feed.min.js?v=76465997249c"></script>
-  <script defer src="js/main.v420.min.js?v=170e977387fc"></script>
+  <script defer src="js/main.v420.min.js?v=2874cecd695e"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2358,7 +2587,7 @@
   <script>
     (function () {
       var modules = {
-        chat: 'js/chat-kb.min.js?v=7195c4d90c6b'
+        chat: 'js/chat-kb.min.js?v=46377b090e80'
       };
       var loaded = {};
       function load(name) {
@@ -2438,7 +2667,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=27da08f8eacb', { updateViaCache: 'none' })
+            .register('/sw.js?v=236536e0f4fd', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

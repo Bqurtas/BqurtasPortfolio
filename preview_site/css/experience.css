@@ -3145,7 +3145,7 @@ html body #design .latest-blog .latest-blog-grid.latest-blog-grid > * {
 /* The services + links page carries five cards and a chip list; in Kurdish and
    Arabic, which set longer, it runs about 32px over on a 720px screen. The
    cards give it back from their padding, not from their words. */
-html body #bio .bio-connect-sheet .bio-connect-links .bio-social {
+html body #bio :is(.bio-connect-sheet, .bio-press-sheet) .bio-connect-links .bio-social {
   padding-block: clamp(8px, 1.1vh, 14px) !important;
 }
 
@@ -3153,7 +3153,7 @@ html body #bio .bio-connect-sheet .services-grid {
   gap: clamp(5px, 0.7vh, 9px) !important;
 }
 
-html body #bio .bio-connect-sheet .bio-connect-links {
+html body #bio :is(.bio-connect-sheet, .bio-press-sheet) .bio-connect-links {
   gap: 8px !important;
 }
 
@@ -3171,36 +3171,36 @@ html body #design .latest-blog .latest-blog-grid.latest-blog-grid > * {
 /* The five link cards run 58px past their page once the services chips are
    above them. Taken from the cards' own padding and the gap between them —
    nothing is hidden and no card is dropped. */
-html body #bio .bio-connect-sheet .bio-connect-links .bio-social {
+html body #bio :is(.bio-connect-sheet, .bio-press-sheet) .bio-connect-links .bio-social {
   padding-block: clamp(7px, 1vh, 12px) !important;
 }
 
-html body #bio .bio-connect-sheet .bio-connect-links {
+html body #bio :is(.bio-connect-sheet, .bio-press-sheet) .bio-connect-links {
   gap: clamp(6px, 0.8vh, 10px) !important;
 }
 
 /* The text block is what sets these cards' height — 212px of a 232px card.
    Tighter leading and margins across the five of them is the 50px the page
    needs; every line of every card still reads. */
-html body #bio .bio-connect-sheet .bio-connect-links .bio-social-text {
+html body #bio :is(.bio-connect-sheet, .bio-press-sheet) .bio-connect-links .bio-social-text {
   line-height: 1.3 !important;
 }
 
-html body #bio .bio-connect-sheet .bio-connect-links .bio-social-eyebrow {
+html body #bio :is(.bio-connect-sheet, .bio-press-sheet) .bio-connect-links .bio-social-eyebrow {
   margin-block-end: 1px !important;
 }
 
-html body #bio .bio-connect-sheet .bio-connect-links .bio-social-title {
+html body #bio :is(.bio-connect-sheet, .bio-press-sheet) .bio-connect-links .bio-social-title {
   margin-block: 0 2px !important;
   line-height: 1.16 !important;
 }
 
-html body #bio .bio-connect-sheet .bio-connect-links .bio-social-desc {
+html body #bio :is(.bio-connect-sheet, .bio-press-sheet) .bio-connect-links .bio-social-desc {
   line-height: 1.38 !important;
   margin-block: 0 2px !important;
 }
 
-html body #bio .bio-connect-sheet .bio-connect-links .bio-social-go {
+html body #bio :is(.bio-connect-sheet, .bio-press-sheet) .bio-connect-links .bio-social-go {
   padding-block: clamp(6px, 0.8vh, 10px) !important;
 }
 
