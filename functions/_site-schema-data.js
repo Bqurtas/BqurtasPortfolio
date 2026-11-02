@@ -186,10 +186,10 @@ export const SITE_SCHEMA = {
         "sameAs": "https://su.edu.krd/"
       },
       "award": [
+        "Honorary Medal — President of the Kurdistan Region, 2026",
         "Certificate of Appreciation for the publication “Presidential Moments” — Idris Nechirvan Barzani, 2025",
         "Shield of Honor & Certificate of Appreciation — Nuche Net Agency, 2025",
         "Honorary Gift of the Office of the President, Kurdish Journalism Day — Kurdistan Region Presidency, 2024",
-        "Honorary Medal of the President of the Kurdistan Region",
         "Shield of Honor — Soran University, 2023",
         "Honor & Appreciation, World Volunteer Day — Governor of Erbil, 2020",
         "Respect & Appreciation — Coordination Network of Organizations, 2020",
