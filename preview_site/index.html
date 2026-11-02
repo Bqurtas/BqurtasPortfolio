@@ -9,7 +9,7 @@
   <link rel="preload" as="style" href="css/modern-framer.min.css?v=618db1d097f1" />
   <link rel="preload" as="style" href="css/fonts.css?v=6bd89c103953" />
   <link rel="preload" as="style" href="css/experience.min.css?v=d78921b4a98f" />
-  <link rel="preload" as="style" href="css/polish.min.css?v=5f3d5d962a7d" />
+  <link rel="preload" as="style" href="css/polish.min.css?v=b517c0e19cf1" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#fbfbfa" />
   <meta name="color-scheme" content="light dark" />
@@ -927,7 +927,7 @@
   <link rel="stylesheet" href="css/fonts.css?v=6bd89c103953">
   <link rel="stylesheet" href="css/experience.min.css?v=d78921b4a98f">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.min.css?v=5f3d5d962a7d">
+  <link rel="stylesheet" href="css/polish.min.css?v=b517c0e19cf1">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=6dee64a9a95d" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=6dee64a9a95d"></noscript>
 
@@ -2313,7 +2313,7 @@
     <div class="chat-body" id="chatBody" role="log" aria-live="polite" aria-relevant="additions text" aria-atomic="false"></div>
     <div class="chat-quick" id="chatQuick"></div>
     <form class="chat-input" id="chatForm">
-      <input type="text" id="chatText" maxlength="1500" enterkeyhint="send" aria-label="Message to studio assistant" data-i18n-aria="chat.ph" placeholder="Ask about services, pricing, timeline…" data-i18n-ph="chat.ph" autocomplete="off" />
+      <textarea id="chatText" rows="1" maxlength="1500" enterkeyhint="send" aria-label="Message to studio assistant" data-i18n-aria="chat.ph" placeholder="Ask about services, pricing, timeline…" data-i18n-ph="chat.ph" autocomplete="off"></textarea>
       <button type="submit" aria-label="Send" data-i18n-aria="a11y.send"><i class="fa-solid fa-paper-plane"></i></button>
     </form>
   </section>
@@ -2512,7 +2512,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=34ac26ab9782';
+        s.src = 'js/enhance.v420.min.js?v=4d57272780d2';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -2667,7 +2667,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=5be31ba4cfe2', { updateViaCache: 'none' })
+            .register('/sw.js?v=fb12da3f9378', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

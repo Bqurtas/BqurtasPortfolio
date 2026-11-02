@@ -910,11 +910,30 @@
     window.__bqLangCb.push(refreshChatKnowledge);
     window.addEventListener('bq:chat-ready', refreshChatKnowledge);
     chatStatus();
+    const fitChatField = () => {
+      if (!input || input.tagName !== 'TEXTAREA') return;
+      const style = getComputedStyle(input);
+      const line = parseFloat(style.lineHeight) || 23;
+      const pad = (parseFloat(style.paddingTop) || 0) + (parseFloat(style.paddingBottom) || 0);
+      const maxLines = 5;
+      input.style.height = 'auto';
+      const lines = Math.max(1, Math.ceil((input.scrollHeight - pad - 1) / line));
+      const shown = Math.min(lines, maxLines);
+      input.style.height = `${Math.ceil(pad + line * shown)}px`;
+      input.style.overflowY = lines > maxLines ? 'auto' : 'hidden';
+    };
+    input.addEventListener('input', fitChatField);
+    input.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
+      event.preventDefault();
+      form.requestSubmit();
+    });
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const v = input.value.trim();
       if (!v || pending) return;
       input.value = '';
+      fitChatField();
       send(v);
     });
   })();
