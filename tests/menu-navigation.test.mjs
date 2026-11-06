@@ -498,6 +498,31 @@ test('ordinary menu close restores the trigger and reopening retains the origina
   assert.equal(page.ids.bqPageStage.getAttribute('aria-hidden'), 'false');
 });
 
+test('an open menu curtain closes after fifteen seconds when no room is chosen', () => {
+  const page = fixture();
+  page.open();
+  assert.equal(page.ids.mobileMenu.classList.contains('is-open'), true);
+  // open() spends one frame revealing the curtain before the quiet wait is sampled.
+  page.advance(14983);
+  assert.equal(page.ids.mobileMenu.classList.contains('is-open'), true);
+  page.advance(1);
+  assert.equal(page.ids.mobileMenu.classList.contains('is-open'), false);
+  assert.equal(page.ids.mobileMenu.classList.contains('is-closing'), true);
+  page.advance(1230);
+  assert.equal(page.body.classList.contains('menu-open'), false);
+});
+
+test('choosing a room closes the curtain before the quiet wait ends', () => {
+  const page = fixture();
+  page.open();
+  page.bioLink.fire('click');
+  page.advance(1230);
+  assert.equal(page.body.dataset.room, 'bio');
+  assert.equal(page.ids.mobileMenu.classList.contains('is-open'), false);
+  page.advance(15000);
+  assert.equal(page.body.classList.contains('menu-open'), false);
+});
+
 test('a new room receives focus only after its menu return has actually finished', () => {
   const page = fixture();
   page.open();

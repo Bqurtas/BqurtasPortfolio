@@ -477,35 +477,65 @@
     if (window.__bqDesktopFlyoutsBound) return;
     window.__bqDesktopFlyoutsBound = true;
     const GRACE = 420; // ms — just enough to move the cursor across the gap
+    const CLICK_IDLE = 5000;
     $$('.lang-hover, .social-hover').forEach(wrap => {
-      let t;
+      let leaveTimer;
+      let clickTimer;
+      let pinned = false;
+      let clickExpired = false;
       const trigger = wrap.querySelector(':scope > button[aria-haspopup]');
+      const menu = wrap.querySelector(':scope > [role="menu"]');
       const setOpen = (open) => {
         wrap.classList.toggle('is-hovering', open);
         trigger?.setAttribute('aria-expanded', String(open));
+        menu?.setAttribute('aria-hidden', String(!open));
+        menu?.toggleAttribute('inert', !open);
       };
       const openIt = () => {
-        clearTimeout(t);
+        clearTimeout(leaveTimer);
         wrap.classList.remove('is-flyout-dismissed');
         setOpen(true);
       };
       const closeNow = () => {
-        clearTimeout(t);
+        clearTimeout(leaveTimer);
+        clearTimeout(clickTimer);
+        pinned = false;
+        clickExpired = false;
+        wrap.classList.add('is-flyout-dismissed');
         setOpen(false);
       };
       const closeIt = () => {
-        clearTimeout(t);
-        t = setTimeout(() => {
-          if (wrap.matches(':hover') || wrap.contains(document.activeElement)) return;
+        clearTimeout(leaveTimer);
+        leaveTimer = setTimeout(() => {
+          if (wrap.matches(':hover')) return;
+          if (pinned && !clickExpired) return;
           closeNow();
         }, GRACE);
+      };
+      const armClickClose = () => {
+        pinned = true;
+        clickExpired = false;
+        clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => {
+          clickExpired = true;
+          if (wrap.matches(':hover')) return;
+          closeNow();
+        }, CLICK_IDLE);
       };
       wrap.addEventListener('mouseenter', openIt);
       wrap.addEventListener('mouseleave', closeIt);
       wrap.addEventListener('focusin', openIt);
-      wrap.addEventListener('focusout', closeIt);
+      wrap.addEventListener('focusout', (e) => {
+        if (e.relatedTarget && wrap.contains(e.relatedTarget)) return;
+        closeIt();
+      });
       trigger?.addEventListener('click', () => {
-        if (wrap.classList.contains('is-flyout-dismissed')) openIt();
+        openIt();
+        armClickClose();
+      });
+      menu?.addEventListener('click', (e) => {
+        if (!pinned || !e.target.closest('a, button, .lang-opt')) return;
+        armClickClose();
       });
       wrap.addEventListener('keydown', (e) => {
         if (e.key !== 'Escape') return;
@@ -815,7 +845,7 @@
 
     let greeted = false;
     const backdrop = $('#chatBackdrop');
-    /* a quiet minute with no interaction → the chat closes itself */
+    /* fifteen quiet seconds with no click → the chat closes itself */
     let idleT = null, focusT = null, lastTrigger = null;
     let resetDrag = () => {};
     panel.toggleAttribute('inert', !panel.classList.contains('is-open'));
@@ -823,9 +853,9 @@
     const armIdle = () => {
       clearTimeout(idleT);
       idleT = setTimeout(() => {
-        if (pending || input?.value.trim() || document.activeElement === input) armIdle();
+        if (pending || input?.value.trim()) armIdle();
         else close();
-      }, 60000);
+      }, 15000);
     };
     const open = (trigger) => {
       clearTimeout(focusT);
@@ -869,8 +899,7 @@
       panel.setAttribute('aria-hidden', 'true');
       lastTrigger = null;
     };
-    ['pointerdown', 'keydown', 'touchstart'].forEach((ev) =>
-      panel.addEventListener(ev, () => { if (panel.classList.contains('is-open')) armIdle(); }, { passive: true }));
+    panel.addEventListener('pointerdown', () => { if (panel.classList.contains('is-open')) armIdle(); }, { passive: true });
     window.__bqPanels = window.__bqPanels || {};
     window.__bqPanels.chat = close;
     triggers.forEach(t => t.addEventListener('click', () => panel.classList.contains('is-open') ? close() : open(t)));
@@ -3648,13 +3677,13 @@
     return `<img class="latest-item-img" src="${esc(source)}" alt="" loading="lazy" decoding="async"${dimensions}>`;
   };
 
-  /* a quiet minute with no interaction → Latest closes itself */
+  /* fifteen quiet seconds with no click → Latest closes itself */
   let idleT = null, lastTrigger = null;
   let resetDrag = () => {};
   const triggers = [bell, bellM].filter(Boolean);
   panel.toggleAttribute('inert', !panel.classList.contains('is-open'));
   triggers.forEach(t => t.setAttribute('aria-expanded', String(panel.classList.contains('is-open'))));
-  const armIdle = () => { clearTimeout(idleT); idleT = setTimeout(() => close(), 60000); };
+  const armIdle = () => { clearTimeout(idleT); idleT = setTimeout(() => close(), 15000); };
   const open = (trigger) => {
     window.__bqLatestFeed?.refresh();
     if (window.__bqExclusive) window.__bqExclusive('latest');
@@ -3679,8 +3708,7 @@
     backdrop && backdrop.classList.remove('is-open');
     lastTrigger = null;
   };
-  ['pointerdown', 'touchstart', 'wheel'].forEach((ev) =>
-    panel.addEventListener(ev, () => { if (panel.classList.contains('is-open')) armIdle(); }, { passive: true }));
+  panel.addEventListener('pointerdown', () => { if (panel.classList.contains('is-open')) armIdle(); }, { passive: true });
   window.__bqPanels = window.__bqPanels || {};
   window.__bqPanels.latest = close;
   const toggle = (event) => (panel.classList.contains('is-open') ? close() : open(event?.currentTarget));

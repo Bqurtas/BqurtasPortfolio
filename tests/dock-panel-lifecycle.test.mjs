@@ -68,9 +68,10 @@ function fixture(kind, { coarse = false } = {}) {
     $: selector => selector === '#latestClose' ? dismiss : backdrop,
     restore: () => false, add() {}, getGreet: () => 'Hello', buildQuick() {}, chatStatus() {}, pending: false,
     setTimeout: timer.setTimeout, clearTimeout: timer.clearTimeout,
+    requestAnimationFrame() {},
   };
   const chat = section('    let greeted = false;', '    /* rebuild quick chips');
-  const latest = section('  /* a quiet minute with no interaction → Latest closes itself */', '  const setBadge = ')
+  const latest = section('  /* fifteen quiet seconds with no click → Latest closes itself */', '  const setBadge = ')
     + section('  bell && bell.addEventListener', '  if (window.__bqLangCb)');
   vm.runInNewContext(kind === 'chat' ? chat : latest, context);
   return { timer, document, window, panel, backdrop, trigger, otherTrigger, head, dismiss, input,
@@ -112,16 +113,18 @@ test('chat still blurs its field when its original opener has been removed', () 
   assert.equal(page.panel.classList.contains('is-open'), false);
 });
 
-test('idle chat stays open for pending replies, unfinished drafts and an active keyboard', () => {
+test('idle chat stays open for pending replies and unfinished drafts, then closes after fifteen quiet seconds', () => {
   const page = fixture('chat', { coarse: true });
-  page.open(); page.setPending(true); page.timer.advance(60000);
+  page.open(); page.setPending(true); page.timer.advance(15000);
   assert.equal(page.panel.classList.contains('is-open'), true, 'the reply is still pending');
-  page.setPending(false); page.input.value = 'My unfinished brief'; page.timer.advance(60000);
+  page.setPending(false); page.input.value = 'My unfinished brief'; page.timer.advance(15000);
   assert.equal(page.panel.classList.contains('is-open'), true, 'an unsent draft remains visible');
-  page.input.value = ''; page.input.focus(); page.timer.advance(60000);
-  assert.equal(page.panel.classList.contains('is-open'), true, 'typing focus remains active');
-  page.input.blur(); page.timer.advance(60000);
-  assert.equal(page.panel.classList.contains('is-open'), false, 'an inactive empty panel eventually closes');
+  page.input.value = ''; page.input.focus(); page.timer.advance(15000);
+  assert.equal(page.panel.classList.contains('is-open'), false, 'an empty panel closes without a click');
+  page.open(); page.timer.advance(14000); page.panel.fire('pointerdown'); page.timer.advance(14000);
+  assert.equal(page.panel.classList.contains('is-open'), true, 'a click inside starts the quiet wait again');
+  page.timer.advance(15000);
+  assert.equal(page.panel.classList.contains('is-open'), false);
 });
 
 for (const kind of ['chat', 'latest']) {

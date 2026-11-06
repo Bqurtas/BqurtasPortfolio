@@ -717,6 +717,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     return longest;
   };
+  /* Fifteen quiet seconds without choosing a room → the curtain closes. */
+  let menuIdleTimer = 0;
+  const clearMenuIdle = () => {
+    window.clearTimeout(menuIdleTimer);
+    menuIdleTimer = 0;
+  };
+  const armMenuIdle = () => {
+    clearMenuIdle();
+    menuIdleTimer = window.setTimeout(() => {
+      menuIdleTimer = 0;
+      if (!mobileMenu?.classList.contains('is-open') && !mobileMenu?.classList.contains('is-ready')) return;
+      setMenu(false);
+    }, 15000);
+  };
   const setMenu = (open, trigger, { restoreScroll = true } = {}) => {
     if (!mobileMenu) return;
     if (open && window.__bqExclusive) window.__bqExclusive('menu');   // opening the menu closes chat/Latest/popovers
@@ -732,6 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Cancel its old scroll destination without removing the transition guards.
     if (!open && wasClosing) return;
     if (!open && !wasOpen) {
+      clearMenuIdle();
       mobileMenu.classList.remove('is-open', 'is-ready', 'is-closing');
       document.body.classList.remove('menu-open', 'menu-revealed', 'menu-closing');
       document.body.style.overflow = '';
@@ -764,7 +779,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('menu-revealed');
         try { menuCloseBtn?.focus({ preventScroll: true }); } catch (e) { menuCloseBtn?.focus(); }
       });
+      armMenuIdle();
     } else {
+      clearMenuIdle();
       document.body.classList.remove('menu-revealed');
       document.body.classList.add('menu-closing');
       mobileMenu.classList.remove('is-ready', 'is-open');
@@ -938,14 +955,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const socialPop = document.getElementById('socialPop');
   const langPopBtn = document.getElementById('langPopBtn');
   const socialPopBtn = document.getElementById('socialPopBtn');
+  let popIdle = null;
   const setPopState = (name, open) => {
     const button = name === 'lang' ? langPopBtn : socialPopBtn;
     const panel = name === 'lang' ? langPop : socialPop;
     button?.setAttribute('aria-expanded', String(open));
+    if (!open) clearTimeout(popIdle);
     if (!panel) return;
     panel.classList.toggle('is-open', open);
     panel.setAttribute('aria-hidden', String(!open));
     panel.toggleAttribute('inert', !open);
+  };
+  const armPopIdle = (name) => {
+    clearTimeout(popIdle);
+    popIdle = setTimeout(() => setPopState(name, false), 5000);
   };
   const closePops = (except) => {
     if (except !== 'lang') setPopState('lang', false);
@@ -956,12 +979,16 @@ document.addEventListener('DOMContentLoaded', () => {
   langPopBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
     window.__bqExclusive('lang');
-    setPopState('lang', !langPop?.classList.contains('is-open'));
+    const open = !langPop?.classList.contains('is-open');
+    setPopState('lang', open);
+    if (open) armPopIdle('lang');
   });
   socialPopBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
     window.__bqExclusive('social');
-    setPopState('social', !socialPop?.classList.contains('is-open'));
+    const open = !socialPop?.classList.contains('is-open');
+    setPopState('social', open);
+    if (open) armPopIdle('social');
   });
   langPop?.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => {
     setPopState('lang', false);
@@ -998,8 +1025,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.__bqDesktopFlyoutsBound) return;
     window.__bqDesktopFlyoutsBound = true;
     const GRACE = 420;
+    const CLICK_IDLE = 5000;
     document.querySelectorAll('.lang-hover, .social-hover').forEach((wrap) => {
-      let timer;
+      let leaveTimer;
+      let clickTimer;
+      let pinned = false;
+      let clickExpired = false;
       const trigger = wrap.querySelector(':scope > button[aria-haspopup]');
       const menu = wrap.querySelector(':scope > [role="menu"]');
       const setOpen = (open) => {
@@ -1009,28 +1040,51 @@ document.addEventListener('DOMContentLoaded', () => {
         menu?.toggleAttribute('inert', !open);
       };
       const openIt = () => {
-        clearTimeout(timer);
+        clearTimeout(leaveTimer);
         wrap.classList.remove('is-flyout-dismissed');
         setOpen(true);
       };
       const closeNow = () => {
-        clearTimeout(timer);
+        clearTimeout(leaveTimer);
+        clearTimeout(clickTimer);
+        pinned = false;
+        clickExpired = false;
+        wrap.classList.add('is-flyout-dismissed');
         setOpen(false);
       };
       const closeIt = () => {
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-          if (wrap.matches(':hover') || wrap.contains(document.activeElement)) return;
+        clearTimeout(leaveTimer);
+        leaveTimer = setTimeout(() => {
+          if (wrap.matches(':hover')) return;
+          if (pinned && !clickExpired) return;
           closeNow();
         }, GRACE);
+      };
+      const armClickClose = () => {
+        pinned = true;
+        clickExpired = false;
+        clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => {
+          clickExpired = true;
+          if (wrap.matches(':hover')) return;
+          closeNow();
+        }, CLICK_IDLE);
       };
       wrap.addEventListener('mouseenter', openIt);
       wrap.addEventListener('mouseleave', closeIt);
       wrap.addEventListener('focusin', openIt);
-      wrap.addEventListener('focusout', closeIt);
+      wrap.addEventListener('focusout', (e) => {
+        if (e.relatedTarget && wrap.contains(e.relatedTarget)) return;
+        closeIt();
+      });
       setOpen(false);
       trigger?.addEventListener('click', () => {
-        if (wrap.classList.contains('is-flyout-dismissed')) openIt();
+        openIt();
+        armClickClose();
+      });
+      menu?.addEventListener('click', (e) => {
+        if (!pinned || !e.target.closest('a, button, .lang-opt')) return;
+        armClickClose();
       });
       wrap.addEventListener('keydown', (e) => {
         if (e.key !== 'Escape') return;
@@ -1617,6 +1671,61 @@ document.addEventListener('DOMContentLoaded', () => {
     window.__bqGoDocumentTop('auto');
     if (window.__bqOnScroll) window.__bqOnScroll();
   };
+
+  /* Thirty quiet seconds with no movement, in any room or layer, returns to
+     the home page and its hero. */
+  (function homeHeroIdle() {
+    const IDLE_MS = 30000;
+    let idleTimer = 0;
+    let lastArm = 0;
+    const homePath = () => ((currentLang && currentLang !== 'en') ? '/' + currentLang : '/');
+    const atHomeHero = () => {
+      if ((document.body.dataset.room || 'design') !== 'design') return false;
+      if ((window.scrollY || document.documentElement.scrollTop || 0) > 4) return false;
+      const path = (location.pathname.replace(/\/+$/, '') || '/');
+      if (path !== (homePath().replace(/\/+$/, '') || '/')) return false;
+      const sheetScrolled = Array.from(document.querySelectorAll(
+        '.room:not(.is-hidden) .paper-scroll, .footer.footer-v249.paper-sheet > .paper-scroll'
+      )).some((el) => el.scrollTop > 4);
+      if (sheetScrolled) return false;
+      if (document.getElementById('lbOverlay')?.classList.contains('is-open')) return false;
+      if (document.getElementById('dash')?.classList.contains('is-open')) return false;
+      if (document.body.classList.contains('menu-open')
+        || document.body.classList.contains('menu-revealed')
+        || document.body.classList.contains('menu-closing')) return false;
+      if (document.getElementById('chat')?.classList.contains('is-open')) return false;
+      if (document.getElementById('latestPanel')?.classList.contains('is-open')) return false;
+      return true;
+    };
+    const armIdle = () => {
+      const now = performance.now();
+      if (idleTimer && now - lastArm < 400) return;
+      lastArm = now;
+      window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(returnHome, IDLE_MS);
+    };
+    const returnHome = () => {
+      idleTimer = 0;
+      if (atHomeHero()) { armIdle(); return; }
+      try { document.getElementById('dashClose')?.click(); } catch (e) {}
+      ['chat', 'latest', 'lang', 'social'].forEach((key) => {
+        try { window.__bqPanels?.[key]?.(); } catch (e) {}
+      });
+      window.__bqResetToHomeHero();
+      armIdle();
+    };
+    const onPointerMove = (event) => {
+      if (event.movementX === 0 && event.movementY === 0) return;
+      armIdle();
+    };
+    window.addEventListener('pointerdown', armIdle, { passive: true });
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('wheel', armIdle, { passive: true });
+    window.addEventListener('keydown', armIdle, { passive: true });
+    window.addEventListener('touchmove', armIdle, { passive: true });
+    window.addEventListener('scroll', armIdle, { passive: true });
+    armIdle();
+  })();
 
   /* ---------- COUNT UP (statistics) ---------- */
   /* Digits only. The "+" lives in its own span so it cannot shift as the

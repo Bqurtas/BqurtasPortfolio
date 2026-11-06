@@ -152,6 +152,93 @@ test('bfcache resumes keep the five-minute threshold and reset only a long absen
   }
 });
 
+function loadHomeIdle({ room = 'bio', path = '/bio', hidden = false, scrollY = 0, chatOpen = false } = {}) {
+  let now = 0, nextTimer = 0, resets = 0;
+  const timers = new Map(), listeners = {}, closed = [];
+  const chat = { classList: { contains: (name) => chatOpen && name === 'is-open' } };
+  const document = {
+    hidden,
+    body: { dataset: { room }, classList: { contains: () => false } },
+    documentElement: { scrollTop: 0 },
+    addEventListener: (type, callback) => { (listeners[type] ||= []).push(callback); },
+    getElementById: (id) => id === 'chat' ? chat : null,
+    querySelectorAll: () => [],
+  };
+  const location = { pathname: path };
+  const window = {
+    scrollY,
+    addEventListener: (type, callback) => { (listeners[type] ||= []).push(callback); },
+    setTimeout(callback, delay) { const id = ++nextTimer; timers.set(id, { at: now + delay, callback }); return id; },
+    clearTimeout(id) { timers.delete(id); },
+    __bqPanels: { chat() { closed.push('chat'); } },
+    __bqResetToHomeHero() {
+      resets += 1;
+      document.body.dataset.room = 'design';
+      location.pathname = '/';
+      window.scrollY = 0;
+      chatOpen = false;
+    },
+  };
+  const start = main.indexOf('  (function homeHeroIdle()');
+  const end = main.indexOf('  /* ---------- COUNT UP', start);
+  assert.ok(start >= 0 && end > start);
+  vm.runInNewContext(main.slice(start, end), {
+    window, document, location, currentLang: 'en', performance: { now: () => now },
+  });
+  return {
+    document, location, closed,
+    get resets() { return resets; },
+    advance(ms) {
+      const endAt = now + ms;
+      for (;;) {
+        const pending = [...timers].filter(([, timer]) => timer.at <= endAt).sort((a, b) => a[1].at - b[1].at)[0];
+        if (!pending) break;
+        timers.delete(pending[0]);
+        now = pending[1].at;
+        pending[1].callback();
+      }
+      now = endAt;
+    },
+    fire(type, event = {}) { for (const callback of listeners[type] || []) callback(event); },
+  };
+}
+
+test('thirty seconds without movement returns any room or scrolled page to the home hero', () => {
+  const away = loadHomeIdle();
+  away.advance(29999);
+  assert.equal(away.resets, 0);
+  away.advance(1);
+  assert.equal(away.resets, 1);
+  assert.equal(away.location.pathname, '/');
+  assert.equal(away.closed.includes('chat'), true);
+  away.advance(30000);
+  assert.equal(away.resets, 1, 'the home hero does not reset itself again');
+
+  const moving = loadHomeIdle({ room: 'contact', path: '/contact' });
+  moving.advance(20000);
+  moving.fire('pointerdown');
+  moving.advance(20000);
+  assert.equal(moving.resets, 0);
+  moving.advance(10000);
+  assert.equal(moving.resets, 1);
+
+  const scrolled = loadHomeIdle({ room: 'design', path: '/design', scrollY: 900 });
+  scrolled.advance(30000);
+  assert.equal(scrolled.resets, 1);
+  assert.equal(scrolled.location.pathname, '/');
+
+  const home = loadHomeIdle({ room: 'design', path: '/' });
+  home.advance(60000);
+  assert.equal(home.resets, 0);
+
+  const paused = loadHomeIdle();
+  paused.document.hidden = true;
+  paused.advance(29999);
+  assert.equal(paused.resets, 0);
+  paused.advance(1);
+  assert.equal(paused.resets, 1);
+});
+
 test('visibility and focus resumes still return a long-backgrounded current tab to its hero', () => {
   for (const mechanism of ['visibility', 'focus']) {
     const page = loadResumePolicy('/design');
