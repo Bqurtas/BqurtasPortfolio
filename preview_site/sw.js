@@ -13,7 +13,7 @@
       instead of being pinned for the life of the installed worker.
    ========================================================= */
 
-const SW_VERSION = '4fd8e316f7e7'; // generated from this worker and the app shell
+const SW_VERSION = 'b3e90d7ce7cb'; // generated from this worker and the app shell
 const CACHE_NAME = `bqurtas-cache-${SW_VERSION}`;
 const DOC_FALLBACK = '/index.html';
 
@@ -37,12 +37,12 @@ async function cachedEntry(request) {
 const PRECACHE_ASSETS = [
   '/index.html',
   '/css/modern-framer.min.css?v=618db1d097f1',
-  '/css/style.v417.min.css?v=6d64a1d15709',
+  '/css/style.v417.min.css?v=31b2f415d7e4',
   '/css/fonts.css?v=6bd89c103953',
   '/css/experience.min.css?v=d78921b4a98f',
-  '/js/main.v420.min.js?v=a349760a91b9',
+  '/js/main.v420.min.js?v=403e64eb871c',
   '/js/gallery.v420.min.js?v=6650d0580a06',
-  '/js/i18n.v420.min.js?v=dcfb041aed5a',
+  '/js/i18n.v420.min.js?v=206201e76f4a',
   '/js/motion.26a62c962613.min.js?v=26a62c962613',
   '/js/lux.min.js?v=1e8781ff602a',
   '/site.webmanifest?v=19c5c4b9ee48',
