@@ -6046,3 +6046,42 @@ html body #chat#chat .chat-head-id strong,
 html body #chat#chat .chat-status {
   line-height: 1.15 !important;
 }
+
+/* Websites sheet — same paper deck as the sections around it, stacked
+   between the portfolio (z 10) and services (z 20). */
+html body #design#design#design.paper-stack > .section.sites-made {
+  z-index: 15 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: var(--bq-paper-sheet, #f3f3f3) !important;
+  background-image: none !important;
+  --bq-paper-content-max: 1180px;
+}
+html body #design#design#design.paper-stack > .section.sites-made > .paper-scroll {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  /* Clear the floating dock so the last line of each card stays readable. */
+  padding: clamp(22px, 3.2vh, 40px) clamp(22px, 3.4vw, 64px) calc(24px + var(--dock-h, 76px)) !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+}
+html body #design#design#design.paper-stack > .section.sites-made .section-head {
+  margin-bottom: clamp(18px, 2.4vh, 32px) !important;
+}
+html body #design#design#design.paper-stack > .section.sites-made .section-title {
+  font-family: Fraunces, "Noto Kufi Arabic", serif !important;
+  font-size: clamp(30px, 3.4vw, 48px) !important;
+  line-height: 1.12 !important;
+}
+@media (max-width: 820px) {
+  html body #design#design#design.paper-stack > .section.sites-made > .paper-scroll {
+    justify-content: flex-start !important;
+    padding: 20px 16px calc(20px + 72px + env(safe-area-inset-bottom, 0px)) !important;
+    overflow-y: auto !important;
+  }
+  html body #design#design#design.paper-stack > .section.sites-made .sites-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

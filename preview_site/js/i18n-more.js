@@ -2813,6 +2813,106 @@ Object.assign(window.I18N, {
   });
 })();
 
+/* Websites plate on the design-room homepage. Applied after the full
+   dictionaries replace each language object. English stays in i18n.js. */
+(function applySitesCopy() {
+  var sites = {
+    ku: {
+      "sites.eye":"وێبسایت",
+      "sites.title":"ئێمە <em>وێبسایتیش</em> دروست دەکەین.",
+      "sites.lede":"سێ وێبسایت لە هەمان ستۆدیۆ — وێبسایتی خۆمان، دەزگایەکی هەواڵ لە هەولێر، و هۆڵدینگێک. هەمان دەست و هەمان وردی.",
+      "sites.visit":"کردنەوەی وێبسایت",
+      "sites.bq.name":"ب قورتاس",
+      "sites.bq.role":"وێبسایتی خۆمان",
+      "sites.bq.desc":"ستۆدیۆکە خۆی. ناسنامە، پۆرتفۆلیۆ و گۆڤار، لە هەولێر.",
+      "sites.sun.name":"سەن ئۆف ئەربیل",
+      "sites.sun.role":"دەزگای هەواڵ",
+      "sites.sun.desc":"گۆڤارێکی ئینگلیزی، ڕەگکێشراو لە هەولێر، بۆ خوێنەرێک لە هەر شوێنێک.",
+      "sites.kosan.name":"کۆسان هۆڵدینگ",
+      "sites.kosan.role":"کۆمپانیای هۆڵدینگ",
+      "sites.kosan.desc":"یازدە کۆمپانیا لە هەولێر، لە ژێر یەک ناو و یەک وێبسایت."
+    },
+    kmr: {
+      "sites.eye":"Malper",
+      "sites.title":"Em <em>malperan</em> jî çêdikin.",
+      "sites.lede":"Sê malper ji heman studyoyê — ya me, jûrek nûçeyan li Hewlêrê, û holîngeke pargîdaniyan.",
+      "sites.visit":"Malperê veke",
+      "sites.bq.name":"Bqurtas",
+      "sites.bq.role":"Malpera me",
+      "sites.bq.desc":"Studyo bi xwe. Nasname, portfolyo û rojname, li Hewlêrê.",
+      "sites.sun.name":"Sun of Erbil",
+      "sites.sun.role":"Jûra nûçeyan",
+      "sites.sun.desc":"Kovareke îngilîzî, kok daye li Hewlêrê, ji bo xwînerekî li her derê.",
+      "sites.kosan.name":"Kosan Holding",
+      "sites.kosan.role":"Holînga pargîdaniyan",
+      "sites.kosan.desc":"Yazdeh pargîdanî li Hewlêrê, di bin yek nav û yek malperê de."
+    },
+    ar: {
+      "sites.eye":"مواقع",
+      "sites.title":"نصنع <em>المواقع</em> أيضاً.",
+      "sites.lede":"ثلاثة مواقع من الاستوديو نفسه — موقعنا، غرفة أخبار في أربيل، وشركة قابضة.",
+      "sites.visit":"فتح الموقع",
+      "sites.bq.name":"ب قورتاس",
+      "sites.bq.role":"موقعنا",
+      "sites.bq.desc":"الاستوديو نفسه. هوية، أعمال ومجلة، من أربيل.",
+      "sites.sun.name":"سن أوف أربيل",
+      "sites.sun.role":"غرفة أخبار",
+      "sites.sun.desc":"مجلة باللغة الإنجليزية، جذورها في أربيل، لقارئ في أي مكان.",
+      "sites.kosan.name":"كوسان هولدينغ",
+      "sites.kosan.role":"شركة قابضة",
+      "sites.kosan.desc":"إحدى عشرة شركة في أربيل، تحت اسم واحد وموقع واحد."
+    },
+    fr: {
+      "sites.eye":"Sites web",
+      "sites.title":"Nous faisons aussi des <em>sites</em>.",
+      "sites.lede":"Trois sites du même studio — le nôtre, une rédaction à Erbil, et une holding.",
+      "sites.visit":"Ouvrir le site",
+      "sites.bq.name":"Bqurtas",
+      "sites.bq.role":"Notre propre site",
+      "sites.bq.desc":"Le studio lui-même. Identité, portfolio et journal, à Hewlêr.",
+      "sites.sun.name":"Sun of Erbil",
+      "sites.sun.role":"Une rédaction",
+      "sites.sun.desc":"Un magazine en anglais, enraciné à Erbil, pour un lecteur n’importe où.",
+      "sites.kosan.name":"Kosan Holding",
+      "sites.kosan.role":"Une holding",
+      "sites.kosan.desc":"Onze sociétés à Erbil, réunies sous un nom et un site."
+    },
+    tr: {
+      "sites.eye":"Web siteleri",
+      "sites.title":"<em>Web sitesi</em> de yapıyoruz.",
+      "sites.lede":"Aynı stüdyodan üç site — kendimizinki, Erbil’de bir haber odası ve bir holding.",
+      "sites.visit":"Siteyi aç",
+      "sites.bq.name":"Bqurtas",
+      "sites.bq.role":"Kendi sitemiz",
+      "sites.bq.desc":"Stüdyonun kendisi. Kimlik, portfolyo ve günlük, Hewlêr’de.",
+      "sites.sun.name":"Sun of Erbil",
+      "sites.sun.role":"Bir haber odası",
+      "sites.sun.desc":"Erbil’e kök salmış, her yerdeki okur için İngilizce bir dergi.",
+      "sites.kosan.name":"Kosan Holding",
+      "sites.kosan.role":"Bir holding",
+      "sites.kosan.desc":"Erbil’de on bir şirket, tek ad ve tek site altında."
+    },
+    sv: {
+      "sites.eye":"Webbplatser",
+      "sites.title":"Vi bygger <em>webbplatser</em> också.",
+      "sites.lede":"Tre sajter från samma studio — vår egen, en redaktion i Erbil och ett holdingbolag.",
+      "sites.visit":"Öppna sajten",
+      "sites.bq.name":"Bqurtas",
+      "sites.bq.role":"Vår egen webbplats",
+      "sites.bq.desc":"Studion själv. Identitet, portfolio och journal, i Hewlêr.",
+      "sites.sun.name":"Sun of Erbil",
+      "sites.sun.role":"En redaktion",
+      "sites.sun.desc":"Ett engelskspråkigt magasin med rötter i Erbil, för en läsare var som helst.",
+      "sites.kosan.name":"Kosan Holding",
+      "sites.kosan.role":"Ett holdingbolag",
+      "sites.kosan.desc":"Elva bolag i Erbil, samlade under ett namn och en sajt."
+    }
+  };
+  Object.keys(sites).forEach(function (lang) {
+    window.I18N[lang] = Object.assign(window.I18N[lang] || {}, sites[lang]);
+  });
+})();
+
 /* Keep the authored v418 identity copy authoritative after the full language
    dictionaries finish loading. */
 (function applyIdentityCopyAfterFullDictionaries() {

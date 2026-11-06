@@ -1699,6 +1699,22 @@ Object.keys(window.ROOMCARD_PANJAMOR332).forEach(function(l){
 
 Object.assign(window.I18N.en,{"footer.backtop":"Back to top","pj.kicker":"02 — Office Studio","pj.mq.brand":"Brand","pj.mq.print":"Print","pj.mq.launch":"Launch","foot.view":"View section"});
 
+Object.assign(window.I18N.en,{
+  "sites.eye":"Websites",
+  "sites.title":"We build <em>websites</em>, too.",
+  "sites.lede":"Three sites from this studio — our own, a newsroom in Erbil, and a holding company. The same hand as the work above.",
+  "sites.visit":"Open the site",
+  "sites.bq.name":"Bqurtas",
+  "sites.bq.role":"Our own website",
+  "sites.bq.desc":"The studio itself. Identity, portfolio and journal, set in Hewlêr.",
+  "sites.sun.name":"Sun of Erbil",
+  "sites.sun.role":"A newsroom",
+  "sites.sun.desc":"An English-language magazine rooted in Erbil, written for a reader anywhere.",
+  "sites.kosan.name":"Kosan Holding",
+  "sites.kosan.role":"A holding company",
+  "sites.kosan.desc":"Eleven companies in Erbil, gathered under one name and one site."
+});
+
 Object.assign(window.I18N.en,{"hero.cta":"View the work","hero.place":"Based in Erbil","hero.since":"Established 2014"});
 Object.assign(window.I18N.ku||(window.I18N.ku={}),{"hero.place":"لە هەولێر","hero.since":"لە ساڵی ٢٠١٤وە"});
 Object.assign(window.I18N.ar||(window.I18N.ar={}),{"hero.place":"مقرها أربيل","hero.since":"تأسست ٢٠١٤"});
