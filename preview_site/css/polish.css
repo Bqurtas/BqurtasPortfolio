@@ -6046,3 +6046,277 @@ html body #chat#chat .chat-head-id strong,
 html body #chat#chat .chat-status {
   line-height: 1.15 !important;
 }
+
+/* ============================================================================
+   WEBSITES — a home sheet after the portfolio.
+
+   Same paper deck, type and ink as the other home sheets. Three equal cards
+   sit in a row on a computer and stack on a phone. The hover is the press
+   bar already used on the service rows: ink sweeps in from the reading edge
+   and the type turns to paper.
+   ========================================================================== */
+html body #design#design#design.paper-stack > .section.sites-sheet {
+  background: var(--bq-paper-sites, #f3efe6) !important;
+  background-image: none !important;
+  color: var(--ink) !important;
+  z-index: 15 !important;
+  content-visibility: visible !important;
+  contain-intrinsic-size: none !important;
+  padding: clamp(22px, 3.4vh, 44px) clamp(18px, 3.6vw, 64px) !important;
+}
+
+html body #design#design#design.paper-stack > .section.sites-sheet > .paper-scroll {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: safe center !important;
+  padding: 0 !important;
+}
+
+html body #design#design#design .sites-layout {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: clamp(18px, 3vh, 36px) !important;
+  inline-size: 100% !important;
+  max-inline-size: 1120px !important;
+  margin-inline: auto !important;
+  flex: 0 0 auto !important;
+}
+
+html body #design#design#design .sites-head {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+  max-inline-size: 40rem !important;
+  margin: 0 !important;
+}
+
+html body #design#design#design .sites-head .section-num {
+  margin: 0 !important;
+  color: var(--ink) !important;
+}
+
+html body #design#design#design .sites-title {
+  margin: 0 !important;
+  max-inline-size: 16ch !important;
+  font-family: Fraunces, 'Noto Kufi Arabic', serif !important;
+  font-size: clamp(32px, min(5.4vw, 6.2vh), 64px) !important;
+  font-weight: 450 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.035em !important;
+  text-wrap: balance;
+  color: var(--ink) !important;
+}
+
+html[lang="ku"] body #design#design#design .sites-title,
+html[lang="ar"] body #design#design#design .sites-title {
+  font-family: 'Noto Kufi Arabic', Fraunces, serif !important;
+  letter-spacing: 0 !important;
+  line-height: 1.25 !important;
+  max-inline-size: 18ch !important;
+}
+
+html body #design#design#design .sites-title em {
+  font-style: italic !important;
+  color: inherit !important;
+}
+
+html body #design#design#design .sites-lede {
+  margin: 4px 0 0 !important;
+  max-inline-size: 38rem !important;
+  font-size: clamp(14px, 1.35vw, 17px) !important;
+  line-height: 1.55 !important;
+  color: var(--ink-soft) !important;
+}
+
+html body #design#design#design .sites-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(12px, 1.6vw, 18px) !important;
+  align-items: stretch !important;
+}
+
+html body #design#design#design .site-card {
+  position: relative !important;
+  isolation: isolate !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: clamp(10px, 1.6vh, 16px) !important;
+  min-inline-size: 0 !important;
+  min-block-size: 100% !important;
+  margin: 0 !important;
+  padding: clamp(18px, 2vw, 26px) clamp(16px, 1.7vw, 22px) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 2px !important;
+  background: var(--bq-paper-sites, #f3efe6) !important;
+  color: var(--ink) !important;
+  text-decoration: none !important;
+  overflow: hidden !important;
+}
+
+html body #design#design#design .site-card::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  background: var(--ink) !important;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .42s cubic-bezier(.22, 1, .36, 1);
+  pointer-events: none !important;
+}
+
+html[dir="rtl"] body #design#design#design .site-card::before {
+  transform-origin: right center;
+}
+
+html body #design#design#design .site-card-top,
+html body #design#design#design .site-card-foot {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+html body #design#design#design .site-card-top {
+  padding-bottom: 12px !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+html body #design#design#design .site-card-index,
+html body #design#design#design .site-card-role,
+html body #design#design#design .site-card-domain,
+html body #design#design#design .site-card-go {
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace !important;
+  font-size: 11px !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: var(--ink-soft) !important;
+}
+
+html[lang="ku"] body #design#design#design .site-card :is(.site-card-index, .site-card-role, .site-card-domain, .site-card-go),
+html[lang="ar"] body #design#design#design .site-card :is(.site-card-index, .site-card-role, .site-card-domain, .site-card-go) {
+  letter-spacing: 0 !important;
+}
+
+html body #design#design#design .site-card-name {
+  margin: 2px 0 0 !important;
+  font-family: Fraunces, 'Noto Kufi Arabic', serif !important;
+  font-size: clamp(26px, 2.4vw, 36px) !important;
+  font-weight: 500 !important;
+  font-style: italic !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.03em !important;
+  color: var(--ink) !important;
+}
+
+html[lang="ku"] body #design#design#design .site-card-name,
+html[lang="ar"] body #design#design#design .site-card-name {
+  font-family: 'Noto Kufi Arabic', Fraunces, serif !important;
+  font-style: normal !important;
+  letter-spacing: 0 !important;
+  line-height: 1.35 !important;
+}
+
+html body #design#design#design .site-card-desc {
+  margin: 0 !important;
+  font-size: clamp(13.5px, 1.15vw, 15px) !important;
+  line-height: 1.55 !important;
+  color: var(--ink-soft) !important;
+}
+
+html body #design#design#design .site-card-foot {
+  margin-top: auto !important;
+  padding-top: 14px !important;
+  border-top: 1px solid var(--line) !important;
+}
+
+html body #design#design#design .site-card-domain {
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+}
+
+html body #design#design#design .site-card-go {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex: 0 0 auto !important;
+  color: var(--ink) !important;
+}
+
+html body #design#design#design .site-card-go i {
+  transition: transform .45s cubic-bezier(.22, 1, .36, 1);
+}
+
+html[dir="rtl"] body #design#design#design .site-card-go i {
+  transform: scaleX(-1);
+}
+
+html body #design#design#design .site-card:hover,
+html body #design#design#design .site-card:focus-visible {
+  border-color: var(--ink) !important;
+  color: var(--bg) !important;
+}
+
+html body #design#design#design .site-card:hover::before,
+html body #design#design#design .site-card:focus-visible::before {
+  transform: scaleX(1);
+}
+
+/* White type blended with difference flips exactly where the ink bar is:
+   dark on the paper, light on the bar, including halfway through the sweep. */
+html body #design#design#design .site-card :is(.site-card-name, .site-card-desc, .site-card-index, .site-card-role, .site-card-domain, .site-card-go) {
+  position: relative !important;
+  z-index: 1 !important;
+  color: #fff !important;
+  mix-blend-mode: difference !important;
+}
+
+html body #design#design#design .site-card:hover .site-card-top,
+html body #design#design#design .site-card:hover .site-card-foot,
+html body #design#design#design .site-card:focus-visible .site-card-top,
+html body #design#design#design .site-card:focus-visible .site-card-foot {
+  border-color: color-mix(in srgb, var(--bg) 28%, transparent) !important;
+}
+
+html body #design#design#design .site-card:hover .site-card-go i {
+  transform: translate(3px, -3px);
+}
+
+html[dir="rtl"] body #design#design#design .site-card:hover .site-card-go i {
+  transform: scaleX(-1) translate(3px, -3px);
+}
+
+@media (max-width: 820px) {
+  html body #design#design#design .sites-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  html body #design#design#design .sites-title {
+    font-size: clamp(28px, 8vw, 40px) !important;
+  }
+
+  html body #design#design#design .site-card {
+    gap: 8px !important;
+    padding: 16px 16px 14px !important;
+  }
+
+  html body #design#design#design .site-card-name {
+    font-size: 24px !important;
+  }
+
+  html body #design#design#design .site-card-desc {
+    font-size: 13.5px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body #design#design#design .site-card::before,
+  html body #design#design#design .site-card-go i,
+  html body #design#design#design .site-card :is(.site-card-name, .site-card-desc, .site-card-index, .site-card-role, .site-card-domain, .site-card-go),
+  html body #design#design#design .site-card:hover :is(.site-card-name, .site-card-desc, .site-card-index, .site-card-role, .site-card-domain, .site-card-go) {
+    transition: none !important;
+  }
+}

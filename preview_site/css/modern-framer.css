@@ -5757,6 +5757,7 @@ body.menu-open .mobilebar {
   --bq-paper-dim: 0.26;
   --bq-paper-hero: #f6f3ec;
   --bq-paper-work: #ecece8;
+  --bq-paper-sites: #f3efe6;
   --bq-paper-focus: #e2e0da;
   --bq-paper-note: #f2ebe0;
   --bq-paper-clients: #e7e7e4;
@@ -5768,6 +5769,7 @@ body.menu-open .mobilebar {
 :root[data-theme="dark"] {
   --bq-paper-hero: #121211;
   --bq-paper-work: #161616;
+  --bq-paper-sites: #1c1b18;
   --bq-paper-focus: #1a1a1c;
   --bq-paper-note: #1c1a17;
   --bq-paper-clients: #181818;

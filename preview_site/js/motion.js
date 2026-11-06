@@ -137,7 +137,12 @@
                 '.bio-teaser-text p',
                 '.bio-teaser-link',
                 '.stat',
-                '.software-experience'] }
+                '.software-experience'] },
+      { sheet: '#design > .sites-sheet',
+        parts: ['.sites-head .section-num',
+                '.sites-title',
+                '.sites-lede',
+                '.site-card'] }
     ];
     var riseSheets = [];
     riseGroups.forEach(function (group) {
