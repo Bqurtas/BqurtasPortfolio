@@ -6567,22 +6567,28 @@ html body #design#design#design#design .logos-section .logos-grid--clients .logo
 html body #design#design#design#design .logos-section .logos-grid--clients .logo-mark--client::after {
   content: "" !important;
   position: absolute !important;
-  background: var(--logo-line) !important;
+  background: none !important;
   pointer-events: none !important;
 }
 html body #design#design#design#design .logos-section .logos-grid--clients .logo-mark--client::before {
   inset-block: 0 !important;
   inset-inline-end: calc(-1px / var(--bq-paper-fit, 1)) !important;
-  inline-size: calc(1px / var(--bq-paper-fit, 1)) !important;
+  inline-size: 0 !important;
+  border-inline-end: calc(1px / var(--bq-paper-fit, 1)) solid var(--logo-line) !important;
 }
 html body #design#design#design#design .logos-section .logos-grid--clients .logo-mark--client::after {
   inset-inline: 0 !important;
   inset-block-end: calc(-1px / var(--bq-paper-fit, 1)) !important;
-  block-size: calc(1px / var(--bq-paper-fit, 1)) !important;
+  block-size: 0 !important;
+  border-block-end: calc(1px / var(--bq-paper-fit, 1)) solid var(--logo-line) !important;
 }
-/* Five client marks are drawn in dark ink and would vanish on the black sheet.
+/* A few marks are drawn in dark ink and would vanish on the black sheet.
    Dark mode swaps them for the same mark with its dark ink lifted, keeping hue;
    their colour stays their own and nothing sits behind them. */
+html:root[data-theme="dark"] body #design#design#design#design .logos-grid--clients img[data-client-file="WorkLogo6.webp"] { content: url("/assets/clients/WorkLogo6-dark.webp"); }
+html:root[data-theme="dark"] body #design#design#design#design .logos-grid--clients img[data-client-file="WorkLogo3.webp"] { content: url("/assets/clients/WorkLogo3-dark.webp"); }
+html:root[data-theme="dark"] body #design#design#design#design .svc-works img[src*="marks/kurd"] { content: url("/assets/marks/kurd-dark.webp"); }
+html:root[data-theme="dark"] body #design#design#design#design .svc-works img[src*="marks/sirwan"] { content: url("/assets/marks/sirwan-dark.webp"); }
 html:root[data-theme="dark"] body #design#design#design#design .logos-grid--clients img[data-client-file="WorkLogo8.webp"] { content: url("/assets/clients/WorkLogo8-dark.webp"); }
 html:root[data-theme="dark"] body #design#design#design#design .logos-grid--clients img[data-client-file="WorkLogo12.webp"] { content: url("/assets/clients/WorkLogo12-dark.webp"); }
 html:root[data-theme="dark"] body #design#design#design#design .logos-grid--clients img[data-client-file="WorkLogo14.webp"] { content: url("/assets/clients/WorkLogo14-dark.webp"); }
@@ -6767,6 +6773,8 @@ html body #design.paper-stack > .paper-sheet[data-paper-fit] :is(.section-num, .
 html body :is(#bio, #blog, #contact).paper-stack > .paper-sheet[data-paper-fit] :is(.section-num, .mono):not(.mono .mono, .section-num .mono, .bio-chapter-index, .index-card *, .pitch-form *, .cert-item *, .bio-tools *) {
   zoom: max(1, calc(.85 / var(--bq-paper-fit, 1)));
 }
+/* Chapter 01's numeral sits inside a floored label and already follows the fit. */
+html body #bio#bio#bio .section-num .bio-chapter-index { font-size: clamp(10px, calc(10px / var(--bq-paper-fit, 1)), calc(10px / .85)) !important; }
 @media (max-height: 640px) {
   html body #design#design#design#design .latest-blog .journal-more li:last-child .journal-row { padding-inline-end: 58px !important; }
 }
@@ -6810,7 +6818,8 @@ html body #design#design#design#design#design .latest-blog .sheet-mid {
 }
 
 /* Kurdish and Arabic never slant: their fonts have no italic and a synthesized one reads as a fault. */
-html[dir="rtl"] body #design#design#design#design :is(.sites-title em, .service-index, .site-num, .journal-row-no, .journal-plate-no) {
+html[dir="rtl"] body #design#design#design#design #services#services#services#services :is(.service-index, em),
+html[dir="rtl"] body #design#design#design#design#design :is(.section-title em, .bio-teaser-title em, .sites-title em, .site-num, .journal-row-no, .journal-plate-no) {
   font-style: normal !important;
 }
 

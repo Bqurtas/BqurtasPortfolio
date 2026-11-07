@@ -90,8 +90,10 @@
     const scale = Math.min(1, Math.max(.5, height / 720));
     /* Above a 1440x900 window the sheets' content grows with it instead of
        sitting small in a large card. The smaller side decides, so a very wide
-       or very tall window keeps the composition's proportions. */
-    const grow = Math.round(Math.min(2.4, Math.max(1, Math.min((window.innerWidth || 1440) / 1440, height / 900))) * 100) / 100;
+       or very tall window keeps the composition's proportions. Sizes are read
+       before browser zoom, or growth would cancel a visitor's Cmd/Ctrl +. */
+    const browserZoom = window.innerWidth > 0 && window.outerWidth > 0 ? window.outerWidth / window.innerWidth : 1;
+    const grow = Math.round(Math.min(2.4, Math.max(1, Math.min((window.innerWidth || 1440) * browserZoom / 1440, height * browserZoom / 900))) * 100) / 100;
     if (window.__bqViewportScale === scale && (window.__bqViewportGrow || 1) === grow) return;
     window.__bqViewportGrow = grow;
     if (window.__bqViewportScale !== scale) {
