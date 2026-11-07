@@ -50,9 +50,9 @@ test('readable phone service fitting leaves enough native track to finish every 
   const fit = vm.runInNewContext(source('  const PAPER_FIT_MIN = 0.5;', '  /* Chapters of one group') + '\nfitPaper;', context);
   const setup = vm.runInNewContext(source('  const serviceSequences = ', '  window.__bqScrollPaperTarget = ') + '\nsetupServiceSequence;', context);
   fit(sheet, scroller);
-  assert.equal(zoom, 0.7889, 'fitting retains the phone viewport scale, rather than shrinking to fit all the copy');
+  assert.equal(zoom, 0.82, 'fitting keeps the readable size on a small phone, rather than shrinking to fit all the copy');
   const overflow = scroller.scrollHeight - scroller.clientHeight;
-  assert.equal(overflow, 241);
+  assert.equal(overflow, 272);
   const sequence = setup(sheet, scroller);
   sequence.measure(overflow);
   assert.equal(sequence.range, sequence.step * 4);
