@@ -2821,3 +2821,96 @@ Object.assign(window.I18N, {
     window.I18N[lang] = Object.assign(window.I18N[lang] || {}, copy[lang]);
   });
 })();
+
+/* Websites sheet — merged after the full dictionaries so a replacement cannot drop it. */
+(function applyWebsiteSheetCopy() {
+  var copy = {
+    ku: {
+      "web.eye": "وێبسایت",
+      "web.title": "ئێستا <em>وێبسایتیش</em> دروست دەکەین.",
+      "web.lede": "هەمان پیشە، ئێستا لەسەر شاشە — سێ وێبسایت، لێرە دروستکراون.",
+      "web.bq.eye": "وێبسایتی خۆمان",
+      "web.bq.title": "ب قورتاس",
+      "web.bq.desc": "وێبسایتی ستۆدیۆکە — ژوورەکان، ئەرشیف و کارەکان لە یەک شوێن.",
+      "web.sun.eye": "ڕۆژنامە",
+      "web.sun.title": "سەن ئۆف ئەربیل",
+      "web.sun.desc": "هەواڵ و بۆچوون لە هەولێرەوە، ستۆدیۆکە لە دەستەی کاردا.",
+      "web.kosan.eye": "هۆڵدینگ",
+      "web.kosan.title": "کۆسان هۆلدینگ",
+      "web.kosan.desc": "یازدە کۆمپانیا لە هەولێر، لە ژێر یەک ناو."
+    },
+    kmr: {
+      "web.eye": "Malper",
+      "web.title": "Em niha <em>malperan</em> jî çêdikin.",
+      "web.lede": "Heman pratîk, niha li ser ekranê — sê malper, li vir hatine çêkirin.",
+      "web.bq.eye": "Malpera me",
+      "web.bq.title": "Bqurtas",
+      "web.bq.desc": "Malpera studyoyê bi xwe — ode, arşîv û kar, li yek cihî.",
+      "web.sun.eye": "Çap",
+      "web.sun.title": "Sun of Erbil",
+      "web.sun.desc": "Nûçe û raman ji Hewlêrê, studyo di desteya kar de.",
+      "web.kosan.eye": "Holding",
+      "web.kosan.title": "Kosan Holding",
+      "web.kosan.desc": "Yazdeh pargîdan li Hewlêrê, di bin yek navî de."
+    },
+    ar: {
+      "web.eye": "مواقع",
+      "web.title": "نصنع <em>المواقع</em> أيضاً.",
+      "web.lede": "الممارسة نفسها، الآن على الشاشة — ثلاثة مواقع، صُنعت هنا.",
+      "web.bq.eye": "موقعنا",
+      "web.bq.title": "ب قورتاس",
+      "web.bq.desc": "موقع الاستوديو نفسه — الغرف والأرشيف والأعمال، في مكان واحد.",
+      "web.sun.eye": "صحافة",
+      "web.sun.title": "صن أوف أربيل",
+      "web.sun.desc": "أخبار ورأي من أربيل، والاستوديو في هيئة التحرير.",
+      "web.kosan.eye": "هولدينغ",
+      "web.kosan.title": "كوسان هولدينغ",
+      "web.kosan.desc": "إحدى عشرة شركة في أربيل، تحت اسم واحد."
+    },
+    fr: {
+      "web.eye": "Sites",
+      "web.title": "Nous faisons aussi des <em>sites</em>.",
+      "web.lede": "La même pratique, maintenant à l'écran — trois sites, faits ici.",
+      "web.bq.eye": "Notre site",
+      "web.bq.title": "Bqurtas",
+      "web.bq.desc": "Le site du studio — les salles, l'archive et le travail, au même endroit.",
+      "web.sun.eye": "Presse",
+      "web.sun.title": "Sun of Erbil",
+      "web.sun.desc": "Actualité et opinion depuis Erbil, le studio au masthead.",
+      "web.kosan.eye": "Holding",
+      "web.kosan.title": "Kosan Holding",
+      "web.kosan.desc": "Onze sociétés à Erbil, réunies sous un seul nom."
+    },
+    tr: {
+      "web.eye": "Web siteleri",
+      "web.title": "Artık <em>web sitesi</em> de yapıyoruz.",
+      "web.lede": "Aynı pratik, şimdi ekranda — üç site, burada yapıldı.",
+      "web.bq.eye": "Kendi sitemiz",
+      "web.bq.title": "Bqurtas",
+      "web.bq.desc": "Stüdyonun kendi sitesi — odalar, arşiv ve işler, tek yerde.",
+      "web.sun.eye": "Basın",
+      "web.sun.title": "Sun of Erbil",
+      "web.sun.desc": "Erbil'den haber ve görüş; stüdyo künyede.",
+      "web.kosan.eye": "Holding",
+      "web.kosan.title": "Kosan Holding",
+      "web.kosan.desc": "Erbil'de on bir şirket, tek isim altında."
+    },
+    sv: {
+      "web.eye": "Webbplatser",
+      "web.title": "Vi bygger också <em>webbplatser</em>.",
+      "web.lede": "Samma praktik, nu på skärmen — tre sajter, gjorda här.",
+      "web.bq.eye": "Vår sajt",
+      "web.bq.title": "Bqurtas",
+      "web.bq.desc": "Studions egen sajt — rum, arkiv och arbetet, på ett ställe.",
+      "web.sun.eye": "Press",
+      "web.sun.title": "Sun of Erbil",
+      "web.sun.desc": "Nyheter och opinion från Erbil, studion i redaktionsrutan.",
+      "web.kosan.eye": "Holding",
+      "web.kosan.title": "Kosan Holding",
+      "web.kosan.desc": "Elva bolag i Erbil, samlade under ett namn."
+    }
+  };
+  Object.keys(copy).forEach(function (lang) {
+    window.I18N[lang] = Object.assign(window.I18N[lang] || {}, copy[lang]);
+  });
+})();

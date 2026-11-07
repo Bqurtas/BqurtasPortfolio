@@ -9,7 +9,7 @@
   <base href="/" />
   <!-- Discover the existing blocking sheets before the inline startup CSS.
        Their stylesheet links stay below in the original cascade order. -->
-  <link rel="preload" as="style" href="css/modern-framer.min.css?v=618db1d097f1" />
+  <link rel="preload" as="style" href="css/modern-framer.min.css?v=ec35ba0675f4" />
   <link rel="preload" as="style" href="css/fonts.css?v=6bd89c103953" />
   <link rel="preload" as="style" href="css/experience.min.css?v=d78921b4a98f" />
   <link rel="preload" as="style" href="css/polish.min.css?v=a96e99b7a162" />
@@ -848,9 +848,9 @@
       html:is(.bq-shell-timeout,.bq-css-timeout):not([data-bq-shell-ready="1"]) body .room.paper-stack > :is(.hero,.room-hero).paper-sheet > .paper-scroll{overflow-y:auto!important;overscroll-behavior:auto!important}
     }
   </style>
-  <link rel="preload" as="style" href="css/style.v417.min.css?v=6d64a1d15709" data-href="css/style.v417.min.css?v=6d64a1d15709" fetchpriority="high" id="bqFullCss">
-  <link rel="stylesheet" href="css/modern-framer.min.css?v=618db1d097f1">
-  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=6d64a1d15709"></noscript>
+  <link rel="preload" as="style" href="css/style.v417.min.css?v=f0bd58034c7e" data-href="css/style.v417.min.css?v=f0bd58034c7e" fetchpriority="high" id="bqFullCss">
+  <link rel="stylesheet" href="css/modern-framer.min.css?v=ec35ba0675f4">
+  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=f0bd58034c7e"></noscript>
   <script>
     (function () {
       var root = document.documentElement;
@@ -1327,6 +1327,81 @@
           </div>
           <button class="load-collapse-btn mono bq-hidden" id="loadCollapseBtn" type="button" data-i18n="lm.collapse">Collapse all</button>
           <a class="gallery-archive-link mono" href="/archive/" data-i18n="gallery.archive">Browse the full archive ↗</a>
+        </div>
+      </div>
+
+      <!-- Websites — a paper sheet in the main room, directly after the portfolio -->
+      <div class="section web-sites" id="websites">
+        <div class="sheet-mid">
+          <header class="section-head web-sites-head">
+            <span class="section-num mono"><i class="fa-solid fa-globe"></i> &nbsp; <span data-i18n="web.eye">Websites</span></span>
+            <h2 class="section-title" data-i18n="web.title">We also make <em>websites</em>.</h2>
+            <p class="section-lede" data-i18n="web.lede">The same practice, carried onto the screen — three sites, built here.</p>
+          </header>
+          <div class="web-sites-grid">
+            <a class="web-site web-site--bq" href="https://bqurtas.com/" target="_blank" rel="noopener noreferrer">
+              <span class="web-site-top">
+                <span class="web-site-index mono" aria-hidden="true">01</span>
+                <span class="web-site-go" aria-hidden="true"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+              </span>
+              <span class="web-screen" aria-hidden="true">
+                <span class="web-screen-bar">
+                  <span class="web-screen-dots"></span>
+                  <span class="web-screen-url" dir="ltr">bqurtas.com</span>
+                </span>
+                <span class="web-screen-body">
+                  <span class="web-mark">Bq</span>
+                  <span class="web-rules"><i></i><i></i><i></i></span>
+                </span>
+              </span>
+              <span class="web-site-kicker mono" data-i18n="web.bq.eye">Our site</span>
+              <h3 class="web-site-name" data-i18n="web.bq.title">Bqurtas</h3>
+              <p class="web-site-desc" data-i18n="web.bq.desc">The studio itself — rooms, archive and the work, kept in one place.</p>
+              <span class="web-site-domain mono" dir="ltr">bqurtas.com</span>
+            </a>
+
+            <a class="web-site web-site--sun" href="https://sunoferbil.com/" target="_blank" rel="noopener noreferrer">
+              <span class="web-site-top">
+                <span class="web-site-index mono" aria-hidden="true">02</span>
+                <span class="web-site-go" aria-hidden="true"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+              </span>
+              <span class="web-screen" aria-hidden="true">
+                <span class="web-screen-bar">
+                  <span class="web-screen-dots"></span>
+                  <span class="web-screen-url" dir="ltr">sunoferbil.com</span>
+                </span>
+                <span class="web-screen-body">
+                  <span class="web-mark"></span>
+                  <span class="web-rules"><i></i><i></i><i></i></span>
+                </span>
+              </span>
+              <span class="web-site-kicker mono" data-i18n="web.sun.eye">Press</span>
+              <h3 class="web-site-name" data-i18n="web.sun.title">Sun of Erbil</h3>
+              <p class="web-site-desc" data-i18n="web.sun.desc">News and opinion from Hewlêr, with the studio on the masthead.</p>
+              <span class="web-site-domain mono" dir="ltr">sunoferbil.com</span>
+            </a>
+
+            <a class="web-site web-site--kosan" href="https://www.kosanh.com/" target="_blank" rel="noopener noreferrer">
+              <span class="web-site-top">
+                <span class="web-site-index mono" aria-hidden="true">03</span>
+                <span class="web-site-go" aria-hidden="true"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+              </span>
+              <span class="web-screen" aria-hidden="true">
+                <span class="web-screen-bar">
+                  <span class="web-screen-dots"></span>
+                  <span class="web-screen-url" dir="ltr">kosanh.com</span>
+                </span>
+                <span class="web-screen-body">
+                  <span class="web-mark">11</span>
+                  <span class="web-rules"><i></i><i></i><i></i></span>
+                </span>
+              </span>
+              <span class="web-site-kicker mono" data-i18n="web.kosan.eye">Holding</span>
+              <h3 class="web-site-name" data-i18n="web.kosan.title">Kosan Holding</h3>
+              <p class="web-site-desc" data-i18n="web.kosan.desc">Eleven companies in Erbil, gathered under one name.</p>
+              <span class="web-site-domain mono" dir="ltr">kosanh.com</span>
+            </a>
+          </div>
         </div>
       </div>
 
@@ -2466,7 +2541,7 @@
     </article>
   </div>
 
-  <script defer src="js/i18n.v420.min.js?v=dcfb041aed5a"></script>
+  <script defer src="js/i18n.v420.min.js?v=158f41c84799"></script>
   <!-- Non-English visitors need the extra dictionaries before first render;
        English (the default + PSI) never loads them, keeping the parse light.
        applyLang() can also fetch this on its own, but starting it here — in
@@ -2483,7 +2558,7 @@
       var lang=u;
       if(lang && lang!=='en'){
         window.__i18nMoreLoading=true; window.__i18nMoreCbs=window.__i18nMoreCbs||[];
-        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=2ab456bb9180'; s.async=false;
+        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=4558fc3aabcb'; s.async=false;
         s.onload=function(){
           window.__i18nMoreLoaded=true; window.__i18nMoreLoading=false;
           var cbs=(window.__i18nMoreCbs||[]).slice(); window.__i18nMoreCbs=[];
@@ -2495,7 +2570,7 @@
     }catch(e){}})();
   </script>
   <script defer src="js/latest-feed.min.js?v=76465997249c"></script>
-  <script defer src="js/main.v420.min.js?v=a349760a91b9"></script>
+  <script defer src="js/main.v420.min.js?v=1d6bbee69180"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2585,7 +2660,7 @@
     }());
   </script>
   <script defer src="js/lux.min.js?v=1e8781ff602a"></script>
-  <script defer src="js/motion.26a62c962613.min.js?v=26a62c962613"></script>
+  <script defer src="js/motion.b28b5dc91be5.min.js?v=b28b5dc91be5"></script>
   <!-- The chatbot knowledge base is loaded only when a visitor shows intent. -->
   <script>
     (function () {
@@ -2670,7 +2745,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=4fd8e316f7e7', { updateViaCache: 'none' })
+            .register('/sw.js?v=67c5b97275fa', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

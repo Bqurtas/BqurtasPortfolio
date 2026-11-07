@@ -125,6 +125,11 @@
        whole. Selectors live here rather than in the markup so the i18n pass —
        which rewrites innerHTML on every [data-i18n] node — cannot strip them. */
     var riseGroups = [
+      { sheet: '#design > .web-sites',
+        parts: ['.web-sites-head .section-num',
+                '.web-sites-head .section-title',
+                '.web-sites-head .section-lede',
+                '.web-site'] },
       { sheet: '#design > .service-showcase',
         parts: ['.service-showcase-head .section-num',
                 '.service-showcase-head .section-title',

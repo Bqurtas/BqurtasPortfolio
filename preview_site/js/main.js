@@ -513,7 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const y = window.scrollY;
     // only once the viewer actually reaches the Design Room — not during the hero/Panjamor
     const inDesign = work ? (y + window.innerHeight * 0.5) >= __absTop(work) : y > window.innerHeight * 0.55;
-    const ctaEnd = services || note;
+    const ctaEnd = document.querySelector('.web-sites') || services || note;
     const beforeEnd = !ctaEnd || (__absTop(ctaEnd) - y) > window.innerHeight * 0.65;
     designCta.classList.toggle('is-shown', inDesign && beforeEnd);
   };
@@ -538,7 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const base = prefix || '/';
       const work = document.querySelector('.section.work');       // "01 — Design Room" + grid
       const note = document.querySelector('.practice-note'); // "A short note" → back to simple
-      const postWork = document.querySelector('.service-showcase') || note;
+      const postWork = document.querySelector('.web-sites') || document.querySelector('.service-showcase') || note;
       const y = window.scrollY + window.innerHeight * 0.38;       // a touch below the fold
       let path = base;
       if (postWork && y >= __absTop(postWork)) {
@@ -3456,7 +3456,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       hero.style.setProperty('--bq-paper-z', '1');
       wrapPaperScroll(hero);
 
-      const paperNames = ['work', 'practice', 'note', 'clients', 'blog'];
+      const paperNames = ['work', 'sites', 'practice', 'note', 'clients', 'blog'];
       sections.forEach((sheet, i) => {
         sheet.classList.add('paper-sheet');
         sheet.dataset.paper = paperNames[i] || `sheet-${i + 1}`;
