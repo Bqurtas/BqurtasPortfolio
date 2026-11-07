@@ -2585,7 +2585,7 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
   cursor: auto; width: 100%;
 }
 .field textarea { resize: vertical; font-size: 17px; line-height: 1.55; min-height: 120px; }
-.field input::placeholder, .field textarea::placeholder { color: var(--ink-muted); opacity: 0.7; }
+.field input::placeholder, .field textarea::placeholder { color: var(--ink-muted); opacity: 1; }
 .field select option { background: var(--bg); color: var(--ink); }
 
 .checkbox {

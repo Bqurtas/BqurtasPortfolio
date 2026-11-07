@@ -1305,7 +1305,7 @@ export const LOCALIZED_COPY = {
     "bio.label": "Salle de Biographie",
     "bio.languages": "Langues",
     "bio.lede": "<span class=\"dropcap\">B</span>arakat Qurtas Babakr — graphiste indépendant, œuvrant entre le protocole d'État, le design éditorial et de discrets projets personnels. Établi à Erbil, Région du Kurdistan d'Irak.",
-    "bio.press": "Reconnaissance & Sources",
+    "bio.press": "Reconnais­sance & Sources",
     "bio.press.lede": "Des preuves, pas des adjectifs : plus de 1 000 travaux achevés dans les archives, près de 25 organisations servies depuis 2014, des distinctions de la Présidence de la Région du Kurdistan, et un nom crédité dans l'imprimé et la presse bien au-delà du Kurdistan.",
     "bio.title": "Une courte biographie, <em>honnête</em>.",
     "blog.cta": "Cliquez pour lire la note complète",

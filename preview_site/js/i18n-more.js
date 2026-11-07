@@ -2440,7 +2440,7 @@ Object.assign(window.I18N, {
     "bt.typing":"Dactylo rapide et précis — saisie rapide en kurde, arabe et anglais.",
     "bio.education":"Formation",
     "bio.honors":"Honneurs & Prix",
-    "bio.press":"Reconnaissance & Sources",
+    "bio.press":"Reconnais­sance & Sources",
     "bio.press.lede":"Des preuves, pas des adjectifs : plus de 1 000 travaux achevés dans les archives, près de 25 organisations servies depuis 2014, des distinctions de la Présidence de la Région du Kurdistan, et un nom crédité dans l'imprimé et la presse bien au-delà du Kurdistan.",
     "bio.languages":"Langues",
     "bio.orgs":"Organisations",

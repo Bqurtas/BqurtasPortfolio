@@ -6967,7 +6967,22 @@ html body #blog#blog#blog#blog#blog .blog-card-cta {
   background: none !important;
   color: var(--ink) !important;
 }
+html body #blog#blog#blog#blog#blog .blog-card-cover:has(> img[hidden]) { display: none !important; }
+html body #blog#blog#blog#blog#blog .index-layout--blog .index-row.is-active { border-block-end-color: var(--ink) !important; }
 html body #blog#blog#blog#blog#blog .blog-pager:not(:has(.blog-page + .blog-page)) { display: none !important; }
+html body #blog#blog#blog#blog#blog :is(.blog-pager-arrow, .blog-page, .blog-pager-go button),
+html body #blog#blog#blog#blog#blog :is(.blog-pager-arrow, .blog-page, .blog-pager-go button):is(:hover, :focus-visible) {
+  border: 0 !important;
+  border-block-end: 1px solid transparent !important;
+  border-radius: 0 !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html body #blog#blog#blog#blog#blog .blog-page.is-active,
+html body #blog#blog#blog#blog#blog .blog-page.is-active:is(:hover, :focus-visible) { border-block-end-color: var(--ink) !important; }
+html body #blog#blog#blog#blog#blog .blog-pager-go input { border: 0 !important; border-block-end: 1px solid var(--room-line) !important; border-radius: 0 !important; background: none !important; }
 /* The newsletter: one sentence and one line to write on. */
 html body #blog#blog#blog#blog#blog .subscribe {
   display: grid !important;
@@ -6980,7 +6995,7 @@ html body #blog#blog#blog#blog#blog .subscribe {
   text-align: center !important;
 }
 html body #blog#blog#blog#blog#blog .subscribe-eyebrow { display: none !important; }
-html body #blog#blog#blog#blog#blog .subscribe-title { margin: 0 !important; font-size: var(--room-title) !important; line-height: 1.08 !important; }
+html body #blog#blog#blog#blog#blog .subscribe-title { margin: 0 auto !important; font-size: var(--room-title) !important; line-height: 1.08 !important; }
 html body #blog#blog#blog#blog#blog .subscribe-text p { max-width: 48ch !important; margin: clamp(10px, 1.8svh, 18px) auto 0 !important; font-size: clamp(15px, 1.3vw, 18px) !important; line-height: 1.6 !important; color: var(--room-soft) !important; }
 html body #blog#blog#blog#blog#blog .subscribe-form {
   display: grid !important;
@@ -7060,7 +7075,8 @@ html body #contact#contact#contact#contact#contact .qc-card:is(:hover, :focus-vi
   backdrop-filter: none !important;
   transform: none !important;
 }
-html body #contact#contact#contact#contact#contact .qc-card > i { display: none !important; }
+html body #contact#contact#contact#contact#contact .qc-card > i,
+html body #contact#contact#contact#contact#contact .qc-card::after { display: none !important; }
 html body #contact#contact#contact#contact#contact .qc-card > div {
   display: grid !important;
   grid-template-columns: minmax(84px, .36fr) minmax(0, 1fr) !important;
@@ -7093,8 +7109,8 @@ html body #contact#contact#contact#contact#contact .pitch-form :is(input:not([ty
   box-shadow: none !important;
 }
 html body #contact#contact#contact#contact#contact .pitch-form :is(input:not([type="checkbox"]), select, textarea):focus { border-block-end-color: var(--ink) !important; outline: 0 !important; }
-html body #contact#contact#contact#contact#contact .pitch-form [aria-invalid="true"],
-html body #contact#contact#contact#contact#contact .pitch-form [aria-invalid="true"]:is(:hover, :focus) { border-block-end: 2px solid var(--ink) !important; }
+html body #contact#contact#contact#contact#contact .pitch-form :is(input:not([type="checkbox"]), select, textarea)[aria-invalid="true"] { border-block-end: 2px solid var(--ink) !important; }
+html body #contact#contact#contact#contact#contact .contact-status { color: var(--ink) !important; }
 html body #contact#contact#contact#contact#contact .pitch-submit,
 html body #contact#contact#contact#contact#contact .pitch-submit:is(:hover, :focus-visible) {
   justify-self: start !important;
@@ -7131,6 +7147,7 @@ html body #bio#bio#bio#bio#bio .bio-chapter-index {
   color: var(--room-soft) !important;
 }
 html body #bio#bio#bio#bio#bio .bio-block-title,
+html body #bio#bio#bio#bio#bio.paper-stack > .bio-kit-sheet .bio-chapter-heading > .bio-block-title,
 html body #bio#bio#bio#bio#bio.paper-stack > :is(.bio-kit-sheet, .bio-record-sheet, .bio-education-sheet, .bio-world-sheet, .bio-honors-sheet, .bio-proof-sheet) .bio-block > .bio-block-title {
   display: flex !important;
   flex-wrap: nowrap !important;
@@ -7169,7 +7186,7 @@ html body #bio#bio#bio#bio#bio .bio-block::before,
 html body #bio#bio#bio#bio#bio .bio-block::after { display: none !important; }
 html body #bio#bio#bio#bio#bio .bio-chapter-heading { margin: 0 !important; padding: 0 !important; border: 0 !important; }
 html body #bio#bio#bio#bio#bio .bio-story-sheet .section-title { max-inline-size: none !important; font-size: var(--bio-t1) !important; overflow-wrap: normal !important; }
-html body #bio#bio#bio#bio#bio .bio-story-sheet .section-head { margin-block-end: clamp(14px, 3svh, 30px) !important; padding-block-end: clamp(14px, 3svh, 30px) !important; border-block-end: 1px solid var(--room-line) !important; }
+html body #bio#bio#bio#bio#bio .bio-story-sheet .section-head { margin-block-end: clamp(14px, 3svh, 30px) !important; }
 /* Experience and education. */
 html body #bio#bio#bio#bio#bio .timeline { display: grid !important; gap: 0 !important; margin: 0 !important; padding: 0 !important; border: 0 !important; border-block-start: 1px solid var(--room-line) !important; }
 html body #bio#bio#bio#bio#bio .timeline::before { display: none !important; }
@@ -7229,7 +7246,7 @@ html body #bio#bio#bio#bio#bio .bio-connect-links .bio-social > .bio-social-text
 html body #bio#bio#bio#bio#bio .bio-connect-links .bio-social > .bio-social-go { position: static !important; grid-column: 2 !important; grid-row: 1 !important; margin: 0 !important; }
 html body #bio#bio#bio#bio#bio .bio-social-title { margin: 4px 0 !important; font-size: var(--bio-t2) !important; line-height: 1.25 !important; }
 html body #bio#bio#bio#bio#bio .bio-social-desc { margin: 0 !important; font-size: calc(var(--bio-body) * .94) !important; line-height: 1.55 !important; color: var(--room-soft) !important; }
-html body #bio#bio#bio#bio#bio .bio-social-handle { display: none !important; }
+html body #bio#bio#bio#bio#bio :is(.bio-connect-sheet, .bio-docs-sheet) .bio-social-handle { display: none !important; }
 /* Languages. */
 html body #bio#bio#bio#bio#bio .langs-grid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 0 clamp(24px, 4vw, 56px) !important; border-block-start: 1px solid var(--room-line) !important; }
 html body #bio#bio#bio#bio#bio .lang-item { display: block !important; padding: clamp(10px, 1.9svh, 18px) 0 !important; border: 0 !important; border-block-end: 1px solid var(--room-line) !important; border-radius: 0 !important; background: none !important; }
@@ -7237,8 +7254,9 @@ html body #bio#bio#bio#bio#bio .lang-item > i { display: none !important; }
 html body #bio#bio#bio#bio#bio .lang-item h4 { margin: 0 0 2px !important; font-size: var(--bio-t2) !important; }
 html body #bio#bio#bio#bio#bio .lang-item p { margin: 0 !important; color: var(--room-soft) !important; }
 /* Certificates: the same open hairline grid as the logos. */
-html body #bio#bio#bio#bio#bio .cert-grid { gap: 0 !important; overflow: hidden !important; }
+html body #bio#bio#bio#bio#bio > .bio-proof-sheet .cert-grid { gap: 0 !important; overflow: hidden !important; }
 html body #bio#bio#bio#bio#bio .bio-proof-sheet .cert-item {
+  inline-size: calc(100% + 1px) !important;
   margin-inline-end: -1px !important;
   margin-block-end: -1px !important;
   padding: clamp(6px, 1.2svh, 12px) !important;
@@ -7250,11 +7268,12 @@ html body #bio#bio#bio#bio#bio .bio-proof-sheet .cert-item {
 }
 html body #bio#bio#bio#bio#bio .bio-proof-sheet .cert-img-wrap { border: 0 !important; border-radius: 0 !important; background: none !important; }
 html body #bio#bio#bio#bio#bio .bio-proof-sheet .cert-label { display: none !important; }
+html body #bio#bio#bio#bio#bio .bio-proof-sheet .cert-item:focus-visible { outline-offset: -2px !important; }
+html body #bio#bio#bio#bio#bio .bio-proof-sheet .cert-zoom { background: none !important; }
+html body #bio#bio#bio#bio#bio .bio-proof-sheet .cert-item:hover .cert-img-wrap img { filter: brightness(.55) !important; }
 
 /* The short chapters carry fewer words, so each word stands larger. */
-@media (min-width: 821px) {
-  html body #bio#bio#bio#bio#bio .bio-kit-sheet .tool { font-size: var(--bio-body) !important; }
-}
+html body #bio#bio#bio#bio#bio > .bio-kit-sheet .bio-chapter-heading > .bio-block-lede { margin: 12px 0 0 !important; font-size: var(--bio-body) !important; }
 html body #bio#bio#bio#bio#bio .bio-kit-sheet .tools-grid { gap: clamp(8px, 1.6svh, 14px) 22px !important; }
 html body #bio#bio#bio#bio#bio :is(.bio-education-sheet .bio-card h4, .bio-docs-sheet .bio-social-title) { font-size: var(--bio-t1) !important; line-height: 1.16 !important; }
 html body #bio#bio#bio#bio#bio .bio-docs-sheet .bio-social-desc { font-size: var(--bio-body) !important; }
@@ -7277,3 +7296,24 @@ html body #bio#bio#bio#bio#bio .bio-docs-sheet .bio-social-desc { font-size: var
   html body #bio#bio#bio#bio#bio .langs-grid,
   html body #bio#bio#bio#bio#bio .bio-tools-directory { grid-template-columns: minmax(0, 1fr) !important; }
 }
+
+/* The list stands alone once the preview column is gone. */
+@media (max-width: 1024px) {
+  html body #blog#blog#blog#blog#blog .index-layout--blog { grid-template-columns: minmax(0, 1fr) !important; }
+}
+@media (max-width: 820px) {
+  html body #bio#bio#bio#bio#bio .bio-block.bio-tools { grid-template-columns: minmax(0, 1fr) !important; }
+}
+/* Kurdish and Arabic need taller lines than the Latin titles above. */
+html[dir="rtl"] body :is(#blog#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact#contact) :is(.section-title, .bio-block-title, .subscribe-title, .pitch-head h3) { line-height: 1.4 !important; }
+html[dir="rtl"] body :is(#blog#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio#bio) :is(.index-row-title, .tl-card h4, .bio-card h4, .bio-social-title) { line-height: 1.55 !important; }
+html[dir="rtl"] body :is(.pitch-submit, .subscribe-form button, .blog-card-cta) .fa-arrow-right { transform: scaleX(-1); }
+/* Autofill stays on the paper instead of painting a tinted slab. */
+html body #contact#contact#contact#contact#contact .pitch-form input:-webkit-autofill,
+html body #blog#blog#blog#blog#blog .subscribe-field input:-webkit-autofill {
+  -webkit-text-fill-color: var(--ink) !important;
+  caret-color: var(--ink);
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+}
+html[data-theme="dark"] body #bio#bio#bio#bio .bio-kit-sheet .tool-ic img[src$="/chatgpt.svg"] { filter: invert(1); }
