@@ -6672,7 +6672,10 @@ html body #design#design#design#design.paper-stack > .hero.hero-editorial.paper-
 }
 html body #design#design#design#design .hero-editorial :is(.hero-edition, .hero-kicker) { display: none !important; }
 html body #design#design#design#design .hero-editorial .hero-inner {
-  --pw: min(45svh, 86vw, 1100px);
+  /* --pw sizes the drawing (made a little smaller, owner 2026-11-07);
+     --pt keeps the words and the name at their earlier size. */
+  --pw: min(40svh, 78vw, 980px);
+  --pt: min(45svh, 86vw, 1100px);
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) !important;
   grid-template-rows: none !important;
@@ -6701,10 +6704,10 @@ html body #design#design#design#design .hero-editorial .hero-portrait {
   margin: 0 !important;
   box-shadow: none !important;
 }
-/* The drawing's open lines dissolve into the paper instead of stopping short. */
+/* The drawing ends where it ends (owner, 2026-11-07: no fade under the picture). */
 html body #design#design#design#design .hero-editorial .hero-portrait img {
-  -webkit-mask-image: linear-gradient(to bottom, #000 80%, transparent 99%);
-  mask-image: linear-gradient(to bottom, #000 80%, transparent 99%);
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
 }
 html body #design#design#design#design .hero-editorial .hero-sign {
   grid-area: name !important;
@@ -6718,17 +6721,43 @@ html body #design#design#design#design .hero-editorial .hero-sign {
   line-height: 1.3 !important;
 }
 html body #design#design#design#design .hero-editorial .hero-sign > span { color: var(--ink) !important; }
+/* The handwritten name (owner, 2026-11-07): the film from the brand kit takes
+   the place of the set name, which stays in the heading for readers and
+   search but is not drawn twice. Ink in light, paper-white in dark. */
+html body #design#design#design#design .hero-editorial .hero-sign--written {
+  display: block !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+html body #design#design#design#design .hero-editorial .hero-sign--written > span {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+}
+html body #design#design#design#design .hero-editorial .hero-sign-hand {
+  display: block;
+  width: min(calc(var(--pt) * 1.25), 88vw);
+  height: auto;
+  margin-inline: auto;
+  pointer-events: none;
+  user-select: none;
+}
+html:root[data-theme="dark"] body #design#design#design#design .hero-editorial .hero-sign-hand { filter: invert(1) brightness(.93); }
 html body #design#design#design#design .hero-editorial .hero-copy {
   grid-area: copy;
   display: grid;
   justify-items: center;
-  row-gap: clamp(8px, calc(var(--pw) * .035), 26px);
-  margin-block-start: clamp(4px, calc(var(--pw) * .02), 16px);
+  row-gap: clamp(8px, calc(var(--pt) * .035), 26px);
+  margin-block-start: clamp(4px, calc(var(--pt) * .02), 16px);
 }
 html body #design#design#design#design .hero-editorial .hero-lede {
   grid-area: auto !important;
   max-width: 54ch !important;
-  font-size: clamp(13.5px, calc(var(--pw) * .04), 25px) !important;
+  font-size: clamp(13.5px, calc(var(--pt) * .04), 25px) !important;
   line-height: 1.55 !important;
   text-align: inherit !important;
 }
@@ -6737,11 +6766,12 @@ html body #design#design#design#design .hero-editorial .hero-cta {
   justify-self: center !important;
   gap: 18px !important;
   min-height: 44px !important;
-  font-size: clamp(13px, calc(var(--pw) * .036), 21px) !important;
+  font-size: clamp(13px, calc(var(--pt) * .036), 21px) !important;
 }
 @media (max-height: 640px) and (min-aspect-ratio: 5/4) {
   html body #design#design#design#design .hero-editorial .hero-inner {
-    --pw: min(74svh, 40vw);
+    --pw: min(66svh, 36vw);
+    --pt: min(74svh, 40vw);
     grid-template-columns: auto minmax(0, auto) !important;
     grid-template-rows: auto auto !important;
     grid-template-areas: 'portrait name' 'portrait copy' !important;
@@ -6754,6 +6784,7 @@ html body #design#design#design#design .hero-editorial .hero-cta {
   }
   html body #design#design#design#design .hero-editorial .hero-title { grid-row: 1 / 3; align-self: center !important; }
   html body #design#design#design#design .hero-editorial .hero-sign { margin: 0 !important; font-size: min(calc(var(--pw) * .2), 6vw) !important; }
+  html body #design#design#design#design .hero-editorial .hero-sign-hand { width: min(calc(var(--pt) * 1.05), 46vw); margin-inline: 0; }
   html body #design#design#design#design .hero-editorial .hero-copy { align-self: start; justify-items: start; }
   html body #design#design#design#design .hero-editorial .hero-lede { max-width: 40ch !important; }
   html body #design#design#design#design .hero-editorial .hero-cta { justify-self: start !important; }

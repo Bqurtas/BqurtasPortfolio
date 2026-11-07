@@ -419,7 +419,7 @@ test('portrait source selection follows phone, landscape and desktop display siz
   const widths = [...variants.map(item => item.width), 1200];
   for (const [width, height, dpr, expected] of [
     [412,823,1.75,640],
-    [390,844,3,1200],
+    [390,844,3,960],   // the smaller picture (owner, 2026-11-07) needs 913 device pixels here
     [320,568,2,512],
     [740,390,2,640],
     [768,1024,2,960],
