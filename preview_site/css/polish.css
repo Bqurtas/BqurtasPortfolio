@@ -6770,7 +6770,7 @@ html body #design.paper-stack > .paper-sheet[data-paper-fit] :is(.section-num, .
 }
 /* Room labels share the floor. Text the room rules already size against the fit
    stays out, or it would be enlarged twice. */
-html body :is(#bio, #blog, #contact).paper-stack > .paper-sheet[data-paper-fit] :is(.section-num, .mono):not(.mono .mono, .section-num .mono, .bio-chapter-index, .index-card *, .pitch-form *, .cert-item *, .bio-tools *) {
+html body :is(#bio, #blog, #contact).paper-stack > .paper-sheet[data-paper-fit] :is(.section-num, .mono):not(.mono .mono, .section-num .mono, .bio-chapter-index, .index-card--blog *, .pitch-form *, .cert-item *, .bio-tools *) {
   zoom: max(1, calc(.85 / var(--bq-paper-fit, 1)));
 }
 /* Chapter 01's numeral sits inside a floored label and already follows the fit. */
@@ -6804,7 +6804,7 @@ html body #blog#blog#blog#blog .blog-filter { font-size: max(10.5px, calc(10.5px
    can measure it. Plain centring pushed the top of the sheet out of sight and
    read as "it fits". */
 html body #design#design#design#design.paper-stack > .section:not(.work).paper-sheet > .paper-scroll,
-html body :is(#bio, #blog, #contact).paper-stack > .section.paper-sheet > .paper-scroll {
+html body :is(#bio#bio#bio#bio#bio, #blog#blog#blog#blog#blog, #contact#contact#contact#contact#contact).paper-stack > .section.paper-sheet > .paper-scroll {
   justify-content: safe center !important;
 }
 @media (max-height: 640px) {
@@ -6827,4 +6827,453 @@ html[dir="rtl"] body #design#design#design#design#design :is(.section-title em, 
 html body .sites-stage .site-row:focus-visible {
   outline-color: var(--site-on) !important;
   outline-offset: 5px !important;
+}
+
+/* ============================================================================
+   THE ROOMS (owner, 2026-11-07: "continue with the rooms", "simple, not crowded",
+   only the site's white and black). One language: paper, type and hairlines, with
+   no pills, tinted cards or boxes. Each room keeps its own idea: the Journal is a
+   reading list, the Biography a book of chapters, Contact a printed letter.
+   ========================================================================== */
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) {
+  --room-line: color-mix(in srgb, var(--ink) 16%, transparent);
+  --room-soft: color-mix(in srgb, var(--ink) 66%, transparent);
+  --room-title: clamp(34px, min(5vw, 8.4svh), 76px);
+}
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact).paper-stack > .section[data-paper-fit] { --bq-paper-content-max: 1160px; }
+
+/* Title pages: one word and one line, centred, like the home hero. */
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact).paper-stack > .room-hero.paper-sheet > .paper-scroll {
+  align-items: center !important;
+  justify-content: safe center !important;
+  text-align: center !important;
+}
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .room-hero :is(.room-hero-num, .room-hero-corner, .room-hero-ghost, .room-hero-scroll) { display: none !important; }
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .room-hero-inner {
+  display: grid !important;
+  justify-items: center !important;
+  gap: clamp(12px, 2.4svh, 26px) !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  text-align: center !important;
+}
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .room-hero-title {
+  margin: 0 !important;
+  font-size: clamp(52px, min(12vw, 19svh), 180px) !important;
+  line-height: 1.04 !important;
+  text-align: center !important;
+}
+html[dir="rtl"] body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .room-hero-title {
+  font-size: clamp(44px, min(9.5vw, 15svh), 140px) !important;
+  line-height: 1.3 !important;
+}
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .room-hero-sub {
+  max-width: 46ch !important;
+  margin: 0 !important;
+  font-size: clamp(15px, min(1.4vw, 2.3svh), 20px) !important;
+  line-height: 1.55 !important;
+  text-align: center !important;
+  color: var(--room-soft) !important;
+}
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .room-hero-return,
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .room-hero-return:is(:hover, :focus-visible) {
+  border: 0 !important;
+  background: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Labels are plain small type. */
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) :is(.section-num, .bio-phil-eyebrow, .subscribe-eyebrow, .pitch-mail, .pitch-head > .mono) {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  color: var(--room-soft) !important;
+}
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .section-num > i,
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .bio-phil-eyebrow > i,
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .pitch-head > .mono > i { display: none !important; }
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .section-title {
+  margin: 0 !important;
+  font-size: var(--room-title) !important;
+  line-height: 1.08 !important;
+}
+
+/* ---- The Journal: a reading list ------------------------------------------- */
+html body #blog#blog#blog#blog#blog .blog-index-sheet .sheet-mid { flex: 0 0 auto !important; max-height: none !important; justify-content: safe center !important; }
+html body #blog#blog#blog#blog#blog .blog-index-sheet .section-head {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: end !important;
+  gap: 6px clamp(20px, 4vw, 56px) !important;
+  margin: 0 0 clamp(14px, 2.6svh, 28px) !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+html body #blog#blog#blog#blog#blog .blog-index-sheet .section-num { grid-column: 1 / -1; }
+html body #blog#blog#blog#blog#blog .blog-index-sheet .section-lede { max-width: 30ch !important; margin: 0 !important; font-size: 15px !important; color: var(--room-soft) !important; text-align: end !important; }
+html body #blog#blog#blog#blog#blog .blog-filters { gap: 20px !important; margin-block: 0 clamp(8px, 1.6svh, 18px) !important; }
+html body #blog#blog#blog#blog#blog .blog-filter,
+html body #blog#blog#blog#blog#blog .blog-filter:is(:hover, :focus-visible, .is-active) {
+  min-block-size: 0 !important;
+  padding: 0 0 4px !important;
+  border: 0 !important;
+  border-block-end: 1px solid transparent !important;
+  border-radius: 0 !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  color: var(--room-soft) !important;
+}
+html body #blog#blog#blog#blog#blog .blog-filter.is-active { border-block-end-color: var(--ink) !important; color: var(--ink) !important; }
+html body #blog#blog#blog#blog#blog .index-layout--blog {
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr) !important;
+  gap: clamp(28px, 5vw, 76px) !important;
+  align-items: start !important;
+}
+html body #blog#blog#blog#blog#blog .index-layout--blog .index-list { border-block-start: 1px solid var(--room-line) !important; }
+html body #blog#blog#blog#blog#blog .index-layout--blog .index-row {
+  padding-block: clamp(14px, 2.4svh, 26px) !important;
+  border: 0 !important;
+  border-block-end: 1px solid var(--room-line) !important;
+  background: none !important;
+}
+html body #blog#blog#blog#blog#blog .index-layout--blog .index-row-title { font-size: clamp(20px, min(2.3vw, 3.6svh), 32px) !important; line-height: 1.22 !important; }
+html body #blog#blog#blog#blog#blog .index-card--blog {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html body #blog#blog#blog#blog#blog .index-card--blog :is(.blog-card-title, .blog-card-foot, .blog-card-tag) { display: none !important; }
+html body #blog#blog#blog#blog#blog .blog-card-cover { border-radius: 16px !important; background: none !important; }
+html body #blog#blog#blog#blog#blog .blog-card-body { display: grid !important; justify-items: start !important; gap: 12px !important; padding: 14px 0 0 !important; background: none !important; }
+html body #blog#blog#blog#blog#blog .blog-card-excerpt { margin: 0 !important; font-size: 15.5px !important; line-height: 1.6 !important; color: var(--room-soft) !important; }
+html body #blog#blog#blog#blog#blog .blog-card-cta {
+  padding: 0 0 5px !important;
+  border: 0 !important;
+  border-block-end: 1px solid currentColor !important;
+  border-radius: 0 !important;
+  background: none !important;
+  color: var(--ink) !important;
+}
+html body #blog#blog#blog#blog#blog .blog-pager:not(:has(.blog-page + .blog-page)) { display: none !important; }
+/* The newsletter: one sentence and one line to write on. */
+html body #blog#blog#blog#blog#blog .subscribe {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  justify-items: center !important;
+  gap: clamp(20px, 3.6svh, 40px) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  text-align: center !important;
+}
+html body #blog#blog#blog#blog#blog .subscribe-eyebrow { display: none !important; }
+html body #blog#blog#blog#blog#blog .subscribe-title { margin: 0 !important; font-size: var(--room-title) !important; line-height: 1.08 !important; }
+html body #blog#blog#blog#blog#blog .subscribe-text p { max-width: 48ch !important; margin: clamp(10px, 1.8svh, 18px) auto 0 !important; font-size: clamp(15px, 1.3vw, 18px) !important; line-height: 1.6 !important; color: var(--room-soft) !important; }
+html body #blog#blog#blog#blog#blog .subscribe-form {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 0 18px !important;
+  inline-size: min(100%, 520px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-block-end: 1px solid var(--ink) !important;
+  background: none !important;
+}
+html body #blog#blog#blog#blog#blog .subscribe-field {
+  min-block-size: 50px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html body #blog#blog#blog#blog#blog .subscribe-field > i { display: none !important; }
+html body #blog#blog#blog#blog#blog .subscribe-field input { padding: 0 !important; border: 0 !important; background: none !important; text-align: start !important; }
+html body #blog#blog#blog#blog#blog .subscribe-form button,
+html body #blog#blog#blog#blog#blog .subscribe-form button:is(:hover, :focus-visible) {
+  min-block-size: 44px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  color: var(--ink) !important;
+  font-weight: 600 !important;
+}
+html body #blog#blog#blog#blog#blog .subscribe-status { grid-column: 1 / -1 !important; }
+
+/* ---- Contact: a printed letter --------------------------------------------- */
+html body #contact#contact#contact#contact#contact .contact-reach-sheet .sheet-mid,
+html body #contact#contact#contact#contact#contact .pitch-wrap {
+  display: grid !important;
+  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr) !important;
+  gap: clamp(28px, 6vw, 96px) !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin-block: 0 !important;
+  margin-inline: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html body #contact#contact#contact#contact#contact .contact-eyebrow { display: none !important; }
+html body #contact#contact#contact#contact#contact .contact-reach-sheet .section-head { margin: 0 !important; padding: 0 !important; border: 0 !important; }
+html body #contact#contact#contact#contact#contact .contact-quick {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 0 !important;
+  margin: 0 !important;
+  border-block-start: 1px solid var(--room-line) !important;
+}
+html body #contact#contact#contact#contact#contact .qc-card,
+html body #contact#contact#contact#contact#contact .qc-card:is(:hover, :focus-visible) {
+  display: block !important;
+  padding: clamp(14px, 2.6svh, 26px) 0 !important;
+  border: 0 !important;
+  border-block-end: 1px solid var(--room-line) !important;
+  border-radius: 0 !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  transform: none !important;
+}
+html body #contact#contact#contact#contact#contact .qc-card > i { display: none !important; }
+html body #contact#contact#contact#contact#contact .qc-card > div {
+  display: grid !important;
+  grid-template-columns: minmax(84px, .36fr) minmax(0, 1fr) !important;
+  align-items: baseline !important;
+  gap: 16px !important;
+}
+html body #contact#contact#contact#contact#contact .qc-card .mono { color: var(--room-soft) !important; }
+html body #contact#contact#contact#contact#contact .qc-card p { margin: 0 !important; font-size: clamp(18px, min(1.9vw, 3.2svh), 28px) !important; line-height: 1.3 !important; color: var(--ink) !important; }
+html body #contact#contact#contact#contact#contact .pitch-wrap { align-items: start !important; }
+html body #contact#contact#contact#contact#contact .pitch-head h3 { margin: clamp(8px, 1.4svh, 14px) 0 !important; font-size: clamp(30px, min(3.6vw, 6svh), 54px) !important; line-height: 1.1 !important; }
+html body #contact#contact#contact#contact#contact .pitch-head .section-lede { align-self: flex-start !important; max-width: 38ch !important; margin: 0 0 14px !important; padding: 0 !important; border: 0 !important; text-indent: 0 !important; font-size: 15.5px !important; line-height: 1.6 !important; color: var(--room-soft) !important; text-align: start !important; }
+html body #contact#contact#contact#contact#contact .pitch-mail > i { display: none !important; }
+html body #contact#contact#contact#contact#contact .pitch-form {
+  gap: clamp(8px, 1.5svh, 16px) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+html body #contact#contact#contact#contact#contact .pitch-form label > i { display: none !important; }
+html body #contact#contact#contact#contact#contact .pitch-form label { color: var(--room-soft) !important; }
+html body #contact#contact#contact#contact#contact .pitch-form :is(input:not([type="checkbox"]), select, textarea),
+html body #contact#contact#contact#contact#contact .pitch-form :is(input:not([type="checkbox"]), select, textarea):is(:hover, :focus) {
+  padding-inline: 0 !important;
+  border: 0 !important;
+  border-block-end: 1px solid var(--room-line) !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+html body #contact#contact#contact#contact#contact .pitch-form :is(input:not([type="checkbox"]), select, textarea):focus { border-block-end-color: var(--ink) !important; outline: 0 !important; }
+html body #contact#contact#contact#contact#contact .pitch-form [aria-invalid="true"],
+html body #contact#contact#contact#contact#contact .pitch-form [aria-invalid="true"]:is(:hover, :focus) { border-block-end: 2px solid var(--ink) !important; }
+html body #contact#contact#contact#contact#contact .pitch-submit,
+html body #contact#contact#contact#contact#contact .pitch-submit:is(:hover, :focus-visible) {
+  justify-self: start !important;
+  inline-size: auto !important;
+  min-block-size: 46px !important;
+  padding: 0 24px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--ink) !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  color: var(--bq-paper-sheet) !important;
+}
+html body #contact#contact#contact#contact#contact .pitch-submit :is(span, i) { color: inherit !important; }
+html body #contact#contact#contact#contact#contact .pitch-submit > .fa-paper-plane { display: none !important; }
+
+/* ---- The Biography: a book of chapters -------------------------------------- */
+html body #bio#bio#bio#bio#bio {
+  --bio-t1: clamp(28px, min(3.3vw, 5.4svh), 46px);
+  --bio-t2: clamp(18px, min(1.7vw, 2.9svh), 24px);
+  --bio-body: clamp(14.5px, min(1.2vw, 2svh), 17px);
+  --bio-rule: var(--room-line);
+}
+html body #bio#bio#bio#bio#bio .bio-chapter-index {
+  flex: none !important;
+  min-inline-size: 0 !important;
+  inline-size: auto !important;
+  block-size: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  color: var(--room-soft) !important;
+}
+html body #bio#bio#bio#bio#bio .bio-block-title,
+html body #bio#bio#bio#bio#bio.paper-stack > :is(.bio-kit-sheet, .bio-record-sheet, .bio-education-sheet, .bio-world-sheet, .bio-honors-sheet, .bio-proof-sheet) .bio-block > .bio-block-title {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: baseline !important;
+  gap: 14px !important;
+  width: auto !important;
+  max-width: none !important;
+  inline-size: auto !important;
+  max-inline-size: none !important;
+  margin: 0 !important;
+  font-size: var(--bio-t1) !important;
+  line-height: 1.14 !important;
+  overflow-wrap: normal !important;
+}
+html body #bio#bio#bio#bio#bio.paper-stack > .section .bio-block > :is(.bio-block-title, .bio-block-lede) { float: none !important; clear: none !important; inline-size: auto !important; }
+html body #bio#bio#bio#bio#bio.paper-stack > .section .bio-block > :is(.bio-block-title, .bio-block-lede) ~ :not(.bio-block-title, .bio-block-lede) { margin-inline-start: 0 !important; }
+html body #bio#bio#bio#bio#bio .bio-block-title > [data-i18n] { flex: 0 1 auto !important; min-width: 0 !important; width: auto !important; max-width: none !important; }
+html body #bio#bio#bio#bio#bio .bio-block-title > i { display: none !important; }
+html body #bio#bio#bio#bio#bio .bio-block-lede { margin: 12px 0 0 !important; max-width: 34ch !important; font-size: var(--bio-body) !important; line-height: 1.6 !important; color: var(--room-soft) !important; }
+/* A chapter is a page: its title in the margin, its matter beside it. */
+html body #bio#bio#bio#bio#bio .sheet-mid { width: 100% !important; }
+html body #bio#bio#bio#bio#bio .bio-block:not(.bio-social, .bio-philosophy),
+html body #bio#bio#bio#bio#bio :is(.bio-press-sheet, .bio-connect-sheet) .sheet-mid {
+  display: grid !important;
+  grid-template-columns: minmax(0, .36fr) minmax(0, 1fr) !important;
+  gap: clamp(20px, 3svh, 32px) clamp(28px, 5vw, 80px) !important;
+  align-items: start !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html body #bio#bio#bio#bio#bio .bio-block::before,
+html body #bio#bio#bio#bio#bio .bio-block::after { display: none !important; }
+html body #bio#bio#bio#bio#bio .bio-chapter-heading { margin: 0 !important; padding: 0 !important; border: 0 !important; }
+html body #bio#bio#bio#bio#bio .bio-story-sheet .section-title { max-inline-size: none !important; font-size: var(--bio-t1) !important; overflow-wrap: normal !important; }
+html body #bio#bio#bio#bio#bio .bio-story-sheet .section-head { margin-block-end: clamp(14px, 3svh, 30px) !important; padding-block-end: clamp(14px, 3svh, 30px) !important; border-block-end: 1px solid var(--room-line) !important; }
+/* Experience and education. */
+html body #bio#bio#bio#bio#bio .timeline { display: grid !important; gap: 0 !important; margin: 0 !important; padding: 0 !important; border: 0 !important; border-block-start: 1px solid var(--room-line) !important; }
+html body #bio#bio#bio#bio#bio .timeline::before { display: none !important; }
+html body #bio#bio#bio#bio#bio .tl-item { margin: 0 !important; padding: clamp(14px, 2.6svh, 26px) 0 !important; border: 0 !important; border-block-end: 1px solid var(--room-line) !important; }
+html body #bio#bio#bio#bio#bio .tl-dot { display: none !important; }
+html body #bio#bio#bio#bio#bio :is(.tl-card, .bio-card) { padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: none !important; background-image: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html body #bio#bio#bio#bio#bio .bio-card { padding-block: clamp(14px, 2.6svh, 26px) !important; border-block: 1px solid var(--room-line) !important; }
+html body #bio#bio#bio#bio#bio :is(.tl-card h4, .bio-card h4) { margin: 0 0 6px !important; font-size: var(--bio-t2) !important; line-height: 1.25 !important; }
+html body #bio#bio#bio#bio#bio :is(.tl-org, .tl-loc, .tl-skills) > i { display: none !important; }
+html body #bio#bio#bio#bio#bio :is(.tl-org, .tl-loc, .tl-desc, .bio-card p) { margin: 0 0 3px !important; font-size: calc(var(--bio-body) * .96) !important; line-height: 1.55 !important; }
+html body #bio#bio#bio#bio#bio .tl-skills { margin: 8px 0 0 !important; padding: 0 !important; border: 0 !important; background: none !important; color: var(--room-soft) !important; }
+/* Tools. */
+html body #bio#bio#bio#bio#bio .bio-tools-directory { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: clamp(14px, 2.6svh, 28px) clamp(24px, 4vw, 56px) !important; }
+html body #bio#bio#bio#bio#bio .tools-group { padding: 12px 0 0 !important; border: 0 !important; border-block-start: 1px solid var(--room-line) !important; background: none !important; }
+html body #bio#bio#bio#bio#bio .tools-grid { gap: 8px 16px !important; }
+html body #bio#bio#bio#bio#bio .tool { background: none !important; border: 0 !important; padding: 0 !important; font-size: calc(var(--bio-body) * .94) !important; }
+/* Honours. */
+html body #bio#bio#bio#bio#bio .index-layout--honors { gap: clamp(24px, 4vw, 56px) !important; }
+html body #bio#bio#bio#bio#bio .index-layout--honors .index-card {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+/* Sources, links and documents: rows on a rule. */
+html body #bio#bio#bio#bio#bio .bio-connect-links {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 0 !important;
+  margin: 0 !important;
+  border-block-start: 1px solid var(--room-line) !important;
+}
+html body #bio#bio#bio#bio#bio .bio-connect-links--press,
+html body #bio#bio#bio#bio#bio .bio-connect-links--docs { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; column-gap: clamp(24px, 4vw, 56px) !important; }
+html body #bio#bio#bio#bio#bio .bio-connect-links .bio-social,
+html body #bio#bio#bio#bio#bio .bio-connect-links .bio-social:is(:hover, :focus-visible) {
+  display: grid !important;
+  grid-template-areas: none !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: start !important;
+  gap: 16px !important;
+  padding: clamp(14px, 2.4svh, 24px) 0 !important;
+  border: 0 !important;
+  border-block-end: 1px solid var(--room-line) !important;
+  border-radius: 0 !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  transform: none !important;
+}
+html body #bio#bio#bio#bio#bio .bio-social-mark { display: none !important; }
+html body #bio#bio#bio#bio#bio .bio-connect-links .bio-social > .bio-social-text { grid-column: 1 !important; grid-row: 1 !important; margin: 0 !important; padding: 0 !important; }
+html body #bio#bio#bio#bio#bio .bio-connect-links .bio-social > .bio-social-go { position: static !important; grid-column: 2 !important; grid-row: 1 !important; margin: 0 !important; }
+html body #bio#bio#bio#bio#bio .bio-social-title { margin: 4px 0 !important; font-size: var(--bio-t2) !important; line-height: 1.25 !important; }
+html body #bio#bio#bio#bio#bio .bio-social-desc { margin: 0 !important; font-size: calc(var(--bio-body) * .94) !important; line-height: 1.55 !important; color: var(--room-soft) !important; }
+html body #bio#bio#bio#bio#bio .bio-social-handle { display: none !important; }
+/* Languages. */
+html body #bio#bio#bio#bio#bio .langs-grid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 0 clamp(24px, 4vw, 56px) !important; border-block-start: 1px solid var(--room-line) !important; }
+html body #bio#bio#bio#bio#bio .lang-item { display: block !important; padding: clamp(10px, 1.9svh, 18px) 0 !important; border: 0 !important; border-block-end: 1px solid var(--room-line) !important; border-radius: 0 !important; background: none !important; }
+html body #bio#bio#bio#bio#bio .lang-item > i { display: none !important; }
+html body #bio#bio#bio#bio#bio .lang-item h4 { margin: 0 0 2px !important; font-size: var(--bio-t2) !important; }
+html body #bio#bio#bio#bio#bio .lang-item p { margin: 0 !important; color: var(--room-soft) !important; }
+/* Certificates: the same open hairline grid as the logos. */
+html body #bio#bio#bio#bio#bio .cert-grid { gap: 0 !important; overflow: hidden !important; }
+html body #bio#bio#bio#bio#bio .bio-proof-sheet .cert-item {
+  margin-inline-end: -1px !important;
+  margin-block-end: -1px !important;
+  padding: clamp(6px, 1.2svh, 12px) !important;
+  border: 0 !important;
+  border-inline-end: 1px solid var(--room-line) !important;
+  border-block-end: 1px solid var(--room-line) !important;
+  border-radius: 0 !important;
+  background: none !important;
+}
+html body #bio#bio#bio#bio#bio .bio-proof-sheet .cert-img-wrap { border: 0 !important; border-radius: 0 !important; background: none !important; }
+html body #bio#bio#bio#bio#bio .bio-proof-sheet .cert-label { display: none !important; }
+
+/* The short chapters carry fewer words, so each word stands larger. */
+@media (min-width: 821px) {
+  html body #bio#bio#bio#bio#bio .bio-kit-sheet .tool { font-size: var(--bio-body) !important; }
+}
+html body #bio#bio#bio#bio#bio .bio-kit-sheet .tools-grid { gap: clamp(8px, 1.6svh, 14px) 22px !important; }
+html body #bio#bio#bio#bio#bio :is(.bio-education-sheet .bio-card h4, .bio-docs-sheet .bio-social-title) { font-size: var(--bio-t1) !important; line-height: 1.16 !important; }
+html body #bio#bio#bio#bio#bio .bio-docs-sheet .bio-social-desc { font-size: var(--bio-body) !important; }
+
+/* One column once the window is narrow or tall. */
+@media (max-width: 620px), (max-aspect-ratio: 1/1) {
+  html body #contact#contact#contact#contact#contact .contact-reach-sheet .sheet-mid,
+  html body #contact#contact#contact#contact#contact .pitch-wrap,
+  html body #blog#blog#blog#blog#blog .index-layout--blog,
+  html body #bio#bio#bio#bio#bio .bio-block:not(.bio-social, .bio-philosophy),
+  html body #bio#bio#bio#bio#bio :is(.bio-press-sheet, .bio-connect-sheet) .sheet-mid { grid-template-columns: minmax(0, 1fr) !important; }
+  html body #blog#blog#blog#blog#blog .blog-index-sheet .section-head { grid-template-columns: minmax(0, 1fr) !important; }
+  html body #blog#blog#blog#blog#blog .blog-index-sheet .section-lede { text-align: start !important; }
+  html body #bio#bio#bio#bio#bio .bio-connect-links--docs { grid-template-columns: minmax(0, 1fr) !important; }
+}
+@media (max-width: 1000px) {
+  html body #bio#bio#bio#bio#bio .bio-connect-links--press { grid-template-columns: minmax(0, 1fr) !important; }
+}
+@media (max-width: 520px) {
+  html body #bio#bio#bio#bio#bio .langs-grid,
+  html body #bio#bio#bio#bio#bio .bio-tools-directory { grid-template-columns: minmax(0, 1fr) !important; }
 }

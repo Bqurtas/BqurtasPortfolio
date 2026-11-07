@@ -12,7 +12,7 @@
   <link rel="preload" as="style" href="css/modern-framer.min.css?v=0741789ec97b" />
   <link rel="preload" as="style" href="css/fonts.css?v=6bd89c103953" />
   <link rel="preload" as="style" href="css/experience.min.css?v=d78921b4a98f" />
-  <link rel="preload" as="style" href="css/polish.min.css?v=d4fbf678f3cf" />
+  <link rel="preload" as="style" href="css/polish.min.css?v=27ffe28c0680" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#fbfbfa" />
   <meta name="color-scheme" content="light dark" />
@@ -930,7 +930,7 @@
   <link rel="stylesheet" href="css/fonts.css?v=6bd89c103953">
   <link rel="stylesheet" href="css/experience.min.css?v=d78921b4a98f">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.min.css?v=d4fbf678f3cf">
+  <link rel="stylesheet" href="css/polish.min.css?v=27ffe28c0680">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543"></noscript>
 
@@ -1685,7 +1685,7 @@
       <div class="section blog-index-sheet">
         <div class="sheet-mid">
           <header class="section-head">
-            <span class="section-num mono"><i class="fa-solid fa-feather-pointed"></i> &nbsp; <span data-i18n="blog.label">Journal</span></span>
+            <span class="section-num mono"><i class="fa-solid fa-feather-pointed"></i> <span data-i18n="blog.label">Journal</span></span>
             <h2 class="section-title" data-i18n="blog.title">Short <em>notes</em>.</h2>
             <p class="section-lede" data-i18n="blog.lede">Ideas from the desk, kept simple.</p>
           </header>
@@ -2205,7 +2205,7 @@
       <div class="section contact-reach-sheet">
         <div class="sheet-mid">
         <header class="section-head">
-          <span class="section-num mono"><i class="fa-solid fa-paper-plane"></i> &nbsp; <span data-i18n="contact.label">Contact Room</span></span>
+          <span class="section-num mono"><i class="fa-solid fa-paper-plane"></i> <span data-i18n="contact.label">Contact Room</span></span>
           <p class="contact-eyebrow mono" data-i18n="c.eyebrow">— Get in Touch · Let's Collaborate · Digital Landscape</p>
           <h2 class="section-title" data-i18n="contact.title">Start a <em>conversation</em>.</h2>
         </header>
@@ -2249,7 +2249,7 @@
         <div class="sheet-mid">
         <div class="pitch-wrap">
           <header class="pitch-head pitch-head--compact">
-            <span class="mono"><i class="fa-solid fa-handshake-angle"></i> &nbsp; <span data-i18n="c.submit.eye">Submit your project</span></span>
+            <span class="mono"><i class="fa-solid fa-handshake-angle"></i> <span data-i18n="c.submit.eye">Submit your project</span></span>
             <h3 data-i18n="contact.pitch.title">Pitch your project — in one careful letter.</h3>
             <p class="section-lede" data-i18n="contact.pitch.lede">Tell me about you, your project, your timeline, and your budget. I reply to every serious enquiry within 48 hours.</p>
             <!--email_off--><a class="pitch-mail mono" href="mailto:hello@bqurtas.com"><i class="fa-solid fa-envelope"></i> hello@bqurtas.com</a><!--/email_off-->
@@ -2595,7 +2595,7 @@
     }catch(e){}})();
   </script>
   <script defer src="js/latest-feed.min.js?v=76465997249c"></script>
-  <script defer src="js/main.v420.min.js?v=1e9ff6767b32"></script>
+  <script defer src="js/main.v420.min.js?v=28c0952dd2b3"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2770,7 +2770,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=c11ab90e617e', { updateViaCache: 'none' })
+            .register('/sw.js?v=f008d8455c67', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

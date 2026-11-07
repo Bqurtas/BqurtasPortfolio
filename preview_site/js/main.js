@@ -2659,11 +2659,11 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
      reading track rather than shrinking type out of legibility. */
   const PAPER_FIT_MIN = 0.5;
   const PAPER_FIT_STEPS = 7;
-  /* The long biography, the project form and the journal index cannot fit a small
+  /* The long biography, its sources, the project form and the journal index cannot fit a small
      window at a readable size, so they stop here and the rest reads on the page
      track: 5px labels and full-size fields helped nobody. */
   const PAPER_READING_MIN = 0.82;
-  const readingPaper = (sheet) => ['bio-story-sheet', 'contact-pitch-sheet', 'blog-index-sheet']
+  const readingPaper = (sheet) => ['bio-story-sheet', 'bio-press-sheet', 'contact-pitch-sheet', 'blog-index-sheet']
     .some(name => sheet.classList.contains?.(name));
   const compactBioPaper = (sheet) => [
     'bio-kit-sheet', 'bio-proof-sheet', 'bio-record-sheet', 'bio-education-sheet',
