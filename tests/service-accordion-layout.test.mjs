@@ -55,40 +55,74 @@ test('services share native reading ownership with other long papers while portf
   assert.equal(allowsInnerScroll({ classList: classes('section'), dataset: { paperScroll: 'inner' } }), true);
 });
 
-test('ordinary reading papers hold only their actual overflow before the following paper', () => {
+function readingDeck(names) {
   const style = () => ({ setProperty(name, value) { this[name] = value; }, removeProperty(name) { delete this[name]; } });
-  const scroller = {
-    dataset: {}, clientHeight: 824, scrollHeight: 824, classList: classes(),
-    querySelector: () => null, removeAttribute() {}, setAttribute() {},
-  };
   const root = { getBoundingClientRect: () => ({ top: 10 }) };
-  const sheet = {
-    dataset: { paperScroll: 'inner' }, classList: classes('section'), style: style(), parentElement: root, offsetHeight: 824,
-    querySelector: () => scroller,
-    after() { throw new Error('Services must not insert a multi-chapter spacer'); },
-  };
-  const next = { ...sheet, classList: classes('section'), dataset: {}, style: style(), querySelector: () => next.scroller,
-    scroller: { ...scroller, dataset: {}, classList: classes() } };
+  const papers = names.map((name) => {
+    const scroller = {
+      dataset: {}, clientHeight: 824, scrollHeight: 824, classList: classes(),
+      querySelector: () => null, removeAttribute() {}, setAttribute() {},
+    };
+    const sheet = {
+      name, dataset: { paperScroll: 'inner' }, classList: classes('section'), style: style(), parentElement: root, offsetHeight: 824,
+      querySelector: () => scroller, nextElementSibling: null,
+      after(node) {
+        if (node.className !== 'paper-reading-track') throw new Error('Only a reading track may follow an ordinary paper');
+        node.removed = false;
+        this.nextElementSibling = node;
+      },
+    };
+    return { sheet, scroller };
+  });
   const context = {
-    window: { scrollY: 0 }, serviceSequences: new WeakMap(), root, sheets: [sheet, next], pin: 10, terminalSheet: null,
+    window: { scrollY: 0 }, serviceSequences: new WeakMap(), root, sheets: papers.map(p => p.sheet), pin: 10, terminalSheet: null,
     allowsInnerScroll, fitPaper() {}, fitGroups() {}, ensurePaperMeter: () => null,
-    updatePaperMeter() {}, paperLabel: () => 'Services',
+    updatePaperMeter() {}, paperLabel: () => 'Paper',
+    document: { createElement: () => ({ style: style(), setAttribute() {}, remove() { this.removed = true; } }) },
     getComputedStyle: node => ({ borderTopWidth: '0px', paddingTop: '0px', marginTop: '0px',
       marginBottom: `${10 + (parseFloat(node.style?.['--bq-flow-extra']) || 0)}px` }),
   };
+  vm.runInNewContext(source('  const readingTracks = new WeakMap();', '  window.__bqScrollPaperTarget = '), context);
   const measure = () => vm.runInNewContext(`{
     ${source('      const rootSheets = sheets.filter', '      /* Give the final card')}
     ${source('      const rootStyle = getComputedStyle(root);', '\n      hasMeasured = true;')}
   }`, context);
+  return { papers, measure };
+}
+
+test('ordinary reading papers hold only their actual overflow before the following paper', () => {
+  const { papers: [{ sheet, scroller }, next], measure } = readingDeck(['first', 'middle', 'last']);
   for (const contentHeight of [824, 1100, 824]) {
     scroller.scrollHeight = contentHeight;
     measure();
     const overflow = Math.max(0, contentHeight - 824);
     assert.equal(scroller.dataset.paperOverflow, String(overflow));
     assert.equal(sheet.style['--bq-flow-extra'], `${overflow}px`);
+    assert.equal(sheet.nextElementSibling, null, 'a paper early in the deck needs no separate track');
     assert.equal(next.scroller.dataset.paperStart, String(834 + overflow), 'only real content adds reading distance, never a chapter hold');
     assert.equal(scroller.classList.contains('is-window-driven'), overflow > 0);
     assert.equal(scroller.classList.contains('is-paper-scrollable'), overflow > 0);
+  }
+});
+
+test('the paper before the last one keeps its reading distance in a sibling, so it stays pinned until the last paper lands', () => {
+  const { papers: [, { sheet, scroller }, last], measure } = readingDeck(['first', 'before-last', 'last']);
+  for (const contentHeight of [824, 1100, 950, 824]) {
+    scroller.scrollHeight = contentHeight;
+    measure();
+    const overflow = Math.max(0, contentHeight - 824);
+    assert.equal(scroller.dataset.paperOverflow, String(overflow));
+    assert.equal(sheet.style['--bq-flow-extra'], '0px', 'a sticky paper must not carry its reading distance on its own margin');
+    const track = sheet.nextElementSibling;
+    if (overflow > 0) {
+      assert.equal(track.className, 'paper-reading-track');
+      assert.equal(track.removed, false);
+      assert.equal(track.style.height, `${overflow}px`, 'the track is exactly the real reading distance');
+    } else if (track) {
+      assert.equal(track.removed, true, 'a paper that fits again drops its track');
+    }
+    assert.equal(last.scroller.dataset.paperStart, String(834 + 834 + overflow), 'the last paper still starts after the same distance');
+    assert.equal(scroller.classList.contains('is-window-driven'), overflow > 0);
   }
 });
 

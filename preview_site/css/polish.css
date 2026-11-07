@@ -6768,15 +6768,15 @@ html body #design#design#design#design .hero-editorial .hero-cta {
    never leaves them unreadable. Zoom keeps each label's own proportions.
    ========================================================================== */
 html body #design.paper-stack > .paper-sheet[data-paper-fit] :is(.section-num, .mono, .stat-label, .journal-row-meta, .bio-teaser-link, .journal-read, .service-cta) {
-  zoom: max(1, calc(.85 / var(--bq-paper-fit, 1)));
+  zoom: max(1, calc(.95 / var(--bq-paper-fit, 1)));
 }
 /* Room labels share the floor. Text the room rules already size against the fit
    stays out, or it would be enlarged twice. */
 html body :is(#bio, #blog, #contact, #behance).paper-stack > .paper-sheet[data-paper-fit] :is(.section-num, .mono):not(.mono .mono, .section-num .mono, .bio-chapter-index, .index-card--blog *, .pitch-form *, .cert-item *, .bio-tools *) {
-  zoom: max(1, calc(.85 / var(--bq-paper-fit, 1)));
+  zoom: max(1, calc(.95 / var(--bq-paper-fit, 1)));
 }
 /* Chapter 01's numeral sits inside a floored label and already follows the fit. */
-html body #bio#bio#bio .section-num .bio-chapter-index { font-size: clamp(10px, calc(10px / var(--bq-paper-fit, 1)), calc(10px / .85)) !important; }
+html body #bio#bio#bio .section-num .bio-chapter-index { font-size: clamp(10px, calc(10px / var(--bq-paper-fit, 1)), calc(10px / .95)) !important; }
 @media (max-height: 640px) {
   html body #design#design#design#design .latest-blog .journal-more li:last-child .journal-row { padding-inline-end: 58px !important; }
 }
@@ -7319,6 +7319,138 @@ html body #blog#blog#blog#blog#blog .subscribe-field input:-webkit-autofill {
   background-clip: text !important;
 }
 html[data-theme="dark"] body #bio#bio#bio#bio .bio-kit-sheet .tool-ic img[src$="/chatgpt.svg"] { filter: invert(1); }
+
+/* ==========================================================================
+   READABLE AT ANY WINDOW (owner, 2026-11-07: the small text in very small
+   windows). The home sheets never scroll inside, so on a short window their
+   pictures and spacing give way first: copy stops at 80% of its size while
+   everything around it keeps shrinking to fit.
+   ========================================================================== */
+html body #design.paper-stack > .paper-sheet[data-paper-fit] :is(.sites-lede, .site-note, .bio-teaser-text > p, .journal-sub, .journal-row-title, .latest-blog-all) {
+  zoom: max(1, calc(.8 / var(--bq-paper-fit, 1)));
+}
+/* Row numerals stop lower than the names they number, so a name is never
+   drawn smaller than its own numeral. */
+html body #design.paper-stack > .paper-sheet[data-paper-fit] :is(.journal-row-no, .site-num) {
+  zoom: max(1, calc(.6 / var(--bq-paper-fit, 1)));
+}
+/* The Journal's index tags are drawn at 9px, under the other labels, so they
+   keep that size once the sheet shrinks; at full size nothing changes. */
+html body #blog#blog.paper-stack > .paper-sheet[data-paper-fit] .index-row.index-row .index-row-tag {
+  zoom: max(1, calc(1 / var(--bq-paper-fit, 1)));
+}
+/* Buttons and skill lists in the rooms hold the same floor as the room labels. */
+html body :is(#bio, #blog, #contact).paper-stack > .paper-sheet[data-paper-fit] :is(.tl-skills, .pitch-submit, .subscribe-form button) {
+  zoom: max(1, calc(.95 / var(--bq-paper-fit, 1)));
+}
+
+/* A short, wide window: the Websites stage lies down. Each row reads on one
+   line and the screen gives back its height, so the sheet still fits. */
+@media (max-height: 480px) and (min-width: 601px) and (orientation: landscape) {
+  /* Above 820px these sheets need only the dock's own reserve. Up to 820px
+     the phone rules (five IDs) keep their larger reserve for the "to top"
+     corner, which wins on purpose. */
+  html body #design#design#design#design.paper-stack > :is(.sites-sheet, .practice-note, .latest-blog).paper-sheet > .paper-scroll {
+    padding-block: 12px calc(var(--bq-dock-top, 92px) + 8px) !important;
+  }
+  html body #design#design#design#design .sites-sheet > .paper-scroll { padding-inline: 62px !important; }
+  html body #design#design#design#design .sites-sheet .sheet-mid {
+    width: min(100%, 210svh) !important;
+    margin-inline: auto !important;
+    gap: 8px !important;
+  }
+  html body #design#design#design#design .sites-sheet .sites-head-row { margin-block-end: 6px !important; }
+  /* The line beside the title drops under it once the two no longer share a row. */
+  html body #design#design#design#design .sites-sheet .sites-head-copy {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 2px 24px !important;
+  }
+  html body #design#design#design#design .sites-sheet .sites-title { max-inline-size: none !important; }
+  html body #design#design#design#design .sites-sheet .sites-lede { max-inline-size: none !important; }
+  html body #design#design#design#design .sites-sheet .sites-stage {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) !important;
+    padding-block: 10px !important;
+    column-gap: 20px !important;
+  }
+  html body #design#design#design#design .sites-sheet .site-row { padding-block: 8px !important; }
+  html body #design#design#design#design .sites-sheet .site-id {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 12px;
+  }
+  html body #design#design#design#design .sites-sheet .site-name { font-size: 20px !important; }
+  html body #design#design#design#design .sites-sheet .site-meta { margin-block-start: 0 !important; }
+  html body #design#design#design#design .sites-sheet .site-mark { inline-size: 30px !important; block-size: 30px !important; }
+  /* One line per row at every width: the address is already in the screen's bar. */
+  @container sites-index (max-width: 460px) {
+    html body .sites-sheet .site-host { display: none; }
+    html body .sites-sheet .site-kind::after { content: none; }
+  }
+  html body #design#design#design#design .sites-sheet .sites-notes { padding-block-start: 8px !important; }
+  html body #design#design#design#design .latest-blog .journal-cover { max-block-size: calc(32svh / var(--bq-paper-fit, 1)); }
+  /* Two rows can sit beside the round "to top" control here, not only the last. */
+  html body #design#design#design#design .latest-blog .journal-more li .journal-row { padding-inline-end: 58px !important; }
+}
+
+/* The narrowest phones keep two figures per row: the third figure starts the
+   second row, so it carries no divider and no inset, like the first. */
+@media (max-width: 339px) {
+  html body #design#design#design#design > .section.practice-note .bio-teaser-grid .stats {
+    row-gap: 10px !important;
+  }
+  html body #design#design#design#design > .section.practice-note .bio-teaser-grid .stats .stat:nth-child(3) {
+    padding-inline-start: 0 !important;
+    border-inline-start: 0 !important;
+  }
+}
+
+/* The reading distance of the paper before a deck's last one (main.js
+   setReadingTrack). Like the service chapter track: in flow, never seen. */
+html body .room.paper-stack > .paper-reading-track,
+html body #design.paper-stack > .paper-reading-track {
+  display: block !important;
+  width: 100% !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  pointer-events: none !important;
+}
+
+/* Phones: the statistic labels now keep a readable size, so the longest words
+   (Turkish "Müşteriler", Swedish "Logotyper") need tighter tracking to stay
+   inside their column instead of crossing the hairline beside them. */
+@media (max-width: 479px) {
+  html body #design#design#design#design > .section.practice-note .bio-teaser-grid .stats .stat .stat-label :is(span) {
+    letter-spacing: .04em !important;
+  }
+  html:is([lang="tr"], [lang="sv"]) body #design#design#design#design > .section.practice-note .bio-teaser-grid .stats .stat .stat-label :is(span) {
+    letter-spacing: 0 !important;
+  }
+}
+
+/* Where the long biography always reads on the page track (phones, and short
+   windows), its last line stops above the round "to top" control instead of
+   ending beside it, as the honours chapter already does. */
+@media (max-width: 820px), (max-height: 480px) {
+  html body #bio#bio#bio#bio.paper-stack > .bio-story-sheet.paper-sheet > .paper-scroll {
+    padding-block-end: calc(var(--bq-dock-top, 92px) + 64px) !important;
+  }
+}
+
+/* On the smallest phones the last service row ends at the round "to top"
+   control: its name stops short of that corner, so no word runs under it. */
+@media (max-width: 479px) {
+  html body #design#design#design#design#design .service-showcase .service-panel:last-child .service-name {
+    margin-inline-end: 22px !important;
+    text-wrap: balance;
+  }
+}
 
 /* ==========================================================================
    BEHANCE (owner, 2026-11-07: a room named Behance with every Behance project
