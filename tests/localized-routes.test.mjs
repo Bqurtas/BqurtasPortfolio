@@ -45,7 +45,7 @@ test('all seven localized routes translate existing content and retain authored 
   const bcp47 = { en: 'en', ku: 'ckb', kmr: 'ku', ar: 'ar', fr: 'fr', tr: 'tr', sv: 'sv' };
   for (const lang of LANGUAGES) {
     const prefix = lang === 'en' ? '' : '/' + lang;
-    for (const room of ['', '/bio', '/contact']) {
+    for (const room of ['', '/bio', '/contact', '/behance']) {
       const response = await onRequest({
         request: new Request('https://bqurtas.com' + (prefix + room || '/')),
         env: { ASSETS: { fetch: async () => new Response(html) } },
@@ -55,7 +55,7 @@ test('all seven localized routes translate existing content and retain authored 
       assert.equal(response.headers.get('content-language'), bcp47[lang]);
       const textHandler = registrations.get('[data-i18n]');
       assert.ok(textHandler, 'localized body text must be rendered before browser JavaScript');
-      for (const key of ['hero.lede', 'hero.place', 'svc.title', 'svc.identity.desc', 'bio.lede', 'bp.p1', 'contact.title', 'f.loc']) {
+      for (const key of ['hero.lede', 'hero.place', 'svc.title', 'svc.identity.desc', 'bio.lede', 'bp.p1', 'contact.title', 'f.loc', 'rh.behance.sub', 'd.bh.title']) {
         const element = elementFor('data-i18n', key);
         textHandler.element(element);
         assert.ok(LOCALIZED_COPY[lang][key], `${lang}.${key} should have authored text`);

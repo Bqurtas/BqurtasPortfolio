@@ -81,21 +81,23 @@
     curtain.setAttribute('aria-hidden', 'true');
     curtain.innerHTML =
       '<span class="lux-transition-room">Design</span>' +
-      '<span class="lux-transition-no">01 / 04</span>' +
+      '<span class="lux-transition-no">01 / 05</span>' +
       '<span class="lux-transition-line"></span>';
     document.body.appendChild(curtain);
 
     var roomNumbers = {
-      design: '01 / 04',
-      blog: '02 / 04',
-      bio: '03 / 04',
-      contact: '04 / 04'
+      design: '01 / 05',
+      blog: '02 / 05',
+      bio: '03 / 05',
+      contact: '04 / 05',
+      behance: '05 / 05'
     };
     var roomFallbacks = {
       design: 'Design',
       blog: 'The Journal',
       bio: 'The Designer',
-      contact: "Let's talk."
+      contact: "Let's talk.",
+      behance: 'Behance'
     };
     var busy = false;
     var playCurtain = function (route) {

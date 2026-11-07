@@ -64,6 +64,15 @@ test('standalone archive and artwork visits use the identical DNT/GPC-aware clie
 });
 
 
+test('the Behance room and canonical project pages are counted; other project spellings are not', () => {
+  for (const pathname of ['/behance', '/ku/behance', '/behance/258156477-barakat-qurtas-selected-works-20142026', '/sv/behance/243902845-photography']) {
+    const page = fixture({ pathname }); page.flush(); assert.equal(page.sent[0]?.data.p, pathname);
+  }
+  for (const pathname of ['/behance/0', '/behance/243902845', '/behance/243902845-PHOTOGRAPHY', '/behance/1/2']) {
+    const page = fixture({ pathname }); page.flush(); assert.equal(page.sent.length, 0, pathname);
+  }
+});
+
 test('statistics wait for explicit permission and stop immediately when it is withdrawn', () => {
   const page = fixture({ consent:null }); page.flush();
   assert.equal(page.sent.length, 0);

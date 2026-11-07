@@ -304,6 +304,12 @@ export const SITE_SCHEMA = {
       "url": "https://bqurtas.com/contact"
     },
     {
+      "@type": "SiteNavigationElement",
+      "position": 5,
+      "name": "Behance",
+      "url": "https://bqurtas.com/behance"
+    },
+    {
       "@type": "ProfessionalService",
       "@id": "https://bqurtas.com/#service",
       "name": "Barakat Qurtas Studio",

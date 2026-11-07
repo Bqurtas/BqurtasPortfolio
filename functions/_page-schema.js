@@ -3,7 +3,7 @@ import { SITE_SCHEMA } from './_site-schema-data.js';
 const SITE = 'https://bqurtas.com';
 const PERSON = SITE + '/#person';
 const LANGUAGES = { en: 'en', ku: 'ckb', kmr: 'ku', ar: 'ar', fr: 'fr', tr: 'tr', sv: 'sv' };
-const ROOM_NAMES = { design: 'nav.design', blog: 'nav.blog', bio: 'nav.bio', contact: 'nav.contact' };
+const ROOM_NAMES = { design: 'nav.design', blog: 'nav.blog', bio: 'nav.bio', contact: 'nav.contact', behance: 'nav.behance' };
 
 // Global entity IDs stay stable across languages; the page itself describes
 // the requested URL, instead of publishing the English homepage on every route.
@@ -13,7 +13,7 @@ export function pageSchema(route, meta, copy = {}) {
   const page = graph.find(node => node['@type'] === 'ProfilePage');
   const profile = route.key === 'home' || route.key === 'bio';
   const type = profile ? 'ProfilePage' : route.key === 'contact' ? 'ContactPage'
-    : route.key === 'blogpost' ? 'WebPage' : 'CollectionPage';
+    : route.key === 'blogpost' ? 'WebPage' : route.key === 'behanceproject' ? 'ItemPage' : 'CollectionPage';
   Object.assign(page, {
     '@type': type,
     '@id': route.canon + '#webpage',
@@ -25,6 +25,7 @@ export function pageSchema(route, meta, copy = {}) {
   delete page.dateModified;
   if (profile) page.mainEntity = { '@id': PERSON };
   else if (route.key === 'blogpost') page.mainEntity = { '@id': route.canon + '#article' };
+  else if (route.key === 'behanceproject') page.mainEntity = { '@id': route.canon + '#work' };
   else delete page.mainEntity;
   const prefix = route.lang === 'en' ? '' : '/' + route.lang;
   for (const node of graph) {

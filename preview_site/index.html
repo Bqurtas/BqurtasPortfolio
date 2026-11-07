@@ -11,14 +11,14 @@
        Their stylesheet links stay below in the original cascade order. -->
   <link rel="preload" as="style" href="css/modern-framer.min.css?v=0741789ec97b" />
   <link rel="preload" as="style" href="css/fonts.css?v=6bd89c103953" />
-  <link rel="preload" as="style" href="css/experience.min.css?v=d78921b4a98f" />
-  <link rel="preload" as="style" href="css/polish.min.css?v=f59ada33e935" />
+  <link rel="preload" as="style" href="css/experience.min.css?v=2c2664c33142" />
+  <link rel="preload" as="style" href="css/polish.min.css?v=1e2f17dc8b5c" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#fbfbfa" />
   <meta name="color-scheme" content="light dark" />
 
   <!-- Optional Cloudflare and Umami pageviews require current visitor consent. -->
-  <script defer src="js/analytics.js?v=efb14eb2851d"></script>
+  <script defer src="js/analytics.js?v=ff8a0b4f706e"></script>
 
   <!-- Meta (Facebook) Pixel removed 2026-06-14 — it was configured (in Facebook
        Events Manager) to forward visitor data to an unrecognised third-party
@@ -400,6 +400,12 @@
       "url": "https://bqurtas.com/contact"
     },
     {
+      "@type": "SiteNavigationElement",
+      "position": 5,
+      "name": "Behance",
+      "url": "https://bqurtas.com/behance"
+    },
+    {
       "@type": "ProfessionalService",
       "@id": "https://bqurtas.com/#service",
       "name": "Barakat Qurtas Studio",
@@ -653,7 +659,7 @@
     (function () {
       var root = document.documentElement;
       var langs = ['ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];
-      var rooms = ['design', 'blog', 'bio', 'contact'];
+      var rooms = ['design', 'blog', 'bio', 'contact', 'behance'];
       var parts = location.pathname.split('/').filter(Boolean);
       var lang = langs.indexOf(parts[0]) > -1 ? parts.shift() : 'en';
       if (['panjamor', 'work', 'brandboard'].indexOf(parts[0]) > -1) {
@@ -824,7 +830,7 @@
     html.bq-css-pending .hero-eyebrow,html.bq-css-pending .hero-line--1,html.bq-css-pending .hero-line--2,html.bq-css-pending .hero-sign,html.bq-css-pending .hero-lede,html.bq-css-pending .hero-scrolldown{animation:none!important;opacity:1!important;transform:none!important}
     html.bq-css-ready .hero-eyebrow,html.bq-css-ready .hero-line--1,html.bq-css-ready .hero-line--2,html.bq-css-ready .hero-sign,html.bq-css-ready .hero-lede,html.bq-css-ready .hero-scrolldown{animation:none!important;opacity:1!important}
     html.bq-css-error .room,html.bq-css-timeout .room{display:none!important}
-    html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact{display:block!important}
+    html.bq-css-error[data-room="design"] #design,html.bq-css-timeout[data-room="design"] #design,html.bq-css-error[data-room="blog"] #blog,html.bq-css-timeout[data-room="blog"] #blog,html.bq-css-error[data-room="bio"] #bio,html.bq-css-timeout[data-room="bio"] #bio,html.bq-css-error[data-room="contact"] #contact,html.bq-css-timeout[data-room="contact"] #contact,html.bq-css-error[data-room="behance"] #behance,html.bq-css-timeout[data-room="behance"] #behance{display:block!important}
     @media (max-width:1024px){.rail{display:none!important}.mobilebar{display:flex!important}.main,[dir=rtl] .main{margin-left:0!important;margin-right:0!important;padding-top:0!important}.design-cta{display:none!important}}
     html.bq-compact .rail{display:none!important}html.bq-compact .mobilebar{display:flex!important}html.bq-compact .main,[dir=rtl] html.bq-compact .main{margin-left:0!important;margin-right:0!important}
     /* The final phone gutter must exist at first paint, before external
@@ -835,7 +841,7 @@
       html body > .bq-frame.bq-frame.bq-frame::before,html body > .bq-frame.bq-frame.bq-frame::after{display:none!important}
       /* The first paper is structural HTML. It stays pinned even when the
          core bundle is slow and the bounded startup fallback has revealed. */
-      html:root,html:root.bq-compact,html body :is(#design,#blog,#bio,#contact).paper-stack{--bq-stack-top:var(--bq-deck-gutter,10px);--bq-stack-sheet-h:calc(max(100svh,var(--bq-frame-height,100dvh)) - (var(--bq-deck-gutter,10px) * 2))!important}
+      html:root,html:root.bq-compact,html body :is(#design,#blog,#bio,#contact,#behance).paper-stack{--bq-stack-top:var(--bq-deck-gutter,10px);--bq-stack-sheet-h:calc(max(100svh,var(--bq-frame-height,100dvh)) - (var(--bq-deck-gutter,10px) * 2))!important}
       html body .room.paper-stack{padding:var(--bq-deck-gutter,10px)!important}
       html body .room.paper-stack > :is(.hero,.room-hero).paper-sheet{position:sticky!important;top:var(--bq-stack-top)!important;width:100%!important;height:var(--bq-stack-sheet-h)!important;min-height:0!important;max-height:var(--bq-stack-sheet-h)!important;margin:0 0 var(--bq-card-gap,10px)!important;padding:0!important;overflow:visible!important;border:0!important;background:transparent!important;transform:none!important}
       html body .room.paper-stack > :is(.hero,.room-hero).paper-sheet > .paper-scroll{position:relative!important;width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;overflow:hidden!important;border-radius:var(--bq-deck-radius,22px)!important;background:var(--bq-paper-sheet,#f3f3f3)!important}
@@ -928,9 +934,9 @@
     }());
   </script>
   <link rel="stylesheet" href="css/fonts.css?v=6bd89c103953">
-  <link rel="stylesheet" href="css/experience.min.css?v=d78921b4a98f">
+  <link rel="stylesheet" href="css/experience.min.css?v=2c2664c33142">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.min.css?v=f59ada33e935">
+  <link rel="stylesheet" href="css/polish.min.css?v=1e2f17dc8b5c">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543"></noscript>
 
@@ -986,6 +992,13 @@
         <span class="rail-tip">
           <span class="rail-tip-num">04</span>
           <span class="rail-tip-text" data-i18n="nav.contact">Let's talk.</span>
+        </span>
+      </a>
+      <a href="/behance" class="rail-link" data-route="behance" aria-label="Behance" data-i18n-aria="nav.behance">
+        <i class="fa-brands fa-behance rail-icon"></i>
+        <span class="rail-tip">
+          <span class="rail-tip-num">05</span>
+          <span class="rail-tip-text" data-i18n="nav.behance">Behance</span>
         </span>
       </a>
     </nav>
@@ -1171,7 +1184,7 @@
 
         <div class="mm-menu-body">
           <div class="mm-menu-index">
-            <span class="mono" data-i18n="menu.rooms">Rooms / 01—04</span>
+            <span class="mono" data-i18n="menu.rooms">Rooms / 01—05</span>
             <span class="mono">HEWLÊR · 36.19° N</span>
           </div>
           <nav class="mm-nav" aria-label="Menu" data-i18n-aria="a11y.sections">
@@ -1193,6 +1206,11 @@
             <a href="/contact" class="mm-link" data-route="contact">
               <span class="mm-n mono" aria-hidden="true">04</span>
               <span class="mm-link-copy"><strong class="mm-link-text" data-i18n="nav.contact">Let's talk.</strong><small data-i18n="menu.note.contact">Start a clear, useful conversation</small></span>
+              <i class="fa-solid fa-arrow-up-right" aria-hidden="true"></i>
+            </a>
+            <a href="/behance" class="mm-link" data-route="behance">
+              <span class="mm-n mono" aria-hidden="true">05</span>
+              <span class="mm-link-copy"><strong class="mm-link-text" data-i18n="nav.behance">Behance</strong><small data-i18n="menu.note.behance">Every Behance project, page by page</small></span>
               <i class="fa-solid fa-arrow-up-right" aria-hidden="true"></i>
             </a>
           </nav>
@@ -1416,6 +1434,25 @@
               </span>
             </a>
           </div>
+        </div>
+      </div>
+
+      <!-- Behance — an invitation to the Behance room: the newest covers lie on
+           the sheet like papers on a desk; the whole pile opens the room. -->
+      <div class="section behance-teaser" id="behanceTeaser">
+        <div class="sheet-mid">
+          <div class="bht-copy">
+            <span class="section-num mono"><i class="fa-brands fa-behance" aria-hidden="true"></i> &nbsp; <span data-i18n="d.bh.eye">Behance</span></span>
+            <h2 class="section-title bht-title" data-i18n="d.bh.title">The work, <em>in full</em>.</h2>
+            <p class="section-lede bht-lede" data-i18n="d.bh.sub">My Behance projects, opened page by page, right here on the site.</p>
+            <a class="bht-cta mono" href="/behance" data-route="behance"><span data-i18n="d.bh.go">Open the Behance room</span> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+          </div>
+          <a class="bht-pile" href="/behance" data-route="behance" tabindex="-1" aria-hidden="true">
+            <img class="bht-sheet" src="assets/behance/243902845/cover-404.webp?v=74e5c509db17" alt="" width="404" height="316" loading="lazy" decoding="async" />
+            <img class="bht-sheet" src="assets/behance/258101757/cover-404.webp?v=91429f12e062" alt="" width="404" height="316" loading="lazy" decoding="async" />
+            <img class="bht-sheet" src="assets/behance/258104193/cover-404.webp?v=403234a173f1" alt="" width="404" height="316" loading="lazy" decoding="async" />
+            <img class="bht-sheet" src="assets/behance/258156477/cover.webp?v=5ac52aeedbd8" alt="" width="808" height="632" loading="lazy" decoding="async" />
+          </a>
         </div>
       </div>
 
@@ -2365,6 +2402,67 @@
       </div>
     </section>
 
+    <!-- ============================================================
+         ROOM 05 — BEHANCE
+         The owner's Behance projects, copied to this site. js/behance.js
+         lists them from projects.json and opens each in #bhViewer.
+         ============================================================ -->
+    <section class="room paper-stack room-paper is-hidden" id="behance" data-room="behance" data-behance-src="assets/behance/projects.json?v=b341d90d85c2">
+      <div class="room-hero paper-sheet" data-paper="behance-1" data-paper-fit>
+        <div class="paper-scroll">
+        <a class="room-hero-return" href="/design" data-route="design" aria-label="Return to start" data-i18n-aria="rh.return"><i class="fa-solid fa-arrow-left-long"></i> <span data-i18n="rh.return">Return to start</span></a>
+        <span class="room-hero-corner room-hero-corner--tr mono"><i class="fa-solid fa-location-dot"></i> <span data-i18n="krg">Hewlêr · KRG</span></span>
+        <span class="room-hero-corner room-hero-corner--bl mono">36.19° N · 44.01° E</span>
+        <div class="room-hero-inner">
+          <span class="room-hero-ghost" aria-hidden="true">05</span>
+          <span class="mono room-hero-num" data-i18n="rh.behance.num">№ 05 · Behance</span>
+          <h1 class="room-hero-title" data-i18n="rh.behance.title">Every project, <em>in full</em></h1>
+          <p class="room-hero-sub" data-i18n="rh.behance.sub">Projects from my Behance, shown here page by page.</p>
+          <a class="bh-hero-link mono" href="https://www.behance.net/bqurtas" target="_blank" rel="noopener me"><i class="fa-brands fa-behance" aria-hidden="true"></i> <span dir="ltr">behance.net/bqurtas</span></a>
+        </div>
+        <div class="room-hero-scroll" aria-hidden="true">
+          <span class="mono" data-i18n="rh.scroll">Scroll</span>
+          <span class="room-hero-scroll-line"></span>
+        </div>
+        </div>
+      </div>
+
+      <div class="section behance-sheet">
+        <div class="sheet-mid">
+          <!-- The profile, as Behance shows it: cover, photo, name, numbers. The
+               figures come from projects.json; the markup carries the last copy. -->
+          <header class="bh-profile" aria-labelledby="bhpName">
+            <div class="bhp-banner">
+              <img src="assets/behance/profile/banner-1600.webp?v=961aa1b5c854" srcset="assets/behance/profile/banner-1600.webp?v=1 1600w, assets/behance/profile/banner-3200.webp?v=1 3200w" sizes="(max-width: 1200px) 94vw, 1160px" alt="" width="3200" height="800" decoding="async" />
+            </div>
+            <div class="bhp-card">
+              <img class="bhp-avatar" src="assets/behance/profile/avatar.webp?v=e27d4d38459a" alt="" width="276" height="276" decoding="async" />
+              <div class="bhp-id">
+                <h2 class="bhp-name" id="bhpName" data-i18n="name.full">Barakat Qurtas</h2>
+                <p class="bhp-role"><span data-i18n="bh.occupation">Graphic Designer</span> <span aria-hidden="true">·</span> <span data-i18n="f.loc">Erbil — Kurdistan, Iraq</span></p>
+                <p class="bhp-available mono" data-i18n="bh.available">Available for freelance and full-time work</p>
+              </div>
+              <div class="bhp-actions">
+                <a class="bhp-follow mono" href="https://www.behance.net/bqurtas" target="_blank" rel="noopener me"><i class="fa-brands fa-behance" aria-hidden="true"></i> <span data-i18n="bh.follow">Follow on Behance</span></a>
+                <a class="bhp-message mono" href="/contact" data-route="contact"><span data-i18n="bh.message">Message</span> <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+              </div>
+            </div>
+            <dl class="bhp-stats" id="bhpStats">
+              <div><dt data-i18n="bh.views">Project views</dt><dd data-stat="views">340</dd></div>
+              <div><dt data-i18n="bh.appreciations">Appreciations</dt><dd data-stat="appreciations">8</dd></div>
+              <div><dt data-i18n="bh.followers">Followers</dt><dd data-stat="followers">614</dd></div>
+              <div><dt data-i18n="bh.following">Following</dt><dd data-stat="following">2,068</dd></div>
+            </dl>
+            <div class="bhp-tabs">
+              <span class="bhp-tab mono"><span data-i18n="bh.work">Work</span> <b class="behance-count" id="behanceCount">12</b></span>
+              <span class="bhp-since mono" id="bhpSince">Member since 2015</span>
+            </div>
+          </header>
+          <ol class="behance-grid" id="behanceGrid" aria-busy="true" aria-label="Behance projects" data-i18n-aria="bh.list"></ol>
+        </div>
+      </div>
+    </section>
+
     <!-- ===== FOOTER ===== -->
     <footer class="footer footer-v249" aria-labelledby="footerCtaTitle">
       <div class="footer-stage">
@@ -2566,7 +2664,50 @@
     </article>
   </div>
 
-  <script defer src="js/i18n.v420.min.js?v=c003ab6e87d9"></script>
+  <!-- ===== BEHANCE PROJECT VIEWER ===== -->
+  <div class="bh-viewer" id="bhViewer" role="dialog" aria-modal="true" aria-labelledby="bhvTitle" aria-hidden="true" hidden>
+    <div class="bhv-bar">
+      <div class="bhv-who">
+        <img src="assets/avatar.webp" alt="" width="124" height="124" />
+        <span class="bhv-who-text"><strong id="bhvTitle" lang="en" dir="auto"></strong><small class="mono"><span data-i18n="name.full">Barakat Qurtas</span> · <span id="bhvMeta"></span></small></span>
+      </div>
+      <div class="bhv-bar-end">
+        <span class="bhv-count mono" id="bhvCount" aria-hidden="true"></span>
+        <a class="bhv-ext mono" id="bhvExt" href="https://www.behance.net/bqurtas" target="_blank" rel="noopener"><span data-i18n="bh.view">View on Behance</span> <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+        <button class="bhv-close" id="bhvClose" type="button" aria-label="Close" data-i18n-aria="a11y.close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      </div>
+    </div>
+    <button class="bhv-side bhv-side--prev" id="bhvPrev" type="button" aria-label="Previous project" data-i18n-aria="bh.prev"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+    <button class="bhv-side bhv-side--next" id="bhvNext" type="button" aria-label="Next project" data-i18n-aria="bh.next"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+    <div class="bhv-scroll" id="bhvScroll">
+      <article class="bhv-canvas">
+        <div class="bhv-images" id="bhvImages"></div>
+        <div class="bhv-notice" id="bhvNotice" hidden>
+          <p data-i18n="bh.onBehance">Just published on Behance: every page of it opens there.</p>
+          <a class="bhv-cta" id="bhvNoticeCta" href="https://www.behance.net/bqurtas" target="_blank" rel="noopener"><span data-i18n="bh.view">View on Behance</span> <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+        </div>
+        <section class="bhv-info" aria-labelledby="bhvInfoTitle">
+          <div class="bhv-info-head">
+            <span class="mono bhv-kicker"><i class="fa-brands fa-behance" aria-hidden="true"></i> Behance</span>
+            <h2 class="bhv-info-title" id="bhvInfoTitle" lang="en" dir="auto"></h2>
+            <p class="bhv-date mono" id="bhvDate"></p>
+          </div>
+          <div class="bhv-about" id="bhvAbout" lang="en"></div>
+          <dl class="bhv-facts">
+            <div class="bhv-fact"><dt class="mono" data-i18n="bh.tools">Tools</dt><dd><ul class="bhv-chips" id="bhvTools"></ul></dd></div>
+            <div class="bhv-fact"><dt class="mono" data-i18n="bh.tags">Tags</dt><dd><ul class="bhv-chips" id="bhvTags" lang="en"></ul></dd></div>
+          </dl>
+          <a class="bhv-cta" id="bhvCta" href="https://www.behance.net/bqurtas" target="_blank" rel="noopener"><span data-i18n="bh.view">View on Behance</span> <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+        </section>
+        <nav class="bhv-more-wrap" aria-labelledby="bhvMoreTitle">
+          <h3 class="bhv-more-title mono" id="bhvMoreTitle" data-i18n="bh.more">More projects</h3>
+          <ol class="bhv-more" id="bhvMore"></ol>
+        </nav>
+      </article>
+    </div>
+  </div>
+
+  <script defer src="js/i18n.v420.min.js?v=76e3d49d6f43"></script>
   <!-- Non-English visitors need the extra dictionaries before first render;
        English (the default + PSI) never loads them, keeping the parse light.
        applyLang() can also fetch this on its own, but starting it here — in
@@ -2583,7 +2724,7 @@
       var lang=u;
       if(lang && lang!=='en'){
         window.__i18nMoreLoading=true; window.__i18nMoreCbs=window.__i18nMoreCbs||[];
-        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=d90742cf23e2'; s.async=false;
+        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=2f371d5a471b'; s.async=false;
         s.onload=function(){
           window.__i18nMoreLoaded=true; window.__i18nMoreLoading=false;
           var cbs=(window.__i18nMoreCbs||[]).slice(); window.__i18nMoreCbs=[];
@@ -2595,7 +2736,7 @@
     }catch(e){}})();
   </script>
   <script defer src="js/latest-feed.min.js?v=76465997249c"></script>
-  <script defer src="js/main.v420.min.js?v=28c0952dd2b3"></script>
+  <script defer src="js/main.v420.min.js?v=f3539a59cebf"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2615,7 +2756,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=664040c47a98';
+        s.src = 'js/enhance.v420.min.js?v=c869e4184602';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -2631,7 +2772,29 @@
         document.body.appendChild(s);
       }
       window.__bqLoadEnhance = loadEnhance;
+      /* The Behance room has its own small bundle: it loads for that room
+         only, on a direct link, on the way there, or on intent. */
+      var behanceLoading = false;
+      function loadBehance() {
+        if (behanceLoading) return;
+        behanceLoading = true;
+        var b = document.createElement('script');
+        b.src = 'js/behance.min.js?v=efc31fc38139';
+        b.onerror = function () { behanceLoading = false; b.remove(); };
+        document.body.appendChild(b);
+      }
+      window.__bqLoadBehance = loadBehance;
+      document.addEventListener('bq:route', function (e) {
+        if (e.detail && e.detail.room === 'behance') loadBehance();
+      });
+      function warmBehance(e) {
+        if (!behanceLoading && e.target && e.target.closest && e.target.closest('[data-route="behance"]')) loadBehance();
+      }
+      document.addEventListener('pointerover', warmBehance, { capture: true, passive: true });
+      document.addEventListener('focusin', warmBehance, true);
+      document.addEventListener('touchstart', warmBehance, { capture: true, passive: true });
       var direct = route();
+      if (direct === 'behance') loadBehance();
       if (direct !== 'home' && direct !== 'design') loadEnhance();
       if (location.hash === '#studio') loadEnhance();
       /* These owner entry points must also work before the optional dashboard
@@ -2667,7 +2830,7 @@
          first click on blog/bio/contact (main.js SPA router handles those). */
       var warmSelector = [
         '#railLatest', '#railLatestM', '#railChat', '#railChatM',
-        '[data-route="blog"]', '[data-route="bio"]', '[data-route="contact"]'
+        '[data-route="blog"]', '[data-route="bio"]', '[data-route="contact"]', '[data-route="behance"]'
       ].join(',');
       var blockSelector = '#railLatest, #railLatestM, #railChat, #railChatM';
       function warmEnhance(e) {
@@ -2684,7 +2847,7 @@
       }, true);
     }());
   </script>
-  <script defer src="js/lux.min.js?v=1e8781ff602a"></script>
+  <script defer src="js/lux.min.js?v=d29cd2fe8677"></script>
   <script defer src="js/motion.44e83e65e735.min.js?v=44e83e65e735"></script>
   <!-- The chatbot knowledge base is loaded only when a visitor shows intent. -->
   <script>
@@ -2770,7 +2933,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=7f2085900d95', { updateViaCache: 'none' })
+            .register('/sw.js?v=4679e5442b36', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

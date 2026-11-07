@@ -599,7 +599,8 @@ html body .room.paper-stack:not(#design) > .paper-sheet[data-paper-fit] > .paper
 html body #design#design#design#design.paper-stack > .paper-sheet.is-paper-measuring > .paper-scroll *,
 html body #bio#bio#bio#bio.paper-stack > .paper-sheet.is-paper-measuring > .paper-scroll *,
 html body #blog#blog#blog#blog.paper-stack > .paper-sheet.is-paper-measuring > .paper-scroll *,
-html body #contact#contact#contact#contact.paper-stack > .paper-sheet.is-paper-measuring > .paper-scroll * {
+html body #contact#contact#contact#contact.paper-stack > .paper-sheet.is-paper-measuring > .paper-scroll *,
+html body #behance#behance#behance#behance.paper-stack > .paper-sheet.is-paper-measuring > .paper-scroll * {
   transform: none !important;
   translate: none !important;
   scale: none !important;
@@ -612,8 +613,8 @@ html body #contact#contact#contact#contact.paper-stack > .paper-sheet.is-paper-m
    real content out for the length of the read. */
 html body #design#design#design#design.paper-stack > .paper-sheet.is-paper-measuring,
 html body #design#design#design#design.paper-stack > .paper-sheet.is-paper-measuring *,
-html body :is(#bio, #blog, #contact).paper-stack > .paper-sheet.is-paper-measuring,
-html body :is(#bio, #blog, #contact).paper-stack > .paper-sheet.is-paper-measuring * {
+html body :is(#bio, #blog, #contact, #behance).paper-stack > .paper-sheet.is-paper-measuring,
+html body :is(#bio, #blog, #contact, #behance).paper-stack > .paper-sheet.is-paper-measuring * {
   content-visibility: visible !important;
 }
 
@@ -622,7 +623,8 @@ html body :is(#bio, #blog, #contact).paper-stack > .paper-sheet.is-paper-measuri
    covers, so the card could "fit" with its last lines under the menu. */
 html body #bio#bio#bio.paper-stack > .paper-sheet[data-paper-fit] > .paper-scroll > .sheet-mid,
 html body #blog#blog#blog.paper-stack > .paper-sheet[data-paper-fit] > .paper-scroll > .sheet-mid,
-html body #contact#contact#contact.paper-stack > .paper-sheet[data-paper-fit] > .paper-scroll > .sheet-mid {
+html body #contact#contact#contact.paper-stack > .paper-sheet[data-paper-fit] > .paper-scroll > .sheet-mid,
+html body #behance#behance#behance.paper-stack > .paper-sheet[data-paper-fit] > .paper-scroll > .sheet-mid {
   max-height: none !important;
   flex: 0 0 auto !important;
 }
@@ -2004,7 +2006,7 @@ html body #bio#bio#bio > .paper-sheet .index-row {
 
 /* These editorial surfaces sit on opaque paper. An inherited glass blur
    redraws the same flat paper on every scroll frame without changing it. */
-html body :is(#design#design#design, #bio#bio#bio, #blog#blog#blog, #contact#contact#contact) .paper-scroll :is(.service-detail-inner, .stat, .tl-card, .blog-card, .qc-card, .pitch-wrap, .bio-card, .bio-block) {
+html body :is(#design#design#design, #bio#bio#bio, #blog#blog#blog, #contact#contact#contact, #behance#behance#behance) .paper-scroll :is(.service-detail-inner, .stat, .tl-card, .blog-card, .qc-card, .pitch-wrap, .bio-card, .bio-block) {
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
@@ -2026,7 +2028,7 @@ html body .footer.footer.paper-sheet.is-paper-measuring * {
 }
 
 html body #design#design#design.paper-stack > .hero.paper-sheet > .paper-scroll,
-html body :is(#bio, #blog, #contact).paper-stack > .room-hero.paper-sheet > .paper-scroll {
+html body :is(#bio, #blog, #contact, #behance).paper-stack > .room-hero.paper-sheet > .paper-scroll {
   display: flex !important;
   flex-direction: column !important;
   justify-content: safe center !important;
@@ -2034,7 +2036,7 @@ html body :is(#bio, #blog, #contact).paper-stack > .room-hero.paper-sheet > .pap
   padding: clamp(36px, 6svh, 56px) clamp(18px, 4vw, 64px) clamp(76px, 12svh, 108px) !important;
 }
 html body #design#design#design.paper-stack .hero-inner,
-html body :is(#bio, #blog, #contact).paper-stack .room-hero-inner {
+html body :is(#bio, #blog, #contact, #behance).paper-stack .room-hero-inner {
   flex: 0 0 auto !important;
   height: auto !important;
   min-height: 0 !important;
@@ -2088,11 +2090,11 @@ html:lang(en) body #footerCtaTitle {
     line-height: 1.65 !important;
   }
   html body #design#design#design.paper-stack > .hero.paper-sheet > .paper-scroll,
-  html body :is(#bio, #blog, #contact).paper-stack > .room-hero.paper-sheet > .paper-scroll {
+  html body :is(#bio, #blog, #contact, #behance).paper-stack > .room-hero.paper-sheet > .paper-scroll {
     padding-block: clamp(24px, 7svh, 40px) clamp(66px, 13svh, 80px) !important;
   }
   html body #design#design#design.paper-stack .hero-scrolldown,
-  html body :is(#bio, #blog, #contact) .room-hero-ghost {
+  html body :is(#bio, #blog, #contact, #behance) .room-hero-ghost {
     display: none !important;
   }
   html body #design#design#design.paper-stack .hero-cta { margin-top: 14px !important; }
@@ -2102,7 +2104,7 @@ html:lang(en) body #footerCtaTitle {
   /* Keep the floating menu reachable without spending a fixed 94px of a
      short reading frame on lower padding. */
   html body #design#design#design.paper-stack > .section:not(.work) > .paper-scroll,
-  html body :is(#bio, #blog, #contact).paper-stack > .section.paper-sheet > .paper-scroll {
+  html body :is(#bio, #blog, #contact, #behance).paper-stack > .section.paper-sheet > .paper-scroll {
     padding-block: clamp(14px, 4svh, 26px) clamp(64px, 14svh, 82px) !important;
   }
   html body .footer.footer.paper-sheet > .paper-scroll {
@@ -2154,7 +2156,7 @@ html body #design#design#design.paper-stack .paper-scroll.work-head-flow > .work
    by the fit again squeezed columns on short landscape screens and created
    unnecessary reading tracks. The authored maximum keeps wide screens tidy. */
 html body #design#design#design#design#design#design.paper-stack > .section[data-paper-fit] > .paper-scroll > :not(.paper-reading-spacer),
-html body :is(#bio#bio#bio#bio, #blog#blog#blog#blog, #contact#contact#contact#contact).paper-stack > .section[data-paper-fit] > .paper-scroll > :not(.paper-reading-spacer) {
+html body :is(#bio#bio#bio#bio, #blog#blog#blog#blog, #contact#contact#contact#contact, #behance#behance#behance#behance).paper-stack > .section[data-paper-fit] > .paper-scroll > :not(.paper-reading-spacer) {
   /* Zoom scales this limit with the content. Dividing a small fit back out keeps
      the column at its real width on a short window, so the text stays wide and
      short instead of narrowing, growing taller and forcing an even smaller fit. */
@@ -2165,7 +2167,7 @@ html body :is(#bio#bio#bio#bio, #blog#blog#blog#blog, #contact#contact#contact#c
 html body #design :is(.service-showcase, .practice-note) {
   --bq-paper-content-max: 1160px;
 }
-html body :is(#bio, #blog, #contact).paper-stack > .section[data-paper-fit] {
+html body :is(#bio, #blog, #contact, #behance).paper-stack > .section[data-paper-fit] {
   --bq-paper-content-max: 1100px;
 }
 
@@ -2195,7 +2197,7 @@ html.bq-reactive-motion body #design#design > .hero .hero-portrait {
   transition: none !important;
 }
 html.bq-reactive-motion body #design#design > .hero .hero-sign,
-html.bq-reactive-motion body :is(#bio#bio, #blog#blog, #contact#contact) > .room-hero :is(.room-hero-title, .room-hero-ghost) {
+html.bq-reactive-motion body :is(#bio#bio, #blog#blog, #contact#contact, #behance#behance) > .room-hero :is(.room-hero-title, .room-hero-ghost) {
   transform: translate3d(var(--scene-x, 0px), var(--scene-y, 0px), 0) !important;
   translate: none !important;
   transition: none !important;
@@ -2241,7 +2243,7 @@ html[data-motion-mode="reduced"] body #design#design#design > .section.practice-
 /* Existing chapter headings settle before their paper reaches its reading
    position. Their final typography, colour, dimensions and placement are the
    authored ones. The four-ID measuring reset above still takes precedence. */
-html.bq-reactive-motion body :is(#design#design, #bio#bio, #blog#blog, #contact#contact) .section:not(.work) .bq-chapter-title {
+html.bq-reactive-motion body :is(#design#design, #bio#bio, #blog#blog, #contact#contact, #behance#behance) .section:not(.work) .bq-chapter-title {
   transform: translate3d(0, var(--chapter-y, 0px), 0) !important;
   translate: none !important;
   opacity: var(--chapter-opacity, 1) !important;
@@ -2281,7 +2283,7 @@ html.bq-reactive-motion body :is(#design#design, #bio#bio, #blog#blog, #contact#
   }
   html body > .bq-frame.bq-frame.bq-frame::before,
   html body > .bq-frame.bq-frame.bq-frame::after { display: none !important; }
-  html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact).paper-stack > .section[data-paper-fit] > .paper-scroll > .sheet-mid {
+  html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance).paper-stack > .section[data-paper-fit] > .paper-scroll > .sheet-mid {
     inline-size: 100% !important;
     max-inline-size: 100% !important;
     min-inline-size: 0 !important;
@@ -2353,7 +2355,7 @@ html body #design#design#design.paper-stack > .section.practice-note .bio-teaser
 /* ============================================================================
    ROOMS — Biography, Contact and the Journal speak the home sheets' language.
    ========================================================================== */
-html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) {
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog, #behance#behance#behance#behance) {
   --rm-mute: color-mix(in srgb, var(--ink) 58%, transparent);
   --rm-faint: color-mix(in srgb, var(--ink) 42%, transparent);
   --rm-line: color-mix(in srgb, var(--ink) 11%, transparent);
@@ -2362,15 +2364,15 @@ html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blo
 }
 
 /* 1 — titles in Fraunces; Arabic-script letters fall back to Noto Kufi */
-html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .bio-block-title > [data-i18n], .bio-phil-label, .bio-social-title, .tl-card h4, .bio-card h4, .lang-item h4, .index-row-title, .index-card-title, .blog-card-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) {
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog, #behance#behance#behance#behance) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .bio-block-title > [data-i18n], .bio-phil-label, .bio-social-title, .tl-card h4, .bio-card h4, .lang-item h4, .index-row-title, .index-card-title, .blog-card-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) {
   font-family: var(--rm-serif) !important;
   font-weight: 500 !important;
   font-optical-sizing: auto;
 }
-html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) {
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog, #behance#behance#behance#behance) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) {
   letter-spacing: -.028em !important;
 }
-html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .bio-phil-label, .bio-social-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) em {
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog, #behance#behance#behance#behance) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .bio-phil-label, .bio-social-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) em {
   font-family: var(--rm-serif) !important;
   font-style: italic !important;
   font-weight: 400 !important;
@@ -2380,30 +2382,30 @@ html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blo
 /* Arabic script is never slanted: the emphasised word steps back in weight,
    not tone — several translations wrap the whole title in <em>, and a grey
    whole title read as washed out. */
-html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .bio-phil-label, .bio-social-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) {
+html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog, #behance#behance#behance#behance) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .bio-phil-label, .bio-social-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) {
   font-weight: 600 !important;
 }
-html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .bio-phil-label, .bio-social-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) em {
+html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog, #behance#behance#behance#behance) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .bio-phil-label, .bio-social-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) em {
   font-style: normal !important;
   font-weight: 400 !important;
   color: inherit !important;
 }
-html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) {
+html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog, #behance#behance#behance#behance) > .paper-sheet :is(.room-hero-title, .section-title, .bio-block-title, .pitch-head h2, .pitch-head h3, .subscribe-text h3, .subscribe-text h2) {
   letter-spacing: 0 !important;
 }
 
 /* 2 — the cover: one line of type, set large and calm */
-html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .room-hero .room-hero-title {
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog, #behance#behance#behance#behance) > .room-hero .room-hero-title {
   font-size: clamp(54px, min(7.4vw, 11vh), 112px) !important;
   line-height: .98 !important;
   letter-spacing: -.022em !important;
   word-spacing: .06em !important;
 }
-html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .room-hero .room-hero-title {
+html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog, #behance#behance#behance#behance) > .room-hero .room-hero-title {
   line-height: 1.25 !important;
   letter-spacing: 0 !important;
 }
-html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .room-hero .room-hero-sub {
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog, #behance#behance#behance#behance) > .room-hero .room-hero-sub {
   max-inline-size: 34ch !important;
   margin-block-start: clamp(16px, 2.6vh, 26px) !important;
   font-size: clamp(15px, 1.15vw, 17px) !important;
@@ -2412,7 +2414,7 @@ html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blo
 }
 
 /* 3 — eyebrows become the home's quiet pills */
-html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.section-num, .bio-phil-eyebrow, .pitch-head > .mono, .subscribe-eyebrow) {
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog, #behance#behance#behance#behance) > .paper-sheet :is(.section-num, .bio-phil-eyebrow, .pitch-head > .mono, .subscribe-eyebrow) {
   display: inline-flex !important;
   align-items: center !important;
   gap: 8px !important;
@@ -2427,11 +2429,11 @@ html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blo
   text-transform: uppercase !important;
   white-space: nowrap !important;
 }
-html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.section-num, .bio-phil-eyebrow, .pitch-head > .mono, .subscribe-eyebrow) i {
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog, #behance#behance#behance#behance) > .paper-sheet :is(.section-num, .bio-phil-eyebrow, .pitch-head > .mono, .subscribe-eyebrow) i {
   font-size: 10px !important;
   opacity: .8 !important;
 }
-html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) > .paper-sheet :is(.section-num, .bio-phil-eyebrow, .pitch-head > .mono, .subscribe-eyebrow) {
+html[dir="rtl"] body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog, #behance#behance#behance#behance) > .paper-sheet :is(.section-num, .bio-phil-eyebrow, .pitch-head > .mono, .subscribe-eyebrow) {
   letter-spacing: 0 !important;
   font-size: 12px !important;
   padding: 6px 12px 6px 14px !important;
@@ -2460,8 +2462,8 @@ html body #bio#bio#bio#bio > .paper-sheet .bio-block-title {
 }
 
 /* 5 — no watermarks behind the chapters */
-html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) [data-wm]::before,
-html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog) [data-wm]::after {
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog, #behance#behance#behance#behance) [data-wm]::before,
+html body :is(#bio#bio#bio#bio, #contact#contact#contact#contact, #blog#blog#blog#blog, #behance#behance#behance#behance) [data-wm]::after {
   content: none !important;
   display: none !important;
 }
@@ -3219,7 +3221,7 @@ html body #dash#dash .dash-view .dash-prof-card .mono {
    INNER ROOMS — editorial mastheads, a journal index, and a studio letter.
    Keep the existing paper stack and measured viewport fitting intact.
    ========================================================================== */
-html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-inner {
+html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact, #behance#behance#behance) .room-hero-inner {
   position: relative !important;
   inline-size: 100% !important;
   max-inline-size: 1100px !important;
@@ -3228,7 +3230,7 @@ html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-her
   text-align: start !important;
   isolation: isolate;
 }
-html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-num {
+html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact, #behance#behance#behance) .room-hero-num {
   inline-size: 100%;
   margin-block-end: 28px !important;
   padding-block-end: 18px;
@@ -3237,7 +3239,7 @@ html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-her
   color: var(--ink-soft) !important;
   font-size: 11px !important;
 }
-html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-title {
+html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact, #behance#behance#behance) .room-hero-title {
   max-inline-size: 12ch !important;
   font-family: 'Fraunces', 'Noto Kufi Arabic', serif !important;
   font-size: clamp(62px, min(10vw, 16svh), 138px) !important;
@@ -3246,8 +3248,8 @@ html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-her
   letter-spacing: -.055em !important;
   text-wrap: balance;
 }
-html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-title em { font-weight: 400 !important; }
-html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-sub {
+html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact, #behance#behance#behance) .room-hero-title em { font-weight: 400 !important; }
+html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact, #behance#behance#behance) .room-hero-sub {
   max-inline-size: 38ch !important;
   margin: 26px 0 0 !important;
   font-size: clamp(16px, 1.7vw, 21px) !important;
@@ -3256,8 +3258,8 @@ html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-her
   opacity: 1 !important;
   text-wrap: pretty;
 }
-html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-ghost { display: none !important; }
-html[dir='rtl'] body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-title {
+html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact, #behance#behance#behance) .room-hero-ghost { display: none !important; }
+html[dir='rtl'] body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact, #behance#behance#behance) .room-hero-title {
   font-family: 'Noto Kufi Arabic', serif !important;
   font-size: clamp(44px, min(8vw, 12svh), 100px) !important;
   line-height: 1.45 !important;
@@ -3451,9 +3453,9 @@ html body #contact#contact#contact .pitch-form .pitch-submit { min-block-size: 5
   html body #blog#blog#blog .index-inline-sub { font-size: 15px !important; line-height: 1.7 !important; color: var(--ink-soft) !important; }
 }
 @media (max-width: 820px) {
-  html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-inner { padding: 20px 0 !important; }
-  html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-title { font-size: clamp(54px, 14vw, 96px) !important; }
-  html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-ghost { display: none !important; }
+  html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact, #behance#behance#behance) .room-hero-inner { padding: 20px 0 !important; }
+  html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact, #behance#behance#behance) .room-hero-title { font-size: clamp(54px, 14vw, 96px) !important; }
+  html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact, #behance#behance#behance) .room-hero-ghost { display: none !important; }
   html body #blog#blog#blog .blog-index-sheet .section-head { grid-template-columns: minmax(0, 1fr) !important; gap: 14px !important; }
   html body #blog#blog#blog .blog-index-sheet .section-head > .section-lede { grid-column: 1 !important; }
   html body #blog#blog#blog .blog-index-sheet .index-row { grid-template-columns: 36px minmax(0, 1fr) 20px !important; gap: 6px 10px !important; padding-block: 22px !important; }
@@ -3523,8 +3525,8 @@ html body #contact#contact#contact .pitch-form .pitch-submit { min-block-size: 5
   html body #contact#contact#contact#contact .contact-pitch-sheet .pitch-form .checkbox { min-block-size: calc(44px / var(--bq-paper-fit, 1)); font-size: max(12px, calc(12px / var(--bq-paper-fit, 1))) !important; }
 }
 @media (max-height: 540px) {
-  html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-title { font-size: clamp(38px, 14svh, 68px) !important; }
-  html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-ghost { display: none !important; }
+  html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact, #behance#behance#behance) .room-hero-title { font-size: clamp(38px, 14svh, 68px) !important; }
+  html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact, #behance#behance#behance) .room-hero-ghost { display: none !important; }
 }
 
 /* Feed state is authoritative even when an earlier layout sets display. */
@@ -3782,7 +3784,7 @@ html body #bio#bio#bio .bio-docs-sheet .bio-social-title { font-size: clamp(26px
 }
 :root[dir="rtl"] body #bio#bio#bio :is(.bio-philosophy, .bio-story-sheet .section-head) { text-align: start !important; }
 
-html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact) .room-hero-num::after { display: none !important; }
+html body :is(#blog#blog#blog, #bio#bio#bio, #contact#contact#contact, #behance#behance#behance) .room-hero-num::after { display: none !important; }
 /* Small supporting copy retains a readable physical size after paper fitting. */
 html body #blog#blog#blog .blog-card-excerpt { font-size: max(15px, calc(13px / var(--bq-paper-fit, 1))) !important; }
 html body #blog#blog#blog :is(.blog-card-author strong, .blog-card-author small, .blog-card-read, .blog-card-cta) { font-size: max(11px, calc(10px / var(--bq-paper-fit, 1))) !important; }
@@ -3877,7 +3879,7 @@ html body #latestPanel#latestPanel {
 /* Reserve the bar's real scaled height in fitted rooms and their footer.
    The gallery keeps its existing native scroll and gains the same end gap. */
 html body #design#design#design#design.paper-stack > .paper-sheet:not(.work) > .paper-scroll,
-html body :is(#bio#bio#bio#bio, #blog#blog#blog#blog, #contact#contact#contact#contact).paper-stack > .paper-sheet > .paper-scroll,
+html body :is(#bio#bio#bio#bio, #blog#blog#blog#blog, #contact#contact#contact#contact, #behance#behance#behance#behance).paper-stack > .paper-sheet > .paper-scroll,
 html body .footer.footer.footer.footer-v249.paper-sheet > .paper-scroll.paper-scroll {
   padding-block-end: max(76px, calc(var(--bq-dock-top, 92px) + 20px - var(--bq-deck-gutter, 10px))) !important;
 }
@@ -4377,14 +4379,14 @@ html[dir='rtl'] body #design#design#design .hero-editorial .hero-kicker { letter
 @media (max-width: 820px) {
   html:root,
   html.bq-compact,
-  html body :is(#design, #blog, #bio, #contact).paper-stack {
+  html body :is(#design, #blog, #bio, #contact, #behance).paper-stack {
     --bq-stack-top: var(--bq-deck-gutter, 10px) !important;
     /* A transient short visualViewport sample must not collapse the first
        paper. The CSS small viewport is the toolbar-expanded lower bound;
        the bridge can then extend the same frame as the toolbar retracts. */
     --bq-stack-sheet-h: calc(max(100svh, var(--bq-frame-height, 100dvh)) - (var(--bq-deck-gutter, 10px) * 2)) !important;
   }
-  html body :is(#design, #blog, #bio, #contact).paper-stack > .paper-sheet:not(.work),
+  html body :is(#design, #blog, #bio, #contact, #behance).paper-stack > .paper-sheet:not(.work),
   html body .footer.footer-v249.paper-sheet {
     top: var(--bq-stack-top) !important;
     height: var(--bq-stack-sheet-h) !important;
@@ -5282,7 +5284,7 @@ html body :is(
   #design#design#design .bio-teaser-link:is(:hover, :focus-visible),
   #design#design#design .latest-blog-all:is(:hover, :focus-visible),
   #bio#bio#bio .bio-teaser-link:is(:hover, :focus-visible),
-  :is(#bio#bio#bio, #blog#blog#blog, #contact#contact#contact) .room-hero-return:is(:hover, :focus-visible),
+  :is(#bio#bio#bio, #blog#blog#blog, #contact#contact#contact, #behance#behance#behance) .room-hero-return:is(:hover, :focus-visible),
   #blog#blog#blog .subscribe-form button:is(:hover, :focus-visible),
   #contact#contact#contact .pitch-submit:is(:hover, :focus-visible),
   #contact#contact#contact#contact .contact-quick .qc-card:is(:hover, :focus-visible),
@@ -6770,7 +6772,7 @@ html body #design.paper-stack > .paper-sheet[data-paper-fit] :is(.section-num, .
 }
 /* Room labels share the floor. Text the room rules already size against the fit
    stays out, or it would be enlarged twice. */
-html body :is(#bio, #blog, #contact).paper-stack > .paper-sheet[data-paper-fit] :is(.section-num, .mono):not(.mono .mono, .section-num .mono, .bio-chapter-index, .index-card--blog *, .pitch-form *, .cert-item *, .bio-tools *) {
+html body :is(#bio, #blog, #contact, #behance).paper-stack > .paper-sheet[data-paper-fit] :is(.section-num, .mono):not(.mono .mono, .section-num .mono, .bio-chapter-index, .index-card--blog *, .pitch-form *, .cert-item *, .bio-tools *) {
   zoom: max(1, calc(.85 / var(--bq-paper-fit, 1)));
 }
 /* Chapter 01's numeral sits inside a floored label and already follows the fit. */
@@ -6804,7 +6806,7 @@ html body #blog#blog#blog#blog .blog-filter { font-size: max(10.5px, calc(10.5px
    can measure it. Plain centring pushed the top of the sheet out of sight and
    read as "it fits". */
 html body #design#design#design#design.paper-stack > .section:not(.work).paper-sheet > .paper-scroll,
-html body :is(#bio#bio#bio#bio#bio, #blog#blog#blog#blog#blog, #contact#contact#contact#contact#contact).paper-stack > .section.paper-sheet > .paper-scroll {
+html body :is(#bio#bio#bio#bio#bio, #blog#blog#blog#blog#blog, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance).paper-stack > .section.paper-sheet > .paper-scroll {
   justify-content: safe center !important;
 }
 @media (max-height: 640px) {
@@ -6835,21 +6837,21 @@ html body .sites-stage .site-row:focus-visible {
    no pills, tinted cards or boxes. Each room keeps its own idea: the Journal is a
    reading list, the Biography a book of chapters, Contact a printed letter.
    ========================================================================== */
-html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) {
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance) {
   --room-line: color-mix(in srgb, var(--ink) 16%, transparent);
   --room-soft: color-mix(in srgb, var(--ink) 66%, transparent);
   --room-title: clamp(34px, min(5vw, 8.4svh), 76px);
 }
-html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact).paper-stack > .section[data-paper-fit] { --bq-paper-content-max: 1160px; }
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance).paper-stack > .section[data-paper-fit] { --bq-paper-content-max: 1160px; }
 
 /* Title pages: one word and one line, centred, like the home hero. */
-html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact).paper-stack > .room-hero.paper-sheet > .paper-scroll {
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance).paper-stack > .room-hero.paper-sheet > .paper-scroll {
   align-items: center !important;
   justify-content: safe center !important;
   text-align: center !important;
 }
-html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .room-hero :is(.room-hero-num, .room-hero-corner, .room-hero-ghost, .room-hero-scroll) { display: none !important; }
-html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .room-hero-inner {
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance) .room-hero :is(.room-hero-num, .room-hero-corner, .room-hero-ghost, .room-hero-scroll) { display: none !important; }
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance) .room-hero-inner {
   display: grid !important;
   justify-items: center !important;
   gap: clamp(12px, 2.4svh, 26px) !important;
@@ -6860,17 +6862,17 @@ html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#
   border: 0 !important;
   text-align: center !important;
 }
-html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .room-hero-title {
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance) .room-hero-title {
   margin: 0 !important;
   font-size: clamp(52px, min(12vw, 19svh), 180px) !important;
   line-height: 1.04 !important;
   text-align: center !important;
 }
-html[dir="rtl"] body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .room-hero-title {
+html[dir="rtl"] body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance) .room-hero-title {
   font-size: clamp(44px, min(9.5vw, 15svh), 140px) !important;
   line-height: 1.3 !important;
 }
-html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .room-hero-sub {
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance) .room-hero-sub {
   max-width: 46ch !important;
   margin: 0 !important;
   font-size: clamp(15px, min(1.4vw, 2.3svh), 20px) !important;
@@ -6878,8 +6880,8 @@ html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#
   text-align: center !important;
   color: var(--room-soft) !important;
 }
-html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .room-hero-return,
-html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .room-hero-return:is(:hover, :focus-visible) {
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance) .room-hero-return,
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance) .room-hero-return:is(:hover, :focus-visible) {
   border: 0 !important;
   background: none !important;
   -webkit-backdrop-filter: none !important;
@@ -6887,7 +6889,7 @@ html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#
 }
 
 /* Labels are plain small type. */
-html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) :is(.section-num, .bio-phil-eyebrow, .subscribe-eyebrow, .pitch-mail, .pitch-head > .mono) {
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance) :is(.section-num, .bio-phil-eyebrow, .subscribe-eyebrow, .pitch-mail, .pitch-head > .mono) {
   padding: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
@@ -6897,10 +6899,10 @@ html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#
   backdrop-filter: none !important;
   color: var(--room-soft) !important;
 }
-html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .section-num > i,
-html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .bio-phil-eyebrow > i,
-html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .pitch-head > .mono > i { display: none !important; }
-html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact) .section-title {
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance) .section-num > i,
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance) .bio-phil-eyebrow > i,
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance) .pitch-head > .mono > i { display: none !important; }
+html body :is(#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance) .section-title {
   margin: 0 !important;
   font-size: var(--room-title) !important;
   line-height: 1.08 !important;
@@ -7305,7 +7307,7 @@ html body #bio#bio#bio#bio#bio .bio-docs-sheet .bio-social-desc { font-size: var
   html body #bio#bio#bio#bio#bio .bio-block.bio-tools { grid-template-columns: minmax(0, 1fr) !important; }
 }
 /* Kurdish and Arabic need taller lines than the Latin titles above. */
-html[dir="rtl"] body :is(#blog#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact#contact) :is(.section-title, .bio-block-title, .subscribe-title, .pitch-head h3) { line-height: 1.4 !important; }
+html[dir="rtl"] body :is(#blog#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio#bio, #contact#contact#contact#contact#contact#contact, #behance#behance#behance#behance#behance#behance) :is(.section-title, .bio-block-title, .subscribe-title, .pitch-head h3) { line-height: 1.4 !important; }
 html[dir="rtl"] body :is(#blog#blog#blog#blog#blog#blog, #bio#bio#bio#bio#bio#bio) :is(.index-row-title, .tl-card h4, .bio-card h4, .bio-social-title) { line-height: 1.55 !important; }
 html[dir="rtl"] body :is(.pitch-submit, .subscribe-form button, .blog-card-cta) .fa-arrow-right { transform: scaleX(-1); }
 /* Autofill stays on the paper instead of painting a tinted slab. */
@@ -7317,3 +7319,583 @@ html body #blog#blog#blog#blog#blog .subscribe-field input:-webkit-autofill {
   background-clip: text !important;
 }
 html[data-theme="dark"] body #bio#bio#bio#bio .bio-kit-sheet .tool-ic img[src$="/chatgpt.svg"] { filter: invert(1); }
+
+/* ==========================================================================
+   BEHANCE (owner, 2026-11-07: a room named Behance with every Behance project
+   inside the site, and a home sheet that invites people into it). Same paper,
+   type and hairlines as the other rooms. The home sheet lays the newest covers
+   on the paper like sheets on a desk; the room lists the projects the way a
+   Behance profile does and opens each one in a full-screen viewer.
+   ========================================================================== */
+
+/* Home: the invitation. */
+html body #design#design#design#design.paper-stack > .behance-teaser.paper-sheet > .paper-scroll {
+  justify-content: safe center !important;
+}
+html body #design#design#design#design .behance-teaser .sheet-mid {
+  display: grid !important;
+  grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+  align-items: center;
+  gap: clamp(28px, 6vw, 110px);
+  width: min(100%, 1180px) !important;
+  margin-inline: auto !important;
+}
+html body #design#design#design#design .behance-teaser .bht-copy {
+  display: grid;
+  justify-items: start;
+  gap: clamp(12px, 2.2vh, 22px);
+  min-width: 0;
+}
+html body #design#design#design#design .behance-teaser .bht-title {
+  margin: 0 !important;
+  max-width: 11em;
+  font-family: 'Fraunces', 'Noto Naskh Arabic', serif !important;
+  font-size: clamp(32px, min(4.4vw, 6.6svh), 66px) !important;
+  font-weight: 400 !important;
+  line-height: 1.04 !important;
+  letter-spacing: -.03em !important;
+}
+html[dir="rtl"] body #design#design#design#design .behance-teaser .bht-title {
+  font-size: clamp(28px, min(3.6vw, 5.6svh), 54px) !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0 !important;
+}
+html body #design#design#design#design .behance-teaser .bht-lede {
+  margin: 0 !important;
+  max-width: 34ch;
+  font-size: clamp(14px, min(1.3vw, 2.1svh), 18px) !important;
+  line-height: 1.6 !important;
+}
+html body #design#design#design#design .behance-teaser .bht-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: clamp(4px, 1vh, 10px);
+  padding-block-end: 8px;
+  border-block-end: 1px solid var(--ink);
+  font-size: 11.5px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+}
+html body #design#design#design#design .behance-teaser .bht-cta i { transition: transform .45s var(--ease); }
+html body #design#design#design#design .behance-teaser .bht-cta:is(:hover, :focus-visible) i { transform: translateX(4px); }
+html[dir="rtl"] body #design#design#design#design .behance-teaser .bht-cta i { transform: scaleX(-1); }
+html[dir="rtl"] body #design#design#design#design .behance-teaser .bht-cta:is(:hover, :focus-visible) i { transform: scaleX(-1) translateX(4px); }
+
+/* The pile: four covers dropped on the sheet, the newest on top. */
+html body #design#design#design#design .behance-teaser .bht-pile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 808 / 632;
+  padding: 7%;
+  box-sizing: border-box;
+}
+html body #design#design#design#design .behance-teaser .bht-sheet {
+  grid-area: 1 / 1;
+  display: block;
+  width: 86%;
+  height: auto;
+  aspect-ratio: 808 / 632;
+  object-fit: cover;
+  border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  border-radius: clamp(8px, 1vw, 14px);
+  background: var(--bq-paper-sheet);
+  transform: translate(var(--bx, 0%), var(--by, 0%)) rotate(var(--br, 0deg));
+  transition: transform .8s cubic-bezier(.22, 1, .36, 1);
+}
+html body #design#design#design#design .behance-teaser .bht-sheet:nth-child(1) { --bx: 8%; --by: -7%; --br: 5deg; }
+html body #design#design#design#design .behance-teaser .bht-sheet:nth-child(2) { --bx: -7%; --by: 6%; --br: -4.5deg; }
+html body #design#design#design#design .behance-teaser .bht-sheet:nth-child(3) { --bx: 5%; --by: 4%; --br: 2.5deg; }
+html body #design#design#design#design .behance-teaser .bht-sheet:nth-child(4) { --bx: -1.5%; --by: -1.5%; --br: -1deg; }
+html body #design#design#design#design .behance-teaser:is(:has(.bht-pile:hover), :has(.bht-cta:hover), :has(.bht-cta:focus-visible)) .bht-sheet {
+  transform: translate(calc(var(--bx, 0%) * 1.7), calc(var(--by, 0%) * 1.7)) rotate(calc(var(--br, 0deg) * 1.6));
+}
+html[dir="rtl"] body #design#design#design#design .behance-teaser .bht-sheet {
+  transform: translate(calc(var(--bx, 0%) * -1), var(--by, 0%)) rotate(calc(var(--br, 0deg) * -1));
+}
+html[dir="rtl"] body #design#design#design#design .behance-teaser:is(:has(.bht-pile:hover), :has(.bht-cta:hover), :has(.bht-cta:focus-visible)) .bht-sheet {
+  transform: translate(calc(var(--bx, 0%) * -1.7), calc(var(--by, 0%) * 1.7)) rotate(calc(var(--br, 0deg) * -1.6));
+}
+@media (max-width: 820px), (max-aspect-ratio: 1/1) {
+  html body #design#design#design#design .behance-teaser .sheet-mid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(14px, 3vh, 30px);
+  }
+  html body #design#design#design#design .behance-teaser .bht-pile {
+    width: min(100%, 560px);
+    justify-self: center;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body #design#design#design#design .behance-teaser .bht-sheet { transition-duration: .2s; }
+}
+
+/* The room: a hero like the other rooms, then the profile grid. */
+html body #behance#behance#behance#behance#behance .bh-hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-block-end: 4px;
+  border-block-end: 1px solid var(--room-line);
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: none !important;
+  color: var(--room-soft);
+  text-decoration: none;
+}
+html body #behance#behance#behance#behance#behance .bh-hero-link:is(:hover, :focus-visible) { color: var(--ink); border-color: var(--ink); }
+html body #behance#behance#behance#behance#behance .behance-count {
+  margin-inline-start: 6px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* The profile, as on Behance (owner, 2026-11-07: "make the room like my
+   Behance profile, with my photo, the cover and the rest"): the cover, the
+   photo over its edge, name and work, two plain links, then the figures on
+   hairlines and the Work tab above the grid. Site white and black only. */
+html body #behance#behance#behance#behance#behance .bh-profile { display: grid; }
+html body #behance#behance#behance#behance#behance .bhp-banner {
+  overflow: hidden;
+  aspect-ratio: 4 / 1;
+  border: 1px solid var(--room-line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+html body #behance#behance#behance#behance#behance .bhp-banner img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+html body #behance#behance#behance#behance#behance .bhp-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px clamp(16px, 2.4vw, 32px);
+  margin-block-start: calc(-1 * clamp(34px, 4.6vw, 60px));
+  padding-inline: clamp(12px, 2.4vw, 32px);
+}
+html body #behance#behance#behance#behance#behance .bhp-avatar {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: clamp(92px, 10.5vw, 144px);
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 4px solid var(--bq-paper-sheet);
+  border-radius: 50%;
+  background: var(--bq-paper-sheet);
+}
+html body #behance#behance#behance#behance#behance .bhp-id { display: grid; gap: 6px; min-width: 0; padding-block-end: 4px; }
+html body #behance#behance#behance#behance#behance .bhp-name {
+  margin: 0 !important;
+  font-family: 'Fraunces', 'Noto Naskh Arabic', serif !important;
+  font-size: clamp(26px, 3vw, 42px) !important;
+  font-weight: 450 !important;
+  line-height: 1.05 !important;
+  letter-spacing: -.02em !important;
+}
+html body #behance#behance#behance#behance#behance .bhp-role {
+  margin: 0 !important;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--room-soft);
+}
+html body #behance#behance#behance#behance#behance .bhp-available {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 !important;
+  font-size: 10.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--room-soft);
+}
+html body #behance#behance#behance#behance#behance .bhp-available::before {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+html body #behance#behance#behance#behance#behance .bhp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  padding-block-end: 10px;
+}
+html body #behance#behance#behance#behance#behance :is(.bhp-follow, .bhp-message) {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding-block-end: 6px;
+  border-block-end: 1px solid var(--ink);
+  font-size: 11.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+}
+html body #behance#behance#behance#behance#behance .bhp-message { border-color: var(--room-line); color: var(--room-soft); }
+html body #behance#behance#behance#behance#behance .bhp-message:is(:hover, :focus-visible) { border-color: var(--ink); color: var(--ink); }
+html[dir="rtl"] body #behance#behance#behance#behance#behance .bhp-message i { transform: scaleX(-1); }
+html body #behance#behance#behance#behance#behance .bhp-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: clamp(20px, 3vh, 32px) 0 0;
+  border-block: 1px solid var(--room-line);
+}
+html body #behance#behance#behance#behance#behance .bhp-stats > div {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding-block: 14px;
+  padding-inline-start: clamp(12px, 2vw, 24px);
+  border-inline-start: 1px solid var(--room-line);
+}
+html body #behance#behance#behance#behance#behance .bhp-stats > div:first-child { padding-inline-start: 0; border-inline-start: 0; }
+html body #behance#behance#behance#behance#behance .bhp-stats dt {
+  order: 2;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
+  font-size: 10.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--room-soft);
+}
+html body #behance#behance#behance#behance#behance .bhp-stats dd {
+  order: 1;
+  margin: 0;
+  font-family: 'Fraunces', 'Noto Naskh Arabic', serif !important;
+  font-size: clamp(22px, 2.4vw, 34px);
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+html body #behance#behance#behance#behance#behance .bhp-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-block-start: clamp(18px, 2.6vh, 28px);
+  padding-block-end: 12px;
+  border-block-end: 1px solid var(--room-line);
+}
+html body #behance#behance#behance#behance#behance .bhp-tab {
+  position: relative;
+  font-size: 11.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+html body #behance#behance#behance#behance#behance .bhp-tab::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -13px;
+  height: 2px;
+  background: var(--ink);
+}
+html body #behance#behance#behance#behance#behance .bhp-since {
+  font-size: 10.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--room-soft);
+}
+html[dir="rtl"] body #behance#behance#behance#behance#behance :is(.bhp-available, .bhp-tab, .bhp-since, .bhp-stats dt, .bhp-follow, .bhp-message) { letter-spacing: 0; }
+@media (max-width: 760px) {
+  html body #behance#behance#behance#behance#behance .bhp-banner { aspect-ratio: 3 / 1; border-radius: 10px; }
+  html body #behance#behance#behance#behance#behance .bhp-card {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    padding-inline: 0;
+  }
+  html body #behance#behance#behance#behance#behance .bhp-avatar { margin-inline-start: 14px; }
+  html body #behance#behance#behance#behance#behance .bhp-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html body #behance#behance#behance#behance#behance .bhp-stats > div:nth-child(3) { padding-inline-start: 0; border-inline-start: 0; }
+  html body #behance#behance#behance#behance#behance .bhp-stats > div:nth-child(n + 3) { border-block-start: 1px solid var(--room-line); }
+}
+
+/* A project that has just arrived from Behance's public feed and is not
+   copied yet: it is marked new, and its viewer sends the reader to Behance. */
+html body .bh-card-new {
+  display: inline-block;
+  margin-inline-start: 8px;
+  color: var(--ink);
+  font-weight: 600;
+}
+html body .bh-viewer .bhv-notice {
+  display: grid;
+  justify-items: start;
+  gap: 18px;
+  padding: clamp(26px, 4vw, 52px) clamp(20px, 6vw, 84px);
+  border-block-start: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+}
+html body .bh-viewer .bhv-notice p { margin: 0; max-width: 52ch; font-size: 16px; line-height: 1.6; }
+html body #behance#behance#behance#behance#behance .behance-grid {
+  list-style: none;
+  margin: clamp(22px, 3.6vh, 40px) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: clamp(26px, 3.4vw, 44px) clamp(14px, 2vw, 26px);
+}
+html body #behance#behance#behance#behance#behance .behance-grid[aria-busy="true"]:empty {
+  min-height: 40svh;
+}
+
+/* A project card: the cover, then its title and a quiet line (also used in
+   the viewer's "More projects"). */
+html body .bh-card { min-width: 0; }
+html body .bh-card-link {
+  display: grid;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+html body .bh-card-cover {
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 808 / 632;
+  border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+}
+html body .bh-card-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .7s cubic-bezier(.22, 1, .36, 1);
+}
+html body .bh-card-link:is(:hover, :focus-visible) .bh-card-cover img { transform: scale(1.035); }
+html body .bh-card-link:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; border-radius: 12px; }
+html body .bh-card-text { display: grid; gap: 4px; min-width: 0; }
+html body .bh-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -.01em;
+  overflow-wrap: anywhere;
+}
+html body .bh-card-meta {
+  font-size: 10.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 62%, transparent);
+}
+
+/* The viewer: dark backdrop, the project's canvas in the middle, as on
+   Behance. In dark mode the frame inverts like the rest of the site. */
+html.bh-viewer-open,
+html.bh-viewer-open body { overflow: hidden !important; }
+html body .bh-viewer {
+  --bhv-back: #0b0b0b;
+  --bhv-front: #f4f3ef;
+  position: fixed;
+  inset: 0;
+  z-index: 100002;
+  display: none;
+  background: var(--bhv-back);
+  color: var(--bhv-front);
+}
+html:root[data-theme="dark"] body .bh-viewer {
+  --bhv-back: #f4f3ef;
+  --bhv-front: #0b0b0b;
+}
+html body .bh-viewer.is-open { display: block; animation: bhv-in .35s cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes bhv-in { from { opacity: 0; } to { opacity: 1; } }
+html body .bh-viewer .bhv-bar {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-inline: clamp(14px, 3vw, 28px);
+}
+html body .bh-viewer .bhv-who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+html body .bh-viewer .bhv-who img { flex: none; width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+html body .bh-viewer .bhv-who-text { display: grid; min-width: 0; }
+html body .bh-viewer .bhv-who-text strong {
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+html body .bh-viewer .bhv-who-text small {
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  opacity: .62;
+}
+html body .bh-viewer .bhv-bar-end { display: flex; flex: none; align-items: center; gap: clamp(10px, 1.6vw, 18px); }
+html body .bh-viewer .bhv-count { font-size: 11px; letter-spacing: .14em; opacity: .62; }
+html body .bh-viewer .bhv-ext {
+  padding-block-end: 3px;
+  border-block-end: 1px solid currentColor;
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: inherit;
+  text-decoration: none;
+}
+html body .bh-viewer :is(.bhv-close, .bhv-side) {
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--bhv-front) 32%, transparent);
+  border-radius: 50%;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color .25s ease, color .25s ease;
+}
+html body .bh-viewer .bhv-close { width: 42px; height: 42px; font-size: 16px; }
+html body .bh-viewer :is(.bhv-close, .bhv-side):is(:hover, :focus-visible) {
+  background: var(--bhv-front);
+  color: var(--bhv-back);
+}
+html body .bh-viewer :is(.bhv-close, .bhv-side, .bhv-ext, .bhv-cta):focus-visible { outline: 2px solid var(--bhv-front); outline-offset: 3px; }
+html body .bh-viewer .bhv-side {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  width: 48px;
+  height: 48px;
+  translate: 0 -50%;
+  font-size: 15px;
+}
+html body .bh-viewer .bhv-side--prev { inset-inline-start: clamp(10px, 2vw, 28px); }
+html body .bh-viewer .bhv-side--next { inset-inline-end: clamp(10px, 2vw, 28px); }
+html[dir="rtl"] body .bh-viewer .bhv-side i { transform: scaleX(-1); }
+html body .bh-viewer .bhv-scroll {
+  position: absolute;
+  inset: 64px 0 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+html body .bh-viewer .bhv-canvas {
+  width: min(1400px, calc(100% - 2 * clamp(0px, 7vw, 110px)));
+  margin: 0 auto clamp(36px, 7vh, 80px);
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+  background: var(--bq-paper-sheet);
+  color: var(--ink);
+}
+html body .bh-viewer .bhv-images { display: grid; }
+html body .bh-viewer .bhv-image { margin: 0; }
+html body .bh-viewer .bhv-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+}
+html body .bh-viewer .bhv-image figcaption {
+  padding: 10px clamp(16px, 3vw, 28px);
+  font-size: 13px;
+  color: color-mix(in srgb, var(--ink) 66%, transparent);
+}
+html body .bh-viewer .bhv-info {
+  display: grid;
+  gap: clamp(20px, 3.4vh, 32px);
+  padding: clamp(30px, 5vw, 68px) clamp(20px, 6vw, 84px);
+  border-block-start: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+}
+html body .bh-viewer .bhv-info-head { display: grid; gap: 10px; }
+html body .bh-viewer :is(.bhv-kicker, .bhv-date, .bhv-fact dt, .bhv-more-title) {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 62%, transparent);
+}
+html body .bh-viewer .bhv-kicker { display: inline-flex; align-items: center; gap: 8px; }
+html body .bh-viewer .bhv-info-title {
+  margin: 0;
+  font-family: 'Fraunces', 'Noto Naskh Arabic', serif !important;
+  font-size: clamp(28px, 3.4vw, 48px);
+  font-weight: 450;
+  line-height: 1.08;
+  letter-spacing: -.025em;
+}
+html body .bh-viewer .bhv-about { display: grid; gap: 14px; max-width: 68ch; }
+html body .bh-viewer .bhv-about p { margin: 0; font-size: 16px; line-height: 1.7; }
+html body .bh-viewer .bhv-about p:first-child {
+  font-family: 'Fraunces', 'Noto Naskh Arabic', serif !important;
+  font-size: clamp(20px, 2.1vw, 27px);
+  line-height: 1.35;
+}
+html body .bh-viewer .bhv-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 18px clamp(24px, 4vw, 56px);
+  margin: 0;
+}
+html body .bh-viewer .bhv-fact {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding-block-start: 14px;
+  border-block-start: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+}
+html body .bh-viewer .bhv-fact dd { margin: 0; }
+html body .bh-viewer .bhv-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+html body .bh-viewer .bhv-cta {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding-block-end: 8px;
+  border-block-end: 1px solid var(--ink);
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
+  font-size: 11.5px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+}
+html body .bh-viewer .bhv-more-wrap {
+  padding: clamp(26px, 4vw, 50px) clamp(20px, 6vw, 84px) clamp(40px, 6vw, 76px);
+  border-block-start: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+}
+html body .bh-viewer .bhv-more-title { margin-block-end: 18px; }
+html body .bh-viewer .bhv-more {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
+  gap: 24px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .bh-viewer .bhv-more .bh-card-title { font-size: 13.5px; }
+@media (max-width: 900px) {
+  html body .bh-viewer .bhv-side { display: none; }
+  html body .bh-viewer .bhv-canvas { width: 100%; border-radius: 0; }
+}
+@media (max-width: 560px) {
+  html body .bh-viewer .bhv-count { display: none; }
+  html body .bh-viewer .bhv-ext span { display: none; }
+  html body .bh-viewer .bhv-ext { border: 0; font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body .bh-viewer.is-open { animation: none; }
+}

@@ -26,7 +26,8 @@ const jsBundles = [
   ['js/latest-feed.js', 'js/latest-feed.min.js'],
   ['js/motion.js', 'js/motion.min.js'],
   ['js/chat-kb.js', 'js/chat-kb.min.js'],
-  ['js/lux.js', 'js/lux.min.js']
+  ['js/lux.js', 'js/lux.min.js'],
+  ['js/behance.js', 'js/behance.min.js']
 ];
 
 const cssBundles = [

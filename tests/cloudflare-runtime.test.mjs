@@ -117,9 +117,13 @@ test('retired email delivery alone cannot make authenticator login appear config
 
 test('first-party analytics derive a separate private key and count archive and work pages in D1', async (t) => {
   const { env, request } = await context(t);
-  const paths = ['/', '/ku/bio', '/design/book/1', '/archive/', '/archive/photos/2/'];
+  const paths = ['/', '/ku/bio', '/design/book/1', '/archive/', '/archive/photos/2/', '/behance', '/ku/behance/258156477-barakat-qurtas-selected-works-20142026'];
   for (const p of paths) {
     assert.equal((await hit({ env, request: request('/api/hit', { p, l: 'ku', r: 'https://example.org/private?personal=value' }) })).status, 204);
+  }
+  // Malformed or non-canonical project paths are not visits.
+  for (const p of ['/behance/0', '/behance/abc', '/behance/243902845-PHOTOGRAPHY']) {
+    assert.equal((await hit({ env, request: request('/api/hit', { p, l: 'en' }) })).status, 204);
   }
   const rows = env.DB.sqlite.prepare('SELECT * FROM hits').all();
   assert.equal(rows.length, paths.length);

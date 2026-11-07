@@ -73,6 +73,7 @@ Book-cover examples: https://bqurtas.com/design/book
 Video examples: https://bqurtas.com/design/video
 Full archive: https://bqurtas.com/archive/
 Journal: https://bqurtas.com/blog
+Behance projects: https://bqurtas.com/behance
 Start a project: https://bqurtas.com/contact
 Only give a link when it helps the visitor's request. Do not invent individual work URLs, client projects or published articles.
 

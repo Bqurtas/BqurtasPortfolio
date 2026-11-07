@@ -66,6 +66,19 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/contact" />
   </url>
   <url>
+    <loc>https://bqurtas.com/behance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bqurtas.com/behance" />
+    <xhtml:link rel="alternate" hreflang="ckb" href="https://bqurtas.com/ku/behance" />
+    <xhtml:link rel="alternate" hreflang="ku" href="https://bqurtas.com/kmr/behance" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bqurtas.com/ar/behance" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bqurtas.com/fr/behance" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/behance" />
+    <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/behance" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/behance" />
+  </url>
+  <url>
     <loc>https://bqurtas.com/design/official</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -272,6 +285,19 @@
     <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/contact" />
     <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/contact" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/contact" />
+  </url>
+  <url>
+    <loc>https://bqurtas.com/ku/behance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bqurtas.com/behance" />
+    <xhtml:link rel="alternate" hreflang="ckb" href="https://bqurtas.com/ku/behance" />
+    <xhtml:link rel="alternate" hreflang="ku" href="https://bqurtas.com/kmr/behance" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bqurtas.com/ar/behance" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bqurtas.com/fr/behance" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/behance" />
+    <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/behance" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/behance" />
   </url>
   <url>
     <loc>https://bqurtas.com/ku/design/official</loc>
@@ -482,6 +508,19 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/contact" />
   </url>
   <url>
+    <loc>https://bqurtas.com/kmr/behance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bqurtas.com/behance" />
+    <xhtml:link rel="alternate" hreflang="ckb" href="https://bqurtas.com/ku/behance" />
+    <xhtml:link rel="alternate" hreflang="ku" href="https://bqurtas.com/kmr/behance" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bqurtas.com/ar/behance" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bqurtas.com/fr/behance" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/behance" />
+    <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/behance" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/behance" />
+  </url>
+  <url>
     <loc>https://bqurtas.com/kmr/design/official</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -688,6 +727,19 @@
     <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/contact" />
     <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/contact" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/contact" />
+  </url>
+  <url>
+    <loc>https://bqurtas.com/ar/behance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bqurtas.com/behance" />
+    <xhtml:link rel="alternate" hreflang="ckb" href="https://bqurtas.com/ku/behance" />
+    <xhtml:link rel="alternate" hreflang="ku" href="https://bqurtas.com/kmr/behance" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bqurtas.com/ar/behance" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bqurtas.com/fr/behance" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/behance" />
+    <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/behance" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/behance" />
   </url>
   <url>
     <loc>https://bqurtas.com/ar/design/official</loc>
@@ -898,6 +950,19 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/contact" />
   </url>
   <url>
+    <loc>https://bqurtas.com/fr/behance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bqurtas.com/behance" />
+    <xhtml:link rel="alternate" hreflang="ckb" href="https://bqurtas.com/ku/behance" />
+    <xhtml:link rel="alternate" hreflang="ku" href="https://bqurtas.com/kmr/behance" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bqurtas.com/ar/behance" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bqurtas.com/fr/behance" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/behance" />
+    <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/behance" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/behance" />
+  </url>
+  <url>
     <loc>https://bqurtas.com/fr/design/official</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -1106,6 +1171,19 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/contact" />
   </url>
   <url>
+    <loc>https://bqurtas.com/tr/behance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bqurtas.com/behance" />
+    <xhtml:link rel="alternate" hreflang="ckb" href="https://bqurtas.com/ku/behance" />
+    <xhtml:link rel="alternate" hreflang="ku" href="https://bqurtas.com/kmr/behance" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bqurtas.com/ar/behance" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bqurtas.com/fr/behance" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/behance" />
+    <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/behance" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/behance" />
+  </url>
+  <url>
     <loc>https://bqurtas.com/tr/design/official</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -1312,6 +1390,19 @@
     <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/contact" />
     <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/contact" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/contact" />
+  </url>
+  <url>
+    <loc>https://bqurtas.com/sv/behance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bqurtas.com/behance" />
+    <xhtml:link rel="alternate" hreflang="ckb" href="https://bqurtas.com/ku/behance" />
+    <xhtml:link rel="alternate" hreflang="ku" href="https://bqurtas.com/kmr/behance" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bqurtas.com/ar/behance" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bqurtas.com/fr/behance" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://bqurtas.com/tr/behance" />
+    <xhtml:link rel="alternate" hreflang="sv" href="https://bqurtas.com/sv/behance" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bqurtas.com/behance" />
   </url>
   <url>
     <loc>https://bqurtas.com/sv/design/official</loc>

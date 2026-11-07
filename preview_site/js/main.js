@@ -226,7 +226,8 @@ document.addEventListener('DOMContentLoaded', () => {
     work: 'nav.work',
     brandboard: 'nav.brandboard',
     bio: 'nav.bio',
-    contact: 'nav.contact'
+    contact: 'nav.contact',
+    behance: 'nav.behance'
   };
   const roomLabelFallbacks = {
     design: 'Design',
@@ -235,7 +236,8 @@ document.addEventListener('DOMContentLoaded', () => {
     work: 'Selected Work',
     brandboard: 'The Brand Board',
     bio: 'The Designer',
-    contact: "Let's talk."
+    contact: "Let's talk.",
+    behance: 'Behance'
   };
   const setRoomChrome = (room) => {
     const key = roomLabelKeys[room] || roomLabelKeys.design;
@@ -332,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- ROUTER (room switcher + deep-links) ---------- */
   const rooms = document.querySelectorAll('.room');
   const routeLinks = document.querySelectorAll('[data-route]');
-  const validRooms = ['design','blog','bio','contact'];
+  const validRooms = ['design','blog','bio','contact','behance'];
   let restoringHistory = false;
 
   // Real anchors keep their authored destination (home versus /design) while
@@ -383,7 +385,8 @@ document.addEventListener('DOMContentLoaded', () => {
       path = prefix + '/' + room;
     }
     // deep post/case URLs are owned by their readers — leave them intact on passive syncs
-    if (!push && ((room === 'blog' && /\/blog\/[^/]+/.test(location.pathname)) || (room === 'work' && /\/work\/[^/]+/.test(location.pathname)))) return;
+    if (!push && ((room === 'blog' && /\/blog\/[^/]+/.test(location.pathname)) || (room === 'work' && /\/work\/[^/]+/.test(location.pathname))
+      || (room === 'behance' && /\/behance\/[^/]+/.test(location.pathname)))) return;
     if ((location.pathname.replace(/\/+$/, '') || '/') === path) return;
     try {
       if (push) history.pushState(null, '', path);
@@ -572,6 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       if (window.__bqCloseReader) window.__bqCloseReader();   // leaving via the rail closes an open post
       if (window.__bqCloseWorkCase) window.__bqCloseWorkCase();   // leaving via the rail closes an open case study
+      if (window.__bqCloseBehance) window.__bqCloseBehance();   // and an open Behance project
       showRoomAfterTransitionCurtain(route, true);
     });
   });
@@ -1671,6 +1675,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.__bqResetToHomeHero = () => {
     try { window.__bqCloseReader && window.__bqCloseReader(); } catch (e) {}
     try { window.__bqCloseWorkCase && window.__bqCloseWorkCase(); } catch (e) {}
+    try { window.__bqCloseBehance && window.__bqCloseBehance(); } catch (e) {}
     const all = document.querySelector('.tab[data-filter="all"]');
     if (all && currentFilter !== 'all') setActiveTab(all);
     showRoom('design', false);
@@ -2663,7 +2668,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
      window at a readable size, so they stop here and the rest reads on the page
      track: 5px labels and full-size fields helped nobody. */
   const PAPER_READING_MIN = 0.82;
-  const readingPaper = (sheet) => ['bio-story-sheet', 'bio-press-sheet', 'contact-pitch-sheet', 'blog-index-sheet']
+  const readingPaper = (sheet) => ['bio-story-sheet', 'bio-press-sheet', 'contact-pitch-sheet', 'blog-index-sheet', 'behance-sheet']
     .some(name => sheet.classList.contains?.(name));
   const compactBioPaper = (sheet) => [
     'bio-kit-sheet', 'bio-proof-sheet', 'bio-record-sheet', 'bio-education-sheet',
@@ -3500,7 +3505,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       hero.style.setProperty('--bq-paper-z', '1');
       wrapPaperScroll(hero);
 
-      const paperNames = ['work', 'sites', 'practice', 'note', 'clients', 'blog'];
+      const paperNames = ['work', 'sites', 'behance', 'practice', 'note', 'clients', 'blog'];
       sections.forEach((sheet, i) => {
         sheet.classList.add('paper-sheet');
         sheet.dataset.paper = paperNames[i] || `sheet-${i + 1}`;
@@ -3533,7 +3538,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
   /* ---- Blog / Bio / Contact — the same paper deck as the main room ---- */
   const sharedFooter = document.querySelector('.footer.footer-v249');
   if (sharedFooter) sharedFooter.dataset.paperFit = '';
-  ['blog', 'bio', 'contact'].forEach((id) => {
+  ['blog', 'bio', 'contact', 'behance'].forEach((id) => {
     const room = document.getElementById(id);
     if (!room) return;
     room.classList.add('paper-stack', 'room-paper');

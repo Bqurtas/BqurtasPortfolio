@@ -13,12 +13,12 @@
       instead of being pinned for the life of the installed worker.
    ========================================================= */
 
-const SW_VERSION = '7f2085900d95'; // generated from this worker and the app shell
+const SW_VERSION = '4679e5442b36'; // generated from this worker and the app shell
 const CACHE_NAME = `bqurtas-cache-${SW_VERSION}`;
 const DOC_FALLBACK = '/index.html';
 
 function isAppDocument(pathname) {
-  return pathname === DOC_FALLBACK || /^\/(?:(?:ku|kmr|ar|fr|tr|sv)(?:\/|$))?(?:|design(?:\/(?:logo|official|book|posters|social|events|stationery|image|video|other|certificate))?|blog(?:\/[1-9]\d{0,17})?|bio|contact)\/?$/.test(pathname);
+  return pathname === DOC_FALLBACK || /^\/(?:(?:ku|kmr|ar|fr|tr|sv)(?:\/|$))?(?:|design(?:\/(?:logo|official|book|posters|social|events|stationery|image|video|other|certificate))?|blog(?:\/[1-9]\d{0,17})?|bio|contact|behance(?:\/[1-9]\d{5,11}(?:-[A-Za-z0-9-]*)?)?)\/?$/.test(pathname);
 }
 
 async function cachedEntry(request) {
@@ -39,12 +39,12 @@ const PRECACHE_ASSETS = [
   '/css/modern-framer.min.css?v=0741789ec97b',
   '/css/style.v417.min.css?v=ddcf2f5464ea',
   '/css/fonts.css?v=6bd89c103953',
-  '/css/experience.min.css?v=d78921b4a98f',
-  '/js/main.v420.min.js?v=28c0952dd2b3',
+  '/css/experience.min.css?v=2c2664c33142',
+  '/js/main.v420.min.js?v=f3539a59cebf',
   '/js/gallery.v420.min.js?v=6650d0580a06',
-  '/js/i18n.v420.min.js?v=c003ab6e87d9',
+  '/js/i18n.v420.min.js?v=76e3d49d6f43',
   '/js/motion.44e83e65e735.min.js?v=44e83e65e735',
-  '/js/lux.min.js?v=1e8781ff602a',
+  '/js/lux.min.js?v=d29cd2fe8677',
   '/site.webmanifest?v=19c5c4b9ee48',
   '/favicon.ico',
   '/assets/hero-sketch.webp?v=0a32dc9eafb1',

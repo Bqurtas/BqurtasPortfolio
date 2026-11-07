@@ -205,8 +205,8 @@ function divBody(source, opening) {
   assert.fail('hero markup must have a balanced closing element');
 }
 
-test('all four room heroes have a complete paper frame before any deferred script runs', () => {
-  for (const id of ['design', 'blog', 'bio', 'contact']) {
+test('every room hero has a complete paper frame before any deferred script runs', () => {
+  for (const id of ['design', 'blog', 'bio', 'contact', 'behance']) {
     const room = html.match(new RegExp(`<section\\b([^>]*\\bid="${id}"[^>]*)>([\\s\\S]*?)<\\/section>`));
     assert.ok(room, id);
     assert.match(room[1], /class="[^"]*\bpaper-stack\b/, `${id} has its sticky containing block before JavaScript`);
@@ -257,7 +257,7 @@ test('the initial phone frame and failure fallback do not depend on external cor
   assert.match(critical, /--bq-stack-sheet-h:calc\(max\(100svh,var\(--bq-frame-height,100dvh\)\)/);
   assert.match(polish, /--bq-stack-sheet-h:\s*calc\(max\(100svh,\s*var\(--bq-frame-height,\s*100dvh\)\)/,
     'the final cascade retains the same first-paint lower bound as the critical frame');
-  assert.match(critical, /html:root,html:root\.bq-compact,html body :is\(#design,#blog,#bio,#contact\)\.paper-stack\{--bq-stack-top:/,
+  assert.match(critical, /html:root,html:root\.bq-compact,html body :is\(#design,#blog,#bio,#contact,#behance\)\.paper-stack\{--bq-stack-top:/,
     'the early frame must override both local room and compact-root legacy heights if polish arrives late');
   assert.match(critical, /:is\(\.hero,\.room-hero\)\.paper-sheet\{position:sticky!important/);
   assert.match(critical, /\.bq-deck-edge\{display:block!important;position:fixed;[^}]*height:var\(--bq-stack-sheet-h\)/);

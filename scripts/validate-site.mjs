@@ -15,7 +15,7 @@ for (const match of html.matchAll(/\b(?:src|href)="([^"]+)"/g)) {
   let ref = match[1];
   if (!ref || /^(?:https?:|mailto:|tel:|#|data:|blob:)/i.test(ref)) continue;
   ref = ref.split(/[?#]/, 1)[0];
-  if (!ref || ref === '/' || ref.startsWith('/design') || ref.startsWith('/blog') || ref.startsWith('/bio') || ref.startsWith('/contact')) continue;
+  if (!ref || ref === '/' || ref.startsWith('/design') || ref.startsWith('/blog') || ref.startsWith('/bio') || ref.startsWith('/contact') || ref.startsWith('/behance')) continue;
   localRefs.add(ref.replace(/^\//, ''));
 }
 for (const ref of localRefs) {
@@ -77,12 +77,15 @@ for (const forbidden of [
   if (html.includes(forbidden)) failures.push(`index.html contains retired token: ${forbidden}`);
 }
 
+/* Room heroes follow the menu: 02 Journal, 03 Designer, 04 Contact and
+   05 Behance. 05 is allowed rather than required so the server side can ship
+   before the Behance room's markup; 06 (a retired room) must not return. */
 const roomHeroNumbers = [...html.matchAll(/<span\b[^>]*class="[^"]*\broom-hero-ghost\b[^"]*"[^>]*>\s*(\d+)\s*<\/span>/g)].map(match => match[1]);
 if (!['02', '03', '04'].every(number => roomHeroNumbers.includes(number))) {
-  failures.push('room heroes are not numbered 02–04 to match the four-room menu');
+  failures.push('room heroes are not numbered 02–04 to match the room menu');
 }
-if (roomHeroNumbers.includes('05') || roomHeroNumbers.includes('06')) {
-  failures.push('retired room numbers 05/06 still present');
+if (roomHeroNumbers.includes('06')) {
+  failures.push('retired room number 06 still present');
 }
 
 if (failures.length) {
