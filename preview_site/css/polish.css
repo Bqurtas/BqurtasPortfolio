@@ -2231,7 +2231,7 @@ html body #design #grid .card .card-art::after {
 }
 /* The visitor's choice also pauses the existing decorative loops. Entrance
    reveals remain readable and native page scrolling remains available. */
-html[data-motion-mode="reduced"] body :is(.software-track, .hero-marquee-track, .logo-marquee-track, .footer-marquee-track, .pj2-marquee-track, .hero-spark svg),
+html[data-motion-mode="reduced"] body :is(.software-track, .hero-marquee-track, .footer-marquee-track, .pj2-marquee-track, .hero-spark svg),
 html[data-motion-mode="reduced"] body #design#design#design .mouse-wheel,
 html[data-motion-mode="reduced"] body #design#design#design > .section.practice-note .bio-teaser-portrait .portrait-orbit,
 html[data-motion-mode="reduced"] body #design#design#design > .section.practice-note .bio-teaser-portrait .orbit-ic::before {
@@ -3648,7 +3648,7 @@ html body #bio#bio#bio .bio-education-sheet .bio-card .bio-sub { color: var(--in
 /* The honours preview stays monochrome and readable instead of oversized. */
 html body #bio#bio#bio .index-layout--honors { display: grid !important; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr) !important; gap: 32px !important; align-items: start !important; }
 html body #bio#bio#bio .index-layout--honors .index-ghost { display: none !important; }
-html body #bio#bio#bio .index-layout--honors .index-row { display: grid !important; grid-template-columns: 56px minmax(0, 1fr) 35px !important; align-items: baseline !important; gap: 12px !important; min-block-size: 56px !important; padding: 18px 0 !important; border: 0 !important; border-block-end: 1px solid var(--bio-rule) !important; border-radius: 0 !important; background: transparent !important; }
+html body #bio#bio#bio .index-layout--honors .index-row { display: grid !important; grid-template-columns: max(56px, calc(40px / var(--bq-paper-fit, 1))) minmax(0, 1fr) 35px !important; align-items: baseline !important; gap: 12px !important; min-block-size: 56px !important; padding: 18px 0 !important; border: 0 !important; border-block-end: 1px solid var(--bio-rule) !important; border-radius: 0 !important; background: transparent !important; }
 html body #bio#bio#bio .index-layout--honors .index-row.is-active { border-block-end-color: var(--ink) !important; }
 html body #bio#bio#bio .index-row-title { font-size: 13px !important; font-weight: 500 !important; line-height: 1.8 !important; }
 html body #bio#bio#bio :is(.index-row-num, .index-row-tag) { font-size: 10px !important; line-height: 1.8 !important; color: var(--bio-muted) !important; white-space: nowrap !important; }
@@ -3719,7 +3719,7 @@ html body #bio#bio#bio .bio-docs-sheet .bio-social-title { font-size: clamp(26px
   html body #bio#bio#bio#bio .bio-kit-sheet .tools-typing { margin-block-start: 14px !important; padding-block-start: 10px !important; padding-left: max(32px, calc(32px / var(--bq-paper-fit, 1))) !important; }
   html body #bio#bio#bio .bio-block-title { font-size: 23px !important; gap: 11px !important; }
   html body #bio#bio#bio .index-layout--honors { grid-template-columns: minmax(0, 1fr) !important; }
-  html body #bio#bio#bio .index-layout--honors .index-row { grid-template-columns: 48px minmax(0, 1fr) 32px !important; gap: 8px !important; padding-block: 16px !important; }
+  html body #bio#bio#bio .index-layout--honors .index-row { grid-template-columns: max(48px, calc(40px / var(--bq-paper-fit, 1))) minmax(0, 1fr) 32px !important; gap: 8px !important; padding-block: 16px !important; }
   html body #bio#bio#bio .index-row-title { font-size: 12px !important; }
   html body #bio#bio#bio .index-card--honor { padding: 22px !important; }
   html body #bio#bio#bio .langs-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; column-gap: 18px !important; }
@@ -6502,14 +6502,6 @@ html body #design#design#design#design > .section.practice-note .bio-teaser-grid
 }
 html body #design#design#design#design > .section.practice-note .bio-teaser-grid .stats .stat .stat-label { color: var(--note-soft) !important; }
 html body #design#design#design#design > .section.practice-note .bio-teaser-portrait .orbit-ic { color: var(--note-ink) !important; opacity: .72 !important; }
-html body #design#design#design#design > .section.practice-note .bio-teaser-portrait::after {
-  content: "";
-  position: absolute;
-  inset: calc(50% - var(--bq-orbit-r));
-  border: 1px solid var(--note-line);
-  border-radius: 50%;
-  pointer-events: none;
-}
 @media (min-width: 900px) {
   html body #design#design#design#design#design > .section.practice-note .sheet-mid {
     flex: 1 0 auto !important;
@@ -6554,7 +6546,7 @@ html body #design#design#design#design .logos-section .logo-marquee--designed { 
 /* Owner: nothing under the logos, only a thin line between them, open on all
    four sides. Each mark draws a line just past its end and bottom edge; the grid
    clips whatever falls outside it, so the outermost lines never appear at any
-   column count. */
+   column count. The fit is divided back out so a line stays one even pixel. */
 html body #design#design#design#design .logos-section .logos-grid--clients {
   gap: 0 !important;
   overflow: hidden !important;
@@ -6580,13 +6572,13 @@ html body #design#design#design#design .logos-section .logos-grid--clients .logo
 }
 html body #design#design#design#design .logos-section .logos-grid--clients .logo-mark--client::before {
   inset-block: 0 !important;
-  inset-inline-end: -1px !important;
-  inline-size: 1px !important;
+  inset-inline-end: calc(-1px / var(--bq-paper-fit, 1)) !important;
+  inline-size: calc(1px / var(--bq-paper-fit, 1)) !important;
 }
 html body #design#design#design#design .logos-section .logos-grid--clients .logo-mark--client::after {
   inset-inline: 0 !important;
-  inset-block-end: -1px !important;
-  block-size: 1px !important;
+  inset-block-end: calc(-1px / var(--bq-paper-fit, 1)) !important;
+  block-size: calc(1px / var(--bq-paper-fit, 1)) !important;
 }
 /* Five client marks are drawn in dark ink and would vanish on the black sheet.
    Dark mode swaps them for the same mark with its dark ink lifted, keeping hue;
@@ -6772,7 +6764,7 @@ html body #design.paper-stack > .paper-sheet[data-paper-fit] :is(.section-num, .
 }
 /* Room labels share the floor. Text the room rules already size against the fit
    stays out, or it would be enlarged twice. */
-html body :is(#bio, #blog, #contact).paper-stack > .paper-sheet[data-paper-fit] :is(.section-num, .mono):not(.mono .mono, .section-num .mono, .index-card *, .pitch-form *, .cert-item *, .bio-tools *) {
+html body :is(#bio, #blog, #contact).paper-stack > .paper-sheet[data-paper-fit] :is(.section-num, .mono):not(.mono .mono, .section-num .mono, .bio-chapter-index, .index-card *, .pitch-form *, .cert-item *, .bio-tools *) {
   zoom: max(1, calc(.85 / var(--bq-paper-fit, 1)));
 }
 @media (max-height: 640px) {
@@ -6815,4 +6807,15 @@ html body #design#design#design#design#design .latest-blog .sheet-mid {
   max-block-size: none !important;
   max-height: none !important;
   justify-content: safe center !important;
+}
+
+/* Kurdish and Arabic never slant: their fonts have no italic and a synthesized one reads as a fault. */
+html[dir="rtl"] body #design#design#design#design :is(.sites-title em, .service-index, .site-num, .journal-row-no, .journal-plate-no) {
+  font-style: normal !important;
+}
+
+/* The keyboard ring on the Websites plate uses the plate's own light ink. */
+html body .sites-stage .site-row:focus-visible {
+  outline-color: var(--site-on) !important;
+  outline-offset: 5px !important;
 }
