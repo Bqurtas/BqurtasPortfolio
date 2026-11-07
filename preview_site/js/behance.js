@@ -112,7 +112,10 @@
       const openId = isOpen() && projects[current] ? projects[current].id : '';
       if (!data || !mergeFeed(data.projects)) return;
       renderGrid();
-      if (openId) current = indexOfId(openId);
+      if (openId) {
+        current = indexOfId(openId);
+        renderProject(projects[current], current);
+      }
     })
     .catch(() => {});
 
@@ -129,6 +132,13 @@
       const value = stats[node.dataset.stat];
       if (Number.isFinite(value)) node.textContent = groupDigits(value);
     });
+    const swap = (img, data) => {
+      if (!img || !data || typeof data.src !== 'string' || img.getAttribute('src')?.split('?')[0] === data.src.replace(/^\//, '')) return;
+      img.removeAttribute('srcset');
+      img.src = data.src;
+    };
+    swap(room.querySelector('.bhp-banner img'), owner.banner);
+    swap(room.querySelector('.bhp-avatar'), owner.avatar);
     const since = $('bhpSince');
     const y = String(owner.since || '').slice(0, 4);
     if (since) {
@@ -156,7 +166,7 @@
     const link = document.createElement('a');
     link.className = 'bh-card-link';
     link.href = p.live ? p.url : projectPath(p);
-    link.dataset.index = String(index);
+    link.dataset.id = p.id;
     const frame = document.createElement('span');
     frame.className = 'bh-card-cover';
     frame.appendChild(cover(p, sizes));
@@ -181,7 +191,7 @@
     link.addEventListener('click', (event) => {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
-      open(index, { trigger: link });
+      open(indexOfId(p.id), { trigger: link });
     });
     item.appendChild(link);
     return item;
@@ -231,6 +241,7 @@
     ui.date.textContent = fill(t('bh.published', 'Published {date}'), { date: longDate(p.date) });
     ui.ext.href = p.url;
     ui.cta.href = p.url;
+    ui.cta.hidden = coverOnly(p);
     ui.count.textContent = `${digits(String(index + 1).padStart(2, '0'))} / ${digits(String(projects.length).padStart(2, '0'))}`;
     const altText = t('bh.alt', '{title}, image {i} of {n}');
     ui.images.replaceChildren(...pictures.map((image, i) => {
@@ -257,6 +268,8 @@
     ui.about.hidden = !(p.about || []).length;
     chips(p.tools || [], ui.tools);
     chips(p.tags || [], ui.tags);
+    const facts = ui.tools.closest('.bhv-facts');
+    if (facts) facts.hidden = !((p.tools || []).length || (p.tags || []).length);
     const sizes = '(max-width: 560px) 46vw, 18vw';
     ui.more.replaceChildren(...projects
       .map((other, i) => ({ other, i }))
@@ -288,14 +301,21 @@
     /* A project just arrived from the feed has no page on this site yet, so
        the address stays on the room. */
     const path = p.live ? base() : projectPath(p);
-    if (!fromPop && location.pathname !== path) {
-      if (replace || wasOpen || p.live) history.replaceState({ bhProject: p.id, bhPushed: pushed }, '', path + location.search);
-      else {
+    if (!fromPop) {
+      if (replace || wasOpen) {
+        if (location.pathname !== path) history.replaceState({ bhProject: p.id, bhPushed: pushed }, '', path + location.search);
+      } else {
+        // Its own entry even on the room's address, so Back closes the viewer.
         history.pushState({ bhProject: p.id, bhPushed: true }, '', path + location.search);
         pushed = true;
       }
     }
-    if (!wasOpen) requestAnimationFrame(() => ui.close.focus({ preventScroll: true }));
+    /* Focus the scrolling page, so Space, Page Down and the arrows read it;
+       also when the link that opened it was replaced by the new project. */
+    requestAnimationFrame(() => {
+      const active = document.activeElement;
+      if (!wasOpen || !active || !active.isConnected || !viewer.contains(active)) ui.scroll.focus({ preventScroll: true });
+    });
   };
 
   /* Hides the viewer without touching history: used by the room router and
@@ -311,8 +331,11 @@
     current = -1;
     pushed = false;
     document.title = roomTitle();
-    const target = lastTrigger;
+    let target = lastTrigger;
     lastTrigger = null;
+    if (target && !target.isConnected && target.dataset && target.dataset.id) {
+      target = grid.querySelector(`.bh-card-link[data-id="${target.dataset.id}"]`);
+    }
     if (target && target.isConnected && typeof target.focus === 'function') {
       try { target.focus({ preventScroll: true }); } catch (e) {}
     }
@@ -334,10 +357,13 @@
   ui.close.addEventListener('click', close);
   ui.prev.addEventListener('click', () => step(-1));
   ui.next.addEventListener('click', () => step(1));
-  viewer.addEventListener('keydown', (event) => {
+  /* Listened on the document (capture), so the keys still work after a click
+     inside the viewer moved focus to the page, and nothing behind it reacts. */
+  document.addEventListener('keydown', (event) => {
     if (!isOpen()) return;
     if (event.key === 'Escape') {
       event.preventDefault();
+      event.stopPropagation();
       close();
       return;
     }
@@ -346,24 +372,28 @@
       const rtl = document.documentElement.dir === 'rtl';
       const forward = event.key === 'ArrowRight' ? !rtl : rtl;
       event.preventDefault();
+      event.stopPropagation();
       step(forward ? 1 : -1);
       return;
     }
     if (event.key === 'Tab') {
       const focusable = [...viewer.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')]
-        .filter((el) => el.offsetParent !== null || el === document.activeElement);
+        .filter((el) => el.offsetParent !== null);
       if (!focusable.length) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      const active = document.activeElement;
+      if (!viewer.contains(active)) { event.preventDefault(); (event.shiftKey ? last : first).focus(); }
+      else if (event.shiftKey && (active === first || active === ui.scroll)) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && active === last) { event.preventDefault(); first.focus(); }
     }
-  });
+  }, true);
   const syncWithAddress = (fromPop) => {
     const id = idFromPath(location.pathname);
     if (id) {
       const index = indexOfId(id);
       if (index > -1) {
+        pushed = Boolean(history.state && history.state.bhPushed);
         open(index, { fromPop: true });
         const canonical = projectPath(projects[index]);
         if (location.pathname !== canonical) history.replaceState(history.state, '', canonical + location.search);
@@ -389,7 +419,8 @@
     if (isOpen()) {
       renderProject(projects[current], current);
       document.title = projectTitle(projects[current]);
-      const path = projectPath(projects[current]);
+      const p = projects[current];
+      const path = p.live ? base() : projectPath(p);
       if (location.pathname !== path) history.replaceState(history.state, '', path + location.search);
     }
   });

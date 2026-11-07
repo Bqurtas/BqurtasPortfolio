@@ -7604,13 +7604,25 @@ html body #behance#behance#behance#behance#behance .bhp-banner img {
   height: 100%;
   object-fit: cover;
 }
+/* Only the photo rises over the cover's edge; the name and links always sit
+   on the paper below it (over the cover they vanished in dark mode). */
 html body #behance#behance#behance#behance#behance .bhp-card {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: end;
+  grid-template-areas: "photo id actions";
+  align-items: start;
   gap: 12px clamp(16px, 2.4vw, 32px);
-  margin-block-start: calc(-1 * clamp(34px, 4.6vw, 60px));
   padding-inline: clamp(12px, 2.4vw, 32px);
+}
+html body #behance#behance#behance#behance#behance .bhp-card > .bhp-avatar { grid-area: photo; margin-block-start: calc(-1 * clamp(34px, 4.6vw, 60px)); }
+html body #behance#behance#behance#behance#behance .bhp-card > .bhp-id { grid-area: id; padding-block-start: clamp(12px, 1.4vw, 18px); }
+html body #behance#behance#behance#behance#behance .bhp-card > .bhp-actions { grid-area: actions; padding-block-start: clamp(16px, 1.8vw, 24px); }
+@media (min-width: 761px) and (max-width: 1100px) {
+  html body #behance#behance#behance#behance#behance .bhp-card {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "photo id" "photo actions";
+  }
+  html body #behance#behance#behance#behance#behance .bhp-card > .bhp-actions { padding-block-start: 0; }
 }
 html body #behance#behance#behance#behance#behance .bhp-avatar {
   position: relative;
@@ -7745,9 +7757,11 @@ html[dir="rtl"] body #behance#behance#behance#behance#behance :is(.bhp-available
   html body #behance#behance#behance#behance#behance .bhp-banner { aspect-ratio: 3 / 1; border-radius: 10px; }
   html body #behance#behance#behance#behance#behance .bhp-card {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "photo" "id" "actions";
     align-items: start;
     padding-inline: 0;
   }
+  html body #behance#behance#behance#behance#behance .bhp-card > :is(.bhp-id, .bhp-actions) { padding-block-start: 0; }
   html body #behance#behance#behance#behance#behance .bhp-avatar { margin-inline-start: 14px; }
   html body #behance#behance#behance#behance#behance .bhp-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   html body #behance#behance#behance#behance#behance .bhp-stats > div:nth-child(3) { padding-inline-start: 0; border-inline-start: 0; }
@@ -7877,10 +7891,18 @@ html body .bh-viewer .bhv-who-text small {
   font-size: 10.5px;
   letter-spacing: .12em;
   text-transform: uppercase;
-  opacity: .62;
+  opacity: 1;
+  color: color-mix(in srgb, var(--bhv-front) 68%, transparent) !important;
 }
+html body .bh-viewer .bhv-who-text small * { color: inherit !important; }
 html body .bh-viewer .bhv-bar-end { display: flex; flex: none; align-items: center; gap: clamp(10px, 1.6vw, 18px); }
-html body .bh-viewer .bhv-count { font-size: 11px; letter-spacing: .14em; opacity: .62; }
+html body .bh-viewer .bhv-count {
+  font-size: 11px;
+  letter-spacing: .14em;
+  color: color-mix(in srgb, var(--bhv-front) 68%, transparent) !important;
+}
+html body .bh-viewer :is(.bhv-who-text strong, .bhv-ext) { color: var(--bhv-front) !important; }
+html body .bh-viewer .bhv-scroll:focus { outline: none; }
 html body .bh-viewer .bhv-ext {
   padding-block-end: 3px;
   border-block-end: 1px solid currentColor;

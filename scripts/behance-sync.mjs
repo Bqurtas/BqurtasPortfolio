@@ -9,9 +9,15 @@
 
    Without options it uses only what Behance publishes for machines: the
    profile's RSS feed and oEmbed, plus images from Behance's image host. That
-   keeps the list, titles, dates and covers current; new projects arrive with
-   their cover. (Between runs the edge, functions/api/behance-feed.js, already
-   shows new projects with their cover.)
+   keeps the list, titles and dates current, adds new projects with their
+   cover, and downloads a cover again when Behance's cover file changed.
+   (Between runs the edge, functions/api/behance-feed.js, already shows new
+   projects with their cover.) Covers are always saved as cover.webp and
+   cover-404.webp: index.html names some of them.
+
+   Nothing is changed until every download has arrived: files are gathered
+   in <id>.incoming folders first, and a failed run removes them and leaves
+   the copy as it was.
 
    Behance does not open project pages to automated readers, and this script
    does not try to. To copy a project's pages, open the project (and the
@@ -21,7 +27,7 @@
    Then run `npm run build`.
    ========================================================= */
 import { existsSync } from 'node:fs';
-import { mkdir, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readBehanceFeed, oembedTitle, BEHANCE_OEMBED } from '../functions/api/_behance-feed.js';
@@ -104,21 +110,6 @@ async function download(url, folder, stem) {
     }
   }
 }
-/* Write a folder beside the current one and swap only when it is complete. */
-async function replaceFolder(folder, fill) {
-  const fresh = `${folder}.incoming`;
-  await rm(fresh, { recursive: true, force: true });
-  await mkdir(fresh, { recursive: true });
-  try {
-    const result = await fill(fresh);
-    await rm(folder, { recursive: true, force: true });
-    await rename(fresh, folder);
-    return result;
-  } catch (error) {
-    await rm(fresh, { recursive: true, force: true });
-    throw error;
-  }
-}
 const cleanAbout = (description) => String(description || '').replace(/\r/g, '').split('\n')
   .filter((line) => !/^for more inf/i.test(line.trim()) && !/^https?:\/\/(www\.)?bqurtas\.com\/#/.test(line.trim()))
   .join('\n').trim().split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
@@ -129,49 +120,103 @@ const copy = existsSync(jsonPath) ? JSON.parse(await readFile(jsonPath, 'utf8'))
 const before = new Map((copy.projects || []).map((p) => [p.id, p]));
 const exported = option('pages') ? JSON.parse(await readFile(option('pages'), 'utf8')) : { projects: [] };
 const pages = new Map((exported.projects || []).map((p) => [String(p.id), p]));
+const incoming = (name) => path.join(outDir, `${name}.incoming`);
+
+// Leftovers of an interrupted run never mix with this one.
+await mkdir(outDir, { recursive: true });
+for (const entry of await readdir(outDir, { withFileTypes: true })) {
+  if (entry.isDirectory() && entry.name.endsWith('.incoming')) await rm(path.join(outDir, entry.name), { recursive: true, force: true });
+}
 
 const feed = await readBehanceFeed();
 if (!feed.length) throw new Error('the Behance feed listed no projects');
 console.log(`${feed.length} projects in the Behance feed`);
+
+/* Phase 1: gather every new file beside the copy. */
+const staged = new Map();
+let profileFiles = null;
+try {
+  for (const item of feed) {
+    const old = before.get(item.id);
+    const page = pages.get(item.id);
+    const folder = path.join(outDir, item.id);
+    const coverChanged = !old || old.coverFile !== item.cover || !existsSync(path.join(folder, 'cover.webp'));
+    if (!page && !coverChanged) continue;
+    const fresh = incoming(item.id);
+    await mkdir(fresh, { recursive: true });
+    const base = `/assets/behance/${item.id}/`;
+    const entry = { full: Boolean(page) };
+    if (coverChanged || page) {
+      /* Behance's image host can answer the first request for a WebP size
+         with the original file while it converts; ask again before failing. */
+      const webp = async (size, stem) => {
+        for (let attempt = 1; ; attempt += 1) {
+          const saved = await download(`https://mir-s3-cdn-cf.behance.net/projects/${size}/${item.cover}`, fresh, stem);
+          if (saved.name === `${stem}.webp`) return saved;
+          await rm(path.join(fresh, saved.name), { force: true });
+          if (attempt >= 4) throw new Error(`${item.id}: Behance did not send a WebP ${stem}`);
+          await sleep(2000 * attempt);
+        }
+      };
+      const big = await webp('808_webp', 'cover');
+      const small = await webp('404_webp', 'cover-404');
+      entry.cover = { src: base + big.name, small: base + small.name, w: big.w, h: big.h };
+    }
+    if (page) {
+      entry.images = [];
+      for (const [i, image] of (page.images || []).entries()) {
+        const saved = await download(typeof image === 'string' ? image : image.src, fresh, String(i + 1).padStart(2, '0'));
+        entry.images.push({ src: base + saved.name, w: saved.w, h: saved.h, ...(image.caption ? { caption: image.caption } : {}) });
+        await sleep(120);
+      }
+    }
+    staged.set(item.id, entry);
+  }
+  if (exported.owner) {
+    const o = exported.owner;
+    const fresh = incoming('profile');
+    await mkdir(fresh, { recursive: true });
+    profileFiles = {
+      banner: o.banner ? await download(o.banner, fresh, 'banner') : null,
+      avatar: o.avatar ? await download(o.avatar, fresh, 'avatar') : null,
+    };
+  }
+} catch (error) {
+  for (const id of [...staged.keys(), 'profile']) await rm(incoming(id), { recursive: true, force: true });
+  for (const item of feed) await rm(incoming(item.id), { recursive: true, force: true });
+  throw error;
+}
+
+/* Phase 2: everything arrived; swap it in and write the list once. */
 const projects = [];
 for (const item of feed) {
   const old = before.get(item.id);
+  const page = pages.get(item.id);
+  const entry = staged.get(item.id);
+  const folder = path.join(outDir, item.id);
+  if (entry) {
+    if (entry.full || !existsSync(folder)) {
+      await rm(folder, { recursive: true, force: true });
+      await rename(incoming(item.id), folder);
+    } else {
+      // Only the covers changed: put them in place and keep the copied pages.
+      for (const name of ['cover.webp', 'cover-404.webp']) await copyFile(path.join(incoming(item.id), name), path.join(folder, name));
+      await rm(incoming(item.id), { recursive: true, force: true });
+    }
+  }
   let title = old?.title || item.title;
   try {
     const response = await fetch(BEHANCE_OEMBED + encodeURIComponent(item.url), { headers: { 'User-Agent': AGENT } });
     if (response.ok) title = oembedTitle(await response.json()) || title;
   } catch (e) {}
-  const base = `/assets/behance/${item.id}/`;
-  const folder = path.join(outDir, item.id);
-  const page = pages.get(item.id);
-  let cover = old?.cover;
-  let images = old?.images || [];
-  if (page || !old || !existsSync(folder)) {
-    ({ cover, images } = await replaceFolder(folder, async (fresh) => {
-      const big = await download(`https://mir-s3-cdn-cf.behance.net/projects/808/${item.cover}`, fresh, 'cover');
-      const small = await download(`https://mir-s3-cdn-cf.behance.net/projects/404/${item.cover}`, fresh, 'cover-404');
-      const list = [];
-      if (page) {
-        for (const [i, image] of (page.images || []).entries()) {
-          const saved = await download(typeof image === 'string' ? image : image.src, fresh, String(i + 1).padStart(2, '0'));
-          list.push({ src: base + saved.name, w: saved.w, h: saved.h, ...(image.caption ? { caption: image.caption } : {}) });
-          await sleep(120);
-        }
-      } else if (old && existsSync(folder)) {
-        // Keep the pages already copied.
-        for (const file of await readdir(folder)) if (!file.startsWith('cover')) await rename(path.join(folder, file), path.join(fresh, file));
-        list.push(...(old.images || []));
-      }
-      return { cover: { src: base + big.name, small: base + small.name, w: big.w, h: big.h }, images: list };
-    }));
-    console.log(`  ${old ? 'updated' : 'added  '}  ${item.id} ${title}${page ? ` (${images.length} pages)` : images.length ? '' : ' (cover only)'}`);
-  }
+  const images = entry?.images || old?.images || [];
+  if (entry) console.log(`  ${old ? 'updated' : 'added  '}  ${item.id} ${title}${page ? ` (${images.length} pages)` : images.length ? ' (cover)' : ' (cover only)'}`);
   projects.push({
     id: item.id, slug: item.slug, title, url: item.url, date: item.date || old?.date || '',
     about: page ? cleanAbout(page.about) : (old?.about || []),
     tools: page ? (page.tools || []).map((t) => String(t).trim()) : (old?.tools || []),
     tags: page ? (page.tags || []).map((t) => String(t).trim()) : (old?.tags || []),
-    cover, images,
+    coverFile: item.cover, cover: entry?.cover || old?.cover, images,
   });
 }
 /* The feed may list only recent projects: keep older copies unless asked. */
@@ -186,16 +231,18 @@ for (const old of copy.projects || []) {
 let owner = copy.owner || null;
 if (exported.owner) {
   const o = exported.owner;
+  // New files sit beside the old ones; index.html names the first copy's.
   const profileDir = path.join(outDir, 'profile');
-  const saved = await replaceFolder(profileDir, async (fresh) => ({
-    banner: o.banner ? await download(o.banner, fresh, 'banner') : null,
-    avatar: o.avatar ? await download(o.avatar, fresh, 'avatar') : null,
-  }));
+  await mkdir(profileDir, { recursive: true });
+  for (const saved of Object.values(profileFiles).filter(Boolean)) {
+    await copyFile(path.join(incoming('profile'), saved.name), path.join(profileDir, saved.name));
+  }
+  await rm(incoming('profile'), { recursive: true, force: true });
   owner = {
     name: o.name, occupation: o.occupation, location: o.location, url: 'https://www.behance.net/bqurtas', website: o.website,
     since: o.since, available: o.available, stats: o.stats, statsAsOf: new Date().toISOString().slice(0, 10),
-    banner: saved.banner ? { src: `/assets/behance/profile/${saved.banner.name}`, large: `/assets/behance/profile/${saved.banner.name}`, w: saved.banner.w, h: saved.banner.h } : owner?.banner,
-    avatar: saved.avatar ? { src: `/assets/behance/profile/${saved.avatar.name}`, w: saved.avatar.w, h: saved.avatar.h } : owner?.avatar,
+    banner: profileFiles.banner ? { src: `/assets/behance/profile/${profileFiles.banner.name}`, w: profileFiles.banner.w, h: profileFiles.banner.h } : owner?.banner,
+    avatar: profileFiles.avatar ? { src: `/assets/behance/profile/${profileFiles.avatar.name}`, w: profileFiles.avatar.w, h: profileFiles.avatar.h } : owner?.avatar,
   };
   console.log('  updated the profile');
 }
