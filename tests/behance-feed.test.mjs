@@ -67,16 +67,44 @@ test('the feed endpoint answers new projects, and an empty list when Behance or 
     const response = await feedGet({ request, env: assets(KNOWN) });
     assert.equal(response.status, 200);
     assert.match(response.headers.get('cache-control'), /public, max-age=600/);
+    assert.equal(response.headers.get('x-behance-feed'), 'ok');
     const body = await response.json();
     assert.deepEqual(body.projects.map((p) => p.id), ['999000111']);
   });
-  await withFetch(() => new Response('down', { status: 503 }), async () => {
-    const body = await (await feedGet({ request, env: assets(KNOWN) })).json();
-    assert.deepEqual(body.projects, []);
+  const tab = String.fromCharCode(9); // legal in a header, but not printable
+  await withFetch(() => new Response('down', { status: 503, headers: { Server: `varnish${tab}edge` } }), async () => {
+    const response = await feedGet({ request, env: assets(KNOWN) });
+    assert.match(response.headers.get('cache-control'), /public, max-age=120/);
+    assert.equal(response.headers.get('x-behance-feed'), 'behance 503 (varnish edge)', 'why, in header-safe text');
+    assert.deepEqual((await response.json()).projects, []);
+  });
+  await withFetch(() => { throw new TypeError('Network connection lost.'); }, async () => {
+    const response = await feedGet({ request, env: assets(KNOWN) });
+    assert.equal(response.headers.get('x-behance-feed'), 'unreachable: TypeError Network connection lost.');
+  });
+  await withFetch(() => { throw Object.assign(new Error('The operation was aborted'), { name: 'AbortError' }); }, async () => {
+    const response = await feedGet({ request, env: assets(KNOWN) });
+    assert.equal(response.headers.get('x-behance-feed'), 'timeout');
   });
   await withFetch(behance, async () => {
-    const body = await (await feedGet({ request, env: {} })).json();
-    assert.deepEqual(body.projects, [], 'without the copy nothing is reported as new');
+    const response = await feedGet({ request, env: {} });
+    assert.equal(response.headers.get('x-behance-feed'), 'copy unavailable');
+    assert.deepEqual((await response.json()).projects, [], 'without the copy nothing is reported as new');
+  });
+});
+
+test('Behance refusals and errors are never kept in the edge cache', async () => {
+  await withFetch(behance, async () => {
+    const seen = [];
+    const original = globalThis.fetch;
+    globalThis.fetch = async (url, options) => { seen.push(options?.cf); return original(url, options); };
+    try { await freshBehanceProjects(new Set(['243843115'])); } finally { globalThis.fetch = original; }
+    assert.ok(seen.length >= 2);
+    for (const cf of seen) {
+      assert.equal(cf.cacheTtl, undefined);
+      assert.equal(cf.cacheTtlByStatus['300-599'], -1);
+      assert.ok(cf.cacheTtlByStatus['200-299'] > 0);
+    }
   });
 });
 

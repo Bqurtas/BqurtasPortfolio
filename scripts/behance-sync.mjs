@@ -17,7 +17,10 @@
 
    Nothing is changed until every download has arrived: files are gathered
    in <id>.incoming folders first, and a failed run removes them and leaves
-   the copy as it was.
+   the copy as it was. When Behance has nothing new, no file is written at
+   all, so a scheduled run (.github/workflows/behance-sync.yml) only commits
+   real changes. If Behance cannot be reached the script exits with code 75
+   (try again later) and the copy stays as it was.
 
    Behance does not open project pages to automated readers, and this script
    does not try to. To copy a project's pages, open the project (and the
@@ -30,6 +33,7 @@ import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
 import { readBehanceFeed, oembedTitle, BEHANCE_OEMBED } from '../functions/api/_behance-feed.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -39,7 +43,11 @@ const flag = (name) => args.includes(`--${name}`);
 const option = (name) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : ''; };
 const AGENT = 'bqurtas.com (+https://bqurtas.com)';
 const IMAGE_HOSTS = ['https://mir-s3-cdn-cf.behance.net/', 'https://pps.services.adobe.com/'];
+const UNREACHABLE = 75; // EX_TEMPFAIL: Behance did not answer; the next run tries again
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+/* The feed writes each character outside Latin-1 as one "?". A saved title
+   still matches its feed form unless the project was renamed on Behance. */
+const feedForm = (title) => [...String(title || '')].map((c) => (c.codePointAt(0) > 0xff ? '?' : c)).join('');
 
 /* Runs in an ordinary browser on a Behance project page or on the profile. */
 const SNIPPET = String.raw`(() => {
@@ -128,8 +136,17 @@ for (const entry of await readdir(outDir, { withFileTypes: true })) {
   if (entry.isDirectory() && entry.name.endsWith('.incoming')) await rm(path.join(outDir, entry.name), { recursive: true, force: true });
 }
 
-const feed = await readBehanceFeed();
-if (!feed.length) throw new Error('the Behance feed listed no projects');
+let feed = [];
+try {
+  feed = await readBehanceFeed();
+} catch (error) {
+  console.error(`Behance did not answer: ${error.message}. The copy stays as it was.`);
+  process.exit(UNREACHABLE);
+}
+if (!feed.length) {
+  console.error('Behance did not answer: the feed listed no projects. The copy stays as it was.');
+  process.exit(UNREACHABLE);
+}
 console.log(`${feed.length} projects in the Behance feed`);
 
 /* Phase 1: gather every new file beside the copy. */
@@ -184,7 +201,8 @@ try {
 } catch (error) {
   for (const id of [...staged.keys(), 'profile']) await rm(incoming(id), { recursive: true, force: true });
   for (const item of feed) await rm(incoming(item.id), { recursive: true, force: true });
-  throw error;
+  console.error(`A download from Behance failed: ${error.message}. The copy stays as it was.`);
+  process.exit(UNREACHABLE);
 }
 
 /* Phase 2: everything arrived; swap it in and write the list once. */
@@ -205,12 +223,17 @@ for (const item of feed) {
     }
   }
   let title = old?.title || item.title;
-  try {
-    const response = await fetch(BEHANCE_OEMBED + encodeURIComponent(item.url), { headers: { 'User-Agent': AGENT } });
-    if (response.ok) title = oembedTitle(await response.json()) || title;
-  } catch (e) {}
+  // oEmbed only for a new or renamed project, or a title still in feed form.
+  if (!old?.title || feedForm(old.title) !== item.title || old.title.includes('?')) {
+    try {
+      const response = await fetch(BEHANCE_OEMBED + encodeURIComponent(item.url), { headers: { 'User-Agent': AGENT } });
+      if (response.ok) title = oembedTitle(await response.json()) || title;
+    } catch (e) {}
+  }
   const images = entry?.images || old?.images || [];
-  if (entry) console.log(`  ${old ? 'updated' : 'added  '}  ${item.id} ${title}${page ? ` (${images.length} pages)` : images.length ? ' (cover)' : ' (cover only)'}`);
+  // "checked": the cover was fetched again but Behance did not change it.
+  const what = !old ? 'added  ' : page || (old.coverFile && old.coverFile !== item.cover) ? 'updated' : 'checked';
+  if (entry) console.log(`  ${what}  ${item.id} ${title}${page ? ` (${images.length} pages)` : images.length ? ' (cover)' : ' (cover only)'}`);
   projects.push({
     id: item.id, slug: item.slug, title, url: item.url, date: item.date || old?.date || '',
     about: page ? cleanAbout(page.about) : (old?.about || []),
@@ -248,5 +271,10 @@ if (exported.owner) {
 }
 projects.sort((a, b) => String(b.date).localeCompare(String(a.date)));
 const out = { profile: 'https://www.behance.net/bqurtas', synced: new Date().toISOString().slice(0, 10), ...(owner ? { owner } : {}), projects };
-await writeFile(jsonPath, JSON.stringify(out));
-console.log(`saved ${projects.length} projects. Next: npm run build`);
+const withoutDate = ({ synced, ...rest }) => rest;
+if (isDeepStrictEqual(withoutDate(out), withoutDate(copy))) {
+  console.log('Nothing new on Behance; the copy is unchanged.');
+} else {
+  await writeFile(jsonPath, JSON.stringify(out));
+  console.log(`saved ${projects.length} projects. Next: npm run build`);
+}

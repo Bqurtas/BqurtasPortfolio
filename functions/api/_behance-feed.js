@@ -64,12 +64,23 @@ async function fetchWithin(url, ttl, kind) {
     const response = await fetch(url, {
       headers: { 'User-Agent': AGENT, Accept: kind },
       signal: controller.signal,
-      cf: { cacheTtl: ttl, cacheEverything: true },
+      // Keep Behance's answers for `ttl`, but never keep a refusal or an error.
+      cf: { cacheTtlByStatus: { '200-299': ttl, '300-599': -1 }, cacheEverything: true },
     });
     return response;
   } finally {
     clearTimeout(timer);
   }
+}
+
+/* One short, header-safe line on why Behance's feed could not be used:
+   "behance 403 (server)", "timeout" or "unreachable: TypeError …". It holds
+   no address and no answer body; /api/behance-feed shows it as X-Behance-Feed. */
+export function feedProblem(error) {
+  const clean = (value, max) => String(value || '').replace(/[^\x20-\x7e]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
+  if (error?.status) return `behance ${error.status}${error.server ? ` (${clean(error.server, 40)})` : ''}`;
+  if (error?.name === 'AbortError') return 'timeout';
+  return clean(`unreachable: ${error?.name || 'Error'} ${error?.message || ''}`, 120);
 }
 
 /* oEmbed answers "<project> - Barakat Qurtas"; the room shows the project. */
@@ -81,7 +92,9 @@ export function oembedTitle(data) {
 
 export async function readBehanceFeed() {
   const response = await fetchWithin(BEHANCE_FEED_URL, 900, 'application/rss+xml, application/xml');
-  if (!response.ok) throw new Error(`feed ${response.status}`);
+  if (!response.ok) {
+    throw Object.assign(new Error(`feed ${response.status}`), { status: response.status, server: response.headers.get('server') || '' });
+  }
   return parseBehanceFeed(await response.text());
 }
 
