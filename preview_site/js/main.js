@@ -2732,7 +2732,11 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
        needed: every chapter scales with its frame the way the hero does, down
        to the legibility floor. Only a remainder below that floor still reads
        on the page track. */
-    const floor = Math.min(ceiling, readingPaper(sheet) ? PAPER_READING_MIN : PAPER_FIT_MIN);
+    /* The Behance profile is a long page by nature, as on Behance: it keeps
+       the window's natural size (grown on a large one) and the grid reads on
+       the page track instead of being drawn smaller. */
+    const floor = sheet.classList.contains?.('behance-sheet') ? ceiling
+      : Math.min(ceiling, readingPaper(sheet) ? PAPER_READING_MIN : PAPER_FIT_MIN);
     const roomId = sheet.closest?.('.room')?.id;
     /* The compact service accordion also needs its reading track on tablets,
        landscape phones and desktops. Fitting its HEIGHT removed the overflow

@@ -7754,6 +7754,12 @@ html[dir="rtl"] body #behance#behance#behance#behance#behance :is(.bhp-available
   html body #behance#behance#behance#behance#behance .bhp-stats > div:nth-child(n + 3) { border-block-start: 1px solid var(--room-line); }
 }
 
+/* A short window keeps the cover to a strip, so the name and figures stay
+   in view (after the phone rule, which it overrides on a landscape phone). */
+@media (max-height: 520px) {
+  html body #behance#behance#behance#behance#behance .bhp-banner { aspect-ratio: 6 / 1; }
+}
+
 /* A project that has just arrived from Behance's public feed and is not
    copied yet: it is marked new, and its viewer sends the reader to Behance. */
 html body .bh-card-new {
@@ -7770,6 +7776,9 @@ html body .bh-viewer .bhv-notice {
   border-block-start: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
 }
 html body .bh-viewer .bhv-notice p { margin: 0; max-width: 52ch; font-size: 16px; line-height: 1.6; }
+/* Rows and notes this project does not have stay out (their own display
+   would otherwise outrank the hidden attribute). */
+html body .bh-viewer [hidden] { display: none !important; }
 html body #behance#behance#behance#behance#behance .behance-grid {
   list-style: none;
   margin: clamp(22px, 3.6vh, 40px) 0 0;

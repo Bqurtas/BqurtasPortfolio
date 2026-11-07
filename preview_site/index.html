@@ -12,7 +12,7 @@
   <link rel="preload" as="style" href="css/modern-framer.min.css?v=0741789ec97b" />
   <link rel="preload" as="style" href="css/fonts.css?v=6bd89c103953" />
   <link rel="preload" as="style" href="css/experience.min.css?v=2c2664c33142" />
-  <link rel="preload" as="style" href="css/polish.min.css?v=cb3b5c2e1ada" />
+  <link rel="preload" as="style" href="css/polish.min.css?v=5c9a25d4a255" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#fbfbfa" />
   <meta name="color-scheme" content="light dark" />
@@ -936,7 +936,7 @@
   <link rel="stylesheet" href="css/fonts.css?v=6bd89c103953">
   <link rel="stylesheet" href="css/experience.min.css?v=2c2664c33142">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.min.css?v=cb3b5c2e1ada">
+  <link rel="stylesheet" href="css/polish.min.css?v=5c9a25d4a255">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543"></noscript>
 
@@ -2448,10 +2448,10 @@
               </div>
             </div>
             <dl class="bhp-stats" id="bhpStats">
-              <div><dt data-i18n="bh.views">Project views</dt><dd data-stat="views">340</dd></div>
-              <div><dt data-i18n="bh.appreciations">Appreciations</dt><dd data-stat="appreciations">8</dd></div>
-              <div><dt data-i18n="bh.followers">Followers</dt><dd data-stat="followers">614</dd></div>
-              <div><dt data-i18n="bh.following">Following</dt><dd data-stat="following">2,068</dd></div>
+              <div><dt class="mono" data-i18n="bh.views">Project views</dt><dd data-stat="views">340</dd></div>
+              <div><dt class="mono" data-i18n="bh.appreciations">Appreciations</dt><dd data-stat="appreciations">8</dd></div>
+              <div><dt class="mono" data-i18n="bh.followers">Followers</dt><dd data-stat="followers">614</dd></div>
+              <div><dt class="mono" data-i18n="bh.following">Following</dt><dd data-stat="following">2,068</dd></div>
             </dl>
             <div class="bhp-tabs">
               <span class="bhp-tab mono"><span data-i18n="bh.work">Work</span> <b class="behance-count" id="behanceCount">12</b></span>
@@ -2736,7 +2736,7 @@
     }catch(e){}})();
   </script>
   <script defer src="js/latest-feed.min.js?v=76465997249c"></script>
-  <script defer src="js/main.v420.min.js?v=d29eaf807777"></script>
+  <script defer src="js/main.v420.min.js?v=58203f405c63"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2779,7 +2779,7 @@
         if (behanceLoading) return;
         behanceLoading = true;
         var b = document.createElement('script');
-        b.src = 'js/behance.min.js?v=efc31fc38139';
+        b.src = 'js/behance.min.js?v=6e6eea6df264';
         b.onerror = function () { behanceLoading = false; b.remove(); };
         document.body.appendChild(b);
       }
@@ -2933,7 +2933,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=77a039844bd7', { updateViaCache: 'none' })
+            .register('/sw.js?v=521d87a20518', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

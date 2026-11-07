@@ -90,6 +90,9 @@
   };
   const indexOfId = (id) => projects.findIndex((p) => p.id === id);
   const year = (p) => digits(String(p.date || '').slice(0, 4));
+  /* A project whose pages are not copied here (just published, or listed by
+     the feed-only sync) shows its cover and opens on Behance. */
+  const coverOnly = (p) => Boolean(p.live) || !(p.images || []).length;
 
   /* New on Behance: the edge reads Behance's public RSS feed and returns the
      projects that are not copied here yet. They join the grid at once, newest
@@ -114,7 +117,11 @@
     .catch(() => {});
 
   /* ---------- the profile ---------- */
-  const groupDigits = (n) => digits(Number(n).toLocaleString('en-US'));
+  /* Kurdish and Arabic group thousands with the Arabic separator. */
+  const groupDigits = (n) => {
+    const grouped = digits(Number(n).toLocaleString('en-US'));
+    return ['ku', 'ar'].includes(lang()) ? grouped.replace(/,/g, '\u066C') : grouped;
+  };
   const renderProfile = () => {
     if (!owner) return;
     const stats = owner.stats || {};
@@ -162,7 +169,7 @@
     title.textContent = p.title;
     const meta = document.createElement('span');
     meta.className = 'bh-card-meta mono';
-    meta.textContent = p.live ? `${year(p)} · Behance` : `${year(p)} · ${imagesLabel((p.images || []).length)}`;
+    meta.textContent = coverOnly(p) ? `${year(p)} · Behance` : `${year(p)} · ${imagesLabel((p.images || []).length)}`;
     if (p.live) {
       const mark = document.createElement('span');
       mark.className = 'bh-card-new';
@@ -214,12 +221,12 @@
   };
   const renderProject = (p, index) => {
     /* A project not copied yet shows its cover and sends the reader on. */
-    const pictures = p.live ? [{ src: p.cover.src, w: p.cover.w || 808, h: p.cover.h || 632 }] : (p.images || []);
+    const pictures = coverOnly(p) ? [{ src: p.cover.src, w: p.cover.w || 808, h: p.cover.h || 632 }] : p.images;
     const total = pictures.length;
     ui.title.textContent = p.title;
     ui.infoTitle.textContent = p.title;
-    ui.meta.textContent = p.live ? `${year(p)} · Behance` : `${year(p)} · ${imagesLabel(total)}`;
-    if (ui.notice) ui.notice.hidden = !p.live;
+    ui.meta.textContent = coverOnly(p) ? `${year(p)} · Behance` : `${year(p)} · ${imagesLabel(total)}`;
+    if (ui.notice) ui.notice.hidden = !coverOnly(p);
     if (ui.noticeCta) ui.noticeCta.href = p.url;
     ui.date.textContent = fill(t('bh.published', 'Published {date}'), { date: longDate(p.date) });
     ui.ext.href = p.url;
