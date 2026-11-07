@@ -303,7 +303,19 @@ export const LOCALIZED_COPY = {
     "tip.latest": "Latest",
     "tip.menu": "Menu",
     "tip.share": "Socials",
-    "tip.theme": "Theme"
+    "tip.theme": "Theme",
+    "web.bq.desc": "The studio itself — rooms, archive and the work, kept in one place.",
+    "web.bq.eye": "Our site",
+    "web.bq.title": "Bqurtas",
+    "web.eye": "Websites",
+    "web.kosan.desc": "Eleven companies in Erbil, gathered under one name.",
+    "web.kosan.eye": "Holding",
+    "web.kosan.title": "Kosan Holding",
+    "web.lede": "The same practice, carried onto the screen — three sites, built here.",
+    "web.sun.desc": "News and opinion from Hewlêr, with the studio on the masthead.",
+    "web.sun.eye": "Press",
+    "web.sun.title": "Sun of Erbil",
+    "web.title": "We also make <em>websites</em>."
   },
   "ku": {
     "a11y.blogPages": "پەڕەکانی بلۆگ",
@@ -608,7 +620,19 @@ export const LOCALIZED_COPY = {
     "tip.latest": "نوێترین",
     "tip.menu": "مینۆ",
     "tip.share": "سۆشیاڵ",
-    "tip.theme": "ڕووکار"
+    "tip.theme": "ڕووکار",
+    "web.bq.desc": "وێبسایتی ستۆدیۆکە — ژوورەکان، ئەرشیف و کارەکان لە یەک شوێن.",
+    "web.bq.eye": "وێبسایتی خۆمان",
+    "web.bq.title": "ب قورتاس",
+    "web.eye": "وێبسایت",
+    "web.kosan.desc": "یازدە کۆمپانیا لە هەولێر، لە ژێر یەک ناو.",
+    "web.kosan.eye": "هۆڵدینگ",
+    "web.kosan.title": "کۆسان هۆلدینگ",
+    "web.lede": "هەمان پیشە، ئێستا لەسەر شاشە — سێ وێبسایت، لێرە دروستکراون.",
+    "web.sun.desc": "هەواڵ و بۆچوون لە هەولێرەوە، ستۆدیۆکە لە دەستەی کاردا.",
+    "web.sun.eye": "ڕۆژنامە",
+    "web.sun.title": "سەن ئۆف ئەربیل",
+    "web.title": "ئێستا <em>وێبسایتیش</em> دروست دەکەین."
   },
   "kmr": {
     "a11y.blogPages": "Rûpelên blogê",
@@ -913,7 +937,19 @@ export const LOCALIZED_COPY = {
     "tip.latest": "Ya nû",
     "tip.menu": "Menû",
     "tip.share": "Civakî",
-    "tip.theme": "Rûkar"
+    "tip.theme": "Rûkar",
+    "web.bq.desc": "Malpera studyoyê bi xwe — ode, arşîv û kar, li yek cihî.",
+    "web.bq.eye": "Malpera me",
+    "web.bq.title": "Bqurtas",
+    "web.eye": "Malper",
+    "web.kosan.desc": "Yazdeh pargîdan li Hewlêrê, di bin yek navî de.",
+    "web.kosan.eye": "Holding",
+    "web.kosan.title": "Kosan Holding",
+    "web.lede": "Heman pratîk, niha li ser ekranê — sê malper, li vir hatine çêkirin.",
+    "web.sun.desc": "Nûçe û raman ji Hewlêrê, studyo di desteya kar de.",
+    "web.sun.eye": "Çap",
+    "web.sun.title": "Sun of Erbil",
+    "web.title": "Em niha <em>malperan</em> jî çêdikin."
   },
   "ar": {
     "a11y.blogPages": "صفحات المدونة",
@@ -1218,7 +1254,19 @@ export const LOCALIZED_COPY = {
     "tip.latest": "الأحدث",
     "tip.menu": "القائمة",
     "tip.share": "التواصل",
-    "tip.theme": "المظهر"
+    "tip.theme": "المظهر",
+    "web.bq.desc": "موقع الاستوديو نفسه — الغرف والأرشيف والأعمال، في مكان واحد.",
+    "web.bq.eye": "موقعنا",
+    "web.bq.title": "ب قورتاس",
+    "web.eye": "مواقع",
+    "web.kosan.desc": "إحدى عشرة شركة في أربيل، تحت اسم واحد.",
+    "web.kosan.eye": "هولدينغ",
+    "web.kosan.title": "كوسان هولدينغ",
+    "web.lede": "الممارسة نفسها، الآن على الشاشة — ثلاثة مواقع، صُنعت هنا.",
+    "web.sun.desc": "أخبار ورأي من أربيل، والاستوديو في هيئة التحرير.",
+    "web.sun.eye": "صحافة",
+    "web.sun.title": "صن أوف أربيل",
+    "web.title": "نصنع <em>المواقع</em> أيضاً."
   },
   "fr": {
     "a11y.blogPages": "Pages du blog",
@@ -1523,7 +1571,19 @@ export const LOCALIZED_COPY = {
     "tip.latest": "Nouveautés",
     "tip.menu": "Menu",
     "tip.share": "Réseaux",
-    "tip.theme": "Thème"
+    "tip.theme": "Thème",
+    "web.bq.desc": "Le site du studio — les salles, l'archive et le travail, au même endroit.",
+    "web.bq.eye": "Notre site",
+    "web.bq.title": "Bqurtas",
+    "web.eye": "Sites",
+    "web.kosan.desc": "Onze sociétés à Erbil, réunies sous un seul nom.",
+    "web.kosan.eye": "Holding",
+    "web.kosan.title": "Kosan Holding",
+    "web.lede": "La même pratique, maintenant à l'écran — trois sites, faits ici.",
+    "web.sun.desc": "Actualité et opinion depuis Erbil, le studio au masthead.",
+    "web.sun.eye": "Presse",
+    "web.sun.title": "Sun of Erbil",
+    "web.title": "Nous faisons aussi des <em>sites</em>."
   },
   "tr": {
     "a11y.blogPages": "Blog sayfaları",
@@ -1828,7 +1888,19 @@ export const LOCALIZED_COPY = {
     "tip.latest": "Yenilikler",
     "tip.menu": "Menü",
     "tip.share": "Sosyaller",
-    "tip.theme": "Tema"
+    "tip.theme": "Tema",
+    "web.bq.desc": "Stüdyonun kendi sitesi — odalar, arşiv ve işler, tek yerde.",
+    "web.bq.eye": "Kendi sitemiz",
+    "web.bq.title": "Bqurtas",
+    "web.eye": "Web siteleri",
+    "web.kosan.desc": "Erbil'de on bir şirket, tek isim altında.",
+    "web.kosan.eye": "Holding",
+    "web.kosan.title": "Kosan Holding",
+    "web.lede": "Aynı pratik, şimdi ekranda — üç site, burada yapıldı.",
+    "web.sun.desc": "Erbil'den haber ve görüş; stüdyo künyede.",
+    "web.sun.eye": "Basın",
+    "web.sun.title": "Sun of Erbil",
+    "web.title": "Artık <em>web sitesi</em> de yapıyoruz."
   },
   "sv": {
     "a11y.blogPages": "Bloggsidor",
@@ -2133,6 +2205,18 @@ export const LOCALIZED_COPY = {
     "tip.latest": "Senaste",
     "tip.menu": "Meny",
     "tip.share": "Socials",
-    "tip.theme": "Tema"
+    "tip.theme": "Tema",
+    "web.bq.desc": "Studions egen sajt — rum, arkiv och arbetet, på ett ställe.",
+    "web.bq.eye": "Vår sajt",
+    "web.bq.title": "Bqurtas",
+    "web.eye": "Webbplatser",
+    "web.kosan.desc": "Elva bolag i Erbil, samlade under ett namn.",
+    "web.kosan.eye": "Holding",
+    "web.kosan.title": "Kosan Holding",
+    "web.lede": "Samma praktik, nu på skärmen — tre sajter, gjorda här.",
+    "web.sun.desc": "Nyheter och opinion från Erbil, studion i redaktionsrutan.",
+    "web.sun.eye": "Press",
+    "web.sun.title": "Sun of Erbil",
+    "web.title": "Vi bygger också <em>webbplatser</em>."
   }
 };

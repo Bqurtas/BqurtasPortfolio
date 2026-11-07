@@ -13,7 +13,7 @@
       instead of being pinned for the life of the installed worker.
    ========================================================= */
 
-const SW_VERSION = '4fd8e316f7e7'; // generated from this worker and the app shell
+const SW_VERSION = '67c5b97275fa'; // generated from this worker and the app shell
 const CACHE_NAME = `bqurtas-cache-${SW_VERSION}`;
 const DOC_FALLBACK = '/index.html';
 
@@ -36,14 +36,14 @@ async function cachedEntry(request) {
    remain network-first, so this copy is only an offline fallback. */
 const PRECACHE_ASSETS = [
   '/index.html',
-  '/css/modern-framer.min.css?v=618db1d097f1',
-  '/css/style.v417.min.css?v=6d64a1d15709',
+  '/css/modern-framer.min.css?v=ec35ba0675f4',
+  '/css/style.v417.min.css?v=f0bd58034c7e',
   '/css/fonts.css?v=6bd89c103953',
   '/css/experience.min.css?v=d78921b4a98f',
-  '/js/main.v420.min.js?v=a349760a91b9',
+  '/js/main.v420.min.js?v=1d6bbee69180',
   '/js/gallery.v420.min.js?v=6650d0580a06',
-  '/js/i18n.v420.min.js?v=dcfb041aed5a',
-  '/js/motion.26a62c962613.min.js?v=26a62c962613',
+  '/js/i18n.v420.min.js?v=158f41c84799',
+  '/js/motion.b28b5dc91be5.min.js?v=b28b5dc91be5',
   '/js/lux.min.js?v=1e8781ff602a',
   '/site.webmanifest?v=19c5c4b9ee48',
   '/favicon.ico',
