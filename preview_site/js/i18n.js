@@ -1843,6 +1843,22 @@ window.BQ_IDENTITY_COPY = {
   });
 })();
 
+Object.assign(window.I18N.en, {
+  'sites.eye': 'Websites',
+  'sites.title': 'Three sites, <em>made</em> here.',
+  'sites.lede': 'The same practice now builds the web — the studio, a newsroom, and a holding in Hewlêr.',
+  'sites.visit': 'Visit',
+  'sites.bq.name': 'Bqurtas',
+  'sites.bq.role': 'Our own site',
+  'sites.bq.aria': 'Bqurtas, our own site, opens in a new tab',
+  'sites.sun.name': 'Sun of Erbil',
+  'sites.sun.role': 'News and opinion',
+  'sites.sun.aria': 'Sun of Erbil, opens in a new tab',
+  'sites.kosan.name': 'Kosan Holding',
+  'sites.kosan.role': 'Eleven companies',
+  'sites.kosan.aria': 'Kosan Holding, opens in a new tab'
+});
+
 /* Preserve small hero labels when an on-demand dictionary replaces its stub. */
 Object.keys(window.BQ_UI_I18N).forEach(function (lang) {
   Object.assign(window.BQ_UI_I18N[lang], {

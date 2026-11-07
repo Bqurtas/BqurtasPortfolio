@@ -3456,7 +3456,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       hero.style.setProperty('--bq-paper-z', '1');
       wrapPaperScroll(hero);
 
-      const paperNames = ['work', 'practice', 'note', 'clients', 'blog'];
+      const paperNames = ['work', 'sites', 'practice', 'note', 'clients', 'blog'];
       sections.forEach((sheet, i) => {
         sheet.classList.add('paper-sheet');
         sheet.dataset.paper = paperNames[i] || `sheet-${i + 1}`;

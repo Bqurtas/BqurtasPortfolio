@@ -2864,6 +2864,147 @@ body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: n
 }
 
 /* =========================================================
+   WEBSITES — three sites on one paper, after the portfolio
+   ========================================================= */
+.sites-head { max-width: 760px; margin-bottom: clamp(18px, 2.4vh, 28px); }
+.sites-sheet .section-num { margin-bottom: 12px; }
+.sites-sheet .sites-title {
+  font-family: 'Fraunces', 'Noto Kufi Arabic', serif;
+  font-size: clamp(30px, 3.4vw, 48px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  max-width: 16ch;
+}
+.sites-sheet .sites-title em { font-style: italic; }
+.sites-lede {
+  margin-top: 12px;
+  max-width: 38rem;
+  font-size: clamp(15px, 1.3vw, 17px);
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+.sites-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 1.4vw, 20px);
+}
+.site-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100%;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--ink) 3.5%, var(--bq-paper-sheet, #f3f3f3));
+  transition: transform .45s var(--ease), border-color .3s var(--ease), background .3s var(--ease);
+}
+.site-card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--ink) 42%, transparent);
+}
+.site-card-chrome {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--line);
+}
+.site-card-dots { display: inline-flex; gap: 5px; }
+.site-card-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ink) 28%, transparent);
+}
+.site-card-url {
+  font-size: 10px !important;
+  letter-spacing: .08em;
+  color: var(--ink-muted) !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.site-card-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: clamp(112px, 16vh, 168px);
+  color: var(--ink);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--ink) 5%, transparent), transparent 70%);
+}
+.site-card--bq .site-card-stage {
+  color: var(--bg);
+  background: var(--ink);
+}
+.site-card-mark {
+  font-family: 'Fraunces', 'Noto Kufi Arabic', serif;
+  font-weight: 500;
+  font-style: italic;
+  font-size: clamp(42px, 4vw, 64px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.site-card-sun { width: 72px; height: 72px; display: block; }
+.site-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 16px 18px;
+}
+.site-card-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-muted) !important;
+  font-size: 10px !important;
+}
+.site-card-index { color: var(--ink); }
+.site-card-name {
+  font-family: 'Fraunces', 'Noto Kufi Arabic', serif;
+  font-size: clamp(22px, 1.8vw, 28px);
+  font-weight: 500;
+  line-height: 1.15;
+}
+.site-card-go {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  font-family: 'JetBrains Mono', 'Noto Kufi Arabic', monospace;
+  font-size: 11px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 28%, transparent);
+  padding-bottom: 3px;
+}
+.site-card:hover .site-card-go { gap: 12px; }
+@media (max-width: 820px) {
+  .sites-grid { grid-template-columns: 1fr; gap: 10px; }
+  .site-card {
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr);
+    grid-template-areas: "stage copy";
+  }
+  .site-card-chrome { display: none; }
+  .site-card-stage { grid-area: stage; min-height: 92px; }
+  .site-card-copy { grid-area: copy; justify-content: center; padding: 12px 14px; }
+  .site-card-mark { font-size: 34px; }
+  .site-card-sun { width: 46px; height: 46px; }
+  .site-card:hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-card, .site-card-go { transition: none; }
+  .site-card:hover { transform: none; }
+}
+
+/* =========================================================
    FOOTER
    ========================================================= */
 .footer {

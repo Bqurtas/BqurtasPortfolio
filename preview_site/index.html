@@ -12,7 +12,7 @@
   <link rel="preload" as="style" href="css/modern-framer.min.css?v=618db1d097f1" />
   <link rel="preload" as="style" href="css/fonts.css?v=6bd89c103953" />
   <link rel="preload" as="style" href="css/experience.min.css?v=d78921b4a98f" />
-  <link rel="preload" as="style" href="css/polish.min.css?v=a96e99b7a162" />
+  <link rel="preload" as="style" href="css/polish.min.css?v=51ed61a75d1a" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#fbfbfa" />
   <meta name="color-scheme" content="light dark" />
@@ -848,9 +848,9 @@
       html:is(.bq-shell-timeout,.bq-css-timeout):not([data-bq-shell-ready="1"]) body .room.paper-stack > :is(.hero,.room-hero).paper-sheet > .paper-scroll{overflow-y:auto!important;overscroll-behavior:auto!important}
     }
   </style>
-  <link rel="preload" as="style" href="css/style.v417.min.css?v=6d64a1d15709" data-href="css/style.v417.min.css?v=6d64a1d15709" fetchpriority="high" id="bqFullCss">
+  <link rel="preload" as="style" href="css/style.v417.min.css?v=94cda4589b76" data-href="css/style.v417.min.css?v=94cda4589b76" fetchpriority="high" id="bqFullCss">
   <link rel="stylesheet" href="css/modern-framer.min.css?v=618db1d097f1">
-  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=6d64a1d15709"></noscript>
+  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=94cda4589b76"></noscript>
   <script>
     (function () {
       var root = document.documentElement;
@@ -930,7 +930,7 @@
   <link rel="stylesheet" href="css/fonts.css?v=6bd89c103953">
   <link rel="stylesheet" href="css/experience.min.css?v=d78921b4a98f">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.min.css?v=a96e99b7a162">
+  <link rel="stylesheet" href="css/polish.min.css?v=51ed61a75d1a">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=6dee64a9a95d" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=6dee64a9a95d"></noscript>
 
@@ -1327,6 +1327,62 @@
           </div>
           <button class="load-collapse-btn mono bq-hidden" id="loadCollapseBtn" type="button" data-i18n="lm.collapse">Collapse all</button>
           <a class="gallery-archive-link mono" href="/archive/" data-i18n="gallery.archive">Browse the full archive ↗</a>
+        </div>
+      </div>
+
+      <!-- ===== WEBSITES — a paper after the portfolio ===== -->
+      <div class="section sites-sheet" id="sites">
+        <div class="sheet-mid">
+          <header class="sites-head">
+            <span class="section-num mono"><i class="fa-solid fa-code"></i> &nbsp; <span data-i18n="sites.eye">Websites</span></span>
+            <h2 class="section-title sites-title" data-i18n="sites.title">Three sites, <em>made</em> here.</h2>
+            <p class="section-lede sites-lede" data-i18n="sites.lede">The same practice now builds the web — the studio, a newsroom, and a holding in Hewlêr.</p>
+          </header>
+          <div class="sites-grid">
+            <a class="site-card site-card--bq" href="https://bqurtas.com/" target="_blank" rel="noopener noreferrer" data-i18n-aria="sites.bq.aria" aria-label="Bqurtas, our own site, opens in a new tab">
+              <span class="site-card-chrome" aria-hidden="true">
+                <span class="site-card-dots"><i></i><i></i><i></i></span>
+                <span class="site-card-url mono">bqurtas.com</span>
+              </span>
+              <span class="site-card-stage" aria-hidden="true"><span class="site-card-mark">BQ</span></span>
+              <span class="site-card-copy">
+                <span class="site-card-kicker mono"><span class="site-card-index">01</span> <span data-i18n="sites.bq.role">Our own site</span></span>
+                <span class="site-card-name" data-i18n="sites.bq.name">Bqurtas</span>
+                <span class="site-card-go"><span data-i18n="sites.visit">Visit</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+              </span>
+            </a>
+            <a class="site-card site-card--sun" href="https://sunoferbil.com/" target="_blank" rel="noopener noreferrer" data-i18n-aria="sites.sun.aria" aria-label="Sun of Erbil, opens in a new tab">
+              <span class="site-card-chrome" aria-hidden="true">
+                <span class="site-card-dots"><i></i><i></i><i></i></span>
+                <span class="site-card-url mono">sunoferbil.com</span>
+              </span>
+              <span class="site-card-stage" aria-hidden="true">
+                <svg class="site-card-sun" viewBox="0 0 64 64" aria-hidden="true">
+                  <circle cx="32" cy="32" r="9" fill="currentColor"/>
+                  <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                    <path d="M32 8v8M32 48v8M8 32h8M48 32h8M14.7 14.7l5.6 5.6M43.7 43.7l5.6 5.6M49.3 14.7l-5.6 5.6M20.3 43.7l-5.6 5.6"/>
+                  </g>
+                </svg>
+              </span>
+              <span class="site-card-copy">
+                <span class="site-card-kicker mono"><span class="site-card-index">02</span> <span data-i18n="sites.sun.role">News and opinion</span></span>
+                <span class="site-card-name" data-i18n="sites.sun.name">Sun of Erbil</span>
+                <span class="site-card-go"><span data-i18n="sites.visit">Visit</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+              </span>
+            </a>
+            <a class="site-card site-card--kosan" href="https://www.kosanh.com/" target="_blank" rel="noopener noreferrer" data-i18n-aria="sites.kosan.aria" aria-label="Kosan Holding, opens in a new tab">
+              <span class="site-card-chrome" aria-hidden="true">
+                <span class="site-card-dots"><i></i><i></i><i></i></span>
+                <span class="site-card-url mono">kosanh.com</span>
+              </span>
+              <span class="site-card-stage" aria-hidden="true"><span class="site-card-mark">11</span></span>
+              <span class="site-card-copy">
+                <span class="site-card-kicker mono"><span class="site-card-index">03</span> <span data-i18n="sites.kosan.role">Eleven companies</span></span>
+                <span class="site-card-name" data-i18n="sites.kosan.name">Kosan Holding</span>
+                <span class="site-card-go"><span data-i18n="sites.visit">Visit</span> <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+              </span>
+            </a>
+          </div>
         </div>
       </div>
 
@@ -2466,7 +2522,7 @@
     </article>
   </div>
 
-  <script defer src="js/i18n.v420.min.js?v=dcfb041aed5a"></script>
+  <script defer src="js/i18n.v420.min.js?v=090ee4ed0a01"></script>
   <!-- Non-English visitors need the extra dictionaries before first render;
        English (the default + PSI) never loads them, keeping the parse light.
        applyLang() can also fetch this on its own, but starting it here — in
@@ -2483,7 +2539,7 @@
       var lang=u;
       if(lang && lang!=='en'){
         window.__i18nMoreLoading=true; window.__i18nMoreCbs=window.__i18nMoreCbs||[];
-        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=2ab456bb9180'; s.async=false;
+        var s=document.createElement('script'); s.src='js/i18n-more.min.js?v=170ec6d8e070'; s.async=false;
         s.onload=function(){
           window.__i18nMoreLoaded=true; window.__i18nMoreLoading=false;
           var cbs=(window.__i18nMoreCbs||[]).slice(); window.__i18nMoreCbs=[];
@@ -2495,7 +2551,7 @@
     }catch(e){}})();
   </script>
   <script defer src="js/latest-feed.min.js?v=76465997249c"></script>
-  <script defer src="js/main.v420.min.js?v=a349760a91b9"></script>
+  <script defer src="js/main.v420.min.js?v=403e64eb871c"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2670,7 +2726,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=4fd8e316f7e7', { updateViaCache: 'none' })
+            .register('/sw.js?v=90ea7c5edbce', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

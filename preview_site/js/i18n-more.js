@@ -2821,3 +2821,102 @@ Object.assign(window.I18N, {
     window.I18N[lang] = Object.assign(window.I18N[lang] || {}, copy[lang]);
   });
 })();
+
+/* Websites paper, merged after the full dictionaries so it is not replaced. */
+(function applySitesCopy() {
+  var copy = {
+    ku: {
+      'sites.eye': 'وێبسایتەکان',
+      'sites.title': 'سێ وێبسایت، لێرە <em>دروست</em> کراون.',
+      'sites.lede': 'هەمان پراکتیس ئێستا وێبیش دروست دەکات — ستۆدیۆکە، دەزگایەکی هەواڵ، و هۆڵدینگێک لە هەولێر.',
+      'sites.visit': 'سەردان',
+      'sites.bq.name': 'ب قورتاس',
+      'sites.bq.role': 'وێبسایتی خۆمان',
+      'sites.bq.aria': 'وێبسایتی ب قورتاس، لە پەنجەرەیەکی نوێدا دەکرێتەوە',
+      'sites.sun.name': 'سەن ئۆف ئەربیل',
+      'sites.sun.role': 'هەواڵ و بۆچوون',
+      'sites.sun.aria': 'وێبسایتی سەن ئۆف ئەربیل، لە پەنجەرەیەکی نوێدا دەکرێتەوە',
+      'sites.kosan.name': 'کۆسان هۆڵدینگ',
+      'sites.kosan.role': 'یازدە کۆمپانیا',
+      'sites.kosan.aria': 'وێبسایتی کۆسان هۆڵدینگ، لە پەنجەرەیەکی نوێدا دەکرێتەوە'
+    },
+    kmr: {
+      'sites.eye': 'Malper',
+      'sites.title': 'Sê malper, li vir <em>hatine çêkirin</em>.',
+      'sites.lede': 'Heman pratîk niha webê jî çêdike — studyo, dezgeheke nûçeyan, û holîngeke li Hewlêrê.',
+      'sites.visit': 'Serdan',
+      'sites.bq.name': 'Bqurtas',
+      'sites.bq.role': 'Malpera me',
+      'sites.bq.aria': 'Malpera Bqurtas, di paceyeke nû de vedibe',
+      'sites.sun.name': 'Sun of Erbil',
+      'sites.sun.role': 'Nûçe û nêrîn',
+      'sites.sun.aria': 'Malpera Sun of Erbil, di paceyeke nû de vedibe',
+      'sites.kosan.name': 'Kosan Holding',
+      'sites.kosan.role': 'Yanzdeh kompanya',
+      'sites.kosan.aria': 'Malpera Kosan Holding, di paceyeke nû de vedibe'
+    },
+    ar: {
+      'sites.eye': 'المواقع',
+      'sites.title': 'ثلاثة مواقع، <em>صُنعت</em> هنا.',
+      'sites.lede': 'الممارسة نفسها تبني الويب الآن — الاستوديو، ومؤسسة أخبار، وشركة قابضة في أربيل.',
+      'sites.visit': 'زيارة',
+      'sites.bq.name': 'ب قورتاس',
+      'sites.bq.role': 'موقعنا',
+      'sites.bq.aria': 'موقع ب قورتاس، يُفتح في نافذة جديدة',
+      'sites.sun.name': 'صن أوف أربيل',
+      'sites.sun.role': 'أخبار ورأي',
+      'sites.sun.aria': 'موقع صن أوف أربيل، يُفتح في نافذة جديدة',
+      'sites.kosan.name': 'كوسان هولدينغ',
+      'sites.kosan.role': 'إحدى عشرة شركة',
+      'sites.kosan.aria': 'موقع كوسان هولدينغ، يُفتح في نافذة جديدة'
+    },
+    fr: {
+      'sites.eye': 'Sites web',
+      'sites.title': 'Trois sites, <em>faits</em> ici.',
+      'sites.lede': 'La même pratique construit aussi le web — le studio, une rédaction, et une holding à Hewlêr.',
+      'sites.visit': 'Visiter',
+      'sites.bq.name': 'Bqurtas',
+      'sites.bq.role': 'Notre site',
+      'sites.bq.aria': 'Bqurtas, notre site, s’ouvre dans un nouvel onglet',
+      'sites.sun.name': 'Sun of Erbil',
+      'sites.sun.role': 'Actualités et opinion',
+      'sites.sun.aria': 'Sun of Erbil s’ouvre dans un nouvel onglet',
+      'sites.kosan.name': 'Kosan Holding',
+      'sites.kosan.role': 'Onze sociétés',
+      'sites.kosan.aria': 'Kosan Holding s’ouvre dans un nouvel onglet'
+    },
+    tr: {
+      'sites.eye': 'Web siteleri',
+      'sites.title': 'Üç site, burada <em>yapıldı</em>.',
+      'sites.lede': 'Aynı pratik artık web’i de kuruyor — stüdyo, bir haber odası ve Hewlêr’de bir holding.',
+      'sites.visit': 'Ziyaret et',
+      'sites.bq.name': 'Bqurtas',
+      'sites.bq.role': 'Kendi sitemiz',
+      'sites.bq.aria': 'Bqurtas, kendi sitemiz, yeni bir sekmede açılır',
+      'sites.sun.name': 'Sun of Erbil',
+      'sites.sun.role': 'Haber ve görüş',
+      'sites.sun.aria': 'Sun of Erbil yeni bir sekmede açılır',
+      'sites.kosan.name': 'Kosan Holding',
+      'sites.kosan.role': 'On bir şirket',
+      'sites.kosan.aria': 'Kosan Holding yeni bir sekmede açılır'
+    },
+    sv: {
+      'sites.eye': 'Webbplatser',
+      'sites.title': 'Tre sajter, <em>gjorda</em> här.',
+      'sites.lede': 'Samma praktik bygger nu också webben — studion, en redaktion och ett holdingbolag i Hewlêr.',
+      'sites.visit': 'Besök',
+      'sites.bq.name': 'Bqurtas',
+      'sites.bq.role': 'Vår egen sajt',
+      'sites.bq.aria': 'Bqurtas, vår egen sajt, öppnas i en ny flik',
+      'sites.sun.name': 'Sun of Erbil',
+      'sites.sun.role': 'Nyheter och opinion',
+      'sites.sun.aria': 'Sun of Erbil öppnas i en ny flik',
+      'sites.kosan.name': 'Kosan Holding',
+      'sites.kosan.role': 'Elva bolag',
+      'sites.kosan.aria': 'Kosan Holding öppnas i en ny flik'
+    }
+  };
+  Object.keys(copy).forEach(function (lang) {
+    window.I18N[lang] = Object.assign(window.I18N[lang] || {}, copy[lang]);
+  });
+})();
