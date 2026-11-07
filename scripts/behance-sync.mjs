@@ -118,6 +118,22 @@ async function download(url, folder, stem) {
     }
   }
 }
+/* Behance's image host answers the first request for a WebP size with the
+   original file (JPEG or PNG) while it converts, then with the WebP: ask
+   again. Covers must arrive as WebP (index.html names cover.webp); a page
+   keeps its original file if the WebP never comes. A moving GIF stays a GIF
+   on Behance's WebP sizes, which keeps it moving, so it is taken as it comes. */
+async function downloadWebp(url, folder, stem, { required = false } = {}) {
+  if (!required && /\.gif$/i.test(new URL(url).pathname)) return download(url, folder, stem);
+  for (let attempt = 1; ; attempt += 1) {
+    const saved = await download(url, folder, stem);
+    if (saved.name === `${stem}.webp`) return saved;
+    if (attempt >= 4 && !required) return saved;
+    await rm(path.join(folder, saved.name), { force: true });
+    if (attempt >= 4) throw new Error(`Behance did not send a WebP for ${url}`);
+    await sleep(2000 * attempt);
+  }
+}
 const cleanAbout = (description) => String(description || '').replace(/\r/g, '').split('\n')
   .filter((line) => !/^for more inf/i.test(line.trim()) && !/^https?:\/\/(www\.)?bqurtas\.com\/#/.test(line.trim()))
   .join('\n').trim().split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
@@ -164,25 +180,15 @@ try {
     const base = `/assets/behance/${item.id}/`;
     const entry = { full: Boolean(page) };
     if (coverChanged || page) {
-      /* Behance's image host can answer the first request for a WebP size
-         with the original file while it converts; ask again before failing. */
-      const webp = async (size, stem) => {
-        for (let attempt = 1; ; attempt += 1) {
-          const saved = await download(`https://mir-s3-cdn-cf.behance.net/projects/${size}/${item.cover}`, fresh, stem);
-          if (saved.name === `${stem}.webp`) return saved;
-          await rm(path.join(fresh, saved.name), { force: true });
-          if (attempt >= 4) throw new Error(`${item.id}: Behance did not send a WebP ${stem}`);
-          await sleep(2000 * attempt);
-        }
-      };
-      const big = await webp('808_webp', 'cover');
-      const small = await webp('404_webp', 'cover-404');
+      const cover = (size, stem) => downloadWebp(`https://mir-s3-cdn-cf.behance.net/projects/${size}/${item.cover}`, fresh, stem, { required: true });
+      const big = await cover('808_webp', 'cover');
+      const small = await cover('404_webp', 'cover-404');
       entry.cover = { src: base + big.name, small: base + small.name, w: big.w, h: big.h };
     }
     if (page) {
       entry.images = [];
       for (const [i, image] of (page.images || []).entries()) {
-        const saved = await download(typeof image === 'string' ? image : image.src, fresh, String(i + 1).padStart(2, '0'));
+        const saved = await downloadWebp(typeof image === 'string' ? image : image.src, fresh, String(i + 1).padStart(2, '0'));
         entry.images.push({ src: base + saved.name, w: saved.w, h: saved.h, ...(image.caption ? { caption: image.caption } : {}) });
         await sleep(120);
       }
