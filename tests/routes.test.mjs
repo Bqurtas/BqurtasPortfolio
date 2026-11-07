@@ -432,7 +432,9 @@ test('the Behance catalogue yields only safe, canonical project data', () => {
   const { projects, byId } = behanceCatalogue({ projects: [
     { id: '243902845', slug: 'Photography', title: '  PHOTOGRAPHY  ', url: 'https://evil.example/243902845', date: '2026-02-31',
       tags: ['photo', 'photo', ''], cover: { src: '/assets/behance/243902845/cover.webp', w: 808 },
-      images: [{ src: '/assets/behance/243902845/01.webp' }, { src: '/assets/behance/../secret.webp' }, { src: 'https://cdn.example/x.webp' }] },
+      images: [{ src: '/assets/behance/243902845/01.webp' }, { src: '/assets/behance/../secret.webp' }, { src: 'https://cdn.example/x.webp' },
+        { src: '/assets/behance/243902845/02.gif?v=0123456789ab' }, { src: '/assets/behance/243902845/03.webp?x=1' },
+        { src: '/assets/behance/243902845/04.webp?v=0123456789ab&x=1' }] },
     { id: '243902845', slug: 'duplicate', title: 'Duplicate' },
     { id: '0123', slug: 'bad-id' },
     { id: 258156477, slug: '', title: 'Untitled slug' },
@@ -445,7 +447,8 @@ test('the Behance catalogue yields only safe, canonical project data', () => {
   assert.equal(photo.date, '', 'an impossible date is dropped');
   assert.deepEqual(photo.tags, ['photo']);
   assert.equal(photo.cover, null, 'a cover without its size is not used for the share card');
-  assert.deepEqual(photo.images, ['/assets/behance/243902845/01.webp']);
+  assert.deepEqual(photo.images, ['/assets/behance/243902845/01.webp', '/assets/behance/243902845/02.gif?v=0123456789ab'],
+    'only first-party files, with at most the sync\'s content stamp');
   assert.throws(() => behanceCatalogue({ projects: 'none' }), /invalid behance catalogue/);
 
   const long = 'A catalogue of selected work by Barakat Qurtas, a Kurdish multidisciplinary designer, creative technologist and photographer in Hewlêr (Erbil), Kurdistan Region. Since 2014.';

@@ -29,8 +29,9 @@
    JSON file { "owner": {...}, "projects": [{...}] } and pass it with --pages.
    Then run `npm run build`.
    ========================================================= */
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { copyFile, mkdir, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
@@ -276,7 +277,23 @@ if (exported.owner) {
   console.log('  updated the profile');
 }
 projects.sort((a, b) => String(b.date).localeCompare(String(a.date)));
-const out = { profile: 'https://www.behance.net/bqurtas', synced: new Date().toISOString().slice(0, 10), ...(owner ? { owner } : {}), projects };
+/* Every cover and page address carries a stamp of its file's content
+   (?v=<12 hex>). A page Behance changed keeps its file name, so without the
+   stamp the edge cache, browsers and the service worker would go on showing
+   the old one; an unchanged file keeps its address. New objects, so `copy`
+   stays as it was read for the comparison below. */
+const stamp = (src) => {
+  if (typeof src !== 'string' || !src.startsWith('/assets/behance/')) return src;
+  const clean = src.split('?')[0];
+  const file = path.join(root, 'preview_site', clean);
+  return existsSync(file) ? `${clean}?v=${createHash('sha256').update(readFileSync(file)).digest('hex').slice(0, 12)}` : clean;
+};
+const stamped = projects.map((p) => ({
+  ...p,
+  ...(p.cover ? { cover: { ...p.cover, src: stamp(p.cover.src), ...(p.cover.small ? { small: stamp(p.cover.small) } : {}) } } : {}),
+  images: (p.images || []).map((image) => ({ ...image, src: stamp(image.src) })),
+}));
+const out = { profile: 'https://www.behance.net/bqurtas', synced: new Date().toISOString().slice(0, 10), ...(owner ? { owner } : {}), projects: stamped };
 const withoutDate = ({ synced, ...rest }) => rest;
 if (isDeepStrictEqual(withoutDate(out), withoutDate(copy))) {
   console.log('Nothing new on Behance; the copy is unchanged.');

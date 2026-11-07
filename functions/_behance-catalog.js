@@ -20,8 +20,9 @@ export const BEHANCE_ID = /^[1-9]\d{5,11}$/;
 export const BEHANCE_SEGMENT = /^([1-9]\d{5,11})(?:-[A-Za-z0-9-]*)?$/;
 
 const SITE = 'https://bqurtas.com';
-// First-party files only: no query, no "..", no other folder.
-const IMAGE_PATH = /^\/assets\/behance\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.(webp|jpe?g|png|avif|gif)$/i;
+// First-party files only: no "..", no other folder, and no query except the
+// content stamp the sync writes (?v=<12 hex>, see scripts/behance-sync.mjs).
+const IMAGE_PATH = /^\/assets\/behance\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.(webp|jpe?g|png|avif|gif)(?:\?v=[0-9a-f]{12})?$/i;
 const IMAGE_TYPES = { webp: 'image/webp', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', avif: 'image/avif', gif: 'image/gif' };
 
 const text = (value) => (typeof value === 'string' || typeof value === 'number')
