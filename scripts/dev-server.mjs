@@ -12,7 +12,7 @@ export const DEFAULT_ROOT = path.join(projectRoot, 'preview_site');
 export const DEFAULT_HOST = '127.0.0.1';
 
 const LANGUAGES = new Set(['ku', 'kmr', 'ar', 'fr', 'tr', 'sv']);
-const ROOMS = new Set(['blog', 'bio', 'contact']);
+const ROOMS = new Set(['blog', 'bio', 'contact', 'behance']);
 const DESIGN_TABS = new Set([
   'logo', 'official', 'book', 'posters', 'social', 'events',
   'stationery', 'image', 'video', 'other', 'certificate'
@@ -50,6 +50,8 @@ export function isSpaRoute(pathname) {
   if (parts.length === 0) return true;
   if (parts.length === 1 && (ROOMS.has(parts[0]) || parts[0] === 'design')) return true;
   if (parts.length === 2 && parts[0] === 'design' && DESIGN_TABS.has(parts[1])) return true;
+  // Behance projects: /behance/<id>-<slug>, the shape the edge router accepts.
+  if (parts.length === 2 && parts[0] === 'behance' && /^[1-9]\d{5,11}(?:-[A-Za-z0-9-]*)?$/.test(parts[1])) return true;
   return parts.length === 2 && parts[0] === 'blog' && /^[1-9]\d{0,17}$/.test(parts[1]);
 }
 

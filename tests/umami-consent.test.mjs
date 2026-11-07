@@ -89,7 +89,7 @@ test('SPA history, locale and route events are deduplicated; hidden documents wa
 test('Studio, unknown paths and nonproduction hosts are never tracked by either provider',()=>{
   for(const options of [
     {url:'https://bqurtas.com/#studio'}, {dash:true}, {url:'https://bqurtas.com/api/content'},
-    {url:'https://bqurtas.com/private/person@example.com'}, {url:'https://bqurtas.com/blog/0001'},
+    {url:'https://bqurtas.com/private/person@example.com'}, {url:'https://bqurtas.com/blog/0001'}, {url:'https://bqurtas.com/behance/0'},
     {url:'http://localhost:8093/'}, {url:'http://127.0.0.1:8083/'},
     {url:'https://preview.bqurtasportfolio.pages.dev/'}, {url:'https://www.bqurtas.com/'}
   ]) {
@@ -99,7 +99,7 @@ test('Studio, unknown paths and nonproduction hosts are never tracked by either 
 });
 
 test('standalone canonical pages share consent-gated collection and reject unknown archive paths',()=>{
-  for(const path of ['/archive/','/archive/photos/2/','/design/book/1','/ku/design/stationery','/sv/contact']) {
+  for(const path of ['/archive/','/archive/photos/2/','/design/book/1','/ku/design/stationery','/sv/contact','/behance','/fr/behance/243902845-photography']) {
     const page=fixture({consent:'allowed',url:'https://bqurtas.com'+path});page.advance();
     assert.equal(page.requests[0].payload.payload.url,path);
   }

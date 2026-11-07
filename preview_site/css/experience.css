@@ -675,14 +675,14 @@ html[data-lang="ku"] :is(
    it at a weight that actually lands, using the same doubled-selector trick the
    service headings already use further down this file. Arabic script is drawn
    connected: it takes zero tracking, never negative. */
-html[data-lang="ku"] body :is(#design, #blog, #bio, #contact):is(#design, #blog, #bio, #contact) :is(
+html[data-lang="ku"] body :is(#design, #blog, #bio, #contact, #behance):is(#design, #blog, #bio, #contact, #behance) :is(
   .room-hero-title, .section-title, .tab-header-title, .logos-title,
   .latest-blog-title, .subscribe-title, .bio-phil-label, .pitch-head h3,
   .service-showcase-title, .service-name, .bio-teaser-title,
   .card-title, .blog-card h3
 ),
 html[data-lang="ku"] body .footer.footer.footer :is(.footer-cta-title),
-html[data-lang="ar"] body :is(#design, #blog, #bio, #contact):is(#design, #blog, #bio, #contact) :is(
+html[data-lang="ar"] body :is(#design, #blog, #bio, #contact, #behance):is(#design, #blog, #bio, #contact, #behance) :is(
   .room-hero-title, .section-title, .tab-header-title, .logos-title,
   .latest-blog-title, .subscribe-title, .bio-phil-label, .pitch-head h3,
   .service-showcase-title, .service-name, .bio-teaser-title,

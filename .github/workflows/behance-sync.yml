@@ -1,0 +1,113 @@
+name: Behance sync
+
+# Brings projects the owner publishes on Behance into the Behance room
+# (preview_site/assets/behance/) without anyone pressing a button.
+# scripts/behance-sync.mjs reads only what Behance publishes for machines:
+# the profile's RSS feed, oEmbed for titles, and covers from Behance's image
+# host. It never opens project pages. When something changed, the site is
+# rebuilt and the new copy is pushed to main, which Cloudflare Pages deploys.
+# When Behance does not answer, the run ends with a warning and the next one
+# tries again; the room keeps its copy.
+
+on:
+  schedule:
+    - cron: '23 */3 * * *'   # every three hours
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/behance-sync.yml
+      - scripts/behance-sync.mjs
+      - functions/api/_behance-feed.js
+
+permissions:
+  contents: read
+
+concurrency:
+  group: behance-sync
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  sync:
+    if: github.repository == 'Bqurtas/BqurtasPortfolio'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+
+      - name: Read Behance's public feed
+        run: |
+          set +e
+          node scripts/behance-sync.mjs > "$RUNNER_TEMP/sync.log" 2>&1
+          code=$?
+          set -e
+          # Titles come from Behance: print them as plain text, never as commands.
+          stop=$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')
+          echo "::stop-commands::$stop"
+          cat "$RUNNER_TEMP/sync.log"
+          echo "::$stop::"
+          { echo '```'; cat "$RUNNER_TEMP/sync.log"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$code" -eq 75 ]; then
+            echo "::warning title=Behance did not answer::The room keeps its copy. The next run tries again."
+          elif [ "$code" -ne 0 ]; then
+            exit "$code"
+          fi
+
+      - name: See whether the copy changed
+        id: changed
+        run: |
+          if [ -n "$(git status --porcelain -- preview_site/assets/behance)" ]; then
+            echo "copy=yes" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Rebuild and check the site
+        if: steps.changed.outputs.copy == 'yes'
+        run: |
+          npm run build
+          npm run check:syntax
+          npm run validate
+          node --test tests/behance-feed.test.mjs tests/routes.test.mjs
+          node scripts/check-generated-bundles.mjs
+
+      - name: Publish the new copy
+        if: steps.changed.outputs.copy == 'yes'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A -- preview_site
+          {
+            echo 'Bring new Behance projects into the room.'
+            echo
+            grep -E '^ +(added|updated)' "$RUNNER_TEMP/sync.log" | sed -E 's/^ +//' || true
+          } > "$RUNNER_TEMP/message.txt"
+          git commit -q -F "$RUNNER_TEMP/message.txt"
+          base=$(git rev-parse HEAD~1)
+          auth=$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)
+          echo "::add-mask::$auth"
+          git_auth() { git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" "$@"; }
+          if git_auth push -q origin HEAD:refs/heads/main; then
+            git log -1 --format='Published %h.' | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          now=$(git_auth ls-remote origin refs/heads/main | cut -f1)
+          if [ -n "$now" ] && [ "$now" != "$base" ]; then
+            echo "::warning title=Not published this time::main changed during the run. The next run brings the projects in."
+            exit 0
+          fi
+          exit 1

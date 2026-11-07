@@ -45,6 +45,40 @@ test('the authored identity copy is complete in every language', async () => {
   }
 });
 
+test('the Behance room and its home invitation are written in every language', async () => {
+  const source = await readFile(new URL('../preview_site/js/i18n.js', import.meta.url), 'utf8');
+  const start = source.indexOf('window.I18N_BEHANCE =');
+  const end = source.indexOf('\nObject.keys(window.I18N_BEHANCE)', start);
+  assert.ok(start >= 0 && end > start, 'I18N_BEHANCE should be declared before it is applied');
+
+  const context = { window: {} };
+  vm.runInNewContext(source.slice(start, end), context);
+  const dictionaries = context.window.I18N_BEHANCE;
+  const languages = ['en', 'ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];
+  const expectedKeys = Object.keys(dictionaries.en).sort();
+  for (const language of languages) {
+    assert.deepEqual(Object.keys(dictionaries[language] || {}).sort(), expectedKeys,
+      `${language} Behance copy should cover the same keys as English`);
+    for (const key of expectedKeys) {
+      assert.ok(String(dictionaries[language][key]).trim(), `${language}.${key} should not be empty`);
+    }
+  }
+  // Sentences are translated; only the brand name may stay the same as English.
+  for (const language of ['ku', 'kmr', 'ar', 'fr', 'tr', 'sv']) {
+    for (const key of ['rh.behance.title', 'rh.behance.sub', 'd.bh.title', 'd.bh.sub', 'd.bh.go', 'bh.available', 'bh.views', 'bh.since']) {
+      assert.notEqual(dictionaries[language][key], dictionaries.en[key], `${language}.${key} should be translated`);
+    }
+  }
+  // Every key the page and the room script use is defined.
+  const html = await readFile(new URL('../preview_site/index.html', import.meta.url), 'utf8');
+  const room = await readFile(new URL('../preview_site/js/behance.js', import.meta.url), 'utf8');
+  const used = new Set([
+    ...[...html.matchAll(/data-i18n(?:-aria)?="((?:bh|d\.bh|rh\.behance)\.[^"]+)"/g)].map((m) => m[1]),
+    ...[...room.matchAll(/t\('((?:bh|meta\.title)\.[^']+)'/g)].map((m) => m[1]),
+  ]);
+  for (const key of used) assert.ok(key in dictionaries.en, `${key} is used but not defined`);
+});
+
 test('a late dictionary callback cannot override a newer language choice', async () => {
   const source = await readFile(new URL('../preview_site/js/i18n.js', import.meta.url), 'utf8');
   const start = source.indexOf('window.applyLang = function(lang)');

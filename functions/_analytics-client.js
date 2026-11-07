@@ -25,7 +25,7 @@ export function createAnalyticsClient(archiveRoutes = MEDIA_ARCHIVE_ROUTES) {
     const path = location.pathname;
     if (typeof path !== 'string' || path.length > 160) return '';
     const route = path.replace(/^\/(?:ku|kmr|ar|fr|tr|sv)(?=\/|$)/, '').replace(/\/$/, '') || '/';
-    if (['/', '/design', '/blog', '/bio', '/contact'].includes(route) || archives.includes(route + '/') || /^\/blog\/[1-9]\d{0,17}$/.test(route)) return path;
+    if (['/', '/design', '/blog', '/bio', '/contact', '/behance'].includes(route) || archives.includes(route + '/') || /^\/blog\/[1-9]\d{0,17}$/.test(route) || /^\/behance\/[1-9]\d{5,11}-[a-z0-9-]+$/.test(route)) return path;
     const match = /^\/design\/([a-z]+)(?:\/([1-9]\d{0,17}))?$/.exec(route);
     return match && (collections.includes(match[1]) || (!match[2] && tabs.includes(match[1]))) ? path : '';
   }

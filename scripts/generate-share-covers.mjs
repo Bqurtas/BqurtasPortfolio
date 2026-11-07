@@ -32,14 +32,14 @@ const HEIGHT = 630;
 const RTL = new Set(['ku', 'ar']);
 const LANGS = ['en', 'ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];
 /* Every key the edge function can ask for (functions/[[route]].js: home,
-   design, the portfolio tabs and the three rooms). */
+   design, the portfolio tabs and the four rooms). */
 const KEYS = [
-  'home', 'design', 'blog', 'bio', 'contact',
+  'home', 'design', 'blog', 'bio', 'contact', 'behance',
   'logo', 'official', 'book', 'posters', 'social', 'events',
   'stationery', 'image', 'video', 'other', 'certificate'
 ];
 const ROUTES = {
-  home: '', design: '/design', blog: '/blog', bio: '/bio', contact: '/contact',
+  home: '', design: '/design', blog: '/blog', bio: '/bio', contact: '/contact', behance: '/behance',
   logo: '/design/logo', official: '/design/official', book: '/design/book',
   posters: '/design/posters', social: '/design/social', events: '/design/events',
   stationery: '/design/stationery', image: '/design/image', video: '/design/video',

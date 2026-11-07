@@ -261,6 +261,9 @@
 	      contact: { n: '07', name: "Let's talk.", tag: 'Enquiries', count: 'Replies in 48h',
 	                 desc: 'Pitch a project in one careful letter. Available for select commissions.',
 	                 icon: 'fa-paper-plane' },
+	      behance: { n: '05', name: 'Behance', tag: 'Projects', count: 'Page by page',
+	                 desc: 'Every Behance project, opened image after image without leaving the site.',
+	                 icon: 'fa-behance', family: 'fa-brands' },
 	    };
 
     const card = document.createElement('div');
@@ -287,7 +290,7 @@
       $('#rcTag', card).textContent = (tr && tr.tag) || r.tag;
       $('#rcTitle', card).textContent = nm;
       $('#rcDesc', card).textContent = (tr && tr.desc) || r.desc;
-      $('#rcIcon', card).className = `fa-solid ${r.icon} rail-card-icon`;
+      $('#rcIcon', card).className = `${r.family || 'fa-solid'} ${r.icon} rail-card-icon`;
       const b = link.getBoundingClientRect();
       card.style.top = Math.max(16, Math.min(b.top + b.height / 2, window.innerHeight - 120)) + 'px';
       card.classList.add('is-shown');

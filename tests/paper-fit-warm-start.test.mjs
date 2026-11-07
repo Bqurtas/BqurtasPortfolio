@@ -252,6 +252,21 @@ test('the long biography, the project form and the journal index stop at a reada
   }
 });
 
+test('the Behance profile keeps its natural size and reads the rest on the page track', () => {
+  for (const [viewport, ceiling] of [
+    [{ innerWidth: 1440, innerHeight: 900, __bqViewportScale: 1 }, 1],
+    [{ innerWidth: 2560, innerHeight: 1440, __bqViewportScale: 1, __bqViewportGrow: 1.6 }, 1.6],
+  ]) {
+    const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: viewport });
+    const { sheet, scroller, state } = paper(0.6, Infinity, { room: 'behance', summary: 'behance-sheet' });
+    fit(sheet, scroller);
+    assert.equal(state.applied, ceiling, `${viewport.innerWidth}px keeps the ceiling`);
+    assert.ok(scroller.scrollHeight > scroller.clientHeight, 'the grid reads on the page track');
+    fit(sheet, scroller);
+    assert.equal(state.applied, ceiling, 'a re-measure keeps it');
+  }
+});
+
 test('a large window grows section content and room heroes, and leaves the home hero to its stylesheet', () => {
   const viewport = { innerWidth: 2560, innerHeight: 1440, __bqViewportScale: 1, __bqViewportGrow: 1.6 };
   const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: viewport });

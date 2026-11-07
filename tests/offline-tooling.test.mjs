@@ -230,9 +230,25 @@ test('content-named fonts are cache-first but an explicit refresh still reaches 
   }
 });
 
+test('service worker serves the Behance room and its project pages offline', async () => {
+  for (const pathname of ['/behance', '/ku/behance', '/behance/258156477-barakat-qurtas-selected-works-20142026',
+    '/ar/behance/243902845', '/behance/243902845-PHOTOGRAPHY']) {
+    const worker = await loadServiceWorker({ offline: true });
+    let responsePromise;
+    worker.handlers.fetch({
+      request: { method: 'GET', url: `https://bqurtas.com${pathname}`, headers: new Headers({ Accept: 'text/html' }), mode: 'navigate' },
+      respondWith(value) { responsePromise = value; },
+      waitUntil() {}
+    });
+    assert.ok(responsePromise, `${pathname} is an application document`);
+    assert.equal(await (await responsePromise).text(), 'offline shell', pathname);
+  }
+});
+
 test('service worker leaves non-app documents and live metadata to the network', async () => {
   const worker = await loadServiceWorker({ basicNetworkResponse: true });
-  for (const pathname of ['/404.html', '/missing-page', '/blog/0', '/autodiscover/autodiscover.xml', '/sitemap-gallery.xml', '/llms.txt',
+  for (const pathname of ['/404.html', '/missing-page', '/blog/0', '/behance/0', '/behance/abc', '/behance/1/2',
+    '/autodiscover/autodiscover.xml', '/sitemap-gallery.xml', '/llms.txt',
     // Work pages and same-origin media always come from the network.
     '/design/book/7', '/ku/design/book/7', '/media/Book/BookCover7.webp', '/media/Videos/Videos26.mp4']) {
     for (const mode of ['navigate', 'cors']) {
@@ -337,6 +353,10 @@ test('dev server stays on loopback and only falls back for known application rou
   assert.equal(isSpaRoute('/ar/design/certificate'), true);
   assert.equal(isSpaRoute('/blog/12'), true);
   assert.equal(isSpaRoute('/blog/0'), false);
+  for (const pathname of ['/behance', '/ku/behance', '/behance/258156477-barakat-qurtas-selected-works-20142026', '/sv/behance/243902845']) {
+    assert.equal(isSpaRoute(pathname), true, pathname);
+  }
+  for (const pathname of ['/behance/0', '/behance/abc', '/behance/1/2']) assert.equal(isSpaRoute(pathname), false, pathname);
   assert.equal(isSpaRoute('/missing-file.js'), false);
   assert.throws(() => startDevServer({ host: '0.0.0.0', watch: false }), /non-loopback/);
 

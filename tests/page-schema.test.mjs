@@ -6,11 +6,12 @@ import { pageSchema, rewritePageSchema } from '../functions/_page-schema.js';
 
 test('every room describes its own canonical page while preserving a single person identity', () => {
   for (const [lang, tag] of Object.entries({ en:'en', ku:'ckb', kmr:'ku', ar:'ar', fr:'fr', tr:'tr', sv:'sv' })) {
-    for (const [key, type] of Object.entries({ home:'ProfilePage', bio:'ProfilePage', contact:'ContactPage', blog:'CollectionPage', logo:'CollectionPage', blogpost:'WebPage' })) {
+    for (const [key, type] of Object.entries({ home:'ProfilePage', bio:'ProfilePage', contact:'ContactPage', blog:'CollectionPage', logo:'CollectionPage', blogpost:'WebPage', behance:'CollectionPage', behanceproject:'ItemPage' })) {
       const prefix = lang === 'en' ? '' : '/' + lang;
-      const path = key === 'home' ? prefix || '/' : prefix + (key === 'logo' ? '/design/logo' : key === 'blogpost' ? '/blog/27' : '/' + key);
+      const path = key === 'home' ? prefix || '/' : prefix + (key === 'logo' ? '/design/logo' : key === 'blogpost' ? '/blog/27'
+        : key === 'behanceproject' ? '/behance/243902845-photography' : '/' + key);
       const canon = 'https://bqurtas.com' + path;
-      const graph = pageSchema({ lang, key, canon }, { t:'Localized title', d:'Localized description' }, { 'nav.bio':'Localized biography' })['@graph'];
+      const graph = pageSchema({ lang, key, canon }, { t:'Localized title', d:'Localized description' }, { 'nav.bio':'Localized biography', 'nav.behance':'Localized Behance' })['@graph'];
       const page = graph.find(n => n['@id'] === canon + '#webpage');
       assert.equal(page['@type'], type);
       assert.equal(page.url, canon);
@@ -23,7 +24,11 @@ test('every room describes its own canonical page while preserving a single pers
       assert.ok(person.alternateName.includes('بەرەکات قورتاس'));
       assert.equal(graph.find(n => n['@type'] === 'SiteNavigationElement' && n.name === 'Localized biography').url, 'https://bqurtas.com' + prefix + '/bio');
       if (key === 'blogpost') assert.equal(page.mainEntity['@id'], canon + '#article');
+      else if (key === 'behanceproject') assert.equal(page.mainEntity['@id'], canon + '#work');
       else if (key !== 'home' && key !== 'bio') assert.equal(page.mainEntity, undefined);
+      // Once the site navigation lists the Behance room, it is named from nav.behance.
+      const behanceNav = graph.find(n => n['@type'] === 'SiteNavigationElement' && /\/behance$/.test(n.url));
+      if (behanceNav) assert.deepEqual([behanceNav.name, behanceNav.url], ['Localized Behance', 'https://bqurtas.com' + prefix + '/behance']);
       assert.ok(!graph.some(n => n['@type'] === 'FAQPage'), 'removed visible FAQ must not survive as hidden markup');
     }
   }

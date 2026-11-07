@@ -22,9 +22,11 @@ const pruneTimes = new WeakMap();
 
 function knownRoute(path) {
   const route = path.replace(/^\/(?:ku|kmr|ar|fr|tr|sv)(?=\/|$)/, '').replace(/\/$/, '') || '/';
-  if (['/', '/design', '/blog', '/bio', '/contact'].includes(route)) return true;
+  if (['/', '/design', '/blog', '/bio', '/contact', '/behance'].includes(route)) return true;
   if (MEDIA_ARCHIVE_ROUTES.has(route + '/')) return true;
   if (/^\/blog\/[1-9]\d{0,17}$/.test(route)) return true;
+  // Canonical Behance project pages only; other spellings 301 before a visit.
+  if (/^\/behance\/[1-9]\d{5,11}-[a-z0-9-]+$/.test(route)) return true;
   const match = /^\/design\/([a-z]+)(?:\/([1-9]\d{0,17}))?$/.exec(route);
   return !!match && (match[2] ? Object.hasOwn(COLLECTIONS, match[1])
     : Object.hasOwn(COLLECTIONS, match[1]) || TABS.includes(match[1]));
