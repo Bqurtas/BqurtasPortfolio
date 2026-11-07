@@ -1889,7 +1889,7 @@
         if (image.dataset.portraitDefaultSrcset === undefined) image.dataset.portraitDefaultSrcset = image.getAttribute('srcset') || '';
         if (image.dataset.portraitDefaultSizes === undefined) image.dataset.portraitDefaultSizes = image.getAttribute('sizes') || '';
         image.srcset = source ? srcset : image.dataset.portraitDefaultSrcset;
-        image.sizes = source && srcset ? '(max-width: 500px) min(45svh, 86vw), (max-height: 640px) min(74svh, 40vw), min(45svh, 86vw, 1100px)' : source ? '' : image.dataset.portraitDefaultSizes;
+        image.sizes = source && srcset ? '(max-width: 500px) min(40svh, 78vw), (max-height: 640px) min(66svh, 36vw), min(40svh, 78vw, 980px)' : source ? '' : image.dataset.portraitDefaultSizes;
         image.src = source || fallback;
         if (source) {
           image.dataset.publicPortrait = 'true';
