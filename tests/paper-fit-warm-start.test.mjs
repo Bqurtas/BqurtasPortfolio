@@ -212,8 +212,7 @@ test('biography chapters fit their own paper on a portrait phone', () => {
   const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: viewport });
   for (const summary of [
     'bio-kit-sheet', 'bio-record-sheet', 'bio-education-sheet', 'bio-honors-sheet',
-    'bio-world-sheet', 'bio-connect-sheet', 'bio-docs-sheet',
-    'bio-story-sheet', 'bio-proof-sheet',
+    'bio-world-sheet', 'bio-connect-sheet', 'bio-docs-sheet', 'bio-proof-sheet',
   ]) {
     const chapter = paper(0.91, Infinity, { room: 'bio', summary });
     fit(chapter.sheet, chapter.scroller);
@@ -227,6 +226,29 @@ test('biography chapters fit their own paper on a portrait phone', () => {
     assert.equal(chapter.state.applied, Number(bisect(0.7).toFixed(4)), `${summary} shrinks with the copy`);
     assert.ok(chapter.scroller.scrollHeight <= chapter.scroller.clientHeight, `${summary} still has no inner scroller`);
   }
+});
+
+test('the long biography, the project form and the journal index stop at a readable size and read on the page track', () => {
+  const viewport = { innerWidth: 390, innerHeight: 844 };
+  const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: viewport });
+  for (const [room, summary] of [['bio', 'bio-story-sheet'], ['contact', 'contact-pitch-sheet'], ['blog', 'blog-index-sheet']]) {
+    const chapter = paper(0.6, Infinity, { room, summary });
+    fit(chapter.sheet, chapter.scroller);
+    assert.equal(chapter.state.applied, 0.82, summary);
+    assert.ok(chapter.scroller.scrollHeight > chapter.scroller.clientHeight, `${summary} keeps the rest for the reading track`);
+  }
+});
+
+test('a large window grows section content and room heroes, and leaves the home hero to its stylesheet', () => {
+  const viewport = { innerWidth: 2560, innerHeight: 1440, __bqViewportScale: 1, __bqViewportGrow: 1.6 };
+  const fit = vm.runInNewContext(`${source}\nfitPaper;`, { WeakMap, window: viewport });
+  const section = paper(5, Infinity, { room: 'bio' });
+  const roomHero = paper(5, Infinity, { section: false, summary: 'room-hero' });
+  const homeHero = paper(5, Infinity, { section: false });
+  for (const { sheet, scroller } of [section, roomHero, homeHero]) fit(sheet, scroller);
+  assert.equal(section.state.applied, 1.6);
+  assert.equal(roomHero.state.applied, 1.6);
+  assert.equal(homeHero.state.applied, 1);
 });
 
 test('compact biography papers fit independently and never shrink the long story through its fit group', () => {

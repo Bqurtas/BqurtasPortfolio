@@ -92,7 +92,7 @@
       return true;
     };
     var revealItems = Array.from(document.querySelectorAll(
-      '[data-motion], .latest-blog-grid .blog-card, #contact .qc-card, #contact .pitch-wrap, ' +
+      '[data-motion], .sites-stage, #contact .qc-card, #contact .pitch-wrap, ' +
       '.bio-doc-btn, .footer-stage-copy, .footer-main-v249 > *, .practice-note .software-head, ' +
       '.pj-room-mark, .studio-card, .studio-step, .studio-proof-item, .pj-cta-section'
     ));

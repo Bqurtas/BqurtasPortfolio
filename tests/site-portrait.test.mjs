@@ -418,14 +418,14 @@ test('portrait source selection follows phone, landscape and desktop display siz
   const variants = Object.values(BUNDLED_PORTRAIT_VARIANTS)[0];
   const widths = [...variants.map(item => item.width), 1200];
   for (const [width, height, dpr, expected] of [
-    [412,823,1.75,512], // The production mobile report: 255px, not the old advertised 297px.
-    [390,844,3,960],
+    [412,823,1.75,640],
+    [390,844,3,1200],
     [320,568,2,512],
-    [740,390,2,512],
-    [768,1024,2,640],
+    [740,390,2,640],
+    [768,1024,2,960],
     [1440,900,1,512],
     [1440,900,2,960],
-    [1440,500,2,512]
+    [1440,500,2,960]
   ]) {
     const needed = sourceSize({ width, height }) * dpr;
     assert.equal(widths.find(candidate => candidate >= needed) || widths.at(-1), expected, `${width}×${height} @${dpr}`);

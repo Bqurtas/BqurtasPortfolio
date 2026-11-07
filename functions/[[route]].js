@@ -509,7 +509,7 @@ export async function onRequest(context) {
       const headline = article.title.trim() || 'Journal';
       meta = { t: headline + ' — Barakat Qurtas',
                d: article.subtitle.trim() || blogD };
-      img = article.cover || SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=3';
+      img = article.cover || SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=4';
       imgType = /\.png(\?|$)/i.test(img) ? 'image/png' : /\.webp(\?|$)/i.test(img) ? 'image/webp' : 'image/jpeg';
       // Machine-readable BlogPosting so AI engines + Google attribute every post
       // to Barakat — author named in the page's own language, linked to #person.
@@ -531,11 +531,11 @@ export async function onRequest(context) {
       postJsonLd = '<script type="application/ld+json">' + JSON.stringify(ld).replace(/</g, '\\u003c') + '</script>';
     } else {
       meta = (OG[r.lang] && OG[r.lang].blog) || OG.en.blog;
-      img  = SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=3';
+      img  = SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=4';
     }
   } else {
     meta = (OG[r.lang] && OG[r.lang][r.key]) || OG.en[r.key] || OG.en.home;
-    img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=3';
+    img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=4';
   }
 
   // A unique CSP nonce is meaningful only when the HTML response itself is not

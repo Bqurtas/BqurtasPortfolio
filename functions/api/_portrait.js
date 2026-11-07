@@ -6,9 +6,9 @@ import { decodeWebp, handleGithubMediaUpload } from './_github-works.js';
 import { BUNDLED_PORTRAIT_VARIANTS } from '../_portrait-variants.js';
 
 export const PORTRAIT_LIMIT = 1_000_000;
-// Match the authored portrait's height-aware mobile and landscape limits;
-// advertising 72vw made a 255px phone portrait request a 640px rendition.
-export const PORTRAIT_SIZES = '(max-width: 820px) and (max-height: 620px) min(48vw, 28svh), (max-width: 820px) min(68vw, clamp(184px, 31svh, 272px)), (max-height: 620px) 40svh, min(42vw, 52svh, 448px)';
+// Match the hero's drawing (--pw in polish.css): one side set by the window's
+// height and width, and half a short, wide window when the page sits side by side.
+export const PORTRAIT_SIZES = '(max-width: 500px) min(45svh, 86vw), (max-height: 640px) min(74svh, 40vw), min(45svh, 86vw, 1100px)';
 const VERSION = /^[a-f0-9]{64}$/;
 const DARK_MODES = new Set(['invert', 'original']);
 const schemas = new WeakMap();

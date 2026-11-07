@@ -97,7 +97,7 @@ test('journal index links preserve native activations while an ordinary desktop 
 test('home journal cards also preserve native activations', () => {
   const card = { ...link('blog', '/blog/27'), getAttribute: () => '27' };
   const post = { id: 27 }, opened = [];
-  vm.runInNewContext(section(enhance, "      grid.querySelectorAll('.blog-card').forEach((c) => {", '\n    };'), {
+  vm.runInNewContext(section(enhance, "      grid.querySelectorAll('[data-slug]').forEach((c) => {", '\n    };'), {
     grid: { querySelectorAll: () => [card] }, findPostBySlug: () => post, openReader: p => opened.push(p)
   });
   for (const options of nativeActivations) {

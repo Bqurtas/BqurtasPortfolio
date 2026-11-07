@@ -155,7 +155,7 @@ test('portrait updates and reset keep responsive sources in sync with the select
   assert.equal(f.apply({ ...published, variants }), true);
   for (const image of f.images) {
     assert.equal(image.srcset, `${variants[0].url} 480w, ${published.url} 900w`);
-    assert.match(image.sizes, /max-width: 820px/);
+    assert.match(image.sizes, /max-width: 500px/);
   }
   assert.equal(f.apply({ ...published, variants:[{ ...variants[0], url:'https://other.test/image.webp' }] }), false);
   f.apply(null);

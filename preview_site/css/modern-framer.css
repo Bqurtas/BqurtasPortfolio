@@ -2540,27 +2540,8 @@ body.menu-closing .bq-page-stage .main {
   background: color-mix(in srgb, #050506 var(--bq-footer-mix), #0f0f10) !important;
 }
 
-:root[data-theme="light"] #design > .section.latest-blog {
-  --ink: color-mix(in srgb, #f7f7f4 var(--bq-footer-mix), #0b0b0c);
-  --ink-2: color-mix(in srgb, #e8e8e5 var(--bq-footer-mix), #202022);
-  --ink-soft: color-mix(in srgb, #bdbdb8 var(--bq-footer-mix), #454548);
-  --ink-muted: color-mix(in srgb, #92928d var(--bq-footer-mix), #68686b);
-  --line: color-mix(in srgb, rgba(255, 255, 255, .18) var(--bq-footer-mix), rgba(0, 0, 0, .13));
-  background: color-mix(in srgb, #050506 var(--bq-footer-mix), #ffffff) !important;
-}
-
-:root[data-theme="dark"] #design > .section.latest-blog {
-  background: color-mix(in srgb, #050506 var(--bq-footer-mix), #101011) !important;
-}
-
-body.footer-arriving #design > .section.latest-blog {
-  box-shadow: none !important;
-}
-
-body.footer-arriving #design > .section.latest-blog .latest-blog-head,
-body.footer-arriving #design > .section.latest-blog .latest-blog-grid {
-  opacity: calc(1 - var(--bq-footer-progress)) !important;
-}
+/* The final paper keeps its ink: the footer rises over it as a sheet of its
+   own, so the journal no longer has to dissolve into the footer colour. */
 
 /* VOXO leaves the closing wordmark unobstructed. The BQ dock quietly clears
    once the footer has taken over, then returns as soon as the user scrolls up. */

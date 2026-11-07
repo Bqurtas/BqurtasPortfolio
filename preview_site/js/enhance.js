@@ -1886,7 +1886,7 @@
         if (image.dataset.portraitDefaultSrcset === undefined) image.dataset.portraitDefaultSrcset = image.getAttribute('srcset') || '';
         if (image.dataset.portraitDefaultSizes === undefined) image.dataset.portraitDefaultSizes = image.getAttribute('sizes') || '';
         image.srcset = source ? srcset : image.dataset.portraitDefaultSrcset;
-        image.sizes = source && srcset ? '(max-width: 820px) and (max-height: 620px) min(48vw, 28svh), (max-width: 820px) min(68vw, clamp(184px, 31svh, 272px)), (max-height: 620px) 40svh, min(42vw, 52svh, 448px)' : source ? '' : image.dataset.portraitDefaultSizes;
+        image.sizes = source && srcset ? '(max-width: 500px) min(45svh, 86vw), (max-height: 640px) min(74svh, 40vw), min(45svh, 86vw, 1100px)' : source ? '' : image.dataset.portraitDefaultSizes;
         image.src = source || fallback;
         if (source) {
           image.dataset.publicPortrait = 'true';
@@ -3496,26 +3496,55 @@
        read-only for visitors, while writes go through the secure Edge Function. */
     /* homepage "Latest from the blog" — auto-fills with the newest posts (DB first), updates on publish */
     const renderLatest = () => {
-      const grid = document.querySelector('.latest-blog-grid');
+      const grid = document.querySelector('[data-latest-blog]');
       if (!grid) return;
       const latest = POSTS.slice(0, 3);
       if (!latest.length) return;
-      grid.innerHTML = latest.map((p) => {
+      /* The home journal reads as a front page: the newest note leads with
+         its cover, the two before it follow as plain rows. Every entry is a
+         REAL link to the post's own page — crawlable for Google/AI, opens in
+         a new tab on middle/ctrl-click, while a normal click still does the
+         smooth in-app reader (preventDefault below). */
+      const entry = (p, i) => {
         const q = L(p);
-        const title = String(q.title || '').replace(/<[^>]+>/g, '');
-        // a REAL link to the post's own page — crawlable for Google/AI, opens in a
-        // new tab on middle/ctrl-click, while a normal click still does the smooth
-        // in-app reader (preventDefault below).
-        const href = blogBase() + '/' + (p.slug || slugify(q.title || p.title || ''));
-        return `<a class="blog-card" href="${esc(href)}" data-slug="${esc(p.slug || p.num)}">
-          <span class="blog-card-plate" aria-hidden="true"></span>
-          <span class="mono blog-meta"><i class="fa-solid fa-calendar"></i> ${esc(q.date || '')} · <i class="fa-solid fa-clock"></i> ${esc(String(p.read || 4))} min</span>
-          <h3>${esc(title)}</h3>
-          <p>${esc(q.sub || '')}</p>
-          <span class="blog-more"><span>${dT('blog.more', 'Read the essay')}</span> <i class="fa-solid fa-arrow-right"></i></span>
-        </a>`;
+        return {
+          q,
+          no: String(i + 1).padStart(2, '0'),
+          title: String(q.title || '').replace(/<[^>]+>/g, ''),
+          href: blogBase() + '/' + (p.slug || slugify(q.title || p.title || '')),
+          slug: esc(p.slug || p.num),
+          when: [q.date, `${p.read || 4} min`].filter(Boolean).join(' · ')
+        };
+      };
+      const lead = entry(latest[0], 0);
+      /* A note with its own picture shows it; one without gets the numbered
+         plate — never a stock image. */
+      const cover = lead.q.img
+        ? `<img src="${esc(lead.q.img)}" alt="" loading="lazy" decoding="async">`
+        : `<span class="journal-plate" aria-hidden="true"><span class="journal-plate-no">${lead.no}</span></span>`;
+      const rows = latest.slice(1).map((p, i) => {
+        const e = entry(p, i + 1);
+        return `<li><a class="journal-row" href="${esc(e.href)}" data-slug="${e.slug}">
+          <span class="journal-row-no" aria-hidden="true">${e.no}</span>
+          <h3 class="journal-row-title">${esc(e.title)}</h3>
+          <span class="journal-row-meta mono">${esc([e.q.tag, e.when].filter(Boolean).join(' · '))}</span>
+          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </a></li>`;
       }).join('');
-      grid.querySelectorAll('.blog-card').forEach((c) => {
+      grid.innerHTML = `<a class="journal-lead" href="${esc(lead.href)}" data-slug="${lead.slug}">
+          <div class="journal-cover">${cover}</div>
+          <div class="journal-copy">
+            <span class="journal-meta mono">${[lead.q.tag, lead.when].filter(Boolean).map(part => `<span>${esc(part)}</span>`).join('')}</span>
+            <h3 class="journal-title">${esc(lead.title)}</h3>
+            <p class="journal-sub">${esc(lead.q.sub || '')}</p>
+            <span class="journal-read"><span>${dT('blog.more', 'Read the essay')}</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+          </div>
+        </a>${rows ? `<ol class="journal-more">${rows}</ol>` : ''}`;
+      /* A cover that fails to load gives way to the numbered plate. */
+      grid.querySelector('.journal-cover img')?.addEventListener('error', (e) => {
+        e.currentTarget.outerHTML = `<span class="journal-plate" aria-hidden="true"><span class="journal-plate-no">${lead.no}</span></span>`;
+      }, { once: true });
+      grid.querySelectorAll('[data-slug]').forEach((c) => {
         c.addEventListener('click', (e) => {
           if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
           e.preventDefault(); const p = findPostBySlug(c.getAttribute('data-slug')); if (p) openReader(p);

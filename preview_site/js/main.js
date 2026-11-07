@@ -88,9 +88,16 @@
   const update = () => {
     const height = probe.getBoundingClientRect().height || window.innerHeight || 720;
     const scale = Math.min(1, Math.max(.5, height / 720));
-    if (window.__bqViewportScale === scale) return;
-    window.__bqViewportScale = scale;
-    document.documentElement.style.setProperty('--bq-viewport-scale', String(scale));
+    /* Above a 1440x900 window the sheets' content grows with it instead of
+       sitting small in a large card. The smaller side decides, so a very wide
+       or very tall window keeps the composition's proportions. */
+    const grow = Math.round(Math.min(2.4, Math.max(1, Math.min((window.innerWidth || 1440) / 1440, height / 900))) * 100) / 100;
+    if (window.__bqViewportScale === scale && (window.__bqViewportGrow || 1) === grow) return;
+    window.__bqViewportGrow = grow;
+    if (window.__bqViewportScale !== scale) {
+      window.__bqViewportScale = scale;
+      document.documentElement.style.setProperty('--bq-viewport-scale', String(scale));
+    }
     window.__bqViewportLayout?.refresh();
   };
   update();
@@ -509,11 +516,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.body.dataset.room !== 'design') { designCta.classList.remove('is-shown'); return; }
     const work = document.querySelector('.section.work');     // the "01 — Design Room" section
     const note = document.querySelector('.practice-note');
-    const services = document.querySelector('.service-showcase');
+    // The paper right after the portfolio ends the Design Room.
+    const afterWork = document.querySelector('.sites-sheet') || document.querySelector('.service-showcase');
     const y = window.scrollY;
     // only once the viewer actually reaches the Design Room — not during the hero/Panjamor
     const inDesign = work ? (y + window.innerHeight * 0.5) >= __absTop(work) : y > window.innerHeight * 0.55;
-    const ctaEnd = services || note;
+    const ctaEnd = afterWork || note;
     const beforeEnd = !ctaEnd || (__absTop(ctaEnd) - y) > window.innerHeight * 0.65;
     designCta.classList.toggle('is-shown', inDesign && beforeEnd);
   };
@@ -538,7 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const base = prefix || '/';
       const work = document.querySelector('.section.work');       // "01 — Design Room" + grid
       const note = document.querySelector('.practice-note'); // "A short note" → back to simple
-      const postWork = document.querySelector('.service-showcase') || note;
+      const postWork = document.querySelector('.sites-sheet') || document.querySelector('.service-showcase') || note;
       const y = window.scrollY + window.innerHeight * 0.38;       // a touch below the fold
       let path = base;
       if (postWork && y >= __absTop(postWork)) {
@@ -2293,15 +2301,34 @@ document.addEventListener('DOMContentLoaded', () => {
         card.classList.remove('swapping');
       }, 180);
     };
-    const activate = (row) => {
+    /* The preview is a live region for the entry a reader chooses. The walk
+       below changes it on its own, which must not be read out every few
+       seconds, so only a chosen entry is announced. */
+    const live = card.closest('[aria-live]');
+    const activate = (row, announce = true) => {
+      if (live) live.setAttribute('aria-live', announce ? 'polite' : 'off');
       rows.forEach(r => r.classList.remove('is-active'));
       row.classList.add('is-active');
       setPreview(row);
     };
+    const list = Array.from(rows);
+    list.forEach((row) => {
+      const mark = document.createElement('i');
+      mark.className = 'index-row-line';
+      mark.setAttribute('aria-hidden', 'true');
+      row.appendChild(mark);
+    });
+    const walk = window.__bqStageWalk?.({
+      stage: root,
+      count: () => list.length,
+      current: () => Math.max(0, list.findIndex(r => r.classList.contains('is-active'))),
+      select: (index) => activate(list[index], false),
+      line: (index) => list[index].querySelector('.index-row-line'),
+    });
     rows.forEach(row => {
       row.addEventListener('mouseenter', () => activate(row));
       row.addEventListener('focus', () => activate(row));
-      row.addEventListener('click', (e) => { e.preventDefault(); activate(row); });
+      row.addEventListener('click', (e) => { e.preventDefault(); activate(row); walk?.holdFor(12000); });
     });
   };
 
@@ -2630,19 +2657,26 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
      reading track rather than shrinking type out of legibility. */
   const PAPER_FIT_MIN = 0.5;
   const PAPER_FIT_STEPS = 7;
+  /* The long biography, the project form and the journal index cannot fit a small
+     window at a readable size, so they stop here and the rest reads on the page
+     track: 5px labels and full-size fields helped nobody. */
+  const PAPER_READING_MIN = 0.82;
+  const readingPaper = (sheet) => ['bio-story-sheet', 'contact-pitch-sheet', 'blog-index-sheet']
+    .some(name => sheet.classList.contains?.(name));
   const compactBioPaper = (sheet) => [
     'bio-kit-sheet', 'bio-proof-sheet', 'bio-record-sheet', 'bio-education-sheet',
     'bio-honors-sheet', 'bio-press-sheet', 'bio-world-sheet', 'bio-connect-sheet', 'bio-docs-sheet',
   ].some(name => sheet.classList.contains(name));
   const lastPaperFit = new WeakMap();
   /* Section content follows the viewport's height even while it comfortably
-     fits. Heroes and the footer retain their existing intrinsic fitting;
-     their type and artwork already use height-aware sizes in the stylesheet. */
+     fits, and grows with a large window. The home hero and the footer retain
+     their intrinsic fitting; their type and artwork are sized by the stylesheet. */
   const paperFitCeiling = (sheet) => {
-    if (!sheet.classList.contains('section')) return 1;
+    const grow = Number(window.__bqViewportGrow) || 1;
+    if (!sheet.classList.contains('section')) return sheet.classList.contains('room-hero') ? grow : 1;
     const viewportScale = Number(window.__bqViewportScale)
       || ((window.innerHeight || 720) / 720);
-    return Math.min(1, Math.max(PAPER_FIT_MIN, viewportScale));
+    return Math.min(1, Math.max(PAPER_FIT_MIN, viewportScale)) * grow;
   };
   const paperFits = (scroller) => (
     scroller.scrollHeight - scroller.clientHeight <= 2
@@ -2690,7 +2724,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
        needed: every chapter scales with its frame the way the hero does, down
        to the legibility floor. Only a remainder below that floor still reads
        on the page track. */
-    const floor = PAPER_FIT_MIN;
+    const floor = Math.min(ceiling, readingPaper(sheet) ? PAPER_READING_MIN : PAPER_FIT_MIN);
     const roomId = sheet.closest?.('.room')?.id;
     /* The compact service accordion also needs its reading track on tablets,
        landscape phones and desktops. Fitting its HEIGHT removed the overflow
@@ -2746,14 +2780,14 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     const smallest = new Map();
     entries.forEach(({ sheet, scroller }) => {
       const group = sheet.dataset.paperFitGroup;
-      if (!group || !sheet.hasAttribute('data-paper-fit')) return;
+      if (!group || !sheet.hasAttribute('data-paper-fit') || readingPaper(sheet)) return;
       const fit = parseFloat(sheet.style.getPropertyValue('--bq-paper-fit')) || 1;
       if (fit <= PAPER_FIT_MIN + 0.001 && !paperFits(scroller)) return;
-      smallest.set(group, Math.min(smallest.has(group) ? smallest.get(group) : 1, fit));
+      smallest.set(group, smallest.has(group) ? Math.min(smallest.get(group), fit) : fit);
     });
     entries.forEach(({ sheet, scroller }) => {
       const fit = smallest.get(sheet.dataset.paperFitGroup);
-      if (fit == null || !sheet.hasAttribute('data-paper-fit')) return;
+      if (fit == null || !sheet.hasAttribute('data-paper-fit') || readingPaper(sheet)) return;
       const own = parseFloat(sheet.style.getPropertyValue('--bq-paper-fit')) || 1;
       if (own <= PAPER_FIT_MIN + 0.001 && !paperFits(scroller)) return;
       sheet.style.setProperty('--bq-paper-fit', fit === 1 ? '1' : fit.toFixed(4));
@@ -3047,6 +3081,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       sheets.forEach((sheet) => {
         sheet.style.setProperty('--bq-out', '0');
         sheet.style.setProperty('--bq-fade', '0');
+        sheet.style.setProperty('--bq-veil', '0');
         sheet.style.setProperty('--bq-push-y', '0px');
         sheet.classList.remove('is-paper-gone');
         sheet.inert = false;
@@ -3105,21 +3140,28 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       });
       if (sheets.length < 2 && !terminalSheet) return;
 
-      const applyCoverage = (curr, nextTop) => {
+      const applyCoverage = (curr, nextTop, toned = true) => {
         const fullyCovered = nextTop <= pin + 0.75;
         const raw = coverProgress(nextTop, pin, vh);
         const out = motionOff ? '0' : ease(raw).toFixed(4);
         const fade = motionOff ? '0' : fadeFrom(raw).toFixed(4);
+        /* Two papers of one colour have no edge between them. The veil tones
+           the paper being covered so the incoming sheet reads as a sheet.
+           It is a tone tied to the scroll position, not a movement, so it
+           stays on under Reduce Motion. The footer is not a sheet, so the
+           last card keeps its paper as the footer comes into view. */
+        const veil = toned ? fadeFrom(raw).toFixed(4) : '0';
 
-        /* Nothing below changes the pixels unless one of these three did, so a
+        /* Nothing below changes the pixels unless one of these did, so a
            settled sheet costs a WeakMap lookup and no style invalidation. */
         const was = coverCache.get(curr);
-        if (was && was.out === out && was.fade === fade && was.covered === fullyCovered) return;
-        coverCache.set(curr, { out, fade, covered: fullyCovered });
+        if (was && was.out === out && was.fade === fade && was.veil === veil && was.covered === fullyCovered) return;
+        coverCache.set(curr, { out, fade, veil, covered: fullyCovered });
 
         if (!was) curr.style.setProperty('--bq-push-y', '0px');
         if (!was || was.out !== out) curr.style.setProperty('--bq-out', out);
         if (!was || was.fade !== fade) curr.style.setProperty('--bq-fade', fade);
+        if (!was || was.veil !== veil) curr.style.setProperty('--bq-veil', veil);
         if (!was || was.covered !== fullyCovered) {
           curr.inert = fullyCovered;
           curr.classList.toggle('is-paper-gone', fullyCovered);
@@ -3127,7 +3169,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       };
 
       for (let i = 0; i < sheets.length - 1; i += 1) {
-        applyCoverage(sheets[i], Math.max(pin, metrics[i + 1].naturalTop));
+        applyCoverage(sheets[i], Math.max(pin, metrics[i + 1].naturalTop), sheets[i + 1].parentElement === root);
       }
 
       if (terminalSheet) {
@@ -3135,7 +3177,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
            their final incoming paper. A short footer may never reach the pin
            before the last sticky card exits above the viewport, so either a
            complete cover or a complete exit retires that card from focus. */
-        applyCoverage(lastSheet, lastExited ? pin : terminalTop);
+        applyCoverage(lastSheet, lastExited ? pin : terminalTop, false);
       } else {
         /* The final card has no incoming paper and must always remain live. */
         lastSheet.inert = false;
@@ -3456,7 +3498,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       hero.style.setProperty('--bq-paper-z', '1');
       wrapPaperScroll(hero);
 
-      const paperNames = ['work', 'practice', 'note', 'clients', 'blog'];
+      const paperNames = ['work', 'sites', 'practice', 'note', 'clients', 'blog'];
       sections.forEach((sheet, i) => {
         sheet.classList.add('paper-sheet');
         sheet.dataset.paper = paperNames[i] || `sheet-${i + 1}`;
@@ -4048,6 +4090,200 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     remeasure();
   })();
 
+})();
+
+/* =========================================================
+   STAGE WALK — shared by the lists that show one entry at a
+   time (websites, honours, the journal). While its stage is
+   on screen the selection walks on by itself; the wait is the
+   thin line drawn across the selected row. Pointing at or
+   focusing the stage holds it.
+   ========================================================= */
+window.__bqStageWalk = function stageWalk({ stage, count, current, select, line, dwell = 6000 }) {
+  if (!stage) return null;
+  const sheet = stage.closest('.paper-sheet, .section');
+  let run = null;
+  let inView = false;
+  let pointerHeld = false;
+  let focusHeld = false;
+  let hold = 0;
+
+  /* A sticky sheet still intersects the viewport after the next paper has
+     covered it; the deck marks that state on the sheet itself. */
+  const covered = () => Boolean(sheet && (sheet.inert || sheet.classList.contains('is-paper-gone')));
+  const mayWalk = () => inView && count() > 1 && !covered()
+    && !pointerHeld && !focusHeld && !hold && !document.hidden;
+
+  const stop = () => {
+    if (!run) return;
+    run.onfinish = null;
+    run.cancel();
+    run = null;
+  };
+  /* The dwell is the line itself: one Web Animation draws it and its end
+     moves the selection on. It is not a CSS animation, so the Reduce Motion
+     override that ends those at once cannot turn the walk into a flicker. */
+  const start = () => {
+    stop();
+    if (!mayWalk()) return;
+    const mark = line(current());
+    if (!mark || typeof mark.animate !== 'function') return;
+    run = mark.animate(
+      [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }],
+      { duration: dwell, easing: 'linear', fill: 'forwards' }
+    );
+    run.onfinish = () => {
+      /* A finished line holds its last frame; clear it before moving on so
+         it never stays drawn across a row that is no longer selected. */
+      stop();
+      if (!mayWalk()) return;
+      select((current() + 1) % count());
+      start();
+    };
+  };
+  const refresh = () => {
+    if (mayWalk()) { if (!run) start(); }
+    else stop();
+  };
+
+  stage.addEventListener('pointerenter', (event) => {
+    if (event.pointerType !== 'mouse') return;
+    pointerHeld = true;
+    stop();
+  });
+  stage.addEventListener('pointerleave', (event) => {
+    if (event.pointerType !== 'mouse') return;
+    pointerHeld = false;
+    start();
+  });
+  stage.addEventListener('focusin', () => { focusHeld = true; stop(); });
+  stage.addEventListener('focusout', (event) => {
+    if (stage.contains(event.relatedTarget)) return;
+    focusHeld = false;
+    start();
+  });
+  if (typeof IntersectionObserver === 'function') {
+    new IntersectionObserver((entries) => {
+      inView = entries[entries.length - 1].isIntersecting;
+      refresh();
+    }, { threshold: 0.5 }).observe(stage);
+  }
+  if (sheet && typeof MutationObserver === 'function') {
+    new MutationObserver(refresh).observe(sheet, { attributes: true, attributeFilter: ['class', 'inert'] });
+  }
+  document.addEventListener('visibilitychange', refresh);
+
+  return {
+    restart: start,
+    /* A choice made by touch keeps the stage still for a while. */
+    holdFor(ms) {
+      window.clearTimeout(hold);
+      hold = window.setTimeout(() => { hold = 0; start(); }, ms);
+      stop();
+    },
+  };
+};
+
+/* =========================================================
+   INDEX STAGE — an index of entries and the screen that shows
+   the selected one (the live websites).
+   Every row is an ordinary link, so nothing here is needed to
+   reach an entry. This only moves the selection: pointing at
+   or focusing a row selects it, and the first tap on a touch
+   screen selects instead of leaving.
+   ========================================================= */
+(function indexStages() {
+  const TOUCH_HOLD_MS = 12000;
+  const stages = new WeakMap();
+
+  const init = (stage) => {
+    if (!stage) return;
+    let state = stages.get(stage);
+    if (!state) {
+      state = { items: [], parts: [], current: 0, pendingTap: null, select() {}, walk: null };
+      stages.set(stage, state);
+      // One walk per stage; its rows may be replaced, so it reads them live.
+      state.walk = window.__bqStageWalk({
+        stage,
+        count: () => state.items.length,
+        current: () => state.current,
+        select: (index) => state.select(index),
+        line: (index) => state.items[index]?.querySelector('.site-progress'),
+      });
+    }
+
+    const items = Array.from(stage.querySelectorAll('.site-item[data-site]'));
+    const parts = Array.from(stage.querySelectorAll('.site-note[data-site], .site-shot[data-site]'));
+    const screen = stage.querySelector('[data-sites-screen]');
+    const hostLabel = stage.querySelector('[data-sites-host]');
+    const counter = stage.closest('.section')?.querySelector('[data-sites-current]');
+    state.items = items;
+    state.parts = parts;
+    state.pendingTap = null;
+    if (!items.length) return;
+
+    state.select = (index) => {
+      state.current = (index + items.length) % items.length;
+      const active = items[state.current];
+      const key = active.dataset.site;
+      items.forEach((item) => item.classList.toggle('is-active', item === active));
+      parts.forEach((part) => part.classList.toggle('is-active', part.dataset.site === key));
+      const row = active.querySelector('.site-row');
+      if (screen && row) screen.href = row.href;
+      if (hostLabel) hostLabel.textContent = active.querySelector('.site-host')?.textContent || '';
+      if (counter) counter.textContent = String(state.current + 1).padStart(2, '0');
+    };
+
+    const choose = (index) => {
+      if (index !== state.current) state.select(index);
+      state.walk?.restart();
+    };
+
+    if (items.length > 1) {
+      items.forEach((item, index) => {
+        const row = item.querySelector('.site-row');
+        if (!row) return;
+        row.addEventListener('pointerenter', (event) => {
+          if (event.pointerType === 'mouse') choose(index);
+        });
+        row.addEventListener('focus', () => choose(index));
+        /* A finger cannot hover. Its first tap on a row that is not selected
+           shows that entry; the selected row opens it on the next. */
+        row.addEventListener('pointerdown', (event) => {
+          state.pendingTap = event.pointerType !== 'mouse' && !item.classList.contains('is-active')
+            ? { index, at: performance.now() }
+            : null;
+        });
+        row.addEventListener('click', (event) => {
+          const tap = state.pendingTap;
+          state.pendingTap = null;
+          if (!tap || tap.index !== index || performance.now() - tap.at > 1500) return;
+          event.preventDefault();
+          choose(index);
+          state.walk?.holdFor(TOUCH_HOLD_MS);
+        });
+      });
+    }
+
+    state.select(Math.max(0, items.findIndex((item) => item.classList.contains('is-active'))));
+    state.walk?.restart();
+  };
+
+  document.querySelectorAll('[data-sites]').forEach(init);
+})();
+
+/* The journal teaser is filled by the intent-loaded bundle. Start it while the
+   sheet is still a few screens away, so the last sheet arrives with its notes
+   instead of a placeholder that swaps in front of the visitor. */
+(function journalTeaserWarmup() {
+  const teaser = document.querySelector('[data-latest-blog]');
+  if (!teaser || typeof IntersectionObserver !== 'function') return;
+  const warm = new IntersectionObserver((entries) => {
+    if (!entries.some((entry) => entry.isIntersecting)) return;
+    warm.disconnect();
+    window.__bqLoadEnhance?.();
+  }, { rootMargin: '250% 0px' });
+  warm.observe(teaser);
 })();
 
 /* =========================================================
