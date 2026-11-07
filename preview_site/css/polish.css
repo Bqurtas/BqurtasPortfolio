@@ -7620,12 +7620,13 @@ html body #behance#behance#behance#behance#behance .behance-count {
 /* The profile, as on Behance (owner, 2026-11-07: "make the room like my
    Behance profile, with my photo, the cover and the rest"): the cover, the
    photo over its edge, name and work, two plain links, then the figures on
-   hairlines and the Work tab above the grid. Site white and black only. */
+   hairlines and the Work tab above the grid. Site white and black only.
+   Flat (owner, 2026-11-07): no stroke around the cover, no ring around the
+   photo; "things should be flat". */
 html body #behance#behance#behance#behance#behance .bh-profile { display: grid; }
 html body #behance#behance#behance#behance#behance .bhp-banner {
   overflow: hidden;
   aspect-ratio: 4 / 1;
-  border: 1px solid var(--room-line);
   border-radius: 14px;
   background: color-mix(in srgb, var(--ink) 6%, transparent);
 }
@@ -7663,7 +7664,6 @@ html body #behance#behance#behance#behance#behance .bhp-avatar {
   height: auto;
   aspect-ratio: 1;
   object-fit: cover;
-  border: 4px solid var(--bq-paper-sheet);
   border-radius: 50%;
   background: var(--bq-paper-sheet);
 }
