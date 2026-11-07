@@ -6749,6 +6749,10 @@ html body #design#design#design#design .hero-editorial .hero-sign-hand {
   user-select: none;
 }
 html:root[data-theme="dark"] body #design#design#design#design .hero-editorial .hero-sign-hand { filter: invert(1) brightness(.93); }
+/* On a phone the name was too big for the page (owner, 2026-11-07). */
+@media (max-width: 600px) {
+  html body #design#design#design#design .hero-editorial .hero-sign-hand { width: min(calc(var(--pt) * 1.6), 74vw); }
+}
 html body #design#design#design#design .hero-editorial .hero-copy {
   grid-area: copy;
   display: grid;
