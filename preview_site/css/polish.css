@@ -6740,7 +6740,7 @@ html body #design#design#design#design .hero-editorial .hero-sign--written > spa
 }
 html body #design#design#design#design .hero-editorial .hero-sign-hand {
   display: block;
-  width: min(calc(var(--pt) * 1.25), 88vw);
+  width: min(calc(var(--pt) * 1.6), 90vw);
   height: auto;
   margin-inline: auto;
   pointer-events: none;
@@ -6784,7 +6784,7 @@ html body #design#design#design#design .hero-editorial .hero-cta {
   }
   html body #design#design#design#design .hero-editorial .hero-title { grid-row: 1 / 3; align-self: center !important; }
   html body #design#design#design#design .hero-editorial .hero-sign { margin: 0 !important; font-size: min(calc(var(--pw) * .2), 6vw) !important; }
-  html body #design#design#design#design .hero-editorial .hero-sign-hand { width: min(calc(var(--pt) * 1.05), 46vw); margin-inline: 0; }
+  html body #design#design#design#design .hero-editorial .hero-sign-hand { width: min(calc(var(--pt) * 1.3), 50vw); margin-inline: 0; }
   html body #design#design#design#design .hero-editorial .hero-copy { align-self: start; justify-items: start; }
   html body #design#design#design#design .hero-editorial .hero-lede { max-width: 40ch !important; }
   html body #design#design#design#design .hero-editorial .hero-cta { justify-self: start !important; }
