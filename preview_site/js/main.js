@@ -2948,6 +2948,32 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
     return sequence;
   };
 
+  /* The paper just before a deck's last one keeps its reading distance in a
+     real sibling, the way the service chapters do. Carried on its own bottom
+     margin, the same distance came off its sticky travel, so on a short window
+     it slid away before the last paper landed on it. */
+  const readingTracks = new WeakMap();
+  const setReadingTrack = (sheet, distance) => {
+    let entry = readingTracks.get(sheet);
+    if (!(distance > 0)) {
+      if (entry) {
+        entry.track.remove();
+        entry.distance = 0;
+      }
+      return;
+    }
+    if (!entry) {
+      const track = document.createElement('div');
+      track.className = 'paper-reading-track';
+      track.setAttribute('aria-hidden', 'true');
+      entry = { track, distance: 0 };
+      readingTracks.set(sheet, entry);
+    }
+    if (sheet.nextElementSibling !== entry.track) sheet.after(entry.track);
+    entry.track.style.setProperty('height', `${distance}px`, 'important');
+    entry.distance = distance;
+  };
+
   window.__bqScrollPaperTarget = (target, { behavior = 'smooth', block = 'start' } = {}) => {
     if (!target?.closest) return false;
     const sheet = target.matches?.('.paper-sheet') ? target : target.closest('.paper-sheet');
@@ -3241,6 +3267,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
          apparent speed. Its distance goes to the root's padding instead. */
       const rootSheets = sheets.filter((sheet) => sheet.parentElement === root);
       const tailSheet = rootSheets[rootSheets.length - 1] || null;
+      const beforeTail = rootSheets[rootSheets.length - 2] || null;
       let tailTrack = 0;
       const measurements = sheets.map((sheet) => {
         const scroller = sheet.querySelector(':scope > .paper-scroll');
@@ -3297,6 +3324,9 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         if (sequence || sheet === tailSheet) {
           if (!sequence) tailTrack = overflow;
           sheet.style.setProperty('--bq-flow-extra', '0px');
+        } else if (sheet === beforeTail) {
+          sheet.style.setProperty('--bq-flow-extra', '0px');
+          setReadingTrack(sheet, overflow);
         } else {
           sheet.style.setProperty('--bq-flow-extra', `${overflow}px`);
         }
@@ -3377,7 +3407,8 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         if (sheet.parentElement === root) {
           naturalTop = cursor + marginTop;
           cursor = naturalTop + sheet.offsetHeight + marginBottom
-            + (serviceSequences.get(sheet)?.range || 0);
+            + (serviceSequences.get(sheet)?.range || 0)
+            + (readingTracks.get(sheet)?.distance || 0);
         } else {
           /* Home footer lives immediately after #design (other rooms are
              display:none). Its sticky inset is also the deliberate outer gap

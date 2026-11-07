@@ -12,7 +12,7 @@
   <link rel="preload" as="style" href="css/modern-framer.min.css?v=0741789ec97b" />
   <link rel="preload" as="style" href="css/fonts.css?v=6bd89c103953" />
   <link rel="preload" as="style" href="css/experience.min.css?v=d78921b4a98f" />
-  <link rel="preload" as="style" href="css/polish.min.css?v=c8a6dfc3cd18" />
+  <link rel="preload" as="style" href="css/polish.min.css?v=fd1407dd5afd" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#fbfbfa" />
   <meta name="color-scheme" content="light dark" />
@@ -930,7 +930,7 @@
   <link rel="stylesheet" href="css/fonts.css?v=6bd89c103953">
   <link rel="stylesheet" href="css/experience.min.css?v=d78921b4a98f">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
-  <link rel="stylesheet" href="css/polish.min.css?v=c8a6dfc3cd18">
+  <link rel="stylesheet" href="css/polish.min.css?v=fd1407dd5afd">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543"></noscript>
 
@@ -2595,7 +2595,7 @@
     }catch(e){}})();
   </script>
   <script defer src="js/latest-feed.min.js?v=76465997249c"></script>
-  <script defer src="js/main.v420.min.js?v=c534ecf67836"></script>
+  <script defer src="js/main.v420.min.js?v=c5a77fc4fe2e"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2770,7 +2770,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=94599c7943fe', { updateViaCache: 'none' })
+            .register('/sw.js?v=eb13c685cd6b', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

@@ -101,6 +101,7 @@ test('paper measurement batches spacer reads and paints meters without further s
   const measurementSource = section('      const rootSheets = sheets.filter', '      /* Give the final card');
   const context = {
     sheets, root, terminalSheet: null, ensurePaperMeter: sheet => sheet.meter, serviceSequences: new WeakMap(),
+    setReadingTrack() {},
     allowsInnerScroll: () => true, paperLabel: () => 'Reading section',
     // These sheets are not home papers marked data-paper-fit; fitting is a no-op.
     fitPaper: () => {},
@@ -173,6 +174,7 @@ test('a growing work track refreshes following paper anchors even when its viewp
   const registration = section("    const resizeObserver = typeof ResizeObserver === 'function'", '\n    document.fonts?.ready?.then(queueMeasure');
   const context = {
     root, sheets, pin: 16, window: { scrollY: 0 }, ResizeObserver: Observer, serviceSequences: new WeakMap(),
+    readingTracks: new WeakMap(),
     getComputedStyle: () => ({ borderTopWidth: '0px', paddingTop: '0px', marginTop: '0px', marginBottom: '0px' }),
     updatePaperMeter() {},
     queueMeasure() { frames.push(() => vm.runInNewContext(`{${offsets}}`, context)); },
@@ -215,6 +217,7 @@ test('the footer waits for the entire final paper reading distance before coveri
     const context = {
       root, sheets: includeFooter ? [...sheets, footer] : sheets,
       terminalSheet: includeFooter ? null : footer, tailTrack: 1117, serviceSequences: new WeakMap(),
+      readingTracks: new WeakMap(),
       pin: 10, window: { scrollY: 0 },
       document: { createElement: () => ({ style: style(), setAttribute() {}, remove() { spacer = null; } }) },
       getComputedStyle: node => ({
