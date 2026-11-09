@@ -220,8 +220,8 @@ html,body{width:${WIDTH}px;height:${HEIGHT}px;overflow:hidden;background:#0a0a0a
 body{font-family:'Manrope','Noto Naskh Arabic',sans-serif;color:#111;-webkit-font-smoothing:antialiased}
 .paper{position:absolute;inset:14px;border-radius:28px;background:#f3f3f3;overflow:hidden;
   display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 60px;text-align:center}
-.ai-backdrop{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  padding-bottom:30px;font:700 620px/1 'Manrope',sans-serif;letter-spacing:-.075em;
+.ai-backdrop{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;
+  padding:0 34px 26px 0;font:700 350px/1 'Manrope',sans-serif;letter-spacing:-.075em;
   color:rgba(17,17,17,.045);direction:ltr;pointer-events:none;z-index:0}
 .paper > :not(.ai-backdrop){position:relative;z-index:1}
 .portrait{display:block;width:256px;height:256px;object-fit:contain;filter:grayscale(1);flex-shrink:0}
