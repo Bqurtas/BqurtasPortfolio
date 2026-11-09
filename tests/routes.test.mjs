@@ -325,6 +325,31 @@ function recordRewrites(t) {
   return record;
 }
 
+test('localized home pages share the refreshed cover and retain canonical URLs and image dimensions', async (t) => {
+  const page = recordRewrites(t);
+  const shell = await readFile(new URL('../preview_site/index.html', import.meta.url), 'utf8');
+  const shellMeta = (name) => shell.match(new RegExp('<meta (?:property|name)="' + name + '" content="([^"]+)"'))?.[1];
+  const imageMeta = (name) => page.apply(`meta[property="${name}"]`, { content: shellMeta(name) }).attrs.content;
+  const defaultCover = 'https://bqurtas.com/assets/covers/en-home.jpg?v=5';
+  assert.equal(shellMeta('og:image'), defaultCover);
+  assert.equal(shellMeta('twitter:image'), defaultCover);
+
+  for (const lang of ['en', 'ku', 'kmr', 'ar', 'fr', 'tr', 'sv']) {
+    const path = lang === 'en' ? '/' : '/' + lang;
+    const response = await behanceRoute(path);
+    const cover = `https://bqurtas.com/assets/covers/${lang}-home.jpg?v=5`;
+    const canon = 'https://bqurtas.com' + path;
+    assert.equal(response.status, 200, path);
+    assert.equal(imageMeta('og:image'), cover, path);
+    assert.equal(page.apply('meta[name="twitter:image"]').attrs.content, cover, path);
+    assert.equal(imageMeta('og:image:type'), 'image/jpeg', path);
+    assert.equal(imageMeta('og:image:width'), '1200', path);
+    assert.equal(imageMeta('og:image:height'), '630', path);
+    assert.equal(page.apply('meta[property="og:url"]').attrs.content, canon, path);
+    assert.equal(page.apply('link[rel="canonical"]').attrs.href, canon, path);
+  }
+});
+
 test('the Behance room and well-formed project links are application routes', async () => {
   for (const path of ['/behance', '/ku/behance', '/sv/behance/', '/behance/258156477-barakat-qurtas-selected-works-20142026',
     '/ar/behance/243902845', '/behance/243902845-PHOTOGRAPHY']) {

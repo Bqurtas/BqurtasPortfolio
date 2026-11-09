@@ -3,9 +3,9 @@
    sent or posted (og:image / twitter:image).
 
    One cover per language and page, drawn in the site's own
-   identity: the paper sheet on its dark bed, the signature
-   exactly as the hero sets it, the page's name, its line of
-   copy and the portrait. Nothing is typed here: titles and
+   identity. Home is an editorial identity card with the real
+   handwritten signature, portrait and a bold address band;
+   the other rooms retain their paper-sheet design. Titles and
    descriptions come from the edge function's OG table and the
    interface strings from the generated localized copy, so a
    cover can never disagree with the page it stands for.
@@ -115,10 +115,9 @@ function pageName(title, rtl) {
 }
 
 function coverHtml({ lang, key, meta, copy }) {
+  if (key === 'home') return homeCoverHtml({ lang, copy });
   const rtl = RTL.has(lang);
-  const home = key === 'home';
   const name = `${copy['name.first'] || 'Barakat'} ${copy['name.last'] || 'Qurtas'}`;
-  const lede = home ? (copy['hero.lede'] || meta.d) : meta.d;
   const address = `bqurtas.com${lang === 'en' ? '' : `/${lang}`}${ROUTES[key]}`;
   const arrow = rtl
     ? '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M17 10H4m5-5-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
@@ -145,13 +144,9 @@ body{font-family:${rtl ? "'Noto Kufi Arabic'" : "'Manrope','Noto Kufi Arabic'"},
 [dir="rtl"] .mark{font-family:'Noto Kufi Arabic',sans-serif;font-size:21px;font-weight:700;letter-spacing:0}
 .stage{display:grid;grid-template-columns:minmax(0,1fr) 400px;align-items:center;gap:36px;min-height:0}
 .copy{min-width:0}
-.sign{font-family:'Liana','Fraunces',serif;font-size:104px;font-weight:400;line-height:1.3;
-  letter-spacing:.01em;white-space:nowrap}
-[dir="rtl"] .sign{font-family:'Noto Kufi Arabic',sans-serif;font-size:80px;font-weight:700;line-height:1.5;letter-spacing:0}
 .name{font-family:'Fraunces',serif;font-size:100px;font-weight:500;line-height:1.04;letter-spacing:-.03em}
 .name em{font-style:italic;font-weight:400}
 [dir="rtl"] .name{font-family:'Noto Kufi Arabic',sans-serif;font-size:76px;font-weight:700;line-height:1.4;letter-spacing:0}
-.kicker{margin-top:22px}
 .lede{margin-top:20px;max-width:600px;font-size:26px;font-weight:500;line-height:1.46;letter-spacing:-.01em;
   display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
 [dir="rtl"] .lede{font-size:23px;font-weight:500;line-height:1.85;letter-spacing:0}
@@ -166,18 +161,13 @@ body{font-family:${rtl ? "'Noto Kufi Arabic'" : "'Manrope','Noto Kufi Arabic'"},
 <body>
 <div class="paper">
   <header class="edition mono">
-    ${home
-      ? `<span class="place"><i></i>${escapeHtml(copy['hero.place'] || 'Based in Erbil')}</span>`
-      : `<span class="mark">${escapeHtml(name)}</span>`}
-    <span>${escapeHtml(home ? (copy['hero.since'] || 'Established 2014') : (copy['hero.place'] || 'Based in Erbil'))}</span>
+    <span class="mark">${escapeHtml(name)}</span>
+    <span>${escapeHtml(copy['hero.place'] || 'Based in Erbil')}</span>
   </header>
   <main class="stage">
     <div class="copy">
-      ${home
-        ? `<div class="sign" data-fit>${escapeHtml(name)}</div>
-           <div class="kicker mono">${escapeHtml(copy['menu.practice'] || 'Multidisciplinary creative practice')}</div>`
-        : `<div class="name" data-fit>${pageName(meta.t, rtl)}</div>`}
-      <p class="lede">${escapeHtml(lede)}</p>
+      <div class="name" data-fit>${pageName(meta.t, rtl)}</div>
+      <p class="lede">${escapeHtml(meta.d)}</p>
     </div>
     <img class="portrait" src="${fileUrl('assets/hero-sketch.webp')}" alt="">
   </main>
@@ -200,6 +190,65 @@ body{font-family:${rtl ? "'Noto Kufi Arabic'" : "'Manrope','Noto Kufi Arabic'"},
       size -= 2;
       node.style.fontSize = size + 'px';
     }
+    return true;
+  };
+</script>
+</body>
+</html>`;
+}
+
+/* A link card has to read at a fraction of its native size. Keep the home
+   card to the identity, one discipline line and the address. The signature
+   still is frame 151 (fully written) of the hero's animated WebP. Using a
+   still keeps screenshots independent of the animation's blank first frame. */
+function homeCoverHtml({ lang, copy }) {
+  const rtl = RTL.has(lang);
+  const name = copy['name.full'] || 'Barakat Qurtas';
+  const address = `bqurtas.com${lang === 'en' ? '' : `/${lang}`}`;
+  return `<!doctype html>
+<html lang="${lang}" dir="${rtl ? 'rtl' : 'ltr'}">
+<head>
+<meta charset="utf-8">
+<style>
+${fontFaces()}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:${WIDTH}px;height:${HEIGHT}px;overflow:hidden;background:#f3f3f3}
+body{font-family:'Manrope','Noto Kufi Arabic',sans-serif;color:#111;-webkit-font-smoothing:antialiased}
+.identity{position:absolute;inset-block-start:0;inset-inline-start:0;width:720px;height:500px;padding:66px 64px;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;z-index:2}
+.name{font-size:26px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;line-height:1.5}
+.signature{display:block;width:620px;height:auto;max-width:none;margin-block:38px 26px;direction:ltr}
+.practice{font-family:'Fraunces','Noto Kufi Arabic',serif;font-size:38px;font-weight:400;line-height:1.25;letter-spacing:-.025em;max-width:540px}
+.portrait{position:absolute;inset-inline-end:12px;top:34px;width:490px;height:490px;object-fit:contain;
+  filter:grayscale(1) contrast(1.06);z-index:1}
+.band{position:absolute;inset:500px 0 0;display:flex;align-items:center;justify-content:space-between;
+  padding:0 64px;background:#111;color:#f3f3f3;z-index:3}
+.address{font-size:46px;font-weight:500;letter-spacing:-.045em;direction:ltr;unicode-bidi:isolate}
+.arrow{display:grid;place-items:center;width:64px;height:64px;border:1px solid #777;border-radius:50%}
+.arrow svg{width:27px;height:27px}
+[dir="rtl"] .identity{width:720px}
+[dir="rtl"] .name{font-family:'Noto Kufi Arabic',sans-serif;font-size:44px;font-weight:700;letter-spacing:0}
+[dir="rtl"] .signature{width:610px;margin-block:20px 28px}
+[dir="rtl"] .practice{font-family:'Noto Kufi Arabic',sans-serif;font-size:30px;line-height:1.8;letter-spacing:0}
+</style>
+</head>
+<body>
+<main>
+  <div class="identity">
+    <div class="name">${escapeHtml(name)}</div>
+    <img class="signature" src="${fileUrl('assets/signature/written-by-hand-still.webp')}" alt="Barakat Qurtas">
+    <p class="practice">${escapeHtml(copy['menu.practice'] || 'Multidisciplinary creative practice')}</p>
+  </div>
+  <img class="portrait" src="${fileUrl('assets/hero-sketch.webp')}" alt="">
+</main>
+<footer class="band">
+  <span class="address">${escapeHtml(address)}</span>
+  <span class="arrow"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M7 25 25 7M7 7h18v18" stroke="currentColor" stroke-width="1.8"/></svg></span>
+</footer>
+<script>
+  window.__fit = async () => {
+    await document.fonts.ready;
+    await Promise.all([...document.images].map((image) => image.decode()));
     return true;
   };
 </script>

@@ -627,7 +627,7 @@ export async function onRequest(context) {
     postJsonLd = '<script type="application/ld+json">' + JSON.stringify(ld).replace(/</g, '\\u003c') + '</script>';
   } else {
     meta = (OG[r.lang] && OG[r.lang][r.key]) || OG.en[r.key] || OG.en.home;
-    img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=4';
+    img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=' + (r.key === 'home' ? '5' : '4');
   }
 
   // A unique CSP nonce is meaningful only when the HTML response itself is not
