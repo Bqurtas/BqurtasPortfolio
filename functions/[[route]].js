@@ -549,7 +549,7 @@ export async function onRequest(context) {
       const headline = article.title.trim() || 'Journal';
       meta = { t: headline + ' — Barakat Qurtas',
                d: article.subtitle.trim() || blogD };
-      img = article.cover || SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=4';
+      img = article.cover || SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=5';
       imgType = /\.png(\?|$)/i.test(img) ? 'image/png' : /\.webp(\?|$)/i.test(img) ? 'image/webp' : 'image/jpeg';
       // Machine-readable BlogPosting so AI engines + Google attribute every post
       // to Barakat — author named in the page's own language, linked to #person.
@@ -571,7 +571,7 @@ export async function onRequest(context) {
       postJsonLd = '<script type="application/ld+json">' + JSON.stringify(ld).replace(/</g, '\\u003c') + '</script>';
     } else {
       meta = (OG[r.lang] && OG[r.lang].blog) || OG.en.blog;
-      img  = SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=4';
+      img  = SITE + '/assets/covers/' + r.lang + '-blog.jpg?v=5';
     }
   } else if (r.key === 'behanceproject') {
     /* Project pages read the same published catalogue as the Behance room.
@@ -603,7 +603,7 @@ export async function onRequest(context) {
       imgType = project.cover.type;
       imgSize = { w: project.cover.w, h: project.cover.h };
     } else {
-      img = SITE + '/assets/covers/' + r.lang + '-behance.jpg?v=4';
+      img = SITE + '/assets/covers/' + r.lang + '-behance.jpg?v=5';
     }
     const images = [...new Set([project.cover && project.cover.src, ...project.images].filter(Boolean))]
       .map((src) => SITE + src);
@@ -627,7 +627,7 @@ export async function onRequest(context) {
     postJsonLd = '<script type="application/ld+json">' + JSON.stringify(ld).replace(/</g, '\\u003c') + '</script>';
   } else {
     meta = (OG[r.lang] && OG[r.lang][r.key]) || OG.en[r.key] || OG.en.home;
-    img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=' + (r.key === 'home' ? '5' : '4');
+    img  = SITE + '/assets/covers/' + r.lang + '-' + r.key + '.jpg?v=5';
   }
 
   // A unique CSP nonce is meaningful only when the HTML response itself is not

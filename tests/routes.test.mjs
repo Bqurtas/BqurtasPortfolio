@@ -325,7 +325,7 @@ function recordRewrites(t) {
   return record;
 }
 
-test('localized home pages share the refreshed cover and retain canonical URLs and image dimensions', async (t) => {
+test('localized pages share refreshed covers and retain canonical URLs and image dimensions', async (t) => {
   const page = recordRewrites(t);
   const shell = await readFile(new URL('../preview_site/index.html', import.meta.url), 'utf8');
   const shellMeta = (name) => shell.match(new RegExp('<meta (?:property|name)="' + name + '" content="([^"]+)"'))?.[1];
@@ -334,21 +334,45 @@ test('localized home pages share the refreshed cover and retain canonical URLs a
   assert.equal(shellMeta('og:image'), defaultCover);
   assert.equal(shellMeta('twitter:image'), defaultCover);
 
+  const routes = [
+    ['home', ''], ['design', '/design'], ['blog', '/blog'], ['bio', '/bio'],
+    ['contact', '/contact'], ['behance', '/behance'],
+    ...['logo', 'official', 'book', 'posters', 'social', 'events', 'stationery', 'image', 'video', 'other', 'certificate']
+      .map((key) => [key, '/design/' + key])
+  ];
   for (const lang of ['en', 'ku', 'kmr', 'ar', 'fr', 'tr', 'sv']) {
-    const path = lang === 'en' ? '/' : '/' + lang;
-    const response = await behanceRoute(path);
-    const cover = `https://bqurtas.com/assets/covers/${lang}-home.jpg?v=5`;
-    const canon = 'https://bqurtas.com' + path;
-    assert.equal(response.status, 200, path);
-    assert.equal(imageMeta('og:image'), cover, path);
-    assert.equal(page.apply('meta[name="twitter:image"]').attrs.content, cover, path);
-    assert.equal(imageMeta('og:image:type'), 'image/jpeg', path);
-    assert.equal(imageMeta('og:image:width'), '1200', path);
-    assert.equal(imageMeta('og:image:height'), '630', path);
-    assert.equal(page.apply('meta[property="og:url"]').attrs.content, canon, path);
-    assert.equal(page.apply('link[rel="canonical"]').attrs.href, canon, path);
+    for (const [key, suffix] of routes) {
+      const path = (lang === 'en' ? '' : '/' + lang) + suffix || '/';
+      const response = await behanceRoute(path);
+      const cover = `https://bqurtas.com/assets/covers/${lang}-${key}.jpg?v=5`;
+      const canon = 'https://bqurtas.com' + path;
+      assert.equal(response.status, 200, path);
+      assert.equal(imageMeta('og:image'), cover, path);
+      assert.equal(page.apply('meta[name="twitter:image"]').attrs.content, cover, path);
+      assert.equal(imageMeta('og:image:type'), 'image/jpeg', path);
+      assert.equal(imageMeta('og:image:width'), '1200', path);
+      assert.equal(imageMeta('og:image:height'), '630', path);
+      assert.equal(page.apply('meta[property="og:url"]').attrs.content, canon, path);
+      assert.equal(page.apply('link[rel="canonical"]').attrs.href, canon, path);
+      const bytes = await readFile(new URL(`../preview_site/assets/covers/${lang}-${key}.jpg`, import.meta.url));
+      assert.deepEqual(jpegDimensions(bytes), { width: 1200, height: 630 }, path);
+    }
   }
 });
+
+function jpegDimensions(bytes) {
+  assert.equal(bytes.readUInt16BE(0), 0xffd8, 'cover is a JPEG');
+  for (let offset = 2; offset + 8 < bytes.length;) {
+    assert.equal(bytes[offset], 0xff, 'valid JPEG marker');
+    const marker = bytes[offset + 1];
+    if ([0xc0, 0xc1, 0xc2].includes(marker)) {
+      return { width: bytes.readUInt16BE(offset + 7), height: bytes.readUInt16BE(offset + 5) };
+    }
+    if (marker === 0xda || marker === 0xd9) break;
+    offset += 2 + bytes.readUInt16BE(offset + 2);
+  }
+  throw new Error('cover has no supported JPEG frame');
+}
 
 test('the Behance room and well-formed project links are application routes', async () => {
   for (const path of ['/behance', '/ku/behance', '/sv/behance/', '/behance/258156477-barakat-qurtas-selected-works-20142026',
@@ -447,7 +471,7 @@ test('a canonical Behance project page carries its own title, description, cover
   assert.equal(room.status, 200);
   assert.equal(page.apply('title').content, 'Behance — Barakat Qurtas');
   assert.match(page.apply('meta[name="description"]').attrs.content, /^Tous les projets Behance/);
-  assert.equal(page.apply('meta[property="og:image"]').attrs.content, 'https://bqurtas.com/assets/covers/fr-behance.jpg?v=4');
+  assert.equal(page.apply('meta[property="og:image"]').attrs.content, 'https://bqurtas.com/assets/covers/fr-behance.jpg?v=5');
   assert.equal(page.apply('meta[property="og:image:width"]', { content: '1200' }).attrs.content, '1200', 'room covers keep the shell size');
   assert.equal(page.apply('head').appended, '');
   assert.equal(page.apply('html').attrs['data-room'], 'behance');

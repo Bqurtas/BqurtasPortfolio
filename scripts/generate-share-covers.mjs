@@ -5,7 +5,7 @@
    One cover per language and page, drawn in the site's own
    identity. Home follows the live hero: the current Studio
    portrait, handwritten signature, introductory text and link;
-   the other rooms retain their paper-sheet design. Titles and
+   all other sections use the same simple centred identity. Titles and
    descriptions come from the edge function's OG table and the
    interface strings from the generated localized copy, so a
    cover can never disagree with the page it stands for.
@@ -14,7 +14,6 @@
      node scripts/generate-share-covers.mjs
      node scripts/generate-share-covers.mjs --lang ku,ar --key home,blog
      node scripts/generate-share-covers.mjs --out /tmp/covers   (preview only)
-     node scripts/generate-share-covers.mjs --key home --ai --out /tmp/covers-ai
 
    It needs Google Chrome on this machine (it renders through
    the DevTools protocol); it is not part of `npm run build`.
@@ -51,7 +50,6 @@ const ROUTES = {
 };
 
 const args = process.argv.slice(2);
-const aiBackdrop = args.includes('--ai');
 const option = (name) => {
   const index = args.indexOf(`--${name}`);
   return index >= 0 ? args[index + 1] : null;
@@ -123,11 +121,15 @@ function pageName(title, rtl) {
 function coverHtml({ lang, key, meta, copy }) {
   if (key === 'home') return homeCoverHtml({ lang, copy });
   const rtl = RTL.has(lang);
-  const name = `${copy['name.first'] || 'Barakat'} ${copy['name.last'] || 'Qurtas'}`;
+  const roomTitle = ['blog', 'bio', 'contact'].includes(key) && copy[`rh.${key}.title`];
+  // Only the site's existing emphasis tag is allowed through into cover titles.
+  const title = roomTitle
+    ? escapeHtml(roomTitle).replace(/&lt;(\/?)em&gt;/g, '<$1em>')
+    : pageName(meta.t, rtl);
+  const description = key === 'design'
+    ? copy['design.lede']
+    : (copy[`rh.${key}.sub`] || meta.d);
   const address = `bqurtas.com${lang === 'en' ? '' : `/${lang}`}${ROUTES[key]}`;
-  const arrow = rtl
-    ? '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M17 10H4m5-5-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-    : '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   return `<!doctype html>
 <html lang="${lang}" dir="${rtl ? 'rtl' : 'ltr'}">
 <head>
@@ -136,65 +138,49 @@ function coverHtml({ lang, key, meta, copy }) {
 ${fontFaces()}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:${WIDTH}px;height:${HEIGHT}px;overflow:hidden;background:#0a0a0a}
-body{font-family:${rtl ? "'Noto Kufi Arabic'" : "'Manrope','Noto Kufi Arabic'"},sans-serif;color:#0f0f0f;-webkit-font-smoothing:antialiased}
-.paper{position:absolute;inset:14px;border-radius:30px;background:#f3f3f3;overflow:hidden;
-  display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding:38px 62px 40px}
-.mono{font-family:'JetBrains Mono','Noto Kufi Arabic',monospace;font-size:14px;line-height:1.5;
-  letter-spacing:${rtl ? '0' : '.16em'};text-transform:uppercase;color:rgba(15,15,15,.6)}
-.edition{display:flex;align-items:center;justify-content:space-between;gap:24px;
-  padding-bottom:20px;border-bottom:1px solid rgba(15,15,15,.12)}
-.place{display:inline-flex;align-items:center;gap:12px}
-.place i{width:7px;height:7px;border-radius:50%;background:rgba(15,15,15,.62)}
-.mark{font-family:'Liana','Fraunces',serif;font-size:34px;line-height:1;letter-spacing:.01em;
-  text-transform:none;color:#0f0f0f}
-[dir="rtl"] .mark{font-family:'Noto Kufi Arabic',sans-serif;font-size:21px;font-weight:700;letter-spacing:0}
-.stage{display:grid;grid-template-columns:minmax(0,1fr) 400px;align-items:center;gap:36px;min-height:0}
-.copy{min-width:0}
-.name{font-family:'Fraunces',serif;font-size:100px;font-weight:500;line-height:1.04;letter-spacing:-.03em}
-.name em{font-style:italic;font-weight:400}
-[dir="rtl"] .name{font-family:'Noto Kufi Arabic',sans-serif;font-size:76px;font-weight:700;line-height:1.4;letter-spacing:0}
-.lede{margin-top:20px;max-width:600px;font-size:26px;font-weight:500;line-height:1.46;letter-spacing:-.01em;
-  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
-[dir="rtl"] .lede{font-size:23px;font-weight:500;line-height:1.85;letter-spacing:0}
-.portrait{display:block;width:400px;height:400px;object-fit:contain;justify-self:end;filter:grayscale(1) contrast(1.04)}
-.foot{display:flex;align-items:center;justify-content:space-between;gap:24px}
-.cta{display:inline-flex;align-items:center;gap:14px;height:52px;padding:0 26px;border-radius:999px;
-  background:#101010;color:#f3f3f3;font-size:18px;font-weight:600;letter-spacing:${rtl ? '0' : '-.005em'}}
-.cta svg{width:19px;height:19px}
-.address{direction:ltr;unicode-bidi:isolate;letter-spacing:.06em;text-transform:none;font-size:16px}
+body{font-family:'Manrope','Noto Naskh Arabic',sans-serif;color:#111;-webkit-font-smoothing:antialiased}
+.paper{position:absolute;inset:14px;border-radius:28px;background:#f3f3f3;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;padding:30px 64px 70px;text-align:center}
+.content{display:flex;flex-direction:column;align-items:center;width:100%;min-width:0}
+.portrait{display:block;width:164px;height:164px;object-fit:contain;filter:grayscale(1)}
+.signature{display:block;width:360px;height:auto;margin-top:3px;direction:ltr}
+.title{font-family:'Fraunces',serif;font-size:72px;font-weight:500;line-height:1.12;letter-spacing:-.03em;
+  margin-top:18px;max-width:100%}
+.title em{font-weight:400}
+.lede{max-width:840px;margin-top:18px;font-size:23px;font-weight:400;line-height:1.55;letter-spacing:-.015em}
+.address{position:absolute;bottom:28px;inset-inline:40px;font-family:'JetBrains Mono',monospace;font-size:15px;
+  line-height:1.5;letter-spacing:.025em;color:#666;direction:ltr;unicode-bidi:isolate}
+[dir="rtl"] .title{font-family:'Noto Kufi Arabic',sans-serif;font-size:58px;line-height:1.55;letter-spacing:0}
+[dir="rtl"] .title em{font-style:normal;font-weight:500}
+[dir="rtl"] .lede{font-family:'Noto Naskh Arabic',sans-serif;font-size:29px;line-height:1.6;letter-spacing:0}
 </style>
 </head>
 <body>
-<div class="paper">
-  <header class="edition mono">
-    <span class="mark">${escapeHtml(name)}</span>
-    <span>${escapeHtml(copy['hero.place'] || 'Based in Erbil')}</span>
-  </header>
-  <main class="stage">
-    <div class="copy">
-      <div class="name" data-fit>${pageName(meta.t, rtl)}</div>
-      <p class="lede">${escapeHtml(meta.d)}</p>
-    </div>
-    <img class="portrait" src="${fileUrl('assets/hero-sketch.webp')}" alt="">
-  </main>
-  <footer class="foot">
-    <span class="cta">${escapeHtml(copy['hero.cta'] || 'View the work')}${arrow}</span>
-    <span class="address mono">${escapeHtml(address)}</span>
-  </footer>
-</div>
+<main class="paper">
+  <div class="content">
+    <img class="portrait" src="${fileUrl(HOME_PORTRAIT)}" alt="Barakat Qurtas">
+    <img class="signature" src="${fileUrl('assets/signature/written-by-hand-still.webp')}" alt="Barakat Qurtas">
+    <h1 class="title">${title}</h1>
+    <p class="lede">${escapeHtml(description)}</p>
+  </div>
+  <span class="address">${escapeHtml(address)}</span>
+</main>
 <script>
-  /* A long name steps down until it sits on at most two lines in its column. */
   window.__fit = async () => {
     await document.fonts.ready;
-    await Promise.all([...document.images].map((image) => image.decode().catch(() => {})));
-    const node = document.querySelector('[data-fit]');
-    if (!node) return true;
-    const column = node.parentElement.clientWidth;
-    let size = parseFloat(getComputedStyle(node).fontSize);
-    const lines = () => Math.round(node.getBoundingClientRect().height / parseFloat(getComputedStyle(node).lineHeight));
-    while (size > 44 && (node.scrollWidth > column + 1 || lines() > 2)) {
+    await Promise.all([...document.images].map((image) => image.decode()));
+    const paper = document.querySelector('.paper');
+    const content = document.querySelector('.content');
+    const title = document.querySelector('.title');
+    const style = getComputedStyle(paper);
+    const available = paper.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+    let size = parseFloat(getComputedStyle(title).fontSize);
+    while (size > 40 && (content.scrollHeight > available || title.scrollWidth > content.clientWidth)) {
       size -= 2;
-      node.style.fontSize = size + 'px';
+      title.style.fontSize = size + 'px';
+    }
+    if (content.scrollHeight > available || title.scrollWidth > content.clientWidth) {
+      throw new Error('Cover content does not fit');
     }
     return true;
   };
@@ -220,10 +206,6 @@ html,body{width:${WIDTH}px;height:${HEIGHT}px;overflow:hidden;background:#0a0a0a
 body{font-family:'Manrope','Noto Naskh Arabic',sans-serif;color:#111;-webkit-font-smoothing:antialiased}
 .paper{position:absolute;inset:14px;border-radius:28px;background:#f3f3f3;overflow:hidden;
   display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 60px;text-align:center}
-.ai-backdrop{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;
-  padding:0 34px 26px 0;font:700 350px/1 'Manrope',sans-serif;letter-spacing:-.075em;
-  color:rgba(17,17,17,.045);direction:ltr;pointer-events:none;z-index:0}
-.paper > :not(.ai-backdrop){position:relative;z-index:1}
 .portrait{display:block;width:256px;height:256px;object-fit:contain;filter:grayscale(1);flex-shrink:0}
 .signature{display:block;width:576px;height:auto;margin-top:3px;direction:ltr;flex-shrink:0}
 .lede{max-width:740px;margin-top:10px;font-size:22px;font-weight:400;line-height:1.55;letter-spacing:-.015em}
@@ -236,7 +218,6 @@ body{font-family:'Manrope','Noto Naskh Arabic',sans-serif;color:#111;-webkit-fon
 </head>
 <body>
 <main class="paper">
-  ${aiBackdrop ? '<span class="ai-backdrop" aria-hidden="true">AI</span>' : ''}
   <img class="portrait" src="${fileUrl(HOME_PORTRAIT)}" alt="Barakat Qurtas">
   <img class="signature" src="${fileUrl('assets/signature/written-by-hand-still.webp')}" alt="Barakat Qurtas">
   <p class="lede">${escapeHtml(copy['hero.lede'])}</p>
@@ -333,7 +314,8 @@ async function main() {
         });
         await send('Page.navigate', { url: pathToFileURL(page).href });
         await loaded;
-        await send('Runtime.evaluate', { expression: 'window.__fit()', awaitPromise: true });
+        const fitted = await send('Runtime.evaluate', { expression: 'window.__fit()', awaitPromise: true });
+        if (fitted.exceptionDetails) throw new Error(`Cover render failed: ${lang}/${key}: ${fitted.exceptionDetails.text}`);
         await sleep(60);
         const { data } = await send('Page.captureScreenshot', {
           format: 'jpeg', quality: 88, captureBeyondViewport: false,
