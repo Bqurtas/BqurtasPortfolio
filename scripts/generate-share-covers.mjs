@@ -3,8 +3,8 @@
    sent or posted (og:image / twitter:image).
 
    One cover per language and page, drawn in the site's own
-   identity. Home is an editorial identity card with the real
-   handwritten signature, portrait and a bold address band;
+   identity. Home follows the live hero: the current Studio
+   portrait, handwritten signature, introductory text and link;
    the other rooms retain their paper-sheet design. Titles and
    descriptions come from the edge function's OG table and the
    interface strings from the generated localized copy, so a
@@ -31,6 +31,9 @@ const WIDTH = 1200;
 const HEIGHT = 630;
 const RTL = new Set(['ku', 'ar']);
 const LANGS = ['en', 'ku', 'kmr', 'ar', 'fr', 'tr', 'sv'];
+/* The approved Studio portrait visible on bqurtas.com, verified 2026-11-09.
+   Its bundled 960px rendition preserves the exact live drawing and alpha. */
+const HOME_PORTRAIT = 'assets/portraits/4a2b01f6f4fae90b2becff2f7d45f1ed421c723f042eab0af557cbda8a9ce08d.webp';
 /* Every key the edge function can ask for (functions/[[route]].js: home,
    design, the portfolio tabs and the four rooms). */
 const KEYS = [
@@ -99,7 +102,8 @@ function fontFaces() {
     face('JetBrains Mono', '1e06740a02a443fb-jetbrains-latin.woff2', '300 500'),
     face('JetBrains Mono', '7db7affbce1fdee6-jetbrains-latin-ext.woff2', '300 500'),
     face('Noto Kufi Arabic', '0d62bfd83ff94eb9-noto-kufi-latin.0d62bfd83ff9.woff2', '400 700'),
-    face('Noto Kufi Arabic', 'acfdd4a7c20ee98d-noto-kufi-arabic.acfdd4a7c20e.woff2', '400 700')
+    face('Noto Kufi Arabic', 'acfdd4a7c20ee98d-noto-kufi-arabic.acfdd4a7c20e.woff2', '400 700'),
+    face('Noto Naskh Arabic', '315b3c1151ac6cc2-noto-naskh-RrQKbpV-9Dd1b1OAGA6M9PkyDuVBeO2EF1qELw.woff2', '400 700')
   ].join('\n');
 }
 
@@ -197,14 +201,12 @@ body{font-family:${rtl ? "'Noto Kufi Arabic'" : "'Manrope','Noto Kufi Arabic'"},
 </html>`;
 }
 
-/* A link card has to read at a fraction of its native size. Keep the home
-   card to the identity, one discipline line and the address. The signature
+/* Keep the home card faithful to the four visible elements of the live hero.
+   Hidden edition labels and the discipline kicker are not cover copy. The signature
    still is frame 151 (fully written) of the hero's animated WebP. Using a
    still keeps screenshots independent of the animation's blank first frame. */
 function homeCoverHtml({ lang, copy }) {
   const rtl = RTL.has(lang);
-  const name = copy['name.full'] || 'Barakat Qurtas';
-  const address = `bqurtas.com${lang === 'en' ? '' : `/${lang}`}`;
   return `<!doctype html>
 <html lang="${lang}" dir="${rtl ? 'rtl' : 'ltr'}">
 <head>
@@ -212,39 +214,27 @@ function homeCoverHtml({ lang, copy }) {
 <style>
 ${fontFaces()}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:${WIDTH}px;height:${HEIGHT}px;overflow:hidden;background:#f3f3f3}
-body{font-family:'Manrope','Noto Kufi Arabic',sans-serif;color:#111;-webkit-font-smoothing:antialiased}
-.identity{position:absolute;inset-block-start:0;inset-inline-start:0;width:720px;height:500px;padding:66px 64px;
-  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;z-index:2}
-.name{font-size:26px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;line-height:1.5}
-.signature{display:block;width:620px;height:auto;max-width:none;margin-block:38px 26px;direction:ltr}
-.practice{font-family:'Fraunces','Noto Kufi Arabic',serif;font-size:38px;font-weight:400;line-height:1.25;letter-spacing:-.025em;max-width:540px}
-.portrait{position:absolute;inset-inline-end:12px;top:34px;width:490px;height:490px;object-fit:contain;
-  filter:grayscale(1) contrast(1.06);z-index:1}
-.band{position:absolute;inset:500px 0 0;display:flex;align-items:center;justify-content:space-between;
-  padding:0 64px;background:#111;color:#f3f3f3;z-index:3}
-.address{font-size:46px;font-weight:500;letter-spacing:-.045em;direction:ltr;unicode-bidi:isolate}
-.arrow{display:grid;place-items:center;width:64px;height:64px;border:1px solid #777;border-radius:50%}
-.arrow svg{width:27px;height:27px}
-[dir="rtl"] .identity{width:720px}
-[dir="rtl"] .name{font-family:'Noto Kufi Arabic',sans-serif;font-size:44px;font-weight:700;letter-spacing:0}
-[dir="rtl"] .signature{width:610px;margin-block:20px 28px}
-[dir="rtl"] .practice{font-family:'Noto Kufi Arabic',sans-serif;font-size:30px;line-height:1.8;letter-spacing:0}
+html,body{width:${WIDTH}px;height:${HEIGHT}px;overflow:hidden;background:#0a0a0a}
+body{font-family:'Manrope','Noto Naskh Arabic',sans-serif;color:#111;-webkit-font-smoothing:antialiased}
+.paper{position:absolute;inset:14px;border-radius:28px;background:#f3f3f3;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 60px;text-align:center}
+.portrait{display:block;width:256px;height:256px;object-fit:contain;filter:grayscale(1);flex-shrink:0}
+.signature{display:block;width:576px;height:auto;margin-top:3px;direction:ltr;flex-shrink:0}
+.lede{max-width:740px;margin-top:10px;font-size:22px;font-weight:400;line-height:1.55;letter-spacing:-.015em}
+.cta{display:flex;align-items:center;justify-content:center;gap:18px;min-height:44px;margin-top:16px;
+  padding:8px 0;border-bottom:1px solid #888;font-size:18px;font-weight:600;line-height:1.55}
+.cta svg{width:18px;height:18px}
+[dir="rtl"] .lede{font-family:'Noto Naskh Arabic',sans-serif;font-size:28px;line-height:1.65;letter-spacing:0}
+[dir="rtl"] .cta{font-family:'Noto Kufi Arabic',sans-serif;font-size:18px}
 </style>
 </head>
 <body>
-<main>
-  <div class="identity">
-    <div class="name">${escapeHtml(name)}</div>
-    <img class="signature" src="${fileUrl('assets/signature/written-by-hand-still.webp')}" alt="Barakat Qurtas">
-    <p class="practice">${escapeHtml(copy['menu.practice'] || 'Multidisciplinary creative practice')}</p>
-  </div>
-  <img class="portrait" src="${fileUrl('assets/hero-sketch.webp')}" alt="">
+<main class="paper">
+  <img class="portrait" src="${fileUrl(HOME_PORTRAIT)}" alt="Barakat Qurtas">
+  <img class="signature" src="${fileUrl('assets/signature/written-by-hand-still.webp')}" alt="Barakat Qurtas">
+  <p class="lede">${escapeHtml(copy['hero.lede'])}</p>
+  <span class="cta">${escapeHtml(copy['hero.cta'])}<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v16m-6-6 6 6 6-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 </main>
-<footer class="band">
-  <span class="address">${escapeHtml(address)}</span>
-  <span class="arrow"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M7 25 25 7M7 7h18v18" stroke="currentColor" stroke-width="1.8"/></svg></span>
-</footer>
 <script>
   window.__fit = async () => {
     await document.fonts.ready;
