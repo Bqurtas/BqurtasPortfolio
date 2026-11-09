@@ -854,9 +854,9 @@
       html:is(.bq-shell-timeout,.bq-css-timeout):not([data-bq-shell-ready="1"]) body .room.paper-stack > :is(.hero,.room-hero).paper-sheet > .paper-scroll{overflow-y:auto!important;overscroll-behavior:auto!important}
     }
   </style>
-  <link rel="preload" as="style" href="css/style.v417.min.css?v=ddcf2f5464ea" data-href="css/style.v417.min.css?v=ddcf2f5464ea" fetchpriority="high" id="bqFullCss">
+  <link rel="preload" as="style" href="css/style.v417.min.css?v=4195ff2cdf3c" data-href="css/style.v417.min.css?v=4195ff2cdf3c" fetchpriority="high" id="bqFullCss">
   <link rel="stylesheet" href="css/modern-framer.min.css?v=0741789ec97b">
-  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=ddcf2f5464ea"></noscript>
+  <noscript><link rel="stylesheet" href="css/style.v417.min.css?v=4195ff2cdf3c"></noscript>
   <script>
     (function () {
       var root = document.documentElement;
@@ -1417,7 +1417,7 @@
               <p class="site-note" id="siteNoteKosan" data-site="kosan" data-i18n="sites.kosan.desc">Eleven companies in Erbil, gathered under one name.</p>
             </div>
 
-            <!-- Decorative: the same three links, shown as their real screens. -->
+            <!-- Decorative: the same three links, shown with their cover or screen. -->
             <a class="sites-screen" href="https://bqurtas.com/" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true" data-sites-screen>
               <span class="site-window">
                 <span class="site-bar">
@@ -1426,13 +1426,13 @@
                   <span class="site-bar-end mono"><span data-i18n="sites.visit">Visit</span><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
                 </span>
                 <span class="site-view">
-                  <img class="site-shot is-active" data-site="bq" src="assets/sites/bqurtas-desktop.webp?v=acb4a7e45394" alt="" width="1440" height="900" loading="lazy" decoding="async" />
+                  <img class="site-shot site-shot--cover is-active" data-site="bq" src="assets/covers/en-home.jpg?v=41685e24e4e0" alt="" width="1200" height="630" loading="lazy" decoding="async" />
                   <img class="site-shot" data-site="sun" src="assets/sites/sunoferbil-desktop.webp?v=cfc8f6544598" alt="" width="1440" height="900" loading="lazy" decoding="async" />
                   <img class="site-shot" data-site="kosan" src="assets/sites/kosanh-desktop.webp?v=bd1bba6643b7" alt="" width="1440" height="900" loading="lazy" decoding="async" />
                 </span>
               </span>
               <span class="site-phone">
-                <img class="site-shot is-active" data-site="bq" src="assets/sites/bqurtas-mobile.webp?v=8874283469f8" alt="" width="390" height="844" loading="lazy" decoding="async" />
+                <img class="site-shot site-shot--cover is-active" data-site="bq" src="assets/covers/en-home.jpg?v=41685e24e4e0" alt="" width="1200" height="630" loading="lazy" decoding="async" />
                 <img class="site-shot" data-site="sun" src="assets/sites/sunoferbil-mobile.webp?v=0fcdab2af5ea" alt="" width="390" height="844" loading="lazy" decoding="async" />
                 <img class="site-shot" data-site="kosan" src="assets/sites/kosanh-mobile.webp?v=6d0e60d4ce86" alt="" width="390" height="844" loading="lazy" decoding="async" />
               </span>
@@ -2937,7 +2937,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=244c8195feb1', { updateViaCache: 'none' })
+            .register('/sw.js?v=70dc5bbe33e2', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });
