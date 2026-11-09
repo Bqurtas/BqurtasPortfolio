@@ -14,6 +14,7 @@
      node scripts/generate-share-covers.mjs
      node scripts/generate-share-covers.mjs --lang ku,ar --key home,blog
      node scripts/generate-share-covers.mjs --out /tmp/covers   (preview only)
+     node scripts/generate-share-covers.mjs --key home --ai --out /tmp/covers-ai
 
    It needs Google Chrome on this machine (it renders through
    the DevTools protocol); it is not part of `npm run build`.
@@ -50,6 +51,7 @@ const ROUTES = {
 };
 
 const args = process.argv.slice(2);
+const aiBackdrop = args.includes('--ai');
 const option = (name) => {
   const index = args.indexOf(`--${name}`);
   return index >= 0 ? args[index + 1] : null;
@@ -218,6 +220,10 @@ html,body{width:${WIDTH}px;height:${HEIGHT}px;overflow:hidden;background:#0a0a0a
 body{font-family:'Manrope','Noto Naskh Arabic',sans-serif;color:#111;-webkit-font-smoothing:antialiased}
 .paper{position:absolute;inset:14px;border-radius:28px;background:#f3f3f3;overflow:hidden;
   display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 60px;text-align:center}
+.ai-backdrop{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  padding-bottom:30px;font:700 620px/1 'Manrope',sans-serif;letter-spacing:-.075em;
+  color:rgba(17,17,17,.045);direction:ltr;pointer-events:none;z-index:0}
+.paper > :not(.ai-backdrop){position:relative;z-index:1}
 .portrait{display:block;width:256px;height:256px;object-fit:contain;filter:grayscale(1);flex-shrink:0}
 .signature{display:block;width:576px;height:auto;margin-top:3px;direction:ltr;flex-shrink:0}
 .lede{max-width:740px;margin-top:10px;font-size:22px;font-weight:400;line-height:1.55;letter-spacing:-.015em}
@@ -230,6 +236,7 @@ body{font-family:'Manrope','Noto Naskh Arabic',sans-serif;color:#111;-webkit-fon
 </head>
 <body>
 <main class="paper">
+  ${aiBackdrop ? '<span class="ai-backdrop" aria-hidden="true">AI</span>' : ''}
   <img class="portrait" src="${fileUrl(HOME_PORTRAIT)}" alt="Barakat Qurtas">
   <img class="signature" src="${fileUrl('assets/signature/written-by-hand-still.webp')}" alt="Barakat Qurtas">
   <p class="lede">${escapeHtml(copy['hero.lede'])}</p>
