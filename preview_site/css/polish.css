@@ -7885,6 +7885,10 @@ html body .bh-card-meta {
    Behance. In dark mode the frame inverts like the rest of the site. */
 html.bh-viewer-open,
 html.bh-viewer-open body { overflow: hidden !important; }
+/* Native cursors are hidden while the custom pointer is active. Keep both
+   marks above the full-screen viewer, including its opening animation. */
+html.bh-viewer-open body .cursor-ring { z-index: 100003 !important; }
+html.bh-viewer-open body .cursor-dot { z-index: 100004 !important; }
 html body .bh-viewer {
   --bhv-back: #0b0b0b;
   --bhv-front: #f4f3ef;

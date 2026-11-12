@@ -184,7 +184,10 @@ try {
       const cover = (size, stem) => downloadWebp(`https://mir-s3-cdn-cf.behance.net/projects/${size}/${item.cover}`, fresh, stem, { required: true });
       const big = await cover('808_webp', 'cover');
       const small = await cover('404_webp', 'cover-404');
-      entry.cover = { src: base + big.name, small: base + small.name, w: big.w, h: big.h };
+      entry.cover = {
+        src: base + big.name, small: base + small.name, w: big.w, h: big.h,
+        ...(old?.cover?.tone && old.coverFile === item.cover ? { tone: old.cover.tone } : {}),
+      };
     }
     if (page) {
       entry.images = [];

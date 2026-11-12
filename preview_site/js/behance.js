@@ -196,9 +196,44 @@
     item.appendChild(link);
     return item;
   };
+  let gridCards = [];
+  let gridColumns = 0;
+  const layoutGrid = () => {
+    if (!grid.clientWidth || !gridCards.length) return;
+    const tracks = getComputedStyle(grid).gridTemplateColumns;
+    if (!tracks || tracks === 'none') return;
+    const columns = tracks.trim().split(/\s+/).length;
+    if (columns === gridColumns) return;
+    gridColumns = columns;
+    const dark = gridCards.filter((item) => item.tone === 'dark');
+    const light = gridCards.filter((item) => item.tone === 'light');
+    const darkFirst = (i) => (Math.floor(i / columns) + i % columns) % 2 === 0;
+    const darkSlots = gridCards.reduce((n, _, i) => n + Number(darkFirst(i)), 0);
+    /* An incomplete final row can need the opposite starting colour. Pick
+       the orientation that fits the available covers, keeping every card. */
+    const startDark = Math.abs(dark.length - darkSlots) <= Math.abs(light.length - darkSlots);
+    const ordered = gridCards.map((_, i) => {
+      const pool = darkFirst(i) === startDark ? dark : light;
+      return (pool.shift() || dark.shift() || light.shift()).node;
+    });
+    /* Move the real cards so keyboard focus follows their visual order.
+       Project navigation and URLs keep the catalogue's original order. */
+    const active = grid.contains(document.activeElement) ? document.activeElement : null;
+    grid.replaceChildren(...ordered);
+    if (active) active.focus({ preventScroll: true });
+  };
+  if ('ResizeObserver' in window) new ResizeObserver(layoutGrid).observe(grid);
+  else window.addEventListener('resize', layoutGrid, { passive: true });
+
   const renderGrid = () => {
     const sizes = '(max-width: 560px) 92vw, (max-width: 1100px) 46vw, 30vw';
-    grid.replaceChildren(...projects.map((p, i) => card(p, i, sizes, 'li')));
+    gridCards = projects.map((p, i) => ({
+      node: card(p, i, sizes, 'li'),
+      tone: p.cover.tone || (i % 2 === 0 ? 'dark' : 'light'),
+    }));
+    gridColumns = 0;
+    grid.replaceChildren(...gridCards.map((item) => item.node));
+    layoutGrid();
     grid.removeAttribute('aria-busy');
     room.dataset.behanceCount = String(projects.length);
     const count = $('behanceCount');
