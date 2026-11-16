@@ -937,7 +937,7 @@
   <link rel="stylesheet" href="css/experience.min.css?v=2c2664c33142">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
   <link rel="stylesheet" href="css/polish.min.css?v=d92b228d93e0">
-  <link rel="stylesheet" href="css/recent-work.min.css?v=ebe6ddf7340e">
+  <link rel="stylesheet" href="css/recent-work.min.css?v=b0118608fbec">
   <link rel="stylesheet" href="css/hero-work-trail.min.css?v=5d635cafc3a2">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543"></noscript>
@@ -1304,16 +1304,20 @@
           </div>
           <div class="recent-folio" aria-busy="true">
             <div class="recent-viewer" data-recent-viewer>
-              <div class="recent-wall" data-recent-index><p class="recent-state" data-recent-copy="loading">Opening the folio…</p></div>
-              <div class="recent-stage" data-recent-stage hidden></div>
+              <div class="recent-wall" data-recent-wall hidden>
+                <div class="recent-screen" data-recent-screen><div class="recent-stage" data-recent-stage hidden></div></div>
+                <div class="recent-queue" data-recent-queue></div>
+              </div>
+              <div class="recent-stage-state" data-recent-state><p class="recent-state" data-recent-copy="loading">Opening the folio…</p></div>
               <div class="recent-detail">
                 <div class="recent-caption" data-recent-caption></div>
                 <div class="recent-contact-sheet" data-recent-thumbnails></div>
               </div>
-            </div>
-            <div class="recent-foot">
-              <p class="recent-index-head"><span data-recent-total dir="ltr">—</span><span data-recent-copy="index">Publication index</span></p>
-              <div class="recent-index-actions"><button type="button" class="recent-more" data-recent-more hidden><span data-recent-copy="more">Explore more releases</span><span aria-hidden="true">+</span></button><a class="recent-all" href="/design" data-recent-portfolio><span data-recent-copy="portfolio">The complete portfolio</span><span aria-hidden="true">↗</span></a></div>
+              <div class="recent-rail">
+                <button type="button" class="recent-toggle" data-recent-toggle aria-pressed="false" aria-label="Pause the slideshow"><span aria-hidden="true"></span></button>
+                <div class="recent-progress" data-recent-index></div>
+                <div class="recent-index-actions"><button type="button" class="recent-more" data-recent-more hidden><span data-recent-copy="more">Explore more releases</span><span aria-hidden="true">+</span></button><a class="recent-all" href="/design" data-recent-portfolio><span data-recent-copy="portfolio">The complete portfolio</span><span aria-hidden="true">↗</span></a></div>
+              </div>
             </div>
           </div>
           <p class="recent-status" data-recent-status role="status" aria-live="polite"></p>
@@ -2781,8 +2785,8 @@
   <script defer src="js/latest-feed.min.js?v=76465997249c"></script>
   <script defer src="js/main.v420.min.js?v=c7af279ed731"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
-  <script type="module" src="js/recent-work.min.js?v=10bf303e86eb"></script>
-  <script defer src="js/hero-work-trail.min.js?v=3ae3085f4195"></script>
+  <script type="module" src="js/recent-work.min.js?v=a2799917e44d"></script>
+  <script defer src="js/hero-work-trail.min.js?v=d192966526cf"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
        still receive them immediately. This removes their database/GitHub work
@@ -2978,7 +2982,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=4d745180ca84', { updateViaCache: 'none' })
+            .register('/sw.js?v=ed91f07af643', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

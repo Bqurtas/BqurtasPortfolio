@@ -45,7 +45,7 @@
   hero.dataset.workTrailReady = 'true';
 
   let pool = [], position = 0, shown = 0, visible = true, loading = null;
-  let lastPoint = null, lastAt = 0, pendingPoint = null, followPoint = null, followAt = 0, followBudget = 0, frame = 0, quietTimer = 0;
+  let lastPoint = null, lastAt = 0, pendingPoint = null, followPoint = null, followAt = 0, followBudget = 0, frame = 0, quietTimer = 0, restTimer = 0;
   let touch = null, holdTimer = 0, holdInterval = 0;
   const prints = [];
   const forbidden = target => target?.closest?.('a, button, input, textarea, select, [contenteditable="true"], [role="button"]');
@@ -64,6 +64,7 @@
   const dispose = entry => {
     clearTimeout(entry.timer);
     clearTimeout(entry.retireTimer);
+    clearTimeout(entry.restTimer);
     entry.animation?.cancel();
     entry.retirement?.cancel();
     entry.node.remove();
@@ -78,11 +79,22 @@
     if (!reduced.matches && entry.node.animate) {
       const opacity = typeof getComputedStyle === 'function' ? parseFloat(getComputedStyle(entry.node).opacity) : 1;
       entry.retirement = entry.node.animate([{ opacity: Number.isFinite(opacity) ? opacity : 1 }, { opacity: 0 }], {
-        duration: 460, easing: 'cubic-bezier(.4, 0, .6, 1)', fill: 'forwards',
+        duration: 420, easing: 'cubic-bezier(.33, 0, .67, 1)', fill: 'forwards',
       });
       entry.retirement.onfinish = () => dispose(entry);
-      entry.retireTimer = setTimeout(() => dispose(entry), 460);
+      entry.retireTimer = setTimeout(() => dispose(entry), 420);
     } else dispose(entry);
+  };
+  // When the hand rests, the trail does not linger: the prints it laid down
+  // leave one after another, oldest first. Previews asked for by the button
+  // or a touch hold keep their own time.
+  const rest = () => {
+    clearTimeout(restTimer);
+    restTimer = setTimeout(() => {
+      prints.filter(entry => entry.trail && !entry.retiring).forEach((entry, index) => {
+        entry.restTimer = setTimeout(() => retire(entry), index * 55);
+      });
+    }, 170);
   };
   const stopFollowing = () => {
     cancelAnimationFrame(frame);
@@ -103,13 +115,14 @@
     stopFollowing();
     lastPoint = null;
     clearTimeout(quietTimer);
+    clearTimeout(restTimer);
     [...prints].forEach(dispose);
     hero.classList.remove('is-work-discovering');
   };
   const mediaLabel = item => item.kind === 'case' ? copy().case : item.kind === 'video' ? copy().video
     : window.GAL_I18N?.[lang()]?.[item.coll]?.title || item.label;
 
-  const drop = (clientX, clientY, manual = false) => {
+  const drop = (clientX, clientY, manual = false, trail = false) => {
     if (!pool.length || !active()) return;
     const bounds = stage.getBoundingClientRect();
     if (bounds.width < 1 || bounds.height < 1) return;
@@ -156,17 +169,18 @@
     number.dir = 'ltr';
     caption.append(label, number);
     node.append(image, caption);
-    const entry = { node, animation: null, timer: 0, retirement: null, retireTimer: 0, retiring: false };
+    const entry = { node, animation: null, timer: 0, retirement: null, retireTimer: 0, restTimer: 0, retiring: false, trail: false };
+    entry.trail = trail;
     prints.push(entry);
     stage.append(node);
     const reveal = () => {
       if (!node.isConnected || node.classList.contains('is-loaded')) return;
       node.classList.add('is-loaded');
-      const lifetime = manual ? 4200 : 2700;
+      const lifetime = manual ? 4200 : 2100;
       if (!reduced.matches && node.animate) {
         const at = (distance, lift = 0) => `translate(calc(-50% + ${(ux * distance).toFixed(1)}px), calc(-50% + ${(uy * distance + lift).toFixed(1)}px))`;
         entry.animation = node.animate([
-          { opacity: 0, transform: `${at(-34, 10)} rotate(${(rotation - 1.4).toFixed(2)}deg) scale(.86)`, offset: 0, easing: 'cubic-bezier(.16, 1, .3, 1)' },
+          { opacity: 0, transform: `${at(-26, 8)} rotate(${(rotation - 1).toFixed(2)}deg) scale(.9)`, offset: 0, easing: 'cubic-bezier(.16, 1, .3, 1)' },
           { opacity: 1, transform: `${at(0)} rotate(${rotation.toFixed(2)}deg) scale(1)`, offset: .24, easing: 'cubic-bezier(.37, 0, .63, 1)' },
           { opacity: 1, transform: `${at(12, -2)} rotate(${(rotation + .3).toFixed(2)}deg) scale(1)`, offset: .62, easing: 'cubic-bezier(.5, 0, .75, 0)' },
           { opacity: 0, transform: `${at(30, -8)} rotate(${(rotation + .8).toFixed(2)}deg) scale(.95)`, offset: 1 },
@@ -184,7 +198,7 @@
     counter.textContent = String(shown).padStart(2, '0');
     hero.classList.add('is-work-discovering');
     clearTimeout(quietTimer);
-    quietTimer = setTimeout(() => hero.classList.remove('is-work-discovering'), manual ? 4200 : 2700);
+    quietTimer = setTimeout(() => hero.classList.remove('is-work-discovering'), manual ? 4200 : 2100);
     lastPoint = { x: localX, y: localY };
     lastAt = performance.now();
   };
@@ -269,6 +283,7 @@
       return;
     }
     pendingPoint = { x: event.clientX, y: event.clientY };
+    rest();
     if (!followPoint) followPoint = { ...pendingPoint };
     followBudget = 18;
     if (frame) return;
@@ -288,7 +303,7 @@
       const y = (followPoint.y - bounds.top) * stage.clientHeight / bounds.height;
       const distance = lastPoint ? Math.hypot(x - lastPoint.x, y - lastPoint.y) : Infinity;
       const spacing = Math.max(84, Math.min(stage.clientWidth * .075, 132));
-      if (distance >= spacing && now - lastAt >= 120) drop(followPoint.x, followPoint.y);
+      if (distance >= spacing && now - lastAt >= 120) drop(followPoint.x, followPoint.y, false, true);
       // A short, finite settling tail gives the gesture inertia. It stops as
       // soon as the target settles; there is no idle animation-frame loop.
       if (--followBudget > 0 && Math.hypot(deltaX, deltaY) > .7) frame = requestAnimationFrame(follow);
@@ -312,7 +327,7 @@
       }, 560);
     }, 360);
   }, { passive: true });
-  hero.addEventListener('pointerleave', () => { lastPoint = null; stopTouch(); stopFollowing(); }, { passive: true });
+  hero.addEventListener('pointerleave', () => { lastPoint = null; stopTouch(); stopFollowing(); rest(); }, { passive: true });
   window.addEventListener('pointerup', stopTouch, { passive: true });
   window.addEventListener('pointercancel', stopTouch, { passive: true });
   hero.addEventListener('contextmenu', event => { if (touch?.holding && !forbidden(event.target)) event.preventDefault(); });

@@ -22,7 +22,16 @@ if (section) {
     tr:{title:'Yeni işler.',titleEm:'Yeni bakışlar.',intro:'İlk izlenimden en küçük ayrıntıya.',index:'Yayın şeridi',loading:'Sergi hazırlanıyor…',more:'Daha fazlasını keşfet',note:'Bir iş seç. Dünyasına gir.'},
     sv:{title:'Nya arbeten.',titleEm:'Nya perspektiv.',intro:'Från första intrycket till minsta detalj.',index:'Publikationsrullen',loading:'Utställningen förbereds…',more:'Mer att upptäcka',note:'Välj ett verk. Kliv in i dess värld.'}
   };
-  Object.keys(COPY).forEach(key=>Object.assign(COPY[key],EXHIBITION_COPY[key]));
+  const SLIDE_COPY = {
+    en:{prevWork:'Previous work',nextWork:'Next work',upNext:'Up next',pause:'Pause the slideshow',play:'Play the slideshow',goTo:'Show work {n}'},
+    ku:{prevWork:'کاری پێشوو',nextWork:'کاری دواتر',upNext:'دواتر',pause:'سلایدشۆ بوەستێنە',play:'سلایدشۆ دەست پێ بکەوە',goTo:'کاری {n} پیشان بدە'},
+    kmr:{prevWork:'Karê berê',nextWork:'Karê paş',upNext:'Paşê',pause:'Slaytê rawestîne',play:'Slaytê bidomîne',goTo:'Karê {n} nîşan bide'},
+    ar:{prevWork:'العمل السابق',nextWork:'العمل التالي',upNext:'التالي',pause:'إيقاف العرض',play:'تشغيل العرض',goTo:'اعرض العمل {n}'},
+    fr:{prevWork:'Projet précédent',nextWork:'Projet suivant',upNext:'À suivre',pause:'Mettre en pause',play:'Lancer le diaporama',goTo:'Afficher le projet {n}'},
+    tr:{prevWork:'Önceki iş',nextWork:'Sonraki iş',upNext:'Sıradaki',pause:'Slaytı duraklat',play:'Slaytı oynat',goTo:'{n}. işi göster'},
+    sv:{prevWork:'Föregående arbete',nextWork:'Nästa arbete',upNext:'Härnäst',pause:'Pausa bildspelet',play:'Spela bildspelet',goTo:'Visa arbete {n}'}
+  };
+  Object.keys(COPY).forEach(key=>Object.assign(COPY[key],EXHIBITION_COPY[key],SLIDE_COPY[key]));
   const $ = selector => section.querySelector(selector);
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const language = () => document.documentElement.dataset.lang || document.documentElement.lang || 'en';
@@ -38,49 +47,57 @@ if (section) {
   const title = edition => edition.kind === 'case-study' ? edition.title : collection(edition);
   const memberTitle = member => member.coll === 'behance' ? member.title : `${collection(member)} ${number(member.index)}`;
   const countLabel = edition => edition.kind === 'case-study' ? edition.pageCount ? fill(copy().pages,{n:edition.pageCount}) : copy().caseStudy : edition.count > 1 ? fill(copy().works,{n:edition.count}) : edition.kind === 'video' ? copy().film : copy().single;
-  const nodes = { index:$('[data-recent-index]'),stage:$('[data-recent-stage]'),caption:$('[data-recent-caption]'),thumbs:$('[data-recent-thumbnails]'),viewer:$('[data-recent-viewer]'),more:$('[data-recent-more]'),status:$('[data-recent-status]') };
+  const nodes = { index:$('[data-recent-index]'),wall:$('[data-recent-wall]'),screen:$('[data-recent-screen]'),queue:$('[data-recent-queue]'),stage:$('[data-recent-stage]'),caption:$('[data-recent-caption]'),thumbs:$('[data-recent-thumbnails]'),viewer:$('[data-recent-viewer]'),more:$('[data-recent-more]'),status:$('[data-recent-status]'),toggle:$('[data-recent-toggle]') };
   let editions = [], filter = 'all', selected = '', memberIndex = 0, shown = new Set(), loadState = 'loading';
+  let direction = 1, paused = false, walk = null, frameKey = '', railKey = '', motion = null;
+  const rtl = () => document.documentElement.dir === 'rtl';
   const filtered = () => selectRecentPublications(editions, {filter,limit:Infinity,balanced:false});
+  // The slideshow walks the releases that are out on the rail, in order.
+  const slides = () => filtered().filter(item => shown.has(item.id));
   const current = () => editions.find(item => item.id === selected);
-  const stopFilm = () => nodes.stage.querySelector('video')?.pause();
+  const stopFilm = () => nodes.stage.querySelectorAll('video').forEach(video => video.pause());
   const image = (src, alt, width, height, className = '', lazy = true) => `<img src="${esc(src)}" alt="${esc(alt)}"${width > 0 && height > 0 ? ` width="${width}" height="${height}"` : ''} class="${className}" ${lazy ? 'loading="lazy"' : 'fetchpriority="low"'} decoding="async">`;
+  // The stage is built once. Slides change inside it, so the counter, the
+  // arrows and the artwork can each move on their own.
+  nodes.stage.innerHTML = '<div class="recent-stage-meta"><span data-recent-kind></span><span data-recent-date></span></div><div class="recent-art-mount" data-recent-mount></div><div class="recent-counter" dir="ltr" aria-hidden="true"><span class="recent-counter-now" data-recent-count></span><span class="recent-counter-all" data-recent-total></span></div><div class="recent-arrows"><button type="button" class="recent-arrow" data-recent-go="-1"><span aria-hidden="true">←</span></button><button type="button" class="recent-arrow" data-recent-go="1"><span aria-hidden="true">→</span></button></div>';
+  const mount = $('[data-recent-mount]');
   const updateStaticCopy = () => {
     section.querySelectorAll('[data-recent-copy]').forEach(node => { node.textContent = copy()[node.dataset.recentCopy] || ''; });
     section.querySelectorAll('[data-recent-label]').forEach(node => node.setAttribute('aria-label',copy()[node.dataset.recentLabel] || ''));
+    section.querySelectorAll('[data-recent-go]').forEach(node => node.setAttribute('aria-label',copy()[node.dataset.recentGo === '1' ? 'nextWork' : 'prevWork']));
+    nodes.toggle.setAttribute('aria-label',copy()[paused ? 'play' : 'pause']);
+    nodes.toggle.setAttribute('aria-pressed',String(paused));
     $('[data-recent-portfolio]').href = localizedPath('/design');
   };
   const updateStatus = () => {
     const edition = current();
     nodes.status.textContent = edition ? fill(copy().selected, {title:title(edition),position:fill(copy().position,{n:memberIndex + 1,total:edition.count})}) : '';
   };
-  // The wall keeps its panels between selections, so choosing a work widens
-  // its panel instead of rebuilding the row. The stage is one persistent node
-  // that moves into whichever panel is open.
-  let wallKey = '';
-  const panel = (edition, index) => `<div class="recent-panel" data-recent-panel="${esc(edition.id)}"><button type="button" class="recent-entry" data-recent-edition="${esc(edition.id)}" aria-controls="recentWorkPreview" aria-label="${esc(title(edition) + ' — ' + countLabel(edition) + ' — ' + date(edition.date))}"><span class="recent-entry-thumb">${image(edition.cover,'',edition.width,edition.height)}</span><span class="recent-entry-no" dir="ltr" aria-hidden="true">${number(index + 1)}</span>${edition.kind === 'video' ? '<span class="recent-play-mark" aria-hidden="true">▶</span>' : ''}</button></div>`;
+  // The screen never moves. The releases still to come wait beside it as slim
+  // covers, the next one nearest, and one bar per release keeps the clock.
+  const cover = (edition, index) => `<button type="button" class="recent-entry" data-recent-edition="${esc(edition.id)}" data-recent-panel="${esc(edition.id)}" aria-controls="recentWorkPreview" aria-label="${esc(fill(copy().goTo,{n:index + 1}) + ' — ' + title(edition))}"><span class="recent-entry-thumb">${image(edition.cover,'',edition.width,edition.height,'',false)}</span><span class="recent-entry-no" dir="ltr" aria-hidden="true">${number(index + 1)}</span>${edition.kind === 'video' ? '<span class="recent-play-mark" aria-hidden="true">▶</span>' : ''}</button>`;
+  const renderQueue = () => {
+    const list = slides(), at = list.findIndex(item => item.id === selected);
+    const waiting = at < 0 ? list : [...list.slice(at + 1),...list.slice(0,at)];
+    nodes.queue.style.setProperty('--n',String(waiting.length));
+    nodes.queue.innerHTML = waiting.map(edition => cover(edition,list.indexOf(edition))).join('');
+  };
   const renderIndex = () => {
-    const all = filtered(), list = all.filter(item => shown.has(item.id));
-    $('[data-recent-total]').textContent = number(all.length);
+    const list = slides();
     const key = `${language()}|${loadState}|${list.map(item => item.id).join(',')}`;
-    if (key !== wallKey) {
-      wallKey = key;
-      nodes.stage.remove();
-      nodes.index.innerHTML = list.length ? list.map(panel).join('') : `<p class="recent-state">${esc(copy()[loadState === 'error' ? 'error' : loadState === 'loading' ? 'loading' : 'empty'])}</p>${loadState === 'error' ? `<button type="button" class="recent-retry" data-recent-retry>${esc(copy().retry)}</button>` : ''}`;
+    if (key !== railKey) {
+      railKey = key;
+      nodes.index.innerHTML = list.map((edition, index) => `<button type="button" class="recent-bar" data-recent-edition="${esc(edition.id)}" aria-label="${esc(fill(copy().goTo,{n:index + 1}) + ' — ' + title(edition))}"><i aria-hidden="true"></i></button>`).join('');
+      nodes.wall.hidden = !list.length;
+      $('[data-recent-state]').innerHTML = list.length ? '' : `<p class="recent-state">${esc(copy()[loadState === 'error' ? 'error' : loadState === 'loading' ? 'loading' : 'empty'])}</p>${loadState === 'error' ? `<button type="button" class="recent-retry" data-recent-retry>${esc(copy().retry)}</button>` : ''}`;
     }
-    nodes.more.hidden = list.length >= all.length;
-    nodes.index.querySelectorAll('[data-recent-panel]').forEach(node => {
-      const open = node.dataset.recentPanel === selected, entry = node.firstElementChild;
-      node.classList.toggle('is-open',open);
-      entry.setAttribute('aria-pressed',String(open));
-      entry.tabIndex = open ? -1 : 0;
-      if (open && nodes.stage.parentElement !== node) { nodes.stage.hidden = false; node.append(nodes.stage); }
+    nodes.more.hidden = list.length >= filtered().length;
+    const at = list.findIndex(item => item.id === selected);
+    [...nodes.index.children].forEach((bar, index) => {
+      bar.classList.toggle('is-current',index === at);
+      bar.classList.toggle('is-past',index < at);
+      bar.setAttribute('aria-pressed',String(index === at));
     });
-    // Keep the open panel inside the wall's own frame without moving the page.
-    const active = nodes.index.querySelector('.is-open');
-    if (active && nodes.index.scrollWidth > nodes.index.clientWidth + 1) {
-      const bounds=active.getBoundingClientRect(), frame=nodes.index.getBoundingClientRect();
-      if (bounds.left < frame.left || bounds.right > frame.right) nodes.index.scrollLeft += (bounds.left + bounds.right - frame.left - frame.right) / 2;
-    }
   };
   const compactDetails = window.matchMedia('(max-width: 600px)');
   const renderContacts = (edition) => {
@@ -94,37 +111,174 @@ if (section) {
       nodes.thumbs.innerHTML = `<div class="recent-detail-controls"><button type="button" data-recent-step="-1" aria-label="${esc(copy().previous)}"${memberIndex === 0 ? ' disabled' : ''}><span aria-hidden="true">←</span></button><span class="recent-contact-count" dir="ltr">${number(memberIndex+1)} <i>/</i> ${number(edition.count)}</span><button type="button" data-recent-step="1" aria-label="${esc(copy().next)}"${memberIndex === edition.count-1 ? ' disabled' : ''}><span aria-hidden="true">→</span></button></div><div class="recent-thumbs">${visible.map((item,i) => `<button type="button" data-recent-member="${start+i}" aria-label="${esc(copy().detail + ' ' + (start+i+1))}" aria-pressed="${start+i === memberIndex}">${image(item.poster || item.src,'',item.width,item.height)}${item.type === 'video' ? '<span aria-hidden="true">▶</span>' : ''}</button>`).join('')}</div>${edition.count > 7 ? `<input class="recent-detail-range" type="range" min="1" max="${edition.count}" value="${memberIndex+1}" aria-label="${esc(copy().range)}" aria-valuetext="${esc(fill(copy().position,{n:memberIndex+1,total:edition.count}))}">` : ''}`;
     } else nodes.thumbs.innerHTML = '';
   };
-  const renderDetail = () => {
+  // Builds the slide for the stage and hands back the moment to put it there.
+  const slide = (edition, member, href, external) => {
+    let node;
+    if (member.type === 'video') {
+      node = document.createElement('div');
+      node.className = 'recent-slide recent-slide--film';
+      node.innerHTML = `<video class="recent-art recent-film" controls playsinline preload="none"${member.poster ? ` poster="${esc(member.poster)}"` : ''} aria-label="${esc(memberTitle(member))}"><source src="${esc(member.url)}"></video>`;
+    } else {
+      node = document.createElement('a');
+      node.className = 'recent-slide recent-art-link';
+      node.href = href;
+      node.dataset.recentOpen = '';
+      node.draggable = false;
+      if (external) { node.target = '_blank'; node.rel = 'noopener noreferrer'; }
+      node.setAttribute('aria-label',edition.kind === 'case-study' ? copy().openCase : memberTitle(member));
+      node.innerHTML = `${image(member.src,memberTitle(member),member.width,member.height,'recent-art',false).replace('decoding="async"','decoding="sync"')}<span class="recent-enlarge" aria-hidden="true">↗</span>`;
+      node.firstElementChild.draggable = false;
+    }
+    return node;
+  };
+  // A soft cross-fade, for the details of one release.
+  const fadeTo = node => {
+    [...mount.children].forEach(old => { old.classList.add('is-leaving'); old.inert = true; setTimeout(() => old.remove(), 700); });
+    node.classList.add('is-arriving');
+    mount.append(node);
+  };
+  const place = node => { mount.replaceChildren(node); };
+  const finishMotion = () => { const active = motion; motion = null; active?.finish(); };
+  // Rectangles are read on screen but written as CSS lengths inside the wall.
+  // The sheet is scaled to fit its paper (smaller on short windows, larger on
+  // big screens), so every reading is taken back to the wall's own units.
+  // Without this the travelling poster sat a little off its final place and
+  // slipped back when the real one took over.
+  const box = (node, frame) => { const r = node.getBoundingClientRect(); return {x:(r.left - frame.left) / frame.sx,y:(r.top - frame.top) / frame.sy,w:r.width / frame.sx,h:r.height / frame.sy}; };
+  // The chosen cover leaves the queue, crosses into the screen and opens over
+  // the work that was there, while the rest of the queue closes up behind it.
+  // One clipped layer does it with transforms only, so nothing is re-laid out
+  // and the picture never jumps: it is the same picture from cover to stage.
+  const travel = (edition, member, node) => {
+    const seen = nodes.wall.getBoundingClientRect();
+    const frame = {left:seen.left,top:seen.top,width:nodes.wall.offsetWidth,height:nodes.wall.offsetHeight};
+    frame.sx = seen.width / frame.width || 1; frame.sy = seen.height / frame.height || 1;
+    const before = new Map([...nodes.queue.children].map(item => [item.dataset.recentPanel,box(item,frame)]));
+    const from = before.get(edition.id);
+    renderQueue();
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.hidden || !nodes.wall.animate || frame.width < 1;
+    if (!from || still) { place(node); return; }
+    const screen = box(nodes.screen,frame), stageBox = box(mount,frame);
+    const timing = {duration:1150,easing:'cubic-bezier(.62,0,.2,1)',fill:'both'};
+    const runs = [];
+    const beside = from.x + from.w <= screen.x + 1 ? 1 : from.x >= screen.x + screen.w - 1 ? -1 : 0;
+    // The queue closes up; the work that just left the screen joins its far end.
+    [...nodes.queue.children].forEach(item => {
+      const was = before.get(item.dataset.recentPanel), now = box(item,frame);
+      // A cover that only moves up one place slides; one that would have to
+      // cross its neighbours fades into its new place instead.
+      const far = was && Math.hypot(was.x - now.x,was.y - now.y) > Math.max(was.w,was.h) * 1.6;
+      runs.push(was && far
+        ? item.animate([{opacity:0},{opacity:0,offset:.4},{opacity:1}],timing)
+        : was
+        ? item.animate([{transform:`translate(${(was.x - now.x).toFixed(1)}px,${(was.y - now.y).toFixed(1)}px)`},{transform:'none'}],timing)
+        : item.animate([{opacity:0,transform:`translate(${beside ? -beside * 22 : 0}px,${beside ? 0 : 14}px)`},{opacity:0,transform:`translate(${beside ? -beside * 22 : 0}px,${beside ? 0 : 14}px)`,offset:.45},{opacity:1,transform:'none'}],timing));
+    });
+    const layer = document.createElement('div');
+    layer.className = 'recent-travel';
+    layer.setAttribute('aria-hidden','true');
+    const px = value => `${value.toFixed(1)}px`;
+    const radius = getComputedStyle(nodes.screen).borderTopLeftRadius;
+    const picture = `<img src="${esc(member.poster || member.src)}" alt="" decoding="sync">`;
+    const scene = `<span class="recent-travel-scene"><span class="recent-travel-pane" style="left:${px(screen.x)};top:${px(screen.y)};width:${px(screen.w)};height:${px(screen.h)};border-radius:${radius}"><span class="recent-travel-art" style="left:${px(stageBox.x - screen.x)};top:${px(stageBox.y - screen.y)};width:${px(stageBox.w)};height:${px(stageBox.h)}">${picture}</span></span></span>`;
+    const blade = `<span class="recent-travel-blade" style="left:${px(from.x)};top:${px(from.y)};width:${px(from.w)};height:${px(from.h)}"><img src="${esc(edition.cover)}" alt="" decoding="sync"></span>`;
+    layer.innerHTML = scene + blade;
+    nodes.wall.append(layer);
+    const sceneNode = layer.firstElementChild, bladeNode = layer.lastElementChild;
+    const W = frame.width, H = frame.height;
+    if (beside) {
+      // Beside the screen: the cover keeps its own size and sweeps across the
+      // screen like a blade. Behind it lies the new work, complete and still;
+      // ahead of it the old one. It thins away as it reaches the far side.
+      const end = beside > 0 ? screen.x + screen.w - from.w : screen.x;
+      const seam = t => beside > 0 ? from.x + (end - from.x) * t + from.w * (.5 + .5 * t) : from.x + (end - from.x) * t + from.w * (.5 - .5 * t);
+      const cut = t => beside > 0
+        ? `inset(0 ${px(Math.max(0,W - seam(t)))} 0 0)`
+        : `inset(0 0 0 ${px(Math.max(0,seam(t)))})`;
+      runs.push(sceneNode.animate([{clipPath:cut(0)},{clipPath:cut(1)}],timing));
+      runs.push(bladeNode.animate([{opacity:1,transform:'none'},{opacity:1,offset:.52},{opacity:0,offset:.9},{opacity:0,transform:`translateX(${px(end - from.x)})`}],timing));
+    } else {
+      // Below the screen (phones): the cover's own frame opens into the screen.
+      const slit = (r, round) => `inset(${px(r.y)} ${px(W - r.x - r.w)} ${px(H - r.y - r.h)} ${px(r.x)} round ${round})`;
+      runs.push(sceneNode.animate([{clipPath:slit(from,getComputedStyle(nodes.queue.firstElementChild || nodes.screen).borderTopLeftRadius)},{clipPath:slit(screen,radius)}],timing));
+      runs.push(bladeNode.animate([{opacity:1},{opacity:0,offset:.32},{opacity:0}],timing));
+    }
+    const own = motion = {finish(settled) {
+      runs.forEach(run => { run.onfinish = null; if (!settled) run.cancel(); });
+      place(node);
+      // Keep the layer over the stage until the real picture is decoded, so
+      // the hand-over never shows an empty frame.
+      const real = node.querySelector('img.recent-art');
+      const drop = () => layer.remove();
+      if (settled && real?.decode) real.decode().then(drop,drop); else drop();
+    }};
+    runs[runs.length - 1].onfinish = () => { if (motion === own) { motion = null; own.finish(true); } };
+  };
+  const renderDetail = (mode = 'fade') => {
     stopFilm();
     const edition = current();
+    nodes.stage.hidden = !edition;
     if (!edition) {
-      nodes.stage.innerHTML = '';
+      finishMotion(); frameKey = ''; mount.replaceChildren(); renderQueue();
       nodes.caption.innerHTML = ''; nodes.thumbs.innerHTML = ''; updateStatus(); return;
     }
     memberIndex = Math.max(0, Math.min(memberIndex, edition.members.length - 1));
     const member = edition.members[memberIndex];
     const multi = edition.count > 1;
-    const publications=filtered(), publicationIndex=publications.findIndex(item=>item.id === edition.id);
+    const list = slides(), at = list.findIndex(item => item.id === edition.id);
     nodes.viewer.dataset.kind = edition.kind;
     nodes.viewer.classList.toggle('is-multiple',multi);
+    nodes.viewer.classList.toggle('is-single-slide',list.length < 2);
     nodes.stage.id = 'recentWorkPreview';
     nodes.stage.setAttribute('role','group');
     nodes.stage.setAttribute('aria-label',`${title(edition)} — ${fill(copy().position,{n:memberIndex+1,total:edition.count})}`);
     const href = localizedPath(member.href || edition.href);
-    const external = edition.external ? ' target="_blank" rel="noopener noreferrer"' : '';
-    const media = member.type === 'video'
-      ? `<video class="recent-art recent-film" controls playsinline preload="none"${member.poster ? ` poster="${esc(member.poster)}"` : ''} aria-label="${esc(memberTitle(member))}"><source src="${esc(member.url)}"></video>`
-      : `<a class="recent-art-link" href="${esc(href)}" data-recent-open${external} aria-label="${esc(edition.kind === 'case-study' ? copy().openCase : memberTitle(member))}">${image(member.src,memberTitle(member),member.width,member.height,'recent-art',false)}<span class="recent-enlarge" aria-hidden="true">↗</span></a>`;
+    const external = Boolean(edition.external);
     const kindLabel = edition.kind === 'case-study' ? copy().caseStudy : edition.kind === 'video' && !multi ? copy().film : multi ? copy().series : copy().single;
-    nodes.stage.innerHTML = `<div class="recent-stage-meta"><span class="recent-stage-count" dir="ltr" aria-hidden="true"><b>${number(publicationIndex+1)}</b><i>/</i>${number(publications.length)}</span><span class="recent-stage-date"><time datetime="${esc(edition.date)}">${esc(date(edition.date))}</time></span></div><div class="recent-art-mount">${media}</div>`;
-    nodes.caption.innerHTML = `<div class="recent-caption-copy"><span class="recent-kind">${esc(kindLabel)}${kindLabel === countLabel(edition) ? '' : ` <span aria-hidden="true">·</span> ${esc(countLabel(edition))}`}</span><h3 dir="auto">${esc(edition.kind === 'case-study' ? edition.title : memberTitle(member))}</h3></div><a class="recent-open" data-recent-open href="${esc(href)}"${external}${edition.external ? ` aria-label="${esc(copy().openCase + ' — ' + copy().external)}"` : ''}><span>${esc(edition.kind === 'case-study' ? copy().openCase : copy().open)}</span><span aria-hidden="true">↗</span></a>`;
+    $('[data-recent-kind]').textContent = kindLabel === countLabel(edition) ? kindLabel : `${kindLabel} · ${countLabel(edition)}`;
+    $('[data-recent-date]').innerHTML = `<time datetime="${esc(edition.date)}">${esc(date(edition.date))}</time>`;
+    const count = number(at + 1), countNode = $('[data-recent-count]');
+    if (countNode.dataset.value !== count) {
+      countNode.dataset.value = count;
+      countNode.style.setProperty('--dir',String(direction));
+      countNode.innerHTML = [...count].map((digit, i) => `<b style="--i:${i}">${digit}</b>`).join('');
+    }
+    $('[data-recent-total]').textContent = `/ ${number(list.length)}`;
+    nodes.caption.innerHTML = `<div class="recent-caption-copy"><h3 dir="auto">${esc(edition.kind === 'case-study' ? edition.title : memberTitle(member))}</h3></div><a class="recent-open" data-recent-open href="${esc(href)}"${external ? ' target="_blank" rel="noopener noreferrer"' : ''}${external ? ` aria-label="${esc(copy().openCase + ' — ' + copy().external)}"` : ''}><span>${esc(edition.kind === 'case-study' ? copy().openCase : copy().open)}</span><span aria-hidden="true">↗</span></a>`;
     renderContacts(edition);
     updateStatus();
+    const key = `${edition.id}|${memberIndex}|${href}|${language()}`;
+    if (key === frameKey) { if (mode !== 'travel' && !motion) renderQueue(); return; }
+    frameKey = key;
+    finishMotion();
+    const node = slide(edition, member, href, external);
+    if (mode !== 'travel') {
+      renderQueue();
+      if (mode === 'fade' && mount.childElementCount) fadeTo(node); else place(node);
+      return;
+    }
+    // Start only once both pictures are ready, so the cover never opens empty.
+    let started = false;
+    const own = motion = {finish() { started = true; renderQueue(); place(node); }};
+    const start = () => { if (started || motion !== own) return; started = true; motion = null; travel(edition, member, node); };
+    const wait = [edition.cover, member.poster || member.src].filter(Boolean).map(src => new Promise(done => { const probe = new Image(); probe.onload = probe.onerror = done; probe.src = src; if (probe.complete) done(); }));
+    Promise.all(wait).then(start);
+    setTimeout(start,1200);
   };
-  const render = () => { updateStaticCopy(); renderIndex(); renderDetail(); };
-  const choose = id => {
+  const render = () => { updateStaticCopy(); renderIndex(); renderDetail('place'); };
+  const choose = (id, way) => {
     if (selected === id) return;
-    selected = id; memberIndex = 0; shown.add(id); renderIndex(); renderDetail();
+    const list = slides();
+    const from = list.findIndex(item => item.id === selected), to = list.findIndex(item => item.id === id);
+    direction = way || (to >= from ? 1 : -1);
+    selected = id; memberIndex = 0; shown.add(id); renderIndex(); renderDetail('travel');
+  };
+  const go = (step, way = step) => {
+    const list = slides();
+    if (list.length < 2) return false;
+    const at = Math.max(0,list.findIndex(item => item.id === selected));
+    choose(list[(at + step + list.length) % list.length].id, way);
+    return true;
   };
   const initialSelection = () => {
     const first = selectRecentPublications(editions,{filter,limit:6,balanced:filter === 'all'});
@@ -150,7 +304,7 @@ if (section) {
       if (results.every(result => result.status === 'rejected')) throw new Error('Catalogues unavailable');
       const accept = catalogue => {
         editions = buildRecentPublications(manifest,catalogue);
-        loadState = 'ready'; initialSelection(); render();
+        loadState = 'ready'; initialSelection(); render(); walk?.restart();
         $('.recent-folio').setAttribute('aria-busy','false');
         window.dispatchEvent(new CustomEvent('bq:recent-publications',{detail:{editions}}));
       };
@@ -171,33 +325,38 @@ if (section) {
     window.__bqRecentCatalogue = cataloguePromise;
     return cataloguePromise;
   };
+  // After a choice made by hand the show waits before it walks on by itself.
+  const settle = event => { if (event?.pointerType === 'mouse' || event?.detail === 0) walk?.restart(); else walk?.holdFor(9000); };
+  let dragged = false;
   section.addEventListener('click',event => {
+    if (dragged && event.target.closest('.recent-art-mount')) { event.preventDefault(); dragged = false; return; }
     const format = event.target.closest('[data-recent-filter]');
     if (format) {
       filter=format.dataset.recentFilter;
       section.querySelectorAll('[data-recent-filter]').forEach(button=>button.setAttribute('aria-pressed',String(button === format)));
-      initialSelection(); renderIndex(); renderDetail(); return;
+      direction = 1; initialSelection(); renderIndex(); renderDetail('fade'); walk?.restart(); return;
     }
+    if (event.target.closest('[data-recent-toggle]')) { paused = !paused; updateStaticCopy(); walk?.restart(); return; }
+    const step = event.target.closest('[data-recent-go]');
+    if (step) { go(Number(step.dataset.recentGo)); settle(event); return; }
     const entry=event.target.closest('[data-recent-edition]');
-    if (entry) {
-      choose(entry.dataset.recentEdition);
-      if (event.detail === 0) nodes.stage.querySelector('a,video')?.focus({preventScroll:true});
-      return;
-    }
+    if (entry) { choose(entry.dataset.recentEdition); settle(event); return; }
     const thumb=event.target.closest('[data-recent-member]');
-    const step=event.target.closest('[data-recent-step]');
-    if (thumb || step) {
+    const detail=event.target.closest('[data-recent-step]');
+    if (thumb || detail) {
       const edition=current(); if (!edition) return;
-      memberIndex=Math.max(0,Math.min(edition.count-1,thumb ? Number(thumb.dataset.recentMember) : memberIndex+Number(step.dataset.recentStep)));
-      renderDetail();
+      const before=memberIndex;
+      memberIndex=Math.max(0,Math.min(edition.count-1,thumb ? Number(thumb.dataset.recentMember) : memberIndex+Number(detail.dataset.recentStep)));
+      direction = memberIndex >= before ? 1 : -1;
+      renderDetail(); settle(event);
       // Replacing the contact sheet must preserve keyboard focus on the
       // corresponding control, including when it becomes disabled at an edge.
-      const replacement=thumb ? nodes.thumbs.querySelector(`[data-recent-member="${memberIndex}"]`) : nodes.thumbs.querySelector(`[data-recent-step="${step.dataset.recentStep}"]:not(:disabled)`) || nodes.thumbs.querySelector(`[data-recent-member="${memberIndex}"]`);
+      const replacement=thumb ? nodes.thumbs.querySelector(`[data-recent-member="${memberIndex}"]`) : nodes.thumbs.querySelector(`[data-recent-step="${detail.dataset.recentStep}"]:not(:disabled)`) || nodes.thumbs.querySelector(`[data-recent-member="${memberIndex}"]`);
       if (event.detail === 0) replacement?.focus({preventScroll:true});
       return;
     }
     if (event.target.closest('[data-recent-more]')) {
-      filtered().filter(edition=>!shown.has(edition.id)).slice(0,6).forEach(edition=>shown.add(edition.id)); renderIndex(); return;
+      filtered().filter(edition=>!shown.has(edition.id)).slice(0,6).forEach(edition=>shown.add(edition.id)); renderIndex(); renderDetail('place'); walk?.restart(); return;
     }
     if (event.target.closest('[data-recent-retry]')) { load(); return; }
     const portfolio=event.target.closest('[data-recent-portfolio]');
@@ -216,6 +375,41 @@ if (section) {
       const lightboxPool=pool.map(item=>({full:item.url,raw:item.rawUrl,type:item.type,title:memberTitle(item)}));
       event.preventDefault(); window.__bqOpenLightboxPool(lightboxPool,index);
     }
+  });
+  // By hand: a sideways swipe or drag on the artwork, and the arrow keys.
+  let drag = null;
+  mount.addEventListener('pointerdown',event => {
+    dragged = false;
+    if (event.button > 0 || event.target.closest('video')) return;
+    drag = {id:event.pointerId,x:event.clientX,y:event.clientY};
+  });
+  window.addEventListener('pointerup',event => {
+    if (!drag || event.pointerId !== drag.id) return;
+    const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
+    drag = null;
+    if (Math.abs(dx) < 44 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
+    dragged = true;
+    setTimeout(() => { dragged = false; },400);
+    const step = (dx < 0 ? 1 : -1) * (rtl() ? -1 : 1);
+    if (go(step)) settle(event);
+  },{passive:true});
+  window.addEventListener('pointercancel',() => { drag = null; },{passive:true});
+  nodes.viewer.addEventListener('keydown',event => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    if (event.target.closest('input, video, .recent-contact-sheet') || event.metaKey || event.ctrlKey || event.altKey) return;
+    const step = (event.key === 'ArrowRight' ? 1 : -1) * (rtl() ? -1 : 1);
+    if (go(step)) event.preventDefault();
+  });
+  // A film that is playing keeps its slide until it stops.
+  nodes.stage.addEventListener('play',() => walk?.holdFor(3600000),true);
+  ['pause','ended'].forEach(type => nodes.stage.addEventListener(type,() => walk?.holdFor(2500),true));
+  if (window.__bqStageWalk) walk = window.__bqStageWalk({
+    stage:nodes.viewer,
+    count:() => paused ? 0 : slides().length,
+    current:() => Math.max(0,slides().findIndex(item => item.id === selected)),
+    select:index => { const list = slides(); if (list[index]) choose(list[index].id,1); },
+    line:index => nodes.index.children[index]?.querySelector('i'),
+    dwell:6000
   });
   // Commit a range selection only on change, so re-rendering cannot interrupt
   // pointer capture or keyboard adjustment while the slider is being moved.
