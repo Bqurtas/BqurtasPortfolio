@@ -24,6 +24,8 @@ const jsBundles = [
   ['js/i18n.js', 'js/i18n.v420.min.js'],
   ['js/enhance.js', 'js/enhance.v420.min.js'],
   ['js/latest-feed.js', 'js/latest-feed.min.js'],
+  ['js/recent-work.js', 'js/recent-work.min.js'],
+  ['js/hero-work-trail.js', 'js/hero-work-trail.min.js'],
   ['js/motion.js', 'js/motion.min.js'],
   ['js/chat-kb.js', 'js/chat-kb.min.js'],
   ['js/lux.js', 'js/lux.min.js'],
@@ -34,7 +36,9 @@ const cssBundles = [
   ['css/style.css', 'css/style.v417.min.css'],
   ['css/modern-framer.css', 'css/modern-framer.min.css'],
   ['css/experience.css', 'css/experience.min.css'],
-  ['css/polish.css', 'css/polish.min.css']
+  ['css/polish.css', 'css/polish.min.css'],
+  ['css/recent-work.css', 'css/recent-work.min.css'],
+  ['css/hero-work-trail.css', 'css/hero-work-trail.min.css']
 ];
 
 /* Match only quoted, first-party script and stylesheet references. This covers
@@ -132,12 +136,19 @@ async function compileJavaScript() {
       : await readFile(path.join(siteRoot, input), 'utf8');
     // The owner inbox ships only with the intent-loaded Studio bundle.
     if (input === 'js/enhance.js') source = await readFile(path.join(siteRoot, 'js/studio-inbox.js'), 'utf8') + '\n' + source;
+    // Version the shared publication model with its importing module. A new
+    // entry bundle must never reuse a previous release's cached data rules.
+    if (input === 'js/recent-work.js') {
+      const model = await readFile(path.join(siteRoot, 'js/recent-publications.js'), 'utf8');
+      source = source.replace("'./recent-publications.js'", `'./recent-publications.js?v=${contentHash(model)}'`);
+    }
     // The CDN may retain a stable manifest URL across deployments. Tie the
     // shipped gallery loader to the exact catalogue used to build this release.
     const versionedSource = ['js/gallery.js','js/i18n.js'].includes(input)
       ? await fingerprintVersionedLocalAssets(source)
       : source;
     const result = await minify(versionedSource, {
+      module: input === 'js/recent-work.js',
       ecma: 2020,
       compress: { passes: 2 },
       mangle: true,

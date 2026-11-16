@@ -67,7 +67,7 @@ function fixture(works = []) {
     list: { innerHTML: '', querySelectorAll: () => [] }, close() {},
   };
   vm.runInNewContext(
-    section('  const galleryWorks = ', '  /* a quiet minute')
+    section('  const galleryWorks = ', '  let idleT = ')
       + section('  const goRoom = ', '  const load = ')
       + '\nthis.api = { galleryWorks, findImageWork, normalizeWorkItems, previewImage, goTab, goWork, afterRoom, render };',
     context,

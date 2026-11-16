@@ -3541,10 +3541,14 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       hero.style.setProperty('--bq-paper-z', '1');
       wrapPaperScroll(hero);
 
-      const paperNames = ['work', 'sites', 'behance', 'practice', 'note', 'clients', 'blog'];
+      const paperNames = [
+        ['recent-work', 'recent'], ['work', 'work'], ['sites-sheet', 'sites'],
+        ['behance-teaser', 'behance'], ['service-showcase', 'practice'],
+        ['practice-note', 'note'], ['logos-section', 'clients'], ['latest-blog', 'blog']
+      ];
       sections.forEach((sheet, i) => {
         sheet.classList.add('paper-sheet');
-        sheet.dataset.paper = paperNames[i] || `sheet-${i + 1}`;
+        sheet.dataset.paper = sheet.dataset.paper || paperNames.find(([className]) => sheet.classList.contains(className))?.[1] || `sheet-${i + 1}`;
         sheet.style.setProperty('--bq-paper-z', String((i + 2) * 10));
         if (sheet.classList.contains('work')) {
           delete sheet.dataset.paperScroll;
@@ -3563,7 +3567,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
         footer.dataset.paper = 'footer';
         footer.dataset.paperFit = '';
         delete footer.dataset.paperScroll;
-        footer.style.setProperty('--bq-paper-z', '70');
+        footer.style.setProperty('--bq-paper-z', String((sections.length + 2) * 10));
         wrapPaperScroll(footer);
       }
 

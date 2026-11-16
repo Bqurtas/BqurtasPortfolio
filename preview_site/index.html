@@ -937,6 +937,8 @@
   <link rel="stylesheet" href="css/experience.min.css?v=2c2664c33142">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
   <link rel="stylesheet" href="css/polish.min.css?v=f92d56e1c4dd">
+  <link rel="stylesheet" href="css/recent-work.min.css?v=6ca9c42a985c">
+  <link rel="stylesheet" href="css/hero-work-trail.min.css?v=9046c57ef409">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543"></noscript>
 
@@ -1271,7 +1273,7 @@
             <p class="hero-kicker mono" data-i18n="menu.practice">Multidisciplinary creative practice</p>
             <p class="hero-lede" data-i18n="hero.lede">Kurdish designer and creative technologist, shaping identities, images and digital experiences from Hewlêr.</p>
 
-            <a class="hero-cta" href="#grid" data-hero-cta>
+            <a class="hero-cta" href="#recent-work" data-recent-jump>
               <span class="hero-cta-txt" data-i18n="hero.cta">View the work</span>
               <i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
             </a>
@@ -1281,6 +1283,41 @@
         <div class="hero-scrolldown" aria-hidden="true"><span class="mouse"><span class="mouse-wheel"></span></span></div>
         </div>
       </div>
+      <!-- A publication can be a single work, a batch, a film or a full case study. -->
+      <section class="section recent-work" id="recent-work" data-paper="recent" aria-labelledby="recentWorkTitle">
+        <div class="recent-shell">
+          <header class="recent-heading">
+            <div class="recent-eyebrow"><span class="recent-live-dot" aria-hidden="true"></span><span data-recent-copy="eyebrow">Recent work</span><span class="recent-edition-mark" aria-hidden="true">BQ / INDEX</span></div>
+            <div class="recent-heading-line">
+              <h2 id="recentWorkTitle"><span data-recent-copy="title">The latest,</span> <em data-recent-copy="titleEm">unfolded.</em></h2>
+              <p data-recent-copy="intro">A single piece. A complete story. A closer look.</p>
+            </div>
+          </header>
+          <div class="recent-toolbar">
+            <div class="recent-filters" role="group" aria-label="Work format" data-recent-label="formats">
+              <button type="button" data-recent-filter="all" aria-pressed="true" data-recent-copy="all">Everything</button>
+              <button type="button" data-recent-filter="case-study" aria-pressed="false" data-recent-copy="caseStudies">Case studies</button>
+              <button type="button" data-recent-filter="video" aria-pressed="false" data-recent-copy="films">Films</button>
+              <button type="button" data-recent-filter="image" aria-pressed="false" data-recent-copy="visuals">Design &amp; image</button>
+            </div>
+            <span class="recent-toolbar-note" data-recent-copy="note">Different forms. The same practice.</span>
+          </div>
+          <div class="recent-folio" aria-busy="true">
+            <div class="recent-viewer" data-recent-viewer>
+              <div class="recent-stage" data-recent-stage><span class="recent-placeholder" aria-hidden="true">BQ</span></div>
+              <div class="recent-caption" data-recent-caption></div>
+              <div class="recent-contact-sheet" data-recent-thumbnails></div>
+            </div>
+            <div class="recent-index-panel">
+              <div class="recent-index-head"><span data-recent-copy="index">Publication index</span><span data-recent-total>—</span></div>
+              <div class="recent-index" data-recent-index><p class="recent-state" data-recent-copy="loading">Opening the folio…</p></div>
+              <button type="button" class="recent-more" data-recent-more hidden><span data-recent-copy="more">Explore more releases</span><span aria-hidden="true">+</span></button>
+            </div>
+          </div>
+          <footer class="recent-foot"><p class="recent-status" data-recent-status role="status" aria-live="polite"></p><a href="/design" data-recent-portfolio><span data-recent-copy="portfolio">The complete portfolio</span><span aria-hidden="true">↗</span></a></footer>
+          <noscript><p><a href="/archive/">Browse all work</a> · <a href="/behance">Explore the case studies</a></p></noscript>
+        </div>
+      </section>
       <!-- Portfolio -->
       <div class="section work">
         <header class="section-head">
@@ -2740,8 +2777,10 @@
     }catch(e){}})();
   </script>
   <script defer src="js/latest-feed.min.js?v=76465997249c"></script>
-  <script defer src="js/main.v420.min.js?v=58203f405c63"></script>
+  <script defer src="js/main.v420.min.js?v=1fe39c98f2b5"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
+  <script type="module" src="js/recent-work.min.js?v=f031de69010c"></script>
+  <script defer src="js/hero-work-trail.min.js?v=8da9a02271d1"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
        still receive them immediately. This removes their database/GitHub work
@@ -2937,7 +2976,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=e1db7b9e2f50', { updateViaCache: 'none' })
+            .register('/sw.js?v=84bfcf2036ff', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

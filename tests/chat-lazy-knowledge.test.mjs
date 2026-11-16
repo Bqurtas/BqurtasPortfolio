@@ -35,7 +35,7 @@ function fixture({ opened = true } = {}) {
     },
   };
   const context = vm.createContext({
-    window, document, Event, quick, greeted: opened,
+    window, document, Event, quick, input: null, greeted: opened,
     form: { setAttribute() {}, querySelector: () => submit },
     chatStatus() {}, send() {},
     chatTr: () => window.CHAT_I18N?.[document.documentElement.dataset.lang] || null,
@@ -44,7 +44,7 @@ function fixture({ opened = true } = {}) {
   vm.runInContext(
     section('    const setPending = ', '    const botReply = ')
       + section('    const QUICK = ', '    const send = ')
-      + section('    /* rebuild quick chips', '    chatStatus();\n    form.addEventListener')
+      + section('    let placeholderProbe = ', '    chatStatus();\n')
       + '\nthis.api = { buildQuick, setPending };',
     context,
   );

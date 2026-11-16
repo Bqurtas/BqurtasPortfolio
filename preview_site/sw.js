@@ -13,7 +13,7 @@
       instead of being pinned for the life of the installed worker.
    ========================================================= */
 
-const SW_VERSION = 'e1db7b9e2f50'; // generated from this worker and the app shell
+const SW_VERSION = '84bfcf2036ff'; // generated from this worker and the app shell
 const CACHE_NAME = `bqurtas-cache-${SW_VERSION}`;
 const DOC_FALLBACK = '/index.html';
 
@@ -40,11 +40,16 @@ const PRECACHE_ASSETS = [
   '/css/style.v417.min.css?v=4195ff2cdf3c',
   '/css/fonts.css?v=6bd89c103953',
   '/css/experience.min.css?v=2c2664c33142',
-  '/js/main.v420.min.js?v=58203f405c63',
+  '/js/main.v420.min.js?v=1fe39c98f2b5',
   '/js/gallery.v420.min.js?v=6650d0580a06',
   '/js/i18n.v420.min.js?v=76e3d49d6f43',
   '/js/motion.44e83e65e735.min.js?v=44e83e65e735',
   '/js/lux.min.js?v=d29cd2fe8677',
+  '/js/recent-work.min.js?v=f031de69010c',
+  '/js/recent-publications.js?v=bf2ad4155a3c',
+  '/js/hero-work-trail.min.js?v=8da9a02271d1',
+  '/css/recent-work.min.css?v=6ca9c42a985c',
+  '/css/hero-work-trail.min.css?v=9046c57ef409',
   '/site.webmanifest?v=19c5c4b9ee48',
   '/favicon.ico',
   '/assets/hero-sketch.webp?v=0a32dc9eafb1',
