@@ -2,7 +2,7 @@
 html body #design#design#design#design .hero-work-trail {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 5;
   overflow: hidden;
   pointer-events: none;
   contain: layout style paint;
@@ -18,7 +18,7 @@ html body #design#design#design#design .hero-work-print {
   height: auto;
   margin: 0;
   padding: 0;
-  border-radius: 6px;
+  border-radius: 10px;
   overflow: hidden;
   background: color-mix(in srgb, var(--ink, #141414) 6%, var(--bg, #f3f3f1));
   color: var(--ink-soft, #595953);
@@ -143,4 +143,28 @@ html body #design#design#design#design .hero-work-discover:focus-visible {
   html body #design#design#design#design .hero-work-print { will-change: auto; transform: translate(-50%, -50%); }
   html body #design#design#design#design .hero-work-discover,
   html body #design#design#design#design .hero-work-folio { transition: none; }
+}
+
+/* Top corners of the title page: where, and since when. */
+html body #design#design#design#design .hero-work-mark {
+  position: absolute;
+  z-index: 6;
+  top: clamp(20px, 3.6vh, 38px);
+  font-family: 'Manrope', 'Noto Kufi Arabic', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink, #141414);
+  white-space: nowrap;
+  pointer-events: none;
+  zoom: 1 !important;
+}
+html body #design#design#design#design .hero-work-mark--based { inset-inline-start: clamp(22px, 4vw, 66px); }
+html body #design#design#design#design .hero-work-mark--since { inset-inline-end: clamp(22px, 4vw, 66px); }
+html[dir='rtl'] body #design#design#design#design .hero-work-mark { letter-spacing: 0; font-size: 12px; }
+@media (max-width: 680px) {
+  html body #design#design#design#design .hero-work-mark { top: 18px; font-size: 10px; }
+  html[dir='rtl'] body #design#design#design#design .hero-work-mark { font-size: 11px; }
 }

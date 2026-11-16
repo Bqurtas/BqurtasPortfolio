@@ -2,7 +2,7 @@
    The screen keeps its place; each cover travels from the queue into it,
    the counter rolls, and one bar per release is the clock. Flat throughout: paper, ink and one field. */
 html body #design#design#design#design#design.paper-stack > .recent-work.paper-sheet > .paper-scroll { display:flex!important; align-items:center!important; justify-content:center!important; padding:clamp(22px,3.6vh,42px) clamp(22px,4.3vw,76px) calc(var(--bq-dock-top,80px) + 16px)!important; }
-.recent-work { --ex-line:color-mix(in srgb,var(--ink) 14%,transparent); --ex-field:color-mix(in srgb,var(--ink) 5%,var(--bg)); --ex-ease:cubic-bezier(.22,1,.36,1); --ex-radius:clamp(12px,1.2vw,18px); --ex-wall:clamp(250px,calc(var(--bq-stack-sheet-h,calc(100svh - 30px)) - 450px),600px); }
+.recent-work { --ex-line:color-mix(in srgb,var(--ink) 14%,transparent); --ex-field:color-mix(in srgb,var(--ink) 5%,var(--bg)); --ex-ease:cubic-bezier(.22,1,.36,1); --ex-radius:clamp(12px,1.2vw,18px); --ex-grow:1; --ex-wall:clamp(250px,calc(var(--bq-stack-sheet-h,calc(100svh - 30px)) / var(--ex-grow) - 450px),600px); }
 .recent-shell { width:min(1280px,100%); margin-inline:auto; color:var(--ink); }
 
 /* Heading */
@@ -84,14 +84,14 @@ html[dir='rtl'] .recent-arrow > span,html[dir='rtl'] .recent-detail-controls but
 .is-single-slide .recent-arrows,.is-single-slide .recent-toggle { display:none; }
 
 /* Caption, details and the way in */
-.recent-detail { display:grid; grid-template-columns:minmax(0,1fr) auto auto; align-items:center; column-gap:clamp(18px,2.6vw,40px); min-height:76px; padding:14px 0 10px; }
+.recent-detail { display:grid; grid-template-columns:minmax(34%,1fr) minmax(0,auto) auto; align-items:center; column-gap:clamp(18px,2.6vw,40px); min-height:76px; padding:14px 0 10px; }
 .recent-caption { display:contents; }
 .recent-caption-copy { grid-column:1; min-width:0; overflow:hidden; }
 .recent-caption h3 { font-size:clamp(19px,2vw,28px); font-weight:500; line-height:1.3; letter-spacing:-.015em; overflow:hidden; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; animation:recent-rise .8s var(--ex-ease) both; }
 .recent-open { grid-column:3; display:inline-flex; align-items:center; flex:none; gap:12px; min-height:46px; padding:0 22px; border-radius:999px; background:var(--ink); color:var(--bg); font-size:12.5px; font-weight:500; white-space:nowrap; transition:gap .45s var(--ex-ease); }
 .recent-open:is(:hover,:focus-visible) { gap:18px; }
 .recent-open > span:last-child,.recent-all > span:last-child { display:inline-block; font-size:16px; }
-.recent-contact-sheet { grid-column:2; grid-row:1; display:flex; align-items:center; gap:12px; min-width:0; }
+.recent-contact-sheet { grid-column:2; grid-row:1; display:flex; align-items:center; gap:12px; min-width:0; overflow:hidden; }
 .recent-contact-sheet:empty { display:none; }
 .recent-detail-controls { display:flex; align-items:center; gap:4px; flex:none; }
 .recent-detail-controls button { min-width:32px; min-height:36px; cursor:pointer; font-size:15px; transition:opacity .25s; }
@@ -149,7 +149,7 @@ html body #design#design#design .recent-work .recent-counter-now,html body #desi
 @keyframes recent-pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.35; transform:scale(.7); } }
 
 @media (min-width:821px) and (max-height:760px) {
-  .recent-work { --ex-wall:clamp(210px,calc(var(--bq-stack-sheet-h,calc(100svh - 30px)) - 410px),420px); }
+  .recent-work { --ex-wall:clamp(210px,calc(var(--bq-stack-sheet-h,calc(100svh - 30px)) / var(--ex-grow) - 410px),420px); }
   .recent-heading-line { padding-block:6px 10px; }
   .recent-heading h2 { font-size:clamp(28px,3.4vw,44px); }
   .recent-detail { min-height:60px; padding-block:8px 6px; }
@@ -160,48 +160,77 @@ html body #design#design#design .recent-work .recent-counter-now,html body #desi
 }
 @media (max-width:820px) {
   html body #design#design#design#design#design.paper-stack > .recent-work.paper-sheet > .paper-scroll { padding:24px 20px calc(var(--bq-dock-top,80px) + 14px)!important; }
-  .recent-work { --ex-wall:clamp(210px,calc(var(--bq-stack-sheet-h,calc(100svh - 20px)) - 486px),480px); --ex-strip:56px; }
-  .recent-heading-line { padding-block:10px 14px; }
-  .recent-heading h2 { font-size:clamp(30px,8.4vw,46px); max-width:540px; }
-  .recent-heading p,.recent-toolbar-note { display:none; }
-  .recent-toolbar { padding-bottom:8px; }
-  .recent-filters { width:100%; justify-content:space-between; gap:8px; flex-wrap:nowrap; }
-  .recent-filters button { font-size:12px; min-height:42px; white-space:nowrap; }
-  .recent-stage-meta { padding:12px 14px 0; font-size:10.5px; }
-  .recent-art-mount { inset:40px 16px 62px; }
-  .recent-counter { bottom:10px; left:14px; gap:6px; }
-  html[dir='rtl'] .recent-counter { right:14px; }
-  .recent-counter-now { font-size:46px; }
-  .recent-counter-all { font-size:10.5px; }
-  /* The arrows sit together in the corner, clear of the artwork. */
-  .recent-arrows { bottom:10px; inset-inline-end:12px; }
-  .recent-arrow { width:40px; height:40px; font-size:15px; }
-  .recent-enlarge { display:none; }
-  /* The screen takes the whole width; the others queue beneath it. */
-  .recent-wall { flex-direction:column; gap:7px; height:auto; --ex-gap:7px; }
-  .recent-screen { flex:none; height:var(--ex-wall); }
-  .recent-queue { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); width:auto; max-width:none; }
-  .recent-entry { height:var(--ex-strip); border-radius:12px; }
-  .recent-travel-blade { border-radius:12px; }
-  .recent-entry-no { top:5px; inset-inline-start:5px; padding:1px 6px; font-size:9px; }
-  .recent-play-mark { bottom:5px; inset-inline-start:5px; width:18px; height:18px; font-size:6px; }
-  .recent-detail { grid-template-columns:minmax(0,1fr) auto; row-gap:6px; min-height:0; padding:12px 0 6px; }
-  .recent-caption h3 { font-size:17px; -webkit-line-clamp:2; }
-  .recent-open { grid-column:2; width:46px; min-height:46px; padding:0; justify-content:center; gap:0; }
-  .recent-open > span:first-child { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
-  .recent-open > span:last-child { font-size:18px; }
-  .recent-contact-sheet { grid-column:1 / -1; grid-row:2; gap:8px; }
-  .recent-thumbs button { width:36px; height:36px; }
-  .recent-detail-controls button { min-width:34px; min-height:40px; }
-  .recent-detail-range { flex:1 1 40px; width:auto; min-width:40px; }
-  .recent-rail { flex-wrap:wrap; gap:0 12px; }
-  .recent-toggle { width:34px; height:34px; }
-  .recent-index-actions { flex:1 1 100%; justify-content:space-between; gap:10px; min-width:0; padding-inline-end:58px; }
-  .recent-more,.recent-all { font-size:11.5px; min-height:40px; min-width:0; gap:7px; }
-  html[data-lang='ku'] .recent-heading h2,html[data-lang='ar'] .recent-heading h2 { font-size:clamp(25px,6.6vw,38px); line-height:1.6; }
 }
+/* The narrow composition. It follows the sheet's own width, not the window's:
+   an upright tablet enlarges its content, which leaves the sheet as narrow
+   inside as a phone even when the window is wide. */
+.recent-work[data-narrow] { --ex-wall:clamp(210px,calc(var(--bq-stack-sheet-h,calc(100svh - 20px)) / ((var(--ex-grow) + 1) / 2) - 486px - 6vw),760px); --ex-strip:clamp(56px,9vw,84px); }
+.recent-work[data-narrow] .recent-heading-line { padding-block:10px 14px; }
+.recent-work[data-narrow] .recent-heading h2 { font-size:clamp(30px,8.4vw,46px); max-width:540px; }
+.recent-work[data-narrow] .recent-heading p,.recent-work[data-narrow] .recent-toolbar-note { display:none; }
+.recent-work[data-narrow] .recent-toolbar { padding-bottom:8px; }
+.recent-work[data-narrow] .recent-filters { width:100%; justify-content:space-between; gap:8px; flex-wrap:nowrap; }
+.recent-work[data-narrow] .recent-filters button { font-size:12px; min-height:42px; white-space:nowrap; }
+.recent-work[data-narrow] .recent-stage-meta { padding:12px 14px 0; font-size:10.5px; }
+.recent-work[data-narrow] .recent-art-mount { inset:40px 16px 62px; }
+.recent-work[data-narrow] .recent-counter { bottom:10px; left:14px; gap:6px; }
+html[dir='rtl'] .recent-work[data-narrow] .recent-counter { left:auto; right:14px; }
+.recent-work[data-narrow] .recent-counter-now { font-size:46px; }
+.recent-work[data-narrow] .recent-counter-all { font-size:10.5px; }
+/* The arrows sit together in the corner, clear of the artwork. */
+.recent-work[data-narrow] .recent-arrows { bottom:10px; inset-inline-end:12px; }
+.recent-work[data-narrow] .recent-arrow { width:40px; height:40px; font-size:15px; }
+.recent-work[data-narrow] .recent-enlarge { display:none; }
+/* The screen takes the whole width; the others queue beneath it. */
+.recent-work[data-narrow] .recent-wall { flex-direction:column; gap:7px; height:auto; --ex-gap:7px; }
+.recent-work[data-narrow] .recent-screen { flex:none; height:var(--ex-wall); }
+.recent-work[data-narrow] .recent-queue { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); width:auto; max-width:none; }
+.recent-work[data-narrow] .recent-entry { height:var(--ex-strip); border-radius:12px; }
+.recent-work[data-narrow] .recent-travel-blade { border-radius:12px; }
+.recent-work[data-narrow] .recent-entry-no { top:5px; inset-inline-start:5px; padding:1px 6px; font-size:9px; }
+.recent-work[data-narrow] .recent-play-mark { bottom:5px; inset-inline-start:5px; width:18px; height:18px; font-size:6px; }
+.recent-work[data-narrow] .recent-detail { grid-template-columns:minmax(0,1fr) auto; row-gap:6px; min-height:0; padding:12px 0 6px; }
+.recent-work[data-narrow] .recent-caption h3 { font-size:17px; -webkit-line-clamp:2; }
+.recent-work[data-narrow] .recent-open { grid-column:2; width:46px; min-height:46px; padding:0; justify-content:center; gap:0; }
+.recent-work[data-narrow] .recent-open > span:first-child { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+.recent-work[data-narrow] .recent-open > span:last-child { font-size:18px; }
+.recent-work[data-narrow] .recent-contact-sheet { grid-column:1 / -1; grid-row:2; gap:8px; }
+.recent-work[data-narrow] .recent-thumbs button { width:36px; height:36px; }
+.recent-work[data-narrow] .recent-detail-controls button { min-width:34px; min-height:40px; }
+.recent-work[data-narrow] .recent-detail-range { flex:1 1 40px; width:auto; min-width:40px; }
+.recent-work[data-narrow] .recent-rail { flex-wrap:wrap; gap:0 12px; }
+.recent-work[data-narrow] .recent-toggle { width:34px; height:34px; }
+.recent-work[data-narrow] .recent-index-actions { flex:1 1 100%; justify-content:space-between; gap:10px; min-width:0; padding-inline-end:58px; }
+.recent-work[data-narrow] .recent-more,.recent-work[data-narrow] .recent-all { font-size:11.5px; min-height:40px; min-width:0; gap:7px; }
+html[data-lang='ku'] .recent-work[data-narrow] .recent-heading h2,html[data-lang='ar'] .recent-work[data-narrow] .recent-heading h2 { font-size:clamp(25px,6.6vw,38px); line-height:1.6; }
 @media (max-width:400px) {
   .recent-filters button { font-size:11px; }
   .recent-more > span:first-child { max-width:120px; overflow:hidden; text-overflow:ellipsis; }
 }
 @media (prefers-reduced-motion:reduce) { .recent-work *, .recent-work *::before, .recent-work *::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
+
+/* The statement sheet: one sentence, set large, with works sitting in the line. */
+html body #design#design#design#design#design.paper-stack > .statement.paper-sheet > .paper-scroll { display:flex!important; align-items:center!important; justify-content:center!important; padding:clamp(28px,6vh,72px) clamp(22px,7vw,130px) calc(var(--bq-dock-top,80px) + 20px)!important; }
+.statement-line { max-width:1180px; margin:0 auto; text-align:center; text-wrap:balance; color:var(--ink); font:400 clamp(32px,5.2vw,84px)/1.14 Fraunces,serif; letter-spacing:-.045em; }
+html body #design#design#design .statement .statement-line,html body #design#design#design .statement .statement-word { font-family:Fraunces,serif!important; font-weight:400!important; }
+html[dir='rtl'] body #design#design#design .statement .statement-line,html[dir='rtl'] body #design#design#design .statement .statement-word { font-family:'Noto Kufi Arabic',sans-serif!important; font-weight:500!important; }
+html[dir='rtl'] .statement-line { font-size:clamp(26px,4vw,62px); line-height:1.62; letter-spacing:0; }
+.statement-word { display:inline-block; }
+/* While it is being read the line starts faint; each word darkens in turn. */
+.statement-line.is-live .statement-word { transition:opacity .35s ease; }
+.statement-pic { display:inline-block; vertical-align:middle; width:0; height:.82em; margin-inline:0; margin-block:-.12em 0; overflow:hidden; border-radius:.16em; background:color-mix(in srgb,var(--ink) 6%,var(--bg)); opacity:0; transform:scale(.6); transition:width .9s cubic-bezier(.22,1,.36,1),margin .9s cubic-bezier(.22,1,.36,1),opacity .5s ease,transform .9s cubic-bezier(.22,1,.36,1); }
+html[dir='rtl'] .statement-pic { height:1.15em; margin-block:-.2em 0; border-radius:.2em; }
+.statement-pic.is-open { width:1.3em; margin-inline:.12em; opacity:1; transform:none; }
+html[dir='rtl'] .statement-pic.is-open { width:1.8em; }
+/* A short upright reel: scrolling on turns it to the next work. */
+.statement-reel { display:block; width:1.3em; height:calc(var(--n,1) * 100%); transform:translateY(calc(var(--at,0) * -100% / var(--n,1))); transition:transform .8s cubic-bezier(.65,0,.35,1); }
+html[dir='rtl'] .statement-reel { width:1.8em; }
+.statement-reel img { display:block; width:100%; height:calc(100% / var(--n,1)); max-width:none; object-fit:cover; }
+/* The sheet holds the page alone for a stretch of scroll: that is the reading. */
+html body #design#design#design.paper-stack > .statement.paper-sheet { margin-bottom:85svh!important; }
+@media (max-width:820px) {
+  html body #design#design#design#design#design.paper-stack > .statement.paper-sheet > .paper-scroll { padding:28px 22px calc(var(--bq-dock-top,80px) + 16px)!important; }
+  .statement-line { font-size:clamp(30px,9vw,46px); line-height:1.16; }
+  html[dir='rtl'] .statement-line { font-size:clamp(25px,7.2vw,37px); line-height:1.66; }
+}
+@media (prefers-reduced-motion:reduce) { .statement-pic,.statement-reel,.statement-word { transition:none!important; } }

@@ -99,7 +99,7 @@ if (section) {
       bar.setAttribute('aria-pressed',String(index === at));
     });
   };
-  const compactDetails = window.matchMedia('(max-width: 600px)');
+  const compactDetails = { get matches() { return section.hasAttribute('data-narrow'); } };
   const renderContacts = (edition) => {
     const multi = edition.count > 1;
     // A long batch is never truncated. A moving contact window, next/previous
@@ -418,7 +418,6 @@ if (section) {
     memberIndex=Number(event.target.value)-1; renderDetail();
     nodes.thumbs.querySelector('.recent-detail-range')?.focus({preventScroll:true});
   });
-  compactDetails.addEventListener?.('change',()=>{ if (current()) renderContacts(current()); });
   document.addEventListener('bq:language',render);
   document.addEventListener('visibilitychange',()=>{ if (document.hidden) stopFilm(); });
   document.addEventListener('bq:route',stopFilm);
@@ -427,5 +426,108 @@ if (section) {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || !window.__bqScrollPaperTarget) return;
     event.preventDefault(); window.__bqScrollPaperTarget(section,{behavior:'smooth',block:'start'});
   });
+  // Large screens enlarge every sheet by one shared factor. The wall is sized
+  // for the reference window and left to that factor, so this sheet grows with
+  // its neighbours instead of staying small beside them.
+  const followGrow = () => section.style.setProperty('--ex-grow',String(Math.max(1,Number(window.__bqViewportGrow) || 1)));
+  followGrow();
+  window.addEventListener('resize',followGrow,{passive:true});
+  // The narrow composition follows the sheet's own inner width (in its own
+  // units), so a phone and an enlarged upright tablet share it.
+  const shell = $('.recent-shell');
+  const followWidth = () => {
+    const narrow = shell.clientWidth > 0 && shell.clientWidth < 700;
+    if (narrow === section.hasAttribute('data-narrow')) return;
+    section.toggleAttribute('data-narrow',narrow);
+    if (current()) { renderContacts(current()); }
+  };
+  followWidth();
+  if (typeof ResizeObserver === 'function') new ResizeObserver(followWidth).observe(shell);
   updateStaticCopy(); load();
+}
+
+/* The statement: one sentence set large, with four real works sitting in the
+   line as small pictures. It shares this module only for the catalogue the
+   recent-work sheet has already fetched. */
+const statement = document.querySelector('[data-statement]');
+if (statement) {
+  const LINES = {
+    en: 'From Erbil {} I shape identities, {} books and images {} that stay in the mind long after the page {} is closed.',
+    ku: 'لە هەولێرەوە {} ناسنامە، {} کتێب و وێنە دروست دەکەم {} کە دوای داخستنی لاپەڕەکەش {} لە بیردا دەمێننەوە.',
+    kmr: 'Ji Hewlêrê {} ez nasname, {} pirtûk û wêneyan çêdikim {} ku piştî girtina rûpelê jî {} di bîrê de dimînin.',
+    ar: 'من أربيل {} أصمّم هويات، {} كتبًا وصورًا {} تبقى في الذاكرة طويلًا بعد أن {} تُطوى الصفحة.',
+    fr: 'Depuis Erbil, {} je façonne des identités, {} des livres et des images {} qui restent en mémoire bien après que la page {} s’est refermée.',
+    tr: 'Erbil’den {} kimlikler, {} kitaplar ve görseller tasarlıyorum; {} sayfa kapandıktan çok sonra da {} akılda kalanlar.',
+    sv: 'Från Erbil {} formar jag identiteter, {} böcker och bilder {} som stannar i minnet långt efter att sidan {} har stängts.'
+  };
+  const FOLDERS = ['LogoDesign','Book','Poster','Photos'];
+  const FRAMES = 3;
+  const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const sheet = statement.closest('.statement');
+  // Each gap in the line holds a short reel of works from one discipline,
+  // drawn afresh on every visit, so the sentence never shows the same set twice.
+  let reels = [], tokens = [], painted = -1, frame = 0;
+  const draw = () => {
+    const lang = document.documentElement.dataset.lang || document.documentElement.lang || 'en';
+    const parts = (LINES[lang] || LINES.en).split('{}');
+    statement.setAttribute('aria-label',parts.map(part => part.trim()).join(' ').replace(/\s+([,;.])/g,'$1'));
+    statement.innerHTML = parts.map((part, index) => {
+      const words = part.trim().split(/\s+/).filter(Boolean).map(word => `<span class="statement-word" data-token>${safe(word)}</span>`).join(' ');
+      const reel = reels[index];
+      const picture = index < parts.length - 1 && reel?.length ? ` <span class="statement-pic" data-token aria-hidden="true"><span class="statement-reel" style="--n:${reel.length}">${reel.map(src => `<img src="${safe(src)}" alt="" loading="lazy" decoding="async">`).join('')}</span></span> ` : ' ';
+      return words + picture;
+    }).join('');
+    tokens = [...statement.querySelectorAll('[data-token]')];
+    painted = -1;
+    paint();
+  };
+  // Reading progress: the last part of the sheet's rise, then the stretch of
+  // scroll it holds the page alone before the next sheet starts to arrive.
+  const progress = () => {
+    if (!sheet) return 1;
+    const view = window.innerHeight || 1, top = sheet.getBoundingClientRect().top;
+    const rise = Math.min(1,Math.max(0,1 - (top - 20) / (view * .45)));
+    const next = sheet.nextElementSibling;
+    const hold = parseFloat(getComputedStyle(sheet).marginBottom) || 0;
+    if (!next || hold < 40) return rise;
+    const held = Math.min(1,Math.max(0,1 - (next.getBoundingClientRect().top - view) / hold));
+    return rise * .22 + held * .78;
+  };
+  const paint = () => {
+    frame = 0;
+    if (!tokens.length) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const value = reduce ? 1 : progress();
+    if (Math.abs(value - painted) < .002) return;
+    painted = value;
+    // The fill runs a little past the last word, so the line is whole before
+    // the next sheet appears.
+    const reach = value * (tokens.length + 1.5);
+    tokens.forEach((token, index) => {
+      const lit = Math.min(1,Math.max(0,reach - index));
+      if (token.classList.contains('statement-pic')) {
+        token.classList.toggle('is-open',lit > .15);
+        // Once open, the reel turns on through its other works as the
+        // reading goes on.
+        const turn = Math.max(0,(reach - index - 1) / Math.max(1,tokens.length - index) * FRAMES * 1.6);
+        const reel = token.firstElementChild, count = reel.childElementCount;
+        reel.style.setProperty('--at',String(Math.min(count - 1,Math.floor(turn))));
+      } else token.style.opacity = (.14 + lit * .86).toFixed(3);
+    });
+  };
+  const queue = () => { if (!frame) frame = requestAnimationFrame(paint); };
+  statement.classList.add('is-live');
+  draw();
+  document.addEventListener('bq:language',draw);
+  window.addEventListener('scroll',queue,{passive:true});
+  window.addEventListener('resize',queue,{passive:true});
+  (window.__bqRecentCatalogue || Promise.resolve(null)).then(result => {
+    const records = (result?.manifest?.images || []).filter(record => record && /^[A-Za-z0-9]+\/[^/\\]+\.(?:webp|png|jpe?g|avif)$/i.test(record.path || ''));
+    reels = FOLDERS.map(folder => {
+      const pool = records.filter(record => record.path.startsWith(folder + '/'));
+      for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i],pool[j]] = [pool[j],pool[i]]; }
+      return pool.slice(0,FRAMES).map(record => '/assets/thumbs/' + record.path);
+    });
+    if (reels.some(reel => reel.length)) draw();
+  });
 }

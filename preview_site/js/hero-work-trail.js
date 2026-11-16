@@ -7,13 +7,13 @@
   if (!hero || !paper || hero.dataset.workTrailReady) return;
 
   const COPY = {
-    en: { mouse: 'Move to discover', touch: 'Hold to discover', preview: 'Preview a work', note: 'A glimpse of the practice', case: 'Case study', video: 'Film' },
-    ku: { mouse: 'ماوس بجوڵێنە، کارەکان ببینە', touch: 'پەنجەت ڕابگرە، کارەکان ببینە', preview: 'پێشبینیی کارێک', note: 'نیگایەک بۆ کارەکان', case: 'کەیس ستەدی', video: 'ڤیدیۆ' },
-    kmr: { mouse: 'Bilivîne, karan bibîne', touch: 'Bipêçîne, karan bibîne', preview: 'Pêşdîtina karekî', note: 'Nêrînek li karan', case: 'Lêkolîna projeyê', video: 'Fîlm' },
-    ar: { mouse: 'حرّك المؤشر واكتشف الأعمال', touch: 'اضغط مطولاً واكتشف الأعمال', preview: 'معاينة عمل', note: 'لمحة عن الأعمال', case: 'دراسة حالة', video: 'فيلم' },
-    fr: { mouse: 'Bougez pour découvrir', touch: 'Maintenez pour découvrir', preview: 'Aperçu d’un projet', note: 'Un aperçu de la pratique', case: 'Étude de cas', video: 'Film' },
-    tr: { mouse: 'Hareket ettir, keşfet', touch: 'Basılı tut, keşfet', preview: 'Bir çalışmayı önizle', note: 'Çalışmalara kısa bir bakış', case: 'Vaka çalışması', video: 'Film' },
-    sv: { mouse: 'Rör pekaren och upptäck', touch: 'Håll för att upptäcka', preview: 'Förhandsvisa ett verk', note: 'En glimt av arbetet', case: 'Fallstudie', video: 'Film' },
+    en: { based: 'Based in Erbil', since: 'Established 2014', mouse: 'Move to discover', touch: 'Hold to discover', preview: 'Preview a work', note: 'A glimpse of the practice', case: 'Case study', video: 'Film' },
+    ku: { based: 'بنکە لە هەولێر', since: 'دامەزراو لە 2014', mouse: 'ماوس بجوڵێنە، کارەکان ببینە', touch: 'پەنجەت ڕابگرە، کارەکان ببینە', preview: 'پێشبینیی کارێک', note: 'نیگایەک بۆ کارەکان', case: 'کەیس ستەدی', video: 'ڤیدیۆ' },
+    kmr: { based: 'Li Hewlêrê', since: 'Ji 2014an ve', mouse: 'Bilivîne, karan bibîne', touch: 'Bipêçîne, karan bibîne', preview: 'Pêşdîtina karekî', note: 'Nêrînek li karan', case: 'Lêkolîna projeyê', video: 'Fîlm' },
+    ar: { based: 'مقرّه أربيل', since: 'تأسس عام 2014', mouse: 'حرّك المؤشر واكتشف الأعمال', touch: 'اضغط مطولاً واكتشف الأعمال', preview: 'معاينة عمل', note: 'لمحة عن الأعمال', case: 'دراسة حالة', video: 'فيلم' },
+    fr: { based: 'Basé à Erbil', since: 'Depuis 2014', mouse: 'Bougez pour découvrir', touch: 'Maintenez pour découvrir', preview: 'Aperçu d’un projet', note: 'Un aperçu de la pratique', case: 'Étude de cas', video: 'Film' },
+    tr: { based: 'Erbil merkezli', since: '2014’ten beri', mouse: 'Hareket ettir, keşfet', touch: 'Basılı tut, keşfet', preview: 'Bir çalışmayı önizle', note: 'Çalışmalara kısa bir bakış', case: 'Vaka çalışması', video: 'Film' },
+    sv: { based: 'Baserad i Erbil', since: 'Sedan 2014', mouse: 'Rör pekaren och upptäck', touch: 'Håll för att upptäcka', preview: 'Förhandsvisa ett verk', note: 'En glimt av arbetet', case: 'Fallstudie', video: 'Film' },
   };
   const FOLDERS = {
     Book: ['book', 'Book cover'], Official: ['official', 'Official'], Poster: ['posters', 'Poster'],
@@ -41,7 +41,12 @@
   counter.dir = 'ltr';
   counter.textContent = '00';
   folio.append(folioCopy, counter);
-  paper.append(stage, control, folio);
+  // The two facts a title page carries in its top corners.
+  const based = document.createElement('span');
+  based.className = 'hero-work-mark hero-work-mark--based';
+  const since = document.createElement('span');
+  since.className = 'hero-work-mark hero-work-mark--since';
+  paper.append(stage, control, folio, based, since);
   hero.dataset.workTrailReady = 'true';
 
   let pool = [], position = 0, shown = 0, visible = true, loading = null;
@@ -56,6 +61,8 @@
     control.querySelector('.hero-work-discover-copy').textContent = reduced.matches ? copy().preview : coarse.matches ? copy().touch : copy().mouse;
     control.setAttribute('aria-label', copy().preview);
     folioCopy.textContent = copy().note;
+    based.textContent = copy().based;
+    since.textContent = copy().since;
   };
   updateLanguage();
   document.addEventListener('bq:language', updateLanguage);
@@ -131,20 +138,16 @@
     const item = pool[position++ % pool.length];
     const scaleX = stage.clientWidth / bounds.width, scaleY = stage.clientHeight / bounds.height;
     const localX = (clientX - bounds.left) * scaleX, localY = (clientY - bounds.top) * scaleY;
-    const base = Math.min(stage.clientWidth * (coarse.matches ? .38 : .18), stage.clientHeight * .29, 226);
+    const base = Math.min(stage.clientWidth * (coarse.matches ? .3 : .17), stage.clientHeight * .27, 210);
     const ratio = item.width / item.height;
     const width = Math.max(76, ratio >= 1 ? base : base * Math.max(.58, ratio));
     const height = Math.min(base * 1.25, width / ratio);
     const margin = 18;
     const x = Math.min(Math.max(localX, width / 2 + margin), stage.clientWidth - width / 2 - margin);
     const y = Math.min(Math.max(localY, height / 2 + margin), stage.clientHeight - height / 2 - 52);
-    // The gesture's own direction carries each print: it arrives from behind
-    // the pointer, settles, then keeps gliding the way the hand was moving.
-    const dx = lastPoint ? localX - lastPoint.x : 0, dy = lastPoint ? localY - lastPoint.y : 0;
-    const travel = Math.hypot(dx, dy);
-    const carry = travel > 0 ? Math.min(1, travel / 170) : 0;
-    const ux = travel > 0 ? dx / travel * carry : 0, uy = travel > 0 ? dy / travel * carry : 0;
-    const rotation = Math.max(-3.5, Math.min(3.5, ux * 2.2 + Math.sin(shown * .85) * 1.6));
+    // Each print lands with its own loose tilt, like cards dealt on a table.
+    const tilt = Math.sin(shown * 12.9898 + 4.1) * 43758.5453;
+    const rotation = ((tilt - Math.floor(tilt)) * 2 - 1) * 15;
     if (reduced.matches) [...prints].forEach(dispose);
 
     const node = document.createElement('figure');
@@ -176,14 +179,21 @@
     const reveal = () => {
       if (!node.isConnected || node.classList.contains('is-loaded')) return;
       node.classList.add('is-loaded');
-      const lifetime = manual ? 4200 : 2100;
+      const lifetime = manual ? 4200 : 1650;
       if (!reduced.matches && node.animate) {
-        const at = (distance, lift = 0) => `translate(calc(-50% + ${(ux * distance).toFixed(1)}px), calc(-50% + ${(uy * distance + lift).toFixed(1)}px))`;
+        // It grows out of the pointer, rests for a breath, then shrinks back
+        // into the same point. Size and opacity keep separate clocks: the
+        // print is fully there long before it has finished growing, and it
+        // only fades at the very end of shrinking.
+        const pose = scale => `translate(-50%, -50%) rotate(${rotation.toFixed(2)}deg) scale(${scale})`;
+        const grown = 900 / lifetime, leaving = 1 - 720 / lifetime;
         entry.animation = node.animate([
-          { opacity: 0, transform: `${at(-26, 8)} rotate(${(rotation - 1).toFixed(2)}deg) scale(.9)`, offset: 0, easing: 'cubic-bezier(.16, 1, .3, 1)' },
-          { opacity: 1, transform: `${at(0)} rotate(${rotation.toFixed(2)}deg) scale(1)`, offset: .24, easing: 'cubic-bezier(.37, 0, .63, 1)' },
-          { opacity: 1, transform: `${at(12, -2)} rotate(${(rotation + .3).toFixed(2)}deg) scale(1)`, offset: .62, easing: 'cubic-bezier(.5, 0, .75, 0)' },
-          { opacity: 0, transform: `${at(30, -8)} rotate(${(rotation + .8).toFixed(2)}deg) scale(.95)`, offset: 1 },
+          { offset: 0, opacity: 0, transform: pose(0), easing: 'cubic-bezier(0, .2, .2, 1)' },
+          { offset: 280 / lifetime, opacity: 1 },
+          { offset: grown, transform: pose(1), easing: 'linear' },
+          { offset: leaving, transform: pose(1), easing: 'cubic-bezier(.25, 1, .5, 1)' },
+          { offset: 1 - 300 / lifetime, opacity: 1, easing: 'cubic-bezier(.33, 1, .68, 1)' },
+          { offset: 1, opacity: 0, transform: pose(0) },
         ], { duration: lifetime, easing: 'linear', fill: 'both' });
         entry.animation.onfinish = () => dispose(entry);
       }
@@ -198,7 +208,7 @@
     counter.textContent = String(shown).padStart(2, '0');
     hero.classList.add('is-work-discovering');
     clearTimeout(quietTimer);
-    quietTimer = setTimeout(() => hero.classList.remove('is-work-discovering'), manual ? 4200 : 2100);
+    quietTimer = setTimeout(() => hero.classList.remove('is-work-discovering'), manual ? 4200 : 1650);
     lastPoint = { x: localX, y: localY };
     lastAt = performance.now();
   };
@@ -294,7 +304,7 @@
       // Time-based easing: the trail keeps the same soft lag on a 60 Hz and a
       // 120 Hz screen, and a dropped frame does not make it jump.
       const now = performance.now();
-      const ease = 1 - Math.exp(-Math.min(48, Math.max(8, now - (followAt || now - 16))) / 86);
+      const ease = 1 - Math.exp(-Math.min(48, Math.max(8, now - (followAt || now - 16))) / 26);
       followAt = now;
       followPoint.x += deltaX * ease;
       followPoint.y += deltaY * ease;
@@ -302,8 +312,8 @@
       const x = (followPoint.x - bounds.left) * stage.clientWidth / bounds.width;
       const y = (followPoint.y - bounds.top) * stage.clientHeight / bounds.height;
       const distance = lastPoint ? Math.hypot(x - lastPoint.x, y - lastPoint.y) : Infinity;
-      const spacing = Math.max(84, Math.min(stage.clientWidth * .075, 132));
-      if (distance >= spacing && now - lastAt >= 120) drop(followPoint.x, followPoint.y, false, true);
+      const spacing = coarse.matches ? 66 : 110;
+      if (distance >= spacing && now - lastAt >= 70) drop(followPoint.x, followPoint.y, false, true);
       // A short, finite settling tail gives the gesture inertia. It stops as
       // soon as the target settles; there is no idle animation-frame loop.
       if (--followBudget > 0 && Math.hypot(deltaX, deltaY) > .7) frame = requestAnimationFrame(follow);

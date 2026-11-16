@@ -93,7 +93,20 @@
        or very tall window keeps the composition's proportions. Sizes are read
        before browser zoom, or growth would cancel a visitor's Cmd/Ctrl +. */
     const browserZoom = window.innerWidth > 0 && window.outerWidth > 0 ? window.outerWidth / window.innerWidth : 1;
-    const grow = Math.round(Math.min(2.4, Math.max(1, Math.min((window.innerWidth || 1440) * browserZoom / 1440, height * browserZoom / 900))) * 100) / 100;
+    const wide = (window.innerWidth || 1440) * browserZoom, tall = height * browserZoom;
+    /* An upright tablet uses the phone composition (up to 820px wide) on a
+       sheet far taller and wider than a phone's. Left at phone size, every
+       sheet was a small block lost in an empty page. There the content grows
+       toward the sheet the same way, measured against the phone window the
+       composition was drawn for, and never past what both sides allow. */
+    /* A wider upright tablet (iPad Pro) keeps the desktop composition, which is
+       drawn for a window wider than it is tall, so the same emptiness opened
+       below it. Its ceiling rises with the spare height; the fitter still
+       stops at whatever really fits, in both directions. */
+    const upright = (window.innerWidth || 1440) <= 820
+      ? Math.min(1.6, wide / 430, tall / 780)
+      : tall > wide * 1.1 ? Math.min(1.5, tall / (wide * .9)) : 1;
+    const grow = Math.round(Math.min(2.4, Math.max(1, upright, Math.min(wide / 1440, tall / 900))) * 100) / 100;
     if (window.__bqViewportScale === scale && (window.__bqViewportGrow || 1) === grow) return;
     window.__bqViewportGrow = grow;
     if (window.__bqViewportScale !== scale) {
@@ -3489,7 +3502,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
           // deck for every print/counter tick also disturbed the gallery pin.
           records = records.filter((record) => {
             const target = record.target?.nodeType === 1 ? record.target : record.target?.parentElement;
-            return !target?.closest?.('.hero-work-trail,.hero-work-discover,.hero-work-folio');
+            return !target?.closest?.('.hero-work-trail,.hero-work-discover,.hero-work-folio,.hero-work-mark');
           });
           if (!records.length) return;
           records.forEach((record) => {
@@ -3549,7 +3562,7 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       wrapPaperScroll(hero);
 
       const paperNames = [
-        ['recent-work', 'recent'], ['work', 'work'], ['sites-sheet', 'sites'],
+        ['statement', 'statement'], ['recent-work', 'recent'], ['work', 'work'], ['sites-sheet', 'sites'],
         ['behance-teaser', 'behance'], ['service-showcase', 'practice'],
         ['practice-note', 'note'], ['logos-section', 'clients'], ['latest-blog', 'blog']
       ];
