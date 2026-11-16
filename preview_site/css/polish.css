@@ -8101,3 +8101,13 @@ html body .bh-viewer .bhv-more .bh-card-title { font-size: 13.5px; }
 @media (prefers-reduced-motion: reduce) {
   html body .bh-viewer.is-open { animation: none; }
 }
+
+/* Every home surface follows its place in the deck, including papers inserted
+   before the long portfolio carrier. Legacy section-specific layers cannot
+   cover a later paper or its gallery. */
+html body #design#design.paper-stack > .paper-sheet {
+  z-index: var(--bq-paper-z, 10) !important;
+}
+html:root[data-theme] body[data-room='design'] .footer.footer-v249.paper-sheet {
+  z-index: var(--bq-paper-z, 70) !important;
+}

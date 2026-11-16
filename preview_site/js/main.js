@@ -3485,6 +3485,13 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       : null;
     const mutationObserver = typeof MutationObserver === 'function' && resizeObserver
       ? new MutationObserver((records) => {
+          // Gesture prints never change the paper's layout. Fitting the whole
+          // deck for every print/counter tick also disturbed the gallery pin.
+          records = records.filter((record) => {
+            const target = record.target?.nodeType === 1 ? record.target : record.target?.parentElement;
+            return !target?.closest?.('.hero-work-trail,.hero-work-discover,.hero-work-folio');
+          });
+          if (!records.length) return;
           records.forEach((record) => {
             record.addedNodes.forEach((node) => {
               if (

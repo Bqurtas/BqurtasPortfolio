@@ -66,6 +66,18 @@ if (section) {
       if (bounds.left < frame.left || bounds.right > frame.right) nodes.index.scrollLeft += (bounds.left + bounds.right - frame.left - frame.right) / 2;
     }
   };
+  const compactDetails = window.matchMedia('(max-width: 600px)');
+  const renderContacts = (edition) => {
+    const multi = edition.count > 1;
+    // A long batch is never truncated. A moving contact window, next/previous
+    // and an accessible range reach every member without hundreds of images.
+    if (multi) {
+      const windowSize=compactDetails.matches ? 3 : 7;
+      const start = Math.max(0,Math.min(memberIndex-Math.floor(windowSize/2),edition.count-windowSize));
+      const visible = edition.members.slice(start,start+windowSize);
+      nodes.thumbs.innerHTML = `<div class="recent-detail-controls"><button type="button" data-recent-step="-1" aria-label="${esc(copy().previous)}"${memberIndex === 0 ? ' disabled' : ''}><span aria-hidden="true">←</span></button><span class="recent-contact-count" dir="ltr">${number(memberIndex+1)} <i>/</i> ${number(edition.count)}</span><button type="button" data-recent-step="1" aria-label="${esc(copy().next)}"${memberIndex === edition.count-1 ? ' disabled' : ''}><span aria-hidden="true">→</span></button></div><div class="recent-thumbs">${visible.map((item,i) => `<button type="button" data-recent-member="${start+i}" aria-label="${esc(copy().detail + ' ' + (start+i+1))}" aria-pressed="${start+i === memberIndex}">${image(item.poster || item.src,'',item.width,item.height)}${item.type === 'video' ? '<span aria-hidden="true">▶</span>' : ''}</button>`).join('')}</div>${edition.count > 7 ? `<input class="recent-detail-range" type="range" min="1" max="${edition.count}" value="${memberIndex+1}" aria-label="${esc(copy().range)}" aria-valuetext="${esc(fill(copy().position,{n:memberIndex+1,total:edition.count}))}">` : ''}`;
+    } else nodes.thumbs.innerHTML = '';
+  };
   const renderDetail = () => {
     stopFilm();
     const edition = current();
@@ -92,14 +104,7 @@ if (section) {
       : `<a class="recent-art-link" href="${esc(href)}" data-recent-open${external} aria-label="${esc(edition.kind === 'case-study' ? copy().openCase : memberTitle(member))}">${image(member.src,memberTitle(member),member.width,member.height,'recent-art',false)}<span class="recent-enlarge" aria-hidden="true">↗</span></a>`;
     nodes.stage.innerHTML = `<span class="recent-stage-number" aria-hidden="true">${number(publicationIndex+1)}</span><span class="recent-stage-coordinate" aria-hidden="true">BQ / ${esc(edition.kind === 'case-study' ? 'STORIES' : edition.kind === 'video' ? 'MOTION' : 'VISUALS')}</span>${wing(previous,'previous')}<div class="recent-art-mount">${multi ? '<span class="recent-stack-leaf recent-stack-leaf--one" aria-hidden="true"></span><span class="recent-stack-leaf recent-stack-leaf--two" aria-hidden="true"></span>' : ''}${media}</div>${wing(next,'next')}<span class="recent-stage-date"><time datetime="${esc(edition.date)}">${esc(date(edition.date))}</time></span>`;
     nodes.caption.innerHTML = `<div class="recent-caption-copy"><span class="recent-kind">${esc(edition.kind === 'case-study' ? copy().caseStudy : multi ? copy().series : copy().single)} <span aria-hidden="true">/</span> ${esc(countLabel(edition))}</span><h3>${esc(edition.kind === 'case-study' ? edition.title : memberTitle(member))}</h3></div><a class="recent-open" data-recent-open href="${esc(href)}"${external}${edition.external ? ` aria-label="${esc(copy().openCase + ' — ' + copy().external)}"` : ''}><span>${esc(edition.kind === 'case-study' ? copy().openCase : copy().open)}</span><span aria-hidden="true">↗</span></a>`;
-    // A long batch is never truncated. A moving contact window, next/previous
-    // and an accessible range reach every member without hundreds of images.
-    if (multi) {
-      const windowSize=window.matchMedia('(max-width: 600px)').matches ? 3 : 7;
-      const start = Math.max(0,Math.min(memberIndex-Math.floor(windowSize/2),edition.count-windowSize));
-      const visible = edition.members.slice(start,start+windowSize);
-      nodes.thumbs.innerHTML = `<div class="recent-detail-controls"><button type="button" data-recent-step="-1" aria-label="${esc(copy().previous)}"${memberIndex === 0 ? ' disabled' : ''}><span aria-hidden="true">←</span></button><span class="recent-contact-count" dir="ltr">${number(memberIndex+1)} <i>/</i> ${number(edition.count)}</span><button type="button" data-recent-step="1" aria-label="${esc(copy().next)}"${memberIndex === edition.count-1 ? ' disabled' : ''}><span aria-hidden="true">→</span></button></div><div class="recent-thumbs">${visible.map((item,i) => `<button type="button" data-recent-member="${start+i}" aria-label="${esc(copy().detail + ' ' + (start+i+1))}" aria-pressed="${start+i === memberIndex}">${image(item.poster || item.src,'',item.width,item.height)}${item.type === 'video' ? '<span aria-hidden="true">▶</span>' : ''}</button>`).join('')}</div>${edition.count > 7 ? `<input class="recent-detail-range" type="range" min="1" max="${edition.count}" value="${memberIndex+1}" aria-label="${esc(copy().range)}" aria-valuetext="${esc(fill(copy().position,{n:memberIndex+1,total:edition.count}))}">` : ''}`;
-    } else nodes.thumbs.innerHTML = '';
+    renderContacts(edition);
     updateStatus();
   };
   const render = () => { updateStaticCopy(); renderIndex(); renderDetail(); };
@@ -205,6 +210,7 @@ if (section) {
     memberIndex=Number(event.target.value)-1; renderDetail();
     nodes.thumbs.querySelector('.recent-detail-range')?.focus({preventScroll:true});
   });
+  compactDetails.addEventListener?.('change',()=>{ if (current()) renderContacts(current()); });
   document.addEventListener('bq:language',render);
   document.addEventListener('visibilitychange',()=>{ if (document.hidden) stopFilm(); });
   document.addEventListener('bq:route',stopFilm);
