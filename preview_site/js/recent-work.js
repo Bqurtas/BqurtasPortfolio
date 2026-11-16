@@ -53,15 +53,31 @@ if (section) {
     const edition = current();
     nodes.status.textContent = edition ? fill(copy().selected, {title:title(edition),position:fill(copy().position,{n:memberIndex + 1,total:edition.count})}) : '';
   };
+  // The wall keeps its panels between selections, so choosing a work widens
+  // its panel instead of rebuilding the row. The stage is one persistent node
+  // that moves into whichever panel is open.
+  let wallKey = '';
+  const panel = (edition, index) => `<div class="recent-panel" data-recent-panel="${esc(edition.id)}"><button type="button" class="recent-entry" data-recent-edition="${esc(edition.id)}" aria-controls="recentWorkPreview" aria-label="${esc(title(edition) + ' — ' + countLabel(edition) + ' — ' + date(edition.date))}"><span class="recent-entry-thumb">${image(edition.cover,'',edition.width,edition.height)}</span><span class="recent-entry-no" dir="ltr" aria-hidden="true">${number(index + 1)}</span>${edition.kind === 'video' ? '<span class="recent-play-mark" aria-hidden="true">▶</span>' : ''}</button></div>`;
   const renderIndex = () => {
-    const list = filtered().filter(item => shown.has(item.id));
-    $('[data-recent-total]').textContent = number(filtered().length);
-    nodes.index.innerHTML = list.length ? list.map((edition, index) => `<button type="button" class="recent-entry${edition.id === selected ? ' is-selected' : ''}" data-recent-edition="${esc(edition.id)}" aria-pressed="${edition.id === selected}" aria-controls="recentWorkPreview" aria-label="${esc(title(edition) + ' — ' + countLabel(edition) + ' — ' + date(edition.date))}"><span class="recent-entry-no" aria-hidden="true">${number(index + 1)}</span><span class="recent-entry-thumb">${image(edition.cover,'',edition.width,edition.height)}${edition.kind === 'video' ? '<span class="recent-play-mark" aria-hidden="true">▶</span>' : ''}</span><span class="recent-entry-copy"><strong>${esc(title(edition))}</strong><span>${esc(countLabel(edition))} <i aria-hidden="true">·</i> <time datetime="${esc(edition.date)}">${esc(date(edition.date))}</time></span></span><span class="recent-entry-arrow" aria-hidden="true">↗</span></button>`).join('') : `<p class="recent-state">${esc(copy()[loadState === 'error' ? 'error' : loadState === 'loading' ? 'loading' : 'empty'])}</p>${loadState === 'error' ? `<button type="button" class="recent-retry" data-recent-retry>${esc(copy().retry)}</button>` : ''}`;
-    nodes.more.hidden = list.length >= filtered().length;
-    // Keep the selected entry visible inside the bounded index, without moving
-    // the page or interfering with the paper deck's own reading position.
-    const active = nodes.index.querySelector('.is-selected');
-    if (active) {
+    const all = filtered(), list = all.filter(item => shown.has(item.id));
+    $('[data-recent-total]').textContent = number(all.length);
+    const key = `${language()}|${loadState}|${list.map(item => item.id).join(',')}`;
+    if (key !== wallKey) {
+      wallKey = key;
+      nodes.stage.remove();
+      nodes.index.innerHTML = list.length ? list.map(panel).join('') : `<p class="recent-state">${esc(copy()[loadState === 'error' ? 'error' : loadState === 'loading' ? 'loading' : 'empty'])}</p>${loadState === 'error' ? `<button type="button" class="recent-retry" data-recent-retry>${esc(copy().retry)}</button>` : ''}`;
+    }
+    nodes.more.hidden = list.length >= all.length;
+    nodes.index.querySelectorAll('[data-recent-panel]').forEach(node => {
+      const open = node.dataset.recentPanel === selected, entry = node.firstElementChild;
+      node.classList.toggle('is-open',open);
+      entry.setAttribute('aria-pressed',String(open));
+      entry.tabIndex = open ? -1 : 0;
+      if (open && nodes.stage.parentElement !== node) { nodes.stage.hidden = false; node.append(nodes.stage); }
+    });
+    // Keep the open panel inside the wall's own frame without moving the page.
+    const active = nodes.index.querySelector('.is-open');
+    if (active && nodes.index.scrollWidth > nodes.index.clientWidth + 1) {
       const bounds=active.getBoundingClientRect(), frame=nodes.index.getBoundingClientRect();
       if (bounds.left < frame.left || bounds.right > frame.right) nodes.index.scrollLeft += (bounds.left + bounds.right - frame.left - frame.right) / 2;
     }
@@ -82,16 +98,13 @@ if (section) {
     stopFilm();
     const edition = current();
     if (!edition) {
-      nodes.stage.innerHTML = '<span class="recent-placeholder" aria-hidden="true">BQ</span>';
+      nodes.stage.innerHTML = '';
       nodes.caption.innerHTML = ''; nodes.thumbs.innerHTML = ''; updateStatus(); return;
     }
     memberIndex = Math.max(0, Math.min(memberIndex, edition.members.length - 1));
     const member = edition.members[memberIndex];
     const multi = edition.count > 1;
     const publications=filtered(), publicationIndex=publications.findIndex(item=>item.id === edition.id);
-    const previous=publications[(publicationIndex-1+publications.length)%publications.length];
-    const next=publications[(publicationIndex+1)%publications.length];
-    const wing=(item,side)=>item && item.id !== edition.id ? `<button type="button" class="recent-wing recent-wing--${side}" data-recent-edition="${esc(item.id)}" aria-label="${esc(title(item))}"><span class="recent-wing-art">${image(item.cover,'',item.width,item.height,'',false)}</span><span class="recent-wing-caption"><span>${number(publications.indexOf(item)+1)}</span><strong>${esc(title(item))}</strong><i aria-hidden="true">${side === 'previous' ? '↖' : '↗'}</i></span></button>` : '';
     nodes.viewer.dataset.kind = edition.kind;
     nodes.viewer.classList.toggle('is-multiple',multi);
     nodes.stage.id = 'recentWorkPreview';
@@ -102,8 +115,9 @@ if (section) {
     const media = member.type === 'video'
       ? `<video class="recent-art recent-film" controls playsinline preload="none"${member.poster ? ` poster="${esc(member.poster)}"` : ''} aria-label="${esc(memberTitle(member))}"><source src="${esc(member.url)}"></video>`
       : `<a class="recent-art-link" href="${esc(href)}" data-recent-open${external} aria-label="${esc(edition.kind === 'case-study' ? copy().openCase : memberTitle(member))}">${image(member.src,memberTitle(member),member.width,member.height,'recent-art',false)}<span class="recent-enlarge" aria-hidden="true">↗</span></a>`;
-    nodes.stage.innerHTML = `<span class="recent-stage-number" aria-hidden="true">${number(publicationIndex+1)}</span><span class="recent-stage-coordinate" aria-hidden="true">BQ / ${esc(edition.kind === 'case-study' ? 'STORIES' : edition.kind === 'video' ? 'MOTION' : 'VISUALS')}</span>${wing(previous,'previous')}<div class="recent-art-mount">${multi ? '<span class="recent-stack-leaf recent-stack-leaf--one" aria-hidden="true"></span><span class="recent-stack-leaf recent-stack-leaf--two" aria-hidden="true"></span>' : ''}${media}</div>${wing(next,'next')}<span class="recent-stage-date"><time datetime="${esc(edition.date)}">${esc(date(edition.date))}</time></span>`;
-    nodes.caption.innerHTML = `<div class="recent-caption-copy"><span class="recent-kind">${esc(edition.kind === 'case-study' ? copy().caseStudy : multi ? copy().series : copy().single)} <span aria-hidden="true">/</span> ${esc(countLabel(edition))}</span><h3>${esc(edition.kind === 'case-study' ? edition.title : memberTitle(member))}</h3></div><a class="recent-open" data-recent-open href="${esc(href)}"${external}${edition.external ? ` aria-label="${esc(copy().openCase + ' — ' + copy().external)}"` : ''}><span>${esc(edition.kind === 'case-study' ? copy().openCase : copy().open)}</span><span aria-hidden="true">↗</span></a>`;
+    const kindLabel = edition.kind === 'case-study' ? copy().caseStudy : edition.kind === 'video' && !multi ? copy().film : multi ? copy().series : copy().single;
+    nodes.stage.innerHTML = `<div class="recent-stage-meta"><span class="recent-stage-count" dir="ltr" aria-hidden="true"><b>${number(publicationIndex+1)}</b><i>/</i>${number(publications.length)}</span><span class="recent-stage-date"><time datetime="${esc(edition.date)}">${esc(date(edition.date))}</time></span></div><div class="recent-art-mount">${media}</div>`;
+    nodes.caption.innerHTML = `<div class="recent-caption-copy"><span class="recent-kind">${esc(kindLabel)}${kindLabel === countLabel(edition) ? '' : ` <span aria-hidden="true">·</span> ${esc(countLabel(edition))}`}</span><h3 dir="auto">${esc(edition.kind === 'case-study' ? edition.title : memberTitle(member))}</h3></div><a class="recent-open" data-recent-open href="${esc(href)}"${external}${edition.external ? ` aria-label="${esc(copy().openCase + ' — ' + copy().external)}"` : ''}><span>${esc(edition.kind === 'case-study' ? copy().openCase : copy().open)}</span><span aria-hidden="true">↗</span></a>`;
     renderContacts(edition);
     updateStatus();
   };
@@ -167,7 +181,7 @@ if (section) {
     const entry=event.target.closest('[data-recent-edition]');
     if (entry) {
       choose(entry.dataset.recentEdition);
-      if (event.detail === 0) nodes.index.querySelector('.is-selected')?.focus({preventScroll:true});
+      if (event.detail === 0) nodes.stage.querySelector('a,video')?.focus({preventScroll:true});
       return;
     }
     const thumb=event.target.closest('[data-recent-member]');

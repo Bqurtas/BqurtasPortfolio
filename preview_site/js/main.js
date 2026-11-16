@@ -3985,7 +3985,15 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       if (phoneEntry.matches && !raf && !workMeasureFrame) raf = requestAnimationFrame(drive);
     };
     const remeasure = () => {
-      if (window.__bqViewportLayout?.defer(queueRemeasure)) return;
+      if (window.__bqViewportLayout?.defer(queueRemeasure)) {
+        // queueRemeasure() cancelled the scroll paint it expected to replace.
+        // When the measurement is postponed instead, that paint is still
+        // owed: without it the reel and the phone entry clip stayed on the
+        // previous scroll position until the next scroll event, so the
+        // incoming portfolio was cut short or missing.
+        if (scrollPending && !raf) raf = requestAnimationFrame(drive);
+        return;
+      }
       if (document.body.dataset.room !== 'design'
         || document.body.classList.contains('menu-open') || document.body.classList.contains('menu-closing')) {
         // A cancelled scroll frame would have discarded movement while the
@@ -3996,10 +4004,14 @@ document.getElementById('heroPortrait')?.classList.add('is-in');
       }
       paintedHeadY = null;
       if (track.dataset.holdTrack === '1') {
+        const owed = scrollPending;
         scrollPending = false;
         if (track.dataset.trackHLock) {
           track.style.setProperty('--work-track-h', track.dataset.trackHLock);
         }
+        // The held reel keeps its locked offset inside drive(); the entry
+        // clip and the pin state still follow the scroll that was cancelled.
+        if (owed) drive();
         return;
       }
       const oldSpan = overflow + cardH;

@@ -45,7 +45,7 @@
   hero.dataset.workTrailReady = 'true';
 
   let pool = [], position = 0, shown = 0, visible = true, loading = null;
-  let lastPoint = null, lastAt = 0, pendingPoint = null, followPoint = null, followBudget = 0, frame = 0, quietTimer = 0;
+  let lastPoint = null, lastAt = 0, pendingPoint = null, followPoint = null, followAt = 0, followBudget = 0, frame = 0, quietTimer = 0;
   let touch = null, holdTimer = 0, holdInterval = 0;
   const prints = [];
   const forbidden = target => target?.closest?.('a, button, input, textarea, select, [contenteditable="true"], [role="button"]');
@@ -89,6 +89,7 @@
     frame = 0;
     pendingPoint = null;
     followPoint = null;
+    followAt = 0;
     followBudget = 0;
   };
   const stopTouch = () => {
@@ -124,9 +125,13 @@
     const margin = 18;
     const x = Math.min(Math.max(localX, width / 2 + margin), stage.clientWidth - width / 2 - margin);
     const y = Math.min(Math.max(localY, height / 2 + margin), stage.clientHeight - height / 2 - 52);
-    const dx = lastPoint ? localX - lastPoint.x : 0;
-    const rotation = Math.max(-6, Math.min(6, dx * .012 + Math.sin(shown * .85) * 2.8));
-    const drift = Math.max(-7, Math.min(7, dx * .025));
+    // The gesture's own direction carries each print: it arrives from behind
+    // the pointer, settles, then keeps gliding the way the hand was moving.
+    const dx = lastPoint ? localX - lastPoint.x : 0, dy = lastPoint ? localY - lastPoint.y : 0;
+    const travel = Math.hypot(dx, dy);
+    const carry = travel > 0 ? Math.min(1, travel / 170) : 0;
+    const ux = travel > 0 ? dx / travel * carry : 0, uy = travel > 0 ? dy / travel * carry : 0;
+    const rotation = Math.max(-3.5, Math.min(3.5, ux * 2.2 + Math.sin(shown * .85) * 1.6));
     if (reduced.matches) [...prints].forEach(dispose);
 
     const node = document.createElement('figure');
@@ -157,13 +162,14 @@
     const reveal = () => {
       if (!node.isConnected || node.classList.contains('is-loaded')) return;
       node.classList.add('is-loaded');
-      const lifetime = manual ? 4200 : 3600;
+      const lifetime = manual ? 4200 : 2700;
       if (!reduced.matches && node.animate) {
+        const at = (distance, lift = 0) => `translate(calc(-50% + ${(ux * distance).toFixed(1)}px), calc(-50% + ${(uy * distance + lift).toFixed(1)}px))`;
         entry.animation = node.animate([
-          { opacity: 0, transform: `translate(calc(-50% - ${drift} * 1px), calc(-50% + 5px)) rotate(${rotation - .8}deg) scale(.97)`, offset: 0, easing: 'cubic-bezier(.22, .68, .32, 1)' },
-          { opacity: 1, transform: `translate(-50%, -50%) rotate(${rotation}deg) scale(1)`, offset: .2, easing: 'linear' },
-          { opacity: 1, transform: `translate(calc(-50% + ${drift * .6} * 1px), calc(-50% - 2px)) rotate(${rotation + .25}deg) scale(1)`, offset: .68, easing: 'cubic-bezier(.4, 0, .6, 1)' },
-          { opacity: 0, transform: `translate(calc(-50% + ${drift} * 1px), calc(-50% - 6px)) rotate(${rotation + .6}deg) scale(.99)`, offset: 1 },
+          { opacity: 0, transform: `${at(-34, 10)} rotate(${(rotation - 1.4).toFixed(2)}deg) scale(.86)`, offset: 0, easing: 'cubic-bezier(.16, 1, .3, 1)' },
+          { opacity: 1, transform: `${at(0)} rotate(${rotation.toFixed(2)}deg) scale(1)`, offset: .24, easing: 'cubic-bezier(.37, 0, .63, 1)' },
+          { opacity: 1, transform: `${at(12, -2)} rotate(${(rotation + .3).toFixed(2)}deg) scale(1)`, offset: .62, easing: 'cubic-bezier(.5, 0, .75, 0)' },
+          { opacity: 0, transform: `${at(30, -8)} rotate(${(rotation + .8).toFixed(2)}deg) scale(.95)`, offset: 1 },
         ], { duration: lifetime, easing: 'linear', fill: 'both' });
         entry.animation.onfinish = () => dispose(entry);
       }
@@ -178,7 +184,7 @@
     counter.textContent = String(shown).padStart(2, '0');
     hero.classList.add('is-work-discovering');
     clearTimeout(quietTimer);
-    quietTimer = setTimeout(() => hero.classList.remove('is-work-discovering'), manual ? 4200 : 3600);
+    quietTimer = setTimeout(() => hero.classList.remove('is-work-discovering'), manual ? 4200 : 2700);
     lastPoint = { x: localX, y: localY };
     lastAt = performance.now();
   };
@@ -270,13 +276,19 @@
       frame = 0;
       if (!pendingPoint || !active()) return stopFollowing();
       const deltaX = pendingPoint.x - followPoint.x, deltaY = pendingPoint.y - followPoint.y;
-      followPoint.x += deltaX * .28;
-      followPoint.y += deltaY * .28;
+      // Time-based easing: the trail keeps the same soft lag on a 60 Hz and a
+      // 120 Hz screen, and a dropped frame does not make it jump.
+      const now = performance.now();
+      const ease = 1 - Math.exp(-Math.min(48, Math.max(8, now - (followAt || now - 16))) / 86);
+      followAt = now;
+      followPoint.x += deltaX * ease;
+      followPoint.y += deltaY * ease;
       const bounds = stage.getBoundingClientRect();
       const x = (followPoint.x - bounds.left) * stage.clientWidth / bounds.width;
       const y = (followPoint.y - bounds.top) * stage.clientHeight / bounds.height;
       const distance = lastPoint ? Math.hypot(x - lastPoint.x, y - lastPoint.y) : Infinity;
-      if (distance >= 88 && performance.now() - lastAt >= 128) drop(followPoint.x, followPoint.y);
+      const spacing = Math.max(84, Math.min(stage.clientWidth * .075, 132));
+      if (distance >= spacing && now - lastAt >= 120) drop(followPoint.x, followPoint.y);
       // A short, finite settling tail gives the gesture inertia. It stops as
       // soon as the target settles; there is no idle animation-frame loop.
       if (--followBudget > 0 && Math.hypot(deltaX, deltaY) > .7) frame = requestAnimationFrame(follow);

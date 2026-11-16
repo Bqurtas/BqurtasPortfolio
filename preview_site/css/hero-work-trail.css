@@ -9,23 +9,25 @@ html body #design#design#design#design .hero-work-trail {
   border-radius: inherit;
   zoom: 1 !important;
 }
+/* Flat prints: the work itself, with no frame, ring or shadow around it. */
 html body #design#design#design#design .hero-work-print {
   position: absolute;
   left: var(--work-x);
   top: var(--work-y);
-  width: calc(var(--work-width) + 14px);
+  width: var(--work-width);
   height: auto;
   margin: 0;
-  padding: 7px 7px 0;
-  border-radius: 2px;
-  background: #f6f5f1;
-  color: #242320;
-  box-shadow: 0 12px 30px -18px #0004, 0 30px 58px -36px #0005, 0 0 0 1px #00000008;
+  padding: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--ink, #141414) 6%, var(--bg, #f3f3f1));
+  color: var(--ink-soft, #595953);
   opacity: 0;
   transform: translate(-50%, -50%) rotate(var(--work-rotation));
   transform-origin: 50% 55%;
   pointer-events: none;
   will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 html body #design#design#design#design .hero-work-print.is-loaded { opacity: 1; }
 html body #design#design#design#design .hero-work-print img {
@@ -35,35 +37,10 @@ html body #design#design#design#design .hero-work-print img {
   max-width: none;
   max-height: none;
   border-radius: 0;
-  object-fit: contain;
-  background: #ecebe6;
+  object-fit: cover;
   pointer-events: none;
 }
-html body #design#design#design#design .hero-work-print figcaption {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 25px;
-  padding: 5px 1px;
-  font-family: 'Manrope', 'Noto Kufi Arabic', sans-serif;
-  font-size: 8px;
-  font-weight: 500;
-  line-height: 1.4;
-  letter-spacing: .015em;
-  color: #34332d;
-}
-html body #design#design#design#design .hero-work-print figcaption span:first-child {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-html body #design#design#design#design .hero-work-print figcaption span:last-child {
-  flex: none;
-  font-variant-numeric: tabular-nums;
-  font-size: 7px;
-  opacity: .65;
-}
+html body #design#design#design#design .hero-work-print figcaption { display: none; }
 html body #design#design#design#design .hero-work-discover,
 html body #design#design#design#design .hero-work-folio {
   position: absolute;
@@ -156,7 +133,6 @@ html body #design#design#design#design .hero-work-discover:focus-visible {
   html body #design#design#design#design .hero-work-folio > span:first-child { display: none; }
   html body #design#design#design#design .hero-work-discover { max-width: 76%; }
   html body #design#design#design#design .hero-work-folio { max-width: 14%; }
-  html body #design#design#design#design .hero-work-print figcaption { font-size: 7px; min-height: 23px; }
 }
 @media (max-height: 510px) and (min-width: 681px) {
   html body #design#design#design#design .hero-work-discover,
