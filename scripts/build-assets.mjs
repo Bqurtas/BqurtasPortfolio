@@ -29,7 +29,8 @@ const jsBundles = [
   ['js/motion.js', 'js/motion.min.js'],
   ['js/chat-kb.js', 'js/chat-kb.min.js'],
   ['js/lux.js', 'js/lux.min.js'],
-  ['js/behance.js', 'js/behance.min.js']
+  ['js/behance.js', 'js/behance.min.js'],
+  ['js/film.js', 'js/film.min.js']
 ];
 
 const cssBundles = [
@@ -38,7 +39,8 @@ const cssBundles = [
   ['css/experience.css', 'css/experience.min.css'],
   ['css/polish.css', 'css/polish.min.css'],
   ['css/recent-work.css', 'css/recent-work.min.css'],
-  ['css/hero-work-trail.css', 'css/hero-work-trail.min.css']
+  ['css/hero-work-trail.css', 'css/hero-work-trail.min.css'],
+  ['css/film.css', 'css/film.min.css']
 ];
 
 /* Match only quoted, first-party script and stylesheet references. This covers

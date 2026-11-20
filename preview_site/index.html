@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="light" data-film>
 <head>
   <meta name="msvalidate.01" content="85398C5CA5856F38064A25D1ADF08BA3" />
   <meta name="yandex-verification" content="81b44e84373bb0f4" />
@@ -938,6 +938,8 @@
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
   <link rel="stylesheet" href="css/polish.min.css?v=0993da75dcfb">
   <link rel="stylesheet" href="css/recent-work.min.css?v=71aa3308bb3c">
+  <!-- The story film's language on the homepage: one sheet, one cut (css/film.css). -->
+  <link rel="stylesheet" href="css/film.min.css?v=9cf7674e3e75">
   <link rel="stylesheet" href="css/hero-work-trail.min.css?v=38c2abc32a53">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543"></noscript>
@@ -1245,8 +1247,13 @@
     <section class="room paper-stack" id="design" data-room="design">
 
       <!-- Hero — brand, lede, CTA, portrait -->
-      <div class="hero hero-editorial paper-sheet" data-paper="hero" data-paper-fit>
+      <div class="hero hero-editorial paper-sheet" data-paper="hero" data-paper-fit data-film-portrait="assets/film/portrait-draw.bin?v=afea42a5600b" data-film-pen="assets/film/portrait-pen.json?v=1603a66ec2d7" data-film-logo-still="assets/film/logo-still.webp?v=81de9b71bbcc">
         <div class="paper-scroll">
+        <!-- One sheet, one cut: the ink field below the 61.8 % cut holds the brand's own
+             written-by-hand clip (Brand Kit 06-Motion, white on ink, never retimed). -->
+        <div class="film-ink" aria-hidden="true">
+          <video class="film-logo" src="assets/film/logo-write.mp4?v=77685f1af687" poster="assets/film/logo-still.webp?v=81de9b71bbcc" width="784" height="488" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback tabindex="-1"></video>
+        </div>
         <div class="hero-edition mono">
           <span class="hero-edition-place"><span class="hero-edition-dot" aria-hidden="true"></span><span data-i18n="hero.place">Based in Erbil</span></span>
           <span data-i18n="hero.since">Established 2014</span>
@@ -1399,6 +1406,23 @@
           <a class="gallery-archive-link mono" href="/archive/" data-i18n="gallery.archive">Browse the full archive ↗</a>
         </div>
       </div>
+
+      <!-- The archive, by discipline — the film's infographic, counted from the gallery manifest. -->
+      <section class="section film-archive" id="archiveChart" aria-labelledby="archiveChartTitle" data-film-manifest="assets/gallery-manifest.json?v=c20043016110">
+        <div class="film-archive-mid">
+          <div class="film-wall" data-film-wall aria-hidden="true"></div>
+          <header class="section-head film-archive-head">
+            <span class="section-num mono"><i class="fa-solid fa-grip" aria-hidden="true"></i> &nbsp; <span data-i18n="design.label">Design Room</span></span>
+            <h2 class="section-title film-archive-title" id="archiveChartTitle" data-film-copy="archive.title">The archive, <em>by discipline</em>.</h2>
+            <p class="film-archive-sum mono" data-film-sum>716 works · 686 images · 30 films</p>
+          </header>
+          <ol class="film-bars" data-film-bars></ol>
+          <div class="film-archive-foot">
+            <span class="film-archive-total" data-film-total aria-hidden="true">716</span>
+            <a class="film-archive-link mono" href="/archive/" data-i18n="gallery.archive">Browse the full archive ↗</a>
+          </div>
+        </div>
+      </section>
 
       <!-- Websites — a home sheet after the portfolio, not a room and not a tab. -->
       <div class="section sites-sheet" id="sites">
@@ -2523,6 +2547,12 @@
           </span>
           <h2 class="footer-cta-title" id="footerCtaTitle" data-i18n="f.cta.title">Let's make something <em>quietly</em> good together.</h2>
           <!--email_off--><a class="footer-email" href="mailto:hello@bqurtas.com">hello@bqurtas.com</a><!--/email_off-->
+          <!-- Optional outro: the brand's clip writes the name while it is played as music
+               (B♭ A D A D A F · C G D F A E). Silent and still until the visitor taps. -->
+          <button type="button" class="film-name" data-film-name aria-pressed="false"><span class="film-name-icon" aria-hidden="true"></span><span data-film-name-label>Hear the name</span></button>
+          <div class="film-outro" data-film-outro hidden>
+            <video src="assets/film/logo-write.mp4?v=77685f1af687" poster="assets/film/logo-still.webp?v=81de9b71bbcc" width="784" height="488" muted playsinline preload="none" disablepictureinpicture disableremoteplayback tabindex="-1" aria-hidden="true"></video>
+          </div>
         </div>
       </div>
 
@@ -2789,6 +2819,7 @@
   <script defer src="js/main.v420.min.js?v=6f70e3adee8b"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
   <script type="module" src="js/recent-work.min.js?v=25813f3f583a"></script>
+  <script defer src="js/film.min.js?v=fe97c04cfb9e"></script>
   <script defer src="js/hero-work-trail.min.js?v=2cae74284098"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2985,7 +3016,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=eb7badbe8666', { updateViaCache: 'none' })
+            .register('/sw.js?v=d6930bf64d91', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });
