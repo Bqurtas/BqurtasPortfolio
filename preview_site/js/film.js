@@ -1399,3 +1399,134 @@
   check();
 })();
 
+/* ═════ part: menu-cards ═════ */
+/* film part — the rooms menu. The curtain stays the site's own simple list; on a pointer
+   device the room under the pointer (or the keyboard focus) deals a small composition of
+   shapes and rounded cards on the curtain under the list: a different one for every room, built from
+   that room's own things. Nothing loads before the menu is first opened. */
+(() => {
+  'use strict';
+  const F = window.__bqFilm;
+  if (!F) return;
+  const { doc, root } = F;
+  const menu = doc.getElementById('mobileMenu');
+  if (!menu) return;
+  const links = [...menu.querySelectorAll('.mm-link[data-route]')];
+  if (!links.length) return;
+  const fine = typeof matchMedia === 'function' ? matchMedia('(hover: hover) and (pointer: fine) and (min-width: 1025px)') : null;
+  const isOpen = () => menu.classList.contains('is-open') || menu.classList.contains('is-ready');
+  let stage = null, hideTimer = 0;
+  const el = (tag, cls) => { const n = doc.createElement(tag); if (cls) n.className = cls; return n; };
+  const pic = (src) => { const im = el('img'); im.alt = ''; im.decoding = 'async'; if (src) im.src = src; return im; };
+
+  const build = () => {
+    if (stage) return stage;
+    stage = el('div', 'film-menu-stage');
+    stage.setAttribute('aria-hidden', 'true');
+    const comp = (room) => { const c = el('div', 'film-mc'); c.dataset.room = room; stage.append(c); return c; };
+
+    /* 1 · Design — a hand of three works from different disciplines */
+    const hand = [pic(), pic(), pic()];
+    comp('design').append(...hand);
+    F.getManifest().then((m) => {
+      const first = new Map();
+      for (const it of (Array.isArray(m.images) ? m.images : [])) {
+        const folder = String(it.path || '').split('/')[0];
+        if (!first.has(folder)) first.set(folder, it);
+      }
+      const picks = [];
+      for (const key of ['posters', 'book', 'logo', 'official', 'general']) {
+        const group = (F.GROUPS || []).find((g) => g[0] === key);
+        const it = group && group[1].map((f) => first.get(f)).find(Boolean);
+        if (it) picks.push(`/${String(F.thumbOf(it)).replace(/^\/+/, '')}`);
+        if (picks.length === 3) break;
+      }
+      hand.forEach((im, k) => { if (picks[k]) im.src = picks[k]; });
+    }).catch(() => { /* the hand stays three plain cards */ });
+
+    /* 2 · The Journal — a page (its title is the room's own name) and its number */
+    const page = el('div', 'film-mc-page');
+    const no = el('span', 'film-mc-no mono');
+    no.textContent = '№ 02';
+    page.append(no, el('strong', 'film-mc-title'));
+    for (let k = 0; k < 5; k++) page.append(el('i'));
+    const stamp = el('b', 'film-mc-stamp');
+    stamp.textContent = '02';
+    comp('blog').append(page, stamp);
+
+    /* 3 · The Designer — the portrait the hero shows, in a circle, and the years */
+    const face = el('div', 'film-mc-face');
+    const portrait = doc.querySelector('#heroPortrait img');
+    face.append(pic(portrait ? (portrait.currentSrc || portrait.src) : ''));
+    const years = el('span', 'film-mc-pill mono');
+    years.textContent = `2014 — ${new Date().getFullYear()}`;
+    comp('bio').append(face, years);
+
+    /* 4 · Let's talk — the address on a rounded letter */
+    const letter = el('div', 'film-mc-letter mono');
+    const address = el('span');
+    const mailto = doc.querySelector('a[href^="mailto:"]');
+    address.textContent = mailto ? mailto.getAttribute('href').replace(/^mailto:/, '').split('?')[0] : 'hello@bqurtas.com';
+    letter.append(el('i'), address);
+    const go = el('b', 'film-mc-go');
+    go.textContent = '↗';
+    comp('contact').append(letter, go);
+
+    /* 5 · Behance — three project covers (the data the Behance room itself reads) */
+    const covers = [pic(), pic(), pic()];
+    comp('behance').append(...covers);
+    const room = doc.getElementById('behance');
+    fetch((room && room.dataset.behanceSrc) || 'assets/behance/projects.json', { credentials: 'same-origin' })
+      .then((r) => r.json())
+      .then((d) => {
+        (d.projects || []).filter((p) => p.cover && (p.cover.small || p.cover.src)).slice(0, 3)
+          .forEach((p, k) => { covers[k].src = p.cover.small || p.cover.src; });
+      }).catch(() => { /* three plain squares */ });
+
+    doc.body.append(stage);
+    return stage;
+  };
+
+  const show = (link) => {
+    if ((fine && !fine.matches) || !isOpen()) return;
+    /* the stage has one place: on the curtain under the list, starting where the names start */
+    const last = links[links.length - 1].getBoundingClientRect();
+    const text = (link.querySelector('.mm-link-text') || link).getBoundingClientRect();
+    const top = last.bottom + 20;
+    const room = innerHeight - top - 16;
+    if (room < 96) return;                       // no room under the list on this screen
+    clearTimeout(hideTimer);
+    const s = build();
+    const rtl = getComputedStyle(link).direction === 'rtl';
+    s.style.setProperty('--mx', `${Math.round(rtl ? text.right : text.left)}px`);
+    s.style.setProperty('--my', `${Math.round(top)}px`);
+    s.style.setProperty('--ms', Math.min(1, room / 172).toFixed(3));
+    s.classList.toggle('is-rtl', rtl);
+    if (link.dataset.route === 'blog') {
+      const title = s.querySelector('.film-mc-title');
+      const name = link.querySelector('.mm-link-text');
+      if (title && name) title.textContent = name.textContent.trim();
+    }
+    s.dataset.room = link.dataset.route;
+    void s.offsetWidth;
+    s.classList.add('is-on');
+  };
+  const hide = () => {
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => { if (stage) stage.classList.remove('is-on'); }, 90);
+  };
+  links.forEach((link) => {
+    link.addEventListener('pointerenter', () => show(link));
+    link.addEventListener('focus', () => show(link));
+    link.addEventListener('pointerleave', hide);
+    link.addEventListener('blur', hide);
+  });
+  /* build (and start loading the pictures) when the menu is first opened; put the stage away when it closes */
+  if (typeof MutationObserver === 'function') {
+    new MutationObserver(() => {
+      if (isOpen()) { if (!fine || fine.matches) build(); }
+      else if (stage) stage.classList.remove('is-on');
+    }).observe(menu, { attributes: true, attributeFilter: ['class'] });
+  }
+})();
+
