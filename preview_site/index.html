@@ -691,6 +691,15 @@
         if (appleBar) appleBar.setAttribute('content', theme === 'dark' ? 'black-translucent' : 'default');
       } catch (e) {}
       try {
+        /* The film's opening: once per session, on the homepage only, never with
+           reduced motion, and never when the dashboard has switched it off. */
+        if (root.hasAttribute('data-film') && !route && !sessionStorage.getItem('bq_film_splash')
+            && localStorage.getItem('bq_splash') !== 'off'
+            && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          root.classList.add('film-splashing');
+        }
+      } catch (e) {}
+      try {
         var compactMq = window.matchMedia('(max-width: 1024px)');
         var syncCompact = function () {
           root.classList.toggle('bq-compact', compactMq.matches);
@@ -939,16 +948,26 @@
   <link rel="stylesheet" href="css/polish.min.css?v=0993da75dcfb">
   <link rel="stylesheet" href="css/recent-work.min.css?v=71aa3308bb3c">
   <!-- The story film's language on the homepage: one sheet, one cut (css/film.css). -->
-  <link rel="stylesheet" href="css/film.min.css?v=e1108ba0c84a">
+  <link rel="stylesheet" href="css/film.min.css?v=fe3ac8f46c2d">
   <link rel="stylesheet" href="css/hero-work-trail.min.css?v=38c2abc32a53">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543"></noscript>
+
 
 
 </head>
 <body>
 
   <a class="skip-link" href="#top" data-skip-link data-i18n="a11y.skip">Skip to content</a>
+
+  <!-- The film's opening (css/film.css, js/film.js): shown only while html.film-splashing. -->
+  <div class="film-splash" id="filmSplash" aria-hidden="true">
+    <b></b><b></b>
+    <span class="film-splash-tag mono">bqurtas.com</span>
+    <span class="film-splash-tag mono">2014 — Now</span>
+    <span class="film-splash-name" data-src="assets/film/logo-write.mp4?v=d04c2b1266c2" data-still="assets/film/logo-still.webp?v=5a358370fa6f"></span>
+    <i></i>
+  </div>
 
   <!-- Grain overlay -->
   <div class="grain" aria-hidden="true"></div>
@@ -1496,13 +1515,13 @@
                   <span class="site-bar-end mono"><span data-i18n="sites.visit">Visit</span><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
                 </span>
                 <span class="site-view">
-                  <img class="site-shot site-shot--cover is-active" data-site="bq" src="assets/covers/en-home.jpg?v=41685e24e4e0" alt="" width="1200" height="630" loading="lazy" decoding="async" />
+                  <img class="site-shot is-active" data-site="bq" src="assets/sites/bqurtas-home-desktop.webp" alt="" width="1440" height="900" loading="lazy" decoding="async" />
                   <img class="site-shot" data-site="sun" src="assets/sites/sunoferbil-desktop.webp?v=cfc8f6544598" alt="" width="1440" height="900" loading="lazy" decoding="async" />
                   <img class="site-shot" data-site="kosan" src="assets/sites/kosanh-desktop.webp?v=bd1bba6643b7" alt="" width="1440" height="900" loading="lazy" decoding="async" />
                 </span>
               </span>
               <span class="site-phone">
-                <img class="site-shot site-shot--cover is-active" data-site="bq" src="assets/covers/en-home.jpg?v=41685e24e4e0" alt="" width="1200" height="630" loading="lazy" decoding="async" />
+                <img class="site-shot is-active" data-site="bq" src="assets/sites/bqurtas-home-mobile.webp" alt="" width="390" height="844" loading="lazy" decoding="async" />
                 <img class="site-shot" data-site="sun" src="assets/sites/sunoferbil-mobile.webp?v=0fcdab2af5ea" alt="" width="390" height="844" loading="lazy" decoding="async" />
                 <img class="site-shot" data-site="kosan" src="assets/sites/kosanh-mobile.webp?v=6d0e60d4ce86" alt="" width="390" height="844" loading="lazy" decoding="async" />
               </span>
@@ -1716,6 +1735,53 @@
       </div>
       </div>
       </div>
+
+      <!-- Evidence, not adjectives — the film's figures: four counts, a timeline, seven languages. -->
+      <section class="section film-evidence" id="evidence" aria-labelledby="evidenceTitle">
+        <div class="film-ev-mid">
+          <header class="section-head film-ev-head">
+            <span class="section-num mono"><i class="fa-solid fa-newspaper" aria-hidden="true"></i> &nbsp; <span data-i18n="bio.press">Recognition &amp; Sources</span></span>
+            <h2 class="section-title film-ev-title" id="evidenceTitle" data-film-copy="ev.title">Evidence, <em>not adjectives</em>.</h2>
+          </header>
+          <ul class="film-ev-figs" aria-label="Practice statistics">
+            <li class="film-ev-fig" data-ev="designs">
+              <span class="film-ev-num"><b data-ev-to="1000">1,000</b><i aria-hidden="true">+</i></span>
+              <span class="film-ev-label mono"><i class="fa-solid fa-palette" aria-hidden="true"></i> <span data-i18n="st.designs">Designs</span></span>
+              <span class="film-ev-viz" aria-hidden="true"></span>
+            </li>
+            <li class="film-ev-fig" data-ev="clients">
+              <span class="film-ev-num"><b data-ev-to="25">25</b><i aria-hidden="true">+</i></span>
+              <span class="film-ev-label mono"><i class="fa-solid fa-handshake" aria-hidden="true"></i> <span data-i18n="st.clients">Clients</span></span>
+              <span class="film-ev-viz" aria-hidden="true"></span>
+            </li>
+            <li class="film-ev-fig" data-ev="logos">
+              <span class="film-ev-num"><b data-ev-to="20">20</b><i aria-hidden="true">+</i></span>
+              <span class="film-ev-label mono"><i class="fa-solid fa-pen-nib" aria-hidden="true"></i> <span data-i18n="st.logos">Logos</span></span>
+              <span class="film-ev-viz" aria-hidden="true"></span>
+            </li>
+            <li class="film-ev-fig" data-ev="books">
+              <span class="film-ev-num"><b data-ev-to="100">100</b><i aria-hidden="true">+</i></span>
+              <span class="film-ev-label mono"><i class="fa-solid fa-book" aria-hidden="true"></i> <span data-i18n="st.books">Books</span></span>
+              <span class="film-ev-viz" aria-hidden="true"></span>
+            </li>
+          </ul>
+          <div class="film-ev-time">
+            <div class="film-ev-rule" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>
+            <ol class="film-ev-line">
+              <li><time class="mono" datetime="2014">2014</time><span data-film-copy="ev.t1">Practice established</span></li>
+              <li><time class="mono" datetime="2019">2019</time><span data-i18n="ex2.title">Former designer at Protocol Media</span></li>
+              <li><time class="mono" datetime="2021">2021</time><span data-i18n="ex1.title">Designer at Directorate of Media Affairs</span></li>
+              <li><time class="mono" datetime="2026">2026</time><span data-i18n="h1.t">Honorary Medal — President</span></li>
+            </ol>
+          </div>
+          <div class="film-ev-langs">
+            <span class="film-ev-langs-label mono"><i class="fa-solid fa-globe" aria-hidden="true"></i> <span data-film-copy="ev.langs">The site speaks seven languages</span></span>
+            <div class="film-ev-pills" dir="ltr">
+              <button type="button" class="film-ev-pill mono" data-film-lang="en">EN</button><button type="button" class="film-ev-pill mono" data-film-lang="ku">KU</button><button type="button" class="film-ev-pill mono" data-film-lang="kmr">KMR</button><button type="button" class="film-ev-pill mono" data-film-lang="ar">AR</button><button type="button" class="film-ev-pill mono" data-film-lang="fr">FR</button><button type="button" class="film-ev-pill mono" data-film-lang="tr">TR</button><button type="button" class="film-ev-pill mono" data-film-lang="sv">SV</button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- ===== DESIGNED MARKS, THEN PEOPLE & PLACES ===== -->
       <div class="section logos-section">
@@ -2819,7 +2885,7 @@
   <script defer src="js/main.v420.min.js?v=6f70e3adee8b"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
   <script type="module" src="js/recent-work.min.js?v=25813f3f583a"></script>
-  <script defer src="js/film.min.js?v=da61d40ad988"></script>
+  <script defer src="js/film.min.js?v=23038a42aa4e"></script>
   <script defer src="js/hero-work-trail.min.js?v=2cae74284098"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -3016,7 +3082,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=4ac04b1e787e', { updateViaCache: 'none' })
+            .register('/sw.js?v=88c2d95b9245', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

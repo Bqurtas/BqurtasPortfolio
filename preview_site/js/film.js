@@ -26,13 +26,13 @@
 
   /* ── copy that is new on the page (the rest comes from the site's i18n) ── */
   const COPY = {
-    en: { 'archive.title': 'The archive, <em>by discipline</em>.', works: 'works', images: 'images', films: 'films', play: 'Hear the name', stop: 'Stop' },
-    ku: { 'archive.title': 'ئەرشیف، <em>بەپێی بوار</em>.', works: 'کار', images: 'وێنە', films: 'فیلم', play: 'گوێ لە ناوەکە بگرە', stop: 'ڕاگرتن' },
-    kmr: { 'archive.title': 'Arşîv, <em>li gorî qadê</em>.', works: 'kar', images: 'wêne', films: 'fîlm', play: 'Navê bibihîze', stop: 'Rawestîne' },
-    ar: { 'archive.title': 'الأرشيف، <em>حسب التخصص</em>.', works: 'عملاً', images: 'صورة', films: 'فيلماً', play: 'استمع إلى الاسم', stop: 'إيقاف' },
-    fr: { 'archive.title': 'L’archive, <em>par discipline</em>.', works: 'œuvres', images: 'images', films: 'films', play: 'Écouter le nom', stop: 'Arrêter' },
-    tr: { 'archive.title': 'Arşiv, <em>disipline göre</em>.', works: 'iş', images: 'görsel', films: 'film', play: 'İsmi dinle', stop: 'Durdur' },
-    sv: { 'archive.title': 'Arkivet, <em>per disciplin</em>.', works: 'verk', images: 'bilder', films: 'filmer', play: 'Lyssna på namnet', stop: 'Stoppa' }
+    en: { 'ev.title': 'Evidence, <em>not adjectives</em>.', 'ev.t1': 'Practice established', 'ev.langs': 'The site speaks seven languages', 'archive.title': 'The archive, <em>by discipline</em>.', works: 'works', images: 'images', films: 'films', play: 'Hear the name', stop: 'Stop' },
+    ku: { 'ev.title': 'بەڵگە، <em>نەک ئاوەڵناو</em>.', 'ev.t1': 'دەستپێکی کار', 'ev.langs': 'سایتەکە بە حەوت زمان دەدوێت', 'archive.title': 'ئەرشیف، <em>بەپێی بوار</em>.', works: 'کار', images: 'وێنە', films: 'فیلم', play: 'گوێ لە ناوەکە بگرە', stop: 'ڕاگرتن' },
+    kmr: { 'ev.title': 'Delîl, <em>ne rengdêr</em>.', 'ev.t1': 'Destpêka xebatê', 'ev.langs': 'Malper bi heft zimanan diaxive', 'archive.title': 'Arşîv, <em>li gorî qadê</em>.', works: 'kar', images: 'wêne', films: 'fîlm', play: 'Navê bibihîze', stop: 'Rawestîne' },
+    ar: { 'ev.title': 'أدلّة، <em>لا صفات</em>.', 'ev.t1': 'بداية الممارسة', 'ev.langs': 'الموقع يتحدث سبع لغات', 'archive.title': 'الأرشيف، <em>حسب التخصص</em>.', works: 'عملاً', images: 'صورة', films: 'فيلماً', play: 'استمع إلى الاسم', stop: 'إيقاف' },
+    fr: { 'ev.title': 'Des preuves, <em>pas des adjectifs</em>.', 'ev.t1': 'Début de la pratique', 'ev.langs': 'Le site parle sept langues', 'archive.title': 'L’archive, <em>par discipline</em>.', works: 'œuvres', images: 'images', films: 'films', play: 'Écouter le nom', stop: 'Arrêter' },
+    tr: { 'ev.title': 'Kanıt, <em>sıfat değil</em>.', 'ev.t1': 'Pratiğin başlangıcı', 'ev.langs': 'Site yedi dil konuşuyor', 'archive.title': 'Arşiv, <em>disipline göre</em>.', works: 'iş', images: 'görsel', films: 'film', play: 'İsmi dinle', stop: 'Durdur' },
+    sv: { 'ev.title': 'Belägg, <em>inte adjektiv</em>.', 'ev.t1': 'Praktiken grundas', 'ev.langs': 'Sajten talar sju språk', 'archive.title': 'Arkivet, <em>per disciplin</em>.', works: 'verk', images: 'bilder', films: 'filmer', play: 'Lyssna på namnet', stop: 'Stoppa' }
   };
   const lang = () => {
     const l = String(root.dataset.lang || '').toLowerCase();
@@ -1047,6 +1047,98 @@
   }
 
   /* ════════════════ language, then everything else ════════════════ */
+  /* ════════════════ 8b. EVIDENCE, NOT ADJECTIVES ════════════════ */
+  function buildEvidence() {
+    const sec = doc.getElementById('evidence');
+    if (!sec) return;
+    const viz = (key) => sec.querySelector(`.film-ev-fig[data-ev="${key}"] .film-ev-viz`);
+    const fill = (box, n, each) => {
+      if (!box) return;
+      for (let k = 0; k < n; k++) {
+        const el = doc.createElement('i');
+        el.style.setProperty('--k', String(k));
+        if (each) each(el, k);
+        box.append(el);
+      }
+    };
+    fill(viz('clients'), 25);
+    fill(viz('logos'), 20);
+    fill(viz('books'), 50, (el, k) => el.style.setProperty('--h', `${56 + ((k * 37 + (k % 5) * 23) % 45)}%`));
+    /* designs: a strip cut from the work — the same twelve heads the archive already loaded */
+    const strip = () => {
+      const box = viz('designs');
+      if (!box || box.childElementCount) return;
+      const heads = [...doc.querySelectorAll('#archiveChart .film-bars img')].map((im) => im.currentSrc || im.src).filter(Boolean);
+      if (!heads.length) { fill(box, 36); return; }
+      for (let k = 0; k < 36; k++) {
+        const im = doc.createElement('img');
+        im.alt = ''; im.decoding = 'async'; im.loading = 'lazy'; im.src = heads[k % heads.length];
+        im.style.setProperty('--k', String(k));
+        box.append(im);
+      }
+    };
+    const pills = [...sec.querySelectorAll('[data-film-lang]')];
+    const mark = () => pills.forEach((p) => p.setAttribute('aria-current', String(p.dataset.filmLang === lang())));
+    pills.forEach((p) => p.addEventListener('click', () => {
+      const opt = doc.querySelector(`.lang-opt[data-lang="${p.dataset.filmLang}"]`);
+      if (opt) opt.click();
+    }));
+    doc.addEventListener('bq:language', mark);
+    mark();
+    onceVisible(sec, () => {
+      strip();
+      raf2(() => sec.classList.add('is-in'));
+      sec.querySelectorAll('[data-ev-to]').forEach((b, i) => {
+        if (b.firstChild && b.firstChild.nodeType === 3) rollNumber(b.firstChild, Number(b.dataset.evTo), 200 + i * 140, 1100);
+      });
+    }, 0.3);
+  }
+
+  /* ════════════════ 0. THE OPENING — the name writes itself on ink, a hairline is
+     drawn on the cut, and the sheet opens there. Once per session; any tap skips it. ════════════════ */
+  function runSplash(then) {
+    const el = doc.getElementById('filmSplash');
+    const on = root.classList.contains('film-splashing');
+    let finished = false;
+    const go = () => { if (!finished) { finished = true; then(); } };
+    if (!el || !on) { root.classList.remove('film-splashing'); if (el) el.remove(); go(); return; }
+    try { sessionStorage.setItem('bq_film_splash', '1'); } catch (e) { /* private mode */ }
+    const holder = el.querySelector('.film-splash-name');
+    let opened = false;
+    const open = () => {
+      if (opened) return;
+      opened = true;
+      el.classList.add('is-open');
+      go();                                   // the hero starts drawing as the sheet opens
+      setTimeout(() => { root.classList.remove('film-splashing'); el.remove(); }, 900);
+    };
+    if (holder) {
+      const v = doc.createElement('video');
+      v.muted = true; v.playsInline = true; v.preload = 'auto';
+      v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+      v.disablePictureInPicture = true;
+      v.poster = '';
+      v.src = holder.dataset.src || '';
+      v.addEventListener('ended', () => setTimeout(open, 180), { once: true });
+      v.addEventListener('timeupdate', () => { if (v.duration && v.currentTime > v.duration - 0.9) open(); });
+      holder.append(v);
+      const p = v.play();
+      const fallback = () => {
+        if (opened || holder.querySelector('img')) return;
+        const im = doc.createElement('img');
+        im.alt = ''; im.src = holder.dataset.still || '';
+        v.remove(); holder.append(im);
+      };
+      if (p && typeof p.catch === 'function') p.catch(fallback);
+      setTimeout(() => { if (v.paused || v.readyState < 2) fallback(); }, 900);
+    }
+    raf2(() => el.classList.add('is-on'));
+    const skip = () => open();
+    el.addEventListener('pointerdown', skip, { once: true });
+    addEventListener('keydown', skip, { once: true });
+    setTimeout(open, 4300);                   // never longer than the written name
+  }
+
   function applyCopy() {
     const dict = COPY[lang()] || COPY.en;
     doc.querySelectorAll('[data-film-copy]').forEach((el) => {
@@ -1061,11 +1153,12 @@
   doc.addEventListener('bq:language', applyCopy);
   applyCopy();
 
-  startHero();
+  runSplash(startHero);
   rise();
   tabsPop();
   buildArchive();
   buildFolio();
+  buildEvidence();
   nameOutro();
   /* curtains after the paper deck has placed its sheets */
   const lateStart = () => setTimeout(curtains, 60);
