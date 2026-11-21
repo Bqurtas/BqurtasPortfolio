@@ -691,9 +691,9 @@
         if (appleBar) appleBar.setAttribute('content', theme === 'dark' ? 'black-translucent' : 'default');
       } catch (e) {}
       try {
-        /* The film's opening: once per session, on the homepage only, never with
-           reduced motion, and never when the dashboard has switched it off. */
-        if (root.hasAttribute('data-film') && !route && !sessionStorage.getItem('bq_film_splash')
+        /* The film's opening: with every load of the homepage, never with reduced
+           motion, and never when the dashboard has switched it off. */
+        if (root.hasAttribute('data-film') && !route
             && localStorage.getItem('bq_splash') !== 'off'
             && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           root.classList.add('film-splashing');
@@ -948,7 +948,7 @@
   <link rel="stylesheet" href="css/polish.min.css?v=0993da75dcfb">
   <link rel="stylesheet" href="css/recent-work.min.css?v=71aa3308bb3c">
   <!-- The story film's language on the homepage: one sheet, one cut (css/film.css). -->
-  <link rel="stylesheet" href="css/film.min.css?v=b2abfd021f72">
+  <link rel="stylesheet" href="css/film.min.css?v=c5275a465232">
   <link rel="stylesheet" href="css/hero-work-trail.min.css?v=38c2abc32a53">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543"></noscript>
@@ -2890,7 +2890,7 @@
   <script defer src="js/main.v420.min.js?v=6f70e3adee8b"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
   <script type="module" src="js/recent-work.min.js?v=25813f3f583a"></script>
-  <script defer src="js/film.min.js?v=9258fef0e3bf"></script>
+  <script defer src="js/film.min.js?v=504e4293b4df"></script>
   <script defer src="js/hero-work-trail.min.js?v=2cae74284098"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -3087,7 +3087,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=f41acea6077d', { updateViaCache: 'none' })
+            .register('/sw.js?v=f33f3dde65d5', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

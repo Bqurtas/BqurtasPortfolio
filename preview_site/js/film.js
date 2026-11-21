@@ -213,17 +213,37 @@
      (LOGO_SPLIT/QURTAS_SHIFT only apply to a two-line lockup; 0 = draw whole.) */
   const LOGO_W = 900, LOGO_H = 200, LOGO_SPLIT = 0, QURTAS_SHIFT = 0;
   let logoCanvas = null, logoCtx = null, logoStill = null, logoFrame = 0;
+  /* The hero's own canvas is keyed: the clip's brightness becomes the alpha of the field's
+     opposite tone (paper on the ink field, ink on the paper field in dark), so the name
+     sits on the field itself — no box, no blend mode, whatever the black. */
+  function keyLogo(c) {
+    try {
+      const frame = c.getImageData(0, 0, LOGO_W, LOGO_H);
+      const px = frame.data;
+      const tone = root.dataset.theme === 'dark' ? 22 : 243;
+      for (let i = 0; i < px.length; i += 4) {
+        const a = (px[i] - 20) * 1.085;            // 20 = the clip's ink, 255 = its white
+        px[i] = px[i + 1] = px[i + 2] = tone;
+        px[i + 3] = a <= 0 ? 0 : a >= 255 ? 255 : a;
+      }
+      c.putImageData(frame, 0, 0);
+    } catch (e) { /* nothing drawn yet */ }
+  }
   function drawLogo(src, ctx = logoCtx) {
     if (!ctx) return;
     const c = ctx;
     c.fillStyle = '#141414';
     c.fillRect(0, 0, LOGO_W, LOGO_H);
-    if (!src) return;
-    try {
-      if (!LOGO_SPLIT) { c.drawImage(src, 0, 0, LOGO_W, LOGO_H); return; }
-      c.drawImage(src, 0, 0, LOGO_W, LOGO_SPLIT, 0, 0, LOGO_W, LOGO_SPLIT);
-      c.drawImage(src, 0, LOGO_SPLIT, LOGO_W, LOGO_H - LOGO_SPLIT, QURTAS_SHIFT, LOGO_SPLIT, LOGO_W, LOGO_H - LOGO_SPLIT);
-    } catch { /* the frame is not decoded yet */ }
+    if (src) {
+      try {
+        if (!LOGO_SPLIT) c.drawImage(src, 0, 0, LOGO_W, LOGO_H);
+        else {
+          c.drawImage(src, 0, 0, LOGO_W, LOGO_SPLIT, 0, 0, LOGO_W, LOGO_SPLIT);
+          c.drawImage(src, 0, LOGO_SPLIT, LOGO_W, LOGO_H - LOGO_SPLIT, QURTAS_SHIFT, LOGO_SPLIT, LOGO_W, LOGO_H - LOGO_SPLIT);
+        }
+      } catch { /* the frame is not decoded yet */ }
+    }
+    if (c === logoCtx) keyLogo(c);
   }
   function followLogo() {
     cancelAnimationFrame(logoFrame);
@@ -240,13 +260,21 @@
     logoCanvas.width = LOGO_W;
     logoCanvas.height = LOGO_H;
     logoCanvas.setAttribute('aria-hidden', 'true');
-    logoCtx = logoCanvas.getContext('2d');
+    logoCtx = logoCanvas.getContext('2d', { willReadFrequently: true });
     logo.after(logoCanvas);
     hero.classList.add('film-logo-drawn');
     drawLogo(null);
     logo.addEventListener('playing', followLogo);
     logo.addEventListener('seeked', () => { if (logo.paused) drawLogo(logo); });
     logo.addEventListener('ended', () => drawLogo(logo));
+    if (typeof MutationObserver === 'function') {
+      new MutationObserver(() => {
+        if (!logo.paused && !logo.ended) return;       // the running clip repaints itself
+        const shown = (logo.readyState >= 2 && (logo.ended || logo.currentTime > 0)) ? logo
+          : (logoStill && logoStill.complete && logoStill.naturalWidth ? logoStill : null);
+        if (shown) drawLogo(shown);
+      }).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+    }
     logoStill = new Image();
     logoStill.decoding = 'async';
     logoStill.addEventListener('load', () => { if (!blank && logo.paused) drawLogo(logoStill); }, { once: true });
@@ -1049,7 +1077,7 @@
 
   /* The opening (film-parts/splash) starts the hero as it opens; without an opening the
      hero starts at once. The timer is only a failsafe for an opening that never ran. */
-  if (root.classList.contains('film-splashing')) setTimeout(beginHero, 6500);
+  if (root.classList.contains('film-splashing')) setTimeout(beginHero, 4200);
   else beginHero();
   rise();
   tabsPop();
@@ -1073,7 +1101,6 @@
     F.beginHero();
     return;
   }
-  try { sessionStorage.setItem('bq_film_splash', '1'); } catch (e) { /* private mode */ }
 
   /* the shutters part exactly on the hero's own cut line */
   const seam = () => {
@@ -1094,7 +1121,7 @@
     el.classList.add('is-open');
     F.beginHero();                            // the hero starts drawing as the window opens
     removeEventListener('resize', seam);
-    setTimeout(() => { root.classList.remove('film-splashing'); el.remove(); }, 900);
+    setTimeout(() => { root.classList.remove('film-splashing'); el.remove(); }, 760);
   };
 
   const holder = el.querySelector('.film-splash-name');
@@ -1139,22 +1166,27 @@
       cancelAnimationFrame(frame);
       const im = new Image();
       im.decoding = 'async';
-      im.onload = () => { paint(im); holder.classList.add('is-still'); setTimeout(open, 2600); };
+      im.onload = () => { paint(im); holder.classList.add('is-still'); setTimeout(open, 1300); };
       im.src = holder.dataset.still || '';
     };
     v.addEventListener('playing', () => { cancelAnimationFrame(frame); draw(); });
-    v.addEventListener('ended', () => { draw(); setTimeout(open, 350); }, { once: true });
-    v.addEventListener('timeupdate', () => { if (v.duration && v.currentTime > 3.15) setTimeout(open, 350); });
+    v.addEventListener('ended', () => { draw(); setTimeout(open, 120); }, { once: true });
+    v.addEventListener('timeupdate', () => { if (v.duration && v.currentTime > 3.15) setTimeout(open, 120); });
     v.addEventListener('error', still, { once: true });
+    /* the opening is brisk: the clip writes at twice its pace here (the hero keeps the clip's own) */
+    const RATE = 2;
+    v.defaultPlaybackRate = RATE;
+    v.addEventListener('loadedmetadata', () => { v.playbackRate = RATE; });
     v.src = holder.dataset.src || '';
+    v.playbackRate = RATE;
     const p = v.play();
     if (p && typeof p.catch === 'function') p.catch(still);
-    setTimeout(() => { if (v.paused || v.readyState < 2) still(); }, 1100);
+    setTimeout(() => { if (v.paused || v.readyState < 2) still(); }, 800);
   }
   raf2(() => el.classList.add('is-on'));
   el.addEventListener('pointerdown', open, { once: true });
   addEventListener('keydown', open, { once: true });
-  setTimeout(open, 5200);                     // never longer than the written name
+  setTimeout(open, 3000);                     // never longer than the written name
 })();
 
 /* ═════ part: evidence ═════ */
