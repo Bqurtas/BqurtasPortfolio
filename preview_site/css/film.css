@@ -41,7 +41,9 @@
 :root[data-film] #design#design#design#design .film-hero .hero-corners,
 :root[data-film] #design#design#design#design .film-hero .hero-scrolldown,
 :root[data-film] #design#design#design#design .film-hero .hero-sign-hand,
-:root[data-film] #design#design#design#design .film-hero .hero-work-mark {
+:root[data-film] #design#design#design#design .film-hero .hero-work-mark,
+:root[data-film] #design#design#design#design .film-hero .hero-work-discover,
+:root[data-film] #design#design#design#design .film-hero .hero-work-folio {
   display: none !important;
 }
 
@@ -223,9 +225,7 @@
 :root[data-film][data-theme="dark"] #design#design#design#design .film-hero .hero-cta:focus-visible {
   outline-color: var(--film-ink) !important;
 }
-:root[data-film][data-theme="dark"] #design#design#design#design .film-hero :is(.hero-work-discover, .hero-work-hint, .hero-work-caption, .hero-work-note) {
-  color: var(--film-graphite) !important;
-}
+
 :root[data-film] #design#design#design#design .film-hero .hero-cta,
 :root[data-film] #design#design#design#design .film-hero .hero-cta * {
   color: var(--film-ink) !important;
@@ -346,9 +346,6 @@
   outline-offset: 3px !important;
 }
 /* "Hold to discover" & friends sit on the ink now */
-:root[data-film] #design#design#design#design .film-hero :is(.hero-work-discover, .hero-work-hint, .hero-work-caption, .hero-work-note) {
-  color: var(--film-on-ink-soft) !important;
-}
 
 /* the pen's own canvas, above everything while it draws */
 :root[data-film] .film-pen {
@@ -385,9 +382,6 @@
     bottom: calc(var(--dock-h, 64px) + 12px) !important;
     left: 20px !important;
     right: 20px !important;
-  }
-  :root[data-film] #design#design#design#design .film-hero :is(.hero-work-discover, .hero-work-hint, .hero-work-note, .hero-work-count, .hero-work-glimpse) {
-    display: none !important;
   }
   :root[data-film] #design#design#design#design .film-hero .hero-kicker { display: none !important; }
   :root[data-film] #design#design#design#design .film-hero .hero-lede {
