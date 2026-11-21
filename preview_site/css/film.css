@@ -2750,3 +2750,254 @@ html body .film-menu-stage .film-mc-letter { text-transform: none; }
   transition: background-color .25s ease, color .25s ease !important;
 }
 
+/* ═════ recent-plates ═════ */
+/* RECENT WORK — the film's S03, rebuilt (owner, 2026-11-22: "not beautiful, balanced or tidy").
+   Every work sits on a calm rounded PLATE of the opposite tone (ink on the light sheet,
+   paper on the dark one): kind and date on the top line, the work whole in the middle,
+   the numeral and the title on the bottom line. Two flat tints wait behind it, stepped
+   back. The arrows stand on either side of the plate (under it on narrow sheets).
+   Flat: no strokes, rings or shadows; the plate's own tone separates it. */
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio {
+  --pl: #161616;            /* the plate: the site's own black */
+  --pl-on: #f3f3f3;         /* its type: the site's own white */
+  --pl-sheet: #f3f3f3;      /* the sheet it waits on */
+  --peek: clamp(18px, 3.2vh, 30px);
+  --stage-h: clamp(300px, calc(58vh / var(--bq-paper-fit, 1)), 600px);   /* the sheet's fit zooms it: never twice */
+  --pw: min(100%, calc((var(--stage-h) - var(--peek)) * 1.24));
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto var(--pw) auto minmax(0, 1fr) !important;
+  grid-template-rows: auto !important;
+  align-items: center !important;
+  column-gap: clamp(16px, 3vw, 48px) !important;
+  row-gap: clamp(14px, 2.2vh, 22px) !important;
+  inline-size: 100% !important;
+  block-size: auto !important;
+  min-block-size: 0 !important;
+}
+:root[data-film][data-theme="dark"] body #design#design#design#design#design #recent-work#recent-work .film-folio { --pl: #f3f3f3; --pl-on: #161616; --pl-sheet: #161616; }
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .recent-folio { block-size: auto !important; min-block-size: 0 !important; display: block !important; }
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-meta,
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-nav { display: contents !important; }
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-index,
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-title,
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-tag { display: none !important; }
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-stage {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  order: 0 !important;
+  position: relative !important;
+  inline-size: 100% !important;
+  block-size: var(--stage-h) !important;
+  min-block-size: 0 !important;
+  margin: 0 !important;
+  perspective: 1600px;
+}
+/* the arrows: round, flat, the sheet's own ink; one on each side of the plate */
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-btn {
+  grid-row: 1 !important;
+  align-self: center !important;
+  display: grid !important;
+  place-items: center !important;
+  inline-size: clamp(44px, 3.4vw, 54px) !important;
+  block-size: clamp(44px, 3.4vw, 54px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: color-mix(in srgb, var(--pl) 7%, transparent) !important;
+  color: var(--pl) !important;
+  box-shadow: none !important;
+  font-size: clamp(16px, 1.3vw, 19px) !important;
+  line-height: 1 !important;
+  cursor: pointer;
+  transition: background-color .25s ease, color .25s ease !important;
+}
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-btn[data-dir="-1"] { grid-column: 2 !important; }
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-btn[data-dir="1"] { grid-column: 4 !important; }
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-btn:is(:hover, :focus-visible) { background: var(--pl) !important; color: var(--pl-on) !important; }
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-btn:focus-visible { outline: 2px solid var(--pl) !important; outline-offset: 3px !important; }
+:root[dir="rtl"][data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-btn { transform: scaleX(-1) !important; }
+
+/* the plates */
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card {
+  position: absolute !important;
+  inset: var(--peek) auto 0 50% !important;
+  inline-size: var(--pw) !important;
+  block-size: auto !important;
+  aspect-ratio: auto !important;
+  margin: 0 0 0 calc(var(--pw) / -2) !important;
+  padding: clamp(14px, 1.6vw, 22px) !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  gap: clamp(10px, 1.4vh, 16px) !important;
+  border: 0 !important;
+  border-radius: clamp(16px, 1.6vw, 24px) !important;
+  background: var(--pl) !important;
+  color: var(--pl-on) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  overflow: hidden !important;
+  text-decoration: none !important;
+  opacity: 1;
+  transform-origin: 50% 0 !important;
+  transform: translateY(calc(var(--pos, 0) * var(--peek) / -1.6)) scale(calc(1 - var(--pos, 0) * .055)) !important;
+  z-index: calc(10 - var(--pos, 0)) !important;
+  transition: transform .7s cubic-bezier(.16, 1, .3, 1), background-color .5s ease, opacity .4s ease !important;
+}
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card::before,
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card::after { content: none !important; display: none !important; }
+/* the waiting plates are flat tints of the plate, stepping back */
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card:not([style*="--pos: 0"]) > * { opacity: 0; transition: opacity .3s ease; }
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card[aria-hidden="true"] > * { opacity: 0 !important; }
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card[aria-hidden="true"] { background: color-mix(in srgb, var(--pl) calc(100% - var(--pos, 0) * 34%), var(--pl-sheet)) !important; pointer-events: auto; }
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card.is-deep,
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card.is-out { opacity: 0 !important; visibility: hidden !important; }
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card.is-out { display: none !important; }
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card[aria-hidden="false"] > * { opacity: 1 !important; transition: opacity .35s ease .15s !important; }
+
+/* top line: the kind and the date */
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-plate-top {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: baseline !important;
+  gap: 12px !important;
+  min-inline-size: 0 !important;
+  font-family: 'JetBrains Mono', ui-monospace, monospace !important;
+  font-size: clamp(10px, .72vw, 11.5px) !important;
+  letter-spacing: .16em !important;
+  text-transform: uppercase !important;
+  line-height: 1.2 !important;
+  color: color-mix(in srgb, var(--pl-on) 64%, transparent) !important;
+  white-space: nowrap !important;
+}
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-plate-top > span { overflow: hidden; text-overflow: ellipsis; }
+:root[dir="rtl"][data-film] body #design#design#design#design#design #recent-work#recent-work .film-plate-top { letter-spacing: 0 !important; }
+/* the work, whole, on the plate's own tone */
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-plate-media {
+  position: relative !important;
+  display: grid !important;
+  place-items: center !important;
+  min-block-size: 0 !important;
+  overflow: hidden !important;
+  border-radius: clamp(8px, .8vw, 12px) !important;
+}
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-plate-media > img {
+  position: static !important;
+  inset: auto !important;
+  display: block !important;
+  inline-size: 100% !important;
+  block-size: 100% !important;
+  max-inline-size: 100% !important;
+  max-block-size: 100% !important;
+  object-fit: contain !important;
+  object-position: 50% 50% !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  filter: none !important;
+  transform: none !important;
+  transition: transform .8s cubic-bezier(.16, 1, .3, 1) !important;
+}
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card[aria-hidden="false"]:is(:hover, :focus-visible) .film-plate-media > img { transform: scale(1.025) !important; }
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card.is-film .film-plate-media::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: clamp(38px, 3.4vw, 52px);
+  block-size: clamp(38px, 3.4vw, 52px);
+  margin: calc(clamp(38px, 3.4vw, 52px) / -2) 0 0 calc(clamp(38px, 3.4vw, 52px) / -2);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--pl) 70%, transparent) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9 6.5v11l9-5.5z' fill='%23f3f3f3'/></svg>") center / 46% no-repeat;
+  pointer-events: none;
+}
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card:focus-visible { outline: 2px solid var(--pl) !important; outline-offset: 4px !important; }
+/* bottom line: the large numeral and the title */
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-plate-foot {
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  min-inline-size: 0 !important;
+}
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-plate-no {
+  display: inline-flex !important;
+  align-items: baseline !important;
+  gap: .1em !important;
+  flex: none !important;
+  direction: ltr !important;
+}
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-plate-no b {
+  font-family: 'Fraunces', serif !important;
+  font-weight: 300 !important;
+  font-style: normal !important;
+  font-size: clamp(30px, 3.1vw, 46px) !important;
+  line-height: .9 !important;
+  letter-spacing: -.04em !important;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-plate-no small {
+  font-family: 'JetBrains Mono', ui-monospace, monospace !important;
+  font-size: clamp(10px, .75vw, 12px) !important;
+  letter-spacing: .08em !important;
+  color: color-mix(in srgb, var(--pl-on) 60%, transparent) !important;
+}
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-plate-title {
+  min-inline-size: 0 !important;
+  font-family: 'Fraunces', 'Noto Kufi Arabic', serif !important;
+  font-weight: 400 !important;
+  font-size: clamp(14px, 1.2vw, 19px) !important;
+  line-height: 1.25 !important;
+  letter-spacing: -.01em !important;
+  text-align: end !important;
+  overflow: hidden !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+}
+:root[dir="rtl"][data-film] body #design#design#design#design#design #recent-work#recent-work .film-plate-title { letter-spacing: 0 !important; line-height: 1.5 !important; }
+
+/* a plate turns away (to the leading side, quietly) and returns at the back of the stack */
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card.is-leaving {
+  animation: plate-away .62s cubic-bezier(.55, 0, .45, 1) forwards !important;
+  z-index: 20 !important;
+}
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card.is-leaving > * { opacity: 1 !important; }
+@keyframes plate-away {
+  0% { transform: none; opacity: 1; }
+  55% { opacity: 1; }
+  100% { transform: translateX(-62%) translateY(3%) rotate(-9deg) scale(.92); opacity: 0; }
+}
+:root[dir="rtl"][data-film] body #design#design#design#design#design #recent-work#recent-work .film-card.is-leaving { animation-name: plate-away-rtl !important; }
+@keyframes plate-away-rtl {
+  0% { transform: none; opacity: 1; }
+  55% { opacity: 1; }
+  100% { transform: translateX(62%) translateY(3%) rotate(9deg) scale(.92); opacity: 0; }
+}
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card.is-back { opacity: 0 !important; }
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card.no-anim { transition: none !important; animation: none !important; }
+
+/* narrow sheets (phones, an upright tablet): the plate across the sheet, the arrows under it */
+@media (max-width: 1024px) and (orientation: portrait), (max-width: 760px) {
+  :root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio {
+    --stage-h: clamp(240px, calc(min(50svh, 100svh - 440px) / var(--bq-paper-fit, 1)), 520px);
+    --pw: min(100%, 620px);
+    grid-template-columns: 1fr auto auto 1fr !important;
+    grid-template-rows: auto auto !important;
+    column-gap: 12px !important;
+  }
+  :root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-stage { grid-column: 1 / -1 !important; grid-row: 1 !important; }
+  :root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-btn { grid-row: 2 !important; }
+  :root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-btn[data-dir="-1"] { grid-column: 2 !important; }
+  :root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio-btn[data-dir="1"] { grid-column: 3 !important; }
+  :root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-plate-no b { font-size: clamp(28px, 8vw, 40px) !important; }
+  :root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-plate-title { font-size: clamp(14px, 4vw, 18px) !important; }
+  :root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-plate-top { font-size: clamp(9.5px, 2.6vw, 11px) !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card,
+  :root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-plate-media > img { transition: none !important; animation: none !important; }
+}
+/* two waiting plates are enough: the third and further wait unseen */
+:root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-card[style*="--pos: 3"] { opacity: 0 !important; visibility: hidden !important; }
+

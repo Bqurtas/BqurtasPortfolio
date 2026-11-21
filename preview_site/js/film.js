@@ -613,6 +613,13 @@
       const t = section.querySelector('[data-recent-copy="caseStudies"]');
       return (t && t.textContent.trim()) || 'Case studies';
     };
+    const LOCALE = { en: 'en-GB', ku: 'ckb', kmr: 'ku', ar: 'ar', fr: 'fr', tr: 'tr', sv: 'sv' };
+    const plateDate = (d) => {
+      const t = Date.parse(d);
+      if (!d || Number.isNaN(t)) return '';
+      try { return new Intl.DateTimeFormat(LOCALE[lang()] || 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(t); }
+      catch { return String(d).slice(0, 10); }
+    };
     const items = [];
     ((behance && behance.projects) || []).slice(0, 3).forEach((p) => {
       if (!p.cover || !p.cover.src) return;
@@ -656,10 +663,29 @@
       im.src = it.src;
       if (it.fit === 'contain') a.classList.add('is-contain');
       if (it.fit === 'wide') a.classList.add('is-wide', it.tone === 'light' ? 'is-light' : 'is-dark');
-      const chip = doc.createElement('span');
-      chip.className = 'film-card-tag mono';
-      chip.textContent = it.kind === 'video' && it.dur ? `${tag} · ${it.dur}` : tag;
-      a.append(im, chip);
+      if (it.kind === 'video') a.classList.add('is-film');
+      /* the plate (the film's S03): the kind and the date on top, the work whole in the
+         middle, the numeral and the title on the bottom line */
+      const top = doc.createElement('span');
+      top.className = 'film-plate-top mono';
+      const kind = doc.createElement('span');
+      kind.textContent = it.kind === 'video' && it.dur ? `${tag} · ${it.dur}` : tag;
+      const when = doc.createElement('span');
+      when.textContent = plateDate(it.date);
+      top.append(kind, when);
+      const media = doc.createElement('span');
+      media.className = 'film-plate-media';
+      media.append(im);
+      const foot = doc.createElement('span');
+      foot.className = 'film-plate-foot';
+      const no = doc.createElement('span');
+      no.className = 'film-plate-no';
+      no.append(doc.createElement('b'), doc.createElement('small'));
+      const name = doc.createElement('span');
+      name.className = 'film-plate-title';
+      name.textContent = it.title;
+      foot.append(no, name);
+      a.append(top, media, foot);
       a.filmItem = { ...it, tag };
       stage.append(a);
       return a;
@@ -688,9 +714,20 @@
       c.tabIndex = pos === 0 ? 0 : -1;
       c.setAttribute('aria-hidden', pos === 0 ? 'false' : 'true');
     };
+    const number = () => {
+      const shown = cards.filter((c) => order.includes(c));
+      const total = ` / ${String(order.length).padStart(2, '0')}`;
+      shown.forEach((c, k) => {
+        const no = c.querySelector('.film-plate-no');
+        if (!no) return;
+        no.firstChild.textContent = String(k + 1).padStart(2, '0');
+        no.lastChild.textContent = total;
+      });
+    };
     const layout = () => {
       cards.forEach((c) => { if (!order.includes(c)) c.classList.add('is-out'); });
       order.forEach((c, pos) => { c.classList.remove('is-out'); place(c, pos); });
+      number();
       showMeta(order[0]);
     };
     const step = (dir = 1) => {
@@ -766,7 +803,7 @@
         return;
       }
       if (still()) { land(card.filmItem); return; }
-      const r = card.getBoundingClientRect();
+      const r = (card.querySelector('.film-plate-media') || card).getBoundingClientRect();
       const zoom = doc.createElement('div');
       zoom.className = 'film-zoom';
       zoom.setAttribute('aria-hidden', 'true');
