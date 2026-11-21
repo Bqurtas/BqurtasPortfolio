@@ -543,8 +543,9 @@
   font-weight: 400 !important;
 }
 :root[data-film] #archiveChartTitle {
-  font-size: clamp(34px, 3.4vw + 12px, 64px) !important;
-  margin: 10px 0 0 !important;
+  font-size: clamp(32px, 2.6vw + 14px, 60px) !important;
+  margin: 8px auto 0 !important;
+  max-width: none !important;
 }
 :root[data-film] .film-rise .film-w {
   display: inline-block;
@@ -821,11 +822,13 @@
 :root[data-film] .film-archive-mid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto 1fr auto;
-  gap: clamp(14px, 2.4vh, 26px);
-  min-height: 100%;
+  grid-template-rows: auto auto auto;
+  align-content: center;
+  gap: clamp(12px, 2.2vh, 24px);
+  flex: none;            /* never squeezed by the sheet: the site's paper-fit scales it instead */
+  min-height: auto;
   box-sizing: border-box;
-  padding: clamp(26px, 6vh, 72px) var(--pad-x, clamp(24px, 6vw, 96px)) clamp(84px, 13vh, 120px);
+  padding: clamp(20px, 4.5vh, 56px) var(--pad-x, clamp(24px, 6vw, 96px)) clamp(80px, 11.5vh, 112px);
 }
 :root[data-film] .film-wall {
   position: absolute;
@@ -889,28 +892,16 @@
   display: grid;
   align-content: center;
   gap: clamp(3px, .8vh, 9px);
-  /* the chart sits in its own box on the dimmed wall */
-  padding: clamp(16px, 2.4vw, 34px) clamp(16px, 2.6vw, 38px);
-  border-radius: clamp(18px, 2vw, 28px);
-  background: color-mix(in srgb, var(--bg, #e8e9eb) 84%, transparent);
-  -webkit-backdrop-filter: blur(14px) saturate(1.1);
-  backdrop-filter: blur(14px) saturate(1.1);
-  box-shadow: 0 0 0 1px var(--line, rgba(20, 20, 20, .12)), 0 34px 70px -46px rgba(0, 0, 0, .45);
-}
-@media (max-width: 760px) {
-  :root[data-film] .film-bars {
-    padding: 14px 14px 14px 10px;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    background: color-mix(in srgb, var(--bg, #e8e9eb) 92%, transparent);
-  }
+  padding: 0;
+  width: min(100%, 780px);
+  justify-self: center;
 }
 :root[data-film] .film-bar {
   display: grid;
   grid-template-columns: minmax(84px, 9.5em) minmax(0, 1fr) 3.4em;
   align-items: center;
   gap: 14px;
-  min-height: 20px;
+  min-height: 18px;
   font-size: clamp(12px, .9vw + 4px, 14px);
 }
 :root[data-film] .film-bar-name {
@@ -969,7 +960,7 @@
 :root[data-film] body #design#design .film-archive-total {
   font-family: 'Fraunces', serif !important;
   font-weight: 300;
-  font-size: clamp(56px, 9vh, 112px);
+  font-size: clamp(44px, 7.4vh, 96px);
   line-height: .9;
   letter-spacing: -.03em;
   font-variant-numeric: tabular-nums lining-nums;
@@ -984,26 +975,21 @@
   font-size: 12px;
   text-transform: uppercase;
 }
-@media (min-width: 900px) {
-  :root[data-film] .film-archive-mid {
-    grid-template-columns: minmax(0, .85fr) minmax(0, 1.35fr);
-    grid-template-rows: 1fr auto;
-    grid-template-areas: "head bars" "foot bars";
-    column-gap: clamp(36px, 5vw, 96px);
-    max-width: 1280px;
-    margin-inline: auto;
-    align-items: center;
-  }
-  :root[data-film] .film-archive-head { grid-area: head; align-self: end; }
-  :root[data-film] .film-bars { grid-area: bars; align-self: center; }
-  :root[data-film] .film-archive-foot {
-    grid-area: foot;
-    align-self: start;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    margin-top: clamp(12px, 3vh, 32px);
-  }
+/* balanced: label, title and count centred above, the chart centred, the total and the
+   archive link centred below — the same composition on every screen */
+:root[data-film] body #design#design .film-archive-head {
+  justify-self: center;
+  text-align: center !important;
+  max-width: 920px;
+}
+:root[data-film] body #design#design .film-archive-head .section-num {
+  display: inline-flex !important;
+  justify-content: center;
+}
+:root[data-film] body #design#design .film-archive-foot {
+  justify-content: center;
+  align-items: baseline;
+  gap: clamp(16px, 3vw, 36px);
 }
 @media (max-width: 760px) {
   :root[data-film] .film-wall { grid-template-columns: repeat(4, minmax(0, 1fr)); }
