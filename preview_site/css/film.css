@@ -70,12 +70,11 @@
 :root[data-film] :is(.film-logo, .film-logo-canvas) {
   position: absolute;
   left: 50%;
-  top: calc(var(--film-cut) + (100% - var(--film-cut)) * .1);
-  height: calc((100% - var(--film-cut)) * .56);
-  width: auto;
-  aspect-ratio: 784 / 488;
-  max-width: 78%;
-  transform: translateX(-50%);
+  top: calc((var(--film-cut) + 86%) / 2);
+  width: min(36%, 580px);
+  height: auto;
+  aspect-ratio: 900 / 200;
+  transform: translate(-50%, -50%);
   object-fit: contain;
   background: var(--film-ink);
   mix-blend-mode: lighten;
@@ -275,14 +274,14 @@
   left: clamp(20px, 5%, 64px) !important;
   right: clamp(20px, 5%, 64px) !important;
   top: var(--film-cut) !important;
-  bottom: 19% !important;
+  bottom: 14% !important;
   width: auto !important;
   height: auto !important;
   max-width: none !important;
   margin: 0 !important;
   padding: 0 !important;
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) min(32%, 360px) minmax(0, 1fr) !important;
+  grid-template-columns: minmax(0, 1fr) min(36%, 580px) minmax(0, 1fr) !important;
   grid-template-areas: "kicker . cta" "lede . cta" !important;
   align-content: center !important;
   align-items: center !important;
@@ -366,8 +365,8 @@
 @media (max-width: 760px) {
   :root[data-film] { --film-cut: 52%; }
   :root[data-film] :is(.film-logo, .film-logo-canvas) {
-    top: calc(var(--film-cut) + (100% - var(--film-cut)) * .05);
-    height: calc((100% - var(--film-cut)) * .33);
+    top: calc(var(--film-cut) + (100% - var(--film-cut)) * .17);
+    width: 90%;
   }
   :root[data-film] #design#design#design#design .film-hero .hero-title {
     left: 3% !important;
@@ -380,9 +379,9 @@
     justify-items: center !important;
     align-content: start !important;
     text-align: center !important;
-    row-gap: 18px !important;
-    align-content: center !important;
-    top: calc(var(--film-cut) + (100% - var(--film-cut)) * .38) !important;
+    row-gap: 16px !important;
+    align-content: start !important;
+    top: calc(var(--film-cut) + (100% - var(--film-cut)) * .3) !important;
     bottom: calc(var(--dock-h, 64px) + 12px) !important;
     left: 20px !important;
     right: 20px !important;
@@ -404,6 +403,18 @@
     justify-self: center !important;
     padding: 12px 20px !important;
     font-size: 11.5px !important;
+  }
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  :root[data-film] :is(.film-logo, .film-logo-canvas) {
+    top: calc(var(--film-cut) + (100% - var(--film-cut)) * .26);
+    width: min(60%, 560px);
+  }
+  :root[data-film] #design#design#design#design .film-hero .hero-copy {
+    top: calc(var(--film-cut) + (100% - var(--film-cut)) * .46) !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-areas: "kicker cta" "lede cta" !important;
+    align-content: center !important;
   }
 }
 /* a phone held sideways or a short window: the portrait keeps its room */
@@ -597,7 +608,6 @@
 
 /* ── RECENT WORK — the film's S03: pill chips and a folio of cards that unfold
    away one by one. The sheet follows the theme like every other section. */
-:root[data-film] body #design#design #recent-work > .paper-scroll { background: transparent !important; }
 :root[data-film] body #design#design #recent-work .recent-heading h2 em { color: var(--ink-soft) !important; }
 :root[data-film] body #design#design #recent-work .recent-edition-mark { color: var(--ink-muted) !important; }
 :root[data-film] body #design#design #recent-work .recent-filters {
@@ -665,9 +675,22 @@
   transform: translateX(calc(var(--pos, 0) * 34px)) translateY(calc(var(--pos, 0) * -12px)) scale(calc(1 - var(--pos, 0) * .055));
   z-index: calc(10 - var(--pos, 0));
   filter: brightness(calc(1 - var(--pos, 0) * .12));
-  transition: transform .8s var(--film-ease-curtain), filter .6s ease, opacity .5s ease;
+  transition: transform .95s cubic-bezier(.22, 1, .36, 1), filter .9s ease, opacity .6s ease;
   -webkit-tap-highlight-color: transparent;
 }
+/* the page's shade while it turns */
+:root[data-film] .film-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .55) 100%);
+  opacity: 0;
+}
+:root[dir="rtl"][data-film] .film-card::after { background: linear-gradient(270deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .55) 100%); }
+/* the front card is never quite still: a slow push-in while it is shown */
+:root[data-film] .film-card[aria-hidden="false"] img { animation: film-push 6s cubic-bezier(.16, 1, .3, 1) both; }
+@keyframes film-push { from { transform: scale(1); } to { transform: scale(1.045); } }
 :root[dir="rtl"][data-film] .film-card {
   transform-origin: 100% 50%;
   transform: translateX(calc(var(--pos, 0) * -34px)) translateY(calc(var(--pos, 0) * -12px)) scale(calc(1 - var(--pos, 0) * .055));
@@ -702,11 +725,31 @@
 :root[data-film] .film-card.is-deep { opacity: 0; pointer-events: none; }
 :root[data-film] .film-card.is-out { display: none; }
 :root[data-film] .film-card.is-leaving {
-  transform: perspective(1600px) rotateY(-100deg) translateX(-6%);
-  opacity: 0;
-  transition: transform .76s var(--film-ease-curtain), opacity .42s ease .3s;
+  z-index: 30;
+  pointer-events: none;
+  animation: film-turn .98s var(--film-ease-curtain) forwards;
 }
-:root[dir="rtl"][data-film] .film-card.is-leaving { transform: perspective(1600px) rotateY(100deg) translateX(6%); }
+:root[data-film] .film-card.is-leaving::after { animation: film-shade .98s ease forwards; }
+:root[dir="rtl"][data-film] .film-card.is-leaving { animation-name: film-turn-rtl; }
+:root[data-film] .film-card.is-back { opacity: 0 !important; }
+@keyframes film-turn {
+  0% { transform: none; opacity: 1; }
+  28% { transform: perspective(1800px) translateZ(70px) rotateY(-16deg) translateX(-2%); opacity: 1; }
+  100% { transform: perspective(1800px) translateZ(10px) rotateY(-104deg) translateX(-14%); opacity: 0; }
+}
+@keyframes film-turn-rtl {
+  0% { transform: none; opacity: 1; }
+  28% { transform: perspective(1800px) translateZ(70px) rotateY(16deg) translateX(2%); opacity: 1; }
+  100% { transform: perspective(1800px) translateZ(10px) rotateY(104deg) translateX(14%); opacity: 0; }
+}
+@keyframes film-shade { 0% { opacity: 0; } 55% { opacity: 1; } 100% { opacity: .85; } }
+/* the caption changes with the card */
+:root[data-film] .film-folio-meta.is-swap :is(.film-folio-index b, .film-folio-title, .film-folio-tag) {
+  animation: film-caption .7s var(--film-ease-out) both;
+}
+:root[data-film] .film-folio-meta.is-swap .film-folio-title { animation-delay: .06s; }
+:root[data-film] .film-folio-meta.is-swap .film-folio-tag { animation-delay: .12s; }
+@keyframes film-caption { from { opacity: 0; transform: translateY(.45em); } to { opacity: 1; transform: none; } }
 :root[data-film] .film-card.no-anim { transition: none !important; }
 :root[data-film] .film-card:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
 :root[data-film] .film-folio-meta {
@@ -772,6 +815,8 @@
 }
 @media (prefers-reduced-motion: reduce) {
   :root[data-film] .film-card { transition: none !important; }
+  :root[data-film] .film-card img,
+  :root[data-film] .film-folio-meta.is-swap * { animation: none !important; }
 }
 
 /* ── 5. THE ARCHIVE, BY DISCIPLINE — counted from the gallery manifest ─── */
@@ -847,10 +892,24 @@
 :root[data-film] .film-bars {
   list-style: none;
   margin: 0;
-  padding: 0;
   display: grid;
   align-content: center;
   gap: clamp(3px, .8vh, 9px);
+  /* the chart sits in its own box on the dimmed wall */
+  padding: clamp(16px, 2.4vw, 34px) clamp(16px, 2.6vw, 38px);
+  border-radius: clamp(18px, 2vw, 28px);
+  background: color-mix(in srgb, var(--bg, #e8e9eb) 84%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  backdrop-filter: blur(14px) saturate(1.1);
+  box-shadow: 0 0 0 1px var(--line, rgba(20, 20, 20, .12)), 0 34px 70px -46px rgba(0, 0, 0, .45);
+}
+@media (max-width: 760px) {
+  :root[data-film] .film-bars {
+    padding: 14px 14px 14px 10px;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: color-mix(in srgb, var(--bg, #e8e9eb) 92%, transparent);
+  }
 }
 :root[data-film] .film-bar {
   display: grid;
@@ -930,6 +989,27 @@
   letter-spacing: .1em;
   font-size: 12px;
   text-transform: uppercase;
+}
+@media (min-width: 900px) {
+  :root[data-film] .film-archive-mid {
+    grid-template-columns: minmax(0, .85fr) minmax(0, 1.35fr);
+    grid-template-rows: 1fr auto;
+    grid-template-areas: "head bars" "foot bars";
+    column-gap: clamp(36px, 5vw, 96px);
+    max-width: 1280px;
+    margin-inline: auto;
+    align-items: center;
+  }
+  :root[data-film] .film-archive-head { grid-area: head; align-self: end; }
+  :root[data-film] .film-bars { grid-area: bars; align-self: center; }
+  :root[data-film] .film-archive-foot {
+    grid-area: foot;
+    align-self: start;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-top: clamp(12px, 3vh, 32px);
+  }
 }
 @media (max-width: 760px) {
   :root[data-film] .film-wall { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -1057,9 +1137,9 @@
 }
 :root[data-film] .film-outro {
   position: relative;
-  width: min(460px, 100%);
+  width: min(560px, 100%);
   margin-top: 20px;
-  aspect-ratio: 784 / 488;
+  aspect-ratio: 900 / 200;
   border-radius: 18px;
   overflow: hidden;
   background: var(--film-ink);

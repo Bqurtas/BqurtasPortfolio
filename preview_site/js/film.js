@@ -206,11 +206,11 @@
     c.restore();
   }
 
-  /* The official clip (784 × 488, white on Ink #141414) is drawn onto a canvas so that
-     "Qurtas" can sit a little toward the B, as the owner asked. The clip is never
-     retimed or redrawn: each frame is copied in two bands split on the empty row
-     between the lines (rows 219–286), the lower band shifted left. */
-  const LOGO_W = 784, LOGO_H = 488, LOGO_SPLIT = 252, QURTAS_SHIFT = -28;
+  /* The official one-line clip (Brand Kit 06-Motion/One-line, white master over Ink
+     #141414, 900 × 200, writing 0.1–3.0 s) is copied frame by frame onto a canvas, so
+     the same written name can turn over with the theme. Never retimed or redrawn.
+     (LOGO_SPLIT/QURTAS_SHIFT only apply to a two-line lockup; 0 = draw whole.) */
+  const LOGO_W = 900, LOGO_H = 200, LOGO_SPLIT = 0, QURTAS_SHIFT = 0;
   let logoCanvas = null, logoCtx = null, logoStill = null, logoFrame = 0;
   function drawLogo(src, ctx = logoCtx) {
     if (!ctx) return;
@@ -219,6 +219,7 @@
     c.fillRect(0, 0, LOGO_W, LOGO_H);
     if (!src) return;
     try {
+      if (!LOGO_SPLIT) { c.drawImage(src, 0, 0, LOGO_W, LOGO_H); return; }
       c.drawImage(src, 0, 0, LOGO_W, LOGO_SPLIT, 0, 0, LOGO_W, LOGO_SPLIT);
       c.drawImage(src, 0, LOGO_SPLIT, LOGO_W, LOGO_H - LOGO_SPLIT, QURTAS_SHIFT, LOGO_SPLIT, LOGO_W, LOGO_H - LOGO_SPLIT);
     } catch { /* the frame is not decoded yet */ }
@@ -745,24 +746,27 @@
     let order = cards.slice(), busy = false, timer = 0, hovered = false, inView = false;
     const indexB = meta.querySelector('.film-folio-index b'), indexS = meta.querySelector('.film-folio-index small');
     const titleEl = meta.querySelector('.film-folio-title'), tagEl = meta.querySelector('.film-folio-tag');
+    const showMeta = (front) => {
+      if (!front) return;
+      const k = cards.filter((c) => order.includes(c)).indexOf(front) + 1;
+      indexB.textContent = String(k).padStart(2, '0');
+      indexS.textContent = ` / ${String(order.length).padStart(2, '0')}`;
+      titleEl.textContent = front.filmItem.title;
+      tagEl.textContent = front.filmItem.tag;
+      meta.classList.remove('is-swap');
+      void meta.offsetWidth;                  // restart the caption's rise
+      meta.classList.add('is-swap');
+    };
+    const place = (c, pos) => {
+      c.style.setProperty('--pos', String(Math.min(pos, 4)));
+      c.classList.toggle('is-deep', pos > 3);
+      c.tabIndex = pos === 0 ? 0 : -1;
+      c.setAttribute('aria-hidden', pos === 0 ? 'false' : 'true');
+    };
     const layout = () => {
       cards.forEach((c) => { if (!order.includes(c)) c.classList.add('is-out'); });
-      order.forEach((c, pos) => {
-        c.classList.remove('is-out');
-        c.style.setProperty('--pos', String(Math.min(pos, 4)));
-        c.classList.toggle('is-deep', pos > 3);
-        c.tabIndex = pos === 0 ? 0 : -1;
-        c.setAttribute('aria-hidden', pos === 0 ? 'false' : 'true');
-      });
-      const front = order[0];
-      if (front) {
-        const n = cards.indexOf(front) + 1, all = order.length;
-        const k = order.length ? (cards.filter((c) => order.includes(c)).indexOf(front) + 1) : n;
-        indexB.textContent = String(k).padStart(2, '0');
-        indexS.textContent = ` / ${String(all).padStart(2, '0')}`;
-        titleEl.textContent = front.filmItem.title;
-        tagEl.textContent = front.filmItem.tag;
-      }
+      order.forEach((c, pos) => { c.classList.remove('is-out'); place(c, pos); });
+      showMeta(order[0]);
     };
     const step = (dir = 1) => {
       if (busy || order.length < 2) return;
@@ -772,16 +776,22 @@
         return;
       }
       busy = true;
+      /* the front card lifts and turns away like a page; the rest step forward with it,
+         and the turned card comes back quietly at the end of the stack */
       const leaving = order[0];
       leaving.classList.add('is-leaving');
       order = [...order.slice(1), leaving];
-      order.slice(0, -1).forEach((c, pos) => c.style.setProperty('--pos', String(Math.min(pos, 4))));
+      order.slice(0, -1).forEach((c, pos) => place(c, pos));
+      showMeta(order[0]);
       setTimeout(() => {
-        leaving.classList.add('no-anim');
+        leaving.classList.add('no-anim', 'is-back');
         leaving.classList.remove('is-leaving');
-        layout();
-        raf2(() => { leaving.classList.remove('no-anim'); busy = false; });
-      }, 760);
+        place(leaving, order.length - 1);
+        raf2(() => {
+          leaving.classList.remove('no-anim');
+          raf2(() => { leaving.classList.remove('is-back'); busy = false; });
+        });
+      }, 980);
     };
     const schedule = () => {
       clearTimeout(timer);
@@ -873,10 +883,10 @@
   /* ════════════════ 6. THE NAME, AS MUSIC — tap to play (never on its own) ════════════════
      Barakat = B♭ A D A D A F, Qurtas = C G D F A E, over B♭ → C → F; one note per letter,
      exactly when the brand's clip writes it (claude-film/audio/src/final_audio.py). */
-  const LETTERS = [['B', 0, 0.09], ['a', 0, 0.6082], ['r', 0, 0.6926], ['a', 0, 0.8181], ['k', 0, 0.9527], ['a', 0, 1.275],
-    ['t', 0, 1.4096], ['Q', 1, 1.9946], ['u', 1, 2.4812], ['r', 1, 2.5651], ['t', 1, 2.6906], ['a', 1, 2.9756], ['s', 1, 3.0828]];
+  const LETTERS = [['B', 0, 0.09], ['a', 0, 0.6], ['r', 0, 0.682], ['a', 0, 0.805], ['k', 0, 0.937], ['a', 0, 1.253],
+    ['t', 0, 1.385], ['Q', 1, 1.816], ['u', 1, 2.294], ['r', 1, 2.376], ['t', 1, 2.499], ['a', 1, 2.78], ['s', 1, 2.885]];
   const NOTE = { B: 70, a: 69, r: 74, k: 74, t: 77, Q: 72, u: 79, s: 76 };
-  const DONE = 3.2;
+  const DONE = 3.0;
   const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
 
   function nameScore(ac, base) {
