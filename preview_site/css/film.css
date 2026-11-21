@@ -1,7 +1,7 @@
 /* ==========================================================================
    film.css — the homepage in the language of the story film
    "Bqurtas.com — Story Film" (claude-film/docs/STYLE.md):
-   one sheet, one cut · Ink #141414 / Paper #F4F3EF / Graphite #5C5C5C / Stone #B6B6B6
+   one sheet, one cut · Ink #161616 / Paper #F3F3F3 (the site's own black and white) / Graphite #5C5C5C / Stone #B6B6B6
    the cut sits on golden steps (14.6 / 38.2 / 61.8 / 85.4 %) · every curtain rides
    --ease-curtain · entrances ride --ease-out · colour comes only from the work.
    Last in the cascade; everything is scoped to :root[data-film] so the layer can be
@@ -10,8 +10,8 @@
    ========================================================================== */
 
 :root[data-film] {
-  --film-ink: #141414;
-  --film-paper: #f4f3ef;
+  --film-ink: #161616;     /* the site's own black: the dark-mode sheet */
+  --film-paper: #f3f3f3;   /* the site's own white: the light-mode sheet */
   --film-graphite: #5c5c5c;
   --film-stone: #b6b6b6;
   --film-on-ink: #eceef0;
@@ -656,11 +656,11 @@
   height: 100%;
   object-fit: cover;
 }
-:root[data-film] .film-card.is-contain { background: #f4f3ef; }
+:root[data-film] .film-card.is-contain { background: var(--film-paper); }
 :root[data-film] .film-card.is-contain img { object-fit: contain; padding: 14%; box-sizing: border-box; }
 /* case-study covers are landscape: shown whole on their own tone */
-:root[data-film] .film-card.is-wide { background: #141414; }
-:root[data-film] .film-card.is-wide.is-light { background: #f4f3ef; }
+:root[data-film] .film-card.is-wide { background: var(--film-ink); }
+:root[data-film] .film-card.is-wide.is-light { background: var(--film-paper); }
 :root[data-film] .film-card.is-wide img { object-fit: contain; }
 :root[data-film] .film-zoom.is-wide img { object-fit: contain; }
 :root[data-film] .film-card-tag {
@@ -747,13 +747,13 @@
   z-index: 2147483000;
   overflow: hidden;
   border-radius: 24px;
-  background: #141414;
+  background: var(--film-ink);
   pointer-events: none;
   transition: left .62s var(--film-ease-curtain), top .62s var(--film-ease-curtain), width .62s var(--film-ease-curtain),
     height .62s var(--film-ease-curtain), border-radius .62s var(--film-ease-curtain), opacity .45s ease;
 }
 :root[data-film] .film-zoom img { display: block; width: 100%; height: 100%; object-fit: cover; }
-:root[data-film] .film-zoom.is-contain { background: #f4f3ef; }
+:root[data-film] .film-zoom.is-contain { background: var(--film-paper); }
 :root[data-film] .film-zoom.is-contain img { object-fit: contain; padding: 8%; box-sizing: border-box; }
 :root[data-film] .film-zoom.is-full { left: 0 !important; top: 0 !important; width: 100vw !important; height: 100vh !important; border-radius: 0; }
 :root[data-film] .film-zoom.is-gone { opacity: 0; }
@@ -2257,7 +2257,7 @@
    never flashes first); it removes itself even if the script never runs. ── */
 .film-splash { display: none; }
 :root.film-splashing .film-splash {
-  --fs-bg: #f4f3ef;
+  --fs-bg: #f3f3f3;
   position: fixed;
   inset: 0;
   z-index: 2147483000;
@@ -2266,7 +2266,7 @@
   cursor: pointer;
   animation: film-splash-failsafe .01s linear 7s forwards;
 }
-:root.film-splashing[data-theme="dark"] .film-splash { --fs-bg: #141414; }
+:root.film-splashing[data-theme="dark"] .film-splash { --fs-bg: #161616; }
 :root.film-splashing body { overflow: hidden; }
 /* the two shutters: they meet on the hero's cut (the script sets the exact line in px) */
 .film-splash > b {
@@ -2417,13 +2417,13 @@
    closed over the page the instant the room changes, parting on the new room's cut.
    Light: Paper shutters; dark: Ink (the same as the opening). ── */
 .film-window {
-  --fw-bg: #f4f3ef;
+  --fw-bg: #f3f3f3;
   position: fixed;
   inset: 0;
   z-index: 2147482000;
   pointer-events: none;
 }
-:root[data-theme="dark"] .film-window { --fw-bg: #141414; }
+:root[data-theme="dark"] .film-window { --fw-bg: #161616; }
 .film-window > b {
   position: absolute;
   inset-inline: 0;

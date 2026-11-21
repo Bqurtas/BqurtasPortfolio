@@ -1110,7 +1110,7 @@
     scratch.width = W; scratch.height = H;
     const sx = scratch.getContext('2d', { willReadFrequently: true });
     const dark = root.dataset.theme === 'dark';
-    const R = dark ? 244 : 20, G = dark ? 243 : 20, B = dark ? 239 : 20;
+    const R = dark ? 243 : 22, G = R, B = R;        // the site's own white (#f3f3f3) and black (#161616)
     const paint = (src) => {
       try {
         sx.drawImage(src, 0, 0, W, H);
