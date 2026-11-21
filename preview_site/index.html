@@ -948,7 +948,7 @@
   <link rel="stylesheet" href="css/polish.min.css?v=0993da75dcfb">
   <link rel="stylesheet" href="css/recent-work.min.css?v=71aa3308bb3c">
   <!-- The story film's language on the homepage: one sheet, one cut (css/film.css). -->
-  <link rel="stylesheet" href="css/film.min.css?v=fe3ac8f46c2d">
+  <link rel="stylesheet" href="css/film.min.css?v=d86234874992">
   <link rel="stylesheet" href="css/hero-work-trail.min.css?v=38c2abc32a53">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543"></noscript>
@@ -963,10 +963,7 @@
   <!-- The film's opening (css/film.css, js/film.js): shown only while html.film-splashing. -->
   <div class="film-splash" id="filmSplash" aria-hidden="true">
     <b></b><b></b>
-    <span class="film-splash-tag mono">bqurtas.com</span>
-    <span class="film-splash-tag mono">2014 — Now</span>
     <span class="film-splash-name" data-src="assets/film/logo-write.mp4?v=d04c2b1266c2" data-still="assets/film/logo-still.webp?v=5a358370fa6f"></span>
-    <i></i>
   </div>
 
   <!-- Grain overlay -->
@@ -1354,7 +1351,7 @@
         </div>
       </section>
       <!-- Portfolio -->
-      <div class="section work">
+      <div class="section work" id="design-work">
         <header class="section-head">
           <span class="section-num mono"><i class="fa-solid fa-compass-drafting"></i> &nbsp; <span data-i18n="design.label">Design Room</span></span>
           <h2 class="section-title" data-i18n="design.title">A small catalogue of <em>printed</em> &amp; pixel things.</h2>
@@ -1745,24 +1742,32 @@
           </header>
           <ul class="film-ev-figs" aria-label="Practice statistics">
             <li class="film-ev-fig" data-ev="designs">
-              <span class="film-ev-num"><b data-ev-to="1000">1,000</b><i aria-hidden="true">+</i></span>
-              <span class="film-ev-label mono"><i class="fa-solid fa-palette" aria-hidden="true"></i> <span data-i18n="st.designs">Designs</span></span>
-              <span class="film-ev-viz" aria-hidden="true"></span>
+              <a class="film-ev-link" href="#design-work" data-ev-go="designs">
+                <span class="film-ev-num"><b data-ev-to="1000">1,000</b><i aria-hidden="true">+</i></span>
+                <span class="film-ev-label mono"><i class="fa-solid fa-palette" aria-hidden="true"></i> <span data-i18n="st.designs">Designs</span> <i class="fa-solid fa-arrow-up-right film-ev-go" aria-hidden="true"></i></span>
+                <span class="film-ev-viz" aria-hidden="true"></span>
+              </a>
             </li>
             <li class="film-ev-fig" data-ev="clients">
-              <span class="film-ev-num"><b data-ev-to="25">25</b><i aria-hidden="true">+</i></span>
-              <span class="film-ev-label mono"><i class="fa-solid fa-handshake" aria-hidden="true"></i> <span data-i18n="st.clients">Clients</span></span>
-              <span class="film-ev-viz" aria-hidden="true"></span>
+              <a class="film-ev-link" href="#clients" data-ev-go="clients">
+                <span class="film-ev-num"><b data-ev-to="25">25</b><i aria-hidden="true">+</i></span>
+                <span class="film-ev-label mono"><i class="fa-solid fa-handshake" aria-hidden="true"></i> <span data-i18n="st.clients">Clients</span> <i class="fa-solid fa-arrow-up-right film-ev-go" aria-hidden="true"></i></span>
+                <span class="film-ev-viz" aria-hidden="true"></span>
+              </a>
             </li>
             <li class="film-ev-fig" data-ev="logos">
-              <span class="film-ev-num"><b data-ev-to="20">20</b><i aria-hidden="true">+</i></span>
-              <span class="film-ev-label mono"><i class="fa-solid fa-pen-nib" aria-hidden="true"></i> <span data-i18n="st.logos">Logos</span></span>
-              <span class="film-ev-viz" aria-hidden="true"></span>
+              <a class="film-ev-link" href="/design/logo" data-ev-go="logos">
+                <span class="film-ev-num"><b data-ev-to="20">20</b><i aria-hidden="true">+</i></span>
+                <span class="film-ev-label mono"><i class="fa-solid fa-pen-nib" aria-hidden="true"></i> <span data-i18n="st.logos">Logos</span> <i class="fa-solid fa-arrow-up-right film-ev-go" aria-hidden="true"></i></span>
+                <span class="film-ev-viz" aria-hidden="true"></span>
+              </a>
             </li>
             <li class="film-ev-fig" data-ev="books">
-              <span class="film-ev-num"><b data-ev-to="100">100</b><i aria-hidden="true">+</i></span>
-              <span class="film-ev-label mono"><i class="fa-solid fa-book" aria-hidden="true"></i> <span data-i18n="st.books">Books</span></span>
-              <span class="film-ev-viz" aria-hidden="true"></span>
+              <a class="film-ev-link" href="/design/book" data-ev-go="books">
+                <span class="film-ev-num"><b data-ev-to="100">100</b><i aria-hidden="true">+</i></span>
+                <span class="film-ev-label mono"><i class="fa-solid fa-book" aria-hidden="true"></i> <span data-i18n="st.books">Books</span> <i class="fa-solid fa-arrow-up-right film-ev-go" aria-hidden="true"></i></span>
+                <span class="film-ev-viz" aria-hidden="true"></span>
+              </a>
             </li>
           </ul>
           <div class="film-ev-time">
@@ -1784,7 +1789,7 @@
       </section>
 
       <!-- ===== DESIGNED MARKS, THEN PEOPLE & PLACES ===== -->
-      <div class="section logos-section">
+      <div class="section logos-section" id="clients">
         <div class="sheet-mid">
         <header class="logos-head">
           <span class="section-num mono"><i class="fa-solid fa-pen-nib"></i> &nbsp; <span data-i18n="d.drawn.eye">Designed by hand</span></span>
@@ -2885,7 +2890,7 @@
   <script defer src="js/main.v420.min.js?v=6f70e3adee8b"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
   <script type="module" src="js/recent-work.min.js?v=25813f3f583a"></script>
-  <script defer src="js/film.min.js?v=23038a42aa4e"></script>
+  <script defer src="js/film.min.js?v=f5de30d175a9"></script>
   <script defer src="js/hero-work-trail.min.js?v=2cae74284098"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -3082,7 +3087,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=88c2d95b9245', { updateViaCache: 'none' })
+            .register('/sw.js?v=d7b9dd3e08da', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

@@ -1,10 +1,11 @@
 /* film.js — the homepage in the language of "Bqurtas.com — Story Film".
    One sheet, one cut. The hero opens on the brand cut (61.8 %); a pen draws the
    line-art portrait black on paper in the film's own draw order (eyes first); the
-   brand's official written-by-hand clip writes the name in the ink field. Sheets
-   arrive behind curtains that open on golden-ratio cuts, headings rise from their
-   masks, the Design Room's twelve icons pop, the archive is counted from the
-   gallery manifest, and the footer can play the name as music — only when tapped.
+   brand's official written-by-hand clip writes the name in the ink field. Headings
+   rise from their masks, the Design Room's twelve icons pop, the archive is counted
+   from the gallery manifest, and the footer can play the name as music — only when
+   tapped. The parts that follow this core (the opening, the evidence sheet, the rooms
+   menu, the room switch) each live in their own closure and use window.__bqFilm.
    Strict CSP: no inline style attributes; custom properties go through CSSOM. */
 (() => {
   'use strict';
@@ -413,38 +414,8 @@
     }, 560);
   }
 
-  /* ════════════════ 2. CURTAINS — every sheet opens on a golden cut ════════════════ */
-  function curtains() {
-    if (still() || typeof IntersectionObserver !== 'function') return;
-    const CUTS = ['38.2%', '61.8%', '14.6%', '85.4%'];
-    const sheets = [...doc.querySelectorAll('#design > .section:not(.work), main .footer.footer-v249')];
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (!e.isIntersecting || e.intersectionRatio < 0.3) continue;
-        io.unobserve(e.target);
-        const c = e.target.querySelector(':scope > .film-curtain');
-        if (!c) continue;
-        c.classList.add('is-open');
-        setTimeout(() => c.remove(), 900);
-      }
-    }, { threshold: [0, 0.3] });
-    sheets.forEach((sheet, i) => {
-      const r = sheet.getBoundingClientRect();
-      if (!r.height || (r.top < innerHeight * 0.7 && r.bottom > 0)) return;   // already in view: no curtain
-      const c = doc.createElement('i');
-      c.className = 'film-curtain';
-      c.setAttribute('aria-hidden', 'true');
-      c.append(doc.createElement('b'), doc.createElement('b'));
-      c.style.setProperty('--film-at', CUTS[i % CUTS.length]);
-      sheet.append(c);
-      io.observe(sheet);
-    });
-    /* leaving the Design room (or a route change) must never leave a curtain closed */
-    doc.addEventListener('bq:route', () => {
-      doc.querySelectorAll('.film-curtain').forEach((c) => c.remove());
-      io.disconnect();
-    }, { once: true });
-  }
+  /* (2. The ink curtains that used to cover an arriving sheet are gone: every card now lands
+     directly on the one before it. The "window" opening lives in the splash and the room switch.) */
 
   /* ════════════════ 3. MASK-RISE — headings rise word by word ════════════════ */
   const LATIN = /^[\u0000-ɏ‘’\s.,!?’'&-]+$/;
@@ -1047,98 +1018,6 @@
   }
 
   /* ════════════════ language, then everything else ════════════════ */
-  /* ════════════════ 8b. EVIDENCE, NOT ADJECTIVES ════════════════ */
-  function buildEvidence() {
-    const sec = doc.getElementById('evidence');
-    if (!sec) return;
-    const viz = (key) => sec.querySelector(`.film-ev-fig[data-ev="${key}"] .film-ev-viz`);
-    const fill = (box, n, each) => {
-      if (!box) return;
-      for (let k = 0; k < n; k++) {
-        const el = doc.createElement('i');
-        el.style.setProperty('--k', String(k));
-        if (each) each(el, k);
-        box.append(el);
-      }
-    };
-    fill(viz('clients'), 25);
-    fill(viz('logos'), 20);
-    fill(viz('books'), 50, (el, k) => el.style.setProperty('--h', `${56 + ((k * 37 + (k % 5) * 23) % 45)}%`));
-    /* designs: a strip cut from the work — the same twelve heads the archive already loaded */
-    const strip = () => {
-      const box = viz('designs');
-      if (!box || box.childElementCount) return;
-      const heads = [...doc.querySelectorAll('#archiveChart .film-bars img')].map((im) => im.currentSrc || im.src).filter(Boolean);
-      if (!heads.length) { fill(box, 36); return; }
-      for (let k = 0; k < 36; k++) {
-        const im = doc.createElement('img');
-        im.alt = ''; im.decoding = 'async'; im.loading = 'lazy'; im.src = heads[k % heads.length];
-        im.style.setProperty('--k', String(k));
-        box.append(im);
-      }
-    };
-    const pills = [...sec.querySelectorAll('[data-film-lang]')];
-    const mark = () => pills.forEach((p) => p.setAttribute('aria-current', String(p.dataset.filmLang === lang())));
-    pills.forEach((p) => p.addEventListener('click', () => {
-      const opt = doc.querySelector(`.lang-opt[data-lang="${p.dataset.filmLang}"]`);
-      if (opt) opt.click();
-    }));
-    doc.addEventListener('bq:language', mark);
-    mark();
-    onceVisible(sec, () => {
-      strip();
-      raf2(() => sec.classList.add('is-in'));
-      sec.querySelectorAll('[data-ev-to]').forEach((b, i) => {
-        if (b.firstChild && b.firstChild.nodeType === 3) rollNumber(b.firstChild, Number(b.dataset.evTo), 200 + i * 140, 1100);
-      });
-    }, 0.3);
-  }
-
-  /* ════════════════ 0. THE OPENING — the name writes itself on ink, a hairline is
-     drawn on the cut, and the sheet opens there. Once per session; any tap skips it. ════════════════ */
-  function runSplash(then) {
-    const el = doc.getElementById('filmSplash');
-    const on = root.classList.contains('film-splashing');
-    let finished = false;
-    const go = () => { if (!finished) { finished = true; then(); } };
-    if (!el || !on) { root.classList.remove('film-splashing'); if (el) el.remove(); go(); return; }
-    try { sessionStorage.setItem('bq_film_splash', '1'); } catch (e) { /* private mode */ }
-    const holder = el.querySelector('.film-splash-name');
-    let opened = false;
-    const open = () => {
-      if (opened) return;
-      opened = true;
-      el.classList.add('is-open');
-      go();                                   // the hero starts drawing as the sheet opens
-      setTimeout(() => { root.classList.remove('film-splashing'); el.remove(); }, 900);
-    };
-    if (holder) {
-      const v = doc.createElement('video');
-      v.muted = true; v.playsInline = true; v.preload = 'auto';
-      v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
-      v.disablePictureInPicture = true;
-      v.poster = '';
-      v.src = holder.dataset.src || '';
-      v.addEventListener('ended', () => setTimeout(open, 180), { once: true });
-      v.addEventListener('timeupdate', () => { if (v.duration && v.currentTime > v.duration - 0.9) open(); });
-      holder.append(v);
-      const p = v.play();
-      const fallback = () => {
-        if (opened || holder.querySelector('img')) return;
-        const im = doc.createElement('img');
-        im.alt = ''; im.src = holder.dataset.still || '';
-        v.remove(); holder.append(im);
-      };
-      if (p && typeof p.catch === 'function') p.catch(fallback);
-      setTimeout(() => { if (v.paused || v.readyState < 2) fallback(); }, 900);
-    }
-    raf2(() => el.classList.add('is-on'));
-    const skip = () => open();
-    el.addEventListener('pointerdown', skip, { once: true });
-    addEventListener('keydown', skip, { once: true });
-    setTimeout(open, 4300);                   // never longer than the written name
-  }
-
   function applyCopy() {
     const dict = COPY[lang()] || COPY.en;
     doc.querySelectorAll('[data-film-copy]').forEach((el) => {
@@ -1153,15 +1032,338 @@
   doc.addEventListener('bq:language', applyCopy);
   applyCopy();
 
-  runSplash(startHero);
+  /* The kit the film's parts build on (js/film-parts/*.js, appended to this file by the merge).
+     Each part is its own closure, so one part can never break another. */
+  let heroBegun = false;
+  const beginHero = () => { if (heroBegun) return; heroBegun = true; startHero(); };
+  window.__bqFilm = {
+    doc, root, still, clamp, lerp, prog, inOutSine, outCubic, inCubic, outExpo, raf2,
+    lang, copy, onceVisible, rollNumber, beginHero, hero,
+    getManifest, thumbOf, groupLabel, GROUPS,
+    /* parts add their own strings: addCopy({ en: { key: '…' }, ku: { … } }) */
+    addCopy(table) {
+      for (const [code, dict] of Object.entries(table || {})) COPY[code] = Object.assign(COPY[code] || {}, dict);
+      applyCopy();
+    }
+  };
+
+  /* The opening (film-parts/splash) starts the hero as it opens; without an opening the
+     hero starts at once. The timer is only a failsafe for an opening that never ran. */
+  if (root.classList.contains('film-splashing')) setTimeout(beginHero, 6500);
+  else beginHero();
   rise();
   tabsPop();
   buildArchive();
   buildFolio();
-  buildEvidence();
   nameOutro();
-  /* curtains after the paper deck has placed its sheets */
-  const lateStart = () => setTimeout(curtains, 60);
-  if (doc.readyState === 'complete') lateStart();
-  else addEventListener('load', lateStart, { once: true });
 })();
+
+/* ═════ part: splash ═════ */
+/* film part — 0. THE OPENING (#filmSplash, html.film-splashing)
+   The handwritten name alone, on the theme's own paper; then the window opens on the hero's cut. */
+(() => {
+  'use strict';
+  const F = window.__bqFilm;
+  if (!F) return;
+  const { doc, root, raf2 } = F;
+  const el = doc.getElementById('filmSplash');
+  if (!el || !root.classList.contains('film-splashing')) {
+    root.classList.remove('film-splashing');
+    if (el) el.remove();
+    F.beginHero();
+    return;
+  }
+  try { sessionStorage.setItem('bq_film_splash', '1'); } catch (e) { /* private mode */ }
+
+  /* the shutters part exactly on the hero's own cut line */
+  const seam = () => {
+    const hero = F.hero;
+    if (!hero) return;
+    const r = hero.getBoundingClientRect();
+    const cut = parseFloat(getComputedStyle(root).getPropertyValue('--film-cut')) || 61.8;
+    if (r.height > 0) el.style.setProperty('--film-splash-cut', `${Math.round(r.top + r.height * cut / 100)}px`);
+  };
+  seam();
+  addEventListener('resize', seam);
+
+  let opened = false;
+  const open = () => {
+    if (opened) return;
+    opened = true;
+    seam();
+    el.classList.add('is-open');
+    F.beginHero();                            // the hero starts drawing as the window opens
+    removeEventListener('resize', seam);
+    setTimeout(() => { root.classList.remove('film-splashing'); el.remove(); }, 900);
+  };
+
+  const holder = el.querySelector('.film-splash-name');
+  if (holder) {
+    const W = 900, H = 200;
+    const canvas = doc.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    /* The clip is white on Ink #141414. Each frame is keyed: its brightness becomes the
+       alpha of the theme's own ink, so the name sits on the shutters with no box around
+       it and needs no blend mode (unreliable on video in Safari). */
+    const scratch = doc.createElement('canvas');
+    scratch.width = W; scratch.height = H;
+    const sx = scratch.getContext('2d', { willReadFrequently: true });
+    const dark = root.dataset.theme === 'dark';
+    const R = dark ? 244 : 20, G = dark ? 243 : 20, B = dark ? 239 : 20;
+    const paint = (src) => {
+      try {
+        sx.drawImage(src, 0, 0, W, H);
+        const frame = sx.getImageData(0, 0, W, H);
+        const px = frame.data;
+        for (let i = 0; i < px.length; i += 4) {
+          const a = (px[i] - 20) * 1.085;          // 20 = the clip's ink, 255 = its white
+          px[i] = R; px[i + 1] = G; px[i + 2] = B;
+          px[i + 3] = a <= 0 ? 0 : a >= 255 ? 255 : a;
+        }
+        ctx.putImageData(frame, 0, 0);
+      } catch (e) { /* the frame is not decoded yet */ }
+    };
+    const v = doc.createElement('video');
+    v.muted = true; v.playsInline = true; v.preload = 'auto';
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+    v.disablePictureInPicture = true;
+    holder.append(canvas, v);
+    let frame = 0;
+    const draw = () => {
+      paint(v);
+      if (!v.paused && !v.ended && !opened) frame = requestAnimationFrame(draw);
+    };
+    const still = () => {                     // autoplay refused or the clip failed: the finished name, wiped in
+      if (opened || holder.classList.contains('is-still')) return;
+      cancelAnimationFrame(frame);
+      const im = new Image();
+      im.decoding = 'async';
+      im.onload = () => { paint(im); holder.classList.add('is-still'); setTimeout(open, 2600); };
+      im.src = holder.dataset.still || '';
+    };
+    v.addEventListener('playing', () => { cancelAnimationFrame(frame); draw(); });
+    v.addEventListener('ended', () => { draw(); setTimeout(open, 350); }, { once: true });
+    v.addEventListener('timeupdate', () => { if (v.duration && v.currentTime > 3.15) setTimeout(open, 350); });
+    v.addEventListener('error', still, { once: true });
+    v.src = holder.dataset.src || '';
+    const p = v.play();
+    if (p && typeof p.catch === 'function') p.catch(still);
+    setTimeout(() => { if (v.paused || v.readyState < 2) still(); }, 1100);
+  }
+  raf2(() => el.classList.add('is-on'));
+  el.addEventListener('pointerdown', open, { once: true });
+  addEventListener('keydown', open, { once: true });
+  setTimeout(open, 5200);                     // never longer than the written name
+})();
+
+/* ═════ part: evidence ═════ */
+/* film part — 8b. EVIDENCE, NOT ADJECTIVES (the sheet #evidence)
+   Four counted figures, each with a strip of REAL work and a link to its place; the
+   practice timeline; the seven languages as working buttons. */
+(() => {
+  'use strict';
+  const F = window.__bqFilm;
+  if (!F) return;
+  const { doc, still, raf2, lang, onceVisible, rollNumber } = F;
+  const sec = doc.getElementById('evidence');
+  if (!sec) return;
+
+  const viz = (key) => sec.querySelector(`.film-ev-fig[data-ev="${key}"] .film-ev-viz`);
+  const fill = (box, n, each) => {
+    for (let k = 0; k < n; k++) {
+      const el = doc.createElement('i');
+      el.style.setProperty('--k', String(k));
+      if (each) each(el, k);
+      box.append(el);
+    }
+  };
+  /* the abstract marks are only the fallback when the real work cannot be read */
+  const abstract = (key, box) => {
+    if (key === 'clients') fill(box, 25);
+    else if (key === 'logos') fill(box, 20);
+    else if (key === 'books') fill(box, 50, (el, k) => el.style.setProperty('--h', `${56 + ((k * 37 + (k % 5) * 23) % 45)}%`));
+    else fill(box, 36);
+  };
+  const tiles = (key, srcs) => {
+    const box = viz(key);
+    if (!box || box.childElementCount) return;
+    if (!srcs.length) { abstract(key, box); return; }
+    srcs.forEach((src, k) => {
+      const im = doc.createElement('img');
+      im.alt = ''; im.decoding = 'async'; im.loading = 'lazy'; im.src = src;
+      im.style.setProperty('--k', String(k));
+      box.append(im);
+    });
+  };
+  /* real works per discipline, read from the gallery manifest */
+  const works = async () => {
+    let byFolder = null;
+    try {
+      const m = await F.getManifest();
+      byFolder = new Map();
+      for (const item of (Array.isArray(m.images) ? m.images : [])) {
+        const folder = String(item.path || '').split('/')[0];
+        if (!byFolder.has(folder)) byFolder.set(folder, []);
+        byFolder.get(folder).push(item);
+      }
+    } catch (e) { byFolder = null; }
+    const pick = (key, n) => {
+      const group = (F.GROUPS || []).find((g) => g[0] === key);
+      const items = byFolder && group ? group[1].flatMap((f) => byFolder.get(f) || []) : [];
+      return items.slice(0, n).map((it) => `/${String(F.thumbOf(it)).replace(/^\/+/, '')}`);
+    };
+    const heads = byFolder ? (F.GROUPS || []).map((g) => pick(g[0], 1)[0]).filter(Boolean) : [];
+    tiles('designs', heads.slice(0, 12));
+    tiles('logos', pick('logo', 8));
+    tiles('books', pick('book', 10));
+    /* the client marks are the ones the "worked with" sheet shows (it carries their dark variants) */
+    const grid = doc.querySelector('#clients .logos-grid--clients');
+    const marks = () => (grid ? [...grid.querySelectorAll('img')] : []).map((im) => im.currentSrc || im.src || im.dataset.src || '').filter(Boolean);
+    tiles('clients', marks().slice(0, 10));
+    if (grid && !marks().length && typeof MutationObserver === 'function') {
+      /* the grid is filled a little later: swap the tally for the real marks when it is */
+      const mo = new MutationObserver(() => {
+        const found = marks();
+        if (!found.length) return;
+        mo.disconnect();
+        const box = viz('clients');
+        if (box) { box.textContent = ''; tiles('clients', found.slice(0, 10)); }
+      });
+      mo.observe(grid, { childList: true, subtree: true, attributes: true, attributeFilter: ['src'] });
+    }
+  };
+
+  /* a figure opens its place: a portfolio tab, the portfolio itself, or the clients sheet */
+  const jump = (el) => {
+    if (!el) return false;
+    if (typeof window.__bqScrollPaperTarget === 'function') window.__bqScrollPaperTarget(el);
+    else el.scrollIntoView({ behavior: still() ? 'auto' : 'smooth', block: 'start' });
+    return true;
+  };
+  sec.querySelectorAll('[data-ev-go]').forEach((a) => {
+    const key = a.dataset.evGo;
+    const tab = key === 'logos' ? 'logo' : key === 'books' ? 'book' : null;
+    if (tab) {
+      const sync = () => { const l = lang(); a.href = `${l && l !== 'en' ? `/${l}` : ''}/design/${tab}`; };
+      sync();
+      doc.addEventListener('bq:language', sync);
+    }
+    a.addEventListener('click', (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (tab) {
+        const btn = doc.querySelector(`#design .tab[data-filter="${tab}"]`);
+        const sheet = doc.getElementById('design-work');
+        if (!btn || !sheet) return;              // let the link navigate
+        e.preventDefault();
+        btn.click();
+        jump(sheet);
+      } else if (jump(doc.getElementById(key === 'clients' ? 'clients' : 'design-work'))) {
+        e.preventDefault();
+      }
+    });
+  });
+
+  /* the seven languages */
+  const pills = [...sec.querySelectorAll('[data-film-lang]')];
+  const mark = () => pills.forEach((p) => p.setAttribute('aria-current', String(p.dataset.filmLang === lang())));
+  pills.forEach((p) => p.addEventListener('click', () => {
+    const opt = doc.querySelector(`.lang-opt[data-lang="${p.dataset.filmLang}"]`);
+    if (opt) opt.click();
+  }));
+  doc.addEventListener('bq:language', mark);
+  mark();
+
+  onceVisible(sec, () => {
+    works().finally(() => raf2(() => sec.classList.add('is-in')));
+    sec.querySelectorAll('[data-ev-to]').forEach((b, i) => {
+      if (b.firstChild && b.firstChild.nodeType === 3) rollNumber(b.firstChild, Number(b.dataset.evTo), 200 + i * 140, 1100);
+    });
+  }, 0.3);
+})();
+
+/* ═════ part: menu ═════ */
+/* film part — 9. THE FIVE ROOMS (the menu curtain, #mobileMenu) */
+(() => {
+  'use strict';
+  const F = window.__bqFilm;
+  if (!F) return;
+  const { doc, root, still, raf2, lang, onceVisible } = F;
+
+})();
+
+/* ═════ part: route ═════ */
+/* film part — 12. THE ROOM SWITCH (a new room opens like the window)
+   The router (main.js showRoom) swaps the room and dispatches "bq:route" in the same task,
+   so covering the page here — before the next paint — hides the swap; the shutters then
+   part on the new room's cut. Never with reduced motion; never over the opening itself. */
+(() => {
+  'use strict';
+  const F = window.__bqFilm;
+  if (!F) return;
+  const { doc, root, still } = F;
+  let room = root.dataset.room || doc.body.dataset.room || null;
+  let node = null, timer = 0;
+
+  /* the cut line of the room's first sheet, in px (the home hero cuts higher on phones) */
+  const cutLine = () => {
+    const sheet = room && doc.querySelector(`#${room} > .paper-sheet`);
+    if (!sheet) return null;
+    const r = sheet.getBoundingClientRect();
+    if (!(r.height > 0)) return null;
+    const pct = room === 'design' ? (parseFloat(getComputedStyle(root).getPropertyValue('--film-cut')) || 61.8) : 61.8;
+    return Math.round(r.top + r.height * pct / 100);
+  };
+  const place = () => {
+    const y = cutLine();
+    if (node && y !== null) node.style.setProperty('--film-window-cut', `${y}px`);
+  };
+
+  doc.addEventListener('bq:route', (e) => {
+    const next = e.detail && e.detail.room;
+    if (!next) return;
+    if (room === null || next === room) { room = next; return; }   // first paint, or a tab change inside a room
+    room = next;
+    if (still() || root.classList.contains('film-splashing')) return;
+    clearTimeout(timer);
+    if (node) node.remove();
+    const mine = doc.createElement('div');
+    mine.className = 'film-window';
+    mine.setAttribute('aria-hidden', 'true');
+    mine.append(doc.createElement('b'), doc.createElement('b'));
+    node = mine;
+    place();
+    doc.body.append(mine);
+    void mine.offsetWidth;                     // commit the closed state before anything is painted
+    /* a menu that was open finishes closing under cover */
+    const hold = doc.body.matches('.menu-open, .menu-revealed, .menu-closing') ? 560 : 70;
+    timer = setTimeout(() => {
+      place();
+      mine.classList.add('is-open');
+      timer = setTimeout(() => { mine.remove(); if (node === mine) node = null; }, 900);
+    }, hold);
+  });
+})();
+
+/* ═════ part: work-head ═════ */
+/* film part — the portfolio's tab buttons carry no band; once the gallery has slid under
+   them (phones and tablets) the sheet is marked so their labels can step back. */
+(() => {
+  'use strict';
+  const F = window.__bqFilm;
+  if (!F) return;
+  const track = F.doc.querySelector('#design > .section.work');
+  if (!track) return;
+  let frame = 0, under = false;
+  const check = () => {
+    frame = 0;
+    const card = track.querySelector(':scope > .paper-scroll');
+    if (!card) return;
+    /* the pinned card's travel along its tall track = how far the reel has moved */
+    const now = card.getBoundingClientRect().top - track.getBoundingClientRect().top > 12;
+    if (now !== under) { under = now; track.classList.toggle('film-work-under', now); }
+  };
+  addEventListener('scroll', () => { if (!frame) frame = requestAnimationFrame(check); }, { passive: true });
+  check();
+})();
+
