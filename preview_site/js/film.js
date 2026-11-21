@@ -445,80 +445,8 @@
   /* (2. The ink curtains that used to cover an arriving sheet are gone: every card now lands
      directly on the one before it. The "window" opening lives in the splash and the room switch.) */
 
-  /* ════════════════ 3. MASK-RISE — headings rise word by word ════════════════ */
-  const LATIN = /^[\u0000-ɏ‘’\s.,!?’'&-]+$/;
-  function split(el) {
-    let i = 0;
-    const unfold = (em) => {
-      const text = em.textContent;
-      em.textContent = '';
-      let j = 0;
-      for (const part of text.split(/(\s+)/)) {
-        if (!part) continue;
-        if (/^\s+$/.test(part)) { em.append(part); continue; }
-        const word = doc.createElement('span');
-        word.className = 'film-wd';            // letters unfold, the word never breaks
-        for (const ch of part) {
-          const s = doc.createElement('span');
-          s.className = 'film-ch';
-          s.textContent = ch;
-          s.style.setProperty('--j', String(j++));
-          word.append(s);
-        }
-        em.append(word);
-      }
-    };
-    const walk = (node) => {
-      for (const child of [...node.childNodes]) {
-        if (child.nodeType === 3) {
-          if (!child.data.trim()) continue;
-          const frag = doc.createDocumentFragment();
-          for (const part of child.data.split(/(\s+)/)) {
-            if (!part) continue;
-            if (/^\s+$/.test(part)) { frag.append(part); continue; }
-            const w = doc.createElement('span');
-            w.className = 'film-w';
-            const inner = doc.createElement('span');
-            inner.textContent = part;
-            inner.style.setProperty('--i', String(i++));
-            w.append(inner);
-            frag.append(w);
-          }
-          child.replaceWith(frag);
-        } else if (child.nodeType === 1 && !child.matches('br, img, svg, i, .film-w, .film-ch')) {
-          if (child.tagName === 'EM' && el.dataset.filmUnfold === '' && LATIN.test(child.textContent)) unfold(child);
-          else walk(child);
-        }
-      }
-    };
-    walk(el);
-  }
-  function rise() {
-    if (still()) return;
-    const heads = doc.querySelectorAll([
-      '#design .section-title', '#design .recent-heading h2', '#archiveChartTitle',
-      '.footer.footer-v249 .footer-cta-title'
-    ].join(','));
-    heads.forEach((el) => {
-      if (el.closest('.film-hero')) return;
-      if (el.closest('.recent-heading')) el.dataset.filmUnfold = '';
-      el.classList.add('film-rise');
-      split(el);
-      onceVisible(el, () => {
-        if (!el.querySelector('.film-w, .film-ch')) split(el);
-        raf2(() => el.classList.add('is-in'));
-      }, 0.2);
-    });
-  }
-
-  /* ════════════════ 4. DESIGN ROOM — twelve icons pop onto their grid ════════════════ */
-  function tabsPop() {
-    const tabs = doc.querySelector('#design .tabs');
-    if (!tabs || still()) return;
-    tabs.querySelectorAll('.tab').forEach((t, i) => t.style.setProperty('--i', String(i)));
-    tabs.classList.add('film-pop');
-    onceVisible(tabs, () => raf2(() => tabs.classList.add('is-in')), 0.3);
-  }
+  /* (3–4. Headings no longer rise word by word and the Design Room's icons no longer pop as
+     their sheets arrive: nothing on a sheet moves because the page is being scrolled.) */
 
   /* ════════════════ 5. THE ARCHIVE, BY DISCIPLINE ════════════════ */
   const GROUPS = [
@@ -620,35 +548,9 @@
     }
     renderSummary();
 
-    /* the wall: a few columns of real work that rush past before the data settles */
-    if (wall && !still()) {
-      const pool = [];
-      const lanes = groups.map((g) => g.items.filter((it) => !String(it.path).startsWith('Official/')).slice(0, 8))
-        .filter((l) => l.length);
-      for (let r = 0; pool.length < 42 && r < 8; r++) lanes.forEach((l) => { if (l[r] && pool.length < 42) pool.push(l[r]); });
-      for (let c = 0; c < 6; c++) {
-        const col = doc.createElement('div');
-        for (let k = c; k < pool.length; k += 6) {
-          const it = pool[k];
-          const im = doc.createElement('img');
-          im.alt = '';
-          im.loading = 'lazy';
-          im.decoding = 'async';
-          im.width = 160;
-          im.height = Math.round(160 * ((it.height || 1) / (it.width || 1)));
-          im.src = thumbOf(it);
-          col.append(im);
-        }
-        wall.append(col);
-      }
-    }
-
-    onceVisible(section, () => {
-      archive.counted = true;
-      raf2(() => section.classList.add('is-in'));
-      archive.bars.forEach((b, i) => rollNumber(b.num, b.count, 180 + i * 55, 1000));
-      if (els.total && els.total.firstChild) rollNumber(els.total.firstChild, archive.works, 500, 1400);
-    }, 0.3);
+    /* the chart stands complete from its first frame: no growing bars, no rolling numbers */
+    archive.counted = true;
+    section.classList.add('is-in');
   }
 
   /* ════════════════ 5b. RECENT WORK — the folio: cards unfold away one by one ════════════════
@@ -1079,8 +981,6 @@
      hero starts at once. The timer is only a failsafe for an opening that never ran. */
   if (root.classList.contains('film-splashing')) setTimeout(beginHero, 4200);
   else beginHero();
-  rise();
-  tabsPop();
   buildArchive();
   buildFolio();
   nameOutro();
@@ -1306,12 +1206,10 @@
   doc.addEventListener('bq:language', mark);
   mark();
 
-  onceVisible(sec, () => {
-    works().finally(() => raf2(() => sec.classList.add('is-in')));
-    sec.querySelectorAll('[data-ev-to]').forEach((b, i) => {
-      if (b.firstChild && b.firstChild.nodeType === 3) rollNumber(b.firstChild, Number(b.dataset.evTo), 200 + i * 140, 1100);
-    });
-  }, 0.3);
+  /* the figures stand complete: no rolling numbers or rising tiles; the real work loads
+     only as the sheet comes near */
+  sec.classList.add('is-in');
+  onceVisible(sec, () => { works(); }, 0, '0px 0px 60% 0px');
 })();
 
 /* ═════ part: menu ═════ */

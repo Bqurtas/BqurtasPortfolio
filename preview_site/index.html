@@ -675,14 +675,11 @@
       root.classList.add('bq-css-pending');
       if (route) root.classList.add('bq-direct-route');
       try {
-        /* one-time migration: light is the site default now; visitors keep
-           any theme they choose AFTER this flip */
-        if (!localStorage.getItem('bq_light_v1')) {
-          localStorage.setItem('bq_light_v1', '1');
-          localStorage.setItem('bq_theme3', 'light');
-        }
-        var savedTheme = localStorage.getItem('bq_theme3');
-        if (savedTheme === 'light' || savedTheme === 'dark') root.dataset.theme = savedTheme;
+        /* Light with every visit. Dark is a choice that lasts for this visit only
+           (sessionStorage); a lasting preference from an earlier visit is dropped. */
+        localStorage.removeItem('bq_theme3');
+        var savedTheme = sessionStorage.getItem('bq_theme3');
+        root.dataset.theme = savedTheme === 'dark' ? 'dark' : 'light';
         var theme = root.dataset.theme === 'dark' ? 'dark' : 'light';
         root.style.colorScheme = theme;
         var themeColor = document.querySelector('meta[name="theme-color"]');
@@ -708,6 +705,41 @@
         if (compactMq.addEventListener) compactMq.addEventListener('change', syncCompact);
         else compactMq.addListener(syncCompact);
       } catch (e) {}
+    }());
+  </script>
+  <script>
+    /* Steady while scrolling. On a touch screen the browser's toolbar slides in and out as
+       the page scrolls, and the browser reports every step as a resize of the window and of
+       the visual viewport. The paper no longer follows the toolbar (viewportPaperFrame,
+       below), so those reports carry no new layout: they stop here, before any of the
+       site's own listeners can re-measure, re-fit or re-play something mid-scroll. A real
+       resize (another width, a rotation, a keyboard, a pinch, a big change) passes. */
+    (function steadyToolbar() {
+      var coarse = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)');
+      if (!coarse || !coarse.matches) return;
+      var view = window.visualViewport;
+      var editing = function () {
+        var a = document.activeElement, t = a && a.tagName;
+        return !!(a && (a.isContentEditable || t === 'TEXTAREA'
+          || (t === 'INPUT' && /^(text|search|email|url|tel|number|password)$/.test(a.type || 'text'))));
+      };
+      var settled = { w: window.innerWidth, h: window.innerHeight };
+      window.addEventListener('resize', function (e) {
+        var w = window.innerWidth, h = window.innerHeight, d = Math.abs(h - settled.h);
+        if (w === settled.w && d > 0 && d <= 220 && !editing()) { e.stopImmediatePropagation(); return; }
+        settled = { w: w, h: h };
+      }, true);
+      if (view) {
+        var viewSettled = { w: Math.round(view.width), h: Math.round(view.height), s: view.scale };
+        view.addEventListener('resize', function (e) {
+          var w = Math.round(view.width), h = Math.round(view.height), d = Math.abs(h - viewSettled.h);
+          if (view.scale === viewSettled.s && w === viewSettled.w && d > 0 && d <= 220 && !editing()) { e.stopImmediatePropagation(); return; }
+          viewSettled = { w: w, h: h, s: view.scale };
+        }, true);
+      }
+      window.addEventListener('orientationchange', function () {
+        settled = { w: window.innerWidth, h: window.innerHeight };
+      }, true);
     }());
   </script>
   <script>
@@ -782,7 +814,11 @@
           if (keyboard && height < current.height - 80) return;
         }
         keyboard = false;
-        height = Math.max(height, readSmallViewport(width));
+        /* The paper is as tall as the SMALL viewport (the browser's toolbar shown) and does
+           not follow the toolbar as it slides away while scrolling: following it re-laid out
+           every sheet mid-scroll, so the cards, the gallery and the type jumped. Only a new
+           width (rotation, another window) or a real change of the small viewport moves it. */
+        height = readSmallViewport(width) || height;
         publish({ width: width, height: height });
       };
       var schedule = function () {
@@ -948,7 +984,7 @@
   <link rel="stylesheet" href="css/polish.min.css?v=0993da75dcfb">
   <link rel="stylesheet" href="css/recent-work.min.css?v=71aa3308bb3c">
   <!-- The story film's language on the homepage: one sheet, one cut (css/film.css). -->
-  <link rel="stylesheet" href="css/film.min.css?v=8829ecc9af97">
+  <link rel="stylesheet" href="css/film.min.css?v=86c4d25a7410">
   <link rel="stylesheet" href="css/hero-work-trail.min.css?v=38c2abc32a53">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543"></noscript>
@@ -2887,10 +2923,10 @@
     }catch(e){}})();
   </script>
   <script defer src="js/latest-feed.min.js?v=76465997249c"></script>
-  <script defer src="js/main.v420.min.js?v=6f70e3adee8b"></script>
+  <script defer src="js/main.v420.min.js?v=738dbe5bab43"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
   <script type="module" src="js/recent-work.min.js?v=25813f3f583a"></script>
-  <script defer src="js/film.min.js?v=2e88dd0609e0"></script>
+  <script defer src="js/film.min.js?v=642336c61a95"></script>
   <script defer src="js/hero-work-trail.min.js?v=2cae74284098"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -2910,7 +2946,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=83bdffe1835d';
+        s.src = 'js/enhance.v420.min.js?v=199e24b2b177';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -3087,7 +3123,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=413335417ea1', { updateViaCache: 'none' })
+            .register('/sw.js?v=1c5636532200', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

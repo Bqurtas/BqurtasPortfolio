@@ -90,17 +90,18 @@ test('Cloudflare-only permission never silently authorizes Umami; refusals survi
   allowed.window.dispatchEvent({type:'storage',key:'bq_analytics_consent',newValue:'allowed'});
   assert.equal(allowed.window.__bqPrivacy.choice(),null,'an old tab cannot grant broader permission');
 });
-test('standalone pages default to light even on dark devices and remember only a chosen override',()=>{
-  for (const saved of [null,'unexpected','dark','light']) {
-    const storage=new Map(); if(saved)storage.set('bq_theme3',saved);
+test('standalone pages are light with every visit and keep a dark choice for that visit only',()=>{
+  for (const [stored,session] of [[null,null],['dark',null],['dark','dark'],[null,'light'],['light','unexpected']]) {
+    const lasting=new Map(), visit=new Map(); if(stored)lasting.set('bq_theme3',stored); if(session)visit.set('bq_theme3',session);
+    const store=(m)=>({getItem:k=>m.has(k)?m.get(k):null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k)});
     const button={...events(),setAttribute(){}}; const root={dataset:{},style:{}};
     const context={document:{documentElement:root,readyState:'complete',querySelector:()=>null,querySelectorAll:()=>[button]},
-      localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},matchMedia:()=>{throw Error('system theme must not choose the site theme');}};
+      localStorage:store(lasting),sessionStorage:store(visit),matchMedia:()=>{throw Error('system theme must not choose the site theme');}};
     vm.runInNewContext(APPEARANCE_JS,context);
-    assert.equal(root.dataset.theme,saved==='dark'?'dark':'light');
-    assert.equal(storage.get('bq_theme3'),saved||undefined,'initial rendering does not invent a manual preference');
-    button.dispatchEvent({type:'click'}); assert.equal(storage.get('bq_theme3'),saved==='dark'?'light':'dark');
-    assert.equal(storage.get('bq_light_v1'),'1','a manual archive choice survives the main page’s legacy light-default migration');
+    assert.equal(root.dataset.theme,session==='dark'?'dark':'light','a preference from an earlier visit never darkens a new one');
+    assert.equal(lasting.has('bq_theme3'),false,'the old lasting preference is dropped');
+    assert.equal(visit.get('bq_theme3'),session||undefined,'initial rendering does not invent a choice');
+    button.dispatchEvent({type:'click'}); assert.equal(visit.get('bq_theme3'),session==='dark'?'light':'dark');
   }
 });
 test('main entry is English unless the visitor explicitly opens a translated route',async()=>{

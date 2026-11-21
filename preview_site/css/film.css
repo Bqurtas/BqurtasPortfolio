@@ -2730,3 +2730,23 @@ html body .film-menu-stage .film-mc-letter { text-transform: none; }
   :root[data-film] body #design#design#design#design .sites-sheet .site-note { max-inline-size: 46em !important; }
 }
 
+/* ═════ steady ═════ */
+/* Steady while scrolling (owner, 2026-11-22): nothing on a sheet moves because the page is
+   being scrolled. The archive and the evidence figures stand complete from their first
+   frame — no growing bars, no rolling numbers, no rushing wall, no rising tiles. */
+:root[data-film] .film-bar-fill { transform: scaleX(1) !important; transition: none !important; }
+:root[data-film] .film-bar-dot { transform: translate(-50%, -50%) scale(1) !important; transition: none !important; }
+:root[dir="rtl"][data-film] .film-bar-dot { transform: translate(50%, -50%) scale(1) !important; }
+:root[data-film] .film-wall { display: none !important; }
+:root[data-film] .film-evidence :is(.film-ev-viz > *, .film-ev-rule::before, .film-ev-rule > i, .film-ev-rule > b, .film-ev-line > li) {
+  opacity: 1 !important;
+  transition: none !important;
+}
+:root[data-film] .film-evidence :is(.film-ev-viz > *, .film-ev-rule::before, .film-ev-line > li) { transform: none !important; }
+:root[data-film] .film-evidence .film-ev-rule > :is(i, b) { transform: none !important; }
+:root[data-film] .film-evidence .film-ev-pill {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: background-color .25s ease, color .25s ease !important;
+}
+

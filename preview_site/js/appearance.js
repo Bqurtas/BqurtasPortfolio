@@ -4,7 +4,7 @@
     const value = theme === 'dark' ? 'dark' : 'light';
     root.dataset.theme = value;
     root.style.colorScheme = value;
-    if (persist) { try { localStorage.setItem('bq_theme3', value); localStorage.setItem('bq_light_v1', '1'); } catch (e) {} }
+    if (persist) { try { sessionStorage.setItem('bq_theme3', value); } catch (e) {} }
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', value === 'dark' ? '#151713' : '#f5f4f0');
     document.querySelectorAll('[data-site-theme]').forEach(button => {
@@ -14,7 +14,8 @@
     });
   }
   let saved = 'light';
-  try { saved = localStorage.getItem('bq_theme3') || 'light'; } catch (e) {}
+  try { localStorage.removeItem('bq_theme3'); } catch (e) {}
+  try { saved = sessionStorage.getItem('bq_theme3') || 'light'; } catch (e) {}
   apply(saved, false);
   function mount() {
     apply(root.dataset.theme, false);

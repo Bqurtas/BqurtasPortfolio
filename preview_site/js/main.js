@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const root = document.documentElement;
     root.dataset.theme = t;
     root.style.colorScheme = t;
-    try { localStorage.setItem('bq_theme3', t); } catch(e){}
+    try { sessionStorage.setItem('bq_theme3', t); } catch(e){}   // dark lasts for this visit only
     themeBtns.forEach(b => b.setAttribute('aria-checked', t === 'dark' ? 'true' : 'false'));
     const meta = document.querySelector('meta[name="theme-color"]:not([media])');
     if (meta) meta.setAttribute('content', t === 'dark' ? '#0f0f10' : '#fbfbfa');
@@ -189,10 +189,10 @@ document.addEventListener('DOMContentLoaded', () => {
   window.__bqApplyTheme = applyTheme;
   const isCompact = () => window.matchMedia('(max-width: 1024px)').matches;
   window.__bqIsCompact = isCompact;
-  // Light is the site default (matches the bq_light_v1 migration that runs
-  // inline in index.html before first paint).
+  // Light with every visit (the head script decides before first paint); a dark
+  // choice made during this visit is kept in sessionStorage.
   let savedTheme = null;
-  try { savedTheme = localStorage.getItem('bq_theme3'); } catch(e){}
+  try { savedTheme = sessionStorage.getItem('bq_theme3'); } catch(e){}
   applyTheme(savedTheme === 'dark' ? 'dark' : 'light');
   themeBtns.forEach(btn => btn.addEventListener('click', () => {
     const cur = document.documentElement.dataset.theme;

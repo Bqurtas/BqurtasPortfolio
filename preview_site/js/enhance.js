@@ -1786,7 +1786,7 @@
         else {
           document.documentElement.dataset.theme = next;
           document.documentElement.style.colorScheme = next;
-          try { localStorage.setItem('bq_theme3', next); } catch (x) {}
+          try { sessionStorage.setItem('bq_theme3', next); } catch (x) {}
         }
       });
       $('#setReset').addEventListener('click', () => { if (confirm(DT('sResetConfirm'))) { ['bq_theme','bq_theme3','bq_lang','bq_splash'].forEach(k => localStorage.removeItem(k)); alert(DT('sDone')); } });
@@ -2994,7 +2994,7 @@
       else {
         document.documentElement.dataset.theme = next;
         document.documentElement.style.colorScheme = next;
-        try { localStorage.setItem('bq_theme3', next); } catch (e) {}
+        try { sessionStorage.setItem('bq_theme3', next); } catch (e) {}
       }
     });
     // AI + Add-admin sidebar tools

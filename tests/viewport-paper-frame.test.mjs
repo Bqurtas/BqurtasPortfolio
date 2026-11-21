@@ -131,16 +131,19 @@ test('the stable CSS bound rejects anomalous shrink but follows a genuine viewpo
   assert.equal(page.window.__bqPaperViewport.height, 500, 'a real CSS viewport resize can make the frame shorter');
 });
 
-test('toolbar tracking uses the cached small viewport without recurring layout reads', () => {
+test('the paper keeps the small viewport while the toolbar slides, without recurring layout reads', () => {
+  // Steady while scrolling: following the toolbar re-laid out every sheet mid-scroll.
   const page = fixture();
   page.paint(); page.paint();
   const settledReads = page.cssViewport.reads;
+  const settledChanges = page.changes.length;
   for (const height of [720, 750, 780, 760, 730, 700]) {
     page.view.height = height;
     page.view.fire('resize'); page.paint();
-    assert.equal(page.window.__bqPaperViewport.height, height);
+    assert.equal(page.window.__bqPaperViewport.height, 700);
   }
   assert.equal(page.cssViewport.reads, settledReads);
+  assert.equal(page.changes.length, settledChanges, 'no layout event while the toolbar slides');
 });
 
 test('browsers without a resize observer still refresh the CSS bound on resize', () => {
@@ -159,7 +162,7 @@ test('unsupported small viewport units retain visual viewport sizing', () => {
   assert.equal(page.window.__bqPaperViewport.height, 650);
 });
 
-test('toolbar visual-height updates share one paint while innerHeight remains stale', () => {
+test('a toolbar resize burst publishes nothing: the paper keeps the small viewport', () => {
   const page = fixture();
   for (const height of [711, 720, 738, 760, 784.4]) {
     page.view.height = height;
@@ -169,10 +172,9 @@ test('toolbar visual-height updates share one paint while innerHeight remains st
   assert.equal(page.frames.size, 1);
   assert.equal(page.changes.length, 1, 'no layout is published inside the resize burst');
   page.paint();
-  assert.equal(page.window.innerHeight, 700);
-  assert.equal(page.window.__bqPaperViewport.height, 784);
-  assert.equal(page.properties.get('--bq-frame-height'), '784px');
-  assert.equal(page.changes.length, 2);
+  assert.equal(page.window.__bqPaperViewport.height, 700);
+  assert.equal(page.properties.get('--bq-frame-height'), '700px');
+  assert.equal(page.changes.length, 1, 'nor after it');
 });
 
 test('unchanged and subpixel viewport noise causes no style write or layout event', () => {
@@ -189,7 +191,7 @@ test('unchanged and subpixel viewport noise causes no style write or layout even
   assert.equal(page.changes.length, 1);
 });
 
-test('pinch zoom never shrinks the page frame and normal toolbar tracking resumes afterward', () => {
+test('neither pinch zoom nor the toolbar moves the page frame', () => {
   const page = fixture();
   Object.assign(page.view, { scale: 2, width: 195, height: 350 });
   page.view.fire('resize'); page.paint();
@@ -197,11 +199,11 @@ test('pinch zoom never shrinks the page frame and normal toolbar tracking resume
   assert.equal(page.changes.length, 1);
   Object.assign(page.view, { scale: 1, width: 390, height: 780 });
   page.view.fire('resize'); page.paint();
-  assert.equal(page.window.__bqPaperViewport.height, 780);
-  assert.equal(page.changes.length, 2);
+  assert.equal(page.window.__bqPaperViewport.height, 700);
+  assert.equal(page.changes.length, 1);
 });
 
-test('editing freezes the paper until blur and the closing keyboard have recovered', () => {
+test('a keyboard never shrinks the paper, before or after blur, and the toolbar never grows it', () => {
   const page = fixture();
   page.document.activeElement = { tagName: 'INPUT', type: 'text', matches: () => true };
   page.view.height = 390;
@@ -209,16 +211,12 @@ test('editing freezes the paper until blur and the closing keyboard have recover
   assert.equal(page.window.__bqPaperViewport.height, 700);
   page.document.activeElement = null;
   page.document.fire('focusout'); page.paint();
-  assert.equal(page.changes.length, 1, 'blur alone cannot shrink the paper while the keyboard is still visible');
   page.view.height = 520;
   page.view.fire('resize'); page.paint();
-  assert.equal(page.changes.length, 1, 'the middle of the closing animation remains frozen');
-  page.view.height = 700;
-  page.view.fire('resize'); page.paint();
-  assert.equal(page.changes.length, 1, 'restoring the same frame is a no-op');
   page.view.height = 780;
   page.view.fire('resize'); page.paint();
-  assert.equal(page.window.__bqPaperViewport.height, 780, 'later browser-toolbar movement is no longer frozen');
+  assert.equal(page.window.__bqPaperViewport.height, 700);
+  assert.equal(page.changes.length, 1, 'the paper never moved');
 });
 
 test('phone rotation changes the frame even when a form field is focused', () => {
@@ -236,17 +234,16 @@ test('phone rotation changes the frame even when a form field is focused', () =>
 });
 
 for (const type of ['checkbox', 'radio', 'file', 'color', 'range', 'submit']) {
-  test(`a focused ${type} input cannot freeze the paper while browser controls retract`, () => {
+  test(`a focused ${type} input leaves the paper at the small viewport while browser controls retract`, () => {
     const page = fixture();
-    // These are still input elements, but none opens a text keyboard.
     page.document.activeElement = { tagName: 'INPUT', type, matches: () => true };
     for (const height of [744, 780]) {
       page.view.height = height;
       page.view.fire('resize'); page.paint();
-      assert.equal(page.window.__bqPaperViewport.height, height);
-      assert.equal(page.properties.get('--bq-frame-height'), `${height}px`);
+      assert.equal(page.window.__bqPaperViewport.height, 700);
+      assert.equal(page.properties.get('--bq-frame-height'), '700px');
     }
-    assert.equal(page.changes.length, 3);
+    assert.equal(page.changes.length, 1);
   });
 }
 
@@ -269,18 +266,23 @@ test('leaving the phone breakpoint removes its frame and returning publishes a f
   page.window.fire('resize'); page.paint();
   assert.equal(page.changes.length, 2, 'desktop resize does not repeatedly remove an absent frame');
   page.window.innerWidth = 390;
-  page.view.height = 810;
+  page.view.height = 810;               // the toolbar happens to be away: it does not matter
+  page.cssViewport.height = 690;        // the small viewport is measured afresh for the new width
   page.query.fire('change'); page.paint();
-  assert.equal(page.window.__bqPaperViewport.height, 810);
-  assert.equal(page.properties.get('--bq-frame-height'), '810px');
+  assert.equal(page.window.__bqPaperViewport.height, 690);
+  assert.equal(page.properties.get('--bq-frame-height'), '690px');
 });
 
-test('desktop cold loads keep CSS sizing, and browsers without visualViewport use innerHeight', () => {
+test('desktop cold loads keep CSS sizing; without visualViewport the small viewport still rules, and innerHeight is the last fallback', () => {
   const desktop = fixture({ width: 1200 });
   assert.equal(desktop.writes.length, 0);
   assert.equal(desktop.changes.length, 0);
   const fallback = fixture({ visualViewport: false });
   fallback.window.innerHeight = 780;
   fallback.window.fire('resize'); fallback.paint();
-  assert.equal(fallback.window.__bqPaperViewport.height, 780);
+  assert.equal(fallback.window.__bqPaperViewport.height, 700);
+  const noUnits = fixture({ visualViewport: false, smallHeight: 0 });
+  noUnits.window.innerHeight = 780;
+  noUnits.window.fire('resize'); noUnits.paint();
+  assert.equal(noUnits.window.__bqPaperViewport.height, 780);
 });
