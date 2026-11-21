@@ -2733,11 +2733,17 @@ html body .film-menu-stage .film-mc-letter { text-transform: none; }
 /* ═════ steady ═════ */
 /* Steady while scrolling (owner, 2026-11-22): nothing on a sheet moves because the page is
    being scrolled. The archive and the evidence figures stand complete from their first
-   frame — no growing bars, no rolling numbers, no rushing wall, no rising tiles. */
+   frame — no growing bars, no rolling numbers, no rising tiles, and the archive's wall of
+   work rests behind the chart instead of rushing past. */
 :root[data-film] .film-bar-fill { transform: scaleX(1) !important; transition: none !important; }
 :root[data-film] .film-bar-dot { transform: translate(-50%, -50%) scale(1) !important; transition: none !important; }
 :root[dir="rtl"][data-film] .film-bar-dot { transform: translate(50%, -50%) scale(1) !important; }
-:root[data-film] .film-wall { display: none !important; }
+/* the archive's faint wall of real work stays behind the chart — at its resting tone and still
+   (also with reduced motion, since nothing moves); print still leaves it out */
+@media screen {
+  :root[data-film] .film-archive .film-wall { display: grid !important; opacity: .07 !important; animation: none !important; }
+}
+:root[data-film] .film-archive .film-wall > div { animation: none !important; transform: none !important; }
 :root[data-film] .film-evidence :is(.film-ev-viz > *, .film-ev-rule::before, .film-ev-rule > i, .film-ev-rule > b, .film-ev-line > li) {
   opacity: 1 !important;
   transition: none !important;
