@@ -548,9 +548,8 @@
     }
     renderSummary();
 
-    /* the wall: columns of real work behind the chart, faint and still (it no longer rushes
-       past as the sheet arrives — nothing on a sheet moves because the page is scrolled) */
-    if (wall) {
+    /* the wall: a few columns of real work that rush past before the data settles */
+    if (wall && !still()) {
       const pool = [];
       const lanes = groups.map((g) => g.items.filter((it) => !String(it.path).startsWith('Official/')).slice(0, 8))
         .filter((l) => l.length);
@@ -572,9 +571,10 @@
       }
     }
 
-    /* the chart stands complete from its first frame: no growing bars, no rolling numbers */
+    /* the chart stands complete (no growing bars, no rolling numbers); the wall of work
+       behind it rushes past once as the sheet arrives and settles faint, as before */
     archive.counted = true;
-    section.classList.add('is-in');
+    onceVisible(section, () => raf2(() => section.classList.add('is-in')), 0.3);
   }
 
   /* ════════════════ 5b. RECENT WORK — the folio: cards unfold away one by one ════════════════
