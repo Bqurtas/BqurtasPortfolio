@@ -445,8 +445,71 @@
   /* (2. The ink curtains that used to cover an arriving sheet are gone: every card now lands
      directly on the one before it. The "window" opening lives in the splash and the room switch.) */
 
-  /* (3–4. Headings no longer rise word by word and the Design Room's icons no longer pop as
-     their sheets arrive: nothing on a sheet moves because the page is being scrolled.) */
+  /* ════════════════ 3. MASK-RISE — headings rise word by word ════════════════ */
+  const LATIN = /^[\u0000-ɏ‘’\s.,!?’'&-]+$/;
+  function split(el) {
+    let i = 0;
+    const unfold = (em) => {
+      const text = em.textContent;
+      em.textContent = '';
+      let j = 0;
+      for (const part of text.split(/(\s+)/)) {
+        if (!part) continue;
+        if (/^\s+$/.test(part)) { em.append(part); continue; }
+        const word = doc.createElement('span');
+        word.className = 'film-wd';            // letters unfold, the word never breaks
+        for (const ch of part) {
+          const s = doc.createElement('span');
+          s.className = 'film-ch';
+          s.textContent = ch;
+          s.style.setProperty('--j', String(j++));
+          word.append(s);
+        }
+        em.append(word);
+      }
+    };
+    const walk = (node) => {
+      for (const child of [...node.childNodes]) {
+        if (child.nodeType === 3) {
+          if (!child.data.trim()) continue;
+          const frag = doc.createDocumentFragment();
+          for (const part of child.data.split(/(\s+)/)) {
+            if (!part) continue;
+            if (/^\s+$/.test(part)) { frag.append(part); continue; }
+            const w = doc.createElement('span');
+            w.className = 'film-w';
+            const inner = doc.createElement('span');
+            inner.textContent = part;
+            inner.style.setProperty('--i', String(i++));
+            w.append(inner);
+            frag.append(w);
+          }
+          child.replaceWith(frag);
+        } else if (child.nodeType === 1 && !child.matches('br, img, svg, i, .film-w, .film-ch')) {
+          if (child.tagName === 'EM' && el.dataset.filmUnfold === '' && LATIN.test(child.textContent)) unfold(child);
+          else walk(child);
+        }
+      }
+    };
+    walk(el);
+  }
+  function rise() {
+    if (still()) return;
+    /* only the evidence sheet's heading rises (owner, 2026-11-22: "the numbers, the text and
+       the line must move"); the other sheets stay as they are */
+    const heads = doc.querySelectorAll('#evidence .section-title');
+    heads.forEach((el) => {
+      if (el.closest('.film-hero')) return;
+      if (el.closest('.recent-heading')) el.dataset.filmUnfold = '';
+      el.classList.add('film-rise');
+      split(el);
+      onceVisible(el, () => {
+        if (!el.querySelector('.film-w, .film-ch')) split(el);
+        raf2(() => el.classList.add('is-in'));
+      }, 0.2);
+    });
+  }
+  rise();
 
   /* ════════════════ 5. THE ARCHIVE, BY DISCIPLINE ════════════════ */
   const GROUPS = [
@@ -623,18 +686,21 @@
     const items = [];
     ((behance && behance.projects) || []).slice(0, 3).forEach((p) => {
       if (!p.cover || !p.cover.src) return;
-      items.push({ kind: 'case-study', date: p.date || '', title: p.title, src: p.cover.src, fit: 'wide', tone: p.cover.tone, route: 'behance' });
+      items.push({ kind: 'case-study', date: p.date || '', title: p.title, src: p.cover.src, fit: 'wide', tone: p.cover.tone, route: 'behance',
+        ar: p.cover.width && p.cover.height ? p.cover.width / p.cover.height : 0 });
     });
     const byDate = (a, b) => String(b.date || '').localeCompare(String(a.date || '')) || (b.index || 0) - (a.index || 0);
     (manifest.images || []).filter((it) => !String(it.path).startsWith('Official/')).sort(byDate).slice(0, 9).forEach((it) => {
       const folder = String(it.path).split('/')[0];
       const square = Math.abs((it.width || 1) / (it.height || 1) - 1) < 0.18;
+      /* the original, not the 320px thumbnail: the plate shows the work large and sharp */
       items.push({ kind: 'image', date: it.date || '', title: `${FOLDER_TITLE[folder] || folder} ${it.index || ''}`.trim(),
-        src: `assets/thumbs/${it.path}`, fit: square || folder === 'LogoDesign' ? 'contain' : 'cover', tab: FOLDER_TAB[folder] || 'all' });
+        src: `/media/${it.path}`, thumb: `assets/thumbs/${it.path}`, ar: it.width && it.height ? it.width / it.height : 0,
+        fit: square || folder === 'LogoDesign' ? 'contain' : 'cover', tab: FOLDER_TAB[folder] || 'all' });
     });
     (manifest.videos || []).slice(0, 2).forEach((it, i) => {
       items.push({ kind: 'video', date: it.date || '', title: `${FOLDER_TITLE.Videos} ${i + 1}`,
-        src: String(it.poster || '').replace(/^\//, ''), fit: 'cover', tab: 'video',
+        src: String(it.poster || '').replace(/^\//, ''), fit: 'cover', tab: 'video', ar: it.width && it.height ? it.width / it.height : 16 / 9,
         dur: it.duration ? `${Math.floor(it.duration / 60)}:${String(Math.round(it.duration % 60)).padStart(2, '0')}` : '' });
     });
     if (items.length < 3) return;
@@ -661,6 +727,12 @@
       im.loading = 'lazy';
       im.decoding = 'async';
       im.src = it.src;
+      /* the plate takes the work's own proportions, so the work fills it whole */
+      if (it.ar) a.style.setProperty('--ar', it.ar.toFixed(4));
+      im.addEventListener('load', () => {
+        if (!it.ar && im.naturalWidth && im.naturalHeight) a.style.setProperty('--ar', (im.naturalWidth / im.naturalHeight).toFixed(4));
+      }, { once: true });
+      if (it.thumb) im.addEventListener('error', () => { im.src = it.thumb; }, { once: true });
       if (it.fit === 'contain') a.classList.add('is-contain');
       if (it.fit === 'wide') a.classList.add('is-wide', it.tone === 'light' ? 'is-light' : 'is-dark');
       if (it.kind === 'video') a.classList.add('is-film');
@@ -709,6 +781,8 @@
       meta.classList.add('is-swap');
     };
     const place = (c, pos) => {
+      /* the plates waiting behind take the front plate's proportions: one even stack */
+      if (pos === 0) stage.style.setProperty('--ar-front', c.style.getPropertyValue('--ar') || '1.32');
       c.style.setProperty('--pos', String(Math.min(pos, 4)));
       c.classList.toggle('is-deep', pos > 3);
       c.tabIndex = pos === 0 ? 0 : -1;
@@ -1267,10 +1341,17 @@
   doc.addEventListener('bq:language', mark);
   mark();
 
-  /* the figures stand complete: no rolling numbers or rising tiles; the real work loads
-     only as the sheet comes near */
-  sec.classList.add('is-in');
-  onceVisible(sec, () => { works(); }, 0, '0px 0px 60% 0px');
+  /* the figures arrive once: the numbers roll, the work rises, the line draws and the
+     years follow it; then the sheet is settled, so a later re-measure cannot replay it */
+  onceVisible(sec, () => {
+    works().finally(() => raf2(() => {
+      sec.classList.add('is-in');
+      setTimeout(() => sec.classList.add('is-settled'), 2800);
+    }));
+    sec.querySelectorAll('[data-ev-to]').forEach((b, i) => {
+      if (b.firstChild && b.firstChild.nodeType === 3) rollNumber(b.firstChild, Number(b.dataset.evTo), 200 + i * 140, 1100);
+    });
+  }, 0.3);
 })();
 
 /* ═════ part: menu ═════ */
@@ -1309,6 +1390,17 @@
     const y = cutLine();
     if (node && y !== null) node.style.setProperty('--film-window-cut', `${y}px`);
   };
+  /* the new room's name on the curtain, set exactly like the room's own title (The Journal…) */
+  const roomName = (id) => {
+    const src = doc.querySelector(`#${id} .room-hero-title`);
+    const link = doc.querySelector(`#mobileMenu .mm-link[data-route="${id}"] .mm-link-text`);
+    const label = doc.createElement('span');
+    label.className = 'film-window-name';
+    if (src && src.textContent.trim()) src.childNodes.forEach((n) => label.append(n.cloneNode(true)));
+    else if (link && link.textContent.trim()) label.textContent = link.textContent.trim();
+    else return null;
+    return label;
+  };
 
   doc.addEventListener('bq:route', (e) => {
     const next = e.detail && e.detail.room;
@@ -1321,13 +1413,16 @@
     const mine = doc.createElement('div');
     mine.className = 'film-window';
     mine.setAttribute('aria-hidden', 'true');
-    mine.append(doc.createElement('b'), doc.createElement('b'));
+    const upper = doc.createElement('b');
+    const label = roomName(next);
+    if (label) upper.append(label);
+    mine.append(upper, doc.createElement('b'));
     node = mine;
     place();
     doc.body.append(mine);
     void mine.offsetWidth;                     // commit the closed state before anything is painted
     /* a menu that was open finishes closing under cover */
-    const hold = doc.body.matches('.menu-open, .menu-revealed, .menu-closing') ? 560 : 70;
+    const hold = Math.max(doc.body.matches('.menu-open, .menu-revealed, .menu-closing') ? 560 : 70, label ? 520 : 0);
     timer = setTimeout(() => {
       place();
       mine.classList.add('is-open');
@@ -1367,7 +1462,7 @@
   'use strict';
   const F = window.__bqFilm;
   if (!F) return;
-  const { doc, root } = F;
+  const { doc, root, still } = F;
   const menu = doc.getElementById('mobileMenu');
   if (!menu) return;
   const links = [...menu.querySelectorAll('.mm-link[data-route]')];
@@ -1446,8 +1541,51 @@
     return stage;
   };
 
-  const show = (link) => {
+  /* the cards ride with the pointer: beside it, eased, turning to the other side near an edge
+     (keyboard focus still deals them under the list) */
+  const CW = 232, CH = 172, GAP = 26;
+  let tx = 0, ty = 0, cx = 0, cy = 0, ride = 0, riding = false;
+  const glide = () => {
+    ride = 0;
+    if (!stage) return;
+    const k = still() ? 1 : 0.2;
+    cx += (tx - cx) * k;
+    cy += (ty - cy) * k;
+    stage.style.setProperty('--mx', `${cx.toFixed(1)}px`);
+    stage.style.setProperty('--my', `${cy.toFixed(1)}px`);
+    if (Math.abs(tx - cx) > 0.4 || Math.abs(ty - cy) > 0.4) ride = requestAnimationFrame(glide);
+  };
+  const follow = (e, jump) => {
+    if (!stage || !e || e.pointerType === 'touch') return;
+    const rtl = root.getAttribute('dir') === 'rtl';
+    let x = rtl ? e.clientX - GAP - CW : e.clientX + GAP;
+    if (x + CW > innerWidth - 14) x = e.clientX - GAP - CW;
+    if (x < 14) x = e.clientX + GAP;
+    let y = e.clientY + GAP;
+    if (y + CH > innerHeight - 14) y = e.clientY - GAP - CH;
+    tx = Math.max(14, Math.min(innerWidth - CW - 14, x));
+    ty = Math.max(14, Math.min(innerHeight - CH - 14, y));
+    if (jump || !riding) { cx = tx; cy = ty; riding = true; }
+    if (!ride) ride = requestAnimationFrame(glide);
+  };
+  const show = (link, e) => {
     if ((fine && !fine.matches) || !isOpen()) return;
+    if (e && e.pointerType !== 'touch') {
+      clearTimeout(hideTimer);
+      const s = build();
+      s.classList.remove('is-rtl');
+      s.style.setProperty('--ms', '1');
+      follow(e, !s.classList.contains('is-on'));
+      if (link.dataset.route === 'blog') {
+        const title = s.querySelector('.film-mc-title');
+        const name = link.querySelector('.mm-link-text');
+        if (title && name) title.textContent = name.textContent.trim();
+      }
+      s.dataset.room = link.dataset.route;
+      void s.offsetWidth;
+      s.classList.add('is-on');
+      return;
+    }
     /* the stage has one place: on the curtain under the list, starting where the names start */
     const last = links[links.length - 1].getBoundingClientRect();
     const text = (link.querySelector('.mm-link-text') || link).getBoundingClientRect();
@@ -1472,10 +1610,11 @@
   };
   const hide = () => {
     clearTimeout(hideTimer);
-    hideTimer = setTimeout(() => { if (stage) stage.classList.remove('is-on'); }, 90);
+    hideTimer = setTimeout(() => { if (stage) stage.classList.remove('is-on'); riding = false; }, 90);
   };
   links.forEach((link) => {
-    link.addEventListener('pointerenter', () => show(link));
+    link.addEventListener('pointerenter', (e) => show(link, e));
+    link.addEventListener('pointermove', (e) => follow(e));
     link.addEventListener('focus', () => show(link));
     link.addEventListener('pointerleave', hide);
     link.addEventListener('blur', hide);
@@ -1487,5 +1626,20 @@
       else if (stage) stage.classList.remove('is-on');
     }).observe(menu, { attributes: true, attributeFilter: ['class'] });
   }
+})();
+
+/* ═════ part: practice-works ═════ */
+/* film part — WHAT I DO: every service shows its works in its own row, always (owner,
+   2026-11-22: they appeared only one service at a time as the sheet was scrolled, and never
+   on a tablet). The strip moves from the folding detail into the service's row. */
+(() => {
+  'use strict';
+  document.querySelectorAll('#services .service-panel').forEach((panel) => {
+    const works = panel.querySelector('.service-detail .svc-works');
+    const trigger = panel.querySelector('.service-trigger');
+    if (!works || !trigger) return;
+    works.classList.add('film-svc-works');
+    trigger.insertBefore(works, trigger.querySelector('.service-toggle'));
+  });
 })();
 
