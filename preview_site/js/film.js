@@ -216,17 +216,27 @@
   /* The hero's own canvas is keyed: the clip's brightness becomes the alpha of the field's
      opposite tone (paper on the ink field, ink on the paper field in dark), so the name
      sits on the field itself — no box, no blend mode, whatever the black. */
+  /* the key, worked out once: the clip's brightness → the name's alpha (20 = the clip's ink,
+     255 = its white). Pixels are written whole (one 32-bit word each), so a phone keys a
+     frame several times faster than byte by byte. */
+  const KEY = new Uint8Array(256);
+  for (let v = 0; v < 256; v++) { const a = (v - 20) * 1.085; KEY[v] = a <= 0 ? 0 : a >= 255 ? 255 : Math.round(a); }
+  const LITTLE = new Uint8Array(new Uint32Array([1]).buffer)[0] === 1;
+  function keyFrame(frame, tone) {
+    const px = frame.data;
+    if (LITTLE) {
+      const p32 = new Uint32Array(px.buffer, px.byteOffset, px.length >> 2);
+      const rgb = tone | (tone << 8) | (tone << 16);
+      for (let i = 0, n = p32.length; i < n; i++) p32[i] = (KEY[p32[i] & 255] << 24) | rgb;
+    } else {
+      for (let i = 0; i < px.length; i += 4) { const a = KEY[px[i]]; px[i] = px[i + 1] = px[i + 2] = tone; px[i + 3] = a; }
+    }
+    return frame;
+  }
   function keyLogo(c) {
     try {
       const frame = c.getImageData(0, 0, LOGO_W, LOGO_H);
-      const px = frame.data;
-      const tone = root.dataset.theme === 'dark' ? 22 : 243;
-      for (let i = 0; i < px.length; i += 4) {
-        const a = (px[i] - 20) * 1.085;            // 20 = the clip's ink, 255 = its white
-        px[i] = px[i + 1] = px[i + 2] = tone;
-        px[i + 3] = a <= 0 ? 0 : a >= 255 ? 255 : a;
-      }
-      c.putImageData(frame, 0, 0);
+      c.putImageData(keyFrame(frame, root.dataset.theme === 'dark' ? 22 : 243), 0, 0);
     } catch (e) { /* nothing drawn yet */ }
   }
   function drawLogo(src, ctx = logoCtx) {
@@ -245,11 +255,19 @@
     }
     if (c === logoCtx) keyLogo(c);
   }
+  let logoGaveUp = false, logoChain = false;
   function followLogo() {
+    if (logoGaveUp || logoChain) return;
     cancelAnimationFrame(logoFrame);
+    logoChain = true;
+    /* one key per new frame of the clip (a 120 Hz phone would otherwise key each frame twice) */
+    const next = (fn) => (typeof logo.requestVideoFrameCallback === 'function'
+      ? logo.requestVideoFrameCallback(fn) : (logoFrame = requestAnimationFrame(fn)));
     const step = () => {
+      if (logoGaveUp) { logoChain = false; return; }
       drawLogo(logo);
-      if (!logo.paused && !logo.ended) logoFrame = requestAnimationFrame(step);
+      if (!logo.paused && !logo.ended) next(step);
+      else logoChain = false;
     };
     step();
   }
@@ -265,7 +283,7 @@
     hero.classList.add('film-logo-drawn');
     drawLogo(null);
     logo.addEventListener('playing', followLogo);
-    logo.addEventListener('seeked', () => { if (logo.paused) drawLogo(logo); });
+    logo.addEventListener('seeked', () => { if (logo.paused && !logoGaveUp) drawLogo(logo); });
     logo.addEventListener('ended', () => drawLogo(logo));
     if (typeof MutationObserver === 'function') {
       new MutationObserver(() => {
@@ -283,13 +301,23 @@
   function playLogo() {
     if (!logo) return;
     hero.classList.add('film-writing');
+    logoGaveUp = false;
     try { logo.currentTime = 0; } catch { /* not seekable yet */ }
+    /* the finished name whenever the clip cannot write it — autoplay refused (a phone in
+       low-power or data-saver mode) or a stalled network: the name must always appear */
     const fallback = () => {
-      if (logoStill && logoStill.complete) drawLogo(logoStill);
+      if (logoGaveUp || logo.ended) return;
+      logoGaveUp = true;
+      try { logo.pause(); } catch { /* already stopped */ }
+      cancelAnimationFrame(logoFrame);
+      const show = () => drawLogo(logoStill);
+      if (logoStill && logoStill.complete && logoStill.naturalWidth) show();
+      else if (logoStill) logoStill.addEventListener('load', show, { once: true });
       else if (logo.dataset.filmPoster) logo.setAttribute('poster', logo.dataset.filmPoster);
     };
     const p = logo.play();
     if (p && p.catch) p.catch(fallback);
+    setTimeout(() => { if (!logo.ended && (logo.paused || logo.readyState < 2)) fallback(); }, 1600);
   }
 
   function startHero() {
@@ -1103,7 +1131,7 @@
   const beginHero = () => { if (heroBegun) return; heroBegun = true; startHero(); };
   window.__bqFilm = {
     doc, root, still, clamp, lerp, prog, inOutSine, outCubic, inCubic, outExpo, raf2,
-    lang, copy, onceVisible, rollNumber, beginHero, hero,
+    lang, copy, onceVisible, rollNumber, beginHero, hero, keyFrame,
     getManifest, thumbOf, groupLabel, GROUPS,
     /* parts add their own strings: addCopy({ en: { key: '…' }, ku: { … } }) */
     addCopy(table) {
@@ -1154,7 +1182,7 @@
     opened = true;
     seam();
     el.classList.add('is-open');
-    F.beginHero();                            // the hero starts drawing as the window opens
+    raf2(() => F.beginHero());                // the hero starts drawing once the shutters are moving
     removeEventListener('resize', seam);
     setTimeout(() => { root.classList.remove('film-splashing'); el.remove(); }, 760);
   };
@@ -1176,14 +1204,7 @@
     const paint = (src) => {
       try {
         sx.drawImage(src, 0, 0, W, H);
-        const frame = sx.getImageData(0, 0, W, H);
-        const px = frame.data;
-        for (let i = 0; i < px.length; i += 4) {
-          const a = (px[i] - 20) * 1.085;          // 20 = the clip's ink, 255 = its white
-          px[i] = R; px[i + 1] = G; px[i + 2] = B;
-          px[i + 3] = a <= 0 ? 0 : a >= 255 ? 255 : a;
-        }
-        ctx.putImageData(frame, 0, 0);
+        ctx.putImageData(F.keyFrame(sx.getImageData(0, 0, W, H), R), 0, 0);
       } catch (e) { /* the frame is not decoded yet */ }
     };
     const v = doc.createElement('video');
@@ -1191,20 +1212,27 @@
     v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
     v.disablePictureInPicture = true;
     holder.append(canvas, v);
-    let frame = 0;
+    let frame = 0, gaveUp = false, chain = false;
+    /* one key per new frame of the clip where the browser can tell (requestVideoFrameCallback) */
     const draw = () => {
+      if (gaveUp) { chain = false; return; }
       paint(v);
-      if (!v.paused && !v.ended && !opened) frame = requestAnimationFrame(draw);
+      if (v.paused || v.ended || opened) { chain = false; return; }
+      if (typeof v.requestVideoFrameCallback === 'function') v.requestVideoFrameCallback(draw);
+      else frame = requestAnimationFrame(draw);
     };
     const still = () => {                     // autoplay refused or the clip failed: the finished name, wiped in
-      if (opened || holder.classList.contains('is-still')) return;
+      if (opened || gaveUp) return;
+      gaveUp = true;
+      try { v.pause(); } catch (e) { /* already stopped */ }
       cancelAnimationFrame(frame);
       const im = new Image();
       im.decoding = 'async';
-      im.onload = () => { paint(im); holder.classList.add('is-still'); setTimeout(open, 1300); };
+      im.onload = () => { paint(im); holder.classList.add('is-still'); setTimeout(open, 1100); };
+      im.onerror = () => open();
       im.src = holder.dataset.still || '';
     };
-    v.addEventListener('playing', () => { cancelAnimationFrame(frame); draw(); });
+    v.addEventListener('playing', () => { if (gaveUp || chain) return; chain = true; cancelAnimationFrame(frame); draw(); });
     v.addEventListener('ended', () => { draw(); setTimeout(open, 120); }, { once: true });
     v.addEventListener('timeupdate', () => { if (v.duration && v.currentTime > 3.15) setTimeout(open, 120); });
     v.addEventListener('error', still, { once: true });
@@ -1641,5 +1669,20 @@
     works.classList.add('film-svc-works');
     trigger.insertBefore(works, trigger.querySelector('.service-toggle'));
   });
+})();
+
+/* ═════ part: work-jump ═════ */
+/* film part — the hero's "View the work" goes straight to the portfolio (owner, 2026-11-22) */
+(() => {
+  'use strict';
+  const doc = document;
+  doc.querySelectorAll('[data-work-jump]').forEach((a) => a.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const sheet = doc.getElementById('design-work');
+    if (!sheet) return;
+    e.preventDefault();
+    if (typeof window.__bqScrollPaperTarget === 'function') window.__bqScrollPaperTarget(sheet, { behavior: 'smooth', block: 'start' });
+    else sheet.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }));
 })();
 

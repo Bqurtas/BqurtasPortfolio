@@ -13,7 +13,7 @@
       instead of being pinned for the life of the installed worker.
    ========================================================= */
 
-const SW_VERSION = '59a96da0d7f1'; // generated from this worker and the app shell
+const SW_VERSION = '7fc6b4d56d8a'; // generated from this worker and the app shell
 const CACHE_NAME = `bqurtas-cache-${SW_VERSION}`;
 const DOC_FALLBACK = '/index.html';
 
