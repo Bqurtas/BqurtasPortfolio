@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 
 const authored = await readFile(new URL('../preview_site/js/enhance.js', import.meta.url), 'utf8');
 const worksStart = authored.indexOf('const WK_ACCESS_I18N =');
@@ -12,6 +13,12 @@ const publicationEnd = authored.indexOf('    /* Uploads create', publicationStar
 assert.ok(publicationStart > 0 && publicationEnd > publicationStart);
 const worksSource = authored.slice(publicationStart, publicationEnd)
   + authored.slice(worksStart, worksEnd).replace('const renderWorks =', 'globalThis.renderWorks =');
+// The real film planner; only its converter is replaced in these tests.
+const videoTools = (() => {
+  const window = {};
+  vm.runInNewContext(readFileSync(new URL('../preview_site/js/studio-video.js', import.meta.url), 'utf8'), { window, Blob });
+  return window.BQStudioVideo;
+})();
 
 function node() {
   const handlers = new Map();
@@ -23,9 +30,11 @@ function node() {
   };
 }
 
-/* A browser <video> whose metadata and seeks resolve on the next microtask. */
-function fakeVideo({ width = 1080, height = 1920, duration = 34.07, broken = false } = {}) {
+/* A browser <video> whose metadata and seeks resolve on the next microtask.
+   `frames` lists what each newly loaded film reports, in order. */
+function fakeVideo({ width = 1080, height = 1920, duration = 34.07, broken = false, frames = null } = {}) {
   const listeners = new Map();
+  let loads = 0;
   return {
     videoWidth:0, videoHeight:0, duration:NaN, readyState:0, paused:false, _src:'', _time:0,
     addEventListener(type, handler) { if (!listeners.has(type)) listeners.set(type, new Set()); listeners.get(type).add(handler); },
@@ -37,7 +46,8 @@ function fakeVideo({ width = 1080, height = 1920, duration = 34.07, broken = fal
       this._src = value;
       queueMicrotask(() => {
         if (broken) { this.emit('error'); return; }
-        Object.assign(this, { videoWidth:width, videoHeight:height, duration, readyState:1 });
+        const next = frames ? frames[Math.min(loads++, frames.length - 1)] : { width, height, duration };
+        Object.assign(this, { videoWidth:next.width, videoHeight:next.height, duration:next.duration, readyState:1 });
         this.emit('loadedmetadata');
       });
     },
@@ -46,18 +56,19 @@ function fakeVideo({ width = 1080, height = 1920, duration = 34.07, broken = fal
   };
 }
 
-function worksFixture({ token = 'browser-editor', resize = async () => 'webp-image', api = async () => ({ ok:true, files:[] }), video = fakeVideo(), upload = async () => ({ ok:true, sha:'f'.repeat(40), size:4096, receipt:'r'.repeat(43) }) } = {}) {
+function worksFixture({ token = 'browser-editor', resize = async () => 'webp-image', api = async () => ({ ok:true, files:[] }), video = fakeVideo(), upload = async () => ({ ok:true, sha:'f'.repeat(40), size:4096, receipt:'r'.repeat(43) }), prepare = async () => { throw new Error('no conversion expected'); } } = {}) {
   const nodes = Object.fromEntries(['wkTokenForm', 'wkToken', 'wkTokenMsg', 'wkFile', 'wkPrev', 'wkMsg', 'wkUp', 'wkFolder', 'wkGrid', 'wkMgFolder', 'wkMgLoad', 'wkNote', 'wkFileLabel', 'wkUpText', 'wkVidPrev', 'wkVidInfo'].map(id => ['#' + id, node()]));
   nodes['#wkTokenForm button[type="submit"]'] = node();
   nodes['#wkPrev'].image = { src:'' };
   nodes['#wkFolder'].value = 'Book';
   nodes['#wkVid'] = video;
   const store = new Map(token ? [['bq_edit_token', token]] : []);
-  const view = node(), calls = [], uploads = [], revoked = [];
+  const view = node(), calls = [], uploads = [], revoked = [], conversions = [];
   const collection = { book:{ folder:'Book', title:'Books', count:1, ext:'webp' }, video:{ folder:'Videos', title:'Video', count:30, ext:'mp4' } };
   const context = {
     $:selector => nodes[selector], view, collections:() => collection, curLang:() => 'en',
-    window:{ BQ_GALLERY:{ COLLECTIONS:collection } },
+    window:{ BQ_GALLERY:{ COLLECTIONS:collection },
+      BQStudioVideo:{ ...videoTools, prepare:(file, meta, options) => { conversions.push({ file, meta, options }); return prepare(file, meta, options); } } },
     WK_I18N:{ en:{ note:'Upload a finished design.', upload:'Publish', cat:'Folder', file:'Image', reading:'Preparing', ready:'Ready', pick:'Pick an image', uploading:'Publishing', done:'Published', fail:'Failed' } },
     CT_I18N:{ en:{ tokPh:'Editor password', conn:'Connect' } },
     editToken:() => store.get('bq_edit_token') || '',
@@ -65,16 +76,16 @@ function worksFixture({ token = 'browser-editor', resize = async () => 'webp-ima
     esc:value => String(value || ''), cmsResize:resize,
     wkApi:async payload => { calls.push(payload); return api(payload); },
     studioUpload:async (service, text, progress) => { uploads.push({ service, text }); progress(50); return upload({ service, text }); },
-    URL:{ createObjectURL:file => 'blob:' + file.name, revokeObjectURL:url => revoked.push(url) },
+    URL:{ createObjectURL:file => 'blob:' + (file.name || 'converted'), revokeObjectURL:url => revoked.push(url) },
     FileReader:class { readAsDataURL(file) { queueMicrotask(() => { this.result = 'data:video/mp4;base64,' + file.base64; this.onload(); }); } },
     document:{ createElement:() => ({ getContext:() => ({ drawImage() {} }), toDataURL:() => 'data:image/jpeg;base64,' + '/9j/'.repeat(100) }) },
-    setTimeout, clearTimeout, queueMicrotask
+    setTimeout, clearTimeout, queueMicrotask, AbortController
   };
   vm.runInNewContext(worksSource, context);
   context.renderWorks();
   // These elements are browser-created with the authored disabled attribute.
   nodes['#wkUp'].disabled = /id="wkUp"[^>]*disabled/.test(view.innerHTML);
-  return { context, nodes, view, calls, store, uploads, revoked, video,
+  return { context, nodes, view, calls, store, uploads, revoked, video, conversions,
     choose:file => nodes['#wkFile'].fire('change', { target:{ files:file ? [file] : [] } }),
     collection:folder => { nodes['#wkFolder'].value = folder; nodes['#wkFolder'].fire('change'); },
     publish:() => nodes['#wkUp'].fire('click'),
@@ -149,33 +160,88 @@ test('publishing is single flight and a service failure preserves the prepared i
   assert.equal(f.nodes['#wkPrev'].hidden, true);
 });
 
-const film = (extra = {}) => ({ name:'reel.mp4', type:'video/mp4', size:4096, base64:'AAAAGGZ0eXBpc29t', ...extra });
+const header = brand => Uint8Array.from([0, 0, 0, 24, ...Buffer.from('ftyp' + brand)]);
+const film = (extra = {}) => ({ name:'reel.mp4', type:'video/mp4', size:4096, base64:'AAAAGGZ0eXBpc29t', brand:'isom',
+  slice() { const bytes = header(this.brand); return { arrayBuffer:async () => bytes.buffer }; }, ...extra });
 
 test('Video is one of the Works collections and switches the same form to MP4 films', async () => {
   const f = worksFixture();
   assert.match(f.view.innerHTML, /<option value="Videos">Video<\/option>/);
   assert.match(f.view.innerHTML, /id="wkFolder"[\s\S]*<option value="Book">Books<\/option><option value="Videos">Video<\/option>/);
   f.collection('Videos');
-  assert.equal(f.nodes['#wkFile'].accept, 'video/mp4,.mp4');
-  assert.match(f.nodes['#wkNote'].textContent, /MP4 video, up to 25 MB/);
-  assert.equal(f.nodes['#wkFileLabel'].textContent, 'Choose video (MP4, up to 25 MB)');
+  assert.equal(f.nodes['#wkFile'].accept, 'video/*,.mp4,.m4v,.mov');
+  assert.match(f.nodes['#wkNote'].textContent, /video of any size[\s\S]*Over 25 MB, it is compressed here/);
+  assert.equal(f.nodes['#wkFileLabel'].textContent, 'Choose video (any size)');
   assert.equal(f.nodes['#wkUpText'].textContent, 'Publish video');
   f.collection('Book');
   assert.equal(f.nodes['#wkFile'].accept, 'image/*');
   assert.equal(f.nodes['#wkUpText'].textContent, 'Publish');
 });
 
-test('a film over 25 MB or not an MP4 is refused with its size before anything is read or sent', async () => {
+test('only video files are taken, and a film too long for 25 MB says how long it may be', async () => {
   const f = worksFixture();
   f.collection('Videos');
-  await f.choose(film({ size:31_200_000 }));
-  assert.equal(f.nodes['#wkMsg'].textContent, '✗ This video is \u206631.2 MB\u2069. The limit is 25 MB — export a smaller MP4.');
+  assert.equal(f.nodes['#wkFile'].accept, 'video/*,.mp4,.m4v,.mov');
+  await f.choose(film({ name:'notes.pdf', type:'application/pdf' }));
+  assert.match(f.nodes['#wkMsg'].textContent, /Choose a video file \(MP4 or MOV\)/);
   assert.equal(f.video.src, '');
-  await f.choose(film({ name:'clip.mov', type:'video/quicktime' }));
-  assert.match(f.nodes['#wkMsg'].textContent, /Choose an MP4 video file/);
+  const long = worksFixture({ video:fakeVideo({ width:1920, height:1080, duration:25 * 60 }) });
+  long.collection('Videos');
+  await long.choose(film({ size:3_000_000_000 }));
+  assert.match(long.nodes['#wkMsg'].textContent, /too long to fit in 25 MB[\s\S]*under about 10 minutes/);
+  assert.equal(long.conversions.length, 0);
+  await long.publish();
+  assert.equal(long.uploads.length + long.calls.length, 0);
+  assert.equal(long.nodes['#wkUp'].disabled, true);
+});
+
+test('a film over 25 MB is compressed here with progress, then the compressed film is shown and published', async () => {
+  const compressed = { size:9_870_000, type:'video/mp4', base64:'Q09NUFJFU1NFRA==' };
+  let report;
+  const f = worksFixture({
+    video:fakeVideo({ frames:[{ width:2160, height:3840, duration:42 }, { width:1080, height:1920, duration:42.04 }] }),
+    prepare:async (file, meta, options) => { report = options.onProgress; options.onProgress(0.5); return { blob:compressed, target:{ action:'encode' } }; }
+  });
+  f.collection('Videos');
+  await f.choose(film({ size:180_000_000 }));
+  assert.equal(f.conversions.length, 1);
+  assert.deepEqual(JSON.parse(JSON.stringify(f.conversions[0].meta)), { size:180_000_000, width:2160, height:3840, duration:42, mp4:true });
+  report(0.73); // a late progress report never replaces the finished state
+  assert.equal(f.nodes['#wkVidInfo'].textContent, '\u20661080 × 1920 · 0:42 · 9.9 MB\u2069');
+  assert.match(f.nodes['#wkMsg'].textContent, /^Compressed from \u2066180\.0 MB\u2069 to \u20669\.9 MB\u2069\. Ready/);
+  assert.equal(f.nodes['#wkUp'].disabled, false);
   await f.publish();
-  assert.equal(f.uploads.length + f.calls.length, 0);
+  assert.deepEqual(f.uploads, [{ service:'work-video', text:'Q09NUFJFU1NFRA==' }]);
+  assert.deepEqual(JSON.parse(JSON.stringify({ width:f.calls[0].width, height:f.calls[0].height, duration:f.calls[0].duration })), { width:1080, height:1920, duration:42.04 });
+});
+
+test('compression progress is shown, a newer choice cancels it, and an unsupported browser is told plainly', async () => {
+  let release;
+  const f = worksFixture({ prepare:(file, meta, options) => {
+    options.onProgress(0.41);
+    return new Promise((resolve, reject) => { release = resolve; options.signal.addEventListener('abort', () => reject(Object.assign(new Error('canceled'), { code:'canceled' }))); });
+  } });
+  f.collection('Videos');
+  const first = f.choose(film({ size:90_000_000 }));
+  for (let tick = 0; tick < 20 && !f.conversions.length; tick++) await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(f.nodes['#wkMsg'].textContent, 'Compressing the video to fit 25 MB… 41%');
   assert.equal(f.nodes['#wkUp'].disabled, true);
+  const signal = f.conversions[0].options.signal;
+  await f.choose(film({ name:'other.mp4', size:5000 }));
+  assert.equal(signal.aborted, true, 'the first compression stops when another film is chosen');
+  await first;
+  assert.match(f.nodes['#wkMsg'].textContent, /^Ready/);
+  const unsupported = worksFixture({ prepare:async () => { throw Object.assign(new Error('unsupported'), { code:'unsupported' }); } });
+  unsupported.collection('Videos');
+  await unsupported.choose(film({ name:'clip.mov', type:'video/quicktime', brand:'qt  ', size:12_000_000 }));
+  const rewrapped = worksFixture({ prepare:async () => ({ blob:{ size:12_000_400, type:'video/mp4', base64:'TU9W' }, target:{ action:'rewrap' } }) });
+  rewrapped.collection('Videos');
+  await rewrapped.choose(film({ name:'clip.mov', type:'video/quicktime', brand:'qt  ', size:12_000_000 }));
+  assert.match(rewrapped.nodes['#wkMsg'].textContent, /^Converted to MP4\. Ready/);
+  assert.equal(unsupported.conversions[0].meta.mp4, false, 'a QuickTime file is never sent as it is');
+  assert.match(unsupported.nodes['#wkMsg'].textContent, /cannot compress videos[\s\S]*Google Chrome/);
+  assert.equal(unsupported.nodes['#wkVidPrev'].hidden, true);
+  assert.equal(unsupported.nodes['#wkUp'].disabled, true);
 });
 
 test('a film shows its frame size, length and file size, then publishes once with its cover frame', async () => {

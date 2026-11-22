@@ -136,8 +136,11 @@ async function compileJavaScript() {
     let source = input === 'js/i18n.js' ? languages.initial
       : input === 'js/i18n-more.js' ? languages.more
       : await readFile(path.join(siteRoot, input), 'utf8');
-    // The owner inbox ships only with the intent-loaded Studio bundle.
-    if (input === 'js/enhance.js') source = await readFile(path.join(siteRoot, 'js/studio-inbox.js'), 'utf8') + '\n' + source;
+    // The owner inbox and film preparation ship only with the intent-loaded Studio bundle.
+    if (input === 'js/enhance.js') {
+      source = await readFile(path.join(siteRoot, 'js/studio-inbox.js'), 'utf8') + '\n'
+        + await readFile(path.join(siteRoot, 'js/studio-video.js'), 'utf8') + '\n' + source;
+    }
     // Version the shared publication model with its importing module. A new
     // entry bundle must never reuse a previous release's cached data rules.
     if (input === 'js/recent-work.js') {

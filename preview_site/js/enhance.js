@@ -1617,11 +1617,11 @@
        server stores the film once before publishing it with that cover. */
     const WK_VIDEO_FOLDER = 'Videos', WK_VIDEO_MAX = 25_000_000;
     const WK_VIDEO_I18N = {
-      en:  { note:'Add a finished MP4 video, up to 25 MB. The cover is the frame showing in the preview — pause it where you like. It appears in the gallery’s Video tab once the website has deployed.', file:'Choose video (MP4, up to 25 MB)', upload:'Publish video', reading:'Reading the video…', ready:'Ready — pause the preview on the cover frame, then click Publish video.', pick:'Choose an MP4 video first.', notMp4:'Choose an MP4 video file.', tooBig:'This video is {size}. The limit is 25 MB — export a smaller MP4.', unreadable:'This video cannot be played here. Export it as an MP4 (H.264) and try again.', poster:'Could not take the cover frame from this video. Play it for a moment, then publish again.', sending:'Uploading the video… {p}%', saving:'Saving the video to GitHub…', manageBtn:'Show videos', count:'videos', empty:'No videos yet.', delAsk:'Delete this video permanently?', rejected:'This file is not a usable MP4 video.', mb:'MB' },
-      ku:  { note:'ڤیدیۆیەکی تەواوکراو بە فۆرماتی MP4 زیاد بکە، تا ٢٥ مێگابایت. وێنەی بەرگ ئەو فرەیمەیە کە لە پێشبینینەکەدا دیارە — لە هەر شوێنێک بتەوێت ڕایبگرە. دوای بڵاوبوونەوەی وێبسایتەکە لە تابی ڤیدیۆی گەلەریدا دەردەکەوێت.', file:'ڤیدیۆ هەڵبژێرە (MP4، تا ٢٥ مێگابایت)', upload:'بڵاوکردنەوەی ڤیدیۆ', reading:'خوێندنەوەی ڤیدیۆکە…', ready:'ئامادەیە — پێشبینینەکە لەسەر فرەیمی بەرگ ڕابگرە، پاشان کلیکی بڵاوکردنەوەی ڤیدیۆ بکە.', pick:'سەرەتا ڤیدیۆیەکی MP4 هەڵبژێرە.', notMp4:'فایلێکی ڤیدیۆی MP4 هەڵبژێرە.', tooBig:'قەبارەی ئەم ڤیدیۆیە {size}. سنوور ٢٥ مێگابایتە — ڤیدیۆیەکی بچووکتر بە MP4 export بکە.', unreadable:'ئەم ڤیدیۆیە لێرە لێنادرێت. بە MP4 (H.264) export ـی بکە و دووبارە هەوڵ بدەوە.', poster:'نەتوانرا وێنەی بەرگ لەم ڤیدیۆیە وەربگیرێت. کەمێک لێی بدە، پاشان دووبارە بڵاوی بکەوە.', sending:'ڤیدیۆکە بار دەکرێت… {p}%', saving:'ڤیدیۆکە لە GitHub پاشەکەوت دەکرێت…', manageBtn:'پیشاندانی ڤیدیۆکان', count:'ڤیدیۆ', empty:'هێشتا هیچ ڤیدیۆیەک نییە.', delAsk:'ئەم ڤیدیۆیە بە یەکجاری بسڕدرێتەوە؟', rejected:'ئەم فایلە ڤیدیۆیەکی MP4 ـی بەکەڵک نییە.', mb:'MB' },
-      kmr: { note:'Vîdyoyeke MP4 ya temam zêde bike, heta 25 MB. Berg ew çarçove ye ku di pêşdîtinê de xuya dibe — li ku bixwazî rawestîne. Piştî ku malper belav bibe, di taba Vîdyoyê ya galerîyê de xuya dibe.', file:'Vîdyo hilbijêre (MP4, heta 25 MB)', upload:'Vîdyoyê belav bike', reading:'Vîdyo tê xwendin…', ready:'Amade ye — pêşdîtinê li ser çarçoveya bergê rawestîne, paşê Vîdyoyê belav bike bitikîne.', pick:'Pêşî vîdyoyeke MP4 hilbijêre.', notMp4:'Pelekî vîdyoyê yê MP4 hilbijêre.', tooBig:'Ev vîdyo {size} e. Sînor 25 MB e — MP4-eke piçûktir derxe.', unreadable:'Ev vîdyo li vir nayê lîstin. Wê wek MP4 (H.264) derxe û dîsa biceribîne.', poster:'Çarçoveya bergê ji vê vîdyoyê nehat girtin. Kêlîkekê bilîze, paşê dîsa belav bike.', sending:'Vîdyo tê barkirin… {p}%', saving:'Vîdyo li GitHub tê tomarkirin…', manageBtn:'Vîdyoyan nîşan bide', count:'vîdyo', empty:'Hêj vîdyo tune.', delAsk:'Ev vîdyo bi temamî were jêbirin?', rejected:'Ev pel ne vîdyoyeke MP4 ya bikêr e.', mb:'MB' },
-      ar:  { note:'أضف فيديو MP4 منتهياً، حتى 25 ميغابايت. الغلاف هو الإطار الظاهر في المعاينة — أوقفها حيث تريد. يظهر في تبويب الفيديو في المعرض بعد نشر الموقع.', file:'اختر فيديو (MP4، حتى 25 ميغابايت)', upload:'نشر الفيديو', reading:'جارٍ قراءة الفيديو…', ready:'جاهز — أوقف المعاينة على إطار الغلاف ثم اضغط نشر الفيديو.', pick:'اختر فيديو MP4 أولاً.', notMp4:'اختر ملف فيديو MP4.', tooBig:'حجم هذا الفيديو {size}. الحد 25 ميغابايت — صدّر ملف MP4 أصغر.', unreadable:'لا يمكن تشغيل هذا الفيديو هنا. صدّره بصيغة MP4 (H.264) وحاول مجدداً.', poster:'تعذّر أخذ إطار الغلاف من هذا الفيديو. شغّله لحظة ثم انشر مجدداً.', sending:'جارٍ رفع الفيديو… {p}%', saving:'جارٍ حفظ الفيديو على GitHub…', manageBtn:'عرض الفيديوهات', count:'فيديو', empty:'لا توجد فيديوهات بعد.', delAsk:'حذف هذا الفيديو نهائياً؟', rejected:'هذا الملف ليس فيديو MP4 صالحاً.', mb:'MB' },
-      fr:  { note:'Ajoutez une vidéo MP4 finie, jusqu’à 25 Mo. La couverture est l’image affichée dans l’aperçu — mettez-le en pause où vous voulez. Elle apparaît dans l’onglet Vidéo de la galerie après le déploiement du site.', file:'Choisir une vidéo (MP4, jusqu’à 25 Mo)', upload:'Publier la vidéo', reading:'Lecture de la vidéo…', ready:'Prêt — mettez l’aperçu en pause sur l’image de couverture, puis cliquez sur Publier la vidéo.', pick:'Choisissez d’abord une vidéo MP4.', notMp4:'Choisissez un fichier vidéo MP4.', tooBig:'Cette vidéo fait {size}. La limite est de 25 Mo — exportez un MP4 plus léger.', unreadable:'Cette vidéo ne peut pas être lue ici. Exportez-la en MP4 (H.264) et réessayez.', poster:'Impossible de prendre l’image de couverture de cette vidéo. Lisez-la un instant, puis publiez à nouveau.', sending:'Envoi de la vidéo… {p} %', saving:'Enregistrement de la vidéo sur GitHub…', manageBtn:'Afficher les vidéos', count:'vidéos', empty:'Aucune vidéo pour l’instant.', delAsk:'Supprimer définitivement cette vidéo ?', rejected:'Ce fichier n’est pas une vidéo MP4 utilisable.', mb:'Mo' }
+      en:  { note:'Add a finished video of any size (MP4 or MOV). Over 25 MB, it is compressed here first, keeping the best quality that fits. The cover is the frame showing in the preview — pause it where you like. It appears in the gallery’s Video tab once the website has deployed.', file:'Choose video (any size)', upload:'Publish video', reading:'Reading the video…', ready:'Ready — pause the preview on the cover frame, then click Publish video.', pick:'Choose an MP4 video first.', notVideo:'Choose a video file (MP4 or MOV).', tooBig:'This video is {size}. The limit is 25 MB — export a smaller MP4.', unreadable:'This video cannot be played here. Export it as an MP4 (H.264) and try again.', poster:'Could not take the cover frame from this video. Play it for a moment, then publish again.', sending:'Uploading the video… {p}%', saving:'Saving the video to GitHub…', manageBtn:'Show videos', count:'videos', empty:'No videos yet.', delAsk:'Delete this video permanently?', rejected:'This file is not a usable MP4 video.', mb:'MB', compressing:'Compressing the video to fit 25 MB… {p}%', converted:'Converted to MP4.', compressed:'Compressed from {from} to {to}.', cannotCompress:'This browser cannot compress videos. Open the dashboard in Google Chrome, or export the video as an MP4 under 25 MB.', tooLong:'This video is too long to fit in 25 MB at a watchable quality. Keep it under about {max} minutes.', compressFailed:'Could not compress this video here. Export it as an MP4 (H.264) under 25 MB and try again.' },
+      ku:  { note:'ڤیدیۆیەکی تەواوکراو بە هەر قەبارەیەک زیاد بکە (MP4 یان MOV). ئەگەر لە ٢٥ مێگابایت گەورەتر بێت، لێرە پێش ناردن بچووک دەکرێتەوە بە باشترین کوالیتی کە جێی دەبێتەوە. وێنەی بەرگ ئەو فرەیمەیە کە لە پێشبینینەکەدا دیارە — لە هەر شوێنێک بتەوێت ڕایبگرە. دوای بڵاوبوونەوەی وێبسایتەکە لە تابی ڤیدیۆی گەلەریدا دەردەکەوێت.', file:'ڤیدیۆ هەڵبژێرە (هەر قەبارەیەک)', upload:'بڵاوکردنەوەی ڤیدیۆ', reading:'خوێندنەوەی ڤیدیۆکە…', ready:'ئامادەیە — پێشبینینەکە لەسەر فرەیمی بەرگ ڕابگرە، پاشان کلیکی بڵاوکردنەوەی ڤیدیۆ بکە.', pick:'سەرەتا ڤیدیۆیەکی MP4 هەڵبژێرە.', notVideo:'فایلێکی ڤیدیۆ هەڵبژێرە (MP4 یان MOV).', tooBig:'قەبارەی ئەم ڤیدیۆیە {size}. سنوور ٢٥ مێگابایتە — ڤیدیۆیەکی بچووکتر بە MP4 export بکە.', unreadable:'ئەم ڤیدیۆیە لێرە لێنادرێت. بە MP4 (H.264) export ـی بکە و دووبارە هەوڵ بدەوە.', poster:'نەتوانرا وێنەی بەرگ لەم ڤیدیۆیە وەربگیرێت. کەمێک لێی بدە، پاشان دووبارە بڵاوی بکەوە.', sending:'ڤیدیۆکە بار دەکرێت… {p}%', saving:'ڤیدیۆکە لە GitHub پاشەکەوت دەکرێت…', manageBtn:'پیشاندانی ڤیدیۆکان', count:'ڤیدیۆ', empty:'هێشتا هیچ ڤیدیۆیەک نییە.', delAsk:'ئەم ڤیدیۆیە بە یەکجاری بسڕدرێتەوە؟', rejected:'ئەم فایلە ڤیدیۆیەکی MP4 ـی بەکەڵک نییە.', mb:'MB', compressing:'ڤیدیۆکە بچووک دەکرێتەوە بۆ ٢٥ مێگابایت… {p}%', converted:'گۆڕدرا بۆ MP4.', compressed:'قەبارەی ڤیدیۆکە لە {from} ـەوە کرا بە {to}.', cannotCompress:'ئەم وێبگەڕە ناتوانێت ڤیدیۆ بچووک بکاتەوە. داشبۆردەکە لە Google Chrome بکەرەوە، یان ڤیدیۆکە بە MP4 ـی خوار ٢٥ مێگابایت export بکە.', tooLong:'ئەم ڤیدیۆیە زۆر درێژە بۆ ئەوەی بە کوالیتییەکی باش لە ٢٥ مێگابایتدا جێی ببێتەوە. با لە نزیکەی {max} خولەک کەمتر بێت.', compressFailed:'نەتوانرا ئەم ڤیدیۆیە لێرە بچووک بکرێتەوە. بە MP4 (H.264) ـی خوار ٢٥ مێگابایت export ـی بکە و دووبارە هەوڵ بدەوە.' },
+      kmr: { note:'Vîdyoyeke temam bi her mezinahiyê zêde bike (MP4 an MOV). Heke ji 25 MB mezintir be, li vir pêşî tê piçûkkirin bi baştirîn kalîteya ku cih digire. Berg ew çarçove ye ku di pêşdîtinê de xuya dibe — li ku bixwazî rawestîne. Piştî ku malper belav bibe, di taba Vîdyoyê ya galerîyê de xuya dibe.', file:'Vîdyo hilbijêre (her mezinahî)', upload:'Vîdyoyê belav bike', reading:'Vîdyo tê xwendin…', ready:'Amade ye — pêşdîtinê li ser çarçoveya bergê rawestîne, paşê Vîdyoyê belav bike bitikîne.', pick:'Pêşî vîdyoyeke MP4 hilbijêre.', notVideo:'Pelekî vîdyoyê hilbijêre (MP4 an MOV).', tooBig:'Ev vîdyo {size} e. Sînor 25 MB e — MP4-eke piçûktir derxe.', unreadable:'Ev vîdyo li vir nayê lîstin. Wê wek MP4 (H.264) derxe û dîsa biceribîne.', poster:'Çarçoveya bergê ji vê vîdyoyê nehat girtin. Kêlîkekê bilîze, paşê dîsa belav bike.', sending:'Vîdyo tê barkirin… {p}%', saving:'Vîdyo li GitHub tê tomarkirin…', manageBtn:'Vîdyoyan nîşan bide', count:'vîdyo', empty:'Hêj vîdyo tune.', delAsk:'Ev vîdyo bi temamî were jêbirin?', rejected:'Ev pel ne vîdyoyeke MP4 ya bikêr e.', mb:'MB', compressing:'Vîdyo ji bo 25 MB tê piçûkkirin… {p}%', converted:'Hat veguhertin bo MP4.', compressed:'Ji {from} hat piçûkkirin bo {to}.', cannotCompress:'Ev gerok nikare vîdyoyan piçûk bike. Panelê di Google Chrome de veke, an vîdyoyê wek MP4-eke di bin 25 MB de derxe.', tooLong:'Ev vîdyo ji bo ku bi kalîteyeke baş di 25 MB de cih bigire pir dirêj e. Wê ji nêzîkî {max} deqeyan kurttir bike.', compressFailed:'Ev vîdyo li vir nehat piçûkkirin. Wê wek MP4 (H.264) di bin 25 MB de derxe û dîsa biceribîne.' },
+      ar:  { note:'أضف فيديو منتهياً بأي حجم (MP4 أو MOV). إذا تجاوز 25 ميغابايت يُضغط هنا أولاً بأفضل جودة ممكنة ضمن الحد. الغلاف هو الإطار الظاهر في المعاينة — أوقفها حيث تريد. يظهر في تبويب الفيديو في المعرض بعد نشر الموقع.', file:'اختر فيديو (أي حجم)', upload:'نشر الفيديو', reading:'جارٍ قراءة الفيديو…', ready:'جاهز — أوقف المعاينة على إطار الغلاف ثم اضغط نشر الفيديو.', pick:'اختر فيديو MP4 أولاً.', notVideo:'اختر ملف فيديو (MP4 أو MOV).', tooBig:'حجم هذا الفيديو {size}. الحد 25 ميغابايت — صدّر ملف MP4 أصغر.', unreadable:'لا يمكن تشغيل هذا الفيديو هنا. صدّره بصيغة MP4 (H.264) وحاول مجدداً.', poster:'تعذّر أخذ إطار الغلاف من هذا الفيديو. شغّله لحظة ثم انشر مجدداً.', sending:'جارٍ رفع الفيديو… {p}%', saving:'جارٍ حفظ الفيديو على GitHub…', manageBtn:'عرض الفيديوهات', count:'فيديو', empty:'لا توجد فيديوهات بعد.', delAsk:'حذف هذا الفيديو نهائياً؟', rejected:'هذا الملف ليس فيديو MP4 صالحاً.', mb:'MB', compressing:'جارٍ ضغط الفيديو ليناسب 25 ميغابايت… {p}%', converted:'حُوّل إلى MP4.', compressed:'ضُغط من {from} إلى {to}.', cannotCompress:'هذا المتصفح لا يستطيع ضغط الفيديو. افتح لوحة التحكم في Google Chrome، أو صدّر الفيديو بصيغة MP4 بحجم أقل من 25 ميغابايت.', tooLong:'هذا الفيديو أطول من أن يتسع في 25 ميغابايت بجودة مقبولة. اجعله أقصر من نحو {max} دقيقة.', compressFailed:'تعذّر ضغط هذا الفيديو هنا. صدّره بصيغة MP4 (H.264) بحجم أقل من 25 ميغابايت وحاول مجدداً.' },
+      fr:  { note:'Ajoutez une vidéo finie de toute taille (MP4 ou MOV). Au-delà de 25 Mo, elle est d’abord compressée ici, avec la meilleure qualité qui tient dans la limite. La couverture est l’image affichée dans l’aperçu — mettez-le en pause où vous voulez. Elle apparaît dans l’onglet Vidéo de la galerie après le déploiement du site.', file:'Choisir une vidéo (toute taille)', upload:'Publier la vidéo', reading:'Lecture de la vidéo…', ready:'Prêt — mettez l’aperçu en pause sur l’image de couverture, puis cliquez sur Publier la vidéo.', pick:'Choisissez d’abord une vidéo MP4.', notVideo:'Choisissez un fichier vidéo (MP4 ou MOV).', tooBig:'Cette vidéo fait {size}. La limite est de 25 Mo — exportez un MP4 plus léger.', unreadable:'Cette vidéo ne peut pas être lue ici. Exportez-la en MP4 (H.264) et réessayez.', poster:'Impossible de prendre l’image de couverture de cette vidéo. Lisez-la un instant, puis publiez à nouveau.', sending:'Envoi de la vidéo… {p} %', saving:'Enregistrement de la vidéo sur GitHub…', manageBtn:'Afficher les vidéos', count:'vidéos', empty:'Aucune vidéo pour l’instant.', delAsk:'Supprimer définitivement cette vidéo ?', rejected:'Ce fichier n’est pas une vidéo MP4 utilisable.', mb:'Mo', compressing:'Compression de la vidéo pour tenir dans 25 Mo… {p} %', converted:'Convertie en MP4.', compressed:'Compressée de {from} à {to}.', cannotCompress:'Ce navigateur ne peut pas compresser de vidéo. Ouvrez le tableau de bord dans Google Chrome, ou exportez la vidéo en MP4 de moins de 25 Mo.', tooLong:'Cette vidéo est trop longue pour tenir dans 25 Mo avec une qualité correcte. Gardez-la sous environ {max} minutes.', compressFailed:'Impossible de compresser cette vidéo ici. Exportez-la en MP4 (H.264) de moins de 25 Mo et réessayez.' }
     };
     // Resolves on the media event; an error or a stalled file rejects.
     const wkMediaEvent = (media, type, ms) => new Promise((resolve, reject) => {
@@ -1722,11 +1722,12 @@
            <span class="dash-bar"><span class="dash-bar-fill" data-css="width:${(c.count / max * 100).toFixed(1)}%"></span></span>
            <span class="dash-bar-n mono">${c.count}</span>
          </div>`).join('') + `</div>`;
-      let pend = null, pendVideo = null, videoUrl = '', preparation = 0, publishing = false;
+      let pend = null, pendVideo = null, videoUrl = '', preparation = 0, publishing = false, converting = null;
       const fileIn = $('#wkFile'), prev = $('#wkPrev'), msg = $('#wkMsg'), publish = $('#wkUp'), folderIn = $('#wkFolder');
       const vidPrev = $('#wkVidPrev'), vid = $('#wkVid'), vidInfo = $('#wkVidInfo');
       const isVideo = () => folderIn.value === WK_VIDEO_FOLDER;
       const clearVideo = () => {
+        if (converting) { converting.abort(); converting = null; }
         pendVideo = null; vidPrev.hidden = true; vidInfo.textContent = '';
         if (!videoUrl) return;
         vid.pause(); vid.removeAttribute('src'); vid.load();
@@ -1738,31 +1739,71 @@
         pend = null; prev.hidden = true; publish.disabled = true; clearVideo();
         fileIn.value = ''; msg.textContent = '';
         const video = isVideo();
-        fileIn.accept = video ? 'video/mp4,.mp4' : 'image/*';
+        fileIn.accept = video ? 'video/*,.mp4,.m4v,.mov' : 'image/*';
         $('#wkNote').textContent = video ? V.note : W.note;
         $('#wkFileLabel').textContent = video ? V.file : W.file;
         $('#wkUpText').textContent = video ? V.upload : W.upload;
       });
+      // Shows a film in the preview and reads what the browser decodes from it.
+      const previewFilm = async (film) => {
+        if (videoUrl) URL.revokeObjectURL(videoUrl);
+        videoUrl = URL.createObjectURL(film);
+        vid.src = videoUrl;
+        await wkMediaEvent(vid, 'loadedmetadata', 20_000);
+        const width = vid.videoWidth, height = vid.videoHeight, duration = vid.duration;
+        if (!(width >= 16 && height >= 16) || !Number.isFinite(duration) || duration <= 0) throw new Error('video_error');
+        return { width, height, duration };
+      };
       const prepareVideo = async (file, current) => {
-        if (!/\.mp4$/i.test(file.name || '') && file.type !== 'video/mp4') { msg.textContent = '✗ ' + V.notMp4; return; }
-        if (file.size > WK_VIDEO_MAX) { msg.textContent = '✗ ' + V.tooBig.replace('{size}', wkMegabytes(file.size, V.mb)); return; }
+        if (!/^video\//.test(file.type || '') && !/\.(mp4|m4v|mov|webm)$/i.test(file.name || '')) { msg.textContent = '✗ ' + V.notVideo; return; }
         if (file.size < 1024) { msg.textContent = '✗ ' + V.rejected; return; }
         msg.textContent = V.reading;
-        videoUrl = URL.createObjectURL(file);
-        vid.src = videoUrl;
+        const tools = window.BQStudioVideo;
+        let source, film = file, note = '';
         try {
-          await wkMediaEvent(vid, 'loadedmetadata', 20_000);
+          source = await previewFilm(file);
           if (current !== preparation) return;
-          const width = vid.videoWidth, height = vid.videoHeight, duration = vid.duration;
-          if (!(width >= 16 && height >= 16 && width <= 8192 && height <= 8192) || !Number.isFinite(duration) || duration <= 0) throw new Error('video_error');
+          const header = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+          const meta = { size:file.size, ...source, mp4:tools.isMp4Header(header) };
+          const target = tools.plan(meta);
+          if (target.action === 'too-long') { clearVideo(); msg.textContent = '✗ ' + V.tooLong.replace('{max}', String(Math.max(1, Math.floor(target.maxSeconds / 60)))); return; }
+          if (target.action !== 'keep') {
+            // Larger films, QuickTime files and oversized frames become an MP4 that fits.
+            const controller = new AbortController();
+            converting = controller;
+            vid.pause();
+            msg.textContent = V.compressing.replace('{p}', '0');
+            try {
+              const result = await tools.prepare(file, meta, { signal:controller.signal,
+                onProgress:progress => { if (current === preparation && converting === controller) msg.textContent = V.compressing.replace('{p}', String(Math.floor(progress * 100))); } });
+              if (current !== preparation) return;
+              film = result.blob;
+              // A rewrapped QuickTime film keeps its size; only a re-encode is "compressed".
+              note = (result.target && result.target.action === 'encode'
+                ? V.compressed.replace('{from}', wkMegabytes(file.size, V.mb)).replace('{to}', wkMegabytes(film.size, V.mb))
+                : V.converted) + ' ';
+            } catch (error) {
+              if (current !== preparation) return;
+              clearVideo();
+              msg.textContent = '✗ ' + (error && error.code === 'unsupported' ? V.cannotCompress
+                : error && error.code === 'too-long' ? V.tooLong.replace('{max}', String(Math.max(1, Math.floor((error.maxSeconds || 60) / 60))))
+                : V.compressFailed);
+              return;
+            } finally { if (converting === controller) converting = null; }
+            // The record and the cover describe the film that is published.
+            source = await previewFilm(film);
+            if (current !== preparation) return;
+          }
+          const { width, height, duration } = source;
+          if (width > 8192 || height > 8192) throw new Error('video_error');
           // Start the preview a moment in, past any fade from black.
           vid.currentTime = Math.min(1, duration / 4);
           await wkMediaEvent(vid, 'seeked', 10_000).catch(() => {});
           if (current !== preparation) return;
-          pendVideo = { file, width, height, duration:Math.round(duration * 100) / 100, staged:null };
+          pendVideo = { file:film, width, height, duration:Math.round(duration * 100) / 100, staged:null };
           vidPrev.hidden = false;
-          vidInfo.textContent = wkIsolate(`${width} × ${height} · ${wkClock(duration)} · ${(file.size / 1e6).toFixed(1)} ${V.mb}`);
-          msg.textContent = V.ready; publish.disabled = publishing;
+          vidInfo.textContent = wkIsolate(`${width} × ${height} · ${wkClock(duration)} · ${(film.size / 1e6).toFixed(1)} ${V.mb}`);
+          msg.textContent = note + V.ready; publish.disabled = publishing;
         } catch (e) {
           if (current === preparation) { clearVideo(); msg.textContent = '✗ ' + V.unreadable; }
         }

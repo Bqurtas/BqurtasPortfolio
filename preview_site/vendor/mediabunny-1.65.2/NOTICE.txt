@@ -1,0 +1,10 @@
+Mediabunny 1.65.2 — https://github.com/Vanilagy/mediabunny
+License: Mozilla Public License 2.0 (see LICENSE in this folder).
+
+mediabunny.min.js is dist/bundles/mediabunny.min.mjs from the npm package
+mediabunny@1.65.2, unmodified (npm tarball sha1
+ef1db034a70f11702dba2fbe65e8342d268dfd38). Its source code is available at
+https://github.com/Vanilagy/mediabunny/tree/v1.65.2 and in the npm package.
+
+Only the private Studio dashboard loads it, and only when a chosen video must
+be converted to fit the 25 MB publishing limit (preview_site/js/studio-video.js).
