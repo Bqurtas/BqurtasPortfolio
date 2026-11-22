@@ -3020,6 +3020,21 @@ html body #dash#dash .dash-view :is(.dash-latest-form, .dash-manage, .dash-box, 
 html body #dash#dash .dash-view .dash-latest-form {
   max-inline-size: 640px !important;
 }
+/* Film preview: flat, bounded, its frame shown whole; the paused frame is the cover. */
+html body #dash#dash .dash-view .wk-video-prev video {
+  display: block !important;
+  inline-size: auto !important;
+  max-inline-size: min(100%, 360px) !important;
+  max-block-size: 320px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  background: #000 !important;
+}
+html body #dash#dash .dash-view .wk-video-prev .dash-note {
+  display: block !important;
+  margin-block-start: 8px !important;
+}
 html body #dash#dash .dash-view .dash-set {
   display: grid !important;
   gap: 10px !important;

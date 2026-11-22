@@ -424,10 +424,11 @@ test('every distinct gallery image and film appears exactly once, under its own 
   assert.ok(aliases > 0, 'the catalogue knows its duplicate copies');
   assert.equal(images + aliases, manifest.images.length);
   assert.equal(videos, manifest.videos.length);
-  assert.equal(videos, 30);
+  // Studio publishes films, so the count follows the manifest (30 at launch).
+  assert.ok(videos >= 30);
   const allMedia = [...mediaByPage.values()].flat();
   assert.equal(new Set(allMedia).size, allMedia.length, 'no media listed twice');
-  assert.equal((xml.match(/<video:video>/g) || []).length, 30);
+  assert.equal((xml.match(/<video:video>/g) || []).length, manifest.videos.length);
   for (const block of urls.filter((b) => b.includes('<video:video>'))) {
     for (const tag of ['thumbnail_loc', 'title', 'description', 'content_loc', 'publication_date', 'family_friendly']) {
       assert.match(block, new RegExp(`<video:${tag}>`), tag);

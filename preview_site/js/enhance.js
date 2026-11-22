@@ -1206,7 +1206,7 @@
     const DASH_PAGE_DESC = {
       en: {
         overview:'Your studio at a glance.', visitors:'Who visits the site and what they look at.',
-        works:'Add finished designs to the gallery, or take them down.', content:'Write, edit and publish Journal posts.',
+        works:'Add finished designs and videos to the gallery, or take them down.', content:'Write, edit and publish Journal posts.',
         cases:'Case studies for Selected Work.', latest:'Pin a work to the homepage bell for seven days.',
         leads:'Project pitches sent from the contact form.', profile:'Your name, role and photo in this console.',
         settings:'Preferences, two-step sign-in and the editor password.', ai:'Drafts, replies, captions and translations.',
@@ -1214,7 +1214,7 @@
       },
       ku: {
         overview:'تێڕوانینێکی گشتی بۆ ستۆدیۆکەت.', visitors:'کێ سەردانی سایتەکە دەکات و چی دەبینێت.',
-        works:'دیزاینی تەواوکراو بۆ گالەری زیاد بکە، یان لایبە.', content:'بابەتەکانی جۆرناڵ بنووسە، دەستکاری بکە و بڵاوی بکەوە.',
+        works:'دیزاین و ڤیدیۆی تەواوکراو بۆ گالەری زیاد بکە، یان لایبە.', content:'بابەتەکانی جۆرناڵ بنووسە، دەستکاری بکە و بڵاوی بکەوە.',
         cases:'لێکۆڵینەوەی پرۆژەکان بۆ بەشی کارە هەڵبژێردراوەکان.', latest:'کارێک بۆ ماوەی حەوت ڕۆژ لە زەنگی پەڕەی سەرەکی دابنێ.',
         leads:'داواکاری پرۆژەکان کە لە فۆرمی پەیوەندییەوە هاتوون.', profile:'ناو، ڕۆڵ و وێنەکەت لەم داشبۆردەدا.',
         settings:'ڕێکخستنەکان، چوونەژوورەوەی دوو هەنگاوی و وشەی نهێنیی دەستکاریکەر.', ai:'ڕەشنووس، وەڵام، کەپشن و وەرگێڕان.',
@@ -1612,6 +1612,53 @@
       kmr:{ gate:'Weşandina galerîyê girêde', gateNote:'Bi şîfreya edîtorê têkeve da ku karan bar bikî û birêve bibî.', wrong:'Şîfreya edîtorê çewt e. Dîsa biceribîne.', noToken:'Weşandina GitHub ne girêdayî ye. Xizmeta work-upload bi destûra nivîsandina repoyê saz bike.' },
       fr:{ gate:'Connecter la publication du portfolio', gateNote:'Connectez-vous avec votre mot de passe éditeur pour publier et gérer vos travaux.', wrong:'Le mot de passe éditeur est incorrect. Réessayez.', noToken:'La publication GitHub n’est pas connectée. Configurez le service work-upload avec un accès en écriture au dépôt.' }
     };
+    /* Films publish like images: the browser checks the MP4 and reads its frame
+       size and length, the cover is the frame showing in the preview, and the
+       server stores the film once before publishing it with that cover. */
+    const WK_VIDEO_FOLDER = 'Videos', WK_VIDEO_MAX = 25_000_000;
+    const WK_VIDEO_I18N = {
+      en:  { note:'Add a finished MP4 video, up to 25 MB. The cover is the frame showing in the preview — pause it where you like. It appears in the gallery’s Video tab once the website has deployed.', file:'Choose video (MP4, up to 25 MB)', upload:'Publish video', reading:'Reading the video…', ready:'Ready — pause the preview on the cover frame, then click Publish video.', pick:'Choose an MP4 video first.', notMp4:'Choose an MP4 video file.', tooBig:'This video is {size}. The limit is 25 MB — export a smaller MP4.', unreadable:'This video cannot be played here. Export it as an MP4 (H.264) and try again.', poster:'Could not take the cover frame from this video. Play it for a moment, then publish again.', sending:'Uploading the video… {p}%', saving:'Saving the video to GitHub…', manageBtn:'Show videos', count:'videos', empty:'No videos yet.', delAsk:'Delete this video permanently?', rejected:'This file is not a usable MP4 video.', mb:'MB' },
+      ku:  { note:'ڤیدیۆیەکی تەواوکراو بە فۆرماتی MP4 زیاد بکە، تا ٢٥ مێگابایت. وێنەی بەرگ ئەو فرەیمەیە کە لە پێشبینینەکەدا دیارە — لە هەر شوێنێک بتەوێت ڕایبگرە. دوای بڵاوبوونەوەی وێبسایتەکە لە تابی ڤیدیۆی گەلەریدا دەردەکەوێت.', file:'ڤیدیۆ هەڵبژێرە (MP4، تا ٢٥ مێگابایت)', upload:'بڵاوکردنەوەی ڤیدیۆ', reading:'خوێندنەوەی ڤیدیۆکە…', ready:'ئامادەیە — پێشبینینەکە لەسەر فرەیمی بەرگ ڕابگرە، پاشان کلیکی بڵاوکردنەوەی ڤیدیۆ بکە.', pick:'سەرەتا ڤیدیۆیەکی MP4 هەڵبژێرە.', notMp4:'فایلێکی ڤیدیۆی MP4 هەڵبژێرە.', tooBig:'قەبارەی ئەم ڤیدیۆیە {size}. سنوور ٢٥ مێگابایتە — ڤیدیۆیەکی بچووکتر بە MP4 export بکە.', unreadable:'ئەم ڤیدیۆیە لێرە لێنادرێت. بە MP4 (H.264) export ـی بکە و دووبارە هەوڵ بدەوە.', poster:'نەتوانرا وێنەی بەرگ لەم ڤیدیۆیە وەربگیرێت. کەمێک لێی بدە، پاشان دووبارە بڵاوی بکەوە.', sending:'ڤیدیۆکە بار دەکرێت… {p}%', saving:'ڤیدیۆکە لە GitHub پاشەکەوت دەکرێت…', manageBtn:'پیشاندانی ڤیدیۆکان', count:'ڤیدیۆ', empty:'هێشتا هیچ ڤیدیۆیەک نییە.', delAsk:'ئەم ڤیدیۆیە بە یەکجاری بسڕدرێتەوە؟', rejected:'ئەم فایلە ڤیدیۆیەکی MP4 ـی بەکەڵک نییە.', mb:'MB' },
+      kmr: { note:'Vîdyoyeke MP4 ya temam zêde bike, heta 25 MB. Berg ew çarçove ye ku di pêşdîtinê de xuya dibe — li ku bixwazî rawestîne. Piştî ku malper belav bibe, di taba Vîdyoyê ya galerîyê de xuya dibe.', file:'Vîdyo hilbijêre (MP4, heta 25 MB)', upload:'Vîdyoyê belav bike', reading:'Vîdyo tê xwendin…', ready:'Amade ye — pêşdîtinê li ser çarçoveya bergê rawestîne, paşê Vîdyoyê belav bike bitikîne.', pick:'Pêşî vîdyoyeke MP4 hilbijêre.', notMp4:'Pelekî vîdyoyê yê MP4 hilbijêre.', tooBig:'Ev vîdyo {size} e. Sînor 25 MB e — MP4-eke piçûktir derxe.', unreadable:'Ev vîdyo li vir nayê lîstin. Wê wek MP4 (H.264) derxe û dîsa biceribîne.', poster:'Çarçoveya bergê ji vê vîdyoyê nehat girtin. Kêlîkekê bilîze, paşê dîsa belav bike.', sending:'Vîdyo tê barkirin… {p}%', saving:'Vîdyo li GitHub tê tomarkirin…', manageBtn:'Vîdyoyan nîşan bide', count:'vîdyo', empty:'Hêj vîdyo tune.', delAsk:'Ev vîdyo bi temamî were jêbirin?', rejected:'Ev pel ne vîdyoyeke MP4 ya bikêr e.', mb:'MB' },
+      ar:  { note:'أضف فيديو MP4 منتهياً، حتى 25 ميغابايت. الغلاف هو الإطار الظاهر في المعاينة — أوقفها حيث تريد. يظهر في تبويب الفيديو في المعرض بعد نشر الموقع.', file:'اختر فيديو (MP4، حتى 25 ميغابايت)', upload:'نشر الفيديو', reading:'جارٍ قراءة الفيديو…', ready:'جاهز — أوقف المعاينة على إطار الغلاف ثم اضغط نشر الفيديو.', pick:'اختر فيديو MP4 أولاً.', notMp4:'اختر ملف فيديو MP4.', tooBig:'حجم هذا الفيديو {size}. الحد 25 ميغابايت — صدّر ملف MP4 أصغر.', unreadable:'لا يمكن تشغيل هذا الفيديو هنا. صدّره بصيغة MP4 (H.264) وحاول مجدداً.', poster:'تعذّر أخذ إطار الغلاف من هذا الفيديو. شغّله لحظة ثم انشر مجدداً.', sending:'جارٍ رفع الفيديو… {p}%', saving:'جارٍ حفظ الفيديو على GitHub…', manageBtn:'عرض الفيديوهات', count:'فيديو', empty:'لا توجد فيديوهات بعد.', delAsk:'حذف هذا الفيديو نهائياً؟', rejected:'هذا الملف ليس فيديو MP4 صالحاً.', mb:'MB' },
+      fr:  { note:'Ajoutez une vidéo MP4 finie, jusqu’à 25 Mo. La couverture est l’image affichée dans l’aperçu — mettez-le en pause où vous voulez. Elle apparaît dans l’onglet Vidéo de la galerie après le déploiement du site.', file:'Choisir une vidéo (MP4, jusqu’à 25 Mo)', upload:'Publier la vidéo', reading:'Lecture de la vidéo…', ready:'Prêt — mettez l’aperçu en pause sur l’image de couverture, puis cliquez sur Publier la vidéo.', pick:'Choisissez d’abord une vidéo MP4.', notMp4:'Choisissez un fichier vidéo MP4.', tooBig:'Cette vidéo fait {size}. La limite est de 25 Mo — exportez un MP4 plus léger.', unreadable:'Cette vidéo ne peut pas être lue ici. Exportez-la en MP4 (H.264) et réessayez.', poster:'Impossible de prendre l’image de couverture de cette vidéo. Lisez-la un instant, puis publiez à nouveau.', sending:'Envoi de la vidéo… {p} %', saving:'Enregistrement de la vidéo sur GitHub…', manageBtn:'Afficher les vidéos', count:'vidéos', empty:'Aucune vidéo pour l’instant.', delAsk:'Supprimer définitivement cette vidéo ?', rejected:'Ce fichier n’est pas une vidéo MP4 utilisable.', mb:'Mo' }
+    };
+    // Resolves on the media event; an error or a stalled file rejects.
+    const wkMediaEvent = (media, type, ms) => new Promise((resolve, reject) => {
+      const finish = (ok) => {
+        clearTimeout(timer); media.removeEventListener(type, done); media.removeEventListener('error', failed);
+        if (ok) resolve(); else reject(new Error('video_error'));
+      };
+      const done = () => finish(true), failed = () => finish(false);
+      const timer = setTimeout(failed, ms);
+      media.addEventListener(type, done); media.addEventListener('error', failed);
+    });
+    // The cover: the preview's current frame, at most 1280px on its long side.
+    const wkVideoPoster = (video) => {
+      const scale = Math.min(1, 1280 / Math.max(video.videoWidth, video.videoHeight));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(16, Math.round(video.videoWidth * scale));
+      canvas.height = Math.max(16, Math.round(video.videoHeight * scale));
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('poster');
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const encoded = canvas.toDataURL('image/jpeg', 0.85);
+      if (!encoded.startsWith('data:image/jpeg;base64,') || encoded.length < 200) throw new Error('poster');
+      return encoded.slice(23);
+    };
+    const wkFileBase64 = (file) => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const text = String(reader.result || ''), comma = text.indexOf(',');
+        if (comma > 0 && comma < text.length - 1) resolve(text.slice(comma + 1)); else reject(new Error('read'));
+      };
+      reader.onerror = () => reject(reader.error || new Error('read'));
+      reader.readAsDataURL(file);
+    });
+    // Figures stay one left-to-right run inside Kurdish and Arabic sentences.
+    const wkIsolate = text => `\u2066${text}\u2069`;
+    const wkMegabytes = (bytes, unit) => wkIsolate(`${(bytes / 1e6).toFixed(1)} ${unit}`);
+    const wkClock = (seconds) => { const whole = Math.max(0, Math.round(seconds)); return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')}`; };
     const renderWorks = (connectionError = '') => {
       const colls = collections();
       const W = { ...(WK_I18N[curLang()] || WK_I18N.en), ...(WK_ACCESS_I18N[curLang()] || WK_ACCESS_I18N.en) };
@@ -1646,17 +1693,20 @@
         });
         return;
       }
+      const V = WK_VIDEO_I18N[curLang()] || WK_VIDEO_I18N.en;
       const seen = {};
-      const opts = Object.keys(C).filter(k => C[k].ext !== 'mp4' && C[k].folder).filter(k => { if (seen[C[k].folder]) return false; seen[C[k].folder] = 1; return true; })
+      // Every gallery collection, Video included, in the gallery's own order.
+      const opts = Object.keys(C).filter(k => C[k].folder).filter(k => { if (seen[C[k].folder]) return false; seen[C[k].folder] = 1; return true; })
         .map(k => `<option value="${esc(C[k].folder)}">${esc(C[k].title || C[k].tag || k)}</option>`).join('');
       const max = Math.max(...Object.values(colls).map(c => c.count || 0), 1);
       view.innerHTML = `
         <div class="dash-latest-form">
-          <p class="dash-note mono">${esc(W.note)}</p>
+          <p class="dash-note mono" id="wkNote">${esc(W.note)}</p>
           <label class="dash-field"><span class="mono">${esc(W.cat)}</span><select id="wkFolder">${opts}</select></label>
-          <label class="dash-field"><span class="mono">${esc(W.file)}</span><input id="wkFile" type="file" accept="image/*" class="cms-file"><span class="dash-note mono" id="wkMsg"></span></label>
+          <label class="dash-field"><span class="mono" id="wkFileLabel">${esc(W.file)}</span><input id="wkFile" type="file" accept="image/*" class="cms-file"><span class="dash-note mono" id="wkMsg"></span></label>
           <div class="dash-latest-prev" id="wkPrev" hidden><img src="" alt=""></div>
-          <button class="dash-btn dash-btn--go" id="wkUp" type="button" disabled><i class="fa-solid fa-cloud-arrow-up"></i> ${esc(W.upload)}</button>
+          <div class="dash-latest-prev wk-video-prev" id="wkVidPrev" hidden><video id="wkVid" muted playsinline controls preload="metadata"></video><span class="dash-note mono" id="wkVidInfo"></span></div>
+          <button class="dash-btn dash-btn--go" id="wkUp" type="button" disabled><i class="fa-solid fa-cloud-arrow-up"></i> <span id="wkUpText">${esc(W.upload)}</span></button>
         </div>
         <div class="dash-manage">
           <div class="cms-head"><span class="mono cms-status">${W.manageTitle || 'Manage works — view & delete'}</span></div>
@@ -1672,13 +1722,97 @@
            <span class="dash-bar"><span class="dash-bar-fill" data-css="width:${(c.count / max * 100).toFixed(1)}%"></span></span>
            <span class="dash-bar-n mono">${c.count}</span>
          </div>`).join('') + `</div>`;
-      let pend = null, preparation = 0, publishing = false;
+      let pend = null, pendVideo = null, videoUrl = '', preparation = 0, publishing = false;
       const fileIn = $('#wkFile'), prev = $('#wkPrev'), msg = $('#wkMsg'), publish = $('#wkUp'), folderIn = $('#wkFolder');
+      const vidPrev = $('#wkVidPrev'), vid = $('#wkVid'), vidInfo = $('#wkVidInfo');
+      const isVideo = () => folderIn.value === WK_VIDEO_FOLDER;
+      const clearVideo = () => {
+        pendVideo = null; vidPrev.hidden = true; vidInfo.textContent = '';
+        if (!videoUrl) return;
+        vid.pause(); vid.removeAttribute('src'); vid.load();
+        URL.revokeObjectURL(videoUrl); videoUrl = '';
+      };
+      // Choosing Video switches the same form to films; any other collection back to images.
+      folderIn.addEventListener('change', () => {
+        ++preparation;
+        pend = null; prev.hidden = true; publish.disabled = true; clearVideo();
+        fileIn.value = ''; msg.textContent = '';
+        const video = isVideo();
+        fileIn.accept = video ? 'video/mp4,.mp4' : 'image/*';
+        $('#wkNote').textContent = video ? V.note : W.note;
+        $('#wkFileLabel').textContent = video ? V.file : W.file;
+        $('#wkUpText').textContent = video ? V.upload : W.upload;
+      });
+      const prepareVideo = async (file, current) => {
+        if (!/\.mp4$/i.test(file.name || '') && file.type !== 'video/mp4') { msg.textContent = '✗ ' + V.notMp4; return; }
+        if (file.size > WK_VIDEO_MAX) { msg.textContent = '✗ ' + V.tooBig.replace('{size}', wkMegabytes(file.size, V.mb)); return; }
+        if (file.size < 1024) { msg.textContent = '✗ ' + V.rejected; return; }
+        msg.textContent = V.reading;
+        videoUrl = URL.createObjectURL(file);
+        vid.src = videoUrl;
+        try {
+          await wkMediaEvent(vid, 'loadedmetadata', 20_000);
+          if (current !== preparation) return;
+          const width = vid.videoWidth, height = vid.videoHeight, duration = vid.duration;
+          if (!(width >= 16 && height >= 16 && width <= 8192 && height <= 8192) || !Number.isFinite(duration) || duration <= 0) throw new Error('video_error');
+          // Start the preview a moment in, past any fade from black.
+          vid.currentTime = Math.min(1, duration / 4);
+          await wkMediaEvent(vid, 'seeked', 10_000).catch(() => {});
+          if (current !== preparation) return;
+          pendVideo = { file, width, height, duration:Math.round(duration * 100) / 100, staged:null };
+          vidPrev.hidden = false;
+          vidInfo.textContent = wkIsolate(`${width} × ${height} · ${wkClock(duration)} · ${(file.size / 1e6).toFixed(1)} ${V.mb}`);
+          msg.textContent = V.ready; publish.disabled = publishing;
+        } catch (e) {
+          if (current === preparation) { clearVideo(); msg.textContent = '✗ ' + V.unreadable; }
+        }
+      };
+      const videoError = (d) => {
+        if (d && ['payload-too-large', 'studio-github-too-large'].includes(d.error)) return V.tooBig.replace('{size}', wkMegabytes(pendVideo ? pendVideo.file.size : WK_VIDEO_MAX, V.mb));
+        if (d && d.error === 'invalid-studio-video') return V.rejected;
+        return (d && (d.detail || d.error)) || 'failed';
+      };
+      const signedOut = (d) => {
+        if (!d || (d.error !== 'missing_token' && d.error !== 'unauthorized')) return false;
+        try { sessionStorage.removeItem('bq_edit_token'); } catch (e) {}
+        renderWorks(W.wrong);
+        return true;
+      };
+      const publishVideo = async () => {
+        const film = pendVideo;
+        vid.pause();
+        let posterB64;
+        try {
+          if (vid.readyState < 2) await wkMediaEvent(vid, 'loadeddata', 8000);
+          posterB64 = wkVideoPoster(vid);
+        } catch (e) { msg.textContent = '✗ ' + V.poster; return; }
+        // A film that already reached GitHub is not sent again on retry.
+        if (!film.staged) {
+          msg.textContent = V.sending.replace('{p}', '0');
+          const text = await wkFileBase64(film.file);
+          const staged = await studioUpload('work-video', text, percent => { msg.textContent = V.sending.replace('{p}', String(percent)); });
+          if (signedOut(staged)) return;
+          if (!staged || !staged.ok) { msg.textContent = '✗ ' + videoError(staged); return; }
+          film.staged = { sha:staged.sha, size:staged.size, receipt:staged.receipt };
+        }
+        msg.textContent = V.saving;
+        const d = await wkApi({ action:'upload', folder:WK_VIDEO_FOLDER, ext:'mp4', video:film.staged,
+          width:film.width, height:film.height, duration:film.duration, posterB64 });
+        if (signedOut(d)) return;
+        if (d && d.ok) {
+          try { sessionStorage.removeItem('bq_gallery_tree_v1'); } catch (e) {}
+          // A GitHub commit is queued for Pages, not proof that the film is live.
+          msg.textContent = publicationText('queued');
+          fileIn.value = ''; clearVideo();
+        }
+        else msg.textContent = '✗ ' + videoError(d);
+      };
       fileIn.addEventListener('change', async (ev) => {
         const current = ++preparation;
         const file = ev.target.files && ev.target.files[0];
-        pend = null; prev.hidden = true; publish.disabled = true;
+        pend = null; prev.hidden = true; publish.disabled = true; clearVideo();
         if (!file) { msg.textContent = ''; return; }
+        if (isVideo()) { await prepareVideo(file, current); return; }
         msg.textContent = W.reading;
         try {
           const b64 = await cmsResize(file, 1400, 0.78);
@@ -1692,6 +1826,13 @@
       });
       publish.addEventListener('click', async () => {
         if (publishing) return;
+        if (isVideo()) {
+          if (!pendVideo) { msg.textContent = V.pick; return; }
+          publishing = true; publish.disabled = true; fileIn.disabled = true; folderIn.disabled = true;
+          try { await publishVideo(); } catch (e) { msg.textContent = W.fail; }
+          finally { publishing = false; fileIn.disabled = false; folderIn.disabled = false; publish.disabled = !pendVideo; }
+          return;
+        }
         if (!pend) { msg.textContent = W.pick; return; }
         publishing = true; publish.disabled = true; fileIn.disabled = true; folderIn.disabled = true;
         msg.textContent = W.uploading;
@@ -1714,22 +1855,29 @@
           publishing = false; fileIn.disabled = false; folderIn.disabled = false; publish.disabled = !pend;
         }
       });
-      /* ---- Manage works: list every image in a folder + delete one ---- */
-      const wkGrid = $('#wkGrid'), wkMgFolder = $('#wkMgFolder');
-      const mgThumb = (p) => '/assets/thumbs/' + p.split('/').map(encodeURIComponent).join('/');
-      const mgRaw = (p) => 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/' + p;
+      /* ---- Manage works: list every image (or film) in a folder + delete one ---- */
+      const wkGrid = $('#wkGrid'), wkMgFolder = $('#wkMgFolder'), wkMgLoad = $('#wkMgLoad');
+      // A film is shown by its cover frame, the JPEG beside it in assets/thumbs.
+      const mgFile = (p) => p.replace(/^(Videos\/[^/]+)\.mp4$/i, '$1.jpg');
+      const mgThumb = (p) => '/assets/thumbs/' + mgFile(p).split('/').map(encodeURIComponent).join('/');
+      const mgRaw = (p) => 'https://raw.githubusercontent.com/Bqurtas/BqurtasPortfolio/main/' + (mgFile(p) === p ? p : 'preview_site/assets/thumbs/' + mgFile(p));
+      wkMgFolder.addEventListener('change', () => {
+        const video = wkMgFolder.value === WK_VIDEO_FOLDER;
+        wkMgLoad.innerHTML = `<i class="fa-solid ${video ? 'fa-video' : 'fa-images'}"></i> ${esc(video ? V.manageBtn : (W.manageBtn || 'Show images'))}`;
+        wkGrid.innerHTML = '';
+      });
       const loadMg = () => {
-        const folder = wkMgFolder.value;
+        const folder = wkMgFolder.value, video = folder === WK_VIDEO_FOLDER;
         wkGrid.innerHTML = `<p class="dash-dim mono">${W.loading || 'Loading…'}</p>`;
         wkApi({ action: 'list', folder }).then((d) => {
           if (!d || !d.ok) { wkGrid.innerHTML = `<p class="dash-dim mono">✗ ${esc((d && (d.detail || d.error)) || (W.connect || 'Could not load'))}</p>`; return; }
-          if (!d.files.length) { wkGrid.innerHTML = `<p class="dash-dim mono">${W.mgEmpty || 'No images in this folder yet.'}</p>`; return; }
-          wkGrid.innerHTML = `<p class="dash-dim mono">${d.files.length} ${W.mgCount || 'images'}</p><div class="wk-grid-inner">` + d.files.map((f) =>
+          if (!d.files.length) { wkGrid.innerHTML = `<p class="dash-dim mono">${esc(video ? V.empty : (W.mgEmpty || 'No images in this folder yet.'))}</p>`; return; }
+          wkGrid.innerHTML = `<p class="dash-dim mono">${d.files.length} ${esc(video ? V.count : (W.mgCount || 'images'))}</p><div class="wk-grid-inner">` + d.files.map((f) =>
             `<div class="wk-cell" data-path="${esc(f.path)}" data-sha="${esc(f.sha)}"><img loading="lazy" src="${esc(mgThumb(f.path))}" data-raw="${esc(mgRaw(f.path))}" alt=""><button class="wk-del" type="button" aria-label="Delete"><i class="fa-solid fa-trash-can"></i></button></div>`).join('') + `</div>`;
           wkGrid.querySelectorAll('.wk-cell img').forEach((img) => img.addEventListener('error', () => { if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = img.dataset.raw; } }));
           wkGrid.querySelectorAll('.wk-del').forEach((b) => b.addEventListener('click', () => {
             const cell = b.closest('.wk-cell'); const path = cell.dataset.path, sha = cell.dataset.sha;
-            if (!window.confirm((W.delAsk || 'Delete this image permanently?') + '\n' + path)) return;
+            if (!window.confirm((video ? V.delAsk : (W.delAsk || 'Delete this image permanently?')) + '\n' + path)) return;
             b.disabled = true; cell.style.opacity = '0.45';
             wkApi({ action: 'delete', path, sha }).then((r) => {
               if (r && r.ok) cell.remove();
@@ -1738,7 +1886,7 @@
           }));
         }).catch(() => { wkGrid.innerHTML = `<p class="dash-dim mono">${W.fail || 'Could not load (live site only).'}</p>`; });
       };
-      $('#wkMgLoad').addEventListener('click', loadMg);
+      wkMgLoad.addEventListener('click', loadMg);
     };
     const renderLeads = () => window.BQStudioInbox.render({
       root:view, lang:curLang(), getToken:editToken,
@@ -2138,6 +2286,24 @@
       const upstream = Number.isInteger(body.upstreamStatus) && body.upstreamStatus >= 400 && body.upstreamStatus <= 599 ? `; upstream ${body.upstreamStatus}` : '';
       return { ...body, detail:`${DT(messages[code] || 'studioUnavailable')} [${code}${http}${upstream}]` };
     };
+    const studioResult = (status, parsed) => {
+      const body = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : { error:'bad_response' };
+      if (body.error === 'bad_response' && isLoopbackPreview()) {
+        showLiveStudioGate();
+        return { error:'static-preview', detail:DT('staticPreview') + ' https://bqurtas.com/#studio' };
+      }
+      if (body.error === 'session-required') {
+        invalidateDashboardSession();
+        hint.textContent = DT('sessionExpired');
+        return { ...body, detail:DT('sessionExpired') };
+      }
+      if (body.error === 'studio-proxy-not-configured') return { ...body, detail:DT('studioNotSetup') };
+      if (body.error === 'studio-upstream-auth' || body.error === 'studio-github-auth') return { ...body, detail:DT('studioUpstreamAuth') };
+      if (body.error === 'studio-github-not-configured') return { ...body, detail:DT('studioGithubMissing') };
+      if (status === 429) return { ...body, detail:DT('rateLimited') };
+      if (status >= 500 || body.error === 'bad_response' || body.error === 'studio-github-conflict' || body.error === 'studio-github-folder-limit') return studioFailure(body, status);
+      return body;
+    };
     const studioCall = async (service, payload) => {
       const token = editToken();
       if (!token) return { error:'missing_token', detail:DT('editorRequired') };
@@ -2151,26 +2317,32 @@
           if (error && ['AbortError', 'TimeoutError'].includes(error.name)) throw error;
           return null;
         });
-        const body = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : { error:'bad_response' };
-        if (body.error === 'bad_response' && isLoopbackPreview()) {
-          showLiveStudioGate();
-          return { error:'static-preview', detail:DT('staticPreview') + ' https://bqurtas.com/#studio' };
-        }
-        if (body.error === 'session-required') {
-          invalidateDashboardSession();
-          hint.textContent = DT('sessionExpired');
-          return { ...body, detail:DT('sessionExpired') };
-        }
-        if (body.error === 'studio-proxy-not-configured') return { ...body, detail:DT('studioNotSetup') };
-        if (body.error === 'studio-upstream-auth' || body.error === 'studio-github-auth') return { ...body, detail:DT('studioUpstreamAuth') };
-        if (body.error === 'studio-github-not-configured') return { ...body, detail:DT('studioGithubMissing') };
-        if (res.status === 429) return { ...body, detail:DT('rateLimited') };
-        if (res.status >= 500 || body.error === 'bad_response' || body.error === 'studio-github-conflict' || body.error === 'studio-github-folder-limit') return studioFailure(body, res.status);
-        return body;
+        return studioResult(res.status, parsed);
       } catch (error) {
         return studioFailure({ error:error && ['AbortError', 'TimeoutError'].includes(error.name) ? 'studio-client-timeout' : 'studio-unavailable' });
       }
     };
+    /* A film is one long upload: XHR reports its progress. Same origin, same
+       editor credential and the same response handling as every Studio call. */
+    const studioUpload = (service, text, onProgress) => new Promise((resolve) => {
+      const token = editToken();
+      if (!token) { resolve({ error:'missing_token', detail:DT('editorRequired') }); return; }
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/studio/' + service);
+      xhr.setRequestHeader('Content-Type', 'text/plain;charset=UTF-8');
+      xhr.setRequestHeader('Accept', 'application/json');
+      xhr.setRequestHeader('x-edit-token', token);
+      xhr.timeout = 20 * 60 * 1000;
+      xhr.upload.onprogress = (event) => { if (event.lengthComputable && event.total) onProgress(Math.min(99, Math.floor(event.loaded / event.total * 100))); };
+      xhr.onload = () => {
+        let parsed = null;
+        try { parsed = JSON.parse(xhr.responseText); } catch (error) {}
+        resolve(studioResult(xhr.status, parsed));
+      };
+      xhr.onerror = () => resolve(studioFailure({ error:'studio-unavailable' }));
+      xhr.ontimeout = () => resolve(studioFailure({ error:'studio-client-timeout' }));
+      xhr.send(text);
+    });
 
     const PUBLICATION_I18N = {
       en:{ queued:'Saved to GitHub ✓ — waiting for the website deployment. It is not live yet.', waiting:'The image is saved. Waiting for it to become available on the website…', ready:'Image is live ✓ — ready to publish.', retry:'Check again', failed:'Still waiting for deployment. Check again before publishing.', uploadFailed:'The image could not be uploaded.' },

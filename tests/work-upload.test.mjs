@@ -23,14 +23,38 @@ function node() {
   };
 }
 
-function worksFixture({ token = 'browser-editor', resize = async () => 'webp-image', api = async () => ({ ok:true, files:[] }) } = {}) {
-  const nodes = Object.fromEntries(['wkTokenForm', 'wkToken', 'wkTokenMsg', 'wkFile', 'wkPrev', 'wkMsg', 'wkUp', 'wkFolder', 'wkGrid', 'wkMgFolder', 'wkMgLoad'].map(id => ['#' + id, node()]));
+/* A browser <video> whose metadata and seeks resolve on the next microtask. */
+function fakeVideo({ width = 1080, height = 1920, duration = 34.07, broken = false } = {}) {
+  const listeners = new Map();
+  return {
+    videoWidth:0, videoHeight:0, duration:NaN, readyState:0, paused:false, _src:'', _time:0,
+    addEventListener(type, handler) { if (!listeners.has(type)) listeners.set(type, new Set()); listeners.get(type).add(handler); },
+    removeEventListener(type, handler) { listeners.get(type)?.delete(handler); },
+    emit(type) { for (const handler of [...(listeners.get(type) || [])]) handler(); },
+    pause() { this.paused = true; }, load() {}, removeAttribute(name) { if (name === 'src') this._src = ''; },
+    get src() { return this._src; },
+    set src(value) {
+      this._src = value;
+      queueMicrotask(() => {
+        if (broken) { this.emit('error'); return; }
+        Object.assign(this, { videoWidth:width, videoHeight:height, duration, readyState:1 });
+        this.emit('loadedmetadata');
+      });
+    },
+    get currentTime() { return this._time; },
+    set currentTime(value) { this._time = value; queueMicrotask(() => { this.readyState = 4; this.emit('seeked'); }); }
+  };
+}
+
+function worksFixture({ token = 'browser-editor', resize = async () => 'webp-image', api = async () => ({ ok:true, files:[] }), video = fakeVideo(), upload = async () => ({ ok:true, sha:'f'.repeat(40), size:4096, receipt:'r'.repeat(43) }) } = {}) {
+  const nodes = Object.fromEntries(['wkTokenForm', 'wkToken', 'wkTokenMsg', 'wkFile', 'wkPrev', 'wkMsg', 'wkUp', 'wkFolder', 'wkGrid', 'wkMgFolder', 'wkMgLoad', 'wkNote', 'wkFileLabel', 'wkUpText', 'wkVidPrev', 'wkVidInfo'].map(id => ['#' + id, node()]));
   nodes['#wkTokenForm button[type="submit"]'] = node();
   nodes['#wkPrev'].image = { src:'' };
   nodes['#wkFolder'].value = 'Book';
+  nodes['#wkVid'] = video;
   const store = new Map(token ? [['bq_edit_token', token]] : []);
-  const view = node(), calls = [];
-  const collection = { book:{ folder:'Book', title:'Books', count:1, ext:'webp' } };
+  const view = node(), calls = [], uploads = [], revoked = [];
+  const collection = { book:{ folder:'Book', title:'Books', count:1, ext:'webp' }, video:{ folder:'Videos', title:'Video', count:30, ext:'mp4' } };
   const context = {
     $:selector => nodes[selector], view, collections:() => collection, curLang:() => 'en',
     window:{ BQ_GALLERY:{ COLLECTIONS:collection } },
@@ -39,14 +63,20 @@ function worksFixture({ token = 'browser-editor', resize = async () => 'webp-ima
     editToken:() => store.get('bq_edit_token') || '',
     sessionStorage:{ setItem:(key, value) => store.set(key, value), removeItem:key => store.delete(key) },
     esc:value => String(value || ''), cmsResize:resize,
-    wkApi:async payload => { calls.push(payload); return api(payload); }
+    wkApi:async payload => { calls.push(payload); return api(payload); },
+    studioUpload:async (service, text, progress) => { uploads.push({ service, text }); progress(50); return upload({ service, text }); },
+    URL:{ createObjectURL:file => 'blob:' + file.name, revokeObjectURL:url => revoked.push(url) },
+    FileReader:class { readAsDataURL(file) { queueMicrotask(() => { this.result = 'data:video/mp4;base64,' + file.base64; this.onload(); }); } },
+    document:{ createElement:() => ({ getContext:() => ({ drawImage() {} }), toDataURL:() => 'data:image/jpeg;base64,' + '/9j/'.repeat(100) }) },
+    setTimeout, clearTimeout, queueMicrotask
   };
   vm.runInNewContext(worksSource, context);
   context.renderWorks();
   // These elements are browser-created with the authored disabled attribute.
   nodes['#wkUp'].disabled = /id="wkUp"[^>]*disabled/.test(view.innerHTML);
-  return { context, nodes, view, calls, store,
+  return { context, nodes, view, calls, store, uploads, revoked, video,
     choose:file => nodes['#wkFile'].fire('change', { target:{ files:file ? [file] : [] } }),
+    collection:folder => { nodes['#wkFolder'].value = folder; nodes['#wkFolder'].fire('change'); },
     publish:() => nodes['#wkUp'].fire('click'),
     connect:value => { nodes['#wkToken'].value = value; return nodes['#wkTokenForm'].fire('submit', { preventDefault() {} }); }
   };
@@ -117,6 +147,103 @@ test('publishing is single flight and a service failure preserves the prepared i
   assert.equal(f.calls.length, 2);
   assert.equal(f.nodes['#wkUp'].disabled, true);
   assert.equal(f.nodes['#wkPrev'].hidden, true);
+});
+
+const film = (extra = {}) => ({ name:'reel.mp4', type:'video/mp4', size:4096, base64:'AAAAGGZ0eXBpc29t', ...extra });
+
+test('Video is one of the Works collections and switches the same form to MP4 films', async () => {
+  const f = worksFixture();
+  assert.match(f.view.innerHTML, /<option value="Videos">Video<\/option>/);
+  assert.match(f.view.innerHTML, /id="wkFolder"[\s\S]*<option value="Book">Books<\/option><option value="Videos">Video<\/option>/);
+  f.collection('Videos');
+  assert.equal(f.nodes['#wkFile'].accept, 'video/mp4,.mp4');
+  assert.match(f.nodes['#wkNote'].textContent, /MP4 video, up to 25 MB/);
+  assert.equal(f.nodes['#wkFileLabel'].textContent, 'Choose video (MP4, up to 25 MB)');
+  assert.equal(f.nodes['#wkUpText'].textContent, 'Publish video');
+  f.collection('Book');
+  assert.equal(f.nodes['#wkFile'].accept, 'image/*');
+  assert.equal(f.nodes['#wkUpText'].textContent, 'Publish');
+});
+
+test('a film over 25 MB or not an MP4 is refused with its size before anything is read or sent', async () => {
+  const f = worksFixture();
+  f.collection('Videos');
+  await f.choose(film({ size:31_200_000 }));
+  assert.equal(f.nodes['#wkMsg'].textContent, '✗ This video is \u206631.2 MB\u2069. The limit is 25 MB — export a smaller MP4.');
+  assert.equal(f.video.src, '');
+  await f.choose(film({ name:'clip.mov', type:'video/quicktime' }));
+  assert.match(f.nodes['#wkMsg'].textContent, /Choose an MP4 video file/);
+  await f.publish();
+  assert.equal(f.uploads.length + f.calls.length, 0);
+  assert.equal(f.nodes['#wkUp'].disabled, true);
+});
+
+test('a film shows its frame size, length and file size, then publishes once with its cover frame', async () => {
+  const f = worksFixture();
+  f.collection('Videos');
+  await f.choose(film({ size:12_345_678 }));
+  // One isolated left-to-right run, so RTL dashboards keep "12.3 MB" in order.
+  assert.equal(f.nodes['#wkVidInfo'].textContent, '\u20661080 × 1920 · 0:34 · 12.3 MB\u2069');
+  assert.equal(f.nodes['#wkVidPrev'].hidden, false);
+  assert.equal(f.video.currentTime, 1, 'the preview opens a moment in');
+  assert.equal(f.nodes['#wkUp'].disabled, false);
+  const first = f.publish(); await f.publish();
+  await first;
+  assert.equal(f.uploads.length, 1, 'single flight');
+  assert.deepEqual(f.uploads[0], { service:'work-video', text:'AAAAGGZ0eXBpc29t' });
+  assert.equal(f.calls.length, 1);
+  // Objects built inside the dashboard's realm are compared by value.
+  assert.deepEqual(JSON.parse(JSON.stringify({ ...f.calls[0], posterB64:undefined })), { action:'upload', folder:'Videos', ext:'mp4',
+    video:{ sha:'f'.repeat(40), size:4096, receipt:'r'.repeat(43) }, width:1080, height:1920, duration:34.07 });
+  assert.match(f.calls[0].posterB64, /^(\/9j\/)+$/);
+  assert.equal(f.video.paused, true, 'the cover is the paused frame');
+  assert.match(f.nodes['#wkMsg'].textContent, /waiting for the website deployment/);
+  assert.equal(f.nodes['#wkVidPrev'].hidden, true);
+  assert.deepEqual(f.revoked, ['blob:reel.mp4']);
+  assert.equal(f.nodes['#wkUp'].disabled, true);
+});
+
+test('a failed publication keeps the uploaded film so a retry sends only the small commit', async () => {
+  let answer = { error:'studio-github-unavailable', detail:'GitHub could not be reached.' };
+  const f = worksFixture({ api:async () => answer });
+  f.collection('Videos');
+  await f.choose(film());
+  await f.publish();
+  assert.match(f.nodes['#wkMsg'].textContent, /GitHub could not be reached/);
+  assert.equal(f.nodes['#wkUp'].disabled, false);
+  answer = { ok:true, path:'Videos/Videos31.mp4', publication:'queued' };
+  await f.publish();
+  assert.equal(f.uploads.length, 1);
+  assert.equal(f.calls.length, 2);
+  assert.equal(JSON.stringify(f.calls[1].video), JSON.stringify(f.calls[0].video));
+  assert.match(f.nodes['#wkMsg'].textContent, /waiting for the website deployment/);
+});
+
+test('an unplayable film or a refused upload explains itself without publishing', async () => {
+  const broken = worksFixture({ video:fakeVideo({ broken:true }) });
+  broken.collection('Videos');
+  await broken.choose(film());
+  assert.match(broken.nodes['#wkMsg'].textContent, /cannot be played here/);
+  assert.equal(broken.nodes['#wkUp'].disabled, true);
+  const refused = worksFixture({ upload:async () => ({ ok:false, error:'invalid-studio-video' }) });
+  refused.collection('Videos');
+  await refused.choose(film());
+  await refused.publish();
+  assert.match(refused.nodes['#wkMsg'].textContent, /not a usable MP4/);
+  assert.equal(refused.calls.length, 0);
+});
+
+test('managing the Video collection lists films by their cover frames', async () => {
+  const f = worksFixture({ api:async () => ({ ok:true, files:[{ name:'Videos31.mp4', path:'Videos/Videos31.mp4', sha:'a'.repeat(40) }] }) });
+  f.nodes['#wkMgFolder'].value = 'Videos';
+  f.nodes['#wkMgFolder'].fire('change');
+  assert.match(f.nodes['#wkMgLoad'].innerHTML, /fa-video[\s\S]*Show videos/);
+  await f.nodes['#wkMgLoad'].fire('click');
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.deepEqual(JSON.parse(JSON.stringify(f.calls[0])), { action:'list', folder:'Videos' });
+  assert.match(f.nodes['#wkGrid'].innerHTML, /1 videos/);
+  assert.match(f.nodes['#wkGrid'].innerHTML, /src="\/assets\/thumbs\/Videos\/Videos31\.jpg"/);
+  assert.match(f.nodes['#wkGrid'].innerHTML, /data-raw="https:\/\/raw\.githubusercontent\.com\/Bqurtas\/BqurtasPortfolio\/main\/preview_site\/assets\/thumbs\/Videos\/Videos31\.jpg"/);
 });
 
 function studioFixture(fetch) {

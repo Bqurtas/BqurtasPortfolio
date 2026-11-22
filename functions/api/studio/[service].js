@@ -16,8 +16,11 @@ import {
 
 import { handleCmsAdmin } from '../_cms.js';
 import { handlePortraitAdmin } from '../_portrait.js';
-import { handleGithubWork, handleGithubMediaUpload } from '../_github-works.js';
+import {
+  handleGithubWork, handleGithubMediaUpload, handleGithubVideoStage, validVideoCommit, VIDEO_STAGE_MAX
+} from '../_github-works.js';
 const IMAGE_LIMIT = 8 * 1024 * 1024;
+const VIDEO_FOLDER = 'Videos';
 const LATEST_LINKS = new Set(['', 'logo', 'book', 'image', 'posters', 'social', 'events', 'stationery', 'official', 'video', 'other']);
 const FOLDERS = new Set([
   'GeneralDesign', 'Book', 'Official', 'Poster', 'SocialMedia', 'LogoDesign',
@@ -34,6 +37,12 @@ const RULES = Object.freeze({
     maximum: IMAGE_LIMIT,
     actions: new Set(['upload', 'list', 'delete']),
     limit: 40
+  },
+  /* Stores one checked film as a Git blob; publishing stays in work-upload. */
+  'work-video': {
+    maximum: VIDEO_STAGE_MAX,
+    actions: new Set(['stage']),
+    limit: 12
   },
   'blog-admin': {
     maximum: IMAGE_LIMIT,
@@ -107,20 +116,23 @@ function validPayload(service, body) {
   }
 
   if (action === 'list') {
-    return service !== 'work-upload' || FOLDERS.has(body.folder);
+    return service !== 'work-upload' || FOLDERS.has(body.folder) || body.folder === VIDEO_FOLDER;
   }
   if (action === 'delete') {
     if (service === 'work-upload') {
       return typeof body.path === 'string'
         && body.path.length <= 300
         && !body.path.split('/').includes('..')
-        && [...FOLDERS].some((folder) => body.path.startsWith(`${folder}/`))
+        && [...FOLDERS, VIDEO_FOLDER].some((folder) => body.path.startsWith(`${folder}/`))
         && /^[0-9a-f]{40}$/i.test(String(body.sha || ''));
     }
     return validIdentifier(body.id);
   }
   if (action === 'reorder') return validIdList(body.ids);
   if (action === 'upload') {
+    if (service === 'work-upload' && body.folder === VIDEO_FOLDER) {
+      return body.ext === 'mp4' && validVideoCommit(body);
+    }
     if (service === 'work-upload') {
       return FOLDERS.has(body.folder)
         && body.ext === 'webp'
@@ -177,6 +189,14 @@ export async function onRequestPost({ request, env, params }) {
   });
   if (slot.unavailable) return json({ ok: false, error: 'rate-limit-unavailable' }, 503);
   if (!slot.ok) return json({ ok: false, error: 'rate-limited', retryAfter: slot.retryAfter }, 429, { 'Retry-After': String(slot.retryAfter) });
+
+  // A film arrives as checked base64 text, never parsed as JSON.
+  if (service === 'work-video') {
+    try { return await handleGithubVideoStage(request, env); } catch {
+      console.warn({ event: 'studio-content-failure', service });
+      return json({ ok: false, error: 'studio-content-unavailable' }, 503);
+    }
+  }
 
   let body;
   try { body = await readJson(request, rule.maximum); } catch (error) { return inputErrorResponse(error); }
