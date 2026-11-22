@@ -1678,11 +1678,33 @@
   const doc = document;
   doc.querySelectorAll('[data-work-jump]').forEach((a) => a.addEventListener('click', (e) => {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-    const sheet = doc.getElementById('design-work');
-    if (!sheet) return;
+    const work = doc.getElementById('design-work');
+    if (!work) return;
     e.preventDefault();
-    if (typeof window.__bqScrollPaperTarget === 'function') window.__bqScrollPaperTarget(sheet, { behavior: 'smooth', block: 'start' });
-    else sheet.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    /* land exactly where the portfolio pins (its head "Design Room — A small catalogue of
+       printed & pixel things." at the top), then settle the last pixels if a sheet above
+       changed its height on the way */
+    const sheet = work.closest('.paper-sheet') || work;
+    /* every landed sheet rests on the deck's top gutter — where the hero rests now */
+    const hero = a.closest('.paper-sheet');
+    const rest = hero ? Math.max(0, Math.round(hero.getBoundingClientRect().top)) : 10;
+    const pin = () => rest;
+    const go = (behavior) => {
+      const top = Math.max(0, Math.round(window.scrollY + sheet.getBoundingClientRect().top - pin()));
+      window.__bqPaperBypassUntil = performance.now() + (behavior === 'smooth' ? 1400 : 200);
+      try { window.scrollTo({ top, behavior }); } catch { window.scrollTo(0, top); }
+    };
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    go(reduce ? 'auto' : 'smooth');
+    let settled = false;
+    const settle = () => {
+      if (settled) return;
+      settled = true;
+      const d = sheet.getBoundingClientRect().top - pin();
+      if (d > 1 && d < window.innerHeight) go('auto');
+    };
+    if ('onscrollend' in window) window.addEventListener('scrollend', settle, { once: true });
+    setTimeout(settle, 1800);
   }));
 })();
 

@@ -3094,3 +3094,34 @@ html body #design#design#design#design #services#services#services#services .ser
   html body #design#design#design#design #services#services#services#services .service-panel { --svc-img: 24px; --svc-end: 46px; }
 }
 
+/* ═════ recent-phone ═════ */
+/* Recent work on phones (owner, 2026-11-22: "more beautiful on mobile"): the four filters sit
+   as two even rows of slim pills (one row where it fits), so the plate gets the height the
+   tall pills took; the plates waiting behind peek less. */
+@media (max-width: 760px) {
+  :root[data-film] body #design#design#design#design#design #recent-work#recent-work .recent-filters {
+    display: grid !important;
+    grid-template-columns: repeat(4, auto) !important;
+    justify-content: start !important;
+    gap: 6px !important;
+    inline-size: 100% !important;
+  }
+  :root[data-film] body #design#design#design#design#design #recent-work#recent-work .recent-filters > button {
+    inline-size: 100% !important;
+    min-inline-size: 0 !important;
+    block-size: 36px !important;
+    min-block-size: 36px !important;
+    padding: 0 14px !important;
+    font-size: 13px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+  :root[data-film] body #design#design#design#design#design #recent-work#recent-work .film-folio {
+    --peek: 14px;
+    --stage-h: clamp(250px, calc(min(56svh, 100svh - 420px) / var(--bq-paper-fit, 1)), 560px);
+  }
+}
+@media (max-width: 480px) {
+  :root[data-film] body #design#design#design#design#design #recent-work#recent-work .recent-filters { grid-template-columns: 1fr 1fr !important; justify-content: stretch !important; }
+}
+

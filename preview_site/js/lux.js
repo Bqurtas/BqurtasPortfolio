@@ -74,8 +74,10 @@
     }, true);
   }
 
-  /* ---- page-transition curtain when moving between rooms ---- */
-  if (!reduce) {
+  /* ---- page-transition curtain when moving between rooms ----
+     Not under the film layer: its own window (the two shutters with the room's name)
+     opens every room, and two curtains in a row were one too many (owner, 2026-11-22). */
+  if (!reduce && !document.documentElement.hasAttribute('data-film')) {
     var curtain = document.createElement('div');
     curtain.className = 'lux-transition';
     curtain.setAttribute('aria-hidden', 'true');
