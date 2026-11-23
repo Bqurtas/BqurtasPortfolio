@@ -516,8 +516,48 @@ if (statement) {
     });
   };
   const queue = () => { if (!frame) frame = requestAnimationFrame(paint); };
+  // The sentence names books, so the sheet shows them: one cover at a time,
+  // flat, under the line, the next one every few seconds while it is in view.
+  const BOOK_EVERY = 3500;
+  const books = document.createElement('div');
+  books.className = 'statement-books';
+  books.setAttribute('aria-hidden','true');
+  books.innerHTML = '<img alt="" decoding="async"><img alt="" decoding="async">';
+  let bookList = [], bookAt = -1, bookTimer = 0, bookBusy = false, bookInView = false;
+  const bookPlace = () => { if (statement.nextElementSibling !== books) statement.insertAdjacentElement('afterend',books); };
+  const bookWait = () => { window.clearTimeout(bookTimer); bookTimer = 0; };
+  const bookTurn = () => {
+    bookWait();
+    if (bookBusy || !bookList.length || !bookInView || document.hidden) return;
+    const at = (bookAt + 1) % bookList.length, src = bookList[at];
+    const [one, two] = books.children, back = one.classList.contains('is-front') ? two : one;
+    const probe = new Image();
+    probe.decoding = 'async';
+    probe.src = src;
+    bookBusy = true;
+    // A cover changes only once it is fully decoded, so no blank frame shows.
+    (probe.decode ? probe.decode() : Promise.resolve()).then(() => {
+      bookAt = at;
+      back.src = src;
+      one.classList.toggle('is-front',back === one);
+      two.classList.toggle('is-front',back === two);
+      books.classList.add('is-ready');
+      return BOOK_EVERY;
+    },() => { bookAt = at; return 250; }).then(wait => {
+      bookBusy = false;
+      if (bookInView && !document.hidden) bookTimer = window.setTimeout(bookTurn,wait);
+    });
+  };
+  if (sheet && typeof IntersectionObserver === 'function') {
+    new IntersectionObserver(entries => {
+      bookInView = entries.some(entry => entry.isIntersecting);
+      if (!bookInView) bookWait(); else if (!bookTimer) bookTurn();
+    },{threshold:.2}).observe(sheet);
+  } else bookInView = true;
+  document.addEventListener('visibilitychange',() => { if (document.hidden) bookWait(); else if (!bookTimer) bookTurn(); });
   statement.classList.add('is-live');
   draw();
+  bookPlace();
   document.addEventListener('bq:language',draw);
   window.addEventListener('scroll',queue,{passive:true});
   window.addEventListener('resize',queue,{passive:true});
@@ -529,5 +569,10 @@ if (statement) {
       return pool.slice(0,FRAMES).map(record => '/assets/thumbs/' + record.path);
     });
     if (reels.some(reel => reel.length)) draw();
+    // Every book cover, in a new order on each visit, at full resolution.
+    bookList = records.filter(record => record.path.startsWith('Book/'))
+      .map(record => '/media/Book/' + encodeURIComponent(record.path.slice(5)));
+    for (let i = bookList.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [bookList[i],bookList[j]] = [bookList[j],bookList[i]]; }
+    bookTurn();
   });
 }

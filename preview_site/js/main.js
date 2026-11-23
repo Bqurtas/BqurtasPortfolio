@@ -1700,10 +1700,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.__bqOnScroll) window.__bqOnScroll();
   };
 
-  /* Thirty quiet seconds with no movement, in any room or layer, returns to
-     the home page and its hero. */
+  /* An hour with no movement, in any room or layer, returns to the home page
+     and its hero (owner, 2026-11-23: thirty seconds cut visitors off mid-look). */
   (function homeHeroIdle() {
-    const IDLE_MS = 30000;
+    const IDLE_MS = 60 * 60 * 1000;
     let idleTimer = 0;
     let lastArm = 0;
     const homePath = () => ((currentLang && currentLang !== 'en') ? '/' + currentLang : '/');

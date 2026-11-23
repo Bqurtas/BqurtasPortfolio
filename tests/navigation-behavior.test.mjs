@@ -138,16 +138,18 @@ test('fresh deep links discard an earlier document away timer without resetting 
   }
 });
 
-test('bfcache resumes keep the five-minute threshold and reset only a long absence', () => {
-  for (const duration of [60_000, 5 * 60_000 + 1]) {
+const HOUR = 60 * 60_000;
+
+test('bfcache resumes keep the one-hour threshold and reset only a long absence', () => {
+  for (const duration of [60_000, 30 * 60_000, HOUR + 1]) {
     const page = loadResumePolicy('/contact');
     page.fire('pagehide');
     page.elapse(duration);
     page.fire('pageshow', { persisted: true });
     page.flush();
-    assert.equal(page.resets, duration > 5 * 60_000 ? 1 : 0);
+    assert.equal(page.resets, duration > HOUR ? 1 : 0);
     assert.equal(page.fallbackScrolls, 0, 'core reset must not be replayed by enhancement timers');
-    assert.equal(page.location.pathname, duration > 5 * 60_000 ? '/' : '/contact');
+    assert.equal(page.location.pathname, duration > HOUR ? '/' : '/contact');
     assert.equal(page.storage.has('bq_last_away_at'), false);
   }
 });
@@ -203,37 +205,39 @@ function loadHomeIdle({ room = 'bio', path = '/bio', hidden = false, scrollY = 0
   };
 }
 
-test('thirty seconds without movement returns any room or scrolled page to the home hero', () => {
+test('an hour without movement returns any room or scrolled page to the home hero', () => {
   const away = loadHomeIdle();
-  away.advance(29999);
+  away.advance(30_000);
+  assert.equal(away.resets, 0, 'thirty seconds of looking no longer sends a visitor away');
+  away.advance(HOUR - 30_000 - 1);
   assert.equal(away.resets, 0);
   away.advance(1);
   assert.equal(away.resets, 1);
   assert.equal(away.location.pathname, '/');
   assert.equal(away.closed.includes('chat'), true);
-  away.advance(30000);
+  away.advance(HOUR);
   assert.equal(away.resets, 1, 'the home hero does not reset itself again');
 
   const moving = loadHomeIdle({ room: 'contact', path: '/contact' });
-  moving.advance(20000);
+  moving.advance(40 * 60_000);
   moving.fire('pointerdown');
-  moving.advance(20000);
+  moving.advance(40 * 60_000);
   assert.equal(moving.resets, 0);
-  moving.advance(10000);
+  moving.advance(20 * 60_000);
   assert.equal(moving.resets, 1);
 
   const scrolled = loadHomeIdle({ room: 'design', path: '/design', scrollY: 900 });
-  scrolled.advance(30000);
+  scrolled.advance(HOUR);
   assert.equal(scrolled.resets, 1);
   assert.equal(scrolled.location.pathname, '/');
 
   const home = loadHomeIdle({ room: 'design', path: '/' });
-  home.advance(60000);
+  home.advance(2 * HOUR);
   assert.equal(home.resets, 0);
 
   const paused = loadHomeIdle();
   paused.document.hidden = true;
-  paused.advance(29999);
+  paused.advance(HOUR - 1);
   assert.equal(paused.resets, 0);
   paused.advance(1);
   assert.equal(paused.resets, 1);
@@ -247,7 +251,7 @@ test('visibility and focus resumes still return a long-backgrounded current tab 
       page.document.hidden = true;
       page.fire('visibilitychange');
     } else page.fire('blur');
-    page.elapse(5 * 60_000 + 1);
+    page.elapse(HOUR + 1);
     page.document.hidden = false;
     page.fire(mechanism === 'visibility' ? 'visibilitychange' : 'focus');
     page.flush();

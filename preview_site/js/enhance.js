@@ -139,10 +139,11 @@
       bqToTop();
     };
     /* bfcache / session restore can re-show an old scroll position. Do not snap
-       immediately; the same five-minute away timer below decides when to reset. */
+       immediately; the same one-hour away timer below decides when to reset
+       (owner, 2026-11-23: give visitors time; five minutes was too short). */
     let bqHiddenAt = 0;
-    const BQ_RESUME_RESET_MS = 5 * 60 * 1000;
-    const BQ_MOBILE_RESUME_RESET_MS = 5 * 60 * 1000;
+    const BQ_RESUME_RESET_MS = 60 * 60 * 1000;
+    const BQ_MOBILE_RESUME_RESET_MS = 60 * 60 * 1000;
     const BQ_AWAY_KEY = 'bq_last_away_at';
     const bqResumeDelay = () => {
       try {

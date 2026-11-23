@@ -13,7 +13,7 @@
       instead of being pinned for the life of the installed worker.
    ========================================================= */
 
-const SW_VERSION = 'a7d149b712c3'; // generated from this worker and the app shell
+const SW_VERSION = '2399f968f8cb'; // generated from this worker and the app shell
 const CACHE_NAME = `bqurtas-cache-${SW_VERSION}`;
 const DOC_FALLBACK = '/index.html';
 
@@ -40,15 +40,15 @@ const PRECACHE_ASSETS = [
   '/css/style.v417.min.css?v=4195ff2cdf3c',
   '/css/fonts.css?v=6bd89c103953',
   '/css/experience.min.css?v=2c2664c33142',
-  '/js/main.v420.min.js?v=738dbe5bab43',
+  '/js/main.v420.min.js?v=286d10be6563',
   '/js/gallery.v420.min.js?v=6650d0580a06',
   '/js/i18n.v420.min.js?v=76e3d49d6f43',
   '/js/motion.44e83e65e735.min.js?v=44e83e65e735',
   '/js/lux.min.js?v=9053b1a1d0aa',
-  '/js/recent-work.min.js?v=25813f3f583a',
+  '/js/recent-work.min.js?v=cd20fea34978',
   '/js/recent-publications.js?v=bf2ad4155a3c',
   '/js/hero-work-trail.min.js?v=2cae74284098',
-  '/css/recent-work.min.css?v=71aa3308bb3c',
+  '/css/recent-work.min.css?v=7be1aa121844',
   '/css/hero-work-trail.min.css?v=38c2abc32a53',
   '/site.webmanifest?v=19c5c4b9ee48',
   '/favicon.ico',

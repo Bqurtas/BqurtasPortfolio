@@ -982,7 +982,7 @@
   <link rel="stylesheet" href="css/experience.min.css?v=2c2664c33142">
   <!-- Polish overlay. Last in the cascade so it can be dropped without touching the sheets. -->
   <link rel="stylesheet" href="css/polish.min.css?v=00c0d05d2afc">
-  <link rel="stylesheet" href="css/recent-work.min.css?v=71aa3308bb3c">
+  <link rel="stylesheet" href="css/recent-work.min.css?v=7be1aa121844">
   <!-- The story film's language on the homepage: one sheet, one cut (css/film.css). -->
   <link rel="stylesheet" href="css/film.min.css?v=6b9be0b50f4f">
   <link rel="stylesheet" href="css/hero-work-trail.min.css?v=38c2abc32a53">
@@ -2923,9 +2923,9 @@
     }catch(e){}})();
   </script>
   <script defer src="js/latest-feed.min.js?v=76465997249c"></script>
-  <script defer src="js/main.v420.min.js?v=738dbe5bab43"></script>
+  <script defer src="js/main.v420.min.js?v=286d10be6563"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
-  <script type="module" src="js/recent-work.min.js?v=25813f3f583a"></script>
+  <script type="module" src="js/recent-work.min.js?v=cd20fea34978"></script>
   <script defer src="js/film.min.js?v=0090f720f14b"></script>
   <script defer src="js/hero-work-trail.min.js?v=2cae74284098"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
@@ -2946,7 +2946,7 @@
         if (loading) return;
         loading = true;
         var s = document.createElement('script');
-        s.src = 'js/enhance.v420.min.js?v=a979935791b5';
+        s.src = 'js/enhance.v420.min.js?v=7a51fe8f0b19';
         s.onload = function () {
           loaded = true; loading = false;
           document.documentElement.classList.add('bq-enhanced');
@@ -3123,7 +3123,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=a7d149b712c3', { updateViaCache: 'none' })
+            .register('/sw.js?v=2399f968f8cb', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });

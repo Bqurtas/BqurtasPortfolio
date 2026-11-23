@@ -264,7 +264,7 @@ async function publishChanges(env, snapshot, manifest, changes, message, signal,
    publish that blob, a canvas poster and the manifest in one commit, without
    sending the film twice or trusting an arbitrary blob from the browser. */
 const videoReceipt = (env, sha, size) => keyedDigest(String(env?.SESSION_SECRET || ''), `studio-video-stage|${sha}|${size}`);
-const BASE64_INVALID = /[^A-Za-z0-9+/=]/;
+const BASE64_BODY = /^[A-Za-z0-9+/]*$/, BASE64_END = /^[A-Za-z0-9+/]*={0,2}$/;
 
 /* An ISO base-media file opens with its 'ftyp' box. QuickTime movies say
    'qt  ' there; the gallery serves video/mp4, so only MP4 files are kept. */
@@ -276,15 +276,19 @@ function mp4Header(base64) {
   return header.slice(4, 8) === 'ftyp' && size >= 16 && size <= 4096 && header.slice(8, 12) !== 'qt  ';
 }
 
+/* The film is held as received, never re-read byte by byte: scanning 33 MB of
+   text costs ~30 ms of CPU, more than a Cloudflare request may spend. Its
+   first and last stretches show it is base64 that opens as an MP4 and ends
+   with valid padding; the request is already signed in and editor-gated, and
+   GitHub refuses a body that is not valid JSON and base64. */
 async function readVideoBase64(request) {
   const declared = Number(request.headers.get('Content-Length'));
   if (Number.isFinite(declared) && declared > VIDEO_STAGE_MAX) throw new RequestInputError('payload-too-large', 413);
   if (!request.body) throw new GithubWorkError('invalid-studio-video', 400);
   const invalid = () => new GithubWorkError('invalid-studio-video', 400);
   const reader = request.body.getReader();
-  const decoder = new TextDecoder();
   const chunks = [];
-  let length = 0, padding = -1, head = '', tail = '';
+  let length = 0;
   try {
     while (true) {
       const { done, value } = await reader.read();
@@ -294,22 +298,22 @@ async function readVideoBase64(request) {
         await reader.cancel().catch(() => {});
         throw new RequestInputError('payload-too-large', 413);
       }
-      // Base64 is ASCII, so any other byte fails here and characters equal bytes.
-      const text = decoder.decode(value);
-      if (BASE64_INVALID.test(text)) { await reader.cancel().catch(() => {}); throw invalid(); }
-      const pad = text.indexOf('=');
-      if (pad !== -1 && padding === -1) padding = length + pad;
-      if (head.length < 16) head += text.slice(0, 16 - head.length);
-      tail = (tail + text.slice(-2)).slice(-2);
       length += value.byteLength;
       chunks.push(value);
     }
   } finally {
     reader.releaseLock();
   }
-  if (!length || length % 4 !== 0 || (padding !== -1 && (padding < length - 2 || (padding === length - 2 && tail !== '==')))) throw invalid();
-  const size = length / 4 * 3 - (padding === -1 ? 0 : length - padding);
+  if (!length || length % 4 !== 0) throw invalid();
+  const decoder = new TextDecoder();
+  const first = decoder.decode(chunks[0]), last = chunks.length > 1 ? decoder.decode(chunks.at(-1)) : first;
+  if (!(chunks.length > 1 ? BASE64_BODY.test(first) : true) || !BASE64_END.test(last)) throw invalid();
+  // Base64 is ASCII, so characters are bytes: the end holds the padding.
+  const padding = last.endsWith('==') ? 2 : last.endsWith('=') ? 1 : 0;
+  const size = length / 4 * 3 - padding;
   if (size > VIDEO_MAX_BYTES) throw new RequestInputError('payload-too-large', 413);
+  let head = first;
+  for (let index = 1; head.length < 16 && index < chunks.length; index++) head += decoder.decode(chunks[index]);
   if (size < 1024 || !mp4Header(head)) throw invalid();
   return { chunks, length, size };
 }
@@ -326,8 +330,7 @@ export async function handleGithubVideoStage(request, env) {
     return json({ ok:false, error:'bad-request' }, 400);
   }
   try {
-    // The body is exactly GitHub's blob request: fixed JSON around checked
-    // base64, so nothing from the browser can add or change a field.
+    // GitHub's blob request: fixed JSON around the film's base64, sent once.
     const body = new Blob([encoder.encode('{"encoding":"base64","content":"'), ...staged.chunks, encoder.encode('"}')]);
     staged.chunks.length = 0;
     const blob = await githubApiRequest(env, 'git/blobs', { method:'POST', rawBody:body, signal:AbortSignal.timeout(120_000) });
