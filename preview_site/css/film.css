@@ -1337,8 +1337,9 @@
   line-height: 1.1 !important;
   word-spacing: .02em;
 }
+/* the book in the line is just the cover: no ring (owner, 2026-11-23: "remove the other shapes") */
 :root[data-film] body #design#design#design#design#design #statement#statement .statement-pic {
-  box-shadow: 0 0 0 1px var(--line, rgba(20, 20, 20, .12));
+  box-shadow: none;
 }
 
 /* ── RECENT WORK ───────────────────────────────────────────────────────── */

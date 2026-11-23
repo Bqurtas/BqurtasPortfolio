@@ -446,8 +446,9 @@ if (section) {
   updateStaticCopy(); load();
 }
 
-/* The statement: one sentence set large, with four real works sitting in the
-   line as small pictures. It shares this module only for the catalogue the
+/* The statement: one sentence set large, with the books it names sitting in
+   the line, just before the word for them: one flat cover at a time, the next
+   every few seconds. It shares this module only for the catalogue the
    recent-work sheet has already fetched. */
 const statement = document.querySelector('[data-statement]');
 if (statement) {
@@ -460,22 +461,24 @@ if (statement) {
     tr: 'Erbil’den {} kimlikler, {} kitaplar ve görseller tasarlıyorum; {} sayfa kapandıktan çok sonra da {} akılda kalanlar.',
     sv: 'Från Erbil {} formar jag identiteter, {} böcker och bilder {} som stannar i minnet långt efter att sidan {} har stängts.'
   };
-  const FOLDERS = ['LogoDesign','Book','Poster','Photos'];
-  const FRAMES = 3;
+  // In every language the second gap comes just before the word for books.
+  const BOOK_GAP = 1, BOOK_EVERY = 3500;
   const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const sheet = statement.closest('.statement');
-  // Each gap in the line holds a short reel of works from one discipline,
-  // drawn afresh on every visit, so the sentence never shows the same set twice.
-  let reels = [], tokens = [], painted = -1, frame = 0;
+  let bookList = [], bookAt = -1, bookTimer = 0, bookBusy = false, bookInView = false;
+  let tokens = [], painted = -1, frame = 0;
+  const book = () => statement.querySelector('.statement-book');
   const draw = () => {
     const lang = document.documentElement.dataset.lang || document.documentElement.lang || 'en';
     const parts = (LINES[lang] || LINES.en).split('{}');
     statement.setAttribute('aria-label',parts.map(part => part.trim()).join(' ').replace(/\s+([,;.])/g,'$1'));
+    const current = bookList[bookAt] ? safe(bookList[bookAt]) : '';
     statement.innerHTML = parts.map((part, index) => {
       const words = part.trim().split(/\s+/).filter(Boolean).map(word => `<span class="statement-word" data-token>${safe(word)}</span>`).join(' ');
-      const reel = reels[index];
-      const picture = index < parts.length - 1 && reel?.length ? ` <span class="statement-pic" data-token aria-hidden="true"><span class="statement-reel" style="--n:${reel.length}">${reel.map(src => `<img src="${safe(src)}" alt="" loading="lazy" decoding="async">`).join('')}</span></span> ` : ' ';
-      return words + picture;
+      const cover = index === BOOK_GAP && bookList.length
+        ? ` <span class="statement-pic statement-book" data-token aria-hidden="true"><img alt="" decoding="async"${current ? ` src="${current}" class="is-front"` : ''}><img alt="" decoding="async"></span> `
+        : ' ';
+      return words + cover;
     }).join('');
     tokens = [...statement.querySelectorAll('[data-token]')];
     painted = -1;
@@ -505,43 +508,32 @@ if (statement) {
     const reach = value * (tokens.length + 1.5);
     tokens.forEach((token, index) => {
       const lit = Math.min(1,Math.max(0,reach - index));
-      if (token.classList.contains('statement-pic')) {
-        token.classList.toggle('is-open',lit > .15);
-        // Once open, the reel turns on through its other works as the
-        // reading goes on.
-        const turn = Math.max(0,(reach - index - 1) / Math.max(1,tokens.length - index) * FRAMES * 1.6);
-        const reel = token.firstElementChild, count = reel.childElementCount;
-        reel.style.setProperty('--at',String(Math.min(count - 1,Math.floor(turn))));
-      } else token.style.opacity = (.14 + lit * .86).toFixed(3);
+      // The book opens in the line as the reading reaches it.
+      if (token.classList.contains('statement-pic')) token.classList.toggle('is-open',lit > .15);
+      else token.style.opacity = (.14 + lit * .86).toFixed(3);
     });
   };
   const queue = () => { if (!frame) frame = requestAnimationFrame(paint); };
-  // The sentence names books, so the sheet shows them: one cover at a time,
-  // flat, under the line, the next one every few seconds while it is in view.
-  const BOOK_EVERY = 3500;
-  const books = document.createElement('div');
-  books.className = 'statement-books';
-  books.setAttribute('aria-hidden','true');
-  books.innerHTML = '<img alt="" decoding="async"><img alt="" decoding="async">';
-  let bookList = [], bookAt = -1, bookTimer = 0, bookBusy = false, bookInView = false;
-  const bookPlace = () => { if (statement.nextElementSibling !== books) statement.insertAdjacentElement('afterend',books); };
   const bookWait = () => { window.clearTimeout(bookTimer); bookTimer = 0; };
   const bookTurn = () => {
     bookWait();
-    if (bookBusy || !bookList.length || !bookInView || document.hidden) return;
+    const holder = book();
+    if (bookBusy || !holder || !bookList.length || !bookInView || document.hidden) return;
     const at = (bookAt + 1) % bookList.length, src = bookList[at];
-    const [one, two] = books.children, back = one.classList.contains('is-front') ? two : one;
     const probe = new Image();
     probe.decoding = 'async';
     probe.src = src;
     bookBusy = true;
-    // A cover changes only once it is fully decoded, so no blank frame shows.
+    // A cover changes only once it is decoded, so no blank frame shows.
     (probe.decode ? probe.decode() : Promise.resolve()).then(() => {
       bookAt = at;
-      back.src = src;
-      one.classList.toggle('is-front',back === one);
-      two.classList.toggle('is-front',back === two);
-      books.classList.add('is-ready');
+      const live = book();
+      if (live) {
+        const [one, two] = live.children, back = one.classList.contains('is-front') ? two : one;
+        back.src = src;
+        one.classList.toggle('is-front',back === one);
+        two.classList.toggle('is-front',back === two);
+      }
       return BOOK_EVERY;
     },() => { bookAt = at; return 250; }).then(wait => {
       bookBusy = false;
@@ -557,22 +549,16 @@ if (statement) {
   document.addEventListener('visibilitychange',() => { if (document.hidden) bookWait(); else if (!bookTimer) bookTurn(); });
   statement.classList.add('is-live');
   draw();
-  bookPlace();
   document.addEventListener('bq:language',draw);
   window.addEventListener('scroll',queue,{passive:true});
   window.addEventListener('resize',queue,{passive:true});
   (window.__bqRecentCatalogue || Promise.resolve(null)).then(result => {
-    const records = (result?.manifest?.images || []).filter(record => record && /^[A-Za-z0-9]+\/[^/\\]+\.(?:webp|png|jpe?g|avif)$/i.test(record.path || ''));
-    reels = FOLDERS.map(folder => {
-      const pool = records.filter(record => record.path.startsWith(folder + '/'));
-      for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i],pool[j]] = [pool[j],pool[i]]; }
-      return pool.slice(0,FRAMES).map(record => '/assets/thumbs/' + record.path);
-    });
-    if (reels.some(reel => reel.length)) draw();
-    // Every book cover, in a new order on each visit, at full resolution.
-    bookList = records.filter(record => record.path.startsWith('Book/'))
-      .map(record => '/media/Book/' + encodeURIComponent(record.path.slice(5)));
+    const records = (result?.manifest?.images || []).filter(record => record && /^Book\/[^/\\]+\.(?:webp|png|jpe?g|avif)$/i.test(record.path || ''));
+    // Every book cover, in a new order on each visit.
+    bookList = records.map(record => '/assets/thumbs/' + record.path);
     for (let i = bookList.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [bookList[i],bookList[j]] = [bookList[j],bookList[i]]; }
+    if (!bookList.length) return;
+    draw();
     bookTurn();
   });
 }
