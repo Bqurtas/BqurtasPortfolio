@@ -79,12 +79,16 @@
     hero.classList.add('film-hero');
     if (playIntro) hero.classList.add('film-intro');
     if (playIntro && logo) logo.removeAttribute('poster');
+    /* An intro that starts while the page is still behind the startup gate keeps its ink
+       on the cut: the first frame a visitor sees is never a sheet inked black (in light
+       mode that read as "dark first, then light"). */
+    if (playIntro && root.classList.contains('bq-css-pending')) hero.classList.add('film-behind-opening');
   }
 
-  async function loadPortrait(url) {
+  async function loadPortrait(url, type = 'image/webp') {
     const res = await fetch(url, { credentials: 'same-origin' });
     if (!res.ok) throw new Error(`portrait data ${res.status}`);
-    const blob = new Blob([await res.arrayBuffer()], { type: 'image/webp' });
+    const blob = new Blob([await res.arrayBuffer()], { type });
     let bmp;
     try { bmp = await createImageBitmap(blob, { colorSpaceConversion: 'none', premultiplyAlpha: 'none' }); }
     catch { bmp = await createImageBitmap(blob); }
@@ -148,6 +152,57 @@
     };
     paint.reset = () => { o.fill(0); g.clearRect(0, 0, W, H); done = 0; last = -1; };
     return paint;
+  }
+
+  /* The name's second writer. assets/film/logo-draw.bin is made from the brand's clip
+     (scripts/generate-logo-draw.mjs): each ink pixel's keyed alpha and the moment it is
+     first lit. Replayed in time it rebuilds the clip's frames (mean error < 0.2/255), so
+     when the clip cannot play — autoplay refused, as in iOS Low Power Mode — the name is
+     still written stroke by stroke, never popped or wiped in as a finished still. */
+  let drawMap = null;
+  const loadDrawMap = (url) => drawMap || (drawMap = url
+    ? loadPortrait(url, 'image/png') : Promise.reject(new Error('no write map')));
+  /* paints written progress p (0..1 of the 3.0 s write) in a flat tone; a new tone repaints */
+  function namePainter(data, ctx) {
+    const { W, H, n, idx, tq, al } = data;
+    const out = ctx.createImageData(W, H), o = out.data;
+    const SOFT = 0.012, Q = 1023;
+    let done = 0, last = -1, inTone = -1;
+    return (p, tone) => {
+      if (tone !== inTone) { o.fill(0); done = 0; last = -1; inTone = tone; }
+      if (p <= last) return;
+      last = p;
+      let x0 = W, y0 = H, x1 = -1, y1 = -1, lo = done;
+      for (let k = done; k < n; k++) {
+        const dt = p - tq[k] / Q;
+        if (dt <= 0) break;
+        const i = idx[k], m = i << 2;
+        const a = dt >= SOFT ? 1 : dt / SOFT;
+        o[m] = tone; o[m + 1] = tone; o[m + 2] = tone; o[m + 3] = al[k] * a;
+        if (a === 1 && k === lo) lo++;
+        const x = i % W, y = (i / W) | 0;
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+      done = lo;
+      if (x1 >= 0) ctx.putImageData(out, 0, 0, x0, y0, x1 - x0 + 1, y1 - y0 + 1);
+    };
+  }
+  /* writes the name on ctx from clip time `from` at `rate`; resolves once it is written */
+  function writeFromMap(url, ctx, from, rate, tone) {
+    return loadDrawMap(url).then((data) => new Promise((resolve) => {
+      const paint = namePainter(data, ctx);
+      const begin = performance.now() - (from / rate) * 1000;
+      const step = () => {
+        const c = (performance.now() - begin) / 1000 * rate;
+        paint(Math.min(1, c / 3), tone());
+        if (c >= 3) { resolve(); return; }
+        requestAnimationFrame(step);
+      };
+      step();
+    }));
   }
 
   /* the pen's tip on the artwork at progress p (0..1 artwork coords) and how far it is lifted */
@@ -303,17 +358,21 @@
     hero.classList.add('film-writing');
     logoGaveUp = false;
     try { logo.currentTime = 0; } catch { /* not seekable yet */ }
-    /* the finished name whenever the clip cannot write it — autoplay refused (a phone in
-       low-power or data-saver mode) or a stalled network: the name must always appear */
+    /* whenever the clip cannot write it — autoplay refused (a phone in low-power or
+       data-saver mode) or a stalled network — the same strokes are written from the map,
+       from where the clip stopped. Only if the map is missing too does the still appear. */
     const fallback = () => {
       if (logoGaveUp || logo.ended) return;
       logoGaveUp = true;
+      const from = Math.min(3, logo.currentTime || 0);
       try { logo.pause(); } catch { /* already stopped */ }
       cancelAnimationFrame(logoFrame);
-      const show = () => drawLogo(logoStill);
-      if (logoStill && logoStill.complete && logoStill.naturalWidth) show();
-      else if (logoStill) logoStill.addEventListener('load', show, { once: true });
-      else if (logo.dataset.filmPoster) logo.setAttribute('poster', logo.dataset.filmPoster);
+      writeFromMap(hero.dataset.filmLogoDraw, logoCtx, from, 1, () => (root.dataset.theme === 'dark' ? 22 : 243)).catch(() => {
+        const show = () => drawLogo(logoStill);
+        if (logoStill && logoStill.complete && logoStill.naturalWidth) show();
+        else if (logoStill) logoStill.addEventListener('load', show, { once: true });
+        else if (logo.dataset.filmPoster) logo.setAttribute('poster', logo.dataset.filmPoster);
+      });
     };
     const p = logo.play();
     if (p && p.catch) p.catch(fallback);
@@ -327,9 +386,13 @@
     if (logo && !logo.dataset.filmPoster) {
       logo.dataset.filmPoster = hero.dataset.filmLogoStill || '';
     }
-    setupLogo(playIntro);
+    /* After the opening the hero writes its name too, even when the page measured itself
+       scrolled or hidden at load: a still name here would sit beside the opening's own. */
+    const writeName = playIntro || hero.classList.contains('film-behind-opening');
+    setupLogo(writeName);
     if (!playIntro) {
       hero.classList.add('film-static');
+      if (writeName) setTimeout(playLogo, 320);
     } else {
       raf2(() => hero.classList.add('film-open'));
       setTimeout(playLogo, 320);          // the name writes itself while the pen draws
@@ -1131,7 +1194,7 @@
   const beginHero = () => { if (heroBegun) return; heroBegun = true; startHero(); };
   window.__bqFilm = {
     doc, root, still, clamp, lerp, prog, inOutSine, outCubic, inCubic, outExpo, raf2,
-    lang, copy, onceVisible, rollNumber, beginHero, hero, keyFrame,
+    lang, copy, onceVisible, rollNumber, beginHero, hero, keyFrame, loadDrawMap, namePainter,
     getManifest, thumbOf, groupLabel, GROUPS,
     /* parts add their own strings: addCopy({ en: { key: '…' }, ku: { … } }) */
     addCopy(table) {
@@ -1141,8 +1204,9 @@
   };
 
   /* The opening (film-parts/splash) starts the hero as it opens; without an opening the
-     hero starts at once. The timer is only a failsafe for an opening that never ran. */
-  if (root.classList.contains('film-splashing')) setTimeout(beginHero, 4200);
+     hero starts at once. The opening starts on sight, so its own clock is the failsafe;
+     this one only covers an opening part that never ran at all. */
+  if (root.classList.contains('film-splashing')) setTimeout(() => { if (!window.__bqFilmSplash) beginHero(); }, 4200);
   else beginHero();
   buildArchive();
   buildFolio();
@@ -1151,7 +1215,12 @@
 
 /* ═════ part: splash ═════ */
 /* film part — 0. THE OPENING (#filmSplash, html.film-splashing)
-   The handwritten name alone, on the theme's own paper; then the window opens on the hero's cut. */
+   The handwritten name alone, on the theme's own paper; then the window opens on the hero's cut.
+   It starts on sight: the clip and its write map load while the page is still behind the
+   startup gate, out of sight or prerendering, and the first stroke lands on the first frame
+   a visitor can see (owner, 2026-11-23: on phones it ran mostly unseen and felt like nothing).
+   The name is always written — by the brand's clip, or, where the clip cannot play, by the
+   same strokes from assets/film/logo-draw.bin — never a finished still wiped in. */
 (() => {
   'use strict';
   const F = window.__bqFilm;
@@ -1164,6 +1233,14 @@
     F.beginHero();
     return;
   }
+  window.__bqFilmSplash = true;
+  /* the window opens onto the hero's paper and its field, never onto a sheet inked black */
+  if (F.hero) F.hero.classList.add('film-behind-opening');
+
+  /* The clip writes 0.1–3.0 s. Large screens play it at 2×; phones a little slower and with
+     a longer rest on the finished name, so a small screen sees it being written. */
+  const phone = typeof matchMedia === 'function' && matchMedia('(max-width: 760px)').matches;
+  const RATE = phone ? 1.5 : 2, WRITTEN = 3, HOLD = phone ? 0.55 : 0.15;
 
   /* the shutters part exactly on the hero's own cut line */
   const seam = () => {
@@ -1176,80 +1253,121 @@
   seam();
   addEventListener('resize', seam);
 
-  let opened = false;
+  let opened = false, started = false, finished = false, cap = 0, writer = '';
+  const onKey = (e) => { if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') open(); };
+  const onHidden = () => { if (doc.hidden && started && !opened) open(); };
   const open = () => {
     if (opened) return;
     opened = true;
+    writer = '';
+    clearTimeout(cap);
     seam();
     el.classList.add('is-open');
     raf2(() => F.beginHero());                // the hero starts drawing once the shutters are moving
     removeEventListener('resize', seam);
+    removeEventListener('keydown', onKey);
+    doc.removeEventListener('visibilitychange', onHidden);
     setTimeout(() => { root.classList.remove('film-splashing'); el.remove(); }, 760);
+  };
+  /* the name is whole: rest on it a moment, then open */
+  const written = () => {
+    if (finished || opened) return;
+    finished = true;
+    setTimeout(open, HOLD * 1000);
   };
 
   const holder = el.querySelector('.film-splash-name');
-  if (holder) {
-    const W = 900, H = 200;
-    const canvas = doc.createElement('canvas');
-    canvas.width = W; canvas.height = H;
-    const ctx = canvas.getContext('2d');
-    /* The clip is white on Ink #141414. Each frame is keyed: its brightness becomes the
-       alpha of the theme's own ink, so the name sits on the shutters with no box around
-       it and needs no blend mode (unreliable on video in Safari). */
-    const scratch = doc.createElement('canvas');
-    scratch.width = W; scratch.height = H;
-    const sx = scratch.getContext('2d', { willReadFrequently: true });
-    const dark = root.dataset.theme === 'dark';
-    const R = dark ? 243 : 22, G = R, B = R;        // the site's own white (#f3f3f3) and black (#161616)
-    const paint = (src) => {
-      try {
-        sx.drawImage(src, 0, 0, W, H);
-        ctx.putImageData(F.keyFrame(sx.getImageData(0, 0, W, H), R), 0, 0);
-      } catch (e) { /* the frame is not decoded yet */ }
-    };
-    const v = doc.createElement('video');
-    v.muted = true; v.playsInline = true; v.preload = 'auto';
-    v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
-    v.disablePictureInPicture = true;
-    holder.append(canvas, v);
-    let frame = 0, gaveUp = false, chain = false;
-    /* one key per new frame of the clip where the browser can tell (requestVideoFrameCallback) */
-    const draw = () => {
-      if (gaveUp) { chain = false; return; }
-      paint(v);
-      if (v.paused || v.ended || opened) { chain = false; return; }
-      if (typeof v.requestVideoFrameCallback === 'function') v.requestVideoFrameCallback(draw);
-      else frame = requestAnimationFrame(draw);
-    };
-    const still = () => {                     // autoplay refused or the clip failed: the finished name, wiped in
-      if (opened || gaveUp) return;
-      gaveUp = true;
-      try { v.pause(); } catch (e) { /* already stopped */ }
-      cancelAnimationFrame(frame);
-      const im = new Image();
-      im.decoding = 'async';
-      im.onload = () => { paint(im); holder.classList.add('is-still'); setTimeout(open, 1100); };
-      im.onerror = () => open();
-      im.src = holder.dataset.still || '';
-    };
-    v.addEventListener('playing', () => { if (gaveUp || chain) return; chain = true; cancelAnimationFrame(frame); draw(); });
-    v.addEventListener('ended', () => { draw(); setTimeout(open, 120); }, { once: true });
-    v.addEventListener('timeupdate', () => { if (v.duration && v.currentTime > 3.15) setTimeout(open, 120); });
-    v.addEventListener('error', still, { once: true });
-    /* the opening is brisk: the clip writes at twice its pace here (the hero keeps the clip's own) */
-    const RATE = 2;
+  if (!holder) { open(); return; }
+  const W = 900, H = 200;
+  const canvas = doc.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  /* The clip is white on Ink #141414. Each frame is keyed: its brightness becomes the
+     alpha of the theme's own ink, so the name sits on the shutters with no box around
+     it and needs no blend mode (unreliable on video in Safari). The tone is read on
+     every frame, so it always follows the shutters. */
+  const scratch = doc.createElement('canvas');
+  scratch.width = W; scratch.height = H;
+  const sx = scratch.getContext('2d', { willReadFrequently: true });
+  const tone = () => (root.dataset.theme === 'dark' ? 243 : 22);   // the site's own white (#f3f3f3) and black (#161616)
+  const paint = (src) => {
+    try {
+      sx.drawImage(src, 0, 0, W, H);
+      ctx.putImageData(F.keyFrame(sx.getImageData(0, 0, W, H), tone()), 0, 0);
+    } catch (e) { /* the frame is not decoded yet */ }
+  };
+  const v = doc.createElement('video');
+  v.muted = true; v.playsInline = true; v.preload = 'auto';
+  v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+  v.disablePictureInPicture = true;
+  holder.append(canvas, v);
+  /* both writers load now, behind the gate; nothing plays and no clock runs yet */
+  v.src = holder.dataset.src || '';
+  try { v.load(); } catch (e) { /* the clip will be loaded by play() */ }
+  const map = F.loadDrawMap(holder.dataset.draw);
+  map.catch(() => {});
+
+  /* writer 1: the clip, keyed frame by frame where the browser can tell (requestVideoFrameCallback) */
+  let frame = 0, chain = false;
+  const clipTime = (meta) => (meta && typeof meta.mediaTime === 'number' ? meta.mediaTime : v.currentTime);
+  const draw = (now, meta) => {
+    if (writer !== 'clip') { chain = false; return; }
+    paint(v);
+    if (clipTime(meta) >= WRITTEN || v.ended) { chain = false; written(); return; }
+    if (v.paused) { chain = false; return; }
+    if (typeof v.requestVideoFrameCallback === 'function') v.requestVideoFrameCallback(draw);
+    else frame = requestAnimationFrame(draw);
+  };
+  v.addEventListener('playing', () => { if (writer !== 'clip' || chain) return; chain = true; cancelAnimationFrame(frame); draw(); });
+  v.addEventListener('ended', () => { if (writer === 'clip') { paint(v); written(); } });
+
+  /* writer 2: the same strokes from the map, continuing from the clip's own time */
+  const byMap = (from) => {
+    if (opened || writer === 'map') return;
+    writer = 'map';
+    try { v.pause(); } catch (e) { /* already stopped */ }
+    cancelAnimationFrame(frame);
+    map.then((data) => {
+      if (opened || writer !== 'map') return;
+      const write = F.namePainter(data, ctx);
+      const begin = performance.now() - (from / RATE) * 1000;
+      const step = () => {
+        if (opened || writer !== 'map') return;
+        const c = (performance.now() - begin) / 1000 * RATE;
+        write(Math.min(1, c / WRITTEN), tone());
+        if (c >= WRITTEN) { written(); return; }
+        requestAnimationFrame(step);
+      };
+      step();
+    }, () => { if (writer === 'map') open(); });   // neither writer can run: open at once, with no name
+  };
+
+  /* the clock starts on sight: the gate has lifted, the page is visible and not prerendering */
+  const shown = () => !root.classList.contains('bq-css-pending')
+    && doc.visibilityState === 'visible' && !doc.prerendering;
+  const start = () => {
+    if (started || opened || !shown()) return;
+    started = true;
+    writer = 'clip';
     v.defaultPlaybackRate = RATE;
-    v.addEventListener('loadedmetadata', () => { v.playbackRate = RATE; });
-    v.src = holder.dataset.src || '';
     v.playbackRate = RATE;
+    try { v.currentTime = 0; } catch (e) { /* not seekable yet */ }
     const p = v.play();
-    if (p && typeof p.catch === 'function') p.catch(still);
-    setTimeout(() => { if (v.paused || v.readyState < 2) still(); }, 800);
-  }
-  raf2(() => el.classList.add('is-on'));
-  el.addEventListener('pointerdown', open, { once: true });
-  addEventListener('keydown', open, { once: true });
-  setTimeout(open, 3000);                     // never longer than the written name
+    if (p && typeof p.catch === 'function') p.catch(() => byMap(0));
+    /* the clip had the whole gate to load; if it is still not writing, the map takes over */
+    setTimeout(() => {
+      if (writer === 'clip' && !opened && (v.paused || v.readyState < 3 || v.currentTime < 0.02)) byMap(Math.min(WRITTEN, v.currentTime || 0));
+    }, 600);
+    cap = setTimeout(open, (WRITTEN / RATE + HOLD + 1.6) * 1000);   // never longer than a written name
+    el.addEventListener('pointerdown', open, { once: true });
+    addEventListener('keydown', onKey);
+    doc.addEventListener('visibilitychange', onHidden);
+  };
+  const onSight = () => { if (!started && shown()) raf2(start); };
+  addEventListener('bq:css-ready', onSight);
+  doc.addEventListener('visibilitychange', onSight);
+  doc.addEventListener('prerenderingchange', onSight);
+  onSight();
 })();
 
 /* ═════ part: evidence ═════ */

@@ -15,7 +15,7 @@
   <link rel="preload" as="style" href="css/polish.min.css?v=00c0d05d2afc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#fbfbfa" />
-  <meta name="color-scheme" content="light dark" />
+  <meta name="color-scheme" content="light" />
 
   <!-- Optional Cloudflare and Umami pageviews require current visitor consent. -->
   <script defer src="js/analytics.js?v=ff8a0b4f706e"></script>
@@ -65,7 +65,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon-512.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
-  <link rel="manifest" href="/site.webmanifest?v=19c5c4b9ee48" />
+  <link rel="manifest" href="/site.webmanifest?v=f301868b35e4" />
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
@@ -984,7 +984,7 @@
   <link rel="stylesheet" href="css/polish.min.css?v=00c0d05d2afc">
   <link rel="stylesheet" href="css/recent-work.min.css?v=c614de2d558f">
   <!-- The story film's language on the homepage: one sheet, one cut (css/film.css). -->
-  <link rel="stylesheet" href="css/film.min.css?v=792de1f966e0">
+  <link rel="stylesheet" href="css/film.min.css?v=8751a4d09d0c">
   <link rel="stylesheet" href="css/hero-work-trail.min.css?v=38c2abc32a53">
   <link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543" media="print" id="faCss">
   <noscript><link rel="stylesheet" href="vendor/fontawesome-v309/css/icons.min.css?v=ad3572f3e543"></noscript>
@@ -999,7 +999,7 @@
   <!-- The film's opening (css/film.css, js/film.js): shown only while html.film-splashing. -->
   <div class="film-splash" id="filmSplash" aria-hidden="true">
     <b></b><b></b>
-    <span class="film-splash-name" data-src="assets/film/logo-write.mp4?v=d04c2b1266c2" data-still="assets/film/logo-still.webp?v=5a358370fa6f"></span>
+    <span class="film-splash-name" data-src="assets/film/logo-write.mp4?v=d04c2b1266c2" data-draw="assets/film/logo-draw.bin?v=cd97c5522e50"></span>
   </div>
 
   <!-- Grain overlay -->
@@ -1299,12 +1299,12 @@
     <section class="room paper-stack" id="design" data-room="design">
 
       <!-- Hero — brand, lede, CTA, portrait -->
-      <div class="hero hero-editorial paper-sheet" data-paper="hero" data-paper-fit data-film-portrait="assets/film/portrait-draw.bin?v=afea42a5600b" data-film-pen="assets/film/portrait-pen.json?v=1603a66ec2d7" data-film-logo-still="assets/film/logo-still.webp?v=5a358370fa6f">
+      <div class="hero hero-editorial paper-sheet" data-paper="hero" data-paper-fit data-film-portrait="assets/film/portrait-draw.bin?v=afea42a5600b" data-film-pen="assets/film/portrait-pen.json?v=1603a66ec2d7" data-film-logo-still="assets/film/logo-still.webp?v=5a358370fa6f" data-film-logo-draw="assets/film/logo-draw.bin?v=cd97c5522e50">
         <div class="paper-scroll">
         <!-- One sheet, one cut: the ink field below the 61.8 % cut holds the brand's own
              written-by-hand clip (Brand Kit 06-Motion, white on ink, never retimed). -->
         <div class="film-ink" aria-hidden="true">
-          <video class="film-logo" src="assets/film/logo-write.mp4?v=d04c2b1266c2" poster="assets/film/logo-still.webp?v=5a358370fa6f" width="900" height="200" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback tabindex="-1"></video>
+          <video class="film-logo" src="assets/film/logo-write.mp4?v=d04c2b1266c2" width="900" height="200" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback tabindex="-1"></video>
         </div>
         <div class="hero-edition mono">
           <span class="hero-edition-place"><span class="hero-edition-dot" aria-hidden="true"></span><span data-i18n="hero.place">Based in Erbil</span></span>
@@ -2926,7 +2926,7 @@
   <script defer src="js/main.v420.min.js?v=286d10be6563"></script>
   <script defer src="js/gallery.v420.min.js?v=6650d0580a06"></script>
   <script type="module" src="js/recent-work.min.js?v=1cd28e8ac62c"></script>
-  <script defer src="js/film.min.js?v=0090f720f14b"></script>
+  <script defer src="js/film.min.js?v=34e28e94298a"></script>
   <script defer src="js/hero-work-trail.min.js?v=2cae74284098"></script>
   <!-- Heavy blog/dashboard/latest enhancements are not required to paint or
        navigate the landing page. Load them on intent; direct inner-room URLs
@@ -3123,7 +3123,7 @@
              serving the worker script from its own HTTP cache too.
              Bump this with SW_VERSION in sw.js. */
           navigator.serviceWorker
-            .register('/sw.js?v=d5b84d70fe40', { updateViaCache: 'none' })
+            .register('/sw.js?v=041e6a3bd0c3', { updateViaCache: 'none' })
             .catch(function () {});
         }
       });
