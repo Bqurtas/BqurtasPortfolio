@@ -446,10 +446,10 @@ if (section) {
   updateStaticCopy(); load();
 }
 
-/* The statement: one sentence set large, with the books it names sitting in
-   the line, just before the word for them: one flat cover at a time, the next
-   every few seconds. It shares this module only for the catalogue the
-   recent-work sheet has already fetched. */
+/* The statement: one sentence set large, with books sitting in the line in
+   three places, one just before the word for them. Each turns to another cover
+   as the reading scrolls on, and every few seconds while the page rests. It
+   shares this module only for the catalogue the recent-work sheet has fetched. */
 const statement = document.querySelector('[data-statement]');
 if (statement) {
   const LINES = {
@@ -461,22 +461,23 @@ if (statement) {
     tr: 'Erbil’den {} kimlikler, {} kitaplar ve görseller tasarlıyorum; {} sayfa kapandıktan çok sonra da {} akılda kalanlar.',
     sv: 'Från Erbil {} formar jag identiteter, {} böcker och bilder {} som stannar i minnet långt efter att sidan {} har stängts.'
   };
-  // In every language the second gap comes just before the word for books.
-  const BOOK_GAP = 1, BOOK_EVERY = 3500;
+  // Three places in the line; in every language the second gap (1) comes just
+  // before the word for books, and the last sits by "the page".
+  const BOOK_GAPS = [0,1,3], SCROLL_STEPS = 7, IDLE_START = 1400, IDLE_EVERY = 2600;
   const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const sheet = statement.closest('.statement');
-  let bookList = [], bookAt = -1, bookTimer = 0, bookBusy = false, bookInView = false;
+  let bookList = [], cursor = 0, shown = [], busy = [], inView = false, idleTimer = 0, idleNext = 0, lastStep = -1;
   let tokens = [], painted = -1, frame = 0;
-  const book = () => statement.querySelector('.statement-book');
+  const chips = () => [...statement.querySelectorAll('.statement-book')];
   const draw = () => {
     const lang = document.documentElement.dataset.lang || document.documentElement.lang || 'en';
     const parts = (LINES[lang] || LINES.en).split('{}');
     statement.setAttribute('aria-label',parts.map(part => part.trim()).join(' ').replace(/\s+([,;.])/g,'$1'));
-    const current = bookList[bookAt] ? safe(bookList[bookAt]) : '';
     statement.innerHTML = parts.map((part, index) => {
       const words = part.trim().split(/\s+/).filter(Boolean).map(word => `<span class="statement-word" data-token>${safe(word)}</span>`).join(' ');
-      const cover = index === BOOK_GAP && bookList.length
-        ? ` <span class="statement-pic statement-book" data-token aria-hidden="true"><img alt="" decoding="async"${current ? ` src="${current}" class="is-front"` : ''}><img alt="" decoding="async"></span> `
+      const place = BOOK_GAPS.indexOf(index), src = shown[place];
+      const cover = place > -1 && index < parts.length - 1 && bookList.length
+        ? ` <span class="statement-pic statement-book" data-token aria-hidden="true"><img alt="" decoding="async"${src ? ` src="${safe(src)}" class="is-front"` : ''}><img alt="" decoding="async"></span> `
         : ' ';
       return words + cover;
     }).join('');
@@ -484,6 +485,35 @@ if (statement) {
     painted = -1;
     paint();
   };
+  // One place turns to the next cover in the shuffled list, once it is decoded,
+  // so no blank frame ever shows.
+  const turn = place => {
+    const chip = chips()[place];
+    if (!chip || busy[place] || !bookList.length) return;
+    const src = bookList[cursor++ % bookList.length];
+    const probe = new Image();
+    probe.decoding = 'async';
+    probe.src = src;
+    busy[place] = true;
+    (probe.decode ? probe.decode() : Promise.resolve()).then(() => {
+      const live = chips()[place];
+      if (!live) return;
+      const [one, two] = live.children, back = one.classList.contains('is-front') ? two : one;
+      back.src = src;
+      one.classList.toggle('is-front',back === one);
+      two.classList.toggle('is-front',back === two);
+      shown[place] = src;
+    },() => {}).then(() => { busy[place] = false; });
+  };
+  // While the page rests, the places take turns, one every few seconds.
+  const idleStop = () => { window.clearTimeout(idleTimer); idleTimer = 0; };
+  const idleTurn = () => {
+    idleTimer = 0;
+    if (!inView || document.hidden || !bookList.length) return;
+    turn(idleNext++ % BOOK_GAPS.length);
+    idleTimer = window.setTimeout(idleTurn,IDLE_EVERY);
+  };
+  const idleArm = () => { idleStop(); if (inView && !document.hidden) idleTimer = window.setTimeout(idleTurn,IDLE_START); };
   // Reading progress: the last part of the sheet's rise, then the stretch of
   // scroll it holds the page alone before the next sheet starts to arrive.
   const progress = () => {
@@ -508,45 +538,27 @@ if (statement) {
     const reach = value * (tokens.length + 1.5);
     tokens.forEach((token, index) => {
       const lit = Math.min(1,Math.max(0,reach - index));
-      // The book opens in the line as the reading reaches it.
+      // Each book opens in the line as the reading reaches it.
       if (token.classList.contains('statement-pic')) token.classList.toggle('is-open',lit > .15);
       else token.style.opacity = (.14 + lit * .86).toFixed(3);
     });
+    // Scrolling on turns the open books to other covers, one after another.
+    const step = Math.floor(value * SCROLL_STEPS);
+    if (lastStep > -1 && step !== lastStep) {
+      chips().forEach((chip, place) => {
+        if (chip.classList.contains('is-open')) window.setTimeout(() => turn(place),place * 140);
+      });
+    }
+    lastStep = step;
   };
-  const queue = () => { if (!frame) frame = requestAnimationFrame(paint); };
-  const bookWait = () => { window.clearTimeout(bookTimer); bookTimer = 0; };
-  const bookTurn = () => {
-    bookWait();
-    const holder = book();
-    if (bookBusy || !holder || !bookList.length || !bookInView || document.hidden) return;
-    const at = (bookAt + 1) % bookList.length, src = bookList[at];
-    const probe = new Image();
-    probe.decoding = 'async';
-    probe.src = src;
-    bookBusy = true;
-    // A cover changes only once it is decoded, so no blank frame shows.
-    (probe.decode ? probe.decode() : Promise.resolve()).then(() => {
-      bookAt = at;
-      const live = book();
-      if (live) {
-        const [one, two] = live.children, back = one.classList.contains('is-front') ? two : one;
-        back.src = src;
-        one.classList.toggle('is-front',back === one);
-        two.classList.toggle('is-front',back === two);
-      }
-      return BOOK_EVERY;
-    },() => { bookAt = at; return 250; }).then(wait => {
-      bookBusy = false;
-      if (bookInView && !document.hidden) bookTimer = window.setTimeout(bookTurn,wait);
-    });
-  };
+  const queue = () => { if (!frame) frame = requestAnimationFrame(paint); idleArm(); };
   if (sheet && typeof IntersectionObserver === 'function') {
     new IntersectionObserver(entries => {
-      bookInView = entries.some(entry => entry.isIntersecting);
-      if (!bookInView) bookWait(); else if (!bookTimer) bookTurn();
+      inView = entries.some(entry => entry.isIntersecting);
+      if (inView) idleArm(); else idleStop();
     },{threshold:.2}).observe(sheet);
-  } else bookInView = true;
-  document.addEventListener('visibilitychange',() => { if (document.hidden) bookWait(); else if (!bookTimer) bookTurn(); });
+  } else inView = true;
+  document.addEventListener('visibilitychange',() => { if (document.hidden) idleStop(); else idleArm(); });
   statement.classList.add('is-live');
   draw();
   document.addEventListener('bq:language',draw);
@@ -558,7 +570,9 @@ if (statement) {
     bookList = records.map(record => '/assets/thumbs/' + record.path);
     for (let i = bookList.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [bookList[i],bookList[j]] = [bookList[j],bookList[i]]; }
     if (!bookList.length) return;
+    shown = BOOK_GAPS.map((gap, place) => bookList[place % bookList.length]);
+    cursor = BOOK_GAPS.length;
     draw();
-    bookTurn();
+    idleArm();
   });
 }
