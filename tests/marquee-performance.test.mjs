@@ -57,6 +57,29 @@ test('all authored marquees, including the client logo strip, suspend outside th
   assert.equal(page.tracks[0].classList.contains('is-offscreen'), true);
 });
 
+test('the endless orbit and live dots below the hero rest off-screen the same way', async () => {
+  assert.match(source, /querySelectorAll\('\.software-track, \.hero-marquee-track, \.logo-marquee-track, \.portrait-orbit, \.recent-live-dot, \.site-live'\)/);
+  const css = await readFile(new URL('../preview_site/css/modern-framer.css', import.meta.url), 'utf8');
+  const rule = css.slice(css.indexOf('.software-track.is-offscreen,'), css.indexOf('animation-play-state: paused !important;', css.indexOf('.software-track.is-offscreen,')));
+  for (const selector of ['.recent-live-dot.is-offscreen', '.site-live.is-offscreen::after',
+    // four ids: above polish.css's three-id `animation: … !important` on the orbit and its glyphs
+    'html body #design#design#design#design .portrait-orbit.is-offscreen',
+    'html body #design#design#design#design .portrait-orbit.is-offscreen .orbit-ic::before',
+    // a fully covered sticky paper still intersects the viewport, but its content is hidden
+    // listed one by one: an engine without :is() would drop the whole shared rule
+    '.is-paper-gone .software-track', '.is-paper-gone .hero-marquee-track',
+    '.is-paper-gone .logo-marquee-track', '.is-paper-gone .recent-live-dot',
+    '.is-paper-gone .site-live::after',
+    'html body #design#design#design#design .is-paper-gone .portrait-orbit',
+    'html body #design#design#design#design .is-paper-gone .portrait-orbit .orbit-ic::before']) {
+    assert.ok(rule.includes(selector), selector);
+  }
+  assert.doesNotMatch(rule, /:is\(/, 'no :is() in the shared pause rule');
+  const experience = await readFile(new URL('../preview_site/css/experience.css', import.meta.url), 'utf8');
+  assert.match(experience, /\.paper-sheet\.is-paper-gone > \.paper-scroll > \*,[\s\S]{0,200}?visibility: hidden !important;/,
+    'resting is invisible only while a covered paper hides its content');
+});
+
 test('background tabs pause and restore marquee motion without discarding offscreen state', () => {
   const page = fixture({ hidden: true });
   assert.equal(page.document.documentElement.classList.contains('bq-paused'), true);

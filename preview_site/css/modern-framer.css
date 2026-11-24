@@ -939,7 +939,7 @@ body.menu-revealed #mobileMenu.mobile-menu {
 
 /* While the menu is open the page-card is fixed but the body keeps its locked
    full height, which left the root scrollbar showing behind the menu. Clip it. */
-html:has(body.menu-open) {
+html:has(> body.menu-open) {
   overflow: hidden !important;
 }
 
@@ -3976,7 +3976,8 @@ body.footer-entered .to-top {
 }
 
 /* Keep corner meta clear of the cookie notice while it is visible. */
-body:has(#cookieCard.is-shown) #design > .hero .hero-corner--bl {
+/* :has(> …) looks only at body’s own children, where this element always sits: the same match, without re-searching the whole page on every DOM change. */
+body:has(> #cookieCard.is-shown) #design > .hero .hero-corner--bl {
   opacity: 0;
   pointer-events: none;
 }
@@ -16211,6 +16212,19 @@ html, body, .bq-frame, .bq-page-stage, #design, .room, .main {
 .software-track.is-offscreen,
 .hero-marquee-track.is-offscreen,
 .logo-marquee-track.is-offscreen,
+.recent-live-dot.is-offscreen,
+.site-live.is-offscreen::after,
+html body #design#design#design#design .portrait-orbit.is-offscreen,
+html body #design#design#design#design .portrait-orbit.is-offscreen .orbit-ic::before,
+/* a paper the next one has fully covered hides its content (experience.css): its
+   endless loops rest too, since a sticky sheet still intersects the viewport */
+.is-paper-gone .software-track,
+.is-paper-gone .hero-marquee-track,
+.is-paper-gone .logo-marquee-track,
+.is-paper-gone .recent-live-dot,
+.is-paper-gone .site-live::after,
+html body #design#design#design#design .is-paper-gone .portrait-orbit,
+html body #design#design#design#design .is-paper-gone .portrait-orbit .orbit-ic::before,
 html.bq-paused .software-track,
 html.bq-paused .hero-marquee-track,
 html.bq-paused .logo-marquee-track,

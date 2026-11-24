@@ -3909,7 +3909,9 @@ html.bq-cursor-on body #dash * { cursor: auto !important; }
 html.bq-cursor-on body #dash :is(a, button, [role="button"], summary, label[for], select) { cursor: pointer !important; }
 html.bq-cursor-on body #dash :is(input, textarea, [contenteditable="true"]) { cursor: text !important; }
 html.bq-cursor-on body #dash :is(button, input, select):disabled { cursor: not-allowed !important; }
-html:has(#dash.is-open) :is(.cursor-dot, .cursor-ring) { visibility: hidden !important; }
+/* #dash is a child of body, so the test looks only there (`> * >`, same specificity):
+   the drawn cursor is restyled on every frame and must not search the whole page. */
+html:has(> * > #dash.is-open) :is(.cursor-dot, .cursor-ring) { visibility: hidden !important; }
 
 /* Dashboard layout must always respect authenticated/conditional visibility. */
 html body #dash#dash [hidden] { display: none !important; }
@@ -4100,7 +4102,8 @@ html body #toTop .to-top-arrow {
 }
 html body #toTop:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 html body:is(.menu-open, .menu-closing) #toTop,
-html body:has(#reader.is-open) #toTop {
+/* :has(> …) looks only at body’s own children, where this element always sits: the same match, without re-searching the whole page on every DOM change. */
+html body:has(> #reader.is-open) #toTop {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
@@ -4108,7 +4111,7 @@ html body:has(#reader.is-open) #toTop {
 
 /* Consent never disables navigation. Reserve its actual height, including
    translated copy; dialogs still keep their existing focus/visibility rules. */
-html body:has(#cookieCard.is-shown):not(.menu-open):not(.menu-closing) #toTop.is-shown {
+html body:has(> #cookieCard.is-shown):not(.menu-open):not(.menu-closing) #toTop.is-shown {
   bottom: min(calc(var(--bq-dock-top, 92px) + var(--bq-cookie-height, 210px) + 36px), calc(100svh - 74px)) !important;
 }
 
@@ -5680,7 +5683,7 @@ html body #reader#reader.is-open,
 html body #reader#reader.is-open :is(.reader-panel, .reader-bar, .reader-scroll, .reader-body, .reader-text) {
   pointer-events: auto !important;
 }
-html:has(#reader.is-open) :is(.cursor-dot, .cursor-ring) {
+html:has(> * > #reader.is-open) :is(.cursor-dot, .cursor-ring) {   /* #reader is a child of body, as #dash above */
   visibility: hidden !important;
 }
 

@@ -2325,6 +2325,11 @@
 .film-splash-name > video { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; opacity: 0; pointer-events: none; }
 .film-splash.is-open .film-splash-name { opacity: 0; }
 @keyframes film-splash-failsafe { to { visibility: hidden; pointer-events: none; } }
+/* the failsafe counts again from the first frame the opening can be seen (.is-seen, js/film.js),
+   so an opening that waited in a background tab is never hidden before anyone has seen it.
+   Without the script .is-seen never comes and the 6.5 s above still frees the page. */
+:root.film-splashing .film-splash.is-seen { animation-name: film-splash-failsafe-seen; }
+@keyframes film-splash-failsafe-seen { to { visibility: hidden; pointer-events: none; } }
 
 /* ═════ rooms ═════ */
 /* ── 11. THE ROOMS — every room opens on the same sheet and the same cut as the

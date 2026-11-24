@@ -383,7 +383,10 @@
     }
 
     /* Infinite marquees only run while on-screen; pause in background tabs. */
-    var marqueeTracks = Array.from(document.querySelectorAll('.software-track, .hero-marquee-track, .logo-marquee-track'));
+    /* The other endless loops below the hero (the orbit around the portrait,
+       the live dots) rest the same way: each one kept the browser repainting
+       every frame while far off-screen. */
+    var marqueeTracks = Array.from(document.querySelectorAll('.software-track, .hero-marquee-track, .logo-marquee-track, .portrait-orbit, .recent-live-dot, .site-live'));
     if (marqueeTracks.length && 'IntersectionObserver' in window) {
       var tracksByViewport = new Map();
       var trackObserver = new IntersectionObserver(function (entries) {
@@ -473,15 +476,14 @@
       if (layer.style.getPropertyValue(name) !== value) layer.style.setProperty(name, value);
     }
     function queue() { if (!frame && !blocked()) frame = requestAnimationFrame(paint); }
-    function paintChapters() {
-      var vh = Math.max(1, innerHeight);
+    function paintChapters(scrollTop, vh) {
       var amplitude = pointer.matches ? 18 : 10;
       chapters.forEach(function (chapter) {
         if (chapter.room.classList.contains('is-hidden')) return;
         var rawStart = chapter.scroller.dataset.paperStart;
         var start = Number(rawStart);
         if (rawStart == null || !Number.isFinite(start)) return;
-        var progress = clamp((window.scrollY - start + vh * .78) / (vh * .58), 0, 1);
+        var progress = clamp((scrollTop - start + vh * .78) / (vh * .58), 0, 1);
         var eased = progress * progress * (3 - 2 * progress);
         var shift = ((1 - eased) * amplitude).toFixed(2) + 'px';
         var opacity = (.76 + .24 * eased).toFixed(3);
@@ -500,9 +502,13 @@
       // Read the one active hover surface before any writes. Scroll frames use
       // the paper's cached document origin and never measure the gallery.
       if (surfaceDirty && surface && !surfaceRect) surfaceRect = surface.getBoundingClientRect();
-      paintChapters();
+      // One scroll and one height read per frame, both before any write: reading
+      // scrollY after a write forces the browser to lay the page out again. The
+      // writes below move only transform and opacity, so the values cannot change.
+      var scrollTop = window.scrollY, vh = Math.max(1, innerHeight);
+      paintChapters(scrollTop, vh);
       var start = scene && scene.scroller && Number(scene.scroller.dataset.paperStart);
-      var progress = scene ? clamp((window.scrollY - (Number.isFinite(start) ? start : 0)) / Math.max(1, innerHeight), 0, 1) : 1;
+      var progress = scene ? clamp((scrollTop - (Number.isFinite(start) ? start : 0)) / vh, 0, 1) : 1;
       var active = progress < 1 && scene;
       var targetX = active && pointer.matches ? wantedX : 0;
       var targetY = active && pointer.matches ? wantedY : 0;
@@ -535,6 +541,12 @@
       stop();
       var element = scenes.find(function (item) { return !item.closest('.room').classList.contains('is-hidden'); });
       var leaves = element ? Array.from(element.querySelectorAll('.hero-portrait, .hero-sign, .room-hero-title, .room-hero-ghost')) : [];
+      /* On the film homepage the portrait's transform is fixed (film.css) and the name
+         is screen-reader text clipped to nothing, so depth written there never shows:
+         those two leaves are skipped instead of restyled on every pointer frame. */
+      if (element && root.hasAttribute('data-film') && element.classList.contains('film-hero')) {
+        leaves = leaves.filter(function (leaf) { return !leaf.matches('.hero-portrait, .hero-sign'); });
+      }
       scene = element ? { element: element, scroller: element.querySelector('.paper-scroll'), layers: leaves } : null;
       layers = leaves;
       queue();

@@ -4425,12 +4425,11 @@ window.__bqStageWalk = function stageWalk({ stage, count, current, select, line,
   const footer = document.querySelector('.footer-v249');
   if (!footer) return;
 
-  const root = document.documentElement;
   const body = document.body;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   let frame = 0;
 
-  let lastProgress, lastMix, lastArriving, lastEntered;
+  let lastArriving, lastEntered;
   let lastUnder = false;
 
   /* The footer is the inverse of the cards, and the dock stays painted over
@@ -4463,18 +4462,16 @@ window.__bqStageWalk = function stageWalk({ stage, count, current, select, line,
     const start = vh * 1.08;
     const end = vh * .48;
     const raw = Math.min(1, Math.max(0, (start - top) / Math.max(start - end, 1)));
-    const eased = raw * raw * (3 - 2 * raw);
-    const progress = reduced.matches ? (raw >= .5 ? 1 : 0) : eased;
 
-    // These inherited variables affect the entire page. During the gallery
-    // both are zero: do not invalidate every card's styles on every frame.
-    const nextProgress = progress.toFixed(4);
-    const nextMix = (progress * 100).toFixed(2) + '%';
+    /* The colour variables --bq-footer-progress and --bq-footer-mix are no longer
+       written. Their only readers (modern-framer.css, the page stage and footer
+       backgrounds) are always overridden by polish.css `background: transparent
+       !important`, so they never showed. Each write on <html> restyled every element
+       of the page, every scroll frame while the footer arrived (about 24 ms a frame on
+       a fast Mac). If the colour scene ever returns, write them on its own elements. */
     const arriving = raw > .001, entered = raw > .72;
     const edge = dockCoverLine();
     const underDock = edge == null ? false : (lastUnder ? top < edge + 28 : top <= edge);
-    if (nextProgress !== lastProgress) root.style.setProperty('--bq-footer-progress', lastProgress = nextProgress);
-    if (nextMix !== lastMix) root.style.setProperty('--bq-footer-mix', lastMix = nextMix);
     if (arriving !== lastArriving) body.classList.toggle('footer-arriving', lastArriving = arriving);
     if (entered !== lastEntered) body.classList.toggle('footer-entered', lastEntered = entered);
     if (underDock !== lastUnder) body.classList.toggle('footer-under-dock', lastUnder = underDock);
@@ -4603,7 +4600,8 @@ window.__bqStageWalk = function stageWalk({ stage, count, current, select, line,
       const height = Math.ceil(cookie.getBoundingClientRect().height);
       if (height === lastHeight) return;
       lastHeight = height;
-      document.documentElement.style.setProperty('--bq-cookie-height', height + 'px');
+      // Only #toTop reads it (polish.css): set on <html> it restyled the whole page.
+      control.style.setProperty('--bq-cookie-height', height + 'px');
     }).observe(cookie);
   }
   window.__bqCoreGoUpUpdate = queueUpdate;

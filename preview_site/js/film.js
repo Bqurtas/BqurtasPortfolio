@@ -79,10 +79,10 @@
     hero.classList.add('film-hero');
     if (playIntro) hero.classList.add('film-intro');
     if (playIntro && logo) logo.removeAttribute('poster');
-    /* An intro that starts while the page is still behind the startup gate keeps its ink
-       on the cut: the first frame a visitor sees is never a sheet inked black (in light
-       mode that read as "dark first, then light"). */
-    if (playIntro && root.classList.contains('bq-css-pending')) hero.classList.add('film-behind-opening');
+    /* Every intro keeps its ink on the cut, so the first frame a visitor sees is never a
+       sheet inked black (in light mode that read as "dark first, then light"). Normal loads
+       already ran here behind the startup gate; this also covers a gate that lifted first. */
+    if (playIntro) hero.classList.add('film-behind-opening');
   }
 
   async function loadPortrait(url, type = 'image/webp') {
@@ -507,6 +507,14 @@
      hero is on screen, the tab is visible and motion is welcome. */
   const REDRAW_MS = 30000;
   let heroCtl = null, redrawTimer = 0, heroInView = true;
+  /* A sticky sheet still intersects the viewport after the next paper has covered it; the
+     deck marks that state on the sheet itself, and its children are hidden (main.js
+     stageWalk gates on the same marks). Timed redraws skip a covered sheet: nobody can
+     see them, and each one made the deck re-measure every sheet of the page. */
+  const sheetCovered = (el) => {
+    const sheet = el && el.closest && el.closest('.paper-sheet, .section');
+    return Boolean(sheet && (sheet.inert || sheet.classList.contains('is-paper-gone')));
+  };
   if (hero && typeof IntersectionObserver === 'function') {
     new IntersectionObserver((entries) => {
       for (const e of entries) heroInView = e.isIntersecting && e.intersectionRatio >= 0.6;
@@ -519,7 +527,7 @@
   }
   function redraw() {
     scheduleRedraw();
-    if (!heroCtl || heroCtl.busy || doc.hidden || !heroInView || still()) return;
+    if (!heroCtl || heroCtl.busy || doc.hidden || !heroInView || still() || sheetCovered(hero)) return;
     heroCtl.busy = true;
     portraitBox.classList.add('film-erase');
     hero.classList.add('film-rewrite');
@@ -924,7 +932,7 @@
       clearTimeout(timer);
       if (still()) return;
       timer = setTimeout(() => {
-        if (inView && !hovered && !doc.hidden) step(1);
+        if (inView && !hovered && !doc.hidden && !sheetCovered(stage)) step(1);
         schedule();
       }, 2600);
     };
@@ -1233,6 +1241,17 @@
     F.beginHero();
     return;
   }
+  /* On a very slow network this script can arrive after the CSS failsafe has already
+     hidden a visible opening: retire it at once, rather than bring it back over a page
+     the visitor is already reading. (Behind the startup gate the body itself is hidden,
+     so only a lifted gate can mean the failsafe.) */
+  if (!root.classList.contains('bq-css-pending') && doc.visibilityState === 'visible'
+      && typeof getComputedStyle === 'function' && getComputedStyle(el).visibility === 'hidden') {
+    root.classList.remove('film-splashing');
+    el.remove();
+    F.beginHero();
+    return;
+  }
   window.__bqFilmSplash = true;
   /* the window opens onto the hero's paper and its field, never onto a sheet inked black */
   if (F.hero) F.hero.classList.add('film-behind-opening');
@@ -1354,16 +1373,28 @@
     try { v.currentTime = 0; } catch (e) { /* not seekable yet */ }
     const p = v.play();
     if (p && typeof p.catch === 'function') p.catch(() => byMap(0));
-    /* the clip had the whole gate to load; if it is still not writing, the map takes over */
-    setTimeout(() => {
-      if (writer === 'clip' && !opened && (v.paused || v.readyState < 3 || v.currentTime < 0.02)) byMap(Math.min(WRITTEN, v.currentTime || 0));
-    }, 600);
+    /* The clip must be writing 600 ms after sight and keep moving. If it stalls, the map
+       writes on from the clip's own time, so the window never opens on half a name. */
+    let lastT = -1;
+    const watch = () => {
+      if (writer !== 'clip' || opened || finished) return;
+      const t = v.currentTime || 0;
+      /* the first look keeps the old readiness test: a clip still buffering hands over at once */
+      if (v.paused || t < 0.02 || t <= lastT || (lastT < 0 && v.readyState < 3)) { byMap(Math.min(WRITTEN, t)); return; }
+      lastT = t;
+      setTimeout(watch, 300);
+    };
+    setTimeout(watch, 600);
     cap = setTimeout(open, (WRITTEN / RATE + HOLD + 1.6) * 1000);   // never longer than a written name
     el.addEventListener('pointerdown', open, { once: true });
     addEventListener('keydown', onKey);
     doc.addEventListener('visibilitychange', onHidden);
   };
-  const onSight = () => { if (!started && shown()) raf2(start); };
+  const onSight = () => {
+    if (started || !shown()) return;
+    el.classList.add('is-seen');            // the CSS failsafe counts again from this frame (film.css)
+    raf2(start);
+  };
   addEventListener('bq:css-ready', onSight);
   doc.addEventListener('visibilitychange', onSight);
   doc.addEventListener('prerenderingchange', onSight);

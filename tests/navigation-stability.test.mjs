@@ -31,7 +31,7 @@ function fixture(mobile = true) {
   const media = { ...events(), matches: mobile };
   const body = { classList: classes(), dataset: {} };
   const root = { scrollHeight: 3000, clientHeight: 800, style: { setProperty(name, value) { this[name] = value; } } };
-  const button = { ...events(), classList: classes() };
+  const button = { ...events(), classList: classes(), style: { setProperty(name, value) { this[name] = value; } } };
   const cookie = { getBoundingClientRect: () => ({ height: 178 }) };
   const ring = { style: {} };
   const document = { ...events(), body, documentElement: root, scrollingElement: root, hidden: false,
@@ -160,5 +160,7 @@ test('go-up stays available across threshold corrections and refreshes after men
   page.flush();
   assert.equal(page.button.classList.contains('is-shown'), false);
   page.observed[0].callback();
-  assert.equal(page.root.style['--bq-cookie-height'], '178px', 'cookie clearance uses its rendered height');
+  assert.equal(page.button.style['--bq-cookie-height'], '178px', 'cookie clearance uses its rendered height');
+  assert.equal(page.root.style['--bq-cookie-height'], undefined,
+    'set on the one control that reads it: on <html> every element of the page would restyle');
 });

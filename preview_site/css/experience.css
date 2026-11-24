@@ -5509,7 +5509,8 @@ html body .lb-overlay .lb-caption { color: #ededed !important; }
 /* Keep the live document behind the menu. A relative stage still collapses
    the document if an older menu layer gives it height:100dvh and clips it.
    Full flow preserves the native scroll offset and the sticky paper positions. */
-html:has(body:is(.menu-open, .menu-revealed, .menu-closing)) {
+/* :has(> …) looks only at body’s own children, where this element always sits: the same match, without re-searching the whole page on every DOM change. */
+html:has(> body:is(.menu-open, .menu-revealed, .menu-closing)) {
   overflow: hidden !important;
 }
 /* The root locks scrolling. A second overflow:hidden on body would become

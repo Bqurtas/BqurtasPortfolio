@@ -594,7 +594,7 @@ test('returning to design refreshes work offsets without waiting for a ResizeObs
   assert.equal(page.reel.style.transform, 'translate3d(0,-2200px,0)', 'new gallery content must remain reachable beyond the previous scroll limit');
 });
 
-test('footer colour writes occur only when its visible state changes', () => {
+test('the arriving footer toggles its classes only on a change and never restyles the page through <html>', () => {
   const animation = frames();
   const writes = [], classChanges = [];
   let footerTop = 3000;
@@ -612,9 +612,9 @@ test('footer colour writes occur only when its visible state changes', () => {
   assert.equal(classChanges.length, initialClasses);
   footerTop = 624;
   window.fire('scroll'); animation.flush();
-  assert.deepEqual(writes.slice(-2), [['--bq-footer-progress', '0.5000'], ['--bq-footer-mix', '50.00%']]);
-  const changedWrites = writes.length, changedClasses = classChanges.length;
+  assert.equal(writes.length, 0, 'the colour variables are invisible (polish.css makes their readers transparent): no <html> writes');
+  assert.ok(classChanges.some(([name, on]) => name === 'footer-arriving' && on === true), 'the arriving state still turns on');
+  const changedClasses = classChanges.length;
   window.fire('scroll'); animation.flush();
-  assert.equal(writes.length, changedWrites);
   assert.equal(classChanges.length, changedClasses);
 });

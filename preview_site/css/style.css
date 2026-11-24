@@ -487,8 +487,11 @@ h1, h2, h3, h4 { font-family: 'Fraunces', serif; font-weight: 500; color: var(--
 em { font-style: italic; color: var(--ember); }
 :root[data-theme="dark"] em { color: var(--gold); }
 
-/* ---------- Grain overlay ---------- */
+/* ---------- Grain overlay ----------
+   --grain-opacity is 0 in both themes, so the grain never shows. It is taken out
+   of rendering: a full-viewport blended layer Safari could still composite. */
 .grain {
+  display: none;
   position: fixed; inset: 0;
   pointer-events: none;
   z-index: 1000;
@@ -1010,7 +1013,8 @@ button.social-opt { background: none; border: none; cursor: pointer; font-family
 /* the scroll-to-top control hides while the menu is open */
 /* hide the button only while the mobile menu is REALLY open (:has reads the menu's
    actual state — a stale body class can never strand the button hidden again) */
-body:has(#mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: none; transform: scale(0.8); }
+/* :has(> …) looks only at body’s own children, where this element always sits: the same match, without re-searching the whole page on every DOM change. */
+body:has(> #mobileMenu.is-open) .to-top { opacity: 0 !important; pointer-events: none; transform: scale(0.8); }
 
 .mobile-sheet {
   position: absolute; left: 0; right: 0; bottom: var(--dock-h);   /* sits on top of the dock */
@@ -4497,7 +4501,8 @@ html body .journal-front .journal-row-title {
 
 /* When the studio console is open it fills the screen — lock the page behind it
    so the site's own scrollbar doesn't show as a stray line down the side. */
-html:has(.dash.is-open) { overflow: hidden; }
+/* :has(> …) looks only at body’s own children, where this element always sits: the same match, without re-searching the whole page on every DOM change. */
+html:has(> * > .dash.is-open) { overflow: hidden; }
 
 /* ============ Console — a more premium, professional finish ============ */
 /* Sidebar: subtle depth, sharper active state */
@@ -13708,7 +13713,7 @@ html[lang] .splash-name,
       flash past — the title element stays; scroll-up still reveals it after
       the landing settles
    ========================================================= */
-html:has(.dash.is-open){ overflow:hidden !important; }
+html:has(> * > .dash.is-open){ overflow:hidden !important; }
 .dash-view, .dash-side-nav, .dash-tabs{ overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
 @media (max-width:820px){
   .dash-tabs.is-menu-open{ overflow-y:auto; max-height:calc(100dvh - 58px); }

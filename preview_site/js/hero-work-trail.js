@@ -54,9 +54,12 @@
   let touch = null, holdTimer = 0, holdInterval = 0;
   const prints = [];
   const forbidden = target => target?.closest?.('a, button, input, textarea, select, [contenteditable="true"], [role="button"]');
+  // The three overlays are looked up by id: the same answer as a selector
+  // query, without walking the whole page on every pointer move and frame.
+  const overlayOpen = id => document.getElementById(id)?.classList.contains('is-open');
   const active = () => visible && !document.hidden && !hero.closest('.is-hidden')
     && !document.body.classList.contains('menu-open') && !document.body.classList.contains('menu-revealed')
-    && !document.querySelector('#dash.is-open, #chat.is-open, #latestPanel.is-open');
+    && !overlayOpen('dash') && !overlayOpen('chat') && !overlayOpen('latestPanel');
   const updateLanguage = () => {
     control.querySelector('.hero-work-discover-copy').textContent = reduced.matches ? copy().preview : coarse.matches ? copy().touch : copy().mouse;
     control.setAttribute('aria-label', copy().preview);

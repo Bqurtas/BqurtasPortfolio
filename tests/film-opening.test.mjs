@@ -12,7 +12,7 @@ const splashPart = film.slice(film.indexOf('/* ═════ part: splash ═�
 
 /* A stand-in page for the opening: a class list, events, a clip whose play() we
    control, frames on demand and a clock we move by hand. */
-function page({ pending = true, visible = true, play = 'ok', theme = 'light' } = {}) {
+function page({ pending = true, visible = true, play = 'ok', theme = 'light', splashVisibility = 'visible' } = {}) {
   let now = 0, frames = [], timers = [];
   const classes = (...names) => {
     const set = new Set(names);
@@ -54,7 +54,8 @@ function page({ pending = true, visible = true, play = 'ok', theme = 'light' } =
     window: { __bqFilm: F }, performance: { now: () => now },
     requestAnimationFrame: fn => { frames.push(fn); return frames.length; }, cancelAnimationFrame() {},
     setTimeout: (fn, ms = 0) => { timers.push({ at: now + ms, fn }); return timers.length; }, clearTimeout() {},
-    matchMedia: () => ({ matches: false }), getComputedStyle: () => ({ getPropertyValue: () => '61.8' }),
+    matchMedia: () => ({ matches: false }),
+    getComputedStyle: node => ({ visibility: node === el ? splashVisibility : 'visible', getPropertyValue: () => '61.8' }),
     addEventListener: on('win:').addEventListener, removeEventListener: on('win:').removeEventListener
   };
   vm.runInNewContext(splashPart, context);
@@ -134,7 +135,61 @@ test('light visits never start dark: the page is light-only and the hero keeps i
   assert.match(html, /<meta name="color-scheme" content="light" \/>/);
   assert.match(css, /\.film-hero\.film-intro\.film-behind-opening \.film-ink \{\s*clip-path: inset\(var\(--film-cut\) 0 0 0\);\s*transition: none;/);
   assert.match(splashPart, /F\.hero\.classList\.add\('film-behind-opening'\)/);
-  assert.match(film, /if \(playIntro && root\.classList\.contains\('bq-css-pending'\)\) hero\.classList\.add\('film-behind-opening'\)/);
+  assert.match(film, /if \(playIntro\) hero\.classList\.add\('film-behind-opening'\)/);
+});
+
+test('the failsafe counts from the first frame the opening can be seen', async () => {
+  const gated = page({ pending: true });
+  await gated.advance(2000);
+  assert.equal(gated.el.classList.contains('is-seen'), false, 'not while gated');
+  await gated.reveal();
+  assert.equal(gated.el.classList.contains('is-seen'), true);
+  const hidden = page({ pending: false, visible: false });
+  await hidden.advance(8000);
+  assert.equal(hidden.el.classList.contains('is-seen'), false, 'not while out of sight');
+  hidden.doc.visibilityState = 'visible'; hidden.doc.hidden = false;
+  hidden.fire('doc:', 'visibilitychange');
+  assert.equal(hidden.el.classList.contains('is-seen'), true, 'in the same task as the tab is shown');
+  assert.match(css, /:root\.film-splashing \.film-splash\.is-seen \{ animation-name: film-splash-failsafe-seen; \}/);
+  assert.match(css, /@keyframes film-splash-failsafe-seen \{ to \{ visibility: hidden; pointer-events: none; \} \}/);
+});
+
+test('an opening the CSS failsafe already hid is retired at once, never brought back over the page', async () => {
+  const late = page({ pending: false, splashVisibility: 'hidden' });   // film.js arrived after the 6.5 s failsafe
+  assert.equal(late.el.removed, true);
+  assert.equal(late.root.classList.contains('film-splashing'), false, 'the page is free to scroll');
+  assert.equal(late.begun, 1, 'the hero starts at once');
+  assert.equal(late.el.classList.contains('is-seen'), false, 'the failsafe is not restarted');
+  await late.advance(3000);
+  assert.equal(late.video.plays, 0, 'no opening plays over a page already in view');
+  // behind the startup gate the body is hidden, so a hidden splash there is the normal case
+  const gated = page({ pending: true, splashVisibility: 'hidden' });
+  assert.equal(gated.el.removed, false);
+  assert.equal(gated.root.classList.contains('film-splashing'), true);
+  await gated.reveal();
+  assert.equal(gated.video.plays, 1, 'the opening still plays on sight');
+});
+
+test('a clip still buffering at the first look hands the name to the map at once', async () => {
+  const p = page({ pending: false });
+  await p.frame(); await p.frame();                 // start(): play() resolves, readyState 4
+  p.video.readyState = 2; p.video.currentTime = 0.3; // moving a little, but waiting for data
+  await p.advance(650);
+  assert.equal(p.video.paused, true, 'the clip is let go at 600 ms, as before');
+  assert.ok(p.painted.length > 0 && p.painted[0][0] > 0.09 && p.painted[0][0] < 0.11, "the map starts at the clip's own time (0.3/3)");
+});
+
+test('a clip that stalls mid-name is finished by the map from where it stopped', async () => {
+  const p = page({ pending: false });
+  await p.frame(); await p.frame();                 // start(): the clip plays
+  p.video.currentTime = 0.5; await p.advance(650);  // 600 ms: moving
+  p.video.currentTime = 1.1; await p.advance(300);  // still moving
+  await p.advance(300);                             // frozen at 1.1 s: stalled
+  assert.equal(p.video.paused, true, 'the clip is let go');
+  assert.ok(p.painted[0][0] > 0.35 && p.painted[0][0] < 0.4, "the map starts at the clip's own time (1.1/3)");
+  await p.advance(2000);
+  assert.equal(Math.max(...p.painted.map(([x]) => x)), 1);
+  assert.equal(p.el.classList.contains('is-open'), true);
 });
 
 test('the write map records each pixel\'s keyed alpha and the moment it is first half lit', () => {

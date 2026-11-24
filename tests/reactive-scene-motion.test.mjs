@@ -35,20 +35,22 @@ function style() {
     removeProperty(name) { this.writes++; values.delete(name); },
   };
 }
-function fixture({ reducedMotion = false, finePointer = true, stored = null } = {}) {
+function fixture({ reducedMotion = false, finePointer = true, stored = null, film = false } = {}) {
   const frames = new Map(), observers = [], created = [], dispatched = [];
   let frameId = 0;
-  const root = { lang: 'en', dataset: {}, classList: classes() };
+  const root = { lang: 'en', dataset: {}, classList: classes(), hasAttribute: name => film && name === 'data-film' };
   const storage = new Map(stored === null ? [] : [['bq_motion', stored]]);
   const reduced = { ...events(), matches: reducedMotion }, pointer = { ...events(), matches: finePointer };
   const design = { classList: classes() }, bio = { classList: classes('is-hidden') };
-  const layer = name => ({ classList: classes(name), style: style() });
+  const layer = name => ({ classList: classes(name), style: style(),
+    matches: selector => selector.split(',').some(part => part.trim() === '.' + name) });
   const portrait = layer('hero-portrait'), signature = layer('hero-sign');
   const title = layer('room-hero-title'), ghost = layer('room-hero-ghost');
   function hero(room, leaves, paperStart) {
     const scroller = { dataset: { paperStart: String(paperStart) }, appendChild(item) { created.push(item); } };
     return {
       scroller, closest: () => room, querySelectorAll: () => leaves, querySelector: () => scroller,
+      classList: classes(...(film && room === design ? ['film-hero'] : [])),
       getBoundingClientRect() { throw new Error('scene scroll must use the measured paper origin'); },
     };
   }
@@ -222,6 +224,23 @@ test('routes reset the old scene and choose the active room without measuring it
   assert.equal(page.ghost.style.getPropertyValue('--scene-y'), '6.00px');
   assert.equal(card.classList.contains('bq-motion-surface'), false);
   assert.equal(page.window.scrollY, 2400);
+});
+
+test('the film homepage writes no depth onto its fixed portrait or screen-reader name; rooms keep theirs', () => {
+  const page = fixture({ film: true }), card = page.card();
+  page.pointerMove(card, 400, 300); page.settle();
+  assert.equal(card.style.getPropertyValue('--scene-light-x'), '75.0%', 'the card light still follows the pointer');
+  page.window.scrollY = 400; page.window.fire('scroll'); page.settle();
+  assert.equal(page.portrait.style.writes, 0, 'film.css holds the portrait at transform:none, so depth there never shows');
+  assert.equal(page.signature.style.writes, 0, 'the name is clipped to nothing on the film hero');
+  assert.notEqual(page.homeChapter.items[0].style.getPropertyValue('--chapter-y'), '', 'chapter titles still settle with scroll');
+  page.design.classList.add('is-hidden'); page.bio.classList.remove('is-hidden');
+  page.window.scrollY = 2400;
+  page.document.fire('bq:route'); page.settle();
+  assert.equal(page.title.style.getPropertyValue('--scene-y'), '-6.00px', 'room heroes are not film heroes and keep their depth');
+  const plain = fixture();
+  plain.pointerMove(plain.card(), 1100, 700); plain.settle();
+  assert.notEqual(plain.portrait.style.getPropertyValue('--scene-x'), '', 'without the film layer the portrait still moves');
 });
 
 test('menu, visibility, blur, and lightbox changes cancel the spring and clear local decorations', () => {

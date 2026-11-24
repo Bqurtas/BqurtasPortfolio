@@ -13,7 +13,7 @@
       instead of being pinned for the life of the installed worker.
    ========================================================= */
 
-const SW_VERSION = '041e6a3bd0c3'; // generated from this worker and the app shell
+const SW_VERSION = '75fc76d4208d'; // generated from this worker and the app shell
 const CACHE_NAME = `bqurtas-cache-${SW_VERSION}`;
 const DOC_FALLBACK = '/index.html';
 
@@ -36,18 +36,18 @@ async function cachedEntry(request) {
    remain network-first, so this copy is only an offline fallback. */
 const PRECACHE_ASSETS = [
   '/index.html',
-  '/css/modern-framer.min.css?v=0741789ec97b',
-  '/css/style.v417.min.css?v=4195ff2cdf3c',
+  '/css/modern-framer.min.css?v=20f390843b3e',
+  '/css/style.v417.min.css?v=94b796502a37',
   '/css/fonts.css?v=6bd89c103953',
-  '/css/experience.min.css?v=2c2664c33142',
-  '/js/main.v420.min.js?v=286d10be6563',
+  '/css/experience.min.css?v=c94da199d91c',
+  '/js/main.v420.min.js?v=d4c6f95f1391',
   '/js/gallery.v420.min.js?v=6650d0580a06',
   '/js/i18n.v420.min.js?v=76e3d49d6f43',
-  '/js/motion.44e83e65e735.min.js?v=44e83e65e735',
+  '/js/motion.79d520f1a4b3.min.js?v=79d520f1a4b3',
   '/js/lux.min.js?v=9053b1a1d0aa',
   '/js/recent-work.min.js?v=1cd28e8ac62c',
   '/js/recent-publications.js?v=bf2ad4155a3c',
-  '/js/hero-work-trail.min.js?v=2cae74284098',
+  '/js/hero-work-trail.min.js?v=21fa4cf951ac',
   '/css/recent-work.min.css?v=c614de2d558f',
   '/css/hero-work-trail.min.css?v=38c2abc32a53',
   '/site.webmanifest?v=f301868b35e4',
